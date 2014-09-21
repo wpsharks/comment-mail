@@ -2,12 +2,12 @@
 /**
  * Menu Pages
  *
- * @package wp_comment_subs\menu_pages
+ * @package comment_mail\menu_pages
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 2
  */
-namespace wp_comment_subs // Root namespace.
+namespace comment_mail // Root namespace.
 {
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
@@ -20,7 +20,7 @@ namespace wp_comment_subs // Root namespace.
 		 * Menu Pages
 		 *
 		 * @since 14xxxx First documented version.
-		 * @package wp_comment_subs\menu_pages
+		 * @package comment_mail\menu_pages
 		 */
 		class menu_pages // Menu pages.
 		{
@@ -88,13 +88,13 @@ namespace wp_comment_subs // Root namespace.
 				{
 					echo '<div class="plugin-menu-page-notice info">'."\n";
 					echo '   <a href="'.add_query_arg(urlencode_deep(array('page' => __NAMESPACE__)), self_admin_url('/admin.php')).'" class="pull-right" style="margin:0 0 15px 25px; font-variant:small-caps; text-decoration:none;">'.__('close', $this->plugin->text_domain).' <i class="fa fa-eye-slash"></i></a>'."\n";
-					echo '      <i class="fa fa-eye"></i> '.__('<strong>Pro Features (Preview)</strong> ~ New option panels below. Please explore before <a href="'.esc_attr('http://www.websharks-inc.com/product/'.str_replace('_', '-', __NAMESPACE__).'/').'" target="_blank">upgrading <i class="fa fa-heart-o"></i></a>.<br /><small>NOTE: the free version of WP Comment Subs (this LITE version); is more-than-adequate for most sites. Please upgrade only if you desire advanced features or would like to support the developer.</small>', $this->plugin->text_domain)."\n";
+					echo '      <i class="fa fa-eye"></i> '.__('<strong>Pro Features (Preview)</strong> ~ New option panels below. Please explore before <a href="'.esc_attr('http://www.websharks-inc.com/product/'.str_replace('_', '-', __NAMESPACE__).'/').'" target="_blank">upgrading <i class="fa fa-heart-o"></i></a>.<br /><small>NOTE: the free version of Comment Mail™ (this LITE version); is more-than-adequate for most sites. Please upgrade only if you desire advanced features or would like to support the developer.</small>', $this->plugin->text_domain)."\n";
 					echo '</div>'."\n";
 				}
 				if(!$this->plugin->options['enable']) // Not enabled yet?
 				{
 					echo '<div class="plugin-menu-page-notice warning">'."\n";
-					echo '   <i class="fa fa-warning"></i> '.__('WP Comment Subs is currently disabled; please review options below.', $this->plugin->text_domain)."\n";
+					echo '   <i class="fa fa-warning"></i> '.__('Comment Mail™ is currently disabled; please review options below.', $this->plugin->text_domain)."\n";
 					echo '</div>'."\n";
 				}
 				echo '   <div class="plugin-menu-page-body">'."\n";
@@ -106,7 +106,7 @@ namespace wp_comment_subs // Root namespace.
 				echo '         </a>'."\n";
 
 				echo '         <div class="plugin-menu-page-panel-body'.((!$this->plugin->options['enable']) ? ' open' : '').' clearfix">'."\n";
-				echo '            <p><label class="switch-primary"><input type="radio" name="'.esc_attr(__NAMESPACE__).'[save_options][enable]" value="1"'.checked($this->plugin->options['enable'], '1', FALSE).' /> <i class="fa fa-magic fa-flip-horizontal"></i> '.__('Yes, enable WP Comment Subs!', $this->plugin->text_domain).'</label> &nbsp;&nbsp;&nbsp; <label><input type="radio" name="'.esc_attr(__NAMESPACE__).'[save_options][enable]" value="0"'.checked($this->plugin->options['enable'], '0', FALSE).' /> '.__('No, disable.', $this->plugin->text_domain).'</label></p>'."\n";
+				echo '            <p><label class="switch-primary"><input type="radio" name="'.esc_attr(__NAMESPACE__).'[save_options][enable]" value="1"'.checked($this->plugin->options['enable'], '1', FALSE).' /> <i class="fa fa-magic fa-flip-horizontal"></i> '.__('Yes, enable Comment Mail™!', $this->plugin->text_domain).'</label> &nbsp;&nbsp;&nbsp; <label><input type="radio" name="'.esc_attr(__NAMESPACE__).'[save_options][enable]" value="0"'.checked($this->plugin->options['enable'], '0', FALSE).' /> '.__('No, disable.', $this->plugin->text_domain).'</label></p>'."\n";
 				echo '         </div>'."\n";
 
 				echo '      </div>'."\n";

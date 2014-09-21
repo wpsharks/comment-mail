@@ -1,7 +1,7 @@
 source: .
 destination: codex
 extensions: [php,phar]
-title: WP Comment Subs
+title: Comment Mail™
 exclude: [*/externals/*,*/unit-tests/*,*example.php]
 accessLevels: [public,protected,private]
 deprecated: yes

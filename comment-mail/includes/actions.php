@@ -2,12 +2,12 @@
 /**
  * Action Handlers
  *
- * @package wp_comment_subs\actions
+ * @package comment_mail\actions
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 2
  */
-namespace wp_comment_subs // Root namespace.
+namespace comment_mail // Root namespace.
 {
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
@@ -19,7 +19,7 @@ namespace wp_comment_subs // Root namespace.
 		/**
 		 * Action Handlers
 		 *
-		 * @package wp_comment_subs\actions
+		 * @package comment_mail\actions
 		 * @since 14xxxx First documented version.
 		 */
 		class actions // Action handlers.

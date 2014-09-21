@@ -1,9 +1,9 @@
-=== WP Comment Subs (Subscribe to Comments) ===
+=== Comment Mail™ (WP Comment Subscriptions) ===
 
 Stable tag: 14xxxx
 Requires at least: 4.0
 Tested up to: 4.0
-Text Domain: wp-comment-subs
+Text Domain: comment-mail
 
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -46,9 +46,9 @@ TIP: you can preview Pro features in the free version by clicking the "Preview P
 
 == Installation ==
 
-= WP Comment Subs is Very Easy to Install =
+= Comment Mail™ is Very Easy to Install =
 
-1. Upload the `/wp-comment-subs` folder to your `/wp-content/plugins/` directory.
+1. Upload the `/comment-mail` folder to your `/wp-content/plugins/` directory.
 2. Activate the plugin through the Plugins menu in WordPress®.
 3. Navigate to the **Comment Subs** panel & enable it.
 
@@ -72,7 +72,7 @@ Turn on your computer; put fingers on keyboard, blah blah blah...
 
 == Software Requirements ==
 
-In addition to the [WordPress Requirements](http://wordpress.org/about/requirements/), WP Comment Subs requires the following minimum versions:
+In addition to the [WordPress Requirements](http://wordpress.org/about/requirements/), Comment Mail™ requires the following minimum versions:
 
 - PHP 5.3+
 - Apache 2.1+

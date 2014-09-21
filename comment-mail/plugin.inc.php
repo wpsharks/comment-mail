@@ -1,13 +1,13 @@
 <?php
 /**
- * WP Comment Subs
+ * Comment Mail™
  *
- * @package wp_comment_subs\plugin
+ * @package comment_mail\plugin
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 2
  */
-namespace wp_comment_subs
+namespace comment_mail
 {
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
@@ -15,9 +15,9 @@ namespace wp_comment_subs
 	if(!class_exists('\\'.__NAMESPACE__.'\\plugin'))
 	{
 		/**
-		 * WP Comment Subs
+		 * Comment Mail™
 		 *
-		 * @package wp_comment_subs\plugin
+		 * @package comment_mail\plugin
 		 * @since 14xxxx First documented version.
 		 */
 		class plugin
@@ -248,7 +248,7 @@ namespace wp_comment_subs
 				require_once dirname(__FILE__).'/includes/version-specific-upgrade.php';
 				new version_specific_upgrade($prev_version);
 
-				$this->enqueue_notice(__('<strong>WP Comment Subs:</strong> detected a new version of itself. Recompiling w/ latest version... all done :-)', $this->text_domain), '', TRUE);
+				$this->enqueue_notice(__('<strong>Comment Mail™:</strong> detected a new version of itself. Recompiling w/ latest version... all done :-)', $this->text_domain), '', TRUE);
 			}
 
 			/**
@@ -388,7 +388,7 @@ namespace wp_comment_subs
 			 */
 			public function add_menu_pages()
 			{
-				add_menu_page(__('WP Comment Subs', $this->text_domain), __('WP Comment Subs', $this->text_domain),
+				add_menu_page(__('Comment Mail™', $this->text_domain), __('Comment Mail™', $this->text_domain),
 				              $this->cap, __NAMESPACE__, array($this, 'menu_page_options'),
 				              $this->url('/client-s/images/menu-icon.png'));
 			}
@@ -613,7 +613,7 @@ namespace wp_comment_subs
 	else if(!class_exists('\\'.__NAMESPACE__.'\\uninstall')) add_action('all_admin_notices', function ()
 	{
 		echo '<div class="error"><p>'. // Running multiple versions of this plugin at same time.
-		     __('Please disable the LITE version of WP Comment Subs before you activate the PRO version.',
+		     __('Please disable the LITE version of Comment Mail™ before you activate the PRO version.',
 		        str_replace('_', '-', __NAMESPACE__)).'</p></div>';
 	});
 }

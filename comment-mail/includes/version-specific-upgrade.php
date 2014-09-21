@@ -3,11 +3,11 @@
  * Version-Specific Upgrade
  *
  * @since 14xxxx First documented version.
- * @package wp_comment_subs\version_specific_upgrade
+ * @package comment_mail\version_specific_upgrade
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 2
  */
-namespace wp_comment_subs // Root namespace.
+namespace comment_mail // Root namespace.
 {
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
@@ -20,7 +20,7 @@ namespace wp_comment_subs // Root namespace.
 		 * Upgrade Handlers.
 		 *
 		 * @since 14xxxx First documented version.
-		 * @package wp_comment_subs\version_specific_upgrade
+		 * @package comment_mail\version_specific_upgrade
 		 */
 		class version_specific_upgrade
 		{
