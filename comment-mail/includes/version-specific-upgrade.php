@@ -17,7 +17,7 @@ namespace comment_mail // Root namespace.
 	if(!class_exists('\\'.__NAMESPACE__.'\\version_specific_upgrade'))
 	{
 		/**
-		 * Upgrade Handlers.
+		 * Version-Specific Upgrade
 		 *
 		 * @since 14xxxx First documented version.
 		 * @package comment_mail\version_specific_upgrade

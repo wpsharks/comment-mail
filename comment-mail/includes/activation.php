@@ -1,9 +1,9 @@
 <?php
 /**
- * Installation
+ * Activation/Installation
  *
+ * @package comment_mail\activation
  * @since 14xxxx First documented version.
- * @package comment_mail\installation
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 2
  */
@@ -14,15 +14,15 @@ namespace comment_mail // Root namespace.
 
 	require_once dirname(__FILE__).'/plugin.inc.php';
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\installation'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\activation'))
 	{
 		/**
-		 * Installation
+		 * Activation/Installation
 		 *
 		 * @since 14xxxx First documented version.
-		 * @package comment_mail\installation
+		 * @package comment_mail\activation
 		 */
-		class installation
+		class activation
 		{
 			/**
 			 * @var plugin Plugin reference.

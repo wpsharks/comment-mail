@@ -225,8 +225,8 @@ namespace comment_mail
 			{
 				$this->setup(); // Setup routines.
 
-				if(!$this->options['enable'])
-					return; // Nothing to do.
+				require_once dirname(__FILE__).'/includes/activation.php';
+				new activation(); // Installation handler.
 			}
 
 			/**
@@ -239,16 +239,17 @@ namespace comment_mail
 			public function check_version()
 			{
 				$current_version = $prev_version = $this->options['version'];
+
 				if(version_compare($current_version, $this->version, '>='))
 					return; // Nothing to do; we've already upgraded them.
 
 				$current_version = $this->options['version'] = $this->version;
-				update_option(__NAMESPACE__.'_options', $this->options); // Updates version.
+				update_option(__NAMESPACE__.'_options', $this->options); // Bump version.
 
 				require_once dirname(__FILE__).'/includes/version-specific-upgrade.php';
-				new version_specific_upgrade($prev_version);
+				new version_specific_upgrade($prev_version); // Run version-specific upgrades.
 
-				$this->enqueue_notice(__('<strong>Comment Mail™:</strong> detected a new version of itself. Recompiling w/ latest version... all done :-)', $this->text_domain), '', TRUE);
+				$this->enqueue_notice(__('<strong>Comment Mail™</strong> detected a new version of itself. Recompiling... all done :-)', $this->text_domain), '', TRUE);
 			}
 
 			/**
