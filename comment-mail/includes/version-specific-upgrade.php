@@ -57,7 +57,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			public function run_handlers()
+			protected function run_handlers()
 			{
 				$this->from_lt_vxxxx();
 			}
@@ -67,7 +67,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			public function from_lt_vxxxx()
+			protected function from_lt_vxxxx()
 			{
 			}
 		}
