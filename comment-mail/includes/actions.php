@@ -52,7 +52,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param array $args Input array of all arguments.
 			 */
-			public function save_options($args)
+			protected function save_options($args)
 			{
 				if(!current_user_can($this->plugin->cap))
 					return; // Nothing to do.
@@ -79,7 +79,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param array $args Input array of all arguments.
 			 */
-			public function restore_default_options($args)
+			protected function restore_default_options($args)
 			{
 				if(!current_user_can($this->plugin->cap))
 					return; // Nothing to do.
@@ -104,7 +104,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param array $args Input array of all arguments.
 			 */
-			public function dismiss_notice($args)
+			protected function dismiss_notice($args)
 			{
 				if(!current_user_can($this->plugin->cap))
 					return; // Nothing to do.
@@ -129,7 +129,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param array $args Input array of all arguments.
 			 */
-			public function dismiss_error($args)
+			protected function dismiss_error($args)
 			{
 				if(!current_user_can($this->plugin->cap))
 					return; // Nothing to do.
