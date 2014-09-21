@@ -39,6 +39,16 @@ namespace comment_mail // Root namespace.
 			public function __construct()
 			{
 				$this->plugin = plugin();
+				$this->install_db_tables();
+			}
+
+			/**
+			 * Install DB tables.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function install_db_tables()
+			{
 			}
 		}
 	}
