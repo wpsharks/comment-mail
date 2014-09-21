@@ -49,10 +49,13 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function install_db_tables()
 			{
+				$prefix = $this->plugin->wpdb()->prefix.__NAMESPACE__.'_';
+
 				foreach(scandir($tables_dir = dirname(__FILE__).'/tables') as $_sql_file)
 					if(substr($_sql_file, -4) === '.sql' && is_file($tables_dir.'/'.$_sql_file))
 					{
 						$_sql = file_get_contents($tables_dir.'/'.$_sql_file);
+						$_sql = str_replace('%%prefix%%', $prefix, $_sql);
 						$this->plugin->wpdb()->query($_sql);
 					}
 				unset($_sql_file, $_sql); // Housekeeping.

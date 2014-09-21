@@ -132,6 +132,7 @@ namespace comment_mail
 			public function __construct($enable_hooks = TRUE)
 			{
 				$this->enable_hooks = (boolean)$enable_hooks;
+				$this->text_domain  = str_replace('_', '-', __NAMESPACE__);
 				$this->file         = preg_replace('/\.inc\.php$/', '.php', __FILE__);
 
 				if(!$this->enable_hooks) return; // All done in this case.
