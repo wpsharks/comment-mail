@@ -118,6 +118,16 @@ namespace comment_mail // Root namespace.
 				echo '   </div>'."\n";
 				echo '</form>';
 			}
+
+			public function subscribers()
+			{
+				// @TODO
+			}
+
+			public function queue()
+			{
+				// @TODO
+			}
 		}
 	}
 }

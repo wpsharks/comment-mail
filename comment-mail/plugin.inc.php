@@ -47,6 +47,15 @@ namespace comment_mail
 			public $name = 'Comment Mail™';
 
 			/**
+			 * Plugin name (abbreviated).
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @var string Plugin name (abbreviated).
+			 */
+			public $name_abbr = 'CM™';
+
+			/**
 			 * Used by the plugin's uninstall handler.
 			 *
 			 * @since 14xxxx Adding uninstall handler.
@@ -460,8 +469,9 @@ namespace comment_mail
 			 */
 			public function add_menu_pages()
 			{
-				add_menu_page($this->name, $this->name, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'),
-				              $this->url('/client-s/images/menu-icon.png'));
+				add_comments_page($this->name, $this->name, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
+				add_comments_page($this->name, $this->name, $this->cap, __NAMESPACE__.'_subscribers', array($this, 'menu_page_subscribers'));
+				add_comments_page($this->name, $this->name, $this->cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
 			}
 
 			/**
@@ -485,7 +495,7 @@ namespace comment_mail
 			}
 
 			/**
-			 * Loads the admin menu page options.
+			 * Menu page for options.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -496,6 +506,34 @@ namespace comment_mail
 				require_once dirname(__FILE__).'/includes/menu-pages.php';
 				$menu_pages = new menu_pages();
 				$menu_pages->options();
+			}
+
+			/**
+			 * Menu page for subscribers.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_subscribers()
+			{
+				require_once dirname(__FILE__).'/includes/menu-pages.php';
+				$menu_pages = new menu_pages();
+				$menu_pages->subscribers();
+			}
+
+			/**
+			 * Menu page for mail queue.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_queue()
+			{
+				require_once dirname(__FILE__).'/includes/menu-pages.php';
+				$menu_pages = new menu_pages();
+				$menu_pages->queue();
 			}
 
 			/********************************************************************************************************/
