@@ -2,7 +2,7 @@
 /**
  * Action Handlers
  *
- * @package comment_mail\actions
+ * @package actions
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 2
@@ -19,7 +19,7 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Action Handlers
 		 *
-		 * @package comment_mail\actions
+		 * @package actions
 		 * @since 14xxxx First documented version.
 		 */
 		class actions // Action handlers.
@@ -40,9 +40,35 @@ namespace comment_mail // Root namespace.
 			{
 				$this->plugin = plugin();
 
-				if(empty($_REQUEST[__NAMESPACE__])) return;
+				if(empty($_REQUEST[__NAMESPACE__]))
+					return; // Nothing to do.
+
+				if(!current_user_can($this->plugin->cap))
+					return; // Unauthenticated; ignore.
+
+				if(empty($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce']))
+					return; // Unauthenticated; ignore.
+
 				foreach((array)$_REQUEST[__NAMESPACE__] as $action => $args)
-					if(method_exists($this, $action)) $this->{$action}($args);
+					if($action && is_string($action) && method_exists($this, $action))
+						$this->{$action}($this->plugin->trim_strip_deep($args));
+			}
+
+			/**
+			 * Restores defaults options.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function restore_default_options()
+			{
+				delete_option(__NAMESPACE__.'_options');
+				$this->plugin->options = $this->plugin->default_options;
+
+				$redirect_to = self_admin_url('/admin.php');
+				$query_args  = array('page' => __NAMESPACE__, __NAMESPACE__.'__restored' => '1');
+				$redirect_to = add_query_arg(urlencode_deep($query_args), $redirect_to);
+
+				wp_redirect($redirect_to).exit();
 			}
 
 			/**
@@ -52,49 +78,17 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param array $args Input array of all arguments.
 			 */
-			protected function save_options($args)
+			protected function save_options(array $args)
 			{
-				if(!current_user_can($this->plugin->cap))
-					return; // Nothing to do.
-
-				if(empty($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce']))
-					return; // Unauthenticated POST data.
-
-				$args                  = array_map('trim', stripslashes_deep((array)$args));
 				$this->plugin->options = array_merge($this->plugin->default_options, $this->plugin->options, $args);
 				$this->plugin->options = array_intersect_key($this->plugin->options, $this->plugin->default_options);
 				update_option(__NAMESPACE__.'_options', $this->plugin->options);
 
-				$redirect_to = self_admin_url('/admin.php'); // Redirect preparations.
+				$redirect_to = self_admin_url('/admin.php');
 				$query_args  = array('page' => __NAMESPACE__, __NAMESPACE__.'__updated' => '1');
 				$redirect_to = add_query_arg(urlencode_deep($query_args), $redirect_to);
 
-				wp_redirect($redirect_to).exit(); // All done :-)
-			}
-
-			/**
-			 * Restores defaults options.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param array $args Input array of all arguments.
-			 */
-			protected function restore_default_options($args)
-			{
-				if(!current_user_can($this->plugin->cap))
-					return; // Nothing to do.
-
-				if(empty($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce']))
-					return; // Unauthenticated POST data.
-
-				delete_option(__NAMESPACE__.'_options'); // Blog-specific.
-				$this->plugin->options = $this->plugin->default_options;
-
-				$redirect_to = self_admin_url('/admin.php'); // Redirect preparations.
-				$query_args  = array('page' => __NAMESPACE__, __NAMESPACE__.'__restored' => '1');
-				$redirect_to = add_query_arg(urlencode_deep($query_args), $redirect_to);
-
-				wp_redirect($redirect_to).exit(); // All done :-)
+				wp_redirect($redirect_to).exit();
 			}
 
 			/**
@@ -104,16 +98,10 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param array $args Input array of all arguments.
 			 */
-			protected function dismiss_notice($args)
+			protected function dismiss_notice(array $args)
 			{
-				if(!current_user_can($this->plugin->cap))
-					return; // Nothing to do.
-
-				if(empty($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce']))
-					return; // Unauthenticated POST data.
-
-				$args = array_map('trim', stripslashes_deep((array)$args));
-				if(empty($args['key'])) return; // Nothing to dismiss.
+				if(empty($args['key'])) // Missing key?
+					return; // Nothing to dismiss.
 
 				$notices = (is_array($notices = get_option(__NAMESPACE__.'_notices'))) ? $notices : array();
 				unset($notices[$args['key']]); // Dismiss this notice.
@@ -129,16 +117,10 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param array $args Input array of all arguments.
 			 */
-			protected function dismiss_error($args)
+			protected function dismiss_error(array $args)
 			{
-				if(!current_user_can($this->plugin->cap))
-					return; // Nothing to do.
-
-				if(empty($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce']))
-					return; // Unauthenticated POST data.
-
-				$args = array_map('trim', stripslashes_deep((array)$args));
-				if(empty($args['key'])) return; // Nothing to dismiss.
+				if(empty($args['key'])) // Missing key?
+					return; // Nothing to dismiss.
 
 				$errors = (is_array($errors = get_option(__NAMESPACE__.'_errors'))) ? $errors : array();
 				unset($errors[$args['key']]); // Dismiss this error.
@@ -148,5 +130,4 @@ namespace comment_mail // Root namespace.
 			}
 		}
 	}
-	new actions(); // Initialize/handle actions.
 }

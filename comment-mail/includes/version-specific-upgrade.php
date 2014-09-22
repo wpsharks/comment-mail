@@ -2,8 +2,8 @@
 /**
  * Version-Specific Upgrade
  *
+ * @package version_specific_upgrade
  * @since 14xxxx First documented version.
- * @package comment_mail\version_specific_upgrade
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 2
  */
@@ -19,8 +19,8 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Version-Specific Upgrade
 		 *
+		 * @package version_specific_upgrade
 		 * @since 14xxxx First documented version.
-		 * @package comment_mail\version_specific_upgrade
 		 */
 		class version_specific_upgrade
 		{

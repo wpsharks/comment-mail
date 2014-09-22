@@ -1,8 +1,8 @@
 <?php
 /**
- * Comment Mail™
+ * Plugin Class
  *
- * @package comment_mail\plugin
+ * @package plugin
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 2
@@ -15,21 +15,18 @@ namespace comment_mail
 	if(!class_exists('\\'.__NAMESPACE__.'\\plugin'))
 	{
 		/**
-		 * Comment Mail™
+		 * Plugin Class
 		 *
-		 * @package comment_mail\plugin
+		 * @package plugin
 		 * @since 14xxxx First documented version.
 		 */
-		class plugin
+		class plugin // The heart of this plugin.
 		{
-			/**
-			 * Stub `__FILE__` location.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @var string Current `__FILE__` from the stub.
+			/********************************************************************************************************/
+
+			/*
+			 * Public Properties Defined by Constructor
 			 */
-			public $file = '';
 
 			/**
 			 * Identifies pro version.
@@ -41,13 +38,22 @@ namespace comment_mail
 			public $is_pro = FALSE;
 
 			/**
-			 * Version string in YYMMDD[+build] format.
+			 * Plugin name.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @var string Current version of the software.
+			 * @var string Plugin name.
 			 */
-			public $version = '14xxxx';
+			public $name = 'Comment Mail™';
+
+			/**
+			 * Used by the plugin's uninstall handler.
+			 *
+			 * @since 14xxxx Adding uninstall handler.
+			 *
+			 * @var boolean Defined by constructor.
+			 */
+			public $enable_hooks;
 
 			/**
 			 * Text domain for translations; based on `__NAMESPACE__`.
@@ -56,7 +62,91 @@ namespace comment_mail
 			 *
 			 * @var string Defined by class constructor; for translations.
 			 */
-			public $text_domain = '';
+			public $text_domain;
+
+			/**
+			 * Plugin slug; based on `__NAMESPACE__`.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @var string Defined by constructor.
+			 */
+			public $slug;
+
+			/**
+			 * Stub `__FILE__` location.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @var string Defined by class constructor.
+			 */
+			public $file;
+
+			/**
+			 * Version string in YYMMDD[+build] format.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @var string Current version of the software.
+			 */
+			public $version = '14xxxx';
+
+			/********************************************************************************************************/
+
+			/*
+			 * Public Properties Defined @ Setup
+			 */
+
+			/**
+			 * An array of all default option values.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @var array Default options array.
+			 */
+			public $default_options;
+
+			/**
+			 * Configured option values.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @var array Options configured by site owner.
+			 */
+			public $options;
+
+			/**
+			 * WordPress database reference.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @var \wpdb Database object reference.
+			 */
+			public $wpdb;
+
+			/**
+			 * General capability requirement.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @var string Capability required to administer.
+			 */
+			public $cap;
+
+			/**
+			 * Uninstall capability requirement.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @var string Capability required to uninstall.
+			 */
+			public $uninstall_cap;
+
+			/********************************************************************************************************/
+
+			/*
+			 * Protected Cache-Related Properties
+			 */
 
 			/**
 			 * An instance-based cache for class members.
@@ -65,7 +155,7 @@ namespace comment_mail
 			 *
 			 * @var array An instance-based cache for class members.
 			 */
-			public $cache = array();
+			protected $cache = array();
 
 			/**
 			 * A global static cache for class members.
@@ -74,52 +164,13 @@ namespace comment_mail
 			 *
 			 * @var array Global static cache for class members.
 			 */
-			public static $static = array();
+			protected static $static = array();
 
-			/**
-			 * An array of all default option values.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @var array Default options array; set by constructor.
-			 */
-			public $default_options = array();
+			/********************************************************************************************************/
 
-			/**
-			 * Configured option values.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @var array Options configured by site owner; set by constructor.
+			/*
+			 * Plugin Constructor
 			 */
-			public $options = array();
-
-			/**
-			 * General capability requirement.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @var string WordPress capability required to administer.
-			 */
-			public $cap = '';
-
-			/**
-			 * Uninstall capability requirement.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @var string WordPress capability required to completely uninstall/delete.
-			 */
-			public $uninstall_cap = '';
-
-			/**
-			 * Used by the plugin's uninstall handler.
-			 *
-			 * @since 14xxxx Adding uninstall handler.
-			 *
-			 * @var boolean If FALSE, run without any hooks.
-			 */
-			public $enable_hooks = TRUE;
 
 			/**
 			 * Plugin constructor.
@@ -132,15 +183,26 @@ namespace comment_mail
 			public function __construct($enable_hooks = TRUE)
 			{
 				$this->enable_hooks = (boolean)$enable_hooks;
-				$this->text_domain  = str_replace('_', '-', __NAMESPACE__);
+				$this->text_domain  = $this->slug = str_replace('_', '-', __NAMESPACE__);
 				$this->file         = preg_replace('/\.inc\.php$/', '.php', __FILE__);
 
-				if(!$this->enable_hooks) return; // All done in this case.
+				/* -------------------------------------------------------------- */
+
+				if(!$this->enable_hooks) // Without hooks?
+					return; // Stop here; setup without hooks.
+
+				/* -------------------------------------------------------------- */
 
 				add_action('after_setup_theme', array($this, 'setup'));
 				register_activation_hook($this->file, array($this, 'activate'));
 				register_deactivation_hook($this->file, array($this, 'deactivate'));
 			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * Setup Routine(s)
+			 */
 
 			/**
 			 * Setup the plugin.
@@ -149,29 +211,39 @@ namespace comment_mail
 			 */
 			public function setup()
 			{
+				if(isset($this->cache[__FUNCTION__]))
+					return; // Already setup. Once only!
+				$this->cache[__FUNCTION__] = -1;
+
 				if($this->enable_hooks) // Hooks enabled?
 					do_action('before__'.__METHOD__, get_defined_vars());
 
-				load_plugin_textdomain($this->text_domain);
+				/* -------------------------------------------------------------- */
 
-				$this->default_options = array(
-					'version'               => $this->version,
+				load_plugin_textdomain($this->text_domain); // For translations.
 
-					'crons_setup'           => '0', // `0` or timestamp.
-
-					'enable'                => '0', // `0|1`.
-
-					'uninstall_on_deletion' => '0' // `0|1`.
+				$this->default_options = array( // Option defaults.
+				                                'version'               => $this->version,
+				                                'enable'                => '0', // `0|1`.
+				                                'crons_setup'           => '0', // `0` or timestamp.
+				                                'uninstall_on_deletion' => '0' // `0|1`.
 				); // Default options are merged with those defined by the site owner.
-				$options               = (is_array($options = get_option(__NAMESPACE__.'_options'))) ? $options : array();
 				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options, get_defined_vars());
-				$this->options         = array_merge($this->default_options, $options); // This considers old options also.
-				$this->options         = apply_filters(__METHOD__.'__options', $this->options, get_defined_vars());
 
+				$options       = (is_array($options = get_option(__NAMESPACE__.'_options'))) ? $options : array();
+				$this->options = array_merge($this->default_options, $options); // Merge into default options.
+				$this->options = apply_filters(__METHOD__.'__options', $this->options, get_defined_vars());
+
+				$this->wpdb          = $GLOBALS['wpdb']; // DB reference.
 				$this->cap           = apply_filters(__METHOD__.'__cap', 'activate_plugins');
 				$this->uninstall_cap = apply_filters(__METHOD__.'__uninstall_cap', 'delete_plugins');
 
-				if(!$this->enable_hooks) return; // Stop here; setup without hooks.
+				/* -------------------------------------------------------------- */
+
+				if(!$this->enable_hooks) // Without hooks?
+					return; // Stop here; setup without hooks.
+
+				/* -------------------------------------------------------------- */
 
 				add_action('wp_loaded', array($this, 'actions'));
 
@@ -189,31 +261,29 @@ namespace comment_mail
 
 				add_filter('cron_schedules', array($this, 'extend_cron_schedules'));
 
+				/* -------------------------------------------------------------- */
+
 				if((integer)$this->options['crons_setup'] < 1382523750)
 				{
-					//wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_xxx');
-					//wp_schedule_event(time() + 60, 'daily', '_cron_'.__NAMESPACE__.'_xxx');
+					wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_process_queue');
+					wp_schedule_event(time() + 60, 'every5m', '_cron_'.__NAMESPACE__.'_process_queue');
 
 					$this->options['crons_setup'] = (string)time();
-					update_option(__NAMESPACE__.'_options', $this->options); // Blog-specific.
+					update_option(__NAMESPACE__.'_options', $this->options);
 				}
-				//add_action('_cron_'.__NAMESPACE__.'_cleanup', array($this, 'xxx'));
+				add_action('_cron_'.__NAMESPACE__.'_process_queue', array($this, 'process_queue'));
+
+				/* -------------------------------------------------------------- */
 
 				do_action('after__'.__METHOD__, get_defined_vars());
 				do_action(__METHOD__.'_complete', get_defined_vars());
 			}
 
-			/**
-			 * WordPress database instance.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return \wpdb Reference for IDEs.
+			/********************************************************************************************************/
+
+			/*
+			 * Install-Related Methods
 			 */
-			public function wpdb() // Shortcut for other routines.
-			{
-				return $GLOBALS['wpdb'];
-			}
 
 			/**
 			 * Plugin activation hook.
@@ -224,14 +294,12 @@ namespace comment_mail
 			 */
 			public function activate()
 			{
-				$this->setup(); // Setup routines.
-
-				require_once dirname(__FILE__).'/includes/activation.php';
-				new activation(); // Installation handler.
+				require_once dirname(__FILE__).'/includes/installer.php';
+				new installer(); // Installation handler.
 			}
 
 			/**
-			 * Check current plugin version that installed in WP.
+			 * Check current plugin version.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -239,19 +307,18 @@ namespace comment_mail
 			 */
 			public function check_version()
 			{
-				$current_version = $prev_version = $this->options['version'];
+				if(version_compare($this->options['version'], $this->version, '>='))
+					return; // Nothing to do; already @ latest version.
 
-				if(version_compare($current_version, $this->version, '>='))
-					return; // Nothing to do; we've already upgraded them.
-
-				$current_version = $this->options['version'] = $this->version;
-				update_option(__NAMESPACE__.'_options', $this->options); // Bump version.
-
-				require_once dirname(__FILE__).'/includes/version-specific-upgrade.php';
-				new version_specific_upgrade($prev_version); // Run version-specific upgrades.
-
-				$this->enqueue_notice(__('<strong>Comment Mail™</strong> detected a new version of itself. Recompiling... all done :-)', $this->text_domain), '', TRUE);
+				require_once dirname(__FILE__).'/includes/upgrader.php';
+				new upgrader(); // Upgrade handler.
 			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * Uninstall-Related Methods
+			 */
 
 			/**
 			 * Plugin deactivation hook.
@@ -262,77 +329,52 @@ namespace comment_mail
 			 */
 			public function deactivate()
 			{
+				// Does nothing at this time.
 			}
 
 			/**
-			 * Plugin uninstall hook.
+			 * Plugin uninstall handler.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to {@link \register_uninstall_hook()} ~ via {@link uninstall()}
+			 * @called-by {@link uninstall}
 			 */
 			public function uninstall()
 			{
-				if(!current_user_can($this->uninstall_cap))
-					return; // Extra layer of security.
-
-				if(!class_exists('\\'.__NAMESPACE__.'\\uninstall'))
-					return; // Expecting the uninstall class.
-
-				if(!defined('WP_UNINSTALL_PLUGIN'))
-					return; // Disallow.
-
-				if(!$this->options['uninstall_on_deletion'])
-					return; // Nothing to do here.
-
-				delete_option(__NAMESPACE__.'_options');
-				delete_option(__NAMESPACE__.'_notices');
-				delete_option(__NAMESPACE__.'_errors');
-				//
-				// wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_xxx');
+				require_once dirname(__FILE__).'/includes/uninstaller.php';
+				new uninstaller(); // Uninstall handler.
 			}
 
+			/********************************************************************************************************/
+
+			/*
+			 * CRON-Related Methods
+			 */
+
 			/**
-			 * Current request is for a pro version preview?
+			 * Extends WP-Cron schedules.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @return boolean TRUE if the current request is for a pro preview.
+			 * @attaches-to `cron_schedules` filter.
+			 *
+			 * @param array $schedules An array of the current schedules.
+			 *
+			 * @return array Revised array of WP-Cron schedules.
 			 */
-			public function is_pro_preview()
+			public function extend_cron_schedules($schedules)
 			{
-				static $is;
-				if(isset($is)) return $is;
+				$schedules['every5m']  = array('interval' => 300, 'display' => __('Every 5 Minutes', $this->text_domain));
+				$schedules['every15m'] = array('interval' => 900, 'display' => __('Every 15 Minutes', $this->text_domain));
 
-				if(!empty($_REQUEST[__NAMESPACE__.'_pro_preview']))
-					return ($is = TRUE);
-
-				return ($is = FALSE);
+				return apply_filters(__METHOD__, $schedules, get_defined_vars());
 			}
 
-			/**
-			 * URL to a plugin file.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string $file Optional file path; relative to plugin directory.
-			 * @param string $scheme Optional URL scheme; defaults to the current scheme.
-			 *
-			 * @return string URL to plugin directory; or to the specified `$file` if applicable.
+			/********************************************************************************************************/
+
+			/*
+			 * Action-Related Methods
 			 */
-			public function url($file = '', $scheme = '')
-			{
-				if(!isset(static::$static[__FUNCTION__]['plugin_dir']))
-					static::$static[__FUNCTION__]['plugin_dir'] = rtrim(plugin_dir_url($this->file), '/');
-				$plugin_dir =& static::$static[__FUNCTION__]['plugin_dir'];
-
-				$url = $plugin_dir.(string)$file;
-
-				if($scheme) // A specific URL scheme?
-					$url = set_url_scheme($url, (string)$scheme);
-
-				return apply_filters(__METHOD__, $url, get_defined_vars());
-			}
 
 			/**
 			 * Plugin action handler.
@@ -343,9 +385,37 @@ namespace comment_mail
 			 */
 			public function actions()
 			{
-				if(!empty($_REQUEST[__NAMESPACE__]))
-					require_once dirname(__FILE__).'/includes/actions.php';
+				if(empty($_REQUEST[__NAMESPACE__]))
+					return; // Nothing to do here.
+
+				require_once dirname(__FILE__).'/includes/actions.php';
+				new actions(); // Handle action(s).
 			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * Queue-Related Methods
+			 */
+
+			/**
+			 * Queue processor.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `_cron_'.__NAMESPACE__.'_process_queue` hook.
+			 */
+			public function process_queue()
+			{
+				require_once dirname(__FILE__).'/includes/queue-processor.php';
+				$queue = new queue_processor(); // Process queue.
+			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * Admin UI-Related Methods
+			 */
 
 			/**
 			 * Adds CSS for administrative menu pages.
@@ -390,8 +460,7 @@ namespace comment_mail
 			 */
 			public function add_menu_pages()
 			{
-				add_menu_page(__('Comment Mail™', $this->text_domain), __('Comment Mail™', $this->text_domain),
-				              $this->cap, __NAMESPACE__, array($this, 'menu_page_options'),
+				add_menu_page($this->name, $this->name, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'),
 				              $this->url('/client-s/images/menu-icon.png'));
 			}
 
@@ -408,8 +477,8 @@ namespace comment_mail
 			 */
 			public function add_settings_link($links)
 			{
-				$links[] = '<a href="options-general.php?page='.urlencode(__NAMESPACE__).'">'.__('Settings', $this->text_domain).'</a>';
-				$links[] = '<br/><a href="'.esc_attr(add_query_arg(urlencode_deep(array('page' => __NAMESPACE__, __NAMESPACE__.'_pro_preview' => '1')), self_admin_url('/admin.php'))).'">'.__('Preview Pro Features', $this->text_domain).'</a>';
+				$links[] = '<a href="options-general.php?page='.urlencode(__NAMESPACE__).'">'.__('Settings', $this->text_domain).'</a><br/>';
+				$links[] = '<a href="'.esc_attr(add_query_arg(urlencode_deep(array('page' => __NAMESPACE__, __NAMESPACE__.'_pro_preview' => '1')), self_admin_url('/admin.php'))).'">'.__('Preview Pro Features', $this->text_domain).'</a>';
 				$links[] = '<a href="'.esc_attr('http://www.websharks-inc.com/product/'.str_replace('_', '-', __NAMESPACE__).'/').'" target="_blank">'.__('Upgrade', $this->text_domain).'</a>';
 
 				return apply_filters(__METHOD__, $links, get_defined_vars());
@@ -429,38 +498,11 @@ namespace comment_mail
 				$menu_pages->options();
 			}
 
-			/**
-			 * Render admin notices; across all admin dashboard views.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @attaches-to `all_admin_notices` hook.
+			/********************************************************************************************************/
+
+			/*
+			 * Admin Notice/Error Methods
 			 */
-			public function all_admin_notices()
-			{
-				if(($notices = (is_array($notices = get_option(__NAMESPACE__.'_notices'))) ? $notices : array()))
-				{
-					$notices = $updated_notices = array_unique($notices); // De-dupe.
-
-					foreach(array_keys($updated_notices) as $_key) if(strpos($_key, 'persistent-') !== 0)
-						unset($updated_notices[$_key]); // Leave persistent notices; ditch others.
-					unset($_key); // Housekeeping after updating notices.
-
-					update_option(__NAMESPACE__.'_notices', $updated_notices);
-				}
-				if(current_user_can($this->cap)) foreach($notices as $_key => $_notice)
-				{
-					$_dismiss = ''; // Initialize empty string; e.g. reset value on each pass.
-					if(strpos($_key, 'persistent-') === 0) // A dismissal link is needed in this case?
-					{
-						$_dismiss_css = 'display:inline-block; float:right; margin:0 0 0 15px; text-decoration:none; font-weight:bold;';
-						$_dismiss     = add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('dismiss_notice' => array('key' => $_key)), '_wpnonce' => wp_create_nonce())));
-						$_dismiss     = '<a style="'.esc_attr($_dismiss_css).'" href="'.esc_attr($_dismiss).'">'.__('dismiss &times;', $this->text_domain).'</a>';
-					}
-					echo apply_filters(__METHOD__.'__notice', '<div class="updated"><p>'.$_notice.$_dismiss.'</p></div>', get_defined_vars());
-				}
-				unset($_key, $_notice, $_dismiss_css, $_dismiss); // Housekeeping.
-			}
 
 			/**
 			 * Enqueue an administrative notice.
@@ -498,39 +540,6 @@ namespace comment_mail
 				else $notices[] = $notice; // Default behavior.
 
 				update_option(__NAMESPACE__.'_notices', $notices);
-			}
-
-			/**
-			 * Render admin errors; across all admin dashboard views.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @attaches-to `all_admin_notices` hook.
-			 */
-			public function all_admin_errors()
-			{
-				if(($errors = (is_array($errors = get_option(__NAMESPACE__.'_errors'))) ? $errors : array()))
-				{
-					$errors = $updated_errors = array_unique($errors); // De-dupe.
-
-					foreach(array_keys($updated_errors) as $_key) if(strpos($_key, 'persistent-') !== 0)
-						unset($updated_errors[$_key]); // Leave persistent errors; ditch others.
-					unset($_key); // Housekeeping after updating notices.
-
-					update_option(__NAMESPACE__.'_errors', $updated_errors);
-				}
-				if(current_user_can($this->cap)) foreach($errors as $_key => $_error)
-				{
-					$_dismiss = ''; // Initialize empty string; e.g. reset value on each pass.
-					if(strpos($_key, 'persistent-') === 0) // A dismissal link is needed in this case?
-					{
-						$_dismiss_css = 'display:inline-block; float:right; margin:0 0 0 15px; text-decoration:none; font-weight:bold;';
-						$_dismiss     = add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('dismiss_error' => array('key' => $_key)), '_wpnonce' => wp_create_nonce())));
-						$_dismiss     = '<a style="'.esc_attr($_dismiss_css).'" href="'.esc_attr($_dismiss).'">'.__('dismiss &times;', $this->text_domain).'</a>';
-					}
-					echo apply_filters(__METHOD__.'__error', '<div class="error"><p>'.$_error.$_dismiss.'</p></div>', get_defined_vars());
-				}
-				unset($_key, $_error, $_dismiss_css, $_dismiss); // Housekeeping.
 			}
 
 			/**
@@ -572,23 +581,222 @@ namespace comment_mail
 			}
 
 			/**
-			 * Extends WP-Cron schedules.
+			 * Render admin notices; across all admin dashboard views.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `cron_schedules` filter.
-			 *
-			 * @param array $schedules An array of the current schedules.
-			 *
-			 * @return array Revised array of WP-Cron schedules.
+			 * @attaches-to `all_admin_notices` hook.
 			 */
-			public function extend_cron_schedules($schedules)
+			public function all_admin_notices()
 			{
-				$schedules['every15m'] = array('interval' => 900, 'display' => __('Every 15 Minutes', $this->text_domain));
+				if(($notices = (is_array($notices = get_option(__NAMESPACE__.'_notices'))) ? $notices : array()))
+				{
+					$notices = $updated_notices = array_unique($notices); // De-dupe.
 
-				return apply_filters(__METHOD__, $schedules, get_defined_vars());
+					foreach(array_keys($updated_notices) as $_key) if(strpos($_key, 'persistent-') !== 0)
+						unset($updated_notices[$_key]); // Leave persistent notices; ditch others.
+					unset($_key); // Housekeeping after updating notices.
+
+					update_option(__NAMESPACE__.'_notices', $updated_notices);
+				}
+				if(current_user_can($this->cap)) foreach($notices as $_key => $_notice)
+				{
+					$_dismiss = ''; // Initialize empty string; e.g. reset value on each pass.
+					if(strpos($_key, 'persistent-') === 0) // A dismissal link is needed in this case?
+					{
+						$_dismiss_css = 'display:inline-block; float:right; margin:0 0 0 15px; text-decoration:none; font-weight:bold;';
+						$_dismiss     = add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('dismiss_notice' => array('key' => $_key)), '_wpnonce' => wp_create_nonce())));
+						$_dismiss     = '<a style="'.esc_attr($_dismiss_css).'" href="'.esc_attr($_dismiss).'">'.__('dismiss &times;', $this->text_domain).'</a>';
+					}
+					echo apply_filters(__METHOD__.'__notice', '<div class="updated"><p>'.$_notice.$_dismiss.'</p></div>', get_defined_vars());
+				}
+				unset($_key, $_notice, $_dismiss_css, $_dismiss); // Housekeeping.
+			}
+
+			/**
+			 * Render admin errors; across all admin dashboard views.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `all_admin_notices` hook.
+			 */
+			public function all_admin_errors()
+			{
+				if(($errors = (is_array($errors = get_option(__NAMESPACE__.'_errors'))) ? $errors : array()))
+				{
+					$errors = $updated_errors = array_unique($errors); // De-dupe.
+
+					foreach(array_keys($updated_errors) as $_key) if(strpos($_key, 'persistent-') !== 0)
+						unset($updated_errors[$_key]); // Leave persistent errors; ditch others.
+					unset($_key); // Housekeeping after updating notices.
+
+					update_option(__NAMESPACE__.'_errors', $updated_errors);
+				}
+				if(current_user_can($this->cap)) foreach($errors as $_key => $_error)
+				{
+					$_dismiss = ''; // Initialize empty string; e.g. reset value on each pass.
+					if(strpos($_key, 'persistent-') === 0) // A dismissal link is needed in this case?
+					{
+						$_dismiss_css = 'display:inline-block; float:right; margin:0 0 0 15px; text-decoration:none; font-weight:bold;';
+						$_dismiss     = add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('dismiss_error' => array('key' => $_key)), '_wpnonce' => wp_create_nonce())));
+						$_dismiss     = '<a style="'.esc_attr($_dismiss_css).'" href="'.esc_attr($_dismiss).'">'.__('dismiss &times;', $this->text_domain).'</a>';
+					}
+					echo apply_filters(__METHOD__.'__error', '<div class="error"><p>'.$_error.$_dismiss.'</p></div>', get_defined_vars());
+				}
+				unset($_key, $_error, $_dismiss_css, $_dismiss); // Housekeeping.
+			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * DB Utilities
+			 */
+
+			/**
+			 * Current DB table prefix for this plugin.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string Current DB table prefix.
+			 */
+			public function db_prefix()
+			{
+				return $this->wpdb->prefix.__NAMESPACE__.'_';
+			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * Conditional Utilities
+			 */
+
+			/**
+			 * Current request is for a pro version preview?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean TRUE if the current request is for a pro preview.
+			 */
+			public function is_pro_preview()
+			{
+				if(isset(static::$static[__FUNCTION__]))
+					return static::$static[__FUNCTION__];
+
+				if(!empty($_REQUEST[__NAMESPACE__.'_pro_preview']))
+					return (static::$static[__FUNCTION__] = TRUE);
+
+				return (static::$static[__FUNCTION__] = FALSE);
+			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * URL Utilities
+			 */
+
+			/**
+			 * URL to a plugin file.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string      $file Optional file path; relative to plugin directory.
+			 * @param string|null $scheme Optional URL scheme. Defaults to the current scheme.
+			 *
+			 * @return string URL to plugin directory; or to the specified `$file` if applicable.
+			 */
+			public function url($file = '', $scheme = NULL)
+			{
+				if(!isset(static::$static[__FUNCTION__]['plugin_dir']))
+					static::$static[__FUNCTION__]['plugin_dir'] = rtrim(plugin_dir_url($this->file), '/');
+
+				$url = static::$static[__FUNCTION__]['plugin_dir'].(string)$file;
+				$url = set_url_scheme($url, $scheme);
+
+				return apply_filters(__METHOD__, $url, get_defined_vars());
+			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * String Utilities
+			 */
+
+			/**
+			 * Strips slashes in strings deeply.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $value Any value can be converted into a stripped string.
+			 *    Actually, objects can't, but this recurses into objects.
+			 *
+			 * @return string|array|object Stripped string, array, object.
+			 */
+			public function strip_deep($value)
+			{
+				if(is_array($value) || is_object($value))
+				{
+					foreach($value as &$_value)
+						$_value = $this->strip_deep($_value);
+					return $value;
+				}
+				return stripslashes((string)$value);
+			}
+
+			/**
+			 * Trims strings deeply.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed  $value Any value can be converted into a trimmed string.
+			 *    Actually, objects can't, but this recurses into objects.
+			 *
+			 * @param string $chars Specific chars to trim.
+			 *    Defaults to PHP's trim: " \r\n\t\0\x0B". Use an empty string to bypass.
+			 *
+			 * @param string $extra_chars Additional chars to trim.
+			 *
+			 * @return string|array|object Trimmed string, array, object.
+			 */
+			public function trim_deep($value, $chars = '', $extra_chars = '')
+			{
+				if(is_array($value) || is_object($value))
+				{
+					foreach($value as &$_value)
+						$_value = $this->trim_deep($_value, $chars, $extra_chars);
+					return $value;
+				}
+				$chars = isset($chars[0]) ? $chars : " \r\n\t\0\x0B";
+				$chars = $chars.$extra_chars; // Concatenate.
+
+				return trim((string)$value, $chars);
+			}
+
+			/**
+			 * Trims and strips slashes in strings deeply.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed  $value Any value can be converted into a trimmed/stripped string.
+			 *    Actually, objects can't, but this recurses into objects.
+			 *
+			 * @param string $chars Specific chars to trim.
+			 *    Defaults to PHP's trim: " \r\n\t\0\x0B". Use an empty string to bypass.
+			 *
+			 * @param string $extra_chars Additional chars to trim.
+			 *
+			 * @return string|array|object Trimmed/stripped string, array, object.
+			 */
+			public function trim_strip_deep($value, $chars = '', $extra_chars = '')
+			{
+				return $this->trim_deep($this->strip_deep($value), $chars, $extra_chars);
 			}
 		}
+
+		/***********************************************************************************************************/
+
+		/*
+		 * Namespaced Functions
+		 */
 
 		/**
 		 * Used internally by other classes as an easy way to reference
@@ -603,6 +811,12 @@ namespace comment_mail
 			return $GLOBALS[__NAMESPACE__];
 		}
 
+		/***********************************************************************************************************/
+
+		/*
+		 * Automatic Plugin Loader
+		 */
+
 		/**
 		 * A global reference to the plugin.
 		 *
@@ -610,12 +824,23 @@ namespace comment_mail
 		 *
 		 * @var plugin Main plugin class.
 		 */
-		$GLOBALS[__NAMESPACE__] = new plugin(!class_exists('\\'.__NAMESPACE__.'\\uninstall'));
+		if(!isset($GLOBALS[__NAMESPACE__.'_autoload_plugin']) || $GLOBALS[__NAMESPACE__.'_autoload_plugin'])
+			$GLOBALS[__NAMESPACE__] = new plugin(); // Load plugin automatically.
 	}
-	else if(!class_exists('\\'.__NAMESPACE__.'\\uninstall')) add_action('all_admin_notices', function ()
+	/**************************************************************************************************************/
+
+	/*
+	 * Catch a scenario where the plugin class already exists.
+	 *    Assume both lite/pro are running in this case.
+	 */
+
+	else if(empty($GLOBALS[__NAMESPACE__.'_uninstalling'])) add_action('all_admin_notices', function ()
 	{
-		echo '<div class="error"><p>'. // Running multiple versions of this plugin at same time.
-		     __('Please disable the LITE version of Comment Mail™ before you activate the PRO version.',
-		        str_replace('_', '-', __NAMESPACE__)).'</p></div>';
+		echo '<div class="error">'. // Notify the site owner.
+		     '   <p>'.
+		     '      '.sprintf(__('Please disable the lite version of <code>%1$s</code> before activating the pro version.',
+		                         str_replace('_', '-', __NAMESPACE__)), esc_html(str_replace('_', '-', __NAMESPACE__))).
+		     '   </p>'.
+		     '</div>';
 	});
 }

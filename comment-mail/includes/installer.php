@@ -1,8 +1,8 @@
 <?php
 /**
- * Activation/Installation
+ * Install Routines
  *
- * @package comment_mail\activation
+ * @package installer
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 2
@@ -14,15 +14,15 @@ namespace comment_mail // Root namespace.
 
 	require_once dirname(__FILE__).'/plugin.inc.php';
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\activation'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\installer'))
 	{
 		/**
-		 * Activation/Installation
+		 * Install Routines
 		 *
+		 * @package installer
 		 * @since 14xxxx First documented version.
-		 * @package comment_mail\activation
 		 */
-		class activation
+		class installer
 		{
 			/**
 			 * @var plugin Plugin reference.
@@ -39,26 +39,32 @@ namespace comment_mail // Root namespace.
 			public function __construct()
 			{
 				$this->plugin = plugin();
-				$this->install_db_tables();
+
+				$this->plugin->setup(); // Setup.
+
+				$this->create_db_tables();
 			}
 
 			/**
-			 * Install DB tables.
+			 * Create DB tables.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function install_db_tables()
+			protected function create_db_tables()
 			{
-				$prefix = $this->plugin->wpdb()->prefix.__NAMESPACE__.'_';
-
 				foreach(scandir($tables_dir = dirname(__FILE__).'/tables') as $_sql_file)
 					if(substr($_sql_file, -4) === '.sql' && is_file($tables_dir.'/'.$_sql_file))
 					{
+						$_sql_file_table = substr($_sql_file, 0, -4);
+						$_sql_file_table = str_replace('-', '_', $_sql_file_table);
+						$_sql_file_table = $this->plugin->db_prefix().$_sql_file_table;
+
 						$_sql = file_get_contents($tables_dir.'/'.$_sql_file);
-						$_sql = str_replace('%%prefix%%', $prefix, $_sql);
-						$this->plugin->wpdb()->query($_sql);
+						$_sql = str_replace('%%prefix%%', $this->plugin->db_prefix(), $_sql);
+
+						$this->plugin->wpdb->query($_sql); // Create.
 					}
-				unset($_sql_file, $_sql); // Housekeeping.
+				unset($_sql_file, $_sql_file_table, $_sql); // Housekeeping.
 			}
 		}
 	}

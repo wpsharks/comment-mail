@@ -2,7 +2,7 @@
 /**
  * Menu Pages
  *
- * @package comment_mail\menu_pages
+ * @package menu_pages
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 2
@@ -19,8 +19,8 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Menu Pages
 		 *
+		 * @package menu_pages
 		 * @since 14xxxx First documented version.
-		 * @package comment_mail\menu_pages
 		 */
 		class menu_pages // Menu pages.
 		{
