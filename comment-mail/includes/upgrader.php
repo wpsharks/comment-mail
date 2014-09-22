@@ -5,7 +5,7 @@
  * @package upgrader
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
- * @license GNU General Public License, version 2
+ * @license GNU General Public License, version 3
  */
 namespace comment_mail // Root namespace.
 {
