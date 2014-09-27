@@ -289,6 +289,7 @@ namespace comment_mail
 				add_filter('cron_schedules', array($this, 'extend_cron_schedules'));
 
 				add_action('comment_form', array($this, 'comment_form'), 5, 1);
+				add_action('comment_post', array($this, 'comment_post'), 10, 2);
 
 				/* -------------------------------------------------------------- */
 
@@ -331,7 +332,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `admin_init` hook.
+			 * @attaches-to `admin_init` action.
 			 */
 			public function check_version()
 			{
@@ -407,7 +408,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `wp_loaded` hook.
+			 * @attaches-to `wp_loaded` action.
 			 */
 			public function actions()
 			{
@@ -428,7 +429,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `admin_enqueue_scripts` hook.
+			 * @attaches-to `admin_enqueue_scripts` action.
 			 */
 			public function enqueue_admin_styles()
 			{
@@ -445,7 +446,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `admin_enqueue_scripts` hook.
+			 * @attaches-to `admin_enqueue_scripts` action.
 			 */
 			public function enqueue_admin_scripts()
 			{
@@ -462,7 +463,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `admin_menu` hook.
+			 * @attaches-to `admin_menu` action.
 			 */
 			public function add_menu_pages()
 			{
@@ -617,7 +618,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `all_admin_notices` hook.
+			 * @attaches-to `all_admin_notices` action.
 			 */
 			public function all_admin_notices()
 			{
@@ -650,7 +651,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `all_admin_notices` hook.
+			 * @attaches-to `all_admin_notices` action.
 			 */
 			public function all_admin_errors()
 			{
@@ -691,11 +692,26 @@ namespace comment_mail
 			 *
 			 * @attaches-to `comment_form` action.
 			 *
-			 * @param string|integer $post_id Post ID.
+			 * @param integer|string $post_id Post ID.
 			 */
 			public function comment_form($post_id)
 			{
-				new subscr_ops((integer)$post_id);
+				new comment_form($post_id);
+			}
+
+			/**
+			 * Comment post handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `comment_post` action.
+			 *
+			 * @param integer|string $comment_id Comment ID.
+			 * @param integer|string $approval_status `0`, `1`, or `spam`.
+			 */
+			public function comment_post($comment_id, $approval_status)
+			{
+				new comment_post($comment_id, $approval_status);
 			}
 
 			/********************************************************************************************************/
