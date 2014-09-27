@@ -237,26 +237,30 @@ namespace comment_mail
 				load_plugin_textdomain($this->text_domain); // For translations.
 
 				$this->default_options = array( // Option defaults.
-				                                'version'                     => $this->version,
-				                                'enable'                      => '0', // `0|1`.
-				                                'crons_setup'                 => '0', // `0` or timestamp.
-				                                'uninstall_on_deletion'       => '0', // `0|1`.
+				                                'version'                        => $this->version,
+				                                'enable'                         => '0', // `0|1`.
+				                                'crons_setup'                    => '0', // `0` or timestamp.
+				                                'uninstall_on_deletion'          => '0', // `0|1`.
 
-				                                'confirmation_email_template' => '', // Template.
-				                                'auto_subscribe_post_author'  => '1', // `0|1`.
-				                                'auto_subscribe_emails'       => '', // Additional emails.
+				                                'template_emails_confirmation'   => '', // Template.
+				                                'template_site_subscription_ops' => '', // Template.
 
-				                                'smtp_enable'                 => '0', // `0|1`.
-				                                'smtp_host'                   => '', // Host name.
-				                                'smtp_port'                   => '', // Port number.
-				                                'smtp_secure'                 => '', // ``, `ssl` or `tls`.
+				                                'auto_subscribe_enable'          => '1', // `0|1`.
+				                                'auto_subscribe_post_types'      => 'post,page',
+				                                'auto_subscribe_post_author'     => '1', // `0|1`.
+				                                'auto_subscribe_recipients'      => '', // Others.
 
-				                                'smtp_username'               => '', // Username.
-				                                'smtp_password'               => '', // Password.
+				                                'smtp_enable'                    => '0', // `0|1`.
+				                                'smtp_host'                      => '', // Host name.
+				                                'smtp_port'                      => '', // Port number.
+				                                'smtp_secure'                    => '', // ``, `ssl` or `tls`.
 
-				                                'smtp_from_name'              => '', // From name.
-				                                'smtp_from_addr'              => '', // From address.
-				                                'smtp_force_from'             => '1', // `0|1`.
+				                                'smtp_username'                  => '', // Username.
+				                                'smtp_password'                  => '', // Password.
+
+				                                'smtp_from_name'                 => '', // From name.
+				                                'smtp_from_email'                => '', // From email.
+				                                'smtp_force_from'                => '1', // `0|1`.
 
 				); // Default options are merged with those defined by the site owner.
 				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options, get_defined_vars());
@@ -290,11 +294,12 @@ namespace comment_mail
 
 				add_filter('cron_schedules', array($this, 'extend_cron_schedules'));
 
+				add_action('transition_post_status', array($this, 'post_status'), 10, 3);
+				add_action('before_delete_post', array($this, 'delete_post'), 10, 1);
+
 				add_action('comment_form', array($this, 'comment_form'), 5, 1);
 				add_action('comment_post', array($this, 'comment_post'), 10, 2);
 				add_action('transition_comment_status', array($this, 'comment_status'), 10, 3);
-
-				add_action('before_delete_post', array($this, 'delete_post'), 10, 1);
 
 				add_action('user_register', array($this, 'user_register'), 10, 1);
 				add_action('delete_user', array($this, 'delete_user'), 10, 1);
@@ -696,6 +701,55 @@ namespace comment_mail
 			 */
 
 			/**
+			 * Post status handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `transition_post_status` action.
+			 *
+			 * @param string        $new_post_status New post status.
+			 *
+			 *    One of the following statuses:
+			 *    See: <http://codex.wordpress.org/Function_Reference/get_post_status>
+			 *
+			 *       - `publish`
+			 *       - `pending`
+			 *       - `draft`
+			 *       - `auto-draft`
+			 *       - `future`
+			 *       - `private`
+			 *       - `inherit`
+			 *       - `trash`
+			 *
+			 *    See also: {@link get_available_post_statuses()}
+			 *       Custom post types may have their own statuses.
+			 *
+			 * @param string        $old_post_status Old post status.
+			 *
+			 *    One of the following statuses:
+			 *    See: <http://codex.wordpress.org/Function_Reference/get_post_status>
+			 *
+			 *       - `new`
+			 *       - `publish`
+			 *       - `pending`
+			 *       - `draft`
+			 *       - `auto-draft`
+			 *       - `future`
+			 *       - `private`
+			 *       - `inherit`
+			 *       - `trash`
+			 *
+			 *    See also: {@link get_available_post_statuses()}
+			 *       Custom post types may have their own statuses.
+			 *
+			 * @param \WP_Post|null $post Post object instance.
+			 */
+			public function post_status($new_post_status, $old_post_status, $post)
+			{
+				new post_status($new_post_status, $old_post_status, $post);
+			}
+
+			/**
 			 * Post deletion handler.
 			 *
 			 * @since 14xxxx First documented version.
@@ -771,7 +825,7 @@ namespace comment_mail
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `spam`, `delete`.
 			 *
-			 * @param object|null    $comment Comment object (now).
+			 * @param \stdClass|null $comment Comment object (now).
 			 */
 			public function comment_status($new_comment_status, $old_comment_status, $comment)
 			{
@@ -987,6 +1041,41 @@ namespace comment_mail
 			/********************************************************************************************************/
 
 			/*
+			 * Array Utilities
+			 */
+
+			/**
+			 * Forces an array to contain only unique values (deeply).
+			 *
+			 * @param array $array An input array.
+			 *
+			 * @return array The output array, containing only unique array values deeply.
+			 *
+			 * @note Resource pointers CANNOT be serialized, and will therefore be lost (i.e. corrupted) when/if they're nested deeply inside the input array.
+			 *    Resources NOT nested deeply, DO remain intact (this is fine). Only resource pointers nested deeply are lost via `serialize()`.
+			 */
+			public function array_unique_deep(array $array)
+			{
+				foreach($array as &$_value)
+				{
+					if(!is_resource($_value))
+						$_value = serialize($_value);
+				}
+				unset($_value); // Housekeeping.
+
+				$array = array_unique($array);
+
+				foreach($array as &$_value)
+				{
+					if(!is_resource($_value))
+						$_value = unserialize($_value);
+				}
+				return $array; // Unique (deeply).
+			}
+
+			/********************************************************************************************************/
+
+			/*
 			 * String Utilities
 			 */
 
@@ -1058,6 +1147,98 @@ namespace comment_mail
 			public function trim_strip_deep($value, $chars = '', $extra_chars = '')
 			{
 				return $this->trim_deep($this->strip_deep($value), $chars, $extra_chars);
+			}
+
+			/**
+			 * Parses recipients (deeply).
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed   $value Any input value.
+			 *
+			 * @param boolean $strict Optional. Defaults to FALSE (faster). Parses all strings w/ `@` signs.
+			 *    If TRUE, we will validate each address; and we ONLY return 100% valid email addresses.
+			 *
+			 * @param boolean $___recursion Internal use only (indicates function recursion).
+			 *
+			 * @return \stdClass[] Unique array of all parsed recipients (lowercase emails).
+			 *    Each object in the array contains 3 properties: `fname`, `lname`, `email`.
+			 */
+			public function parse_recipients_deep($value, $strict = FALSE, $___recursion = FALSE)
+			{
+				$recipients = array(); // Initialize.
+
+				if(is_array($value) || is_object($value))
+				{
+					foreach($value as $_key => $_value) // Collect all recipients.
+						$recipients = array_merge($recipients, $this->parse_recipients_deep($_value, $strict, TRUE));
+					unset($_key, $_value); // A little housekeeping.
+
+					return $recipients ? $this->array_unique_deep($recipients) : array();
+				}
+				$value                       = trim((string)$value);
+				$delimiter                   = (strpos($value, ';') !== FALSE) ? ';' : ',';
+				$regex_delimitation_splitter = '/'.preg_quote($delimiter, '/').'+/';
+
+				$possible_recipients = preg_split($regex_delimitation_splitter, $value, NULL, PREG_SPLIT_NO_EMPTY);
+				$possible_recipients = $this->trim_deep($possible_recipients);
+
+				foreach($possible_recipients as $_recipient) // Iterate all possible recipients.
+				{
+					if(strpos($_recipient, '@') === FALSE) continue; // NOT an email address.
+
+					if(strpos($_recipient, '<') !== FALSE && preg_match('/(?:"(?P<recipient_name>[^"]+?)"\s*)?\<(?P<recipient_email>.+?)\>/', $_recipient, $_m))
+						if(strpos($_m['recipient_email'], '@', 1) !== FALSE && (!$strict || is_email($_m['recipient_email'])))
+						{
+							$_email = strtolower($_m['recipient_email']);
+
+							$_name = !empty($_m['recipient_name']) ? $_m['recipient_name'] : '';
+							$_name = $_name ? $this->clean_name($_name) : '';
+
+							$_fname = $_name; // Default value; full name.
+							$_lname = ''; // Default value; empty string for now.
+
+							if($_name && strpos($_name, ' ', 1) !== FALSE) // Last name?
+								list($_fname, $_lname) = explode($_name, ' ', 2);
+
+							if(!$_fname) $_fname = strstr($_email, '@', TRUE);
+
+							$recipients[] = (object)array('fname' => $_fname, 'lname' => $_lname, 'email' => $_email);
+
+							continue; // Inside brackets; all done here.
+						}
+					if(strpos($_recipient, '@', 1) !== FALSE && (!$strict || is_email($_recipient)))
+					{
+						$_email = strtolower($_recipient);
+
+						$_fname = strstr($_email, '@', TRUE);
+						$_lname = ''; // Not possible in this case.
+
+						$recipients[] = (object)array('fname' => $_fname, 'lname' => $_lname, 'email' => $_email);
+					}
+				}
+				unset($_recipient, $_m, $_email, $_name, $_fname, $_lname); // Housekeeping.
+
+				return $recipients ? $this->array_unique_deep($recipients) : array();
+			}
+
+			/**
+			 * Cleans a full name.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $name Input name to clean.
+			 *
+			 * @return string Cleaned name.
+			 */
+			public function clean_name($name)
+			{
+				$name = trim((string)$name); // Force string.
+				$name = $name ? preg_replace('/^(?:Mr\.|Mrs\.|Ms\.|Dr\.)\s+/i', '', $name) : '';
+				$name = $name ? preg_replace('/\s+(?:Sr\.|Jr\.)$/i', '', $name) : '';
+				$name = $name ? trim($name) : ''; // Cleanup name.
+
+				return $name; // Cleanup up now.
 			}
 		}
 

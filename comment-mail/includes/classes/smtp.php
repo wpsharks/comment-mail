@@ -37,11 +37,11 @@ namespace comment_mail // Root namespace.
 			protected $from_name = '';
 
 			/**
-			 * @var string From address.
+			 * @var string From email address.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $from_addr = '';
+			protected $from_email = '';
 
 			/**
 			 * @var array Recipients.
@@ -131,8 +131,8 @@ namespace comment_mail // Root namespace.
 			{
 				$this->reset(); // Reset state; i.e. class properties.
 
-				$this->from_name = $this->plugin->options['smtp_from_name'];
-				$this->from_addr = $this->plugin->options['smtp_from_addr'];
+				$this->from_name  = $this->plugin->options['smtp_from_name'];
+				$this->from_email = $this->plugin->options['smtp_from_email'];
 
 				$this->recipients = $this->parse_recipients_deep($to);
 
@@ -142,7 +142,7 @@ namespace comment_mail // Root namespace.
 				$this->headers     = $this->parse_headers_deep($headers);
 				$this->attachments = $this->parse_attachments_deep($attachments);
 
-				if(!$this->from_addr || !$this->recipients || !$this->subject || !$this->message)
+				if(!$this->from_email || !$this->recipients || !$this->subject || !$this->message)
 					return FALSE; // Not possible. Missing vital argument value(s).
 
 				try // PHPMailer (catch exceptions).
@@ -158,9 +158,9 @@ namespace comment_mail // Root namespace.
 					$this->mailer->Username = $this->plugin->options['smtp_username'];
 					$this->mailer->Password = $this->plugin->options['smtp_password'];
 
-					$this->mailer->SetFrom($this->from_addr, $this->from_name);
-					if($this->plugin->options['smtp_force_from'] && $this->plugin->options['smtp_from_addr'])
-						$this->mailer->SetFrom($this->plugin->options['smtp_from_addr'], $this->plugin->options['smtp_from_name']);
+					$this->mailer->SetFrom($this->from_email, $this->from_name);
+					if($this->plugin->options['smtp_force_from'] && $this->plugin->options['smtp_from_email'])
+						$this->mailer->SetFrom($this->plugin->options['smtp_from_email'], $this->plugin->options['smtp_from_name']);
 
 					foreach($this->recipients as $_recipient)
 						$this->mailer->AddAddress($_recipient);
@@ -229,43 +229,15 @@ namespace comment_mail // Root namespace.
 			 * @param boolean $strict Optional. Defaults to FALSE (faster). Parses all strings w/ `@` signs.
 			 *    If TRUE, we will validate each address; and we ONLY return 100% valid email addresses.
 			 *
-			 * @param boolean $___recursion Internal use only (indicates function recursion).
-			 *
 			 * @return array Unique array of all parsed recipients (lowercase).
 			 */
-			protected function parse_recipients_deep($value, $strict = FALSE, $___recursion = FALSE)
+			protected function parse_recipients_deep($value, $strict = FALSE)
 			{
 				$recipients = array(); // Initialize.
 
-				if(is_array($value) || is_object($value))
-				{
-					foreach($value as $_key => $_value) // Collect all recipients.
-						$recipients = array_merge($recipients, $this->parse_recipients_deep($_value, $strict, TRUE));
-					unset($_key, $_value); // A little housekeeping.
-
-					return $recipients ? array_unique($recipients) : array();
-				}
-				$value                       = trim(strtolower((string)$value));
-				$delimiter                   = (strpos($value, ';') !== FALSE) ? ';' : ',';
-				$regex_delimitation_splitter = '/'.preg_quote($delimiter, '/').'+/';
-
-				$possible_recipients = preg_split($regex_delimitation_splitter, $value, NULL, PREG_SPLIT_NO_EMPTY);
-				$possible_recipients = $this->plugin->trim_deep($possible_recipients);
-
-				foreach($possible_recipients as $_recipient) // Iterate all possible recipients.
-				{
-					if(strpos($_recipient, '@') === FALSE) continue; // NOT an email address.
-
-					if(strpos($_recipient, '<') !== FALSE && preg_match('/\<(?P<recipient>.+?)\>/', $_recipient, $_m))
-						if(strpos($_m['recipient'], '@', 1) !== FALSE && (!$strict || is_email($_m['recipient'])))
-						{
-							$recipients[] = $_m['recipient'];
-							continue; // Inside brackets; all done here.
-						}
-					if(strpos($_recipient, '@', 1) !== FALSE && (!$strict || is_email($_recipient)))
-						$recipients[] = $_recipient;
-				}
-				unset($_recipient, $_m); // Housekeeping.
+				foreach($this->plugin->parse_recipients_deep($value, $strict) as $_recipient)
+					$recipients[] = $_recipient->email; // Email address only.
+				unset($_recipient); // Housekeeping.
 
 				return $recipients ? array_unique($recipients) : array();
 			}
@@ -326,20 +298,20 @@ namespace comment_mail // Root namespace.
 								$_from_name = str_replace('"', '', $_from_name);
 								$_from_name = trim($_from_name);
 
-								$_from_addr = substr($_value, strpos($_value, '<') + 1);
-								$_from_addr = str_replace('>', '', $_from_addr);
-								$_from_addr = trim($_from_addr);
+								$_from_email = substr($_value, strpos($_value, '<') + 1);
+								$_from_email = str_replace('>', '', $_from_email);
+								$_from_email = trim($_from_email);
 
-								if($_from_addr && strpos($_from_addr, '@', 1) !== FALSE && is_email($_value))
+								if($_from_email && strpos($_from_email, '@', 1) !== FALSE && is_email($_value))
 								{
-									$this->from_name = $_from_name;
-									$this->from_addr = $_from_addr;
+									$this->from_name  = $_from_name;
+									$this->from_email = $_from_email;
 								}
 							}
 							else if($_value && strpos($_value, '@', 1) !== FALSE && is_email($_value))
 							{
-								$this->from_name = ''; // No name.
-								$this->from_addr = $_value;
+								$this->from_name  = ''; // No name.
+								$this->from_email = $_value;
 							}
 							break; // Break switch handler.
 
@@ -349,9 +321,9 @@ namespace comment_mail // Root namespace.
 							// Our SMTP mailer sends all emails singularly.
 							// Thus, all recipients are pooled together.
 
-							if(($_cc_bcc_addrs = $this->parse_recipients_deep($_value)))
+							if(($_cc_bcc_emails = $this->parse_recipients_deep($_value)))
 							{
-								$this->recipients = array_merge($this->recipients, $_cc_bcc_addrs);
+								$this->recipients = array_merge($this->recipients, $_cc_bcc_emails);
 								$this->recipients = array_unique($this->recipients);
 							}
 							break; // Break switch handler.
@@ -362,7 +334,7 @@ namespace comment_mail // Root namespace.
 
 							break; // Break switch handler.
 					}
-					unset($_from_name, $_from_addr, $_cc_bcc_addrs); // Housekeeping.
+					unset($_from_name, $_from_email, $_cc_bcc_emails); // Housekeeping.
 				}
 				unset($_rn_delimited_header, $_header, $_value); // More housekeeping.
 
@@ -406,8 +378,8 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function reset()
 			{
-				$this->from_name = '';
-				$this->from_addr = '';
+				$this->from_name  = '';
+				$this->from_email = '';
 
 				$this->recipients = array();
 

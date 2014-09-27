@@ -30,7 +30,7 @@ namespace comment_mail // Root namespace.
 			protected $plugin; // Set by constructor.
 
 			/**
-			 * @var object|null Comment object (now).
+			 * @var \stdClass|null Comment object (now).
 			 *
 			 * @since 14xxxx First documented version.
 			 */
@@ -50,6 +50,13 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 */
 			protected $sub_type; // Set by constructor.
+
+			/**
+			 * @var keygen Key generator.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $keygen; // Set by constructor.
 
 			/**
 			 * Class constructor.
@@ -76,6 +83,8 @@ namespace comment_mail // Root namespace.
 				if(!in_array($this->sub_type, array('comments', 'comment'), TRUE))
 					$this->sub_type = ''; // Default type.
 
+				$this->keygen = new keygen();
+
 				$this->maybe_insert(); // If applicable.
 			}
 
@@ -101,15 +110,15 @@ namespace comment_mail // Root namespace.
 				if(!$this->comment->comment_author_email)
 					return; // Not applicable.
 
-				if($this->check_existing()) // Exists?
-					return; // Can't subscribe them again.
+				if($this->check_existing())
+					return; // Can't subscribe again.
 
 				$this->delete_existing(); // Delete existing.
 
 				$insertion_ip = $last_ip = $ip = $this->current_ip();
 
 				$data = array(
-					'key'              => $this->key_gen(),
+					'key'              => $this->keygen->sub_key(),
 					'user_id'          => $this->user->ID,
 					'post_id'          => $this->comment->post_ID,
 					'comment_id'       => $this->sub_type === 'comment'
@@ -226,14 +235,15 @@ namespace comment_mail // Root namespace.
 			{
 				$name = $this->clean_name();
 
-				$fname = $name; // Defaults to the full name.
+				$fname = $name; // Full name.
 
-				if(strpos($name, ' ', 1) !== FALSE) // Last name also?
-					list($fname,) = explode(' ', $this->comment->comment_author, 2);
+				if(strpos($name, ' ', 1) !== FALSE)
+					list($fname,) = explode(' ', $name, 2);
 
-				$fname = trim($fname); // Cleanup the user's first name.
+				$fname = trim($fname); // Cleanup first name.
 
-				if(!$fname) $fname = strstr($this->comment->comment_author_email, '@', TRUE);
+				if(!$fname) // Fallback on the email address.
+					$fname = strstr($this->comment->comment_author_email, '@', TRUE);
 
 				return $fname; // First name.
 			}
@@ -247,14 +257,13 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function last_name()
 			{
-				$name = $this->clean_name();
+				$name  = $this->clean_name();
+				$lname = ''; // Empty string.
 
-				$lname = ''; // Defaults to an empty string.
+				if(strpos($name, ' ', 1) !== FALSE)
+					list(, $lname) = explode(' ', $name, 2);
 
-				if(strpos($name, ' ', 1) !== FALSE) // Last name also?
-					list(, $lname) = explode(' ', $this->comment->comment_author, 2);
-
-				$lname = trim($lname); // Cleanup the user's last name.
+				$lname = trim($lname); // Cleanup last name.
 
 				return $lname; // Last name.
 			}
@@ -268,12 +277,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function clean_name()
 			{
-				$name = $this->comment->comment_author;
-				$name = preg_replace('/^(?:Mr\.|Mrs\.|Ms\.|Dr\.)\s+/i', '', $name);
-				$name = preg_replace('/\s+(?:Sr\.|Jr\.)$/i', '', $name);
-				$name = trim($name); // Cleanup the name.
-
-				return $name; // Cleaned up.
+				return $this->plugin->clean_name($this->comment->comment_author);
 			}
 
 			/**
@@ -286,29 +290,6 @@ namespace comment_mail // Root namespace.
 			protected function current_ip()
 			{
 				return !empty($_SERVER['REMOTE_ADDR']) ? (string)$_SERVER['REMOTE_ADDR'] : '';
-			}
-
-			/**
-			 * A unique, unguessable, case insensitive key for each row.
-			 *
-			 * With a max length of 16 chars. Keys are generated based on `microtime()`,
-			 *    and with base 36 component values concatenated with a random
-			 *    number not to exceed `999999999`.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return string A unique, unguessable, case insensitive key.
-			 */
-			protected function key_gen()
-			{
-				list($seconds, $microseconds) = explode('.', microtime(TRUE), 2);
-				$seconds_base36      = base_convert($seconds, '10', '36');
-				$microseconds_base36 = base_convert($microseconds, '10', '36');
-
-				$mt_rand_base36 = base_convert(mt_rand(1, 999999999), '10', '36');
-				$key            = $mt_rand_base36.$seconds_base36.$microseconds_base36;
-
-				return substr($key, 0, 16);
 			}
 		}
 	}

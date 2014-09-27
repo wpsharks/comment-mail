@@ -30,7 +30,7 @@ namespace comment_mail // Root namespace.
 			protected $plugin; // Set by constructor.
 
 			/**
-			 * @var object|null Subscriber.
+			 * @var \stdClass|null Subscriber.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
