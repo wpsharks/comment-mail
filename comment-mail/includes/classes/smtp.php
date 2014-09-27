@@ -406,10 +406,16 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function reset()
 			{
-				$this->from_name  = $this->from_addr = '';
+				$this->from_name = '';
+				$this->from_addr = '';
+
 				$this->recipients = array();
-				$this->subject    = $this->message = '';
-				$this->headers    = $this->attachments = array();
+
+				$this->subject = '';
+				$this->message = '';
+
+				$this->headers     = array();
+				$this->attachments = array();
 
 				$this->mailer->isSMTP();
 				$this->mailer->SingleTo = TRUE;
@@ -434,7 +440,8 @@ namespace comment_mail // Root namespace.
 
 				$this->mailer->CharSet = 'UTF-8';
 				$this->mailer->Subject = '';
-				$this->mailer->Body    = $this->mailer->AltBody = '';
+				$this->mailer->Body    = '';
+				$this->mailer->AltBody = '';
 			}
 		}
 	}

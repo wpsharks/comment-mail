@@ -273,7 +273,6 @@ namespace comment_mail
 				/* -------------------------------------------------------------- */
 
 				add_action('wp_loaded', array($this, 'actions'));
-
 				add_action('admin_init', array($this, 'check_version'));
 
 				add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
@@ -283,10 +282,20 @@ namespace comment_mail
 				add_action('all_admin_notices', array($this, 'all_admin_errors'));
 
 				add_action('admin_menu', array($this, 'add_menu_pages'));
-
 				add_filter('plugin_action_links_'.plugin_basename($this->file), array($this, 'add_settings_link'));
 
 				add_filter('cron_schedules', array($this, 'extend_cron_schedules'));
+
+				add_action('comment_form', array($this, 'comment_form'), 5, 1);
+				add_action('comment_post', array($this, 'comment_post'), 10, 2);
+				add_action('transition_comment_status', array($this, 'comment_status'), 10, 3);
+
+				add_action('before_delete_post', array($this, 'delete_post'), 10, 1);
+
+				add_action('user_register', array($this, 'user_register'), 10, 1);
+				add_action('delete_user', array($this, 'delete_user'), 10, 1);
+				add_action('wpmu_delete_user', array($this, 'delete_user'), 10, 1);
+				add_action('remove_user_from_blog', array($this, 'delete_user'), 10, 2);
 
 				/* -------------------------------------------------------------- */
 
@@ -329,7 +338,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `admin_init` hook.
+			 * @attaches-to `admin_init` action.
 			 */
 			public function check_version()
 			{
@@ -405,7 +414,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `wp_loaded` hook.
+			 * @attaches-to `wp_loaded` action.
 			 */
 			public function actions()
 			{
@@ -413,62 +422,6 @@ namespace comment_mail
 					return; // Nothing to do here.
 
 				new actions(); // Handle action(s).
-			}
-
-			/********************************************************************************************************/
-
-			/*
-			 * Queue-Related Methods
-			 */
-
-			/**
-			 * Queue processor.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @attaches-to `_cron_'.__NAMESPACE__.'_process_queue` hook.
-			 */
-			public function process_queue()
-			{
-				new queue_processor(); // Process queue.
-			}
-
-			/*
-			 * Mail-Related Methods
-			 */
-
-			/**
-			 * Mail sending utility; `wp_mail()` compatible.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @note This method always (ALWAYS) sends email in HTML format;
-			 *    w/ a plain text alternative — generated automatically.
-			 *
-			 * @param string|array $to Array or comma-separated list of emails.
-			 * @param string       $subject Email subject line.
-			 * @param string       $message Message contents.
-			 * @param string|array $headers Optional. Additional headers.
-			 * @param string|array $attachments Optional. Files to attach.
-			 *
-			 * @return boolean TRUE if the email was sent successfully.
-			 */
-			public function mail($to, $subject, $message, $headers = array(), $attachments = array())
-			{
-				if($this->options['smtp_enable'] && $this->options['smtp_host'] && $this->options['smtp_port'])
-				{
-					if(!isset($this->cache[__FUNCTION__]['smtp']))
-						$smtp = $this->cache[__FUNCTION__]['smtp'] = new smtp();
-					else $smtp = $this->cache[__FUNCTION__]['smtp'];
-
-					/** @var $smtp smtp Reference for IDEs. */
-					return $smtp->mail($to, $subject, $message, $headers, $attachments);
-				}
-				if(is_array($headers)) // Append `Content-Type`.
-					$headers[] = 'Content-Type: text/html; charset=UTF-8';
-				else $headers = trim((string)$headers."\r\n".'Content-Type: text/html; charset=UTF-8');
-
-				return wp_mail($to, $subject, $message, $headers, $attachments);
 			}
 
 			/********************************************************************************************************/
@@ -482,7 +435,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `admin_enqueue_scripts` hook.
+			 * @attaches-to `admin_enqueue_scripts` action.
 			 */
 			public function enqueue_admin_styles()
 			{
@@ -499,7 +452,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `admin_enqueue_scripts` hook.
+			 * @attaches-to `admin_enqueue_scripts` action.
 			 */
 			public function enqueue_admin_scripts()
 			{
@@ -516,7 +469,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `admin_menu` hook.
+			 * @attaches-to `admin_menu` action.
 			 */
 			public function add_menu_pages()
 			{
@@ -671,7 +624,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `all_admin_notices` hook.
+			 * @attaches-to `all_admin_notices` action.
 			 */
 			public function all_admin_notices()
 			{
@@ -704,7 +657,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `all_admin_notices` hook.
+			 * @attaches-to `all_admin_notices` action.
 			 */
 			public function all_admin_errors()
 			{
@@ -730,6 +683,232 @@ namespace comment_mail
 					echo apply_filters(__METHOD__.'__error', '<div class="error"><p>'.$_error.$_dismiss.'</p></div>', get_defined_vars());
 				}
 				unset($_key, $_error, $_dismiss_css, $_dismiss); // Housekeeping.
+			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * Post-Related Methods
+			 */
+
+			/**
+			 * Post deletion handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `before_delete_post` action.
+			 *
+			 * @param integer|string $post_id Post ID.
+			 */
+			public function delete_post($post_id)
+			{
+				new delete_post($post_id);
+			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * Comment-Related Methods
+			 */
+
+			/**
+			 * Comment form handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `comment_form` action.
+			 *
+			 * @param integer|string $post_id Post ID.
+			 */
+			public function comment_form($post_id)
+			{
+				new comment_form($post_id);
+			}
+
+			/**
+			 * Comment post handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `comment_post` action.
+			 *
+			 * @param integer|string $comment_id Comment ID.
+			 *
+			 * @param integer|string $comment_status Initial comment status.
+			 *
+			 *    One of the following:
+			 *       - `0` (aka: `hold`, `unapproved`),
+			 *       - `1` (aka: `approve`, `approved`),
+			 *       - or `trash`, `spam`, `delete`.
+			 */
+			public function comment_post($comment_id, $comment_status)
+			{
+				new comment_post($comment_id, $comment_status);
+			}
+
+			/**
+			 * Comment status handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `transition_comment_status` action.
+			 *
+			 * @param integer|string $new_comment_status New comment status.
+			 *
+			 *    One of the following:
+			 *       - `0` (aka: `hold`, `unapproved`),
+			 *       - `1` (aka: `approve`, `approved`),
+			 *       - or `trash`, `spam`, `delete`.
+			 *
+			 * @param integer|string $old_comment_status Old comment status.
+			 *
+			 *    One of the following:
+			 *       - `0` (aka: `hold`, `unapproved`),
+			 *       - `1` (aka: `approve`, `approved`),
+			 *       - or `trash`, `spam`, `delete`.
+			 *
+			 * @param object|null    $comment Comment object (now).
+			 */
+			public function comment_status($new_comment_status, $old_comment_status, $comment)
+			{
+				new comment_status($new_comment_status, $old_comment_status, $comment);
+			}
+
+			/**
+			 * Comment status translator.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer|string $status
+			 *
+			 *    One of the following:
+			 *       - `0` (aka: `hold`, `unapproved`),
+			 *       - `1` (aka: `approve`, `approved`),
+			 *       - or `trash`, `spam`, `delete`.
+			 *
+			 * @return string `approve`, `hold`, `trash`, `spam`, `delete`.
+			 *
+			 * @throws \exception If an unexpected status is encountered.
+			 */
+			public function comment_status__($status)
+			{
+				switch(strtolower((string)$status))
+				{
+					case '1':
+					case 'approve':
+					case 'approved':
+						return 'approve';
+
+					case '0':
+					case 'hold':
+					case 'unapproved':
+						return 'hold';
+
+					case 'trash':
+						return 'trash';
+
+					case 'spam':
+						return 'spam';
+
+					case 'delete':
+						return 'delete';
+
+					default: // Throw exception on anything else.
+						throw new \exception(sprintf(__('Unexpected comment status: `%1$s`.'), $status));
+				}
+			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * User-Related Methods
+			 */
+
+			/**
+			 * User registration handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `user_register` action.
+			 *
+			 * @param integer|string $user_id User ID.
+			 */
+			public function user_register($user_id)
+			{
+				new user_register($user_id);
+			}
+
+			/**
+			 * User deletion handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `delete_user` action.
+			 * @attaches-to `wpmu_delete_user` action.
+			 * @attaches-to `remove_user_from_blog` action.
+			 *
+			 * @param integer|string $user_id User ID.
+			 * @param integer|string $blog_id Blog ID. Defaults to `0` (current blog).
+			 */
+			public function delete_user($user_id, $blog_id = 0)
+			{
+				new delete_user($user_id, $blog_id);
+			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * Queue-Related Methods
+			 */
+
+			/**
+			 * Queue processor.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `_cron_'.__NAMESPACE__.'_process_queue` action.
+			 */
+			public function process_queue()
+			{
+				new queue_processor(); // Process queue.
+			}
+
+			/*
+			 * Mail Utilities
+			 */
+
+			/**
+			 * Mail sending utility; `wp_mail()` compatible.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @note This method always (ALWAYS) sends email in HTML format;
+			 *    w/ a plain text alternative — generated automatically.
+			 *
+			 * @param string|array $to Array or comma-separated list of emails.
+			 * @param string       $subject Email subject line.
+			 * @param string       $message Message contents.
+			 * @param string|array $headers Optional. Additional headers.
+			 * @param string|array $attachments Optional. Files to attach.
+			 *
+			 * @return boolean TRUE if the email was sent successfully.
+			 */
+			public function mail($to, $subject, $message, $headers = array(), $attachments = array())
+			{
+				if($this->options['smtp_enable'] && $this->options['smtp_host'] && $this->options['smtp_port'])
+				{
+					if(!isset($this->cache[__FUNCTION__]['smtp']))
+						$smtp = $this->cache[__FUNCTION__]['smtp'] = new smtp();
+					else $smtp = $this->cache[__FUNCTION__]['smtp'];
+
+					/** @var $smtp smtp Reference for IDEs. */
+					return $smtp->mail($to, $subject, $message, $headers, $attachments);
+				}
+				if(is_array($headers)) // Append `Content-Type`.
+					$headers[] = 'Content-Type: text/html; charset=UTF-8';
+				else $headers = trim((string)$headers."\r\n".'Content-Type: text/html; charset=UTF-8');
+
+				return wp_mail($to, $subject, $message, $headers, $attachments);
 			}
 
 			/********************************************************************************************************/

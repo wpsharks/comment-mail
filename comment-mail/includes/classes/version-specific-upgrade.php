@@ -34,7 +34,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $prev_version = ''; // Set by constructor.
+			protected $prev_version; // Set by constructor.
 
 			/**
 			 * Class constructor.
@@ -47,6 +47,7 @@ namespace comment_mail // Root namespace.
 			{
 				$this->plugin       = plugin();
 				$this->prev_version = (string)$prev_version;
+
 				$this->run_handlers(); // Run upgrade(s).
 			}
 
