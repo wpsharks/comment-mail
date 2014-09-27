@@ -273,7 +273,6 @@ namespace comment_mail
 				/* -------------------------------------------------------------- */
 
 				add_action('wp_loaded', array($this, 'actions'));
-
 				add_action('admin_init', array($this, 'check_version'));
 
 				add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
@@ -283,7 +282,6 @@ namespace comment_mail
 				add_action('all_admin_notices', array($this, 'all_admin_errors'));
 
 				add_action('admin_menu', array($this, 'add_menu_pages'));
-
 				add_filter('plugin_action_links_'.plugin_basename($this->file), array($this, 'add_settings_link'));
 
 				add_filter('cron_schedules', array($this, 'extend_cron_schedules'));
@@ -292,6 +290,7 @@ namespace comment_mail
 				add_action('comment_post', array($this, 'comment_post'), 10, 2);
 				add_action('transition_comment_status', array($this, 'comment_status'), 10, 3);
 				add_action('before_delete_post', array($this, 'delete_post'), 10, 1);
+				add_action('user_register', array($this, 'user_register'), 10, 1);
 
 				/* -------------------------------------------------------------- */
 
@@ -812,6 +811,26 @@ namespace comment_mail
 					default: // Throw exception on anything else.
 						throw new \exception(sprintf(__('Unexpected comment status: `%1$s`.'), $status));
 				}
+			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * User-Related Methods
+			 */
+
+			/**
+			 * User registration handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `user_register` action.
+			 *
+			 * @param integer|string $user_id User ID.
+			 */
+			public function user_register($user_id)
+			{
+				new user_register($user_id);
 			}
 
 			/********************************************************************************************************/
