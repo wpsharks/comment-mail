@@ -51,7 +51,7 @@ namespace comment_mail // Root namespace.
 
 				if(!$this->post_id) return; // Nothing to do.
 
-				// @TODO
+				new sub_deleter($this->post_id);
 			}
 		}
 	}

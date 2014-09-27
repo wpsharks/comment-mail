@@ -67,7 +67,7 @@ namespace comment_mail // Root namespace.
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `spam`, `delete`.
 			 *
-			 * @param \stdClass|null    $comment Comment object (now).
+			 * @param \stdClass|null $comment Comment object (now).
 			 *
 			 * @since 14xxxx First documented version.
 			 */
@@ -84,7 +84,8 @@ namespace comment_mail // Root namespace.
 				if($new_comment_status === 'approve' && $old_comment_status === 'hold')
 					new queue_inserter($this->comment->comment_ID);
 
-				// @TODO Handle comment deletions.
+				if($new_comment_status === 'delete' && $old_comment_status !== 'delete')
+					new sub_deleter($this->comment->post_ID, $this->comment->comment_ID);
 			}
 		}
 	}
