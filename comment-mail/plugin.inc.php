@@ -291,6 +291,7 @@ namespace comment_mail
 				add_action('comment_form', array($this, 'comment_form'), 5, 1);
 				add_action('comment_post', array($this, 'comment_post'), 10, 2);
 				add_action('transition_comment_status', array($this, 'comment_status'), 10, 3);
+				add_action('before_delete_post', array($this, 'delete_post'), 10, 1);
 
 				/* -------------------------------------------------------------- */
 
@@ -678,6 +679,26 @@ namespace comment_mail
 					echo apply_filters(__METHOD__.'__error', '<div class="error"><p>'.$_error.$_dismiss.'</p></div>', get_defined_vars());
 				}
 				unset($_key, $_error, $_dismiss_css, $_dismiss); // Housekeeping.
+			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * Post-Related Methods
+			 */
+
+			/**
+			 * Post deletion handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `before_delete_post` action.
+			 *
+			 * @param integer|string $post_id Post ID.
+			 */
+			public function delete_post($post_id)
+			{
+				new delete_post($post_id);
 			}
 
 			/********************************************************************************************************/
