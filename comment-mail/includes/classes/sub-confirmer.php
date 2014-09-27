@@ -1,8 +1,8 @@
 <?php
 /**
- * Comment Form
+ * Sub Confirmer
  *
- * @package comment_form
+ * @package sub_confirmer
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -12,15 +12,15 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\comment_form'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\sub_confirmer'))
 	{
 		/**
-		 * Comment Form
+		 * Sub Confirmer
 		 *
-		 * @package comment_form
+		 * @package sub_confirmer
 		 * @since 14xxxx First documented version.
 		 */
-		class comment_form // Comment form.
+		class sub_confirmer // Sub confirmer.
 		{
 			/**
 			 * @var plugin Plugin reference.
@@ -30,40 +30,26 @@ namespace comment_mail // Root namespace.
 			protected $plugin; // Set by constructor.
 
 			/**
-			 * @var integer Post ID.
+			 * @var object|null Subscriber.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $post_id; // Set by constructor.
+			protected $sub; // Set by constructor.
 
 			/**
 			 * Class constructor.
 			 *
-			 * @param integer|string $post_id Post ID.
+			 * @param integer|string $sub_id Comment ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			public function __construct($post_id)
+			public function __construct($sub_id)
 			{
 				$this->plugin = plugin();
 
-				$this->post_id = (integer)$post_id;
-
-				if(!$this->post_id) return; // Nothing to do.
-
-				$this->display_subscription_ops();
-			}
-
-			/**
-			 * Display subscription options.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			public function display_subscription_ops()
-			{
+				$sub_id = (integer)$sub_id;
 				// @TODO
-				// $_POST[__NAMESPACE__.'_subscribe']
-				// templates/subscription-ops.php
+				// templates/emails/confirmation.php
 			}
 		}
 	}

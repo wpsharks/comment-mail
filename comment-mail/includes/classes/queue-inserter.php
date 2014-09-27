@@ -1,8 +1,8 @@
 <?php
 /**
- * Comment Form
+ * Queue Inserter
  *
- * @package comment_form
+ * @package queue_inserter
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -12,15 +12,15 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\comment_form'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\queue_inserter'))
 	{
 		/**
-		 * Comment Form
+		 * Queue Inserter
 		 *
-		 * @package comment_form
+		 * @package queue_inserter
 		 * @since 14xxxx First documented version.
 		 */
-		class comment_form // Comment form.
+		class queue_inserter // Queue inserter.
 		{
 			/**
 			 * @var plugin Plugin reference.
@@ -30,40 +30,25 @@ namespace comment_mail // Root namespace.
 			protected $plugin; // Set by constructor.
 
 			/**
-			 * @var integer Post ID.
+			 * @var integer Comment ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $post_id; // Set by constructor.
+			protected $comment_id; // Set by constructor.
 
 			/**
 			 * Class constructor.
 			 *
-			 * @param integer|string $post_id Post ID.
+			 * @param integer|string $comment_id Comment ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			public function __construct($post_id)
+			public function __construct($comment_id)
 			{
 				$this->plugin = plugin();
 
-				$this->post_id = (integer)$post_id;
-
-				if(!$this->post_id) return; // Nothing to do.
-
-				$this->display_subscription_ops();
-			}
-
-			/**
-			 * Display subscription options.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			public function display_subscription_ops()
-			{
+				$this->comment_id = (integer)$comment_id;
 				// @TODO
-				// $_POST[__NAMESPACE__.'_subscribe']
-				// templates/subscription-ops.php
 			}
 		}
 	}

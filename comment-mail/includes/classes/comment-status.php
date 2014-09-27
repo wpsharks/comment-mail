@@ -80,7 +80,9 @@ namespace comment_mail // Root namespace.
 				$this->old_comment_status = $this->plugin->comment_status__($old_comment_status);
 
 				if(!isset($this->comment)) return; // Nothing to do.
-				// @TODO
+
+				if($new_comment_status === 'approve' && $old_comment_status === 'hold')
+					new queue_inserter($this->comment->comment_ID);
 			}
 		}
 	}

@@ -64,8 +64,14 @@ namespace comment_mail // Root namespace.
 				$this->comment_id     = (integer)$comment_id;
 				$this->comment_status = $this->plugin->comment_status__($comment_status);
 
-				if(!$this->comment_id) return; // Nothing to do.
-				// @TODO
+				if(!$this->comment_id)
+					return; // Nothing to do.
+
+				if(!empty($_POST[__NAMESPACE__.'_subscribe']))
+					new sub_inserter($comment_id);
+
+				if($comment_status === 'approve')
+					new queue_inserter($comment_id);
 			}
 		}
 	}

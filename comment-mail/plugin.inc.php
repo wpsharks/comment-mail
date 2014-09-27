@@ -237,22 +237,26 @@ namespace comment_mail
 				load_plugin_textdomain($this->text_domain); // For translations.
 
 				$this->default_options = array( // Option defaults.
-				                                'version'               => $this->version,
-				                                'enable'                => '0', // `0|1`.
-				                                'crons_setup'           => '0', // `0` or timestamp.
-				                                'uninstall_on_deletion' => '0', // `0|1`.
+				                                'version'                     => $this->version,
+				                                'enable'                      => '0', // `0|1`.
+				                                'crons_setup'                 => '0', // `0` or timestamp.
+				                                'uninstall_on_deletion'       => '0', // `0|1`.
 
-				                                'smtp_enable'           => '0', // `0|1`.
-				                                'smtp_host'             => '', // Host name.
-				                                'smtp_port'             => '', // Port number.
-				                                'smtp_secure'           => '', // ``, `ssl` or `tls`.
+				                                'confirmation_email_template' => '', // Template.
+				                                'auto_subscribe_post_author'  => '1', // `0|1`.
+				                                'auto_subscribe_emails'       => '', // Additional emails.
 
-				                                'smtp_username'         => '', // Username.
-				                                'smtp_password'         => '', // Password.
+				                                'smtp_enable'                 => '0', // `0|1`.
+				                                'smtp_host'                   => '', // Host name.
+				                                'smtp_port'                   => '', // Port number.
+				                                'smtp_secure'                 => '', // ``, `ssl` or `tls`.
 
-				                                'smtp_from_name'        => '', // From name.
-				                                'smtp_from_addr'        => '', // From address.
-				                                'smtp_force_from'       => '1', // `0|1`.
+				                                'smtp_username'               => '', // Username.
+				                                'smtp_password'               => '', // Password.
+
+				                                'smtp_from_name'              => '', // From name.
+				                                'smtp_from_addr'              => '', // From address.
+				                                'smtp_force_from'             => '1', // `0|1`.
 
 				); // Default options are merged with those defined by the site owner.
 				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options, get_defined_vars());
