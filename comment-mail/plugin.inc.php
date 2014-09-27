@@ -288,6 +288,8 @@ namespace comment_mail
 
 				add_filter('cron_schedules', array($this, 'extend_cron_schedules'));
 
+				add_action('comment_form', array($this, 'comment_form'), 5, 1);
+
 				/* -------------------------------------------------------------- */
 
 				if((integer)$this->options['crons_setup'] < 1382523750)
@@ -413,62 +415,6 @@ namespace comment_mail
 					return; // Nothing to do here.
 
 				new actions(); // Handle action(s).
-			}
-
-			/********************************************************************************************************/
-
-			/*
-			 * Queue-Related Methods
-			 */
-
-			/**
-			 * Queue processor.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @attaches-to `_cron_'.__NAMESPACE__.'_process_queue` hook.
-			 */
-			public function process_queue()
-			{
-				new queue_processor(); // Process queue.
-			}
-
-			/*
-			 * Mail-Related Methods
-			 */
-
-			/**
-			 * Mail sending utility; `wp_mail()` compatible.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @note This method always (ALWAYS) sends email in HTML format;
-			 *    w/ a plain text alternative — generated automatically.
-			 *
-			 * @param string|array $to Array or comma-separated list of emails.
-			 * @param string       $subject Email subject line.
-			 * @param string       $message Message contents.
-			 * @param string|array $headers Optional. Additional headers.
-			 * @param string|array $attachments Optional. Files to attach.
-			 *
-			 * @return boolean TRUE if the email was sent successfully.
-			 */
-			public function mail($to, $subject, $message, $headers = array(), $attachments = array())
-			{
-				if($this->options['smtp_enable'] && $this->options['smtp_host'] && $this->options['smtp_port'])
-				{
-					if(!isset($this->cache[__FUNCTION__]['smtp']))
-						$smtp = $this->cache[__FUNCTION__]['smtp'] = new smtp();
-					else $smtp = $this->cache[__FUNCTION__]['smtp'];
-
-					/** @var $smtp smtp Reference for IDEs. */
-					return $smtp->mail($to, $subject, $message, $headers, $attachments);
-				}
-				if(is_array($headers)) // Append `Content-Type`.
-					$headers[] = 'Content-Type: text/html; charset=UTF-8';
-				else $headers = trim((string)$headers."\r\n".'Content-Type: text/html; charset=UTF-8');
-
-				return wp_mail($to, $subject, $message, $headers, $attachments);
 			}
 
 			/********************************************************************************************************/
@@ -730,6 +676,82 @@ namespace comment_mail
 					echo apply_filters(__METHOD__.'__error', '<div class="error"><p>'.$_error.$_dismiss.'</p></div>', get_defined_vars());
 				}
 				unset($_key, $_error, $_dismiss_css, $_dismiss); // Housekeeping.
+			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * Comment-Related Methods
+			 */
+
+			/**
+			 * Comment form handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `comment_form` action.
+			 *
+			 * @param string|integer $post_id Post ID.
+			 */
+			public function comment_form($post_id)
+			{
+				new subscr_ops((integer)$post_id);
+			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * Queue-Related Methods
+			 */
+
+			/**
+			 * Queue processor.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `_cron_'.__NAMESPACE__.'_process_queue` action.
+			 */
+			public function process_queue()
+			{
+				new queue_processor(); // Process queue.
+			}
+
+			/*
+			 * Mail Utilities
+			 */
+
+			/**
+			 * Mail sending utility; `wp_mail()` compatible.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @note This method always (ALWAYS) sends email in HTML format;
+			 *    w/ a plain text alternative — generated automatically.
+			 *
+			 * @param string|array $to Array or comma-separated list of emails.
+			 * @param string       $subject Email subject line.
+			 * @param string       $message Message contents.
+			 * @param string|array $headers Optional. Additional headers.
+			 * @param string|array $attachments Optional. Files to attach.
+			 *
+			 * @return boolean TRUE if the email was sent successfully.
+			 */
+			public function mail($to, $subject, $message, $headers = array(), $attachments = array())
+			{
+				if($this->options['smtp_enable'] && $this->options['smtp_host'] && $this->options['smtp_port'])
+				{
+					if(!isset($this->cache[__FUNCTION__]['smtp']))
+						$smtp = $this->cache[__FUNCTION__]['smtp'] = new smtp();
+					else $smtp = $this->cache[__FUNCTION__]['smtp'];
+
+					/** @var $smtp smtp Reference for IDEs. */
+					return $smtp->mail($to, $subject, $message, $headers, $attachments);
+				}
+				if(is_array($headers)) // Append `Content-Type`.
+					$headers[] = 'Content-Type: text/html; charset=UTF-8';
+				else $headers = trim((string)$headers."\r\n".'Content-Type: text/html; charset=UTF-8');
+
+				return wp_mail($to, $subject, $message, $headers, $attachments);
 			}
 
 			/********************************************************************************************************/

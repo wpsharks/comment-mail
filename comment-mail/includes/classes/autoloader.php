@@ -20,7 +20,7 @@ namespace comment_mail // Root namespace.
 		 * @package autoloader
 		 * @since 14xxxx First documented version.
 		 */
-		class autoloader // Queue processor.
+		class autoloader // Autoloader.
 		{
 			/**
 			 * @var plugin Plugin reference.
