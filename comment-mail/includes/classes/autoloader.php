@@ -44,6 +44,7 @@ namespace comment_mail // Root namespace.
 			public function __construct()
 			{
 				$this->plugin = plugin();
+
 				$this->register();
 			}
 

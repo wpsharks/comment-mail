@@ -290,6 +290,7 @@ namespace comment_mail
 
 				add_action('comment_form', array($this, 'comment_form'), 5, 1);
 				add_action('comment_post', array($this, 'comment_post'), 10, 2);
+				add_action('transition_comment_status', array($this, 'comment_status'), 10, 3);
 
 				/* -------------------------------------------------------------- */
 
@@ -707,11 +708,89 @@ namespace comment_mail
 			 * @attaches-to `comment_post` action.
 			 *
 			 * @param integer|string $comment_id Comment ID.
-			 * @param integer|string $approval_status `0`, `1`, or `spam`.
+			 *
+			 * @param integer|string $comment_status Initial status.
+			 *
+			 *    One of the following:
+			 *       - `0` (aka: `hold`, `unapproved`),
+			 *       - `1` (aka: `approve`, `approved`),
+			 *       - or `trash`, `spam`, `delete`.
 			 */
-			public function comment_post($comment_id, $approval_status)
+			public function comment_post($comment_id, $comment_status)
 			{
-				new comment_post($comment_id, $approval_status);
+				new comment_post($comment_id, $comment_status);
+			}
+
+			/**
+			 * Comment status handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `transition_comment_status` action.
+			 *
+			 * @param integer|string $new_comment_status New status.
+			 *
+			 *    One of the following:
+			 *       - `0` (aka: `hold`, `unapproved`),
+			 *       - `1` (aka: `approve`, `approved`),
+			 *       - or `trash`, `spam`, `delete`.
+			 *
+			 * @param integer|string $old_comment_status Old status.
+			 *
+			 *    One of the following:
+			 *       - `0` (aka: `hold`, `unapproved`),
+			 *       - `1` (aka: `approve`, `approved`),
+			 *       - or `trash`, `spam`, `delete`.
+			 *
+			 * @param object|null    $comment Comment object (now).
+			 */
+			public function comment_status($new_comment_status, $old_comment_status, $comment)
+			{
+				new comment_status($new_comment_status, $old_comment_status, $comment);
+			}
+
+			/**
+			 * Comment status translator.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer|string $status
+			 *
+			 *    One of the following:
+			 *       - `0` (aka: `hold`, `unapproved`),
+			 *       - `1` (aka: `approve`, `approved`),
+			 *       - or `trash`, `spam`, `delete`.
+			 *
+			 * @return string `approve`, `hold`, `trash`, `spam`, `delete`.
+			 *
+			 * @throws \exception If an unexpected status is encountered.
+			 */
+			public function comment_status__($status)
+			{
+				switch(strtolower((string)$status))
+				{
+					case '1':
+					case 'approve':
+					case 'approved':
+						return 'approve';
+
+					case '0':
+					case 'hold':
+					case 'unapproved':
+						return 'hold';
+
+					case 'trash':
+						return 'trash';
+
+					case 'spam':
+						return 'spam';
+
+					case 'delete':
+						return 'delete';
+
+					default: // Throw exception on anything else.
+						throw new \exception(sprintf(__('Unexpected comment status: `%1$s`.'), $status));
+				}
 			}
 
 			/********************************************************************************************************/

@@ -34,33 +34,37 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $comment_id = 0;
+			protected $comment_id; // Set by constructor.
 
 			/**
-			 * @var integer|string Comment approval status.
-			 *    One of the following: `0`, `1`, or `spam`.
+			 * @var string Status; `approve`, `hold`, `trash`, `spam`, `delete`.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $approval_status = 0;
+			protected $status; // Set by constructor.
 
 			/**
 			 * Class constructor.
 			 *
 			 * @param integer|string $comment_id Comment ID.
-			 * @param integer|string $approval_status `0`, `1`, or `spam`.
+			 *
+			 * @param integer|string $status Initial status.
+			 *
+			 *    One of the following:
+			 *       - `0` (aka: `hold`, `unapproved`),
+			 *       - `1` (aka: `approve`, `approved`),
+			 *       - or `trash`, `spam`, `delete`.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			public function __construct($comment_id, $approval_status)
+			public function __construct($comment_id, $status)
 			{
 				$this->plugin = plugin();
 
 				$this->comment_id = (integer)$comment_id;
+				$this->status     = $this->plugin->comment_status__($status);
 
-				if($approval_status !== 'spam')
-					$approval_status = (integer)$approval_status;
-				$this->approval_status = $approval_status;
+				if(!$this->comment_id) return; // Nothing to do.
 				// @TODO
 			}
 		}

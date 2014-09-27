@@ -34,7 +34,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $post_id = 0;
+			protected $post_id; // Set by constructor.
 
 			/**
 			 * Class constructor.
@@ -48,6 +48,8 @@ namespace comment_mail // Root namespace.
 				$this->plugin = plugin();
 
 				$this->post_id = (integer)$post_id;
+
+				if(!$this->post_id) return; // Nothing to do.
 
 				$this->display_subscr_ops();
 			}
