@@ -37,30 +37,30 @@ namespace comment_mail // Root namespace.
 			protected $comment; // Set by constructor.
 
 			/**
-			 * @var string New status; `approve`, `hold`, `trash`, `spam`, `delete`.
+			 * @var string New comment status; `approve`, `hold`, `trash`, `spam`, `delete`.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $new_status; // Set by constructor.
+			protected $new_comment_status; // Set by constructor.
 
 			/**
-			 * @var string Old status; `approve`, `hold`, `trash`, `spam`, `delete`.
+			 * @var string Old comment status; `approve`, `hold`, `trash`, `spam`, `delete`.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $old_status; // Set by constructor.
+			protected $old_comment_status; // Set by constructor.
 
 			/**
 			 * Class constructor.
 			 *
-			 * @param integer|string $new_status New status.
+			 * @param integer|string $new_comment_status New comment status.
 			 *
 			 *    One of the following:
 			 *       - `0` (aka: `hold`, `unapproved`),
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `spam`, `delete`.
 			 *
-			 * @param integer|string $old_status Old status.
+			 * @param integer|string $old_comment_status Old comment status.
 			 *
 			 *    One of the following:
 			 *       - `0` (aka: `hold`, `unapproved`),
@@ -71,13 +71,13 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			public function __construct($new_status, $old_status, $comment)
+			public function __construct($new_comment_status, $old_comment_status, $comment)
 			{
 				$this->plugin = plugin();
 
-				$this->comment    = is_object($comment) ? $comment : NULL;
-				$this->new_status = $this->plugin->comment_status__($new_status);
-				$this->old_status = $this->plugin->comment_status__($old_status);
+				$this->comment            = is_object($comment) ? $comment : NULL;
+				$this->new_comment_status = $this->plugin->comment_status__($new_comment_status);
+				$this->old_comment_status = $this->plugin->comment_status__($old_comment_status);
 
 				if(!isset($this->comment)) return; // Nothing to do.
 				// @TODO

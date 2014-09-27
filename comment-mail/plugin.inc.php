@@ -709,7 +709,7 @@ namespace comment_mail
 			 *
 			 * @param integer|string $comment_id Comment ID.
 			 *
-			 * @param integer|string $comment_status Initial status.
+			 * @param integer|string $comment_status Initial comment status.
 			 *
 			 *    One of the following:
 			 *       - `0` (aka: `hold`, `unapproved`),
@@ -728,14 +728,14 @@ namespace comment_mail
 			 *
 			 * @attaches-to `transition_comment_status` action.
 			 *
-			 * @param integer|string $new_comment_status New status.
+			 * @param integer|string $new_comment_status New comment status.
 			 *
 			 *    One of the following:
 			 *       - `0` (aka: `hold`, `unapproved`),
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `spam`, `delete`.
 			 *
-			 * @param integer|string $old_comment_status Old status.
+			 * @param integer|string $old_comment_status Old comment status.
 			 *
 			 *    One of the following:
 			 *       - `0` (aka: `hold`, `unapproved`),
