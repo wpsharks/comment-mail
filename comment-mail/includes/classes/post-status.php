@@ -84,6 +84,8 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Class constructor.
 			 *
+			 * @since 14xxxx First documented version.
+			 *
 			 * @param string        $new_post_status New post status.
 			 *
 			 *    One of the following statuses:
@@ -120,8 +122,6 @@ namespace comment_mail // Root namespace.
 			 *       Custom post types may have their own statuses.
 			 *
 			 * @param \WP_Post|null $post Post object (now).
-			 *
-			 * @since 14xxxx First documented version.
 			 */
 			public function __construct($new_post_status, $old_post_status, $post)
 			{
@@ -131,11 +131,22 @@ namespace comment_mail // Root namespace.
 				$this->new_post_status = (string)$new_post_status;
 				$this->old_post_status = (string)$old_post_status;
 
-				if(!isset($this->post)) return; // Nothing to do.
+				$this->maybe_auto_sub_insert();
+			}
 
-				if($new_post_status === 'publish' && $old_post_status !== 'publish')
-					if($old_post_status !== 'trash') // Ignore restorations.
-						new auto_sub_inserter($post->ID);
+			/**
+			 * Auto subscribe post author and/or recipients.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function maybe_auto_sub_insert()
+			{
+				if(!isset($this->post))
+					return; // Nothing to do.
+
+				if($this->new_post_status === 'publish' && $this->old_post_status !== 'publish')
+					if($this->old_post_status !== 'trash') // Ignore restorations.
+						new auto_sub_inserter($this->post->ID);
 			}
 		}
 	}

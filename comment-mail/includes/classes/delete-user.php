@@ -65,14 +65,25 @@ namespace comment_mail // Root namespace.
 				$this->user_id = (integer)$user_id;
 				$this->blog_id = (integer)$blog_id;
 
-				if(!$this->user_id) return; // Nothing to do.
+				$this->maybe_delete();
+			}
+
+			/**
+			 * Deletes subscriptions.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function maybe_delete()
+			{
+				if(!$this->user_id)
+					return; // Nothing to do.
 
 				if($this->blog_id && $this->blog_id !== $GLOBALS['blog_id'])
 				{
 					switch_to_blog($this->blog_id);
 					$this->switched_blog = TRUE;
 				}
-				// @TODO
+				new sub_deleter(0, 0, $this->user_id);
 
 				if($this->blog_id && $this->switched_blog)
 				{

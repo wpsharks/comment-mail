@@ -49,7 +49,18 @@ namespace comment_mail // Root namespace.
 
 				$this->post_id = (integer)$post_id;
 
-				if(!$this->post_id) return; // Nothing to do.
+				$this->maybe_delete();
+			}
+
+			/**
+			 * Delete subscriptions.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function maybe_delete()
+			{
+				if(!$this->post_id)
+					return; // Nothing to do.
 
 				new sub_deleter($this->post_id);
 			}

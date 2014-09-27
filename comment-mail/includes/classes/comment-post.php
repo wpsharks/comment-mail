@@ -46,6 +46,8 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Class constructor.
 			 *
+			 * @since 14xxxx First documented version.
+			 *
 			 * @param integer|string $comment_id Comment ID.
 			 *
 			 * @param integer|string $comment_status Initial comment status.
@@ -54,8 +56,6 @@ namespace comment_mail // Root namespace.
 			 *       - `0` (aka: `hold`, `unapproved`),
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `spam`, `delete`.
-			 *
-			 * @since 14xxxx First documented version.
 			 */
 			public function __construct($comment_id, $comment_status)
 			{
@@ -64,14 +64,40 @@ namespace comment_mail // Root namespace.
 				$this->comment_id     = (integer)$comment_id;
 				$this->comment_status = $this->plugin->comment_status__($comment_status);
 
+				$this->maybe_insert_sub();
+				$this->maybe_insert_queue();
+			}
+
+			/**
+			 * Insert subscriber.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function maybe_insert_sub()
+			{
 				if(!$this->comment_id)
-					return; // Nothing to do.
+					return; // Not applicable.
 
-				if(!empty($_POST[__NAMESPACE__.'_subscribe']))
-					new sub_inserter($comment_id);
+				if(empty($_POST[__NAMESPACE__.'_subscribe']))
+					return; // Not applicable.
 
-				if($comment_status === 'approve')
-					new queue_inserter($comment_id);
+				new sub_inserter($this->comment_id);
+			}
+
+			/**
+			 * Insert/queue emails.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function maybe_insert_queue()
+			{
+				if(!$this->comment_id)
+					return; // Not applicable.
+
+				if($this->comment_status !== 'approve')
+					return; // Not applicable.
+
+				new queue_inserter($this->comment_id);
 			}
 		}
 	}
