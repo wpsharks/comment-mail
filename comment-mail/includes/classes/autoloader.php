@@ -59,8 +59,8 @@ namespace comment_mail // Root namespace.
 				if(stripos($ns_class, __NAMESPACE__.'\\') !== 0)
 					return; // Not part of this plugin.
 
-				$class_path = trim(strstr($ns_class, '\\'), '\\');
-				$class_path = str_replace('_', '-', $class_path);
+				$class_path = trim(stristr($ns_class, '\\'), '\\');
+				$class_path = strtolower(str_replace('_', '-', $class_path));
 				$class_file = dirname(__FILE__).'/'.$class_path.'.php';
 
 				if(is_file($class_file)) require_once $class_file;
