@@ -12,8 +12,6 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	require_once dirname(__FILE__).'/plugin.inc.php';
-
 	if(!class_exists('\\'.__NAMESPACE__.'\\upgrader'))
 	{
 		/**
@@ -47,7 +45,6 @@ namespace comment_mail // Root namespace.
 				$this->plugin->options['version'] = $this->plugin->version;
 				update_option(__NAMESPACE__.'_options', $this->plugin->options);
 
-				require_once dirname(__FILE__).'/version-specific-upgrade.php';
 				new version_specific_upgrade($prev_version); // Run upgrader(s).
 
 				$notice = __('<strong>%1$s</strong> detected a new version of itself. Recompiling... All done :-)', $this->plugin->text_domain);
