@@ -235,7 +235,20 @@ namespace comment_mail
 				                                'version'               => $this->version,
 				                                'enable'                => '0', // `0|1`.
 				                                'crons_setup'           => '0', // `0` or timestamp.
-				                                'uninstall_on_deletion' => '0' // `0|1`.
+				                                'uninstall_on_deletion' => '0', // `0|1`.
+
+				                                'smtp_enable'           => '0', // `0|1`.
+				                                'smtp_host'             => '', // Host name.
+				                                'smtp_port'             => '', // Port number.
+				                                'smtp_secure'           => '', // ``, `ssl` or `tls`.
+
+				                                'smtp_username'         => '', // Username.
+				                                'smtp_password'         => '', // Password.
+
+				                                'smtp_from_name'        => '', // From name.
+				                                'smtp_from_addr'        => '', // From address.
+				                                'smtp_force_from'       => '1', // `0|1`.
+
 				); // Default options are merged with those defined by the site owner.
 				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options, get_defined_vars());
 
@@ -303,7 +316,8 @@ namespace comment_mail
 			 */
 			public function activate()
 			{
-				require_once dirname(__FILE__).'/includes/installer.php';
+				if(!class_exists('\\'.__NAMESPACE__.'\\activate'))
+					require_once dirname(__FILE__).'/includes/installer.php';
 				new installer(); // Installation handler.
 			}
 
@@ -319,7 +333,8 @@ namespace comment_mail
 				if(version_compare($this->options['version'], $this->version, '>='))
 					return; // Nothing to do; already @ latest version.
 
-				require_once dirname(__FILE__).'/includes/upgrader.php';
+				if(!class_exists('\\'.__NAMESPACE__.'\\upgrader'))
+					require_once dirname(__FILE__).'/includes/upgrader.php';
 				new upgrader(); // Upgrade handler.
 			}
 
@@ -350,7 +365,8 @@ namespace comment_mail
 			 */
 			public function uninstall()
 			{
-				require_once dirname(__FILE__).'/includes/uninstaller.php';
+				if(!class_exists('\\'.__NAMESPACE__.'\\uninstaller'))
+					require_once dirname(__FILE__).'/includes/uninstaller.php';
 				new uninstaller(); // Uninstall handler.
 			}
 
@@ -397,7 +413,8 @@ namespace comment_mail
 				if(empty($_REQUEST[__NAMESPACE__]))
 					return; // Nothing to do here.
 
-				require_once dirname(__FILE__).'/includes/actions.php';
+				if(!class_exists('\\'.__NAMESPACE__.'\\actions'))
+					require_once dirname(__FILE__).'/includes/actions.php';
 				new actions(); // Handle action(s).
 			}
 
@@ -416,8 +433,50 @@ namespace comment_mail
 			 */
 			public function process_queue()
 			{
-				require_once dirname(__FILE__).'/includes/queue-processor.php';
+				if(!class_exists('\\'.__NAMESPACE__.'\\queue_processor'))
+					require_once dirname(__FILE__).'/includes/queue-processor.php';
 				$queue = new queue_processor(); // Process queue.
+			}
+
+			/*
+			 * Mail-Related Methods
+			 */
+
+			/**
+			 * Mail sending utility; `wp_mail()` compatible.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @note This method always (ALWAYS) sends email in HTML format;
+			 *    w/ a plain text alternative — generated automatically.
+			 *
+			 * @param string|array $to Array or comma-separated list of emails.
+			 * @param string       $subject Email subject line.
+			 * @param string       $message Message contents.
+			 * @param string|array $headers Optional. Additional headers.
+			 * @param string|array $attachments Optional. Files to attach.
+			 *
+			 * @return boolean TRUE if the email was sent successfully.
+			 */
+			public function mail($to, $subject, $message, $headers = array(), $attachments = array())
+			{
+				if($this->options['smtp_enable'] && $this->options['smtp_host'] && $this->options['smtp_port'])
+				{
+					if(!class_exists('\\'.__NAMESPACE__.'\\smtp'))
+						require_once dirname(__FILE__).'/includes/smtp.php';
+
+					if(!isset($this->cache[__FUNCTION__]['smtp']))
+						$smtp = $this->cache[__FUNCTION__]['smtp'] = new smtp();
+					else $smtp = $this->cache[__FUNCTION__]['smtp'];
+
+					/** @var $smtp smtp Reference for IDEs. */
+					return $smtp->mail($to, $subject, $message, $headers, $attachments);
+				}
+				if(is_array($headers)) // Append `Content-Type`.
+					$headers[] = 'Content-Type: text/html; charset=UTF-8';
+				else $headers = trim((string)$headers."\r\n".'Content-Type: text/html; charset=UTF-8');
+
+				return wp_mail($to, $subject, $message, $headers, $attachments);
 			}
 
 			/********************************************************************************************************/
