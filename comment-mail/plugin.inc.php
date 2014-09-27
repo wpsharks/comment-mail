@@ -289,8 +289,13 @@ namespace comment_mail
 				add_action('comment_form', array($this, 'comment_form'), 5, 1);
 				add_action('comment_post', array($this, 'comment_post'), 10, 2);
 				add_action('transition_comment_status', array($this, 'comment_status'), 10, 3);
+
 				add_action('before_delete_post', array($this, 'delete_post'), 10, 1);
+
 				add_action('user_register', array($this, 'user_register'), 10, 1);
+				add_action('delete_user', array($this, 'delete_user'), 10, 1);
+				add_action('wpmu_delete_user', array($this, 'delete_user'), 10, 1);
+				add_action('remove_user_from_blog', array($this, 'delete_user'), 10, 2);
 
 				/* -------------------------------------------------------------- */
 
@@ -831,6 +836,23 @@ namespace comment_mail
 			public function user_register($user_id)
 			{
 				new user_register($user_id);
+			}
+
+			/**
+			 * User deletion handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `delete_user` action.
+			 * @attaches-to `wpmu_delete_user` action.
+			 * @attaches-to `remove_user_from_blog` action.
+			 *
+			 * @param integer|string $user_id User ID.
+			 * @param integer|string $blog_id Blog ID. Defaults to `0` (current blog).
+			 */
+			public function delete_user($user_id, $blog_id = 0)
+			{
+				new delete_user($user_id, $blog_id);
 			}
 
 			/********************************************************************************************************/
