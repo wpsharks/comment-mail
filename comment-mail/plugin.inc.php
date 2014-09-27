@@ -197,6 +197,11 @@ namespace comment_mail
 
 				/* -------------------------------------------------------------- */
 
+				require_once dirname(__FILE__).'/includes/classes/autoloader.php';
+				new autoloader(); // Register the plugin's autoloader.
+
+				/* -------------------------------------------------------------- */
+
 				if(!$this->enable_hooks) // Without hooks?
 					return; // Stop here; setup without hooks.
 
@@ -316,8 +321,6 @@ namespace comment_mail
 			 */
 			public function activate()
 			{
-				if(!class_exists('\\'.__NAMESPACE__.'\\activate'))
-					require_once dirname(__FILE__).'/includes/installer.php';
 				new installer(); // Installation handler.
 			}
 
@@ -333,8 +336,6 @@ namespace comment_mail
 				if(version_compare($this->options['version'], $this->version, '>='))
 					return; // Nothing to do; already @ latest version.
 
-				if(!class_exists('\\'.__NAMESPACE__.'\\upgrader'))
-					require_once dirname(__FILE__).'/includes/upgrader.php';
 				new upgrader(); // Upgrade handler.
 			}
 
@@ -365,8 +366,6 @@ namespace comment_mail
 			 */
 			public function uninstall()
 			{
-				if(!class_exists('\\'.__NAMESPACE__.'\\uninstaller'))
-					require_once dirname(__FILE__).'/includes/uninstaller.php';
 				new uninstaller(); // Uninstall handler.
 			}
 
@@ -413,8 +412,6 @@ namespace comment_mail
 				if(empty($_REQUEST[__NAMESPACE__]))
 					return; // Nothing to do here.
 
-				if(!class_exists('\\'.__NAMESPACE__.'\\actions'))
-					require_once dirname(__FILE__).'/includes/actions.php';
 				new actions(); // Handle action(s).
 			}
 
@@ -433,9 +430,7 @@ namespace comment_mail
 			 */
 			public function process_queue()
 			{
-				if(!class_exists('\\'.__NAMESPACE__.'\\queue_processor'))
-					require_once dirname(__FILE__).'/includes/queue-processor.php';
-				$queue = new queue_processor(); // Process queue.
+				new queue_processor(); // Process queue.
 			}
 
 			/*
@@ -462,9 +457,6 @@ namespace comment_mail
 			{
 				if($this->options['smtp_enable'] && $this->options['smtp_host'] && $this->options['smtp_port'])
 				{
-					if(!class_exists('\\'.__NAMESPACE__.'\\smtp'))
-						require_once dirname(__FILE__).'/includes/smtp.php';
-
 					if(!isset($this->cache[__FUNCTION__]['smtp']))
 						$smtp = $this->cache[__FUNCTION__]['smtp'] = new smtp();
 					else $smtp = $this->cache[__FUNCTION__]['smtp'];
@@ -562,7 +554,6 @@ namespace comment_mail
 			 */
 			public function menu_page_options()
 			{
-				require_once dirname(__FILE__).'/includes/menu-pages.php';
 				$menu_pages = new menu_pages();
 				$menu_pages->options();
 			}
@@ -576,7 +567,6 @@ namespace comment_mail
 			 */
 			public function menu_page_subscribers()
 			{
-				require_once dirname(__FILE__).'/includes/menu-pages.php';
 				$menu_pages = new menu_pages();
 				$menu_pages->subscribers();
 			}
@@ -590,7 +580,6 @@ namespace comment_mail
 			 */
 			public function menu_page_queue()
 			{
-				require_once dirname(__FILE__).'/includes/menu-pages.php';
 				$menu_pages = new menu_pages();
 				$menu_pages->queue();
 			}
