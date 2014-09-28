@@ -2,7 +2,7 @@
 /**
  * Version-Specific Upgrade
  *
- * @package version_specific_upgrade
+ * @package vs_upgrade
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -12,15 +12,15 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\version_specific_upgrade'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\vs_upgrade'))
 	{
 		/**
 		 * Version-Specific Upgrade
 		 *
-		 * @package version_specific_upgrade
+		 * @package vs_upgrade
 		 * @since 14xxxx First documented version.
 		 */
-		class version_specific_upgrade
+		class vs_upgrade
 		{
 			/**
 			 * @var plugin Plugin reference.

@@ -45,7 +45,7 @@ namespace comment_mail // Root namespace.
 				$this->plugin->options['version'] = $this->plugin->version;
 				update_option(__NAMESPACE__.'_options', $this->plugin->options);
 
-				new version_specific_upgrade($prev_version); // Run upgrader(s).
+				new vs_upgrade($prev_version); // Run version-specific upgrader(s).
 
 				$notice = __('<strong>%1$s</strong> detected a new version of itself. Recompiling... All done :-)', $this->plugin->text_domain);
 				$this->plugin->enqueue_notice(sprintf($notice, esc_html($this->plugin->name)), '', TRUE); // Push this to the top.
