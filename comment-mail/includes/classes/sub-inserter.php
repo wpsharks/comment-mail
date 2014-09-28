@@ -144,7 +144,7 @@ namespace comment_mail // Root namespace.
 					'insertion_time'   => time(),
 					'last_update_time' => time(),
 				);
-				$this->plugin->wpdb->insert($this->plugin->db_prefix().'subs', $data);
+				$this->plugin->wpdb->insert($this->plugin->utils_db->prefix().'subs', $data);
 
 				if(!($sub_id = $this->plugin->wpdb->insert_id)) // Insertion failure?
 					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
@@ -185,7 +185,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function check_existing_sub()
 			{
-				$sql = "SELECT * FROM `".esc_sql($this->plugin->db_prefix().'subs')."`".
+				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->comment->post_ID)."'".
 
@@ -246,7 +246,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function delete_existing()
 			{
-				$sql = "DELETE FROM `".esc_sql($this->plugin->db_prefix().'subs')."`".
+				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->comment->post_ID)."'".
 
@@ -310,7 +310,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function clean_name()
 			{
-				return $this->plugin->clean_name($this->comment->comment_author);
+				return $this->plugin->utils_string->clean_name($this->comment->comment_author);
 			}
 
 			/**

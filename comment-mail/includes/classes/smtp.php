@@ -235,7 +235,7 @@ namespace comment_mail // Root namespace.
 			{
 				$recipients = array(); // Initialize.
 
-				foreach($this->plugin->parse_recipients_deep($value, $strict) as $_recipient)
+				foreach($this->plugin->utils_mail->parse_recipients_deep($value, $strict) as $_recipient)
 					$recipients[] = $_recipient->email; // Email address only.
 				unset($_recipient); // Housekeeping.
 

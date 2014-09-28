@@ -49,7 +49,7 @@ namespace comment_mail // Root namespace.
 
 				foreach((array)$_REQUEST[__NAMESPACE__] as $action => $args)
 					if($action && is_string($action) && method_exists($this, $action))
-						$this->{$action}($this->plugin->trim_strip_deep($args));
+						$this->{$action}($this->plugin->utils_string->trim_strip_deep($args));
 			}
 
 			/**

@@ -55,10 +55,10 @@ namespace comment_mail // Root namespace.
 					{
 						$_sql_file_table = substr($_sql_file, 0, -4);
 						$_sql_file_table = str_replace('-', '_', $_sql_file_table);
-						$_sql_file_table = $this->plugin->db_prefix().$_sql_file_table;
+						$_sql_file_table = $this->plugin->utils_db->prefix().$_sql_file_table;
 
 						$_sql = file_get_contents($tables_dir.'/'.$_sql_file);
-						$_sql = str_replace('%%prefix%%', $this->plugin->db_prefix(), $_sql);
+						$_sql = str_replace('%%prefix%%', $this->plugin->utils_db->prefix(), $_sql);
 
 						$this->plugin->wpdb->query($_sql); // Create.
 					}

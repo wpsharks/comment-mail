@@ -73,7 +73,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($post_id)
 			{
-				$this->plugin = plugin();
+				$this->plugin     = plugin();
 
 				$post_id = (integer)$post_id;
 
@@ -167,7 +167,7 @@ namespace comment_mail // Root namespace.
 					'insertion_time'   => time(),
 					'last_update_time' => time(),
 				);
-				$this->plugin->wpdb->insert($this->plugin->db_prefix().'subs', $data);
+				$this->plugin->wpdb->insert($this->plugin->utils_db->prefix().'subs', $data);
 
 				if(!($sub_id = $this->plugin->wpdb->insert_id)) // Insertion failure?
 					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
@@ -189,7 +189,7 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				$recipients = $this->plugin->options['auto_subscribe_recipients'];
-				$recipients = $this->plugin->parse_recipients_deep($recipients);
+				$recipients = $this->plugin->utils_mail->parse_recipients_deep($recipients);
 
 				foreach($recipients as $_recipient)
 				{
@@ -217,7 +217,7 @@ namespace comment_mail // Root namespace.
 						'insertion_time'   => time(),
 						'last_update_time' => time(),
 					);
-					$this->plugin->wpdb->insert($this->plugin->db_prefix().'subs', $data);
+					$this->plugin->wpdb->insert($this->plugin->utils_db->prefix().'subs', $data);
 
 					if(!($sub_id = $this->plugin->wpdb->insert_id)) // Insertion failure?
 						throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
@@ -271,7 +271,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function check_existing_sub_post_author()
 			{
-				$sql = "SELECT * FROM `".esc_sql($this->plugin->db_prefix().'subs')."`".
+				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->post->ID)."'".
 				       " AND `comment_id` = '0'". // All comments.
@@ -295,7 +295,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function check_existing_sub_recipient(\stdClass $recipient)
 			{
-				$sql = "SELECT * FROM `".esc_sql($this->plugin->db_prefix().'subs')."`".
+				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->post->ID)."'".
 				       " AND `comment_id` = '0'". // All comments.
@@ -314,7 +314,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function delete_existing_post_author()
 			{
-				$sql = "DELETE FROM `".esc_sql($this->plugin->db_prefix().'subs')."`".
+				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->post->ID)."'".
 
@@ -333,7 +333,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function delete_existing_recipient(\stdClass $recipient)
 			{
-				$sql = "DELETE FROM `".esc_sql($this->plugin->db_prefix().'subs')."`".
+				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->post->ID)."'".
 
@@ -395,7 +395,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function clean_name_post_author()
 			{
-				return $this->plugin->clean_name($this->post_author->display_name);
+				return $this->plugin->utils_string->clean_name($this->post_author->display_name);
 			}
 
 			/**

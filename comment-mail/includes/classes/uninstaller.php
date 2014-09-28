@@ -94,7 +94,7 @@ namespace comment_mail // Root namespace.
 					{
 						$_sql_file_table = substr($_sql_file, 0, -4);
 						$_sql_file_table = str_replace('-', '_', $_sql_file_table);
-						$_sql_file_table = $this->plugin->db_prefix().$_sql_file_table;
+						$_sql_file_table = $this->plugin->utils_db->prefix().$_sql_file_table;
 
 						$this->plugin->wpdb->query('DROP TABLE IF EXISTS `'.esc_sql($_sql_file_table).'`');
 					}

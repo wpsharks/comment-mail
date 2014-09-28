@@ -19,6 +19,13 @@ namespace comment_mail
 		 *
 		 * @package plugin
 		 * @since 14xxxx First documented version.
+		 *
+		 * @property utils_array  $utils_array
+		 * @property utils_cond   $utils_cond
+		 * @property utils_db     $utils_db
+		 * @property utils_mail   $utils_mail
+		 * @property utils_string $utils_string
+		 * @property utils_url    $utils_url
 		 */
 		class plugin // The heart of this plugin.
 		{
@@ -210,6 +217,85 @@ namespace comment_mail
 				add_action('after_setup_theme', array($this, 'setup'));
 				register_activation_hook($this->file, array($this, 'activate'));
 				register_deactivation_hook($this->file, array($this, 'deactivate'));
+			}
+
+			/********************************************************************************************************/
+
+			/*
+			 * Magic Methods
+			 */
+
+			/**
+			 * Magic/overload property getter.
+			 *
+			 * @param string $property A `utils_*` class instance.
+			 *
+			 * @return object A singleton class instance for the requested `utils_*` class.
+			 *
+			 * @throws \exception If the `$property` is undefined; i.e. not a `utils_*` class.
+			 *
+			 * @see http://php.net/manual/en/language.oop5.overloading.php
+			 */
+			public function __get($property)
+			{
+				$property = (string)$property;
+
+				if(!$property || stripos($property, 'utils_') !== 0 || !class_exists('\\'.__NAMESPACE__.'\\'.$property))
+					throw new \exception(sprintf(__('Undefined utility/property: `%1$s`.', $this->text_domain), $property));
+
+				if(isset($this->cache[__FUNCTION__][$property]))
+					return $this->cache[__FUNCTION__][$property];
+
+				return ($this->cache[__FUNCTION__][$property] = new $property);
+			}
+
+			/**
+			 * Magic `isset()` check.
+			 *
+			 * @param string $property Property to check.
+			 *
+			 * @return boolean TRUE if the property has been set.
+			 *
+			 * @see http://php.net/manual/en/language.oop5.overloading.php
+			 */
+			public function __isset($property)
+			{
+				$property = (string)$property;
+
+				if($property && stripos($property, 'utils_') === 0 && class_exists('\\'.__NAMESPACE__.'\\'.$property))
+					return TRUE; // It's a valid `utils_*` class/property reference.
+
+				return FALSE; // Default return value.
+			}
+
+			/**
+			 * Magic/overload property setter.
+			 *
+			 * @param string $property Property to set.
+			 *
+			 * @throws \exception We do NOT allow magic/overload properties to be set.
+			 *    Magic/overload properties in this class are read-only.
+			 *
+			 * @see http://php.net/manual/en/language.oop5.overloading.php
+			 */
+			public function __set($property)
+			{
+				throw new \exception(sprintf(__('Refused to set magic/overload property: `%1$s`.', $this->text_domain), (string)$property));
+			}
+
+			/**
+			 * Magic `unset()` handler.
+			 *
+			 * @param string $property Property to unset.
+			 *
+			 * @throws \exception We do NOT allow magic/overload properties to be unset.
+			 *    Magic/overload properties in this class are read-only.
+			 *
+			 * @see http://php.net/manual/en/language.oop5.overloading.php
+			 */
+			public function __unset($property)
+			{
+				throw new \exception(sprintf(__('Refused to unset magic/overload property: `%1$s`.', $this->text_domain), (string)$property));
 			}
 
 			/********************************************************************************************************/
@@ -435,7 +521,7 @@ namespace comment_mail
 
 				$deps = array(); // Plugin dependencies.
 
-				wp_enqueue_style(__NAMESPACE__, $this->url('/client-s/css/menu-pages.min.css'), $deps, $this->version, 'all');
+				wp_enqueue_style(__NAMESPACE__, $this->utils_url->to('/client-s/css/menu-pages.min.css'), $deps, $this->version, 'all');
 			}
 
 			/**
@@ -452,7 +538,7 @@ namespace comment_mail
 
 				$deps = array('jquery'); // Plugin dependencies.
 
-				wp_enqueue_script(__NAMESPACE__, $this->url('/client-s/js/menu-pages.min.js'), $deps, $this->version, TRUE);
+				wp_enqueue_script(__NAMESPACE__, $this->utils_url->to('/client-s/js/menu-pages.min.js'), $deps, $this->version, TRUE);
 			}
 
 			/**
@@ -942,319 +1028,6 @@ namespace comment_mail
 			public function sub_cleaner()
 			{
 				new sub_cleaner();
-			}
-
-			/*
-			 * Mail Utilities
-			 */
-
-			/**
-			 * Mail sending utility; `wp_mail()` compatible.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @note This method always (ALWAYS) sends email in HTML format;
-			 *    w/ a plain text alternative — generated automatically.
-			 *
-			 * @param string|array $to Array or comma-separated list of emails.
-			 * @param string       $subject Email subject line.
-			 * @param string       $message Message contents.
-			 * @param string|array $headers Optional. Additional headers.
-			 * @param string|array $attachments Optional. Files to attach.
-			 *
-			 * @return boolean TRUE if the email was sent successfully.
-			 */
-			public function mail($to, $subject, $message, $headers = array(), $attachments = array())
-			{
-				if($this->options['smtp_enable'] && $this->options['smtp_host'] && $this->options['smtp_port'])
-				{
-					if(!isset($this->cache[__FUNCTION__]['smtp']))
-						$smtp = $this->cache[__FUNCTION__]['smtp'] = new smtp();
-					else $smtp = $this->cache[__FUNCTION__]['smtp'];
-
-					/** @var $smtp smtp Reference for IDEs. */
-					return $smtp->mail($to, $subject, $message, $headers, $attachments);
-				}
-				if(is_array($headers)) // Append `Content-Type`.
-					$headers[] = 'Content-Type: text/html; charset=UTF-8';
-				else $headers = trim((string)$headers."\r\n".'Content-Type: text/html; charset=UTF-8');
-
-				return wp_mail($to, $subject, $message, $headers, $attachments);
-			}
-
-			/********************************************************************************************************/
-
-			/*
-			 * DB Utilities
-			 */
-
-			/**
-			 * Current DB table prefix for this plugin.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return string Current DB table prefix.
-			 */
-			public function db_prefix()
-			{
-				return $this->wpdb->prefix.__NAMESPACE__.'_';
-			}
-
-			/********************************************************************************************************/
-
-			/*
-			 * Conditional Utilities
-			 */
-
-			/**
-			 * Current request is for a pro version preview?
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return boolean TRUE if the current request is for a pro preview.
-			 */
-			public function is_pro_preview()
-			{
-				if(isset(static::$static[__FUNCTION__]))
-					return static::$static[__FUNCTION__];
-
-				if(!empty($_REQUEST[__NAMESPACE__.'_pro_preview']))
-					return (static::$static[__FUNCTION__] = TRUE);
-
-				return (static::$static[__FUNCTION__] = FALSE);
-			}
-
-			/********************************************************************************************************/
-
-			/*
-			 * URL Utilities
-			 */
-
-			/**
-			 * URL to a plugin file.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string      $file Optional file path; relative to plugin directory.
-			 * @param string|null $scheme Optional URL scheme. Defaults to the current scheme.
-			 *
-			 * @return string URL to plugin directory; or to the specified `$file` if applicable.
-			 */
-			public function url($file = '', $scheme = NULL)
-			{
-				if(!isset(static::$static[__FUNCTION__]['plugin_dir']))
-					static::$static[__FUNCTION__]['plugin_dir'] = rtrim(plugin_dir_url($this->file), '/');
-
-				$url = static::$static[__FUNCTION__]['plugin_dir'].(string)$file;
-				$url = set_url_scheme($url, $scheme);
-
-				return apply_filters(__METHOD__, $url, get_defined_vars());
-			}
-
-			/********************************************************************************************************/
-
-			/*
-			 * Array Utilities
-			 */
-
-			/**
-			 * Forces an array to contain only unique values (deeply).
-			 *
-			 * @param array $array An input array.
-			 *
-			 * @return array The output array, containing only unique array values deeply.
-			 *
-			 * @note Resource pointers CANNOT be serialized, and will therefore be lost (i.e. corrupted) when/if they're nested deeply inside the input array.
-			 *    Resources NOT nested deeply, DO remain intact (this is fine). Only resource pointers nested deeply are lost via `serialize()`.
-			 */
-			public function array_unique_deep(array $array)
-			{
-				foreach($array as &$_value)
-				{
-					if(!is_resource($_value))
-						$_value = serialize($_value);
-				}
-				unset($_value); // Housekeeping.
-
-				$array = array_unique($array);
-
-				foreach($array as &$_value)
-				{
-					if(!is_resource($_value))
-						$_value = unserialize($_value);
-				}
-				return $array; // Unique (deeply).
-			}
-
-			/********************************************************************************************************/
-
-			/*
-			 * String Utilities
-			 */
-
-			/**
-			 * Strips slashes in strings deeply.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param mixed $value Any value can be converted into a stripped string.
-			 *    Actually, objects can't, but this recurses into objects.
-			 *
-			 * @return string|array|object Stripped string, array, object.
-			 */
-			public function strip_deep($value)
-			{
-				if(is_array($value) || is_object($value))
-				{
-					foreach($value as &$_value)
-						$_value = $this->strip_deep($_value);
-					return $value;
-				}
-				return stripslashes((string)$value);
-			}
-
-			/**
-			 * Trims strings deeply.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param mixed  $value Any value can be converted into a trimmed string.
-			 *    Actually, objects can't, but this recurses into objects.
-			 *
-			 * @param string $chars Specific chars to trim.
-			 *    Defaults to PHP's trim: " \r\n\t\0\x0B". Use an empty string to bypass.
-			 *
-			 * @param string $extra_chars Additional chars to trim.
-			 *
-			 * @return string|array|object Trimmed string, array, object.
-			 */
-			public function trim_deep($value, $chars = '', $extra_chars = '')
-			{
-				if(is_array($value) || is_object($value))
-				{
-					foreach($value as &$_value)
-						$_value = $this->trim_deep($_value, $chars, $extra_chars);
-					return $value;
-				}
-				$chars = isset($chars[0]) ? $chars : " \r\n\t\0\x0B";
-				$chars = $chars.$extra_chars; // Concatenate.
-
-				return trim((string)$value, $chars);
-			}
-
-			/**
-			 * Trims and strips slashes in strings deeply.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param mixed  $value Any value can be converted into a trimmed/stripped string.
-			 *    Actually, objects can't, but this recurses into objects.
-			 *
-			 * @param string $chars Specific chars to trim.
-			 *    Defaults to PHP's trim: " \r\n\t\0\x0B". Use an empty string to bypass.
-			 *
-			 * @param string $extra_chars Additional chars to trim.
-			 *
-			 * @return string|array|object Trimmed/stripped string, array, object.
-			 */
-			public function trim_strip_deep($value, $chars = '', $extra_chars = '')
-			{
-				return $this->trim_deep($this->strip_deep($value), $chars, $extra_chars);
-			}
-
-			/**
-			 * Parses recipients (deeply).
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param mixed   $value Any input value.
-			 *
-			 * @param boolean $strict Optional. Defaults to FALSE (faster). Parses all strings w/ `@` signs.
-			 *    If TRUE, we will validate each address; and we ONLY return 100% valid email addresses.
-			 *
-			 * @param boolean $___recursion Internal use only (indicates function recursion).
-			 *
-			 * @return \stdClass[] Unique array of all parsed recipients (lowercase emails).
-			 *    Each object in the array contains 3 properties: `fname`, `lname`, `email`.
-			 */
-			public function parse_recipients_deep($value, $strict = FALSE, $___recursion = FALSE)
-			{
-				$recipients = array(); // Initialize.
-
-				if(is_array($value) || is_object($value))
-				{
-					foreach($value as $_key => $_value) // Collect all recipients.
-						$recipients = array_merge($recipients, $this->parse_recipients_deep($_value, $strict, TRUE));
-					unset($_key, $_value); // A little housekeeping.
-
-					return $recipients ? $this->array_unique_deep($recipients) : array();
-				}
-				$value                       = trim((string)$value);
-				$delimiter                   = (strpos($value, ';') !== FALSE) ? ';' : ',';
-				$regex_delimitation_splitter = '/'.preg_quote($delimiter, '/').'+/';
-
-				$possible_recipients = preg_split($regex_delimitation_splitter, $value, NULL, PREG_SPLIT_NO_EMPTY);
-				$possible_recipients = $this->trim_deep($possible_recipients);
-
-				foreach($possible_recipients as $_recipient) // Iterate all possible recipients.
-				{
-					if(strpos($_recipient, '@') === FALSE) continue; // NOT an email address.
-
-					if(strpos($_recipient, '<') !== FALSE && preg_match('/(?:"(?P<recipient_name>[^"]+?)"\s*)?\<(?P<recipient_email>.+?)\>/', $_recipient, $_m))
-						if(strpos($_m['recipient_email'], '@', 1) !== FALSE && (!$strict || is_email($_m['recipient_email'])))
-						{
-							$_email = strtolower($_m['recipient_email']);
-
-							$_name = !empty($_m['recipient_name']) ? $_m['recipient_name'] : '';
-							$_name = $_name ? $this->clean_name($_name) : '';
-
-							$_fname = $_name; // Default value; full name.
-							$_lname = ''; // Default value; empty string for now.
-
-							if($_name && strpos($_name, ' ', 1) !== FALSE) // Last name?
-								list($_fname, $_lname) = explode($_name, ' ', 2);
-
-							if(!$_fname) $_fname = strstr($_email, '@', TRUE);
-
-							$recipients[] = (object)array('fname' => $_fname, 'lname' => $_lname, 'email' => $_email);
-
-							continue; // Inside brackets; all done here.
-						}
-					if(strpos($_recipient, '@', 1) !== FALSE && (!$strict || is_email($_recipient)))
-					{
-						$_email = strtolower($_recipient);
-
-						$_fname = strstr($_email, '@', TRUE);
-						$_lname = ''; // Not possible in this case.
-
-						$recipients[] = (object)array('fname' => $_fname, 'lname' => $_lname, 'email' => $_email);
-					}
-				}
-				unset($_recipient, $_m, $_email, $_name, $_fname, $_lname); // Housekeeping.
-
-				return $recipients ? $this->array_unique_deep($recipients) : array();
-			}
-
-			/**
-			 * Cleans a full name.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string $name Input name to clean.
-			 *
-			 * @return string Cleaned name.
-			 */
-			public function clean_name($name)
-			{
-				if(!($name = trim((string)$name)))
-					return ''; // Nothing to do.
-
-				$name = $name ? preg_replace('/^(?:Mr\.?|Mrs\.?|Ms\.?|Dr\.?)\s+/i', '', $name) : '';
-				$name = $name ? preg_replace('/\s+(?:Sr\.?|Jr\.?|IV|I+)$/i', '', $name) : '';
-				$name = $name ? preg_replace('/\s+/', ' ', $name) : '';
-				$name = $name ? trim($name) : ''; // Trim it up now.
-
-				return $name; // Cleaned up now.
 			}
 		}
 

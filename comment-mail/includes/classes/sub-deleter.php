@@ -93,7 +93,7 @@ namespace comment_mail // Root namespace.
 				if(!$this->post_id)
 					return; // Not applicable.
 
-				$sql = "DELETE FROM `".esc_sql($this->plugin->db_prefix().'subs')."`".
+				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->post_id)."'".
 				       ($this->comment_id ? " AND `comment_id` = '".esc_sql($this->comment_id)."'" : '');
@@ -116,7 +116,7 @@ namespace comment_mail // Root namespace.
 				if(!$user->exists() || !$user->ID)
 					return; // Not applicable.
 
-				$sql = "DELETE FROM `".esc_sql($this->plugin->db_prefix().'subs')."`".
+				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `user_id` = '".esc_sql($user->ID)."'".
 				       ($user->user_email ? " OR `email` = '".esc_sql($user->user_email)."'" : '');

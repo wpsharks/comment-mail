@@ -58,7 +58,7 @@ namespace comment_mail // Root namespace.
 			{
 				$user_ids = "SELECT `ID` FROM `".esc_sql($this->plugin->wpdb->users)."`";
 
-				$sql = "DELETE FROM `".esc_sql($this->plugin->db_prefix().'subs')."`".
+				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 				       " WHERE `user_id` != '0' AND `user_id` NOT IN(".$user_ids.")";
 
 				$this->plugin->wpdb->query($sql); // Delete nonexistent users.
@@ -77,7 +77,7 @@ namespace comment_mail // Root namespace.
 				if(!($exp_time = strtotime('-'.$this->plugin->options['unconfirmed_expiration_time'])))
 					return; // Invalid time. Not compatible with `strtotime()`.
 
-				$sql = "DELETE FROM `".esc_sql($this->plugin->db_prefix().'subs')."`".
+				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `status` = 'unconfirmed'".
 				       " AND `last_update_time` < '".esc_sql($exp_time)."'";

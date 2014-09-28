@@ -82,7 +82,7 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				$sub_type = (string)$_POST[__NAMESPACE__.'_subscribe'];
-				if(!($sub_type = $this->plugin->trim_strip_deep($sub_type)))
+				if(!($sub_type = $this->plugin->utils_string->trim_strip_deep($sub_type)))
 					return; // Not applicable.
 
 				new sub_inserter($this->comment_id, $sub_type);

@@ -92,7 +92,7 @@ namespace comment_mail // Root namespace.
 				if(!$this->entry['time'])
 					return; // Not applicable.
 
-				$this->plugin->wpdb->insert($this->plugin->db_prefix().'event_log', $this->entry);
+				$this->plugin->wpdb->insert($this->plugin->utils_db->prefix().'event_log', $this->entry);
 			}
 		}
 	}
