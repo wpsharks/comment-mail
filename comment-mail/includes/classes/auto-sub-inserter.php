@@ -276,8 +276,8 @@ namespace comment_mail // Root namespace.
 				       " WHERE `post_id` = '".esc_sql($this->post->ID)."'".
 				       " AND `comment_id` = '0'". // All comments.
 
-				       " AND ((`user_id` > '0' AND `user_id` = '".esc_sql($this->post_author->ID)."')".
-				       "     OR `email` = '".esc_sql($this->post_author->user_email)."')".
+				       " AND (`user_id` = '".esc_sql($this->post_author->ID)."'".
+				       "       OR `email` = '".esc_sql($this->post_author->user_email)."')".
 
 				       " LIMIT 1"; // We should only have one anyway.
 
@@ -318,8 +318,8 @@ namespace comment_mail // Root namespace.
 
 				       " WHERE `post_id` = '".esc_sql($this->post->ID)."'".
 
-				       " AND ((`user_id` > '0' AND `user_id` = '".esc_sql($this->post_author->ID)."')".
-				       "     OR `email` = '".esc_sql($this->post_author->user_email)."')";
+				       " AND (`user_id` = '".esc_sql($this->post_author->ID)."'".
+				       "       OR `email` = '".esc_sql($this->post_author->user_email)."')";
 
 				$this->plugin->wpdb->query($sql); // Delete any existing subscription(s).
 			}

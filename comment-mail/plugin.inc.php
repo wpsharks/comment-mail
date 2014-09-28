@@ -262,6 +262,9 @@ namespace comment_mail
 				                                'smtp_from_email'                => '', // From email.
 				                                'smtp_force_from'                => '1', // `0|1`.
 
+				                                'unconfirmed_expiration_time'    => '60 days', // `strtotime()` compatible.
+				                                // Or, this can be left empty to disable automatic expirations altogether.
+
 				); // Default options are merged with those defined by the site owner.
 				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options, get_defined_vars());
 
@@ -310,13 +313,17 @@ namespace comment_mail
 
 				if((integer)$this->options['crons_setup'] < 1382523750)
 				{
-					wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_process_queue');
-					wp_schedule_event(time() + 60, 'every5m', '_cron_'.__NAMESPACE__.'_process_queue');
+					wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_queue_processor');
+					wp_schedule_event(time() + 60, 'every5m', '_cron_'.__NAMESPACE__.'_queue_processor');
+
+					wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_sub_cleaner');
+					wp_schedule_event(time() + 60, 'hourly', '_cron_'.__NAMESPACE__.'_sub_cleaner');
 
 					$this->options['crons_setup'] = (string)time();
 					update_option(__NAMESPACE__.'_options', $this->options);
 				}
-				add_action('_cron_'.__NAMESPACE__.'_process_queue', array($this, 'process_queue'));
+				add_action('_cron_'.__NAMESPACE__.'_queue_processor', array($this, 'queue_processor'));
+				add_action('_cron_'.__NAMESPACE__.'_sub_cleaner', array($this, '_sub_cleaner'));
 
 				/* -------------------------------------------------------------- */
 
@@ -385,31 +392,6 @@ namespace comment_mail
 			public function uninstall()
 			{
 				new uninstaller(); // Uninstall handler.
-			}
-
-			/********************************************************************************************************/
-
-			/*
-			 * CRON-Related Methods
-			 */
-
-			/**
-			 * Extends WP-Cron schedules.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @attaches-to `cron_schedules` filter.
-			 *
-			 * @param array $schedules An array of the current schedules.
-			 *
-			 * @return array Revised array of WP-Cron schedules.
-			 */
-			public function extend_cron_schedules($schedules)
-			{
-				$schedules['every5m']  = array('interval' => 300, 'display' => __('Every 5 Minutes', $this->text_domain));
-				$schedules['every15m'] = array('interval' => 900, 'display' => __('Every 15 Minutes', $this->text_domain));
-
-				return apply_filters(__METHOD__, $schedules, get_defined_vars());
 			}
 
 			/********************************************************************************************************/
@@ -916,19 +898,50 @@ namespace comment_mail
 			/********************************************************************************************************/
 
 			/*
-			 * Queue-Related Methods
+			 * CRON-Related Methods
 			 */
+
+			/**
+			 * Extends WP-Cron schedules.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `cron_schedules` filter.
+			 *
+			 * @param array $schedules An array of the current schedules.
+			 *
+			 * @return array Revised array of WP-Cron schedules.
+			 */
+			public function extend_cron_schedules($schedules)
+			{
+				$schedules['every5m']  = array('interval' => 300, 'display' => __('Every 5 Minutes', $this->text_domain));
+				$schedules['every15m'] = array('interval' => 900, 'display' => __('Every 15 Minutes', $this->text_domain));
+
+				return apply_filters(__METHOD__, $schedules, get_defined_vars());
+			}
 
 			/**
 			 * Queue processor.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `_cron_'.__NAMESPACE__.'_process_queue` action.
+			 * @attaches-to `_cron_'.__NAMESPACE__.'_queue_processor` action.
 			 */
-			public function process_queue()
+			public function queue_processor()
 			{
-				new queue_processor(); // Process queue.
+				new queue_processor();
+			}
+
+			/**
+			 * Sub cleaner.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `_cron_'.__NAMESPACE__.'_sub_cleaner` action.
+			 */
+			public function sub_cleaner()
+			{
+				new sub_cleaner();
 			}
 
 			/*
@@ -1233,12 +1246,15 @@ namespace comment_mail
 			 */
 			public function clean_name($name)
 			{
-				$name = trim((string)$name); // Force string.
-				$name = $name ? preg_replace('/^(?:Mr\.|Mrs\.|Ms\.|Dr\.)\s+/i', '', $name) : '';
-				$name = $name ? preg_replace('/\s+(?:Sr\.|Jr\.)$/i', '', $name) : '';
-				$name = $name ? trim($name) : ''; // Cleanup name.
+				if(!($name = trim((string)$name)))
+					return ''; // Nothing to do.
 
-				return $name; // Cleanup up now.
+				$name = $name ? preg_replace('/^(?:Mr\.?|Mrs\.?|Ms\.?|Dr\.?)\s+/i', '', $name) : '';
+				$name = $name ? preg_replace('/\s+(?:Sr\.?|Jr\.?|IV|I+)$/i', '', $name) : '';
+				$name = $name ? preg_replace('/\s+/', ' ', $name) : '';
+				$name = $name ? trim($name) : ''; // Trim it up now.
+
+				return $name; // Cleaned up now.
 			}
 		}
 

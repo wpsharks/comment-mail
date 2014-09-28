@@ -52,6 +52,13 @@ namespace comment_mail // Root namespace.
 			protected $sub_type; // Set by constructor.
 
 			/**
+			 * @var boolean Override existing sub type?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $sub_type_override; // Set by constructor.
+
+			/**
 			 * @var keygen Key generator.
 			 *
 			 * @since 14xxxx First documented version.
@@ -61,31 +68,33 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Class constructor.
 			 *
+			 * @since 14xxxx First documented version.
+			 *
 			 * @param integer|string $comment_id Comment ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @param string         $sub_type Type of subscription.
+			 *    Please pass one of: `comments`, `comment`.
+			 *
+			 * @param boolean        $sub_type_override Defaults to a FALSE value.
 			 */
-			public function __construct($comment_id)
+			public function __construct($comment_id, $sub_type, $sub_type_override = FALSE)
 			{
 				$this->plugin = plugin();
 
-				$comment_id = (integer)$comment_id;
-
-				if($comment_id) // If possible.
+				if(($comment_id = (integer)$comment_id))
 					$this->comment = get_comment($comment_id);
 
-				$this->user = wp_get_current_user();
-
-				if(!empty($_POST[__NAMESPACE__.'_subscribe']))
-					$this->sub_type = $this->plugin->trim_strip_deep((string)$_POST[__NAMESPACE__.'_subscribe']);
-
-				$this->sub_type = strtolower($this->sub_type);
+				$this->sub_type = strtolower((string)$sub_type);
 				if(!in_array($this->sub_type, array('comments', 'comment'), TRUE))
 					$this->sub_type = ''; // Default type.
 
+				$this->sub_type_override = (boolean)$sub_type_override;
+
+				$this->user = wp_get_current_user();
+
 				$this->keygen = new keygen();
 
-				$this->maybe_insert(); // If applicable.
+				$this->maybe_insert();
 			}
 
 			/**
@@ -95,9 +104,6 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_insert()
 			{
-				if(!$this->sub_type)
-					return; // Not applicable.
-
 				if(!$this->comment)
 					return; // Not applicable.
 
@@ -108,6 +114,9 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				if(!$this->comment->comment_author_email)
+					return; // Not applicable.
+
+				if(!$this->sub_type)
 					return; // Not applicable.
 
 				if($this->check_existing())
@@ -179,14 +188,37 @@ namespace comment_mail // Root namespace.
 				$sql = "SELECT * FROM `".esc_sql($this->plugin->db_prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->comment->post_ID)."'".
-				       " AND `comment_id` = '".esc_sql($this->sub_type === 'comment' ? $this->comment->comment_ID : 0)."'".
 
-				       " AND ((`user_id` > '0' AND `user_id` = '".esc_sql($this->user->ID)."')".
-				       "     OR `email` = '".esc_sql($this->comment->comment_author_email)."')".
+				       ($this->sub_type_override // Existing `$sub_type` must match exactly, else override?
+					       ? " AND `comment_id` = '".esc_sql($this->sub_type === 'comment' ? $this->comment->comment_ID : 0)."'"
 
-				       " LIMIT 1"; // We should only have one anyway.
+					       : " AND (`comment_id` = '0'". // If already subscribed to all comments.
+					         // Or, if they are trying to subscribed to a specific comment, and they already are.
+					         ($this->sub_type === 'comment' ? " OR `comment_id` = '".esc_sql($this->comment->comment_ID)."')" : ")")).
 
-				return $this->plugin->wpdb->get_row($sql);
+				       ($this->user->ID // Do we have a user ID?
+					       ? " AND (`user_id` = '".esc_sql($this->user->ID)."'".
+					         "       OR `email` = '".esc_sql($this->comment->comment_author_email)."')"
+					       : " AND `email` = '".esc_sql($this->comment->comment_author_email)."'").
+
+				       " ORDER BY `insertion_time` ASC"; // For the loop below.
+
+				if(!($results = $this->plugin->wpdb->get_results($sql)))
+					return NULL; // Nothing exists.
+
+				$last = $last_subscribed = NULL; // Initialize.
+
+				foreach($results as $_result) switch($_result->status)
+				{
+					case 'subscribed': // Subscribed?
+						$last = $last_subscribed = $_result;
+
+					default: // Default case handler.
+						$last = $_result;
+				}
+				unset($_result); // Just a little housekeeping.
+
+				return $last_subscribed ? $last_subscribed : $last;
 			}
 
 			/**
@@ -204,7 +236,7 @@ namespace comment_mail // Root namespace.
 				if($existing_sub->insertion_time >= strtotime('-15 minutes'))
 					return; // Recently subscribed; give em' time.
 
-				new sub_confirmer($existing_sub->ID); // Send confirmation email now.
+				new sub_confirmer($existing_sub->ID); // Resend confirmation email.
 			}
 
 			/**
@@ -218,8 +250,10 @@ namespace comment_mail // Root namespace.
 
 				       " WHERE `post_id` = '".esc_sql($this->comment->post_ID)."'".
 
-				       " AND ((`user_id` > '0' AND `user_id` = '".esc_sql($this->user->ID)."')".
-				       "     OR `email` = '".esc_sql($this->comment->comment_author_email)."')";
+				       ($this->user->ID // Do we have a user ID?
+					       ? " AND (`user_id` = '".esc_sql($this->user->ID)."'".
+					         "       OR `email` = '".esc_sql($this->comment->comment_author_email)."')"
+					       : " AND `email` = '".esc_sql($this->comment->comment_author_email)."'");
 
 				$this->plugin->wpdb->query($sql); // Delete any existing subscription(s).
 			}
@@ -233,8 +267,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function first_name()
 			{
-				$name = $this->clean_name();
-
+				$name  = $this->clean_name();
 				$fname = $name; // Full name.
 
 				if(strpos($name, ' ', 1) !== FALSE)
