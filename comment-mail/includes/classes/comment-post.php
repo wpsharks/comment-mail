@@ -102,6 +102,23 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				new queue_inserter($this->comment_id);
+				$this->maybe_immediately_process_queue();
+			}
+
+			/**
+			 * Immediately process queued emails.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function maybe_immediately_process_queue()
+			{
+				if(($immediate_max_time = (integer)$this->plugin->options['queue_processor_immediate_max_time']) <= 0)
+					return; // Immediate queue processing is not enabled right now.
+
+				if(($immediate_max_limit = (integer)$this->plugin->options['queue_processor_immediate_max_limit']) <= 0)
+					return; // Immediate queue processing is not enabled right now.
+
+				new queue_processor(FALSE, $immediate_max_time, 0, $immediate_max_limit); // No delay.
 			}
 		}
 	}

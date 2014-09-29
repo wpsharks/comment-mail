@@ -141,7 +141,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_sub_auto_insert()
 			{
-				if(!isset($this->post))
+				if(!$this->post)
 					return; // Nothing to do.
 
 				if($this->new_post_status === 'publish' && $this->old_post_status !== 'publish')

@@ -1,8 +1,8 @@
 <?php
 /**
- * Event Log Inserter
+ * Sub. Event Log Inserter
  *
- * @package event_log_inserter
+ * @package sub_event_log_inserter
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -12,15 +12,15 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\event_log_inserter'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\sub_event_log_inserter'))
 	{
 		/**
-		 * Event Log Inserter
+		 * Sub. Event Log Inserter
 		 *
-		 * @package event_log_inserter
+		 * @package sub_event_log_inserter
 		 * @since 14xxxx First documented version.
 		 */
-		class event_log_inserter // Event log inserter.
+		class sub_event_log_inserter // Sub. event log inserter.
 		{
 			/**
 			 * @var plugin Plugin reference.
@@ -101,8 +101,8 @@ namespace comment_mail // Root namespace.
 				if(!$this->entry['time'])
 					return; // Not applicable.
 
-				if(!$this->plugin->utils_db->wp->insert($this->plugin->utils_db->prefix().'event_log', $this->entry))
-					throw new \exception(__('Event log insertion failure.', $this->plugin->text_domain));
+				if(!$this->plugin->utils_db->wp->insert($this->plugin->utils_db->prefix().'sub_event_log', $this->entry))
+					throw new \exception(__('Insertion failure.', $this->plugin->text_domain));
 			}
 		}
 	}

@@ -20,14 +20,15 @@ namespace comment_mail
 		 * @package plugin
 		 * @since 14xxxx First documented version.
 		 *
-		 * @property utils_array  $utils_array
-		 * @property utils_cond   $utils_cond
-		 * @property utils_db     $utils_db
-		 * @property utils_env    $utils_env
-		 * @property utils_mail   $utils_mail
-		 * @property utils_string $utils_string
-		 * @property utils_sub    $utils_sub
-		 * @property utils_url    $utils_url
+		 * @property utils_array    $utils_array
+		 * @property utils_cond     $utils_cond
+		 * @property utils_db       $utils_db
+		 * @property utils_env      $utils_env
+		 * @property utils_event    $utils_event
+		 * @property utils_mail     $utils_mail
+		 * @property utils_string   $utils_string
+		 * @property utils_sub      $utils_sub
+		 * @property utils_url      $utils_url
 		 */
 		class plugin // The heart of this plugin.
 		{
@@ -352,6 +353,16 @@ namespace comment_mail
 
 				                                'template_email_confirmation_request_subject' => '', // HTML/PHP code.
 				                                'template_email_confirmation_request_message' => '', // HTML/PHP code.
+
+				                                'template_email_comment_notification_subject' => '', // HTML/PHP code.
+				                                'template_email_comment_notification_message' => '', // HTML/PHP code.
+
+				                                'queue_processor_max_time'                    => '30', // In seconds.
+				                                'queue_processor_delay'                       => '250', // In milliseconds.
+				                                'queue_processor_max_limit'                   => '100', // Total queue entries.
+
+				                                'queue_processor_immediate_max_time'          => '10', // In seconds.
+				                                'queue_processor_immediate_max_limit'         => '5', // Total queue entries.
 
 				                                'unconfirmed_expiration_time'                 => '60 days', // `strtotime()` compatible.
 				                                // Or, this can be left empty to disable automatic expirations altogether.

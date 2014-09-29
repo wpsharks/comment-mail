@@ -38,8 +38,20 @@ namespace comment_mail // Root namespace.
 			{
 				$this->plugin = plugin();
 
+				$this->prep_cron_job();
 				$this->clean_nonexistent_users();
 				$this->maybe_clean_unconfirmed_expirations();
+			}
+
+			/**
+			 * Prep CRON job.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function prep_cron_job()
+			{
+				ignore_user_abort(TRUE);
+				@set_time_limit(60); // Plenty.
 			}
 
 			/**

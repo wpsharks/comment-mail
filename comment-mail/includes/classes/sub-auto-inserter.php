@@ -114,6 +114,9 @@ namespace comment_mail // Root namespace.
 				   || !in_array($this->post->post_type, $this->post_types, TRUE)
 				) return; // Not applicable.
 
+				if(in_array($this->post->post_type, array('revision', 'nav_menu_item'), TRUE))
+					return; // Not applicable.
+
 				$this->maybe_insert_post_author();
 				$this->maybe_insert_recipients();
 			}
@@ -173,7 +176,7 @@ namespace comment_mail // Root namespace.
 				if(!($sub_id = (integer)$this->plugin->utils_db->wp->insert_id)) // Insertion failure?
 					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
-				new event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
+				new sub_event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
 			}
 
 			/**
@@ -224,7 +227,7 @@ namespace comment_mail // Root namespace.
 					if(!($sub_id = (integer)$this->plugin->utils_db->wp->insert_id)) // Insertion failure?
 						throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
-					new event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
+					new sub_event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
 				}
 			}
 

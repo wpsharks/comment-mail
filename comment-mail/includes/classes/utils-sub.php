@@ -135,7 +135,7 @@ namespace comment_mail // Root namespace.
 				$last_ip = (string)$last_ip; // Force string.
 
 				if($log_confirmed_event) // Log `confirmed` event?
-					new event_log_inserter(array_merge((array)$sub, array('event' => 'confirmed')));
+					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'confirmed')));
 
 				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
@@ -183,7 +183,7 @@ namespace comment_mail // Root namespace.
 				$last_ip = (string)$last_ip; // Force string.
 
 				if($log_unsubscribed_event) // Log `unsubscribed` event?
-					new event_log_inserter(array_merge((array)$sub, array('event' => 'unsubscribed')));
+					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'unsubscribed')));
 
 				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
