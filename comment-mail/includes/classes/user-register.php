@@ -49,9 +49,37 @@ namespace comment_mail // Root namespace.
 
 				$this->user_id = (integer)$user_id;
 
-				if(!$this->user_id) return; // Nothing to do.
+				$this->maybe_update_subs();
+			}
 
-				// @TODO
+			/**
+			 * Update subscribers; set user ID.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function maybe_update_subs()
+			{
+				if(!$this->user_id)
+					return; // Nothing to do.
+
+				$user = new \WP_User($this->user_id);
+
+				if(!$user->exists() || !$user->ID || !$user->user_email)
+					return; // Not applicable.
+
+				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				       " WHERE `user_id` = '".esc_sql($user->ID)."'";
+
+				$this->plugin->utils_db->wp->query($sql); // Ensure no duplicate keys.
+				// The user ID should NOT exist; we just make absolutely sure in case of corruption.
+
+				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				       " SET `user_id` = '".esc_sql($user->ID)."'".
+
+				       " WHERE `user_id` = '0'".
+				       " AND `email` = '".esc_sql($user->user_email)."'";
+
+				$this->plugin->utils_db->wp->query($sql); // Set user ID.
 			}
 		}
 	}

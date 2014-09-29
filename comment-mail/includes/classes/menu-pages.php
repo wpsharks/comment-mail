@@ -66,7 +66,7 @@ namespace comment_mail // Root namespace.
 				echo '         <a href="'.esc_attr('http://www.websharks-inc.com/r/'.str_replace('_', '-', __NAMESPACE__).'-subscribe/').'" target="_blank"><i class="fa fa-envelope"></i> '.__('Newsletter (Subscribe)', $this->plugin->text_domain).'</a>'."\n";
 				echo '      </div>'."\n";
 
-				echo '      <img src="'.$this->plugin->url('/client-s/images/options.png').'" alt="'.esc_attr(__('Plugin Options', $this->plugin->text_domain)).'" />'."\n";
+				echo '      <img src="'.$this->plugin->utils_url->to('/client-s/images/options.png').'" alt="'.esc_attr(__('Plugin Options', $this->plugin->text_domain)).'" />'."\n";
 
 				echo '   </div>'."\n";
 

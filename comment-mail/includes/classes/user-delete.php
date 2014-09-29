@@ -1,8 +1,8 @@
 <?php
 /**
- * Delete User
+ * User Deletion Handler
  *
- * @package delete_user
+ * @package user_delete
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -12,15 +12,15 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\delete_user'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\user_delete'))
 	{
 		/**
-		 * Delete User
+		 * User Deletion Handler
 		 *
-		 * @package delete_user
+		 * @package user_delete
 		 * @since 14xxxx First documented version.
 		 */
-		class delete_user // User deletion handler.
+		class user_delete // User deletion handler.
 		{
 			/**
 			 * @var plugin Plugin reference.
@@ -65,14 +65,25 @@ namespace comment_mail // Root namespace.
 				$this->user_id = (integer)$user_id;
 				$this->blog_id = (integer)$blog_id;
 
-				if(!$this->user_id) return; // Nothing to do.
+				$this->maybe_delete();
+			}
+
+			/**
+			 * Deletes subscriptions.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function maybe_delete()
+			{
+				if(!$this->user_id)
+					return; // Nothing to do.
 
 				if($this->blog_id && $this->blog_id !== $GLOBALS['blog_id'])
 				{
 					switch_to_blog($this->blog_id);
 					$this->switched_blog = TRUE;
 				}
-				// @TODO
+				new sub_deleter(0, 0, $this->user_id);
 
 				if($this->blog_id && $this->switched_blog)
 				{

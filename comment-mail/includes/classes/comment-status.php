@@ -30,7 +30,7 @@ namespace comment_mail // Root namespace.
 			protected $plugin; // Set by constructor.
 
 			/**
-			 * @var object|null Comment object (now).
+			 * @var \stdClass|null Comment object (now).
 			 *
 			 * @since 14xxxx First documented version.
 			 */
@@ -53,6 +53,8 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Class constructor.
 			 *
+			 * @since 14xxxx First documented version.
+			 *
 			 * @param integer|string $new_comment_status New comment status.
 			 *
 			 *    One of the following:
@@ -67,9 +69,7 @@ namespace comment_mail // Root namespace.
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `spam`, `delete`.
 			 *
-			 * @param object|null    $comment Comment object (now).
-			 *
-			 * @since 14xxxx First documented version.
+			 * @param \stdClass|null $comment Comment object (now).
 			 */
 			public function __construct($new_comment_status, $old_comment_status, $comment)
 			{
@@ -79,8 +79,36 @@ namespace comment_mail // Root namespace.
 				$this->new_comment_status = $this->plugin->comment_status__($new_comment_status);
 				$this->old_comment_status = $this->plugin->comment_status__($old_comment_status);
 
-				if(!isset($this->comment)) return; // Nothing to do.
-				// @TODO
+				$this->maybe_insert_queue();
+				$this->maybe_delete_subs();
+			}
+
+			/**
+			 * Insert/queue emails.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function maybe_insert_queue()
+			{
+				if(!isset($this->comment))
+					return; // Not applicable.
+
+				if($this->new_comment_status === 'approve' && $this->old_comment_status === 'hold')
+					new queue_inserter($this->comment->comment_ID);
+			}
+
+			/**
+			 * Delete subscriptions.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function maybe_delete_subs()
+			{
+				if(!isset($this->comment))
+					return; // Not applicable.
+
+				if($this->new_comment_status === 'delete' && $this->old_comment_status !== 'delete')
+					new sub_deleter($this->comment->post_ID, $this->comment->comment_ID);
 			}
 		}
 	}

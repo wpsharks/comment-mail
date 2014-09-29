@@ -1,8 +1,8 @@
 <?php
 /**
- * Delete Post
+ * Post Deletion Handler
  *
- * @package delete_post
+ * @package post_delete
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -12,15 +12,15 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\delete_post'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\post_delete'))
 	{
 		/**
-		 * Delete Post
+		 * Post Deletion Handler
 		 *
-		 * @package delete_post
+		 * @package post_delete
 		 * @since 14xxxx First documented version.
 		 */
-		class delete_post // Post deletion handler.
+		class post_delete // Post deletion handler.
 		{
 			/**
 			 * @var plugin Plugin reference.
@@ -49,9 +49,20 @@ namespace comment_mail // Root namespace.
 
 				$this->post_id = (integer)$post_id;
 
-				if(!$this->post_id) return; // Nothing to do.
+				$this->maybe_delete();
+			}
 
-				// @TODO
+			/**
+			 * Delete subscriptions.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function maybe_delete()
+			{
+				if(!$this->post_id)
+					return; // Nothing to do.
+
+				new sub_deleter($this->post_id);
 			}
 		}
 	}

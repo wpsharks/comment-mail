@@ -49,9 +49,7 @@ namespace comment_mail // Root namespace.
 
 				$this->post_id = (integer)$post_id;
 
-				if(!$this->post_id) return; // Nothing to do.
-
-				$this->display_subscr_ops();
+				$this->maybe_display_subscription_ops();
 			}
 
 			/**
@@ -59,9 +57,14 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			public function display_subscr_ops()
+			public function maybe_display_subscription_ops()
 			{
+				if(!$this->post_id)
+					return; // Nothing to do.
+
 				// @TODO
+				// $_POST[__NAMESPACE__.'_subscribe']
+				// templates/site/subscription-ops.php
 			}
 		}
 	}

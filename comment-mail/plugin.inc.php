@@ -19,6 +19,16 @@ namespace comment_mail
 		 *
 		 * @package plugin
 		 * @since 14xxxx First documented version.
+		 *
+		 * @property utils_array    $utils_array
+		 * @property utils_cond     $utils_cond
+		 * @property utils_db       $utils_db
+		 * @property utils_env      $utils_env
+		 * @property utils_event    $utils_event
+		 * @property utils_mail     $utils_mail
+		 * @property utils_string   $utils_string
+		 * @property utils_sub      $utils_sub
+		 * @property utils_url      $utils_url
 		 */
 		class plugin // The heart of this plugin.
 		{
@@ -125,15 +135,6 @@ namespace comment_mail
 			public $options;
 
 			/**
-			 * WordPress database reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @var \wpdb Database object reference.
-			 */
-			public $wpdb;
-
-			/**
 			 * General capability requirement.
 			 *
 			 * @since 14xxxx First documented version.
@@ -215,6 +216,85 @@ namespace comment_mail
 			/********************************************************************************************************/
 
 			/*
+			 * Magic Methods
+			 */
+
+			/**
+			 * Magic/overload property getter.
+			 *
+			 * @param string $property A `utils_*` class instance.
+			 *
+			 * @return object A singleton class instance for the requested `utils_*` class.
+			 *
+			 * @throws \exception If the `$property` is undefined; i.e. not a `utils_*` class.
+			 *
+			 * @see http://php.net/manual/en/language.oop5.overloading.php
+			 */
+			public function __get($property)
+			{
+				$property = (string)$property;
+
+				if(!$property || stripos($property, 'utils_') !== 0 || !class_exists('\\'.__NAMESPACE__.'\\'.$property))
+					throw new \exception(sprintf(__('Undefined utility/property: `%1$s`.', $this->text_domain), $property));
+
+				if(isset($this->cache[__FUNCTION__][$property]))
+					return $this->cache[__FUNCTION__][$property];
+
+				return ($this->cache[__FUNCTION__][$property] = new $property);
+			}
+
+			/**
+			 * Magic `isset()` check.
+			 *
+			 * @param string $property Property to check.
+			 *
+			 * @return boolean TRUE if the property has been set.
+			 *
+			 * @see http://php.net/manual/en/language.oop5.overloading.php
+			 */
+			public function __isset($property)
+			{
+				$property = (string)$property;
+
+				if($property && stripos($property, 'utils_') === 0 && class_exists('\\'.__NAMESPACE__.'\\'.$property))
+					return TRUE; // It's a valid `utils_*` class/property reference.
+
+				return FALSE; // Default return value.
+			}
+
+			/**
+			 * Magic/overload property setter.
+			 *
+			 * @param string $property Property to set.
+			 *
+			 * @throws \exception We do NOT allow magic/overload properties to be set.
+			 *    Magic/overload properties in this class are read-only.
+			 *
+			 * @see http://php.net/manual/en/language.oop5.overloading.php
+			 */
+			public function __set($property)
+			{
+				throw new \exception(sprintf(__('Refused to set magic/overload property: `%1$s`.', $this->text_domain), (string)$property));
+			}
+
+			/**
+			 * Magic `unset()` handler.
+			 *
+			 * @param string $property Property to unset.
+			 *
+			 * @throws \exception We do NOT allow magic/overload properties to be unset.
+			 *    Magic/overload properties in this class are read-only.
+			 *
+			 * @see http://php.net/manual/en/language.oop5.overloading.php
+			 */
+			public function __unset($property)
+			{
+				throw new \exception(sprintf(__('Refused to unset magic/overload property: `%1$s`.', $this->text_domain), (string)$property));
+			}
+
+			/********************************************************************************************************/
+
+			/*
 			 * Setup Routine(s)
 			 */
 
@@ -237,22 +317,55 @@ namespace comment_mail
 				load_plugin_textdomain($this->text_domain); // For translations.
 
 				$this->default_options = array( // Option defaults.
-				                                'version'               => $this->version,
-				                                'enable'                => '0', // `0|1`.
-				                                'crons_setup'           => '0', // `0` or timestamp.
-				                                'uninstall_on_deletion' => '0', // `0|1`.
+				                                'version'                                     => $this->version,
+				                                'enable'                                      => '0', // `0|1`.
+				                                'crons_setup'                                 => '0', // `0` or timestamp.
+				                                'uninstall_on_deletion'                       => '0', // `0|1`.
 
-				                                'smtp_enable'           => '0', // `0|1`.
-				                                'smtp_host'             => '', // Host name.
-				                                'smtp_port'             => '', // Port number.
-				                                'smtp_secure'           => '', // ``, `ssl` or `tls`.
+				                                'auto_confirm_enable'                         => '0', // `0|1`.
 
-				                                'smtp_username'         => '', // Username.
-				                                'smtp_password'         => '', // Password.
+				                                'auto_subscribe_enable'                       => '1', // `0|1`.
+				                                'auto_subscribe_post_types'                   => 'post,page',
+				                                'auto_subscribe_post_author'                  => '1', // `0|1`.
+				                                'auto_subscribe_recipients'                   => '', // Others.
 
-				                                'smtp_from_name'        => '', // From name.
-				                                'smtp_from_addr'        => '', // From address.
-				                                'smtp_force_from'       => '1', // `0|1`.
+				                                'smtp_enable'                                 => '0', // `0|1`.
+				                                'smtp_host'                                   => '', // Host name.
+				                                'smtp_port'                                   => '', // Port number.
+				                                'smtp_secure'                                 => '', // ``, `ssl` or `tls`.
+
+				                                'smtp_username'                               => '', // Username.
+				                                'smtp_password'                               => '', // Password.
+
+				                                'smtp_from_name'                              => '', // From name.
+				                                'smtp_from_email'                             => '', // From email.
+				                                'smtp_force_from'                             => '1', // `0|1`.
+
+				                                'template_site_common_header'                 => '', // HTML/PHP code.
+				                                'template_site_common_footer'                 => '', // HTML/PHP code.
+
+				                                'template_site_comment_form_subscription_ops' => '', // HTML/PHP code.
+				                                'template_site_sub_actions_confirmed'         => '', // HTML/PHP code.
+				                                'template_site_sub_actions_unsubscribed'      => '', // HTML/PHP code.
+
+				                                'template_email_common_header'                => '', // HTML/PHP code.
+				                                'template_email_common_footer'                => '', // HTML/PHP code.
+
+				                                'template_email_confirmation_request_subject' => '', // HTML/PHP code.
+				                                'template_email_confirmation_request_message' => '', // HTML/PHP code.
+
+				                                'template_email_comment_notification_subject' => '', // HTML/PHP code.
+				                                'template_email_comment_notification_message' => '', // HTML/PHP code.
+
+				                                'queue_processor_max_time'                    => '30', // In seconds.
+				                                'queue_processor_delay'                       => '250', // In milliseconds.
+				                                'queue_processor_max_limit'                   => '100', // Total queue entries.
+
+				                                'queue_processor_immediate_max_time'          => '10', // In seconds.
+				                                'queue_processor_immediate_max_limit'         => '5', // Total queue entries.
+
+				                                'unconfirmed_expiration_time'                 => '60 days', // `strtotime()` compatible.
+				                                // Or, this can be left empty to disable automatic expirations altogether.
 
 				); // Default options are merged with those defined by the site owner.
 				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options, get_defined_vars());
@@ -261,7 +374,6 @@ namespace comment_mail
 				$this->options = array_merge($this->default_options, $options); // Merge into default options.
 				$this->options = apply_filters(__METHOD__.'__options', $this->options, get_defined_vars());
 
-				$this->wpdb          = $GLOBALS['wpdb']; // DB reference.
 				$this->cap           = apply_filters(__METHOD__.'__cap', 'activate_plugins');
 				$this->uninstall_cap = apply_filters(__METHOD__.'__uninstall_cap', 'delete_plugins');
 
@@ -286,28 +398,33 @@ namespace comment_mail
 
 				add_filter('cron_schedules', array($this, 'extend_cron_schedules'));
 
+				add_action('transition_post_status', array($this, 'post_status'), 10, 3);
+				add_action('before_delete_post', array($this, 'post_delete'), 10, 1);
+
 				add_action('comment_form', array($this, 'comment_form'), 5, 1);
 				add_action('comment_post', array($this, 'comment_post'), 10, 2);
 				add_action('transition_comment_status', array($this, 'comment_status'), 10, 3);
 
-				add_action('before_delete_post', array($this, 'delete_post'), 10, 1);
-
 				add_action('user_register', array($this, 'user_register'), 10, 1);
-				add_action('delete_user', array($this, 'delete_user'), 10, 1);
-				add_action('wpmu_delete_user', array($this, 'delete_user'), 10, 1);
-				add_action('remove_user_from_blog', array($this, 'delete_user'), 10, 2);
+				add_action('delete_user', array($this, 'user_delete'), 10, 1);
+				add_action('wpmu_delete_user', array($this, 'user_delete'), 10, 1);
+				add_action('remove_user_from_blog', array($this, 'user_delete'), 10, 2);
 
 				/* -------------------------------------------------------------- */
 
 				if((integer)$this->options['crons_setup'] < 1382523750)
 				{
-					wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_process_queue');
-					wp_schedule_event(time() + 60, 'every5m', '_cron_'.__NAMESPACE__.'_process_queue');
+					wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_queue_processor');
+					wp_schedule_event(time() + 60, 'every5m', '_cron_'.__NAMESPACE__.'_queue_processor');
+
+					wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_sub_cleaner');
+					wp_schedule_event(time() + 60, 'hourly', '_cron_'.__NAMESPACE__.'_sub_cleaner');
 
 					$this->options['crons_setup'] = (string)time();
 					update_option(__NAMESPACE__.'_options', $this->options);
 				}
-				add_action('_cron_'.__NAMESPACE__.'_process_queue', array($this, 'process_queue'));
+				add_action('_cron_'.__NAMESPACE__.'_queue_processor', array($this, 'queue_processor'));
+				add_action('_cron_'.__NAMESPACE__.'_sub_cleaner', array($this, '_sub_cleaner'));
 
 				/* -------------------------------------------------------------- */
 
@@ -381,31 +498,6 @@ namespace comment_mail
 			/********************************************************************************************************/
 
 			/*
-			 * CRON-Related Methods
-			 */
-
-			/**
-			 * Extends WP-Cron schedules.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @attaches-to `cron_schedules` filter.
-			 *
-			 * @param array $schedules An array of the current schedules.
-			 *
-			 * @return array Revised array of WP-Cron schedules.
-			 */
-			public function extend_cron_schedules($schedules)
-			{
-				$schedules['every5m']  = array('interval' => 300, 'display' => __('Every 5 Minutes', $this->text_domain));
-				$schedules['every15m'] = array('interval' => 900, 'display' => __('Every 15 Minutes', $this->text_domain));
-
-				return apply_filters(__METHOD__, $schedules, get_defined_vars());
-			}
-
-			/********************************************************************************************************/
-
-			/*
 			 * Action-Related Methods
 			 */
 
@@ -444,7 +536,7 @@ namespace comment_mail
 
 				$deps = array(); // Plugin dependencies.
 
-				wp_enqueue_style(__NAMESPACE__, $this->url('/client-s/css/menu-pages.min.css'), $deps, $this->version, 'all');
+				wp_enqueue_style(__NAMESPACE__, $this->utils_url->to('/client-s/css/menu-pages.min.css'), $deps, $this->version, 'all');
 			}
 
 			/**
@@ -461,7 +553,7 @@ namespace comment_mail
 
 				$deps = array('jquery'); // Plugin dependencies.
 
-				wp_enqueue_script(__NAMESPACE__, $this->url('/client-s/js/menu-pages.min.js'), $deps, $this->version, TRUE);
+				wp_enqueue_script(__NAMESPACE__, $this->utils_url->to('/client-s/js/menu-pages.min.js'), $deps, $this->version, TRUE);
 			}
 
 			/**
@@ -692,6 +784,55 @@ namespace comment_mail
 			 */
 
 			/**
+			 * Post status handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `transition_post_status` action.
+			 *
+			 * @param string        $new_post_status New post status.
+			 *
+			 *    One of the following statuses:
+			 *    See: <http://codex.wordpress.org/Function_Reference/get_post_status>
+			 *
+			 *       - `publish`
+			 *       - `pending`
+			 *       - `draft`
+			 *       - `auto-draft`
+			 *       - `future`
+			 *       - `private`
+			 *       - `inherit`
+			 *       - `trash`
+			 *
+			 *    See also: {@link get_available_post_statuses()}
+			 *       Custom post types may have their own statuses.
+			 *
+			 * @param string        $old_post_status Old post status.
+			 *
+			 *    One of the following statuses:
+			 *    See: <http://codex.wordpress.org/Function_Reference/get_post_status>
+			 *
+			 *       - `new`
+			 *       - `publish`
+			 *       - `pending`
+			 *       - `draft`
+			 *       - `auto-draft`
+			 *       - `future`
+			 *       - `private`
+			 *       - `inherit`
+			 *       - `trash`
+			 *
+			 *    See also: {@link get_available_post_statuses()}
+			 *       Custom post types may have their own statuses.
+			 *
+			 * @param \WP_Post|null $post Post object instance.
+			 */
+			public function post_status($new_post_status, $old_post_status, $post)
+			{
+				new post_status($new_post_status, $old_post_status, $post);
+			}
+
+			/**
 			 * Post deletion handler.
 			 *
 			 * @since 14xxxx First documented version.
@@ -700,9 +841,9 @@ namespace comment_mail
 			 *
 			 * @param integer|string $post_id Post ID.
 			 */
-			public function delete_post($post_id)
+			public function post_delete($post_id)
 			{
-				new delete_post($post_id);
+				new post_delete($post_id);
 			}
 
 			/********************************************************************************************************/
@@ -767,7 +908,7 @@ namespace comment_mail
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `spam`, `delete`.
 			 *
-			 * @param object|null    $comment Comment object (now).
+			 * @param \stdClass|null $comment Comment object (now).
 			 */
 			public function comment_status($new_comment_status, $old_comment_status, $comment)
 			{
@@ -850,210 +991,58 @@ namespace comment_mail
 			 * @param integer|string $user_id User ID.
 			 * @param integer|string $blog_id Blog ID. Defaults to `0` (current blog).
 			 */
-			public function delete_user($user_id, $blog_id = 0)
+			public function user_delete($user_id, $blog_id = 0)
 			{
-				new delete_user($user_id, $blog_id);
+				new user_delete($user_id, $blog_id);
 			}
 
 			/********************************************************************************************************/
 
 			/*
-			 * Queue-Related Methods
+			 * CRON-Related Methods
 			 */
+
+			/**
+			 * Extends WP-Cron schedules.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `cron_schedules` filter.
+			 *
+			 * @param array $schedules An array of the current schedules.
+			 *
+			 * @return array Revised array of WP-Cron schedules.
+			 */
+			public function extend_cron_schedules($schedules)
+			{
+				$schedules['every5m']  = array('interval' => 300, 'display' => __('Every 5 Minutes', $this->text_domain));
+				$schedules['every15m'] = array('interval' => 900, 'display' => __('Every 15 Minutes', $this->text_domain));
+
+				return apply_filters(__METHOD__, $schedules, get_defined_vars());
+			}
 
 			/**
 			 * Queue processor.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `_cron_'.__NAMESPACE__.'_process_queue` action.
+			 * @attaches-to `_cron_'.__NAMESPACE__.'_queue_processor` action.
 			 */
-			public function process_queue()
+			public function queue_processor()
 			{
-				new queue_processor(); // Process queue.
-			}
-
-			/*
-			 * Mail Utilities
-			 */
-
-			/**
-			 * Mail sending utility; `wp_mail()` compatible.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @note This method always (ALWAYS) sends email in HTML format;
-			 *    w/ a plain text alternative — generated automatically.
-			 *
-			 * @param string|array $to Array or comma-separated list of emails.
-			 * @param string       $subject Email subject line.
-			 * @param string       $message Message contents.
-			 * @param string|array $headers Optional. Additional headers.
-			 * @param string|array $attachments Optional. Files to attach.
-			 *
-			 * @return boolean TRUE if the email was sent successfully.
-			 */
-			public function mail($to, $subject, $message, $headers = array(), $attachments = array())
-			{
-				if($this->options['smtp_enable'] && $this->options['smtp_host'] && $this->options['smtp_port'])
-				{
-					if(!isset($this->cache[__FUNCTION__]['smtp']))
-						$smtp = $this->cache[__FUNCTION__]['smtp'] = new smtp();
-					else $smtp = $this->cache[__FUNCTION__]['smtp'];
-
-					/** @var $smtp smtp Reference for IDEs. */
-					return $smtp->mail($to, $subject, $message, $headers, $attachments);
-				}
-				if(is_array($headers)) // Append `Content-Type`.
-					$headers[] = 'Content-Type: text/html; charset=UTF-8';
-				else $headers = trim((string)$headers."\r\n".'Content-Type: text/html; charset=UTF-8');
-
-				return wp_mail($to, $subject, $message, $headers, $attachments);
-			}
-
-			/********************************************************************************************************/
-
-			/*
-			 * DB Utilities
-			 */
-
-			/**
-			 * Current DB table prefix for this plugin.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return string Current DB table prefix.
-			 */
-			public function db_prefix()
-			{
-				return $this->wpdb->prefix.__NAMESPACE__.'_';
-			}
-
-			/********************************************************************************************************/
-
-			/*
-			 * Conditional Utilities
-			 */
-
-			/**
-			 * Current request is for a pro version preview?
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return boolean TRUE if the current request is for a pro preview.
-			 */
-			public function is_pro_preview()
-			{
-				if(isset(static::$static[__FUNCTION__]))
-					return static::$static[__FUNCTION__];
-
-				if(!empty($_REQUEST[__NAMESPACE__.'_pro_preview']))
-					return (static::$static[__FUNCTION__] = TRUE);
-
-				return (static::$static[__FUNCTION__] = FALSE);
-			}
-
-			/********************************************************************************************************/
-
-			/*
-			 * URL Utilities
-			 */
-
-			/**
-			 * URL to a plugin file.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string      $file Optional file path; relative to plugin directory.
-			 * @param string|null $scheme Optional URL scheme. Defaults to the current scheme.
-			 *
-			 * @return string URL to plugin directory; or to the specified `$file` if applicable.
-			 */
-			public function url($file = '', $scheme = NULL)
-			{
-				if(!isset(static::$static[__FUNCTION__]['plugin_dir']))
-					static::$static[__FUNCTION__]['plugin_dir'] = rtrim(plugin_dir_url($this->file), '/');
-
-				$url = static::$static[__FUNCTION__]['plugin_dir'].(string)$file;
-				$url = set_url_scheme($url, $scheme);
-
-				return apply_filters(__METHOD__, $url, get_defined_vars());
-			}
-
-			/********************************************************************************************************/
-
-			/*
-			 * String Utilities
-			 */
-
-			/**
-			 * Strips slashes in strings deeply.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param mixed $value Any value can be converted into a stripped string.
-			 *    Actually, objects can't, but this recurses into objects.
-			 *
-			 * @return string|array|object Stripped string, array, object.
-			 */
-			public function strip_deep($value)
-			{
-				if(is_array($value) || is_object($value))
-				{
-					foreach($value as &$_value)
-						$_value = $this->strip_deep($_value);
-					return $value;
-				}
-				return stripslashes((string)$value);
+				new queue_processor();
 			}
 
 			/**
-			 * Trims strings deeply.
+			 * Sub cleaner.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param mixed  $value Any value can be converted into a trimmed string.
-			 *    Actually, objects can't, but this recurses into objects.
-			 *
-			 * @param string $chars Specific chars to trim.
-			 *    Defaults to PHP's trim: " \r\n\t\0\x0B". Use an empty string to bypass.
-			 *
-			 * @param string $extra_chars Additional chars to trim.
-			 *
-			 * @return string|array|object Trimmed string, array, object.
+			 * @attaches-to `_cron_'.__NAMESPACE__.'_sub_cleaner` action.
 			 */
-			public function trim_deep($value, $chars = '', $extra_chars = '')
+			public function sub_cleaner()
 			{
-				if(is_array($value) || is_object($value))
-				{
-					foreach($value as &$_value)
-						$_value = $this->trim_deep($_value, $chars, $extra_chars);
-					return $value;
-				}
-				$chars = isset($chars[0]) ? $chars : " \r\n\t\0\x0B";
-				$chars = $chars.$extra_chars; // Concatenate.
-
-				return trim((string)$value, $chars);
-			}
-
-			/**
-			 * Trims and strips slashes in strings deeply.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param mixed  $value Any value can be converted into a trimmed/stripped string.
-			 *    Actually, objects can't, but this recurses into objects.
-			 *
-			 * @param string $chars Specific chars to trim.
-			 *    Defaults to PHP's trim: " \r\n\t\0\x0B". Use an empty string to bypass.
-			 *
-			 * @param string $extra_chars Additional chars to trim.
-			 *
-			 * @return string|array|object Trimmed/stripped string, array, object.
-			 */
-			public function trim_strip_deep($value, $chars = '', $extra_chars = '')
-			{
-				return $this->trim_deep($this->strip_deep($value), $chars, $extra_chars);
+				new sub_cleaner();
 			}
 		}
 
