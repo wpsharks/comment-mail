@@ -1,6 +1,6 @@
 <?php
 /**
- * Post Status
+ * Post Status Change Handler
  *
  * @package post_status
  * @since 14xxxx First documented version.
@@ -15,12 +15,12 @@ namespace comment_mail // Root namespace.
 	if(!class_exists('\\'.__NAMESPACE__.'\\post_status'))
 	{
 		/**
-		 * Post Status
+		 * Post Status Change Handler
 		 *
 		 * @package post_status
 		 * @since 14xxxx First documented version.
 		 */
-		class post_status // Post status.
+		class post_status // Post status change handler.
 		{
 			/**
 			 * @var plugin Plugin reference.
@@ -131,7 +131,7 @@ namespace comment_mail // Root namespace.
 				$this->new_post_status = (string)$new_post_status;
 				$this->old_post_status = (string)$old_post_status;
 
-				$this->maybe_auto_sub_insert();
+				$this->maybe_sub_auto_insert();
 			}
 
 			/**
@@ -139,14 +139,14 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function maybe_auto_sub_insert()
+			protected function maybe_sub_auto_insert()
 			{
 				if(!isset($this->post))
 					return; // Nothing to do.
 
 				if($this->new_post_status === 'publish' && $this->old_post_status !== 'publish')
 					if($this->old_post_status !== 'trash') // Ignore restorations.
-						new auto_sub_inserter($this->post->ID);
+						new sub_auto_inserter($this->post->ID);
 			}
 		}
 	}

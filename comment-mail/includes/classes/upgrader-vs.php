@@ -1,8 +1,8 @@
 <?php
 /**
- * Version-Specific Upgrade
+ * Upgrader (Version-Specific)
  *
- * @package vs_upgrade
+ * @package upgrader_vs
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -12,15 +12,15 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\vs_upgrade'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\upgrader_vs'))
 	{
 		/**
-		 * Version-Specific Upgrade
+		 * Upgrader (Version-Specific)
 		 *
-		 * @package vs_upgrade
+		 * @package upgrader_vs
 		 * @since 14xxxx First documented version.
 		 */
-		class vs_upgrade
+		class upgrader_vs // Version-specific upgraders.
 		{
 			/**
 			 * @var plugin Plugin reference.
@@ -45,7 +45,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($prev_version)
 			{
-				$this->plugin       = plugin();
+				$this->plugin = plugin();
+
 				$this->prev_version = (string)$prev_version;
 
 				$this->run_handlers(); // Run upgrade(s).
@@ -58,7 +59,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function run_handlers()
 			{
-				$this->from_lt_vxxxx();
+				$this->from_lt_v14xxxx();
 			}
 
 			/**
@@ -66,7 +67,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function from_lt_vxxxx()
+			protected function from_lt_v14xxxx()
 			{
 			}
 		}

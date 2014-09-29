@@ -64,16 +64,16 @@ namespace comment_mail // Root namespace.
 			 */
 			public function send($to, $subject, $message, $headers = array(), $attachments = array())
 			{
-				if($this->plugin->options['smtp_enable'] // SMTP enabled?
+				if($this->plugin->options['smtp_enable'] // SMTP mailer enabled?
 				   && $this->plugin->options['smtp_host'] && $this->plugin->options['smtp_port']
-				) // If SMTP is enabled AND configured for use.
+				) // If the SMTP mailer is enabled & configured; i.e. ready for use.
 				{
-					if(!isset($this->cache[__FUNCTION__]['smtp']))
-						$smtp = $this->cache[__FUNCTION__]['smtp'] = new smtp();
-					else $smtp = $this->cache[__FUNCTION__]['smtp'];
+					if(!isset($this->cache[__FUNCTION__]['mail_smtp']))
+						$mail_smtp = $this->cache[__FUNCTION__]['mail_smtp'] = new mail_smtp();
+					else $mail_smtp = $this->cache[__FUNCTION__]['mail_smtp'];
 
-					/** @var $smtp smtp Reference for IDEs. */
-					return $smtp->mail($to, $subject, $message, $headers, $attachments);
+					/** @var $mail_smtp mail_smtp Reference for IDEs. */
+					return $mail_smtp->send($to, $subject, $message, $headers, $attachments);
 				}
 				if(is_array($headers)) // Append `Content-Type`.
 					$headers[] = 'Content-Type: text/html; charset=UTF-8';
@@ -92,19 +92,17 @@ namespace comment_mail // Root namespace.
 			 * @param boolean $strict Optional. Defaults to FALSE (faster). Parses all strings w/ `@` signs.
 			 *    If TRUE, we will validate each address; and we ONLY return 100% valid email addresses.
 			 *
-			 * @param boolean $___recursion Internal use only (indicates function recursion).
-			 *
 			 * @return \stdClass[] Unique array of all parsed recipients (lowercase emails).
 			 *    Each object in the array contains 3 properties: `fname`, `lname`, `email`.
 			 */
-			public function parse_recipients_deep($value, $strict = FALSE, $___recursion = FALSE)
+			public function parse_recipients_deep($value, $strict = FALSE)
 			{
 				$recipients = array(); // Initialize.
 
 				if(is_array($value) || is_object($value))
 				{
 					foreach($value as $_key => $_value) // Collect all recipients.
-						$recipients = array_merge($recipients, $this->parse_recipients_deep($_value, $strict, TRUE));
+						$recipients = array_merge($recipients, $this->parse_recipients_deep($_value, $strict));
 					unset($_key, $_value); // A little housekeeping.
 
 					return $recipients ? $this->plugin->utils_array->unique_deep($recipients) : array();

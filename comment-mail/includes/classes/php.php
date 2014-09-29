@@ -125,18 +125,19 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param string  $function The name of a function, a static method, or a PHP language construct.
 			 *
-			 * @param boolean $reconsider Defaults to a FALSE value. TRUE to refresh a potentially cached value.
+			 * @param boolean $no_cache Defaults to a FALSE value.
+			 *    TRUE to avoid a potentially cached value.
 			 *
 			 * @return boolean TRUE if (in `$this->constructs` || `is_callable()` || `function_exists()`),
 			 *    and it's NOT been disabled via `ini_get('disable_functions')` (or via Suhosin).
 			 */
-			public function is_function_possible($function, $reconsider = FALSE)
+			public function is_function_possible($function, $no_cache = FALSE)
 			{
 				$function = (string)$function;
 				$function = ltrim(strtolower($function), '\\');
 				if(!$function) return FALSE; // Not possible.
 
-				if(!$reconsider && isset(static::$static[__FUNCTION__][$function]))
+				if(!$no_cache && isset(static::$static[__FUNCTION__][$function]))
 					return static::$static[__FUNCTION__][$function];
 
 				$possible = &static::$static[__FUNCTION__][$function];
@@ -145,7 +146,7 @@ namespace comment_mail // Root namespace.
 				   && !in_array($function, $this->disabled_functions(), TRUE) // And it is NOT disabled in some way.
 				) return ($possible = TRUE);
 
-				return ($possible = FALSE); // Default value.
+				return ($possible = FALSE); // Default.
 			}
 
 			/**

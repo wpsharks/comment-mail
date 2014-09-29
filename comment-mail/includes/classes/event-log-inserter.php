@@ -49,7 +49,7 @@ namespace comment_mail // Root namespace.
 			{
 				$this->plugin = plugin();
 
-				$defaults    = array(
+				$defaults = array(
 					'sub_id'     => 0,
 					'user_id'    => 0,
 					'post_id'    => 0,
@@ -64,6 +64,15 @@ namespace comment_mail // Root namespace.
 
 					'time'       => time(),
 				);
+				if(empty($entry['sub_id']) && !empty($entry['ID']))
+					$entry['sub_id'] = $entry['ID'];
+
+				if(empty($entry['ip']) && !empty($entry['last_ip']))
+					$entry['ip'] = $entry['last_ip'];
+
+				if(empty($entry['ip']) && !empty($entry['insertion_ip']))
+					$entry['ip'] = $entry['insertion_ip'];
+
 				$this->entry = array_merge($defaults, $entry);
 				$this->entry = array_intersect_key($this->entry, $defaults);
 
@@ -86,13 +95,14 @@ namespace comment_mail // Root namespace.
 				if(!$this->entry['email'])
 					return; // Not applicable.
 
-				if(!in_array($this->entry['event'], array('subscribed', 'confirmed', 'unsubscribed'), TRUE))
+				if(!$this->entry['event'])
 					return; // Not applicable.
 
 				if(!$this->entry['time'])
 					return; // Not applicable.
 
-				$this->plugin->wpdb->insert($this->plugin->utils_db->prefix().'event_log', $this->entry);
+				if(!$this->plugin->utils_db->wp->insert($this->plugin->utils_db->prefix().'event_log', $this->entry))
+					throw new \exception(__('Event log insertion failure.', $this->plugin->text_domain));
 			}
 		}
 	}

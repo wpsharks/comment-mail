@@ -23,8 +23,10 @@ namespace comment_mail
 		 * @property utils_array  $utils_array
 		 * @property utils_cond   $utils_cond
 		 * @property utils_db     $utils_db
+		 * @property utils_env    $utils_env
 		 * @property utils_mail   $utils_mail
 		 * @property utils_string $utils_string
+		 * @property utils_sub    $utils_sub
 		 * @property utils_url    $utils_url
 		 */
 		class plugin // The heart of this plugin.
@@ -130,15 +132,6 @@ namespace comment_mail
 			 * @var array Options configured by site owner.
 			 */
 			public $options;
-
-			/**
-			 * WordPress database reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @var \wpdb Database object reference.
-			 */
-			public $wpdb;
 
 			/**
 			 * General capability requirement.
@@ -323,32 +316,44 @@ namespace comment_mail
 				load_plugin_textdomain($this->text_domain); // For translations.
 
 				$this->default_options = array( // Option defaults.
-				                                'version'                        => $this->version,
-				                                'enable'                         => '0', // `0|1`.
-				                                'crons_setup'                    => '0', // `0` or timestamp.
-				                                'uninstall_on_deletion'          => '0', // `0|1`.
+				                                'version'                                     => $this->version,
+				                                'enable'                                      => '0', // `0|1`.
+				                                'crons_setup'                                 => '0', // `0` or timestamp.
+				                                'uninstall_on_deletion'                       => '0', // `0|1`.
 
-				                                'template_emails_confirmation'   => '', // Template.
-				                                'template_site_subscription_ops' => '', // Template.
+				                                'auto_confirm_enable'                         => '0', // `0|1`.
 
-				                                'auto_subscribe_enable'          => '1', // `0|1`.
-				                                'auto_subscribe_post_types'      => 'post,page',
-				                                'auto_subscribe_post_author'     => '1', // `0|1`.
-				                                'auto_subscribe_recipients'      => '', // Others.
+				                                'auto_subscribe_enable'                       => '1', // `0|1`.
+				                                'auto_subscribe_post_types'                   => 'post,page',
+				                                'auto_subscribe_post_author'                  => '1', // `0|1`.
+				                                'auto_subscribe_recipients'                   => '', // Others.
 
-				                                'smtp_enable'                    => '0', // `0|1`.
-				                                'smtp_host'                      => '', // Host name.
-				                                'smtp_port'                      => '', // Port number.
-				                                'smtp_secure'                    => '', // ``, `ssl` or `tls`.
+				                                'smtp_enable'                                 => '0', // `0|1`.
+				                                'smtp_host'                                   => '', // Host name.
+				                                'smtp_port'                                   => '', // Port number.
+				                                'smtp_secure'                                 => '', // ``, `ssl` or `tls`.
 
-				                                'smtp_username'                  => '', // Username.
-				                                'smtp_password'                  => '', // Password.
+				                                'smtp_username'                               => '', // Username.
+				                                'smtp_password'                               => '', // Password.
 
-				                                'smtp_from_name'                 => '', // From name.
-				                                'smtp_from_email'                => '', // From email.
-				                                'smtp_force_from'                => '1', // `0|1`.
+				                                'smtp_from_name'                              => '', // From name.
+				                                'smtp_from_email'                             => '', // From email.
+				                                'smtp_force_from'                             => '1', // `0|1`.
 
-				                                'unconfirmed_expiration_time'    => '60 days', // `strtotime()` compatible.
+				                                'template_site_common_header'                 => '', // HTML/PHP code.
+				                                'template_site_common_footer'                 => '', // HTML/PHP code.
+
+				                                'template_site_comment_form_subscription_ops' => '', // HTML/PHP code.
+				                                'template_site_sub_actions_confirmed'         => '', // HTML/PHP code.
+				                                'template_site_sub_actions_unsubscribed'      => '', // HTML/PHP code.
+
+				                                'template_email_common_header'                => '', // HTML/PHP code.
+				                                'template_email_common_footer'                => '', // HTML/PHP code.
+
+				                                'template_email_confirmation_request_subject' => '', // HTML/PHP code.
+				                                'template_email_confirmation_request_message' => '', // HTML/PHP code.
+
+				                                'unconfirmed_expiration_time'                 => '60 days', // `strtotime()` compatible.
 				                                // Or, this can be left empty to disable automatic expirations altogether.
 
 				); // Default options are merged with those defined by the site owner.
@@ -358,7 +363,6 @@ namespace comment_mail
 				$this->options = array_merge($this->default_options, $options); // Merge into default options.
 				$this->options = apply_filters(__METHOD__.'__options', $this->options, get_defined_vars());
 
-				$this->wpdb          = $GLOBALS['wpdb']; // DB reference.
 				$this->cap           = apply_filters(__METHOD__.'__cap', 'activate_plugins');
 				$this->uninstall_cap = apply_filters(__METHOD__.'__uninstall_cap', 'delete_plugins');
 
@@ -384,16 +388,16 @@ namespace comment_mail
 				add_filter('cron_schedules', array($this, 'extend_cron_schedules'));
 
 				add_action('transition_post_status', array($this, 'post_status'), 10, 3);
-				add_action('before_delete_post', array($this, 'delete_post'), 10, 1);
+				add_action('before_delete_post', array($this, 'post_delete'), 10, 1);
 
 				add_action('comment_form', array($this, 'comment_form'), 5, 1);
 				add_action('comment_post', array($this, 'comment_post'), 10, 2);
 				add_action('transition_comment_status', array($this, 'comment_status'), 10, 3);
 
 				add_action('user_register', array($this, 'user_register'), 10, 1);
-				add_action('delete_user', array($this, 'delete_user'), 10, 1);
-				add_action('wpmu_delete_user', array($this, 'delete_user'), 10, 1);
-				add_action('remove_user_from_blog', array($this, 'delete_user'), 10, 2);
+				add_action('delete_user', array($this, 'user_delete'), 10, 1);
+				add_action('wpmu_delete_user', array($this, 'user_delete'), 10, 1);
+				add_action('remove_user_from_blog', array($this, 'user_delete'), 10, 2);
 
 				/* -------------------------------------------------------------- */
 
@@ -826,9 +830,9 @@ namespace comment_mail
 			 *
 			 * @param integer|string $post_id Post ID.
 			 */
-			public function delete_post($post_id)
+			public function post_delete($post_id)
 			{
-				new delete_post($post_id);
+				new post_delete($post_id);
 			}
 
 			/********************************************************************************************************/
@@ -976,9 +980,9 @@ namespace comment_mail
 			 * @param integer|string $user_id User ID.
 			 * @param integer|string $blog_id Blog ID. Defaults to `0` (current blog).
 			 */
-			public function delete_user($user_id, $blog_id = 0)
+			public function user_delete($user_id, $blog_id = 0)
 			{
-				new delete_user($user_id, $blog_id);
+				new user_delete($user_id, $blog_id);
 			}
 
 			/********************************************************************************************************/

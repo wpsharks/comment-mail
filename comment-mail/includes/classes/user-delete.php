@@ -1,8 +1,8 @@
 <?php
 /**
- * Delete User
+ * User Deletion Handler
  *
- * @package delete_user
+ * @package user_delete
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -12,15 +12,15 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\delete_user'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\user_delete'))
 	{
 		/**
-		 * Delete User
+		 * User Deletion Handler
 		 *
-		 * @package delete_user
+		 * @package user_delete
 		 * @since 14xxxx First documented version.
 		 */
-		class delete_user // User deletion handler.
+		class user_delete // User deletion handler.
 		{
 			/**
 			 * @var plugin Plugin reference.

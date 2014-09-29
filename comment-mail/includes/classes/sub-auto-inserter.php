@@ -2,7 +2,7 @@
 /**
  * Auto Sub Inserter
  *
- * @package auto_sub_inserter
+ * @package sub_auto_inserter
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -12,15 +12,15 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\auto_sub_inserter'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\sub_auto_inserter'))
 	{
 		/**
 		 * Auto Sub Inserter
 		 *
-		 * @package auto_sub_inserter
+		 * @package sub_auto_inserter
 		 * @since 14xxxx First documented version.
 		 */
-		class auto_sub_inserter // Auto sub inserter.
+		class sub_auto_inserter // Auto sub inserter.
 		{
 			/**
 			 * @var plugin Plugin reference.
@@ -73,7 +73,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($post_id)
 			{
-				$this->plugin     = plugin();
+				$this->plugin = plugin();
 
 				$post_id = (integer)$post_id;
 
@@ -148,12 +148,12 @@ namespace comment_mail // Root namespace.
 
 				$this->delete_existing_post_author(); // Delete existing.
 
-				$insertion_ip = $last_ip = $ip = $this->current_ip_post_author();
+				$insertion_ip = $last_ip = $this->current_ip_post_author();
 
 				$data = array(
-					'key'              => $this->keygen->sub_key(),
-					'user_id'          => $this->post_author->ID,
-					'post_id'          => $this->post->ID,
+					'key'              => $this->keygen->uunnci_20_max(),
+					'user_id'          => (integer)$this->post_author->ID,
+					'post_id'          => (integer)$this->post->ID,
 					'comment_id'       => 0, // All comments.
 
 					'fname'            => $this->first_name_post_author(),
@@ -167,12 +167,13 @@ namespace comment_mail // Root namespace.
 					'insertion_time'   => time(),
 					'last_update_time' => time(),
 				);
-				$this->plugin->wpdb->insert($this->plugin->utils_db->prefix().'subs', $data);
-
-				if(!($sub_id = $this->plugin->wpdb->insert_id)) // Insertion failure?
+				if(!$this->plugin->utils_db->wp->insert($this->plugin->utils_db->prefix().'subs', $data))
 					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
-				new event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'ip' => $ip, 'event' => 'subscribed')));
+				if(!($sub_id = (integer)$this->plugin->utils_db->wp->insert_id)) // Insertion failure?
+					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
+
+				new event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
 			}
 
 			/**
@@ -204,8 +205,8 @@ namespace comment_mail // Root namespace.
 					$_insertion_ip = $_last_ip = $_ip = ''; // Not applicable.
 
 					$data = array(
-						'key'              => $this->keygen->sub_key(),
-						'post_id'          => $this->post->ID,
+						'key'              => $this->keygen->uunnci_20_max(),
+						'post_id'          => (integer)$this->post->ID,
 						'comment_id'       => 0, // All comments.
 
 						'fname'            => $_recipient->fname,
@@ -217,9 +218,10 @@ namespace comment_mail // Root namespace.
 						'insertion_time'   => time(),
 						'last_update_time' => time(),
 					);
-					$this->plugin->wpdb->insert($this->plugin->utils_db->prefix().'subs', $data);
+					if(!$this->plugin->utils_db->wp->insert($this->plugin->utils_db->prefix().'subs', $data))
+						throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
-					if(!($sub_id = $this->plugin->wpdb->insert_id)) // Insertion failure?
+					if(!($sub_id = (integer)$this->plugin->utils_db->wp->insert_id)) // Insertion failure?
 						throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
 					new event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
@@ -281,7 +283,9 @@ namespace comment_mail // Root namespace.
 
 				       " LIMIT 1"; // We should only have one anyway.
 
-				return $this->plugin->wpdb->get_row($sql);
+				$row = $this->plugin->utils_db->wp->get_row($sql);
+
+				return $row instanceof \stdClass ? $this->plugin->utils_db->typify_deep($row) : NULL;
 			}
 
 			/**
@@ -304,7 +308,9 @@ namespace comment_mail // Root namespace.
 
 				       " LIMIT 1"; // We should only have one anyway.
 
-				return $this->plugin->wpdb->get_row($sql);
+				$row = $this->plugin->utils_db->wp->get_row($sql);
+
+				return $row instanceof \stdClass ? $this->plugin->utils_db->typify_deep($row) : NULL;
 			}
 
 			/**
@@ -321,7 +327,7 @@ namespace comment_mail // Root namespace.
 				       " AND (`user_id` = '".esc_sql($this->post_author->ID)."'".
 				       "       OR `email` = '".esc_sql($this->post_author->user_email)."')";
 
-				$this->plugin->wpdb->query($sql); // Delete any existing subscription(s).
+				$this->plugin->utils_db->wp->query($sql);
 			}
 
 			/**
@@ -339,7 +345,7 @@ namespace comment_mail // Root namespace.
 
 				       " AND `email` = '".esc_sql($recipient->email)."'";
 
-				$this->plugin->wpdb->query($sql); // Delete any existing subscription(s).
+				$this->plugin->utils_db->wp->query($sql);
 			}
 
 			/**
@@ -408,9 +414,9 @@ namespace comment_mail // Root namespace.
 			protected function current_ip_post_author()
 			{
 				if($this->post_author->ID === $this->user->ID)
-					return !empty($_SERVER['REMOTE_ADDR']) ? (string)$_SERVER['REMOTE_ADDR'] : '';
+					return $this->plugin->utils_env->user_ip();
 
-				return ''; // Post author is not the current user.
+				return ''; // Post author not current user.
 			}
 		}
 	}

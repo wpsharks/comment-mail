@@ -53,9 +53,11 @@ namespace comment_mail // Root namespace.
 			{
 				if(is_array($value) || is_object($value))
 				{
-					foreach($value as &$_value)
+					foreach($value as $_key => &$_value)
 						$_value = $this->strip_deep($_value);
-					return $value;
+					unset($_key, $_value); // Housekeeping.
+
+					return $value; // Stripped deeply.
 				}
 				return stripslashes((string)$value);
 			}
@@ -79,9 +81,11 @@ namespace comment_mail // Root namespace.
 			{
 				if(is_array($value) || is_object($value))
 				{
-					foreach($value as &$_value)
+					foreach($value as $_key => &$_value)
 						$_value = $this->trim_deep($_value, $chars, $extra_chars);
-					return $value;
+					unset($_key, $_value); // Housekeeping.
+
+					return $value; // Trimmed deeply.
 				}
 				$chars = isset($chars[0]) ? $chars : " \r\n\t\0\x0B";
 				$chars = $chars.$extra_chars; // Concatenate.

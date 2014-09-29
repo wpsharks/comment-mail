@@ -30,6 +30,13 @@ namespace comment_mail // Root namespace.
 			protected $plugin; // Set by constructor.
 
 			/**
+			 * @var \wpdb WP DB class reference.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			public $wp; // Set by constructor.
+
+			/**
 			 * Class constructor.
 			 *
 			 * @since 14xxxx First documented version.
@@ -37,6 +44,7 @@ namespace comment_mail // Root namespace.
 			public function __construct()
 			{
 				$this->plugin = plugin();
+				$this->wp     = $GLOBALS['wpdb'];
 			}
 
 			/**
@@ -48,7 +56,77 @@ namespace comment_mail // Root namespace.
 			 */
 			public function prefix()
 			{
-				return $this->plugin->wpdb->prefix.__NAMESPACE__.'_';
+				return $this->wp->prefix.__NAMESPACE__.'_';
+			}
+
+			/**
+			 * Typify result properties deeply.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $value Any value can be typified deeply.
+			 *
+			 * @return mixed Typified value.
+			 */
+			public function typify_deep($value)
+			{
+				if(is_array($value) || is_object($value))
+				{
+					foreach($value as $_key => &$_value)
+					{
+						if(is_array($_value) || is_object($_value))
+							$_value = $this->typify_deep($_value);
+
+						else if($this->is_integer_key($_key))
+							$_value = (integer)$_value;
+
+						else if($this->is_float_key($_key))
+							$_value = (float)$_value;
+
+						else $_value = (string)$_value;
+					}
+					unset($_key, $_value); // Housekeeping.
+				}
+				return $value; // Typified deeply.
+			}
+
+			/**
+			 * Should an array/object key contain an integer value?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $key The input key to check.
+			 *
+			 * @return boolean TRUE if the key should contain an integer value.
+			 */
+			protected function is_integer_key($key)
+			{
+				if(!$key || !is_string($key))
+					return FALSE;
+
+				$key = strtolower($key);
+
+				if(in_array($key, array('id', 'time'), TRUE))
+					return TRUE;
+
+				if(preg_match('/_(?:id|time)$/', $key))
+					return TRUE;
+
+				return FALSE; // Default.
+			}
+
+			/**
+			 * Should an array/object key contain a float value?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $key The input key to check.
+			 *
+			 * @return boolean TRUE if the key should contain a float value.
+			 */
+			protected function is_float_key($key)
+			{
+				return FALSE; // Default; no float keys at this time.
 			}
 		}
 	}

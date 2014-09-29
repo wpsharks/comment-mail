@@ -37,11 +37,25 @@ namespace comment_mail // Root namespace.
 			protected $comment; // Set by constructor.
 
 			/**
-			 * @var \WP_User|null Current user.
+			 * @var \WP_User|null Subscribing user.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
 			protected $user; // Set by constructor.
+
+			/**
+			 * @var \WP_User|null Current user.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $current_user; // Set by constructor.
+
+			/**
+			 * @var boolean Subscribing current user?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $is_current_user; // Set by constructor.
 
 			/**
 			 * @var string Subscription type.
@@ -70,6 +84,9 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
+			 * @param \WP_User|null  Subscribing user.
+			 *    Use `NULL` to indicate they are NOT a user.
+			 *
 			 * @param integer|string $comment_id Comment ID.
 			 *
 			 * @param string         $sub_type Type of subscription.
@@ -77,20 +94,26 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param boolean        $sub_type_override Defaults to a FALSE value.
 			 */
-			public function __construct($comment_id, $sub_type, $sub_type_override = FALSE)
+			public function __construct($user, $comment_id, $sub_type, $sub_type_override = FALSE)
 			{
 				$this->plugin = plugin();
+
+				if($user instanceof \WP_User)
+					$this->user = $user;
+
+				$this->current_user = wp_get_current_user();
+
+				$this->is_current_user = FALSE; // Default value.
+				if($this->user && $this->user->ID === $this->current_user->ID)
+					$this->is_current_user = TRUE; // Even if `ID` is `0`.
 
 				if(($comment_id = (integer)$comment_id))
 					$this->comment = get_comment($comment_id);
 
-				$this->sub_type = strtolower((string)$sub_type);
+				$this->sub_type          = strtolower((string)$sub_type);
+				$this->sub_type_override = (boolean)$sub_type_override;
 				if(!in_array($this->sub_type, array('comments', 'comment'), TRUE))
 					$this->sub_type = ''; // Default type.
-
-				$this->sub_type_override = (boolean)$sub_type_override;
-
-				$this->user = wp_get_current_user();
 
 				$this->keygen = new keygen();
 
@@ -124,14 +147,14 @@ namespace comment_mail // Root namespace.
 
 				$this->delete_existing(); // Delete existing.
 
-				$insertion_ip = $last_ip = $ip = $this->current_ip();
+				$insertion_ip = $last_ip = $this->user_ip();
 
 				$data = array(
-					'key'              => $this->keygen->sub_key(),
-					'user_id'          => $this->user->ID,
-					'post_id'          => $this->comment->post_ID,
+					'key'              => $this->keygen->uunnci_20_max(),
+					'user_id'          => $this->user ? (integer)$this->user->ID : 0,
+					'post_id'          => (integer)$this->comment->post_ID,
 					'comment_id'       => $this->sub_type === 'comment'
-						? $this->comment->comment_ID : 0,
+						? (integer)$this->comment->comment_ID : 0,
 
 					'fname'            => $this->first_name(),
 					'lname'            => $this->last_name(),
@@ -144,12 +167,13 @@ namespace comment_mail // Root namespace.
 					'insertion_time'   => time(),
 					'last_update_time' => time(),
 				);
-				$this->plugin->wpdb->insert($this->plugin->utils_db->prefix().'subs', $data);
-
-				if(!($sub_id = $this->plugin->wpdb->insert_id)) // Insertion failure?
+				if(!$this->plugin->utils_db->wp->insert($this->plugin->utils_db->prefix().'subs', $data))
 					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
-				new event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'ip' => $ip, 'event' => 'subscribed')));
+				if(!($sub_id = (integer)$this->plugin->utils_db->wp->insert_id)) // Insertion failure?
+					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
+
+				new event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
 
 				new sub_confirmer($sub_id); // Send confirmation email now.
 			}
@@ -196,14 +220,14 @@ namespace comment_mail // Root namespace.
 					         // Or, if they are trying to subscribed to a specific comment, and they already are.
 					         ($this->sub_type === 'comment' ? " OR `comment_id` = '".esc_sql($this->comment->comment_ID)."')" : ")")).
 
-				       ($this->user->ID // Do we have a user ID?
+				       ($this->user && $this->user->ID // Have a user ID?
 					       ? " AND (`user_id` = '".esc_sql($this->user->ID)."'".
 					         "       OR `email` = '".esc_sql($this->comment->comment_author_email)."')"
 					       : " AND `email` = '".esc_sql($this->comment->comment_author_email)."'").
 
 				       " ORDER BY `insertion_time` ASC"; // For the loop below.
 
-				if(!($results = $this->plugin->wpdb->get_results($sql)))
+				if(!($results = $this->plugin->utils_db->wp->get_results($sql)))
 					return NULL; // Nothing exists.
 
 				$last = $last_subscribed = NULL; // Initialize.
@@ -218,7 +242,9 @@ namespace comment_mail // Root namespace.
 				}
 				unset($_result); // Just a little housekeeping.
 
-				return $last_subscribed ? $last_subscribed : $last;
+				return $last_subscribed // Subscribed?
+					? $this->plugin->utils_db->typify_deep($last_subscribed)
+					: $this->plugin->utils_db->typify_deep($last);
 			}
 
 			/**
@@ -236,7 +262,7 @@ namespace comment_mail // Root namespace.
 				if($existing_sub->insertion_time >= strtotime('-15 minutes'))
 					return; // Recently subscribed; give em' time.
 
-				new sub_confirmer($existing_sub->ID); // Resend confirmation email.
+				new sub_confirmer($existing_sub->ID); // Resend.
 			}
 
 			/**
@@ -250,12 +276,12 @@ namespace comment_mail // Root namespace.
 
 				       " WHERE `post_id` = '".esc_sql($this->comment->post_ID)."'".
 
-				       ($this->user->ID // Do we have a user ID?
+				       ($this->user && $this->user->ID // Have a user ID?
 					       ? " AND (`user_id` = '".esc_sql($this->user->ID)."'".
 					         "       OR `email` = '".esc_sql($this->comment->comment_author_email)."')"
 					       : " AND `email` = '".esc_sql($this->comment->comment_author_email)."'");
 
-				$this->plugin->wpdb->query($sql); // Delete any existing subscription(s).
+				$this->plugin->utils_db->wp->query($sql); // Delete any existing subscription(s).
 			}
 
 			/**
@@ -320,9 +346,12 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string Commenters IP address; else empty string.
 			 */
-			protected function current_ip()
+			protected function user_ip()
 			{
-				return !empty($_SERVER['REMOTE_ADDR']) ? (string)$_SERVER['REMOTE_ADDR'] : '';
+				if($this->user && $this->is_current_user)
+					return $this->plugin->utils_env->user_ip();
+
+				return ''; // Not current user.
 			}
 		}
 	}

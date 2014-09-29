@@ -40,26 +40,38 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * A unique, unguessable, case insensitive key.
-			 *
-			 * With a max length of 16 chars. Keys are generated based on `microtime()`,
-			 *    and with base 36 component values concatenated with a random
-			 *    number not to exceed `999999999`.
+			 * A unique, unguessable, non-numeric, caSe-insensitive key (20 chars max).
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @return string A unique, unguessable, case insensitive key.
+			 * @note 32-bit systems usually have `PHP_INT_MAX` = `2147483647`.
+			 *    We limit `mt_rand()` to a max of `999999999`.
+			 *
+			 * @note A max possible length of 20 chars assumes this function
+			 *    will not be called after `Sat, 20 Nov 2286 17:46:39 GMT`.
+			 *    At which point a UNIX timestamp will grow in size.
+			 *
+			 * @note Key always begins with a `k` to prevent PHP's `is_numeric()`
+			 *    function from ever thinking it's a number in a different representation.
+			 *    See: <http://php.net/manual/en/function.is-numeric.php> for further details.
+			 *
+			 * @return string A unique, unguessable, non-numeric, caSe-insensitive key (20 chars max).
 			 */
-			public function sub_key()
+			public function uunnci_20_max()
 			{
-				list($seconds, $microseconds) = explode('.', microtime(TRUE), 2);
-				$seconds_base36      = base_convert($seconds, '10', '36');
-				$microseconds_base36 = base_convert($microseconds, '10', '36');
+				$microtime_19_max = number_format(microtime(TRUE), 9, '.', '');
+				// e.g. `9999999999`.`999999999` (max decimals: `9`, max overall precision: `19`).
+				// Assuming timestamp is never > 10 digits; i.e. before `Sat, 20 Nov 2286 17:46:39 GMT`.
 
-				$mt_rand_base36 = base_convert(mt_rand(1, 999999999), '10', '36');
-				$key            = $mt_rand_base36.$seconds_base36.$microseconds_base36;
+				list($seconds_10_max, $microseconds_9_max) = explode('.', $microtime_19_max, 2);
+				// e.g. `array(`9999999999`, `999999999`)`. Max total digits combined: `19`.
 
-				return substr($key, 0, 16);
+				$seconds_base36      = base_convert($seconds_10_max, '10', '36'); // e.g. max `9999999999`, to base 36.
+				$microseconds_base36 = base_convert($microseconds_9_max, '10', '36'); // e.g. max `999999999`, to base 36.
+				$mt_rand_base36      = base_convert(mt_rand(1, 999999999), '10', '36'); // e.g. max `999999999`, to base 36.
+				$key                 = 'k'.$mt_rand_base36.$seconds_base36.$microseconds_base36; // e.g. `kgjdgxr4ldqpdrgjdgxr`.
+
+				return $key; // Max possible value: `kgjdgxr4ldqpdrgjdgxr` (20 chars).
 			}
 		}
 	}

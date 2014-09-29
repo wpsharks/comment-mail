@@ -1,8 +1,8 @@
 <?php
 /**
- * SMTP (powered by PHPMailer)
+ * SMTP Mailer
  *
- * @package smtp
+ * @package mail_smtp
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -12,15 +12,15 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\smtp'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\mail_smtp'))
 	{
 		/**
-		 * SMTP (powered by PHPMailer)
+		 * SMTP Mailer
 		 *
-		 * @package smtp
+		 * @package mail_smtp
 		 * @since 14xxxx First documented version.
 		 */
-		class smtp // SMTP mail handler.
+		class mail_smtp // SMTP mailer.
 		{
 			/**
 			 * @var plugin Plugin reference.
@@ -127,7 +127,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @throws \exception If `$throw` is TRUE and an exception is thrown.
 			 */
-			public function mail($to, $subject, $message, $headers = array(), $attachments = array(), $throw = FALSE)
+			public function send($to, $subject, $message, $headers = array(), $attachments = array(), $throw = FALSE)
 			{
 				$this->reset(); // Reset state; i.e. class properties.
 
@@ -249,11 +249,9 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param mixed   $value Any input value.
 			 *
-			 * @param boolean $___recursion Internal use only (indicates function recursion).
-			 *
 			 * @return array Unique array of all parsed headers.
 			 */
-			protected function parse_headers_deep($value, $___recursion = FALSE)
+			protected function parse_headers_deep($value)
 			{
 				$headers = array(); // Initialize.
 
@@ -262,8 +260,8 @@ namespace comment_mail // Root namespace.
 					foreach($value as $_key => $_value)
 					{
 						if(is_string($_key) && is_string($_value)) // Associative array of headers?
-							$headers = array_merge($headers, $this->parse_headers_deep($_key.': '.$_value, TRUE));
-						else $headers = array_merge($headers, $this->parse_headers_deep($_value, TRUE));
+							$headers = array_merge($headers, $this->parse_headers_deep($_key.': '.$_value));
+						else $headers = array_merge($headers, $this->parse_headers_deep($_value));
 					}
 					unset($_key, $_value); // A little housekeeping.
 
@@ -348,18 +346,16 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param mixed   $value Any input value.
 			 *
-			 * @param boolean $___recursion Internal use only (indicates function recursion).
-			 *
 			 * @return array Unique array of all parsed attachments.
 			 */
-			protected function parse_attachments_deep($value, $___recursion = FALSE)
+			protected function parse_attachments_deep($value)
 			{
 				$attachments = array(); // Initialize.
 
 				if(is_array($value) || is_object($value))
 				{
 					foreach($value as $_key => $_value)
-						$attachments = array_merge($attachments, $this->parse_attachments_deep($_value, TRUE));
+						$attachments = array_merge($attachments, $this->parse_attachments_deep($_value));
 					unset($_key, $_value); // A little housekeeping.
 
 					return $attachments ? array_unique($attachments) : array();

@@ -45,26 +45,6 @@ namespace comment_mail // Root namespace.
 			{
 				$this->plugin = plugin();
 			}
-
-			/**
-			 * Current request is for a pro version preview?
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return boolean TRUE if the current request is for a pro preview.
-			 */
-			public function is_pro_preview()
-			{
-				if(isset(static::$static[__FUNCTION__]))
-					return static::$static[__FUNCTION__];
-
-				$is = &static::$static[__FUNCTION__];
-
-				if(!empty($_REQUEST[__NAMESPACE__.'_pro_preview']))
-					return ($is = TRUE);
-
-				return ($is = FALSE);
-			}
 		}
 	}
 }

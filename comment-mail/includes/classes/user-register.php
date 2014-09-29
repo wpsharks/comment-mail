@@ -68,10 +68,9 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-
 				       " WHERE `user_id` = '".esc_sql($user->ID)."'";
 
-				$this->plugin->wpdb->query($sql); // Make sure there are no duplicate keys.
+				$this->plugin->utils_db->wp->query($sql); // Ensure no duplicate keys.
 				// The user ID should NOT exist; we just make absolutely sure in case of corruption.
 
 				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
@@ -80,7 +79,7 @@ namespace comment_mail // Root namespace.
 				       " WHERE `user_id` = '0'".
 				       " AND `email` = '".esc_sql($user->user_email)."'";
 
-				$this->plugin->wpdb->query($sql); // Set user ID.
+				$this->plugin->utils_db->wp->query($sql); // Set user ID.
 			}
 		}
 	}

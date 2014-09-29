@@ -56,12 +56,12 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function clean_nonexistent_users()
 			{
-				$user_ids = "SELECT `ID` FROM `".esc_sql($this->plugin->wpdb->users)."`";
+				$user_ids = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->wp->users)."`";
 
 				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 				       " WHERE `user_id` != '0' AND `user_id` NOT IN(".$user_ids.")";
 
-				$this->plugin->wpdb->query($sql); // Delete nonexistent users.
+				$this->plugin->utils_db->wp->query($sql); // Delete nonexistent users.
 			}
 
 			/**
@@ -82,7 +82,7 @@ namespace comment_mail // Root namespace.
 				       " WHERE `status` = 'unconfirmed'".
 				       " AND `last_update_time` < '".esc_sql($exp_time)."'";
 
-				$this->plugin->wpdb->query($sql); // Delete unconfirmed expirations.
+				$this->plugin->utils_db->wp->query($sql); // Delete unconfirmed expirations.
 			}
 		}
 	}

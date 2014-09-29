@@ -37,13 +37,6 @@ namespace comment_mail // Root namespace.
 			protected $sub; // Set by constructor.
 
 			/**
-			 * @var template Template instance.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $email_template; // Set by constructor.
-
-			/**
 			 * Class constructor.
 			 *
 			 * @since 14xxxx First documented version.
@@ -54,32 +47,10 @@ namespace comment_mail // Root namespace.
 			{
 				$this->plugin = plugin();
 
-				$sub_id               = (integer)$sub_id;
-				$this->sub            = $this->maybe_get_sub($sub_id);
-				$this->email_template = new template('emails/confirmation.php');
+				$sub_id    = (integer)$sub_id;
+				$this->sub = $this->plugin->utils_sub->get($sub_id);
 
 				$this->maybe_send_confirmation_request();
-			}
-
-			/**
-			 * Get subscriber object data.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param integer $sub_id Subscriber ID.
-			 *
-			 * @return \stdClass|null Subscriber object on success.
-			 */
-			protected function maybe_get_sub($sub_id)
-			{
-				if(!($sub_id = (integer)$sub_id))
-					return NULL; // Not possible.
-
-				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-				       " WHERE `ID` = '".esc_sql($sub_id)."'".
-				       " LIMIT 1";
-
-				return $this->plugin->wpdb->get_row($sql);
 			}
 
 			/**
@@ -92,10 +63,57 @@ namespace comment_mail // Root namespace.
 				if(!$this->sub)
 					return; // Not possible.
 
-				// @TODO
-				// @TODO Add template variables for all emails.
-				//    For instance, we need a universal header/footer and unsub link.
-				//       Along with maybe a CAN-SPAM compliant blurp with the site contact info.
+				if(!$this->sub->email)
+					return; // Not possible.
+
+				if($this->sub->status === 'subscribed')
+					return; // Nothing to do.
+
+				if($this->maybe_auto_confirm())
+					return; // Nothing more to do.
+
+				$template_vars    = array('sub' => $this->sub);
+				$subject_template = new template('email/confirmation-request-subject.php');
+				$message_template = new template('email/confirmation-request-message.php');
+
+				$this->plugin->utils_mail->send($this->sub->email, // To subscriber.
+				                                $subject_template->parse($template_vars),
+				                                $message_template->parse($template_vars));
+			}
+
+			/**
+			 * Auto-confirm, if possible.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean TRUE if auto-confirmed in some way.
+			 */
+			protected function maybe_auto_confirm()
+			{
+				if($this->plugin->options['auto_confirm_enable'])
+				{
+					$this->plugin->utils_sub->confirm($this->sub->ID);
+					return TRUE; // Confirmed automatically.
+				}
+				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " WHERE `post_id` = '".esc_sql($this->sub->post_id)."'".
+
+				       ($this->sub->user_id // Have a user ID?
+					       ? " AND (`user_id` = '".esc_sql($this->sub->user_id)."'".
+					         "       OR `email` = '".esc_sql($this->sub->email)."')"
+					       : " AND `email` = '".esc_sql($this->sub->email)."'").
+
+				       " AND `status` = 'subscribed'".
+
+				       " ORDER BY `insertion_time` DESC LIMIT 1";
+
+				if((integer)$this->plugin->utils_db->wp->get_var($sql))
+				{
+					$this->plugin->utils_sub->confirm($this->sub->ID);
+					return TRUE; // Confirmed automatically.
+				}
+				return FALSE; // Not subscribed already.
 			}
 		}
 	}

@@ -96,7 +96,8 @@ namespace comment_mail // Root namespace.
 						$_sql_file_table = str_replace('-', '_', $_sql_file_table);
 						$_sql_file_table = $this->plugin->utils_db->prefix().$_sql_file_table;
 
-						$this->plugin->wpdb->query('DROP TABLE IF EXISTS `'.esc_sql($_sql_file_table).'`');
+						if(!$this->plugin->utils_db->wp->query('DROP TABLE IF EXISTS `'.esc_sql($_sql_file_table).'`'))
+							throw new \exception(sprintf(__('DB table deletion failure: `%1$s`.', $this->plugin->text_domain), $_sql_file_table));
 					}
 				unset($_sql_file, $_sql_file_table); // Housekeeping.
 			}

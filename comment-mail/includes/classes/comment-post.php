@@ -85,7 +85,7 @@ namespace comment_mail // Root namespace.
 				if(!($sub_type = $this->plugin->utils_string->trim_strip_deep($sub_type)))
 					return; // Not applicable.
 
-				new sub_inserter($this->comment_id, $sub_type);
+				new sub_inserter(wp_get_current_user(), $this->comment_id, $sub_type);
 			}
 
 			/**

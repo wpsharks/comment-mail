@@ -98,7 +98,7 @@ namespace comment_mail // Root namespace.
 				       " WHERE `post_id` = '".esc_sql($this->post_id)."'".
 				       ($this->comment_id ? " AND `comment_id` = '".esc_sql($this->comment_id)."'" : '');
 
-				$this->plugin->wpdb->query($sql); // Delete any existing subscription(s).
+				$this->plugin->utils_db->wp->query($sql); // Delete any existing subscription(s).
 			}
 
 			/**
@@ -121,7 +121,7 @@ namespace comment_mail // Root namespace.
 				       " WHERE `user_id` = '".esc_sql($user->ID)."'".
 				       ($user->user_email ? " OR `email` = '".esc_sql($user->user_email)."'" : '');
 
-				$this->plugin->wpdb->query($sql); // Delete any existing subscription(s).
+				$this->plugin->utils_db->wp->query($sql); // Delete any existing subscription(s).
 			}
 		}
 	}
