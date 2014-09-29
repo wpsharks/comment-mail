@@ -93,7 +93,9 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return array All subscriber IDs.
 			 */
-			protected function sub_ids() // @TODO Consider comment parent ID.
+			protected function sub_ids()
+				// @TODO Consider comment parent ID.
+				// @TODO Add a daily digest option here; perhaps a new DB column for this.
 			{
 				$emails = $sub_ids = array(); // Initialize.
 
@@ -114,8 +116,12 @@ namespace comment_mail // Root namespace.
 						continue; // Missing email address.
 
 					$_email_lowercase = strtolower($_sub->email);
+
 					if(isset($emails[$_email_lowercase]))
 						continue; // Email duplicate.
+
+					if(strcasecmp($_email_lowercase, $this->comment->comment_author_email) === 0)
+						continue; // Don't send an email to the comment author.
 
 					$emails[$_email_lowercase] = -1;
 					$sub_ids[]                 = $_sub->ID;
