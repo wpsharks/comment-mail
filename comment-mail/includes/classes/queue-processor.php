@@ -173,7 +173,7 @@ namespace comment_mail // Root namespace.
 
 				foreach($entries as $_key => $_entry)
 				{
-					$this->maybe_process_entry($_entry);
+					$this->process_entry($_entry);
 					$this->delete_entry($_entry);
 
 					if($this->is_out_of_time())
@@ -195,55 +195,55 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param \stdClass $entry Queue entry.
 			 */
-			protected function maybe_process_entry(\stdClass $entry)
+			protected function process_entry(\stdClass $entry)
 			{
 				if(!$entry->sub_id) // Not possible; data missing.
-					return $this->maybe_process_log_entry('invalidated', 'entry_sub_id_empty', $entry);
+					return $this->process_log_entry('invalidated', 'entry_sub_id_empty', $entry);
 
 				if(!$entry->comment_id) // Not possible; data missing.
-					return $this->maybe_process_log_entry('invalidated', 'entry_comment_id_empty', $entry);
+					return $this->process_log_entry('invalidated', 'entry_comment_id_empty', $entry);
 
 				if(!($sub = $this->plugin->utils_sub->get($entry->sub_id))) // Deleted?
-					return $this->maybe_process_log_entry('invalidated', 'entry_sub_id_missing', $entry);
+					return $this->process_log_entry('invalidated', 'entry_sub_id_missing', $entry);
 
-				if(!$sub->email) // Missing an email address?
-					return $this->maybe_process_log_entry('invalidated', 'sub_email_empty', $entry, $sub);
+				if(!$sub->email) // Missing the subscriber's email address?
+					return $this->process_log_entry('invalidated', 'sub_email_empty', $entry, $sub);
 
 				if($sub->status !== 'subscribed') // Subscriber no longer `subscribed`?
-					return $this->maybe_process_log_entry('invalidated', 'sub_status_not_subscribed', $entry, $sub);
+					return $this->process_log_entry('invalidated', 'sub_status_not_subscribed', $entry, $sub);
 
 				if(!($comment = get_comment($entry->comment_id))) // Comment is missing?
-					return $this->maybe_process_log_entry('invalidated', 'entry_comment_id_missing', $entry, $sub);
+					return $this->process_log_entry('invalidated', 'entry_comment_id_missing', $entry, $sub);
 
 				if($comment->comment_type !== 'comment') // It's a pingback or a trackback?
-					return $this->maybe_process_log_entry('invalidated', 'comment_type_not_comment', $entry, $sub, NULL, $comment);
+					return $this->process_log_entry('invalidated', 'comment_type_not_comment', $entry, $sub, NULL, $comment);
 
 				if(!$comment->comment_content) // An empty commen; i.e. no content?
-					return $this->maybe_process_log_entry('invalidated', 'comment_content_empty', $entry, $sub, NULL, $comment);
+					return $this->process_log_entry('invalidated', 'comment_content_empty', $entry, $sub, NULL, $comment);
 
 				if($this->plugin->comment_status__($comment->comment_approved) !== 'approve')
-					return $this->maybe_process_log_entry('invalidated', 'comment_status_not_approve', $entry, $sub, NULL, $comment);
+					return $this->process_log_entry('invalidated', 'comment_status_not_approve', $entry, $sub, NULL, $comment);
 
 				if(!($post = get_post($comment->post_ID))) // Post is missing?
-					return $this->maybe_process_log_entry('invalidated', 'comment_post_id_missing', $entry, $sub, NULL, $comment);
+					return $this->process_log_entry('invalidated', 'comment_post_id_missing', $entry, $sub, NULL, $comment);
 
 				if(!$post->post_title) // An empty post title; i.e. we have nothing for a subject line?
-					return $this->maybe_process_log_entry('invalidated', 'post_title_empty', $entry, $sub, $post, $comment);
+					return $this->process_log_entry('invalidated', 'post_title_empty', $entry, $sub, $post, $comment);
 
 				if($post->post_status !== 'publish') // Unavailable; i.e. not published?
-					return $this->maybe_process_log_entry('invalidated', 'post_status_not_publish', $entry, $sub, $post, $comment);
+					return $this->process_log_entry('invalidated', 'post_status_not_publish', $entry, $sub, $post, $comment);
 
 				if(in_array($post->post_type, array('revision', 'nav_menu_item'), TRUE))
-					return $this->maybe_process_log_entry('invalidated', 'post_type_auto_excluded', $entry, $sub, $post, $comment);
+					return $this->process_log_entry('invalidated', 'post_type_auto_excluded', $entry, $sub, $post, $comment);
 
 				if(!($subject = $this->entry_subject($entry, $sub, $post, $comment)))
-					return $this->maybe_process_log_entry('invalidated', 'comment_notification_subject_empty', $entry, $sub, $post, $comment);
+					return $this->process_log_entry('invalidated', 'comment_notification_subject_empty', $entry, $sub, $post, $comment);
 
 				if(!($message = $this->entry_message($entry, $sub, $post, $comment)))
-					return $this->maybe_process_log_entry('invalidated', 'comment_notification_message_empty', $entry, $sub, $post, $comment);
+					return $this->process_log_entry('invalidated', 'comment_notification_message_empty', $entry, $sub, $post, $comment);
 
 				$this->plugin->utils_mail->send($sub->email, $subject, $message); // Send notification to subscriber.
-				return $this->maybe_process_log_entry('notified', 'comment_notification_sent_successfully', $entry, $sub, $post, $comment);
+				return $this->process_log_entry('notified', 'comment_notification_sent_successfully', $entry, $sub, $post, $comment);
 			}
 
 			/**
@@ -261,20 +261,14 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @see utils_event::queue_note_code()
 			 */
-			protected function maybe_process_log_entry($event, $note_code = '', \stdClass $entry, \stdClass $sub = NULL, \WP_Post $post = NULL, \stdClass $comment = NULL)
+			protected function process_log_entry($event, $note_code = '', \stdClass $entry, \stdClass $sub = NULL, \WP_Post $post = NULL, \stdClass $comment = NULL)
 			{
-				if(!$entry->ID)
-					return; // Not possible.
-
-				if(!($event = trim((string)$event)))
-					return; // Not possible.
-
 				$entry = array(
 					'queue_id'   => $entry->ID,
-					'sub_id'     => $entry->sub_id,
-					'user_id'    => $sub ? $sub->user_id : 0,
-					'post_id'    => $post ? $post->ID : ($sub ? $sub->post_id : 0),
-					'comment_id' => $entry->comment_id,// @TODO Consider comment parent ID.
+					'sub_id'     => $sub ? $sub->ID : $entry->sub_id,
+					'user_id'    => $sub ? $sub->user_id : 0, // Default; no user.
+					'post_id'    => $post ? $post->ID : ($comment ? $comment->post_ID : ($sub ? $sub->post_id : 0)),
+					'comment_id' => $comment ? $comment->comment_ID : $entry->comment_id,
 
 					'fname'      => $sub ? $sub->fname : '',
 					'lname'      => $sub ? $sub->lname : '',

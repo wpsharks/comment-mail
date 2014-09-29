@@ -75,6 +75,7 @@ namespace comment_mail // Root namespace.
 
 				$this->entry = array_merge($defaults, $entry);
 				$this->entry = array_intersect_key($this->entry, $defaults);
+				$this->entry = $this->plugin->utils_db->typify_deep($this->entry);
 
 				$this->maybe_insert(); // Record event; if applicable.
 			}
