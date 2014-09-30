@@ -46,7 +46,14 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param integer|string $post_id Post ID.
 			 *
-			 * @return array Array of all StCR data for the post ID.
+			 * @return array Array of all StCR data for the post ID or NULL if no data.
+			 *
+			 *    If an array is returned, it will be a multidimentional array with each index containing an array of subscription data with the following keys:
+			 *
+			 *       `string` `$email` The email address of the subscriber
+			 *       `string` `$date` The date the subscription was created in local WordPress time with format YYYY-MM-DD HH:MM:SS
+			 *       `string` `$status` The status of the subscription; exactly one of the following: Y|R|YC|RC|C|-C
+			 *
 			 */
 			public function get_data_for($post_id)
 			{
@@ -55,10 +62,34 @@ namespace comment_mail // Root namespace.
 				if(!($post_id = (integer)$post_id))
 					return $data; // Not possible.
 
-				// @TODO: Collect all STRC data for the `$post_id` and return an associative (possibly multidimensional array).
-				// The format of this array is entirely up to the author. Whatever seems to make the most sense will be fine with me.
+				global $wpdb; // Global database object reference.
+				/** @var \wpdb $wpdb This line for IDEs that need a reference. */
 
-				return $data;
+				$_wp_postmeta_stcr_data = $wpdb->get_results($wpdb->prepare("SELECT meta_key, meta_value FROM wp_postmeta WHERE post_id = %d AND meta_key LIKE '%%_stcr@_%%'", $post_id), OBJECT);
+
+				if(!$_wp_postmeta_stcr_data || count($_wp_postmeta_stcr_data) < 1)
+					return null; // No results.
+
+				foreach ($_wp_postmeta_stcr_data as $_row) {
+					$_email = str_replace('_stcr@_', '', $_row->meta_key); // Original format: _stcr@_user@example.com
+
+					if(empty($_email) || !is_email($_email))
+						continue; // Invalid data.
+
+					$_meta_value = explode('|', $_row->meta_value); // Original format: 2013-03-11 01:31:01|R
+					$_date = $_meta_value[0]; // Local WordPress time
+
+					if(strtotime($_date) === FALSE)
+						continue; // Invalid data.
+
+					$_status = $_meta_value[1]; // Y|R|YC|RC|C|-C
+					if(!in_array($_status, array('Y', 'R', 'YC', 'RC', 'C', '-C')))
+						continue; // Invalid data.
+
+					$data[] = array('email' => $_email, 'date' => $_date, 'status' => $_status);
+				}
+
+				return (empty($data) ? null : $data);
 			}
 		}
 	}
