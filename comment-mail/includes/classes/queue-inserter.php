@@ -94,7 +94,6 @@ namespace comment_mail // Root namespace.
 			 * @return array All subscriber IDs.
 			 */
 			protected function sub_ids()
-				// @TODO Consider comment parent ID.
 				// @TODO Add a daily digest option here; perhaps a new DB column for this.
 			{
 				$emails = $sub_ids = array(); // Initialize.
@@ -102,7 +101,7 @@ namespace comment_mail // Root namespace.
 				$sql = "SELECT `ID`, `email` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->comment->post_ID)."'".
-				       " AND (`comment_id` = '0' OR `comment_id` = '".esc_sql($this->comment->comment_ID)."')".
+				       " AND (`comment_id` = '0' OR `comment_id` = '".esc_sql($this->comment->comment_parent)."')".
 				       " AND `status` = 'subscribed'".
 
 				       " ORDER BY `last_update_time` DESC";
