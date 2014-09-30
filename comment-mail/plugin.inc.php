@@ -204,7 +204,7 @@ namespace comment_mail
 				/* -------------------------------------------------------------- */
 
 				if(!$this->enable_hooks) // Without hooks?
-					return; // Stop here; setup without hooks.
+					return; // Stop here; construct without hooks.
 
 				/* -------------------------------------------------------------- */
 
@@ -397,8 +397,6 @@ namespace comment_mail
 				add_action('admin_menu', array($this, 'add_menu_pages'));
 				add_filter('plugin_action_links_'.plugin_basename($this->file), array($this, 'add_settings_link'));
 
-				add_filter('cron_schedules', array($this, 'extend_cron_schedules'));
-
 				add_action('transition_post_status', array($this, 'post_status'), 10, 3);
 				add_action('before_delete_post', array($this, 'post_delete'), 10, 1);
 
@@ -412,6 +410,8 @@ namespace comment_mail
 				add_action('remove_user_from_blog', array($this, 'user_delete'), 10, 2);
 
 				/* -------------------------------------------------------------- */
+
+				add_filter('cron_schedules', array($this, 'extend_cron_schedules'));
 
 				if((integer)$this->options['crons_setup'] < 1382523750)
 				{
@@ -879,7 +879,7 @@ namespace comment_mail
 			 * @param integer|string $comment_status Initial comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: `hold`, `unapproved`),
+			 *       - `0` (aka: `hold`, `unapprove`, `unapproved`),
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `spam`, `delete`.
 			 */
@@ -898,14 +898,14 @@ namespace comment_mail
 			 * @param integer|string $new_comment_status New comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: `hold`, `unapproved`),
+			 *       - `0` (aka: `hold`, `unapprove`, `unapproved`),
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `spam`, `delete`.
 			 *
 			 * @param integer|string $old_comment_status Old comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: `hold`, `unapproved`),
+			 *       - `0` (aka: `hold`, `unapprove`, `unapproved`),
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `spam`, `delete`.
 			 *
@@ -924,7 +924,7 @@ namespace comment_mail
 			 * @param integer|string $status
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: `hold`, `unapproved`),
+			 *       - `0` (aka: `hold`, `unapprove`, `unapproved`),
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `spam`, `delete`.
 			 *
@@ -943,6 +943,7 @@ namespace comment_mail
 
 					case '0':
 					case 'hold':
+					case 'unapprove':
 					case 'unapproved':
 						return 'hold';
 

@@ -53,7 +53,7 @@ namespace comment_mail // Root namespace.
 			 * @param integer|string $comment_status Initial comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: `hold`, `unapproved`),
+			 *       - `0` (aka: `hold`, `unapprove`, `unapproved`),
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `spam`, `delete`.
 			 */
