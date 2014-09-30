@@ -68,16 +68,17 @@ namespace comment_mail // Root namespace.
 				$_wp_postmeta_stcr_data = $wpdb->get_results($wpdb->prepare("SELECT meta_key, meta_value FROM wp_postmeta WHERE post_id = %d AND meta_key LIKE '%%_stcr@_%%'", $post_id), OBJECT);
 
 				if(!$_wp_postmeta_stcr_data || count($_wp_postmeta_stcr_data) < 1)
-					return null; // No results.
+					return NULL; // No results.
 
-				foreach ($_wp_postmeta_stcr_data as $_row) {
+				foreach($_wp_postmeta_stcr_data as $_row)
+				{
 					$_email = str_replace('_stcr@_', '', $_row->meta_key); // Original format: _stcr@_user@example.com
 
 					if(empty($_email) || !is_email($_email))
 						continue; // Invalid data.
 
 					$_meta_value = explode('|', $_row->meta_value); // Original format: 2013-03-11 01:31:01|R
-					$_date = $_meta_value[0]; // Local WordPress time
+					$_date       = $_meta_value[0]; // Local WordPress time
 
 					if(strtotime($_date) === FALSE)
 						continue; // Invalid data.
@@ -89,7 +90,8 @@ namespace comment_mail // Root namespace.
 					$data[] = array('email' => $_email, 'date' => $_date, 'status' => $_status);
 				}
 
-				return (empty($data) ? null : $data);
+				unset($_wp_postmeta_stcr_data, $_row, $_email, $_meta_value, $_date, $_status);
+				return (empty($data) ? NULL : $data);
 			}
 		}
 	}
