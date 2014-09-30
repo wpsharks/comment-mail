@@ -243,7 +243,7 @@ namespace comment_mail // Root namespace.
 				$existing_sub = $this->check_existing_sub_post_author();
 
 				if($existing_sub && $existing_sub->status === 'subscribed')
-					return TRUE; // Same subscription already exists.
+					return TRUE; // A subscription already exists.
 
 				return FALSE; // Does NOT exist yet.
 			}
@@ -262,7 +262,7 @@ namespace comment_mail // Root namespace.
 				$existing_sub = $this->check_existing_sub_recipient($recipient);
 
 				if($existing_sub && $existing_sub->status === 'subscribed')
-					return TRUE; // Same subscription already exists.
+					return TRUE; // A subscription already exists.
 
 				return FALSE; // Does NOT exist yet.
 			}
