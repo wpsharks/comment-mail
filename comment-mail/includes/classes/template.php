@@ -130,18 +130,18 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function site_vars(array $vars = array())
 			{
-				if($this->file === 'site/common-header.php')
+				if($this->file === 'site/site-header.php')
 					return array(); // Prevent infinite loop.
 
-				if($this->file === 'site/common-footer.php')
+				if($this->file === 'site/site-footer.php')
 					return array(); // Prevent infinite loop.
 
 				if(!isset($this->cache[__FUNCTION__]['site_header_template']))
-					$this->cache[__FUNCTION__]['site_header_template'] = new template('site/common-header.php');
+					$this->cache[__FUNCTION__]['site_header_template'] = new template('site/site-header.php');
 				$site_header_template = &$this->cache[__FUNCTION__]['site_header_template'];
 
 				if(!isset($this->cache[__FUNCTION__]['site_footer_template']))
-					$this->cache[__FUNCTION__]['site_footer_template'] = new template('site/common-footer.php');
+					$this->cache[__FUNCTION__]['site_footer_template'] = new template('site/site-footer.php');
 				$site_footer_template = &$this->cache[__FUNCTION__]['site_footer_template'];
 				/**
 				 * @var $site_header_template template For IDEs.
@@ -164,18 +164,18 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function email_vars(array $vars = array())
 			{
-				if($this->file === 'email/common-header.php')
+				if($this->file === 'email/email-header.php')
 					return array(); // Prevent infinite loop.
 
-				if($this->file === 'email/common-footer.php')
+				if($this->file === 'email/email-footer.php')
 					return array(); // Prevent infinite loop.
 
 				if(!isset($this->cache[__FUNCTION__]['email_header_template']))
-					$this->cache[__FUNCTION__]['email_header_template'] = new template('email/common-header.php');
+					$this->cache[__FUNCTION__]['email_header_template'] = new template('email/email-header.php');
 				$email_header_template = &$this->cache[__FUNCTION__]['email_header_template'];
 
 				if(!isset($this->cache[__FUNCTION__]['email_footer_template']))
-					$this->cache[__FUNCTION__]['email_footer_template'] = new template('email/common-footer.php');
+					$this->cache[__FUNCTION__]['email_footer_template'] = new template('email/email-footer.php');
 				$email_footer_template = &$this->cache[__FUNCTION__]['email_footer_template'];
 				/**
 				 * @var $email_header_template template For IDEs.
