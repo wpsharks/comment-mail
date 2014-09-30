@@ -81,11 +81,18 @@ namespace comment_mail // Root namespace.
 				if(empty($_POST[__NAMESPACE__.'_sub_type']))
 					return; // Not applicable.
 
+				if(empty($_POST[__NAMESPACE__.'_sub_deliver']))
+					return; // Not applicable.
+
 				$sub_type = (string)$_POST[__NAMESPACE__.'_sub_type'];
 				if(!($sub_type = $this->plugin->utils_string->trim_strip_deep($sub_type)))
 					return; // Not applicable.
 
-				new sub_inserter(wp_get_current_user(), $this->comment_id, $sub_type);
+				$sub_deliver = (string)$_POST[__NAMESPACE__.'_sub_deliver'];
+				if(!($sub_deliver = $this->plugin->utils_string->trim_strip_deep($sub_deliver)))
+					return; // Not applicable.
+
+				new sub_inserter(wp_get_current_user(), $this->comment_id, $sub_type, $sub_deliver);
 			}
 
 			/**

@@ -63,7 +63,15 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $sub_type; // Set by constructor.
+			protected $type; // Set by constructor.
+
+			/**
+			 * @var string Subscription delivery cycle.
+			 *    `immediately`, `hourly`, `daily`, `weekly`.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $deliver; // Set by constructor.
 
 			/**
 			 * @var integer Insertion ID.
@@ -89,11 +97,13 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param integer|string $comment_id Comment ID.
 			 *
-			 * @param string         $sub_type Type of subscription.
+			 * @param string         $type Type of subscription.
 			 *    Please pass one of: `comments`, `comment`.
+			 *
+			 * @param string         $deliver Delivery cycle. Defaults to `immediately`.
+			 *    Please pass one of: `immediately`, `hourly`, `daily`, `weekly`.
 			 */
-			public function __construct($user, $comment_id, $sub_type)
-				// @TODO collect `deliver` cycle.
+			public function __construct($user, $comment_id, $type = 'comment', $deliver = 'immediately')
 			{
 				$this->plugin = plugin();
 
@@ -109,9 +119,13 @@ namespace comment_mail // Root namespace.
 				if(($comment_id = (integer)$comment_id))
 					$this->comment = get_comment($comment_id);
 
-				$this->sub_type = strtolower((string)$sub_type);
-				if(!in_array($this->sub_type, array('comments', 'comment'), TRUE))
-					$this->sub_type = ''; // Default type.
+				$this->type = strtolower((string)$type);
+				if(!in_array($this->type, array('comments', 'comment'), TRUE))
+					$this->type = ''; // Default type.
+
+				$this->deliver = strtolower((string)$deliver);
+				if(!in_array($this->deliver, array('immediately', 'hourly', 'daily', 'weekly'), TRUE))
+					$this->deliver = ''; // Default cycle.
 
 				$this->insert_id = 0; // Default value.
 
@@ -139,7 +153,7 @@ namespace comment_mail // Root namespace.
 				if(!$this->comment->comment_author_email)
 					return; // Not applicable.
 
-				if(!$this->sub_type)
+				if(!$this->type || !$this->deliver)
 					return; // Not applicable.
 
 				if($this->check_existing())
@@ -151,8 +165,9 @@ namespace comment_mail // Root namespace.
 					'key'              => $this->keygen->uunnci_20_max(),
 					'user_id'          => $this->user ? (integer)$this->user->ID : 0,
 					'post_id'          => (integer)$this->comment->post_ID,
-					'comment_id'       => $this->sub_type === 'comment'
-						? (integer)$this->comment->comment_ID : 0,
+					'comment_id'       => $this->type === 'comments'
+						? 0 : (integer)$this->comment->comment_ID,
+					'deliver'          => $this->deliver,
 
 					'fname'            => $this->first_name(),
 					'lname'            => $this->last_name(),
@@ -212,7 +227,8 @@ namespace comment_mail // Root namespace.
 				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->comment->post_ID)."'".
-				       " AND `comment_id` = '".esc_sql($this->sub_type === 'comment' ? $this->comment->comment_ID : 0)."'".
+				       " AND `comment_id` = '".esc_sql($this->type === 'comments' ? 0 : $this->comment->comment_ID)."'".
+				       " AND `deliver` = '".esc_sql($this->deliver)."'". // Delivery cycle.
 
 				       ($this->user && $this->user->ID // Has a user ID?
 					       ? " AND (`user_id` = '".esc_sql($this->user->ID)."'".

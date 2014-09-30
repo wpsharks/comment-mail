@@ -54,6 +54,7 @@ namespace comment_mail // Root namespace.
 					'user_id'    => 0,
 					'post_id'    => 0,
 					'comment_id' => 0,
+					'deliver'    => '',
 
 					'fname'      => '',
 					'lname'      => '',
@@ -91,6 +92,9 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				if(!$this->entry['post_id'])
+					return; // Not applicable.
+
+				if(!$this->entry['deliver'])
 					return; // Not applicable.
 
 				if(!$this->entry['email'])

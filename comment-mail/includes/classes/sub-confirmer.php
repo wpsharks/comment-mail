@@ -93,6 +93,7 @@ namespace comment_mail // Root namespace.
 				if($this->plugin->options['auto_confirm_enable'])
 				{
 					$this->plugin->utils_sub->confirm($this->sub->ID);
+
 					return TRUE; // Confirmed automatically.
 				}
 				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
@@ -104,13 +105,12 @@ namespace comment_mail // Root namespace.
 					         "       OR `email` = '".esc_sql($this->sub->email)."')"
 					       : " AND `email` = '".esc_sql($this->sub->email)."'").
 
-				       " AND `status` = 'subscribed'".
-
-				       " ORDER BY `insertion_time` DESC LIMIT 1";
+				       " AND `status` = 'subscribed' LIMIT 1";
 
 				if((integer)$this->plugin->utils_db->wp->get_var($sql))
 				{
 					$this->plugin->utils_sub->confirm($this->sub->ID);
+
 					return TRUE; // Confirmed automatically.
 				}
 				return FALSE; // Not subscribed already.

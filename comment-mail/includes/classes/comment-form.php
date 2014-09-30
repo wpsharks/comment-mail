@@ -64,6 +64,7 @@ namespace comment_mail // Root namespace.
 
 				// @TODO
 				// $_POST[__NAMESPACE__.'_sub_type']
+				// $_POST[__NAMESPACE__.'_sub_deliver']
 				// templates/site/subscription-ops.php
 			}
 		}

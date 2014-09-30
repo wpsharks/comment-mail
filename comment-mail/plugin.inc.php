@@ -318,28 +318,29 @@ namespace comment_mail
 
 				$this->default_options = array( // Option defaults.
 				                                'version'                                     => $this->version,
-				                                'enable'                                      => '0', // `0|1`.
+				                                'enable'                                      => '0', // `0|1`; enable?
 				                                'crons_setup'                                 => '0', // `0` or timestamp.
-				                                'uninstall_on_deletion'                       => '0', // `0|1`.
+				                                'uninstall_on_deletion'                       => '0', // `0|1`; run uninstaller?
 
-				                                'auto_confirm_enable'                         => '0', // `0|1`.
+				                                'auto_confirm_enable'                         => '0', // `0|1`; auto-confirm enable?
 
-				                                'auto_subscribe_enable'                       => '1', // `0|1`.
-				                                'auto_subscribe_post_types'                   => 'post,page',
-				                                'auto_subscribe_post_author'                  => '1', // `0|1`.
-				                                'auto_subscribe_recipients'                   => '', // Others.
+				                                'auto_subscribe_enable'                       => '1', // `0|1`; auto-subscribe enable?
+				                                'auto_subscribe_deliver'                      => 'immediately', // `immediately`, `hourly`, `daily`, `weekly`.
+				                                'auto_subscribe_post_types'                   => 'post,page', // Comma-delimited post types.
+				                                'auto_subscribe_post_author'                  => '1', // `0|1`; auto-subscribe post authors?
+				                                'auto_subscribe_recipients'                   => '', // Others `;|,` delimited emails.
 
-				                                'smtp_enable'                                 => '0', // `0|1`.
-				                                'smtp_host'                                   => '', // Host name.
-				                                'smtp_port'                                   => '', // Port number.
+				                                'smtp_enable'                                 => '0', // `0|1`; enable?
+				                                'smtp_host'                                   => '', // SMTP host name.
+				                                'smtp_port'                                   => '', // SMTP port number.
 				                                'smtp_secure'                                 => '', // ``, `ssl` or `tls`.
 
-				                                'smtp_username'                               => '', // Username.
-				                                'smtp_password'                               => '', // Password.
+				                                'smtp_username'                               => '', // SMTP username.
+				                                'smtp_password'                               => '', // SMTP password.
 
-				                                'smtp_from_name'                              => '', // From name.
-				                                'smtp_from_email'                             => '', // From email.
-				                                'smtp_force_from'                             => '1', // `0|1`.
+				                                'smtp_from_name'                              => '', // SMTP from name.
+				                                'smtp_from_email'                             => '', // SMTP from email.
+				                                'smtp_force_from'                             => '1', // `0|1`; force?
 
 				                                'template_site_common_header'                 => '', // HTML/PHP code.
 				                                'template_site_common_footer'                 => '', // HTML/PHP code.

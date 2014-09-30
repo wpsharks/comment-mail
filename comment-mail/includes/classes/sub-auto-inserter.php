@@ -155,6 +155,10 @@ namespace comment_mail // Root namespace.
 				if(!$this->plugin->options['auto_subscribe_post_author'])
 					return; // Not applicable.
 
+				if(!in_array($this->plugin->options['auto_subscribe_deliver'],
+				             array('immediately', 'hourly', 'daily', 'weekly'), TRUE)
+				) return; // Not applicable.
+
 				if($this->check_existing_post_author())
 					return; // Can't subscribe again.
 
@@ -164,7 +168,8 @@ namespace comment_mail // Root namespace.
 					'key'              => $this->keygen->uunnci_20_max(),
 					'user_id'          => (integer)$this->post_author->ID,
 					'post_id'          => (integer)$this->post->ID,
-					'comment_id'       => 0, // All comments.
+					'comment_id'       => 0, // Auto-subscribe to all comments.
+					'deliver'          => $this->plugin->options['auto_subscribe_deliver'],
 
 					'fname'            => $this->first_name_post_author(),
 					'lname'            => $this->last_name_post_author(),
@@ -201,6 +206,10 @@ namespace comment_mail // Root namespace.
 				if(!$this->plugin->options['auto_subscribe_recipients'])
 					return; // Not applicable.
 
+				if(!in_array($this->plugin->options['auto_subscribe_deliver'],
+				             array('immediately', 'hourly', 'daily', 'weekly'), TRUE)
+				) return; // Not applicable.
+
 				$recipients = $this->plugin->options['auto_subscribe_recipients'];
 				$recipients = $this->plugin->utils_mail->parse_recipients_deep($recipients);
 
@@ -212,32 +221,37 @@ namespace comment_mail // Root namespace.
 					if($this->check_existing_recipient($_recipient))
 						continue; // Can't subscribe again.
 
-					$_insertion_ip = $_last_ip = $_ip = ''; // Not applicable.
+					$_insertion_ip = $_last_ip = ''; // Unknown.
 
-					$data = array(
+					$_data = array(
 						'key'              => $this->keygen->uunnci_20_max(),
+						'user_id'          => 0, // Unknown user ID.
 						'post_id'          => (integer)$this->post->ID,
-						'comment_id'       => 0, // All comments.
+						'comment_id'       => 0, // Auto-subscribe to all comments.
+						'deliver'          => $this->plugin->options['auto_subscribe_deliver'],
 
 						'fname'            => $_recipient->fname,
 						'lname'            => $_recipient->lname,
 						'email'            => $_recipient->email,
+						'insertion_ip'     => $_insertion_ip,
+						'last_ip'          => $_last_ip,
 
 						'status'           => 'subscribed',
 
 						'insertion_time'   => time(),
 						'last_update_time' => time()
 					);
-					if(!$this->plugin->utils_db->wp->replace($this->plugin->utils_db->prefix().'subs', $data))
+					if(!$this->plugin->utils_db->wp->replace($this->plugin->utils_db->prefix().'subs', $_data))
 						throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
-					if(!($sub_id = $this->insert_id = (integer)$this->plugin->utils_db->wp->insert_id))
+					if(!($_sub_id = $this->insert_id = (integer)$this->plugin->utils_db->wp->insert_id))
 						throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
-					new sub_event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
+					new sub_event_log_inserter(array_merge($_data, array('sub_id' => $_sub_id, 'event' => 'subscribed')));
 
 					$this->delete_others_recipient($_recipient); // Delete other subscriptions now.
 				}
+				unset($_recipient, $_insertion_ip, $_last_ip, $_data, $_sub_id); // Housekeeping.
 			}
 
 			/**
@@ -288,7 +302,6 @@ namespace comment_mail // Root namespace.
 				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->post->ID)."'".
-				       " AND `comment_id` = '0'". // All comments.
 
 				       " AND (`user_id` = '".esc_sql($this->post_author->ID)."'".
 				       "       OR `email` = '".esc_sql($this->post_author->user_email)."')".
@@ -314,7 +327,6 @@ namespace comment_mail // Root namespace.
 				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->post->ID)."'".
-				       " AND `comment_id` = '0'". // All comments.
 
 				       " AND `email` = '".esc_sql($recipient->email)."'".
 
