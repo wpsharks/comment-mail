@@ -79,7 +79,8 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function clear_cron_hooks()
 			{
-				wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_process_queue');
+				wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_queue_processor');
+				wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_sub_cleaner');
 			}
 
 			/**

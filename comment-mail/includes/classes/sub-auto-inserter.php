@@ -149,8 +149,6 @@ namespace comment_mail // Root namespace.
 				if($this->check_existing_post_author())
 					return; // Can't subscribe again.
 
-				$this->delete_existing_post_author(); // Delete existing.
-
 				$insertion_ip = $last_ip = $this->current_ip_post_author();
 
 				$data = array(
@@ -168,15 +166,17 @@ namespace comment_mail // Root namespace.
 					'status'           => 'subscribed',
 
 					'insertion_time'   => time(),
-					'last_update_time' => time(),
+					'last_update_time' => time()
 				);
-				if(!$this->plugin->utils_db->wp->insert($this->plugin->utils_db->prefix().'subs', $data))
+				if(!$this->plugin->utils_db->wp->replace($this->plugin->utils_db->prefix().'subs', $data))
 					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
-				if(!($sub_id = (integer)$this->plugin->utils_db->wp->insert_id)) // Insertion failure?
+				if(!($sub_id = (integer)$this->plugin->utils_db->wp->insert_id)) // Failure?
 					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
 				new sub_event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
+
+				$this->delete_others_post_author(); // Delete other subscriptions now.
 			}
 
 			/**
@@ -203,8 +203,6 @@ namespace comment_mail // Root namespace.
 					if($this->check_existing_recipient($_recipient))
 						continue; // Can't subscribe again.
 
-					$this->delete_existing_recipient($_recipient); // Delete existing.
-
 					$_insertion_ip = $_last_ip = $_ip = ''; // Not applicable.
 
 					$data = array(
@@ -219,15 +217,17 @@ namespace comment_mail // Root namespace.
 						'status'           => 'subscribed',
 
 						'insertion_time'   => time(),
-						'last_update_time' => time(),
+						'last_update_time' => time()
 					);
-					if(!$this->plugin->utils_db->wp->insert($this->plugin->utils_db->prefix().'subs', $data))
+					if(!$this->plugin->utils_db->wp->replace($this->plugin->utils_db->prefix().'subs', $data))
 						throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
-					if(!($sub_id = (integer)$this->plugin->utils_db->wp->insert_id)) // Insertion failure?
+					if(!($sub_id = (integer)$this->plugin->utils_db->wp->insert_id)) // Failure?
 						throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
 					new sub_event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
+
+					$this->delete_others_recipient($_recipient); // Delete other subscriptions now.
 				}
 			}
 
@@ -317,36 +317,40 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Delete any existing subscription(s).
+			 * Delete other subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function delete_existing_post_author()
+			protected function delete_others_post_author()
 			{
 				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->post->ID)."'".
 
 				       " AND (`user_id` = '".esc_sql($this->post_author->ID)."'".
-				       "       OR `email` = '".esc_sql($this->post_author->user_email)."')";
+				       "       OR `email` = '".esc_sql($this->post_author->user_email)."')".
+
+				       " AND `ID` != '".esc_sql($this->plugin->utils_db->wp->insert_id)."'";
 
 				$this->plugin->utils_db->wp->query($sql);
 			}
 
 			/**
-			 * Delete any existing subscription(s).
+			 * Delete other subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param \stdClass $recipient Recipient object to check.
 			 */
-			protected function delete_existing_recipient(\stdClass $recipient)
+			protected function delete_others_recipient(\stdClass $recipient)
 			{
 				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->post->ID)."'".
 
-				       " AND `email` = '".esc_sql($recipient->email)."'";
+				       " AND `email` = '".esc_sql($recipient->email)."'".
+
+				       " AND `ID` != '".esc_sql($this->plugin->utils_db->wp->insert_id)."'";
 
 				$this->plugin->utils_db->wp->query($sql);
 			}

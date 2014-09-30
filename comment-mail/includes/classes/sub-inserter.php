@@ -66,13 +66,6 @@ namespace comment_mail // Root namespace.
 			protected $sub_type; // Set by constructor.
 
 			/**
-			 * @var boolean Override existing sub type?
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $sub_type_override; // Set by constructor.
-
-			/**
 			 * @var keygen Key generator.
 			 *
 			 * @since 14xxxx First documented version.
@@ -91,10 +84,9 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param string         $sub_type Type of subscription.
 			 *    Please pass one of: `comments`, `comment`.
-			 *
-			 * @param boolean        $sub_type_override Defaults to a TRUE value.
 			 */
-			public function __construct($user, $comment_id, $sub_type, $sub_type_override = TRUE)
+			public function __construct($user, $comment_id, $sub_type)
+				// @TODO collect `deliver` cycle.
 			{
 				$this->plugin = plugin();
 
@@ -110,8 +102,7 @@ namespace comment_mail // Root namespace.
 				if(($comment_id = (integer)$comment_id))
 					$this->comment = get_comment($comment_id);
 
-				$this->sub_type          = strtolower((string)$sub_type);
-				$this->sub_type_override = (boolean)$sub_type_override;
+				$this->sub_type = strtolower((string)$sub_type);
 				if(!in_array($this->sub_type, array('comments', 'comment'), TRUE))
 					$this->sub_type = ''; // Default type.
 
@@ -145,8 +136,6 @@ namespace comment_mail // Root namespace.
 				if($this->check_existing())
 					return; // Can't subscribe again.
 
-				$this->delete_existing(); // Delete existing.
-
 				$insertion_ip = $last_ip = $this->user_ip();
 
 				$data = array(
@@ -167,15 +156,17 @@ namespace comment_mail // Root namespace.
 					'insertion_time'   => time(),
 					'last_update_time' => time()
 				);
-				if(!$this->plugin->utils_db->wp->insert($this->plugin->utils_db->prefix().'subs', $data))
+				if(!$this->plugin->utils_db->wp->replace($this->plugin->utils_db->prefix().'subs', $data))
 					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
-				if(!($sub_id = (integer)$this->plugin->utils_db->wp->insert_id)) // Insertion failure?
+				if(!($sub_id = (integer)$this->plugin->utils_db->wp->insert_id)) // Failure?
 					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
 				new sub_event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
 
-				new sub_confirmer($sub_id); // Send confirmation email now.
+				new sub_confirmer($sub_id); // Confirm; before deletion of others.
+
+				$this->delete_others(); // Delete other subscriptions now.
 			}
 
 			/**
@@ -212,15 +203,9 @@ namespace comment_mail // Root namespace.
 				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->comment->post_ID)."'".
+				       " AND `comment_id` = '".esc_sql($this->sub_type === 'comment' ? $this->comment->comment_ID : 0)."'".
 
-				       ($this->sub_type_override // Existing `$sub_type` must match exactly, else override?
-					       ? " AND `comment_id` = '".esc_sql($this->sub_type === 'comment' ? $this->comment->comment_ID : 0)."'"
-
-					       : " AND (`comment_id` = '0'". // If already subscribed to all comments.
-					         // Or, if they are trying to subscribe to a specific comment, and they already are.
-					         ($this->sub_type === 'comment' ? " OR `comment_id` = '".esc_sql($this->comment->comment_ID)."')" : ")")).
-
-				       ($this->user && $this->user->ID // Have a user ID?
+				       ($this->user && $this->user->ID // Has a user ID?
 					       ? " AND (`user_id` = '".esc_sql($this->user->ID)."'".
 					         "       OR `email` = '".esc_sql($this->comment->comment_author_email)."')"
 					       : " AND `email` = '".esc_sql($this->comment->comment_author_email)."'").
@@ -266,21 +251,23 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Delete any existing subscription(s).
+			 * Delete other subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function delete_existing()
+			protected function delete_others()
 			{
 				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->comment->post_ID)."'".
 				       " AND (`comment_id` = '0' OR `comment_id` = '".esc_sql($this->comment->comment_ID)."')".
 
-				       ($this->user && $this->user->ID // Have a user ID?
+				       ($this->user && $this->user->ID // Has a user ID?
 					       ? " AND (`user_id` = '".esc_sql($this->user->ID)."'".
 					         "       OR `email` = '".esc_sql($this->comment->comment_author_email)."')"
-					       : " AND `email` = '".esc_sql($this->comment->comment_author_email)."'");
+					       : " AND `email` = '".esc_sql($this->comment->comment_author_email)."'").
+
+				       " AND `ID` != '".esc_sql($this->plugin->utils_db->wp->insert_id)."'";
 
 				$this->plugin->utils_db->wp->query($sql); // Delete any existing subscription(s).
 			}

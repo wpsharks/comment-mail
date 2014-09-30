@@ -58,6 +58,13 @@ namespace comment_mail // Root namespace.
 			protected $php; // Set by constructor.
 
 			/**
+			 * @var array Instance cache.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $cache = array();
+
+			/**
 			 * Class constructor.
 			 *
 			 * @since 14xxxx First documented version.
@@ -129,13 +136,21 @@ namespace comment_mail // Root namespace.
 				if($this->file === 'site/common-footer.php')
 					return array(); // Prevent infinite loop.
 
-				$site_header_template = new template('site/common-header.php');
-				$site_header          = $site_header_template->parse($vars);
+				if(!isset($this->cache[__FUNCTION__]['site_header_template']))
+					$this->cache[__FUNCTION__]['site_header_template'] = new template('site/common-header.php');
+				$site_header_template = &$this->cache[__FUNCTION__]['site_header_template'];
 
-				$site_footer_template = new template('site/common-footer.php');
-				$site_footer          = $site_footer_template->parse($vars);
+				if(!isset($this->cache[__FUNCTION__]['site_footer_template']))
+					$this->cache[__FUNCTION__]['site_footer_template'] = new template('site/common-footer.php');
+				$site_footer_template = &$this->cache[__FUNCTION__]['site_footer_template'];
+				/**
+				 * @var $site_header_template template For IDEs.
+				 * @var $site_footer_template template For IDEs.
+				 */
+				$site_header = $site_header_template->parse($vars);
+				$site_footer = $site_footer_template->parse($vars);
 
-				return compact('site_header', 'site_footer');
+				return compact('site_header', 'site_footer'); // Header/footer.
 			}
 
 			/**
@@ -155,13 +170,21 @@ namespace comment_mail // Root namespace.
 				if($this->file === 'email/common-footer.php')
 					return array(); // Prevent infinite loop.
 
-				$email_header_template = new template('email/common-header.php');
-				$email_header          = $email_header_template->parse($vars);
+				if(!isset($this->cache[__FUNCTION__]['email_header_template']))
+					$this->cache[__FUNCTION__]['email_header_template'] = new template('email/common-header.php');
+				$email_header_template = &$this->cache[__FUNCTION__]['email_header_template'];
 
-				$email_footer_template = new template('email/common-footer.php');
-				$email_footer          = $email_footer_template->parse($vars);
+				if(!isset($this->cache[__FUNCTION__]['email_footer_template']))
+					$this->cache[__FUNCTION__]['email_footer_template'] = new template('email/common-footer.php');
+				$email_footer_template = &$this->cache[__FUNCTION__]['email_footer_template'];
+				/**
+				 * @var $email_header_template template For IDEs.
+				 * @var $email_footer_template template For IDEs.
+				 */
+				$email_header = $email_header_template->parse($vars);
+				$email_footer = $email_footer_template->parse($vars);
 
-				return compact('email_header', 'email_footer');
+				return compact('email_header', 'email_footer'); // Header/footer.
 			}
 
 			/**
@@ -174,6 +197,7 @@ namespace comment_mail // Root namespace.
 			 * @return array An array of all sub. template vars.
 			 */
 			protected function sub_vars(\stdClass $sub)
+				// @TODO Add link to subscriptions management panel.
 			{
 				$confirm_url     = add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('confirm' => $sub->key))), home_url('/'));
 				$unsubscribe_url = add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('unsubscribe' => $sub->key))), home_url('/'));

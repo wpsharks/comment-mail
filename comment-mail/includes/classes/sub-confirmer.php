@@ -99,7 +99,7 @@ namespace comment_mail // Root namespace.
 
 				       " WHERE `post_id` = '".esc_sql($this->sub->post_id)."'".
 
-				       ($this->sub->user_id // Have a user ID?
+				       ($this->sub->user_id // Has a user ID?
 					       ? " AND (`user_id` = '".esc_sql($this->sub->user_id)."'".
 					         "       OR `email` = '".esc_sql($this->sub->email)."')"
 					       : " AND `email` = '".esc_sql($this->sub->email)."'").
