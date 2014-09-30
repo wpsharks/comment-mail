@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS `%%prefix%%subs` (
   `email` varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Email address. If we have a `user_id`, use value from `wp_users` table.',
   `insertion_ip` varchar(39) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Insertion IP address.',
   `last_ip` varchar(39) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Last known IP address.',
+  `deliver` enum('immediately','hourly','daily','weekly') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'immediately' COMMENT 'Delivery cycle.',
   `status` enum('unconfirmed','subscribed','suspended') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'unconfirmed' COMMENT 'Current subscription status.',
   `insertion_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Row insertion time. UNIX timestamp.',
   `last_update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Last row update time. Unix timestamp.',
