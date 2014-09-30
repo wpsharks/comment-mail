@@ -155,8 +155,15 @@ namespace comment_mail // Root namespace.
 					return; // Nothing to do.
 
 				ignore_user_abort(TRUE);
-				@set_time_limit($this->max_time);
-				@set_time_limit($this->max_time + 30);
+
+				@set_time_limit($this->max_time); // Max time only (first).
+				// Doing this first in case the times below exceed an upper limit.
+				// i.e. hosts may prevent this from being set higher than `$max_time`.
+
+				// The following may not work, but we can try :-)
+				if($this->delay) // Allow some extra time for the delay?
+					@set_time_limit(ceil($this->max_time + ($this->delay / 1000) + 30));
+				else @set_time_limit($this->max_time + 30);
 			}
 
 			/**
