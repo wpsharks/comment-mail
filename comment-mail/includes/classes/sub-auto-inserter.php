@@ -156,7 +156,7 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				if(!in_array($this->plugin->options['auto_subscribe_deliver'],
-				             array('immediately', 'hourly', 'daily', 'weekly'), TRUE)
+				             array('asap', 'hourly', 'daily', 'weekly'), TRUE)
 				) return; // Not applicable.
 
 				if($this->check_existing_post_author())
@@ -207,7 +207,7 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				if(!in_array($this->plugin->options['auto_subscribe_deliver'],
-				             array('immediately', 'hourly', 'daily', 'weekly'), TRUE)
+				             array('asap', 'hourly', 'daily', 'weekly'), TRUE)
 				) return; // Not applicable.
 
 				$recipients = $this->plugin->options['auto_subscribe_recipients'];

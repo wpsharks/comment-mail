@@ -325,7 +325,7 @@ namespace comment_mail
 				                                'auto_confirm_enable'                         => '0', // `0|1`; auto-confirm enable?
 
 				                                'auto_subscribe_enable'                       => '1', // `0|1`; auto-subscribe enable?
-				                                'auto_subscribe_deliver'                      => 'immediately', // `immediately`, `hourly`, `daily`, `weekly`.
+				                                'auto_subscribe_deliver'                      => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
 				                                'auto_subscribe_post_types'                   => 'post,page', // Comma-delimited post types.
 				                                'auto_subscribe_post_author'                  => '1', // `0|1`; auto-subscribe post authors?
 				                                'auto_subscribe_recipients'                   => '', // Others `;|,` delimited emails.

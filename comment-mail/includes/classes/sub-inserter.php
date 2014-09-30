@@ -67,7 +67,7 @@ namespace comment_mail // Root namespace.
 
 			/**
 			 * @var string Subscription delivery cycle.
-			 *    `immediately`, `hourly`, `daily`, `weekly`.
+			 *    `asap`, `hourly`, `daily`, `weekly`.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
@@ -100,10 +100,10 @@ namespace comment_mail // Root namespace.
 			 * @param string         $type Type of subscription.
 			 *    Please pass one of: `comments`, `comment`.
 			 *
-			 * @param string         $deliver Delivery cycle. Defaults to `immediately`.
-			 *    Please pass one of: `immediately`, `hourly`, `daily`, `weekly`.
+			 * @param string         $deliver Delivery cycle. Defaults to `asap`.
+			 *    Please pass one of: `asap`, `hourly`, `daily`, `weekly`.
 			 */
-			public function __construct($user, $comment_id, $type = 'comment', $deliver = 'immediately')
+			public function __construct($user, $comment_id, $type = 'comment', $deliver = 'asap')
 			{
 				$this->plugin = plugin();
 
@@ -124,7 +124,7 @@ namespace comment_mail // Root namespace.
 					$this->type = ''; // Default type.
 
 				$this->deliver = strtolower((string)$deliver);
-				if(!in_array($this->deliver, array('immediately', 'hourly', 'daily', 'weekly'), TRUE))
+				if(!in_array($this->deliver, array('asap', 'hourly', 'daily', 'weekly'), TRUE))
 					$this->deliver = ''; // Default cycle.
 
 				$this->insert_id = 0; // Default value.
