@@ -165,7 +165,7 @@ namespace comment_mail // Root namespace.
 					'status'           => 'unconfirmed',
 
 					'insertion_time'   => time(),
-					'last_update_time' => time(),
+					'last_update_time' => time()
 				);
 				if(!$this->plugin->utils_db->wp->insert($this->plugin->utils_db->prefix().'subs', $data))
 					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
@@ -208,6 +208,7 @@ namespace comment_mail // Root namespace.
 			 * @return \stdClass|null Existing sub; else NULL.
 			 */
 			protected function check_existing_sub()
+				// @TODO Take a closer look at this. We should allow subscriptions to multiple comment IDs.
 			{
 				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
