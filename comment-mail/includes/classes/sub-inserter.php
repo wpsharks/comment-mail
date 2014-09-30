@@ -66,6 +66,13 @@ namespace comment_mail // Root namespace.
 			protected $sub_type; // Set by constructor.
 
 			/**
+			 * @var integer Insertion ID.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $insert_id; // Set by constructor.
+
+			/**
 			 * @var keygen Key generator.
 			 *
 			 * @since 14xxxx First documented version.
@@ -105,6 +112,8 @@ namespace comment_mail // Root namespace.
 				$this->sub_type = strtolower((string)$sub_type);
 				if(!in_array($this->sub_type, array('comments', 'comment'), TRUE))
 					$this->sub_type = ''; // Default type.
+
+				$this->insert_id = 0; // Default value.
 
 				$this->keygen = new keygen();
 
@@ -159,7 +168,7 @@ namespace comment_mail // Root namespace.
 				if(!$this->plugin->utils_db->wp->replace($this->plugin->utils_db->prefix().'subs', $data))
 					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
-				if(!($sub_id = (integer)$this->plugin->utils_db->wp->insert_id)) // Failure?
+				if(!($sub_id = $this->insert_id = (integer)$this->plugin->utils_db->wp->insert_id))
 					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
 				new sub_event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
@@ -267,7 +276,7 @@ namespace comment_mail // Root namespace.
 					         "       OR `email` = '".esc_sql($this->comment->comment_author_email)."')"
 					       : " AND `email` = '".esc_sql($this->comment->comment_author_email)."'").
 
-				       " AND `ID` != '".esc_sql($this->plugin->utils_db->wp->insert_id)."'";
+				       " AND `ID` != '".esc_sql($this->insert_id)."'";
 
 				$this->plugin->utils_db->wp->query($sql); // Delete any existing subscription(s).
 			}

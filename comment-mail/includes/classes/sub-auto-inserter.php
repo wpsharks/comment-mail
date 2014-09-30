@@ -55,7 +55,14 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $user; // Set by constructor.
+			protected $current_user; // Set by constructor.
+
+			/**
+			 * @var integer Insertion ID.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $insert_id; // Set by constructor.
 
 			/**
 			 * @var keygen Key generator.
@@ -87,7 +94,9 @@ namespace comment_mail // Root namespace.
 				$this->post_types = strtolower($this->plugin->options['auto_subscribe_post_types']);
 				$this->post_types = preg_split('/[;,\s]+/', $this->post_types, NULL, PREG_SPLIT_NO_EMPTY);
 
-				$this->user = wp_get_current_user();
+				$this->current_user = wp_get_current_user();
+
+				$this->insert_id = 0; // Default value.
 
 				$this->keygen = new keygen();
 
@@ -171,7 +180,7 @@ namespace comment_mail // Root namespace.
 				if(!$this->plugin->utils_db->wp->replace($this->plugin->utils_db->prefix().'subs', $data))
 					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
-				if(!($sub_id = (integer)$this->plugin->utils_db->wp->insert_id)) // Failure?
+				if(!($sub_id = $this->insert_id = (integer)$this->plugin->utils_db->wp->insert_id))
 					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
 				new sub_event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
@@ -222,7 +231,7 @@ namespace comment_mail // Root namespace.
 					if(!$this->plugin->utils_db->wp->replace($this->plugin->utils_db->prefix().'subs', $data))
 						throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
-					if(!($sub_id = (integer)$this->plugin->utils_db->wp->insert_id)) // Failure?
+					if(!($sub_id = $this->insert_id = (integer)$this->plugin->utils_db->wp->insert_id))
 						throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
 					new sub_event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
@@ -330,7 +339,7 @@ namespace comment_mail // Root namespace.
 				       " AND (`user_id` = '".esc_sql($this->post_author->ID)."'".
 				       "       OR `email` = '".esc_sql($this->post_author->user_email)."')".
 
-				       " AND `ID` != '".esc_sql($this->plugin->utils_db->wp->insert_id)."'";
+				       " AND `ID` != '".esc_sql($this->insert_id)."'";
 
 				$this->plugin->utils_db->wp->query($sql);
 			}
@@ -350,7 +359,7 @@ namespace comment_mail // Root namespace.
 
 				       " AND `email` = '".esc_sql($recipient->email)."'".
 
-				       " AND `ID` != '".esc_sql($this->plugin->utils_db->wp->insert_id)."'";
+				       " AND `ID` != '".esc_sql($this->insert_id)."'";
 
 				$this->plugin->utils_db->wp->query($sql);
 			}
@@ -420,7 +429,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function current_ip_post_author()
 			{
-				if($this->post_author->ID === $this->user->ID)
+				if($this->post_author->ID === $this->current_user->ID)
 					return $this->plugin->utils_env->user_ip();
 
 				return ''; // Post author not current user.
