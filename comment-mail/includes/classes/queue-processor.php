@@ -215,6 +215,8 @@ namespace comment_mail // Root namespace.
 				if(($entry_digestable_entries = $this->check_entry_digestable_entries($entry_props)))
 					$entry_props->comments = $entry_digestable_entries;
 
+				// @TODO Move everything above this line into its own method.
+
 				if(!($entry_subject = $this->entry_subject($entry_props)))
 				{
 					$entry_props->event     = 'invalidated';
