@@ -215,6 +215,9 @@ namespace comment_mail // Root namespace.
 					return $this->update_entry_hold_until_time($entry_props, $entry_hold_until_time);
 				}
 				// @TODO Add support for `entry_digestable_entries()` here.
+				if(($entry_digestable_entries = $this->check_digestable_entries($entry_props)))
+					$entry_props->comments = $entry_digestable_entries;
+				else $entry_props->comments = array($entry_props->comment);
 
 				if(!($entry_subject = $this->entry_subject($entry_props)))
 				{
@@ -371,6 +374,7 @@ namespace comment_mail // Root namespace.
 			 *    - `sub` the subscriber.
 			 *    - `post` the post.
 			 *    - `comment` the comment.
+			 *    - `comments` digestable comments.
 			 *
 			 * @see utils_event::queue_note_code()
 			 */
@@ -378,8 +382,9 @@ namespace comment_mail // Root namespace.
 			{
 				$event     = (string)$event;
 				$note_code = (string)$note_code;
+				$comments  = $comment ? array($comment) : array();
 
-				return (object)compact('event', 'note_code', 'entry', 'sub', 'post', 'comment');
+				return (object)compact('event', 'note_code', 'entry', 'sub', 'post', 'comment', 'comments');
 			}
 
 			/**
@@ -479,6 +484,74 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Queued entries.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of up to `$this->max_limit` entries.
+			 */
+			protected function entries()
+			{
+				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
+
+				       " WHERE `hold_until_time` < '".esc_sql(time())."'".
+
+				       " ORDER BY `insertion_time` ASC".
+
+				       " LIMIT ".$this->max_limit;
+
+				if(($entries = $this->plugin->utils_db->wp->get_results($sql)))
+					$entries = $this->plugin->utils_db->typify_deep($entries);
+
+				return $entries ? $entries : array();
+			}
+
+			/**
+			 * Check digestable entries.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdclass $entry_props entry properties.
+			 *
+			 * @return array An array of all queued digestable entries.
+			 */
+			protected function check_digestable_entries(\stdClass $entry_props)
+			{
+				if($entry_props->sub->deliver === 'asap')
+					return array(); // Not applicable.
+
+				return $this->digestable_entries($entry_props);
+			}
+
+			/**
+			 * Queued digestable entries.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdclass $entry_props entry properties.
+			 *
+			 * @return array An array of all queued digestable entries.
+			 */
+			protected function digestable_entries(\stdClass $entry_props)
+			{
+				if($entry_props->sub->deliver === 'asap')
+					return array(); // Not applicable.
+
+				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
+
+				       " WHERE `post_id` = '".esc_sql($entry_props->post->ID)."'".
+				       " AND `comment_parent_id` = '".esc_sql($entry_props->comment->comment_parent)."'".
+				       " AND `sub_id` = '".esc_sql($entry_props->sub->ID)."'".
+
+				       " ORDER BY `insertion_time` ASC";
+
+				if(($digestable_entries = $this->plugin->utils_db->wp->get_results($sql)))
+					$digestable_entries = $this->plugin->utils_db->typify_deep($digestable_entries);
+
+				return $digestable_entries ? $digestable_entries : array();
+			}
+
+			/**
 			 * process entry subject.
 			 *
 			 * @since 14xxxx first documented version.
@@ -504,54 +577,6 @@ namespace comment_mail // Root namespace.
 			protected function entry_message(\stdclass $entry_props)
 			{
 				return $this->message_template->parse(array('sub' => $entry_props->sub, 'post' => $entry_props->post, 'comment' => $entry_props->comment));
-			}
-
-			/**
-			 * Queued entries.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return array An array of up to `$this->max_limit` entries.
-			 */
-			protected function entries()
-			{
-				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
-
-				       " WHERE `hold_until_time` < '".esc_sql(time())."'".
-
-				       " ORDER BY `insertion_time` ASC".
-
-				       " LIMIT ".$this->max_limit;
-
-				if(($entries = $this->plugin->utils_db->wp->get_results($sql)))
-					$entries = $this->plugin->utils_db->typify_deep($entries);
-
-				return $entries ? $entries : array();
-			}
-
-			/**
-			 * Queued digestable entries.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param \stdclass $entry_props entry properties.
-			 *
-			 * @return array An array of all queued digestable entries.
-			 */
-			protected function entry_digestable_entries(\stdClass $entry_props)
-			{
-				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
-
-				       " WHERE `post_id` = '".esc_sql($entry_props->post->ID)."'".
-				       " AND `comment_parent_id` = '".esc_sql($entry_props->comment->comment_parent)."'".
-				       " AND `sub_id` = '".esc_sql($entry_props->sub->ID)."'".
-
-				       " ORDER BY `insertion_time` ASC";
-
-				if(($digestable_entries = $this->plugin->utils_db->wp->get_results($sql)))
-					$digestable_entries = $this->plugin->utils_db->typify_deep($digestable_entries);
-
-				return $digestable_entries ? $digestable_entries : array();
 			}
 
 			/**
