@@ -214,6 +214,8 @@ namespace comment_mail // Root namespace.
 				{
 					return $this->update_entry_hold_until_time($entry_props, $entry_hold_until_time);
 				}
+				// @TODO Add support for `entry_digestable_entries()` here.
+
 				if(!($entry_subject = $this->entry_subject($entry_props)))
 				{
 					$entry_props->event     = 'invalidated';
@@ -246,19 +248,20 @@ namespace comment_mail // Root namespace.
 			protected function process_log_entry(\stdClass $entry_props)
 			{
 				$entry = array(
-					'queue_id'   => $entry_props->entry->ID,
-					'sub_id'     => $entry_props->sub ? $entry_props->sub->ID : $entry_props->entry->sub_id,
-					'user_id'    => $entry_props->sub ? $entry_props->sub->user_id : 0, // Default; no user.
-					'post_id'    => $entry_props->post ? $entry_props->post->ID : ($entry_props->comment ? $entry_props->comment->post_ID : ($entry_props->sub ? $entry_props->sub->post_id : 0)),
-					'comment_id' => $entry_props->comment ? $entry_props->comment->comment_ID : $entry_props->entry->comment_id,
+					'queue_id'          => $entry_props->entry->ID,
+					'sub_id'            => $entry_props->sub ? $entry_props->sub->ID : $entry_props->entry->sub_id,
+					'user_id'           => $entry_props->sub ? $entry_props->sub->user_id : 0, // Default; no user.
+					'post_id'           => $entry_props->post ? $entry_props->post->ID : ($entry_props->comment ? $entry_props->comment->post_ID : ($entry_props->sub ? $entry_props->sub->post_id : 0)),
+					'comment_id'        => $entry_props->comment ? $entry_props->comment->comment_ID : $entry_props->entry->comment_id,
+					'comment_parent_id' => $entry_props->comment ? $entry_props->comment->comment_parent : $entry_props->entry->comment_parent_id,
 
-					'fname'      => $entry_props->sub ? $entry_props->sub->fname : '',
-					'lname'      => $entry_props->sub ? $entry_props->sub->lname : '',
-					'email'      => $entry_props->sub ? $entry_props->sub->email : '',
-					'ip'         => $entry_props->sub ? $entry_props->sub->last_ip : '',
+					'fname'             => $entry_props->sub ? $entry_props->sub->fname : '',
+					'lname'             => $entry_props->sub ? $entry_props->sub->lname : '',
+					'email'             => $entry_props->sub ? $entry_props->sub->email : '',
+					'ip'                => $entry_props->sub ? $entry_props->sub->last_ip : '',
 
-					'event'      => $entry_props->event,
-					'note_code'  => $entry_props->note_code
+					'event'             => $entry_props->event,
+					'note_code'         => $entry_props->note_code
 				);
 				new queue_event_log_inserter($entry);
 			}
@@ -411,16 +414,16 @@ namespace comment_mail // Root namespace.
 				switch($entry_props->sub->deliver) // Check for digests.
 				{
 					case 'hourly': // Delivery cycle/format = hourly digest.
-						if(($entry_post_sub_last_notified_time = $this->entry_post_sub_last_notified_time($entry_props)))
-							return $entry_post_sub_last_notified_time + 3600;
+						if(($entry_last_notified_time = $this->entry_last_notified_time($entry_props)))
+							return $entry_last_notified_time + 3600;
 
 					case 'daily': // Delivery cycle/format = daily digest.
-						if(($entry_post_sub_last_notified_time = $this->entry_post_sub_last_notified_time($entry_props)))
-							return $entry_post_sub_last_notified_time + 86400;
+						if(($entry_last_notified_time = $this->entry_last_notified_time($entry_props)))
+							return $entry_last_notified_time + 86400;
 
 					case 'weekly': // Delivery cycle/format = weekly digest.
-						if(($entry_post_sub_last_notified_time = $this->entry_post_sub_last_notified_time($entry_props)))
-							return $entry_post_sub_last_notified_time + 604800;
+						if(($entry_last_notified_time = $this->entry_last_notified_time($entry_props)))
+							return $entry_last_notified_time + 604800;
 				}
 				return $entry_props->entry->hold_until_time ? $entry_props->entry->hold_until_time : $entry_props->entry->time;
 			}
@@ -438,7 +441,8 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function update_entry_hold_until_time(\stdClass $entry_props, $entry_hold_until_time)
 			{
-				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'queue_event_log')."`".
+				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
+
 				       " SET `last_update_time` = '".esc_sql(time())."', `hold_until_time` = '".esc_sql((integer)$entry_hold_until_time)."'".
 
 				       " WHERE `ID` = '".esc_sql($entry_props->entry->ID)."'";
@@ -450,7 +454,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Post sub. last notified time.
+			 * Entry last notified time.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -458,20 +462,18 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return integer Last notified time; UNIX timestamp.
 			 */
-			protected function entry_post_sub_last_notified_time(\stdClass $entry_props)
+			protected function entry_last_notified_time(\stdClass $entry_props)
 			{
 				$sql = "SELECT `time` FROM `".esc_sql($this->plugin->utils_db->prefix().'queue_event_log')."`".
 
 				       " WHERE `post_id` = '".esc_sql($entry_props->post->ID)."'".
+				       " AND `comment_parent_id` = '".esc_sql($entry_props->comment->comment_parent)."'".
+				       " AND `sub_id` = '".esc_sql($entry_props->sub->ID)."'".
+				       " AND `event` = 'notified'".
 
-				       ($entry_props->sub->user_id // Sub. has a user ID?
-					       ? " AND (`user_id` = '".esc_sql($entry_props->sub->user_id)."'".
-					         "       OR `email` = '".esc_sql($entry_props->sub->email)."')"
-					       : " AND `email` = '".esc_sql($entry_props->sub->email)."'").
+				       " ORDER BY `time` DESC".
 
-				       " AND `event` = 'notified'". // Event type.
-
-				       " ORDER BY `time` DESC LIMIT 1";
+				       " LIMIT 1"; // Only need the last time.
 
 				return (integer)$this->plugin->utils_db->wp->get_var($sql);
 			}
@@ -505,7 +507,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Get all queued entries.
+			 * Queued entries.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -517,12 +519,39 @@ namespace comment_mail // Root namespace.
 
 				       " WHERE `hold_until_time` < '".esc_sql(time())."'".
 
-				       " ORDER BY `insertion_time` ASC LIMIT ".$this->max_limit;
+				       " ORDER BY `insertion_time` ASC".
+
+				       " LIMIT ".$this->max_limit;
 
 				if(($entries = $this->plugin->utils_db->wp->get_results($sql)))
 					$entries = $this->plugin->utils_db->typify_deep($entries);
 
 				return $entries ? $entries : array();
+			}
+
+			/**
+			 * Queued digestable entries.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdclass $entry_props entry properties.
+			 *
+			 * @return array An array of all queued digestable entries.
+			 */
+			protected function entry_digestable_entries(\stdClass $entry_props)
+			{
+				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
+
+				       " WHERE `post_id` = '".esc_sql($entry_props->post->ID)."'".
+				       " AND `comment_parent_id` = '".esc_sql($entry_props->comment->comment_parent)."'".
+				       " AND `sub_id` = '".esc_sql($entry_props->sub->ID)."'".
+
+				       " ORDER BY `insertion_time` ASC";
+
+				if(($digestable_entries = $this->plugin->utils_db->wp->get_results($sql)))
+					$digestable_entries = $this->plugin->utils_db->typify_deep($digestable_entries);
+
+				return $digestable_entries ? $digestable_entries : array();
 			}
 
 			/**

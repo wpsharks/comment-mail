@@ -50,21 +50,22 @@ namespace comment_mail // Root namespace.
 				$this->plugin = plugin();
 
 				$defaults = array(
-					'queue_id'   => 0,
-					'sub_id'     => 0,
-					'user_id'    => 0,
-					'post_id'    => 0,
-					'comment_id' => 0,
+					'queue_id'          => 0,
+					'sub_id'            => 0,
+					'user_id'           => 0,
+					'post_id'           => 0,
+					'comment_id'        => 0,
+					'comment_parent_id' => 0,
 
-					'fname'      => '',
-					'lname'      => '',
-					'email'      => '',
-					'ip'         => '',
+					'fname'             => '',
+					'lname'             => '',
+					'email'             => '',
+					'ip'                => '',
 
-					'event'      => '',
-					'note_code'  => '',
+					'event'             => '',
+					'note_code'         => '',
 
-					'time'       => time(),
+					'time'              => time(),
 				);
 				if(empty($entry['ip']) && !empty($entry['last_ip']))
 					$entry['ip'] = $entry['last_ip'];
