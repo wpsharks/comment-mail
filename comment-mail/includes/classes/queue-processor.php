@@ -207,17 +207,13 @@ namespace comment_mail // Root namespace.
 				$entry_props = $this->compile_check_entry_props($entry);
 
 				if($entry_props->event === 'invalidated')
-				{
 					return $this->process_log_entry($entry_props);
-				}
+
 				if(($entry_hold_until_time = $this->check_entry_hold_until_time($entry_props)))
-				{
 					return $this->update_entry_hold_until_time($entry_props, $entry_hold_until_time);
-				}
-				// @TODO Add support for `entry_digestable_entries()` here.
-				if(($entry_digestable_entries = $this->check_digestable_entries($entry_props)))
+
+				if(($entry_digestable_entries = $this->check_entry_digestable_entries($entry_props)))
 					$entry_props->comments = $entry_digestable_entries;
-				else $entry_props->comments = array($entry_props->comment);
 
 				if(!($entry_subject = $this->entry_subject($entry_props)))
 				{
@@ -328,27 +324,27 @@ namespace comment_mail // Root namespace.
 					return $this->checked_entry_props('invalidated', 'entry_comment_id_missing', $entry, $sub);
 
 				if($comment->comment_type !== 'comment') // It's a pingback or a trackback?
-					return $this->checked_entry_props('invalidated', 'comment_type_not_comment', $entry, $sub, NULL, $comment);
+					return $this->checked_entry_props('invalidated', 'comment_type_not_comment', $entry, $sub, NULL, $comment, array($comment));
 
 				if(!$comment->comment_content) // An empty commen; i.e. no content?
-					return $this->checked_entry_props('invalidated', 'comment_content_empty', $entry, $sub, NULL, $comment);
+					return $this->checked_entry_props('invalidated', 'comment_content_empty', $entry, $sub, NULL, $comment, array($comment));
 
 				if($this->plugin->comment_status__($comment->comment_approved) !== 'approve')
-					return $this->checked_entry_props('invalidated', 'comment_status_not_approve', $entry, $sub, NULL, $comment);
+					return $this->checked_entry_props('invalidated', 'comment_status_not_approve', $entry, $sub, NULL, $comment, array($comment));
 
 				if(!($post = get_post($comment->post_ID))) // Post is missing?
-					return $this->checked_entry_props('invalidated', 'comment_post_id_missing', $entry, $sub, NULL, $comment);
+					return $this->checked_entry_props('invalidated', 'comment_post_id_missing', $entry, $sub, NULL, $comment, array($comment));
 
 				if(!$post->post_title) // An empty post title; i.e. we have nothing for a subject line?
-					return $this->checked_entry_props('invalidated', 'post_title_empty', $entry, $sub, $post, $comment);
+					return $this->checked_entry_props('invalidated', 'post_title_empty', $entry, $sub, $post, $comment, array($comment));
 
 				if($post->post_status !== 'publish') // Unavailable; i.e. not published?
-					return $this->checked_entry_props('invalidated', 'post_status_not_publish', $entry, $sub, $post, $comment);
+					return $this->checked_entry_props('invalidated', 'post_status_not_publish', $entry, $sub, $post, $comment, array($comment));
 
 				if(in_array($post->post_type, array('revision', 'nav_menu_item'), TRUE))
-					return $this->checked_entry_props('invalidated', 'post_type_auto_excluded', $entry, $sub, $post, $comment);
+					return $this->checked_entry_props('invalidated', 'post_type_auto_excluded', $entry, $sub, $post, $comment, array($comment));
 
-				return $this->checked_entry_props('', '', $entry, $sub, $post, $comment);
+				return $this->checked_entry_props('', '', $entry, $sub, $post, $comment, array($comment));
 			}
 
 			/**
@@ -356,13 +352,14 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string    $event Event type; `invalidated` or `notified`.
-			 * @param string    $note_code See {@link utils_event::queue_note_code()}.
+			 * @param string      $event Event type; `invalidated` or `notified`.
+			 * @param string      $note_code See {@link utils_event::queue_note_code()}.
 			 *
-			 * @param \stdClass $entry Queue entry.
-			 * @param \stdClass $sub Subscriber.
-			 * @param \WP_Post  $post Post.
-			 * @param \stdClass $comment Comment.
+			 * @param \stdClass   $entry Queue entry.
+			 * @param \stdClass   $sub Subscriber.
+			 * @param \WP_Post    $post Post.
+			 * @param \stdClass   $comment Comment.
+			 * @param \stdClass[] $comments Digestable comments.
 			 *
 			 * @return object Object with properties.
 			 *
@@ -378,11 +375,10 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @see utils_event::queue_note_code()
 			 */
-			protected function checked_entry_props($event = '', $note_code = '', \stdClass $entry, \stdClass $sub = NULL, \WP_Post $post = NULL, \stdClass $comment = NULL)
+			protected function checked_entry_props($event = '', $note_code = '', \stdClass $entry, \stdClass $sub = NULL, \WP_Post $post = NULL, \stdClass $comment = NULL, array $comments = array())
 			{
 				$event     = (string)$event;
 				$note_code = (string)$note_code;
-				$comments  = $comment ? array($comment) : array();
 
 				return (object)compact('event', 'note_code', 'entry', 'sub', 'post', 'comment', 'comments');
 			}
@@ -484,29 +480,6 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Queued entries.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return array An array of up to `$this->max_limit` entries.
-			 */
-			protected function entries()
-			{
-				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
-
-				       " WHERE `hold_until_time` < '".esc_sql(time())."'".
-
-				       " ORDER BY `insertion_time` ASC".
-
-				       " LIMIT ".$this->max_limit;
-
-				if(($entries = $this->plugin->utils_db->wp->get_results($sql)))
-					$entries = $this->plugin->utils_db->typify_deep($entries);
-
-				return $entries ? $entries : array();
-			}
-
-			/**
 			 * Check digestable entries.
 			 *
 			 * @since 14xxxx First documented version.
@@ -515,12 +488,12 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return array An array of all queued digestable entries.
 			 */
-			protected function check_digestable_entries(\stdClass $entry_props)
+			protected function check_entry_digestable_entries(\stdClass $entry_props)
 			{
 				if($entry_props->sub->deliver === 'asap')
 					return array(); // Not applicable.
 
-				return $this->digestable_entries($entry_props);
+				return $this->entry_digestable_entries($entry_props);
 			}
 
 			/**
@@ -532,11 +505,8 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return array An array of all queued digestable entries.
 			 */
-			protected function digestable_entries(\stdClass $entry_props)
+			protected function entry_digestable_entries(\stdClass $entry_props)
 			{
-				if($entry_props->sub->deliver === 'asap')
-					return array(); // Not applicable.
-
 				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
 
 				       " WHERE `post_id` = '".esc_sql($entry_props->post->ID)."'".
@@ -577,6 +547,29 @@ namespace comment_mail // Root namespace.
 			protected function entry_message(\stdclass $entry_props)
 			{
 				return $this->message_template->parse(array('sub' => $entry_props->sub, 'post' => $entry_props->post, 'comment' => $entry_props->comment));
+			}
+
+			/**
+			 * Queued entries.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of up to `$this->max_limit` entries.
+			 */
+			protected function entries()
+			{
+				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
+
+				       " WHERE `hold_until_time` < '".esc_sql(time())."'".
+
+				       " ORDER BY `insertion_time` ASC".
+
+				       " LIMIT ".$this->max_limit;
+
+				if(($entries = $this->plugin->utils_db->wp->get_results($sql)))
+					$entries = $this->plugin->utils_db->typify_deep($entries);
+
+				return $entries ? $entries : array();
 			}
 
 			/**
