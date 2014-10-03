@@ -127,6 +127,8 @@ namespace comment_mail // Root namespace.
 				foreach($this->unimported_post_ids as $_post_id)
 				{
 					$this->total_imported_post_ids++;
+					$this->imported_post_ids[] = $_post_id;
+
 					$this->mark_post_imported($_post_id);
 					$this->maybe_import_post($_post_id);
 				}
