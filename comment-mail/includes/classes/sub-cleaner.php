@@ -65,6 +65,8 @@ namespace comment_mail // Root namespace.
 			 *    We also have a `delete_user` hook too, for normal WP installs.
 			 *
 			 *    This routine is just here to help keep things extra tidy on normal WP installs.
+			 *
+			 * @throws \exception If a deletion failure occurs.
 			 */
 			protected function clean_nonexistent_users()
 			{
@@ -73,13 +75,16 @@ namespace comment_mail // Root namespace.
 				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 				       " WHERE `user_id` != '0' AND `user_id` NOT IN(".$user_ids.")";
 
-				$this->plugin->utils_db->wp->query($sql); // Delete nonexistent users.
+				if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
 			}
 
 			/**
 			 * Cleanup nonexistent users.
 			 *
 			 * @since 14xxxx First documented version.
+			 *
+			 * @throws \exception If a deletion failure occurs.
 			 */
 			protected function maybe_clean_unconfirmed_expirations()
 			{
@@ -94,7 +99,8 @@ namespace comment_mail // Root namespace.
 				       " WHERE `status` = 'unconfirmed'".
 				       " AND `last_update_time` < '".esc_sql($exp_time)."'";
 
-				$this->plugin->utils_db->wp->query($sql); // Delete unconfirmed expirations.
+				if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
 			}
 		}
 	}

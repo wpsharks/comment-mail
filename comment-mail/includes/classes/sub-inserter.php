@@ -279,6 +279,8 @@ namespace comment_mail // Root namespace.
 			 * Delete other subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
+			 *
+			 * @throws \exception If a deletion failure occurs.
 			 */
 			protected function delete_others()
 			{
@@ -294,7 +296,8 @@ namespace comment_mail // Root namespace.
 
 				       " AND `ID` != '".esc_sql($this->insert_id)."'";
 
-				$this->plugin->utils_db->wp->query($sql); // Delete any existing subscription(s).
+				if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
 			}
 
 			/**

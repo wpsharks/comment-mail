@@ -348,15 +348,15 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param \stdClass $entry Queue entry.
 			 *
-			 * @throws \exception If unable to delete entry.
+			 * @throws \exception If a deletion failure occurs.
 			 */
 			protected function delete_entry(\stdClass $entry)
 			{
 				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
 				       " WHERE `ID` = '".esc_sql($entry->ID)."'";
 
-				if(!$this->plugin->utils_db->wp->query($sql)) // Deletion failure.
-					throw new \exception(sprintf(__('Queue entry deletion failure. ID: `%1$s`.', $this->plugin->text_domain), $entry->ID));
+				if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
 			}
 
 			/**
@@ -577,8 +577,8 @@ namespace comment_mail // Root namespace.
 
 				       " WHERE `ID` = '".esc_sql($entry_props->entry->ID)."'";
 
-				if(!$this->plugin->utils_db->wp->query($sql)) // Update failure.
-					throw new \exception(sprintf(__('Dntry update failure. ID: `%1$s`.', $this->plugin->text_domain), $entry_props->entry->ID));
+				if(!$this->plugin->utils_db->wp->query($sql))
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
 
 				$entry_props->entry->hold_until_time = (integer)$entry_hold_until_time;
 				$entry_props->held                   = TRUE; // Flag as `TRUE` now.

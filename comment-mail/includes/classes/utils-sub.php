@@ -103,8 +103,8 @@ namespace comment_mail // Root namespace.
 				else $sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 				            " WHERE `ID` = '".esc_sql((integer)$sub_id_or_key)."' LIMIT 1";
 
-				if(($row = $this->plugin->utils_db->wp->get_row($sql)) instanceof \stdClass)
-					return ($cache[$row->ID] = $cache[$row->key] = $this->plugin->utils_db->typify_deep($row));
+				if(($row = $this->plugin->utils_db->wp->get_row($sql)))
+					return ($cache[$row->ID] = $cache[$row->key] = $row = $this->plugin->utils_db->typify_deep($row));
 
 				return ($cache[$sub_id_or_key] = NULL); // Default.
 			}
@@ -123,6 +123,8 @@ namespace comment_mail // Root namespace.
 			 * @return boolean|null TRUE if subscriber is confirmed successfully.
 			 *    Or, FALSE if unable to confirm (e.g. already confirmed).
 			 *    Or, NULL on complete failure (e.g. invalid ID or key).
+			 *
+			 * @throws \exception If an update failure occurs.
 			 */
 			public function confirm($sub_id_or_key, $log_confirmed_event = FALSE, $last_ip = '')
 			{
@@ -145,7 +147,10 @@ namespace comment_mail // Root namespace.
 
 				       " WHERE `ID` = '".esc_sql($sub->ID)."'";
 
-				if(($confirmed = (boolean)$this->plugin->utils_db->wp->query($sql)))
+				if(($confirmed = $this->plugin->utils_db->wp->query($sql)) === FALSE)
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
+
+				if(($confirmed = (boolean)$confirmed)) // Convert to boolean.
 				{
 					$sub->status = 'subscribed'; // Obj. properties.
 					if($last_ip) $sub->last_ip = $last_ip;
@@ -171,6 +176,8 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @note There is one additional status that a subscriber can have (in code only, not in the DB).
 			 *    See below. It's possible for a subscriber to have a `deleted` status.
+			 *
+			 * @throws \exception If a deletion failure occurs.
 			 */
 			public function delete($sub_id_or_key, $log_unsubscribed_event = FALSE, $last_ip = '')
 			{
@@ -189,7 +196,10 @@ namespace comment_mail // Root namespace.
 
 				       " WHERE `ID` = '".esc_sql($sub->ID)."'";
 
-				if(($deleted = (boolean)$this->plugin->utils_db->wp->query($sql)))
+				if(($deleted = $this->plugin->utils_db->wp->query($sql)) === FALSE)
+					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
+
+				if(($deleted = (boolean)$deleted)) // Convert to boolean.
 				{
 					$this->cache['get'][$sub->ID] // Nullify cache.
 						= $this->cache['get'][$sub->key] = NULL;

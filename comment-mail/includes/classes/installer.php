@@ -47,6 +47,8 @@ namespace comment_mail // Root namespace.
 			 * Create DB tables.
 			 *
 			 * @since 14xxxx First documented version.
+			 *
+			 * @throws \exception If table creation fails.
 			 */
 			protected function create_db_tables()
 			{

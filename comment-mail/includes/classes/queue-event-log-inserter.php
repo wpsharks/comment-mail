@@ -85,6 +85,8 @@ namespace comment_mail // Root namespace.
 			 * Record event; if applicable.
 			 *
 			 * @since 14xxxx First documented version.
+			 *
+			 * @throws \exception If an insertion failure occurs.
 			 */
 			protected function maybe_insert()
 			{

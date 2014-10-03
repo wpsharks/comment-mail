@@ -87,6 +87,8 @@ namespace comment_mail // Root namespace.
 			 * Deletes subscriptions on post/comment deletions.
 			 *
 			 * @since 14xxxx First documented version.
+			 *
+			 * @throws \exception If a deletion failure occurs.
 			 */
 			protected function maybe_delete_post_comment()
 			{
@@ -98,13 +100,16 @@ namespace comment_mail // Root namespace.
 				       " WHERE `post_id` = '".esc_sql($this->post_id)."'".
 				       ($this->comment_id ? " AND `comment_id` = '".esc_sql($this->comment_id)."'" : '');
 
-				$this->plugin->utils_db->wp->query($sql); // Delete any existing subscription(s).
+				if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
 			}
 
 			/**
 			 * Deletes subscriptions on user deletions.
 			 *
 			 * @since 14xxxx First documented version.
+			 *
+			 * @throws \exception If a deletion failure occurs.
 			 */
 			protected function maybe_delete_user()
 			{
@@ -121,7 +126,8 @@ namespace comment_mail // Root namespace.
 				       " WHERE `user_id` = '".esc_sql($user->ID)."'".
 				       ($user->user_email ? " OR `email` = '".esc_sql($user->user_email)."'" : '');
 
-				$this->plugin->utils_db->wp->query($sql); // Delete any existing subscription(s).
+				if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
 			}
 		}
 	}

@@ -59,6 +59,8 @@ namespace comment_mail // Root namespace.
 			 * Queue insertions.
 			 *
 			 * @since 14xxxx First documented version.
+			 *
+			 * @throws \exception If an insertion failure occurs.
 			 */
 			protected function maybe_insert()
 			{
@@ -83,7 +85,8 @@ namespace comment_mail // Root namespace.
 				$sql = rtrim($sql, ','); // Trim leftover delimiter.
 				unset($_key, $_sub_id); // Housekeeping.
 
-				$this->plugin->utils_db->wp->query($sql); // Bulk insertions.
+				if(!$this->plugin->utils_db->wp->query($sql))
+					throw new \exception(__('Insertion failure.', $this->plugin->text_domain));
 			}
 
 			/**
@@ -105,8 +108,9 @@ namespace comment_mail // Root namespace.
 
 				if(($subs = $this->plugin->utils_db->wp->get_results($sql)))
 					$subs = $this->plugin->utils_db->typify_deep($subs);
+				else $subs = array(); // Default; empty array.
 
-				if($subs) foreach($subs as $_key => $_sub)
+				foreach($subs as $_key => $_sub)
 				{
 					if(!$_sub->email) // Email empty?
 						continue; // Missing email address.

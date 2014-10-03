@@ -56,6 +56,8 @@ namespace comment_mail // Root namespace.
 			 * Update subscribers; set user ID.
 			 *
 			 * @since 14xxxx First documented version.
+			 *
+			 * @throws \exception If a deletion failure occurs.
 			 */
 			protected function maybe_update_subs()
 			{
@@ -70,7 +72,8 @@ namespace comment_mail // Root namespace.
 				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 				       " WHERE `user_id` = '".esc_sql($user->ID)."'";
 
-				$this->plugin->utils_db->wp->query($sql); // Ensure no duplicate keys.
+				if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
 				// The user ID should NOT exist; we just make absolutely sure in case of corruption.
 
 				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
@@ -79,7 +82,8 @@ namespace comment_mail // Root namespace.
 				       " WHERE `user_id` = '0'".
 				       " AND `email` = '".esc_sql($user->user_email)."'";
 
-				$this->plugin->utils_db->wp->query($sql); // Set user ID.
+				if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
 			}
 		}
 	}

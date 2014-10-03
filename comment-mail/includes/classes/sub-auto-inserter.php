@@ -308,9 +308,10 @@ namespace comment_mail // Root namespace.
 
 				       " LIMIT 1"; // We should only have one anyway.
 
-				$row = $this->plugin->utils_db->wp->get_row($sql);
+				if(($row = $this->plugin->utils_db->wp->get_row($sql)))
+					$row = $this->plugin->utils_db->typify_deep($row);
 
-				return $row instanceof \stdClass ? $this->plugin->utils_db->typify_deep($row) : NULL;
+				return $row ? $row : NULL;
 			}
 
 			/**
@@ -332,15 +333,18 @@ namespace comment_mail // Root namespace.
 
 				       " LIMIT 1"; // We should only have one anyway.
 
-				$row = $this->plugin->utils_db->wp->get_row($sql);
+				if(($row = $this->plugin->utils_db->wp->get_row($sql)))
+					$row = $this->plugin->utils_db->typify_deep($row);
 
-				return $row instanceof \stdClass ? $this->plugin->utils_db->typify_deep($row) : NULL;
+				return $row ? $row : NULL;
 			}
 
 			/**
 			 * Delete other subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
+			 *
+			 * @throws \exception If a deletion failure occurs.
 			 */
 			protected function delete_others_post_author()
 			{
@@ -353,7 +357,8 @@ namespace comment_mail // Root namespace.
 
 				       " AND `ID` != '".esc_sql($this->insert_id)."'";
 
-				$this->plugin->utils_db->wp->query($sql);
+				if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
 			}
 
 			/**
@@ -362,6 +367,8 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param \stdClass $recipient Recipient object to check.
+			 *
+			 * @throws \exception If a deletion failure occurs.
 			 */
 			protected function delete_others_recipient(\stdClass $recipient)
 			{
@@ -373,7 +380,8 @@ namespace comment_mail // Root namespace.
 
 				       " AND `ID` != '".esc_sql($this->insert_id)."'";
 
-				$this->plugin->utils_db->wp->query($sql);
+				if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
 			}
 
 			/**
