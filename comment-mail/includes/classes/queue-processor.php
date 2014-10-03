@@ -225,17 +225,16 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function process_entry(\stdClass $entry)
 			{
-				if($entry->dby_queue_id) // Digested?
-					return; // Already done; indirectly.
+				if($entry->dby_queue_id || $entry->logged)
+					return; // Already processed this.
 
 				if(!($entry_props = $this->validated_entry_props($entry)))
-					return; // Unable to validate entry props.
+					return; // Bypass; unable to validate entry props.
 
 				if($this->check_entry_hold_until_time($entry_props))
-					return; // Holding; nothing more to do.
+					return; // Holding (for now); nothing more.
 
 				$is_digest = $this->check_entry_digestable_entries($entry_props);
-				// @TODO log each digestable entry too.
 
 				if(!($entry_subject = $this->entry_subject($entry_props)))
 				{
@@ -261,24 +260,6 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Delete entry.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param \stdClass $entry Queue entry.
-			 *
-			 * @throws \exception If unable to delete entry.
-			 */
-			protected function delete_entry(\stdClass $entry)
-			{
-				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
-				       " WHERE `ID` = '".esc_sql($entry->ID)."'";
-
-				if(!$this->plugin->utils_db->wp->query($sql)) // Deletion failure.
-					throw new \exception(sprintf(__('Queue entry deletion failure. ID: `%1$s`.', $this->plugin->text_domain), $entry->ID));
-			}
-
-			/**
 			 * Log entry event w/ note code.
 			 *
 			 * @since 14xxxx First documented version.
@@ -288,7 +269,10 @@ namespace comment_mail // Root namespace.
 			protected function log_entry(\stdClass $entry_props)
 			{
 				if($entry_props->logged)
-					return; // Already did this.
+					return; // Already logged this.
+
+				if(!$entry_props->entry)
+					return; // Nothing to log; no entry.
 
 				$log_entry = array(
 					'queue_id'          => $entry_props->entry->ID,
@@ -308,7 +292,71 @@ namespace comment_mail // Root namespace.
 					'note_code'         => $entry_props->note_code
 				);
 				new queue_event_log_inserter($log_entry);
-				$entry_props->logged = TRUE; // Flag as `TRUE` now.
+
+				$entry_props->logged        = TRUE; // Flag as `TRUE`.
+				$entry_props->entry->logged = TRUE; // Flag as `TRUE`.
+
+				if(isset($this->entries[$entry_props->entry->ID]))
+					$this->entries[$entry_props->entry->ID]->logged = TRUE;
+
+				$this->maybe_log_delete_entry_digestables($entry_props);
+			}
+
+			/**
+			 * Log/record entry digestables.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $entry_props Entry properties.
+			 */
+			protected function maybe_log_delete_entry_digestables(\stdClass $entry_props)
+			{
+				if(!$entry_props->entry)
+					return; // Nothing to log; no entry.
+
+				if(!$entry_props->props)
+					return; // Nothing to log; no props.
+
+				if(!$entry_props->event || $entry_props->event !== 'notified')
+					return; // Nothing to do. No event, or was NOT notified.
+
+				if(count($entry_props->props) <= 1 && isset($entry_props->props[$entry_props->entry->ID]))
+					return; // Nothing to do; only one (i.e. itself).
+
+				foreach($entry_props->props as $_entry_digestable_entry_id_key => $_entry_digestable_entry_props)
+					if($_entry_digestable_entry_props->entry->ID !== $entry_props->entry->ID)
+					{
+						$_entry_digestable_entry_props->event     = $entry_props->event;
+						$_entry_digestable_entry_props->note_code = $entry_props->note_code;
+
+						$_entry_digestable_entry_props->dby_queue_id        = $entry_props->entry->ID;
+						$_entry_digestable_entry_props->entry->dby_queue_id = $entry_props->entry->ID;
+
+						if(isset($this->entries[$_entry_digestable_entry_props->entry->ID])) // Update these too.
+							$this->entries[$_entry_digestable_entry_props->entry->ID]->dby_queue_id = $entry_props->entry->ID;
+
+						$this->log_entry($_entry_digestable_entry_props);
+						$this->delete_entry($_entry_digestable_entry_props->entry);
+					}
+				unset($_entry_digestable_entry_id_key, $_entry_digestable_entry_props); // Housekeeping.
+			}
+
+			/**
+			 * Delete entry.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $entry Queue entry.
+			 *
+			 * @throws \exception If unable to delete entry.
+			 */
+			protected function delete_entry(\stdClass $entry)
+			{
+				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
+				       " WHERE `ID` = '".esc_sql($entry->ID)."'";
+
+				if(!$this->plugin->utils_db->wp->query($sql)) // Deletion failure.
+					throw new \exception(sprintf(__('Queue entry deletion failure. ID: `%1$s`.', $this->plugin->text_domain), $entry->ID));
 			}
 
 			/**
@@ -331,6 +379,7 @@ namespace comment_mail // Root namespace.
 			 *    - `post` the post.
 			 *    - `comment` the comment.
 			 *
+			 *    - `props` digestable entry props.
 			 *    - `comments` digestable comments.
 			 *
 			 *    - `held` held?
@@ -401,6 +450,7 @@ namespace comment_mail // Root namespace.
 			 * @param \WP_Post    $post Post.
 			 * @param \stdClass   $comment Comment.
 			 *
+			 * @param \stdClass[] $props Digestable entry props.
 			 * @param \stdClass[] $comments Digestable comments.
 			 *
 			 * @param boolean     $held Held? Defaults to `FALSE`.
@@ -419,6 +469,7 @@ namespace comment_mail // Root namespace.
 			 *    - `post` the post.
 			 *    - `comment` the comment.
 			 *
+			 *    - `props` digestable entry props.
 			 *    - `comments` digestable comments.
 			 *
 			 *    - `held` held?
@@ -429,7 +480,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function entry_props($event = '', $note_code = '',
 			                               \stdClass $entry, \stdClass $sub = NULL, \WP_Post $post = NULL, \stdClass $comment = NULL,
-			                               array $comments = array(), // All digestable comments.
+			                               array $props = array(), array $comments = array(), // Digestables.
 			                               $held = FALSE, $dby_queue_id = 0, $logged = FALSE)
 			{
 				$event     = (string)$event;
@@ -442,12 +493,16 @@ namespace comment_mail // Root namespace.
 				$dby_queue_id = (integer)$dby_queue_id;
 				$logged       = (boolean)$logged;
 
-				return (object)compact(
+				$entry_props = (object)compact(
 					'event', 'note_code',
-					'held', 'dby_queue_id', 'logged',
 					'entry', 'sub', 'post', 'comment',
-					'comments' // All digestable comments.
+					'props', 'comments', // Digestables.
+					'held', 'dby_queue_id', 'logged'
 				);
+				if(!$props && !$entry_props->props)
+					$entry_props->props = array($entry ? $entry->ID : 0 => $entry_props);
+
+				return $entry_props;
 			}
 
 			/**
@@ -571,20 +626,20 @@ namespace comment_mail // Root namespace.
 				if(!($entry_digestable_entries = $this->entry_digestable_entries($entry_props)))
 					return FALSE; // Not applicable; i.e. no other digestables.
 
-				if(isset($entry_digestable_entries[$entry_props->entry->ID]) && count($entry_digestable_entries) === 1)
+				if(count($entry_digestable_entries) <= 1 && isset($entry_digestable_entries[$entry_props->entry->ID]))
 					return FALSE; // Only itself; i.e. no other digestables.
 
 				foreach($entry_digestable_entries as $_entry_digestable_entry_id_key => $_entry_digestable_entry)
 				{
-					if($_entry_digestable_entry->ID !== $entry_props->entry->ID && isset($this->entries[$_entry_digestable_entry->ID]))
-						$this->entries[$_entry_digestable_entry->ID]->dby_queue_id = $entry_props->entry->ID;
-
 					if($_entry_digestable_entry->ID === $entry_props->entry->ID)
-						$_entry_digestable_entry_props = $entry_props; // No need to validate again.
+						$_entry_digestable_entry_props = $entry_props; // Reference original obj. props.
 					else $_entry_digestable_entry_props = $this->validated_entry_props($_entry_digestable_entry);
 
-					if($_entry_digestable_entry_props) // Do we have validated entry props?
+					if($_entry_digestable_entry_props) // Include this one? i.e. do we have valid entry props?
+					{
+						$entry_props->props[$_entry_digestable_entry_props->entry->ID]              = $_entry_digestable_entry_props;
 						$entry_props->comments[$_entry_digestable_entry_props->comment->comment_ID] = $_entry_digestable_entry_props->comment;
+					}
 				}
 				unset($_entry_digestable_entry_id_key, $_entry_digestable_entry, $_entry_digestable_entry_props); // Housekeeping.
 
@@ -608,15 +663,57 @@ namespace comment_mail // Root namespace.
 				       " AND `comment_parent_id` = '".esc_sql($entry_props->comment->comment_parent)."'".
 				       " AND `sub_id` = '".esc_sql($entry_props->sub->ID)."'".
 
-				       " ORDER BY `insertion_time` ASC";
+				       " ORDER BY `insertion_time` ASC"; // In chronological order.
+
+				if(($entry_digestable_entries = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
+					$entry_digestable_entries = $this->plugin->utils_db->typify_deep($entry_digestable_entries);
+				else $entry_digestable_entries = array(); // Default; empty array.
+
+				foreach($entry_digestable_entries as $_entry_digestable_entry_id_key => $_entry_digestable_entry)
+				{
+					if($_entry_digestable_entry->ID === $entry_props->entry->ID) // Original entry?
+						$entry_digestable_entries[$_entry_digestable_entry_id_key] = $entry_props->entry;
+
+					else // Create dynamic properties for the new digestable entries compiled here.
+					{
+						$_entry_digestable_entry->dby_queue_id = $entry_props->entry->ID; // Dynamic property.
+						$_entry_digestable_entry->logged       = FALSE; // Dynamic property; default value: `FALSE`.
+					}
+				}
+				unset($_entry_digestable_entry_id_key, $_entry_digestable_entry); // Housekeeping.
+
+				return $entry_digestable_entries; // All queued digestable entries.
+			}
+
+			/**
+			 * Queued entries.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of up to `$this->max_limit` entries.
+			 */
+			protected function entries()
+			{
+				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
+
+				       " WHERE `hold_until_time` < '".esc_sql(time())."'".
+
+				       " ORDER BY `insertion_time` ASC". // Oldest get priority.
+
+				       " LIMIT ".$this->max_limit; // Max limit for this class instance.
 
 				if(($entries = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
+					$entries = $this->plugin->utils_db->typify_deep($entries);
+				else $entries = array(); // Default; empty array.
+
+				foreach($entries as $_entry_id_key => $_entry) // Dynamic properties.
 				{
-					foreach(($entries = $this->plugin->utils_db->typify_deep($entries)) as $_entry_id_key => $_entry)
-						$_entry->dby_queue_id = $entry_props->entry->ID;
-					unset($_entry_id_key, $_entry); // Housekeeping.
+					$_entry->dby_queue_id = 0; // Dynamic property; default value: `0`.
+					$_entry->logged       = FALSE; // Dynamic property; default value: `FALSE`.
 				}
-				return $entries ? $entries : array();
+				unset($_entry_id_key, $_entry); // Housekeeping.
+
+				return $entries; // Up to `$this->max_limit` entries.
 			}
 
 			/**
@@ -645,32 +742,6 @@ namespace comment_mail // Root namespace.
 			protected function entry_message(\stdclass $entry_props)
 			{
 				return $this->message_template->parse((array)$entry_props);
-			}
-
-			/**
-			 * Queued entries.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return array An array of up to `$this->max_limit` entries.
-			 */
-			protected function entries()
-			{
-				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
-
-				       " WHERE `hold_until_time` < '".esc_sql(time())."'".
-
-				       " ORDER BY `insertion_time` ASC".
-
-				       " LIMIT ".$this->max_limit;
-
-				if(($entries = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
-				{
-					foreach(($entries = $this->plugin->utils_db->typify_deep($entries)) as $_entry_id_key => $_entry)
-						$_entry->dby_queue_id = 0; // Initialize; `0` by default.
-					unset($_entry_id_key, $_entry); // Housekeeping.
-				}
-				return $entries ? $entries : array();
 			}
 
 			/**
