@@ -197,12 +197,12 @@ namespace comment_mail // Root namespace.
 			 * @return array An array of all sub. template vars.
 			 */
 			protected function sub_vars(\stdClass $sub)
-				// @TODO Add link to subscriptions management panel.
 			{
 				$confirm_url     = add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('confirm' => $sub->key))), home_url('/'));
 				$unsubscribe_url = add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('unsubscribe' => $sub->key))), home_url('/'));
+				$manage_url      = add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('manage' => $sub->key))), home_url('/'));
 
-				return compact('confirm_url', 'unsubscribe_url');
+				return compact('confirm_url', 'unsubscribe_url', 'manage_url');
 			}
 
 			/**

@@ -122,6 +122,38 @@ namespace comment_mail // Root namespace.
 
 				exit($template->parse($template_vars));
 			}
+
+			/**
+			 * Manage.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $args Input argument(s).
+			 */
+			protected function manage($args) // @TODO
+			{
+				$key        = '';
+				$sub        = NULL;
+				$error_code = '';
+
+				if(!$error_code && !($key = trim((string)$args)))
+					$error_code = 'missing_key';
+
+				if(!$error_code && !($sub = $this->plugin->utils_sub->get($key)))
+					$error_code = 'invalid_key';
+
+				if(!$error_code && !($delete = $this->plugin->utils_sub->delete($sub->ID, TRUE, $this->plugin->utils_env->user_ip())))
+					$error_code = $delete === NULL ? 'invalid_key' : 'already_unsubscribed';
+
+				$template_vars = compact('sub', 'error_code');
+				$template      = new template('site/sub-actions/unsubscribed.php');
+
+				status_header(200); // Status header.
+				nocache_headers(); // Disallow caching.
+				header('Content-Type: text/html; charset=UTF-8');
+
+				exit($template->parse($template_vars));
+			}
 		}
 	}
 }
