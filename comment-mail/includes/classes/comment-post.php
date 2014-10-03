@@ -109,6 +109,7 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				new queue_inserter($this->comment_id);
+
 				$this->maybe_immediately_process_queue();
 			}
 

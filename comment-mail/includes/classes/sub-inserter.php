@@ -74,6 +74,13 @@ namespace comment_mail // Root namespace.
 			protected $deliver; // Set by constructor.
 
 			/**
+			 * @var null|boolean Auto-confirm?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $auto_confirm; // Set by constructor.
+
+			/**
 			 * @var integer Insertion ID.
 			 *
 			 * @since 14xxxx First documented version.
@@ -102,8 +109,11 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param string         $deliver Delivery cycle. Defaults to `asap`.
 			 *    Please pass one of: `asap`, `hourly`, `daily`, `weekly`.
+			 *
+			 * @param null|boolean $auto_confirm Auto-confirm subscriber?
+			 *    If `NULL`, use current plugin option value.
 			 */
-			public function __construct($user, $comment_id, $type = 'comment', $deliver = 'asap')
+			public function __construct($user, $comment_id, $type = 'comment', $deliver = 'asap', $auto_confirm = NULL)
 			{
 				$this->plugin = plugin();
 
@@ -126,6 +136,8 @@ namespace comment_mail // Root namespace.
 				$this->deliver = strtolower((string)$deliver);
 				if(!in_array($this->deliver, array('asap', 'hourly', 'daily', 'weekly'), TRUE))
 					$this->deliver = ''; // Default cycle.
+
+				$this->auto_confirm = isset($auto_confirm) ? (boolean)$auto_confirm : NULL;
 
 				$this->insert_id = 0; // Default value.
 
@@ -188,7 +200,7 @@ namespace comment_mail // Root namespace.
 
 				new sub_event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
 
-				new sub_confirmer($sub_id); // Confirm; before deletion of others.
+				new sub_confirmer($sub_id, $this->auto_confirm); // Confirm; before deletion of others.
 
 				$this->delete_others(); // Delete other subscriptions now.
 			}
@@ -272,7 +284,7 @@ namespace comment_mail // Root namespace.
 				if($existing_sub->insertion_time >= strtotime('-15 minutes'))
 					return; // Recently subscribed; give em' time.
 
-				new sub_confirmer($existing_sub->ID); // Resend.
+				new sub_confirmer($existing_sub->ID, $this->auto_confirm);
 			}
 
 			/**

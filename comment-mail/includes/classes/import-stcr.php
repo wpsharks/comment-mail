@@ -20,7 +20,7 @@ namespace comment_mail // Root namespace.
 		 * @package import_stcr
 		 * @since 14xxxx First documented version.
 		 */
-		class import_stcr // Environment utilities.
+		class import_stcr // StCR importer.
 		{
 			/**
 			 * @var plugin Plugin reference.
@@ -30,68 +30,338 @@ namespace comment_mail // Root namespace.
 			protected $plugin; // Set by constructor.
 
 			/**
+			 * @var integer Max number of post IDs.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $max_post_ids_limit; // Set by constructor.
+
+			/**
+			 * @var array Unimported post IDs.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $unimported_post_ids; // Set by constructor.
+
+			/**
+			 * @var integer Total unimported post IDs.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $total_unimported_post_ids; // Set by constructor.
+
+			/**
+			 * @var array Imported post IDs.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $imported_post_ids; // Set by constructor.
+
+			/**
+			 * @var integer Total imported post IDs.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $total_imported_post_ids; // Set by constructor.
+
+			/**
+			 * @var boolean Has more posts to import?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $has_more_posts_to_import; // Set by constructor.
+
+			/**
 			 * Class constructor.
 			 *
 			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $max_post_ids_limit Max post ID to process.
+			 *
+			 *    This cannot be less than `1`.
+			 *    This cannot be greater than `1000` (filterable).
+			 *
+			 *    * A default value of `30` is used if not passed in explicitly.
+			 *
+			 * @note The `$has_more_posts_to_import` property should be read from this class.
+			 *    If this property is `TRUE`, additional class instances should be instantiated until
+			 *    such time as it has as `FALSE` value; i.e. until there are no more posts to import.
+			 *
+			 *    * A UI should be built to help spread this out over multiple server processes.
 			 */
-			public function __construct()
+			public function __construct($max_post_ids_limit = 30)
 			{
 				$this->plugin = plugin();
+
+				$this->max_post_ids_limit = (integer)$max_post_ids_limit;
+				if($this->max_post_ids_limit < 1) $this->max_post_ids_limit = 1;
+				$upper_max_post_ids_limit = (integer)apply_filters(__CLASS__.'_upper_max_post_ids_limit', 1000);
+				if($this->max_post_ids_limit > $upper_max_post_ids_limit) $this->max_post_ids_limit = $upper_max_post_ids_limit;
+
+				$this->has_more_posts_to_import  = FALSE; // Initialize.
+				$this->unimported_post_ids       = $this->unimported_post_ids($this->max_post_ids_limit + 1);
+				$this->total_unimported_post_ids = count($this->unimported_post_ids);
+
+				if($this->total_unimported_post_ids > $this->max_post_ids_limit)
+				{
+					$this->has_more_posts_to_import  = TRUE;
+					$this->unimported_post_ids       = array_slice($this->unimported_post_ids, 0, $this->max_post_ids_limit);
+					$this->total_unimported_post_ids = count($this->unimported_post_ids);
+				}
+				$this->imported_post_ids       = array(); // Initialize.
+				$this->total_imported_post_ids = 0; // Initialize.
+
+				$this->maybe_import(); // Handle importation.
 			}
 
 			/**
-			 * Collect all StCR data for a given post ID.
+			 * Import processor.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function maybe_import()
+			{
+				if(!$this->unimported_post_ids)
+					return; // Nothing to do.
+
+				foreach($this->unimported_post_ids as $_post_id)
+				{
+					$this->total_imported_post_ids++;
+					$this->mark_post_imported($_post_id);
+					$this->maybe_import_post($_post_id);
+				}
+				unset($_post_id); // Housekeeping.
+			}
+
+			/**
+			 * Mark as imported post ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|string $post_id Post ID.
-			 *
-			 * @return array Array of all StCR data for the post ID or NULL if no data.
-			 *
-			 *    If an array is returned, it will be a multidimentional array with each index containing an array of subscription data with the following keys:
-			 *
-			 *       `string` `$email` The email address of the subscriber
-			 *       `string` `$date` The date the subscription was created in local WordPress time with format YYYY-MM-DD HH:MM:SS
-			 *       `string` `$status` The status of the subscription; exactly one of the following: Y|R|YC|RC|C|-C
-			 *
+			 * @param integer $post_id Post ID.
 			 */
-			public function get_data_for($post_id)
+			protected function mark_post_imported($post_id)
 			{
-				$data = array(); // Initialize.
-
 				if(!($post_id = (integer)$post_id))
-					return $data; // Not possible.
+					return; // Nothing to do.
 
-				global $wpdb; // Global database object reference.
-				/** @var \wpdb $wpdb This line for IDEs that need a reference. */
+				update_post_meta($post_id, __NAMESPACE__.'imported_stcr_subs', '1');
+			}
 
-				$_wp_postmeta_stcr_data = $wpdb->get_results($wpdb->prepare("SELECT meta_key, meta_value FROM wp_postmeta WHERE post_id = %d AND meta_key LIKE '%%_stcr@_%%'", $post_id), OBJECT);
+			/**
+			 * Post import processor.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $post_id Post ID.
+			 */
+			protected function maybe_import_post($post_id)
+			{
+				if(!($post_id = (integer)$post_id))
+					return; // Not possible.
 
-				if(!$_wp_postmeta_stcr_data || count($_wp_postmeta_stcr_data) < 1)
-					return NULL; // No results.
+				if(!($stcr_subs = $this->stcr_subs_for_post($post_id)))
+					return; // No StCR subscribers.
 
-				foreach($_wp_postmeta_stcr_data as $_row)
+				foreach($stcr_subs as $_email => $_sub)
+					$this->maybe_import_sub($post_id, $_sub);
+				unset($_email, $_sub); // Housekeeping.
+			}
+
+			/**
+			 * Sub. import processor.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer   $post_id Post ID.
+			 * @param \stdClass $sub Subscriber obj. data.
+			 */
+			protected function maybe_import_sub($post_id, \stdClass $sub)
+			{
+				if(!($post_id = (integer)$post_id))
+					return; // Not possible.
+
+				if(empty($sub->email) || empty($sub->time) || empty($sub->status))
+					return; // Not possible; data missing.
+
+				if($sub->status !== 'Y' && $sub->status !== 'R')
+					return; // Not an active subscriber.
+
+				if(!($comment_ids = $this->sub_comment_ids($post_id, $sub->email)))
+					return; // Not possible; could not find any comment IDs.
+
+				$user = $this->sub_user($sub->email); // `\WP_User` or `NULL`.
+
+				if($sub->status === 'R') // Specific comment(s); i.e. "Replies Only"?
 				{
-					$_email = str_replace('_stcr@_', '', $_row->meta_key); // Original format: _stcr@_user@example.com
-
-					if(empty($_email) || !is_email($_email))
-						continue; // Invalid data.
-
-					$_meta_value = explode('|', $_row->meta_value); // Original format: 2013-03-11 01:31:01|R
-					$_date       = $_meta_value[0]; // Local WordPress time
-
-					if(strtotime($_date) === FALSE)
-						continue; // Invalid data.
-
-					$_status = $_meta_value[1]; // Y|R|YC|RC|C|-C
-					if(!in_array($_status, array('Y', 'R', 'YC', 'RC', 'C', '-C')))
-						continue; // Invalid data.
-
-					$data[] = array('email' => $_email, 'date' => $_date, 'status' => $_status);
+					foreach($comment_ids as $_comment_id) // Comment subscriptions.
+						new sub_inserter($user, $_comment_id, 'comment', 'asap', TRUE);
+					unset($_comment_id); // A little housekeeping.
 				}
+				else new sub_inserter($user, $comment_ids[0], 'comments', 'asap', TRUE);
+			}
 
-				unset($_wp_postmeta_stcr_data, $_row, $_email, $_meta_value, $_date, $_status);
-				return (empty($data) ? NULL : $data);
+			/**
+			 * Collect all StCR subscribers for a given post ID.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $post_id Subscribers for which post ID.
+			 *
+			 * @return \stdClass[] Array of objects; i.e. StCR subscribers for the post ID.
+			 *
+			 *    Each object in the array will contain the following properties.
+			 *
+			 *    - `(string)email` The subscribers's email address (lowercase).
+			 *          Note: each key in the array is also indexed by this email address.
+			 *
+			 *    - `(integer)time` The date the subscription was created; converted to a UTC timestamp.
+			 *
+			 *    - `(string)status` The status of the subscription. One of: `Y|R`.
+			 *          A `Y` indicates they want notifications for all comments.
+			 *          An `R` indicates they want notifications for replies only.
+			 */
+			protected function stcr_subs_for_post($post_id)
+			{
+				if(!($post_id = (integer)$post_id))
+					return array(); // Not possible.
+
+				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->wp->postmeta)."`".
+
+				       " WHERE `post_id` = '".esc_sql($post_id)."'".
+				       " AND `meta_key` LIKE = '%%_stcr@_%%'";
+
+				if(!($results = $this->plugin->utils_db->wp->get_results($sql)))
+					return array(); // Nothing to do; no results.
+
+				$subs = array(); // Initialize array of subscribers.
+
+				foreach($results as $_result) // Iterate results.
+				{
+					// Original format: `_stcr@_user@example.com`.
+					$_email = preg_replace('/^.*?_stcr@_/i', '', $_result->meta_key);
+					$_email = trim(strtolower($_email));
+
+					if(strpos($_email, '@', 1) === FALSE || !is_email($_email))
+						continue; // Invalid email address.
+
+					// Original format: `2013-03-11 01:31:01|R`.
+					if(strpos($_result->meta_value, '|', 1) === FALSE)
+						continue; // Invalid meta data.
+
+					list($_local_datetime, $_status) = explode('|', $_result->meta_value);
+
+					if(!($_time = strtotime($_local_datetime)))
+						continue; // Not `strtotime()` compatible.
+
+					if(($_time = $_time + (get_option('gmt_offset') * 3600)) < 1)
+						continue; // Unable to convert date to UTC timestamp.
+
+					// Possible statuses: `Y|R|YC|RC|C|-C`.
+					// A `Y` indicates they want notifications for all comments.
+					// An `R` indicates they want notifications for replies only.
+					// A `C` indicates "suspended" or "unconfirmed".
+					if($_status !== 'Y' && $_status !== 'R') // Active?
+						continue; // Not an active subscriber.
+
+					if(!isset($subs[$_email]) || ($_status === 'R' && $subs[$_email]->status === 'Y'))
+						// Give precedence to any subscription that chose to receive "Replies Only".
+						// See: <https://github.com/websharks/comment-mail/issues/7#issuecomment-57252200>
+						$subs[$_email] = (object)array('email' => $_email, 'time' => $_time, 'status' => $_status);
+				}
+				unset($_result, $_email, $_local_datetime, $_status); // Housekeeping.
+
+				return $subs; // Subscribers, for this post ID.
+			}
+
+			/**
+			 * Subscriber's comment IDs.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $post_id Post ID to check.
+			 * @param string  $email Email address (i.e. subscriber).
+			 *
+			 * @return array Subscriber's comment IDs.
+			 */
+			protected function sub_comment_ids($post_id, $email)
+			{
+				$comment_ids = array(); // Initialize.
+
+				if(!($post_id = (integer)$post_id) || !($email = (string)$email))
+					return $comment_ids; // Not possible; data missing.
+
+				$sql = "SELECT `comment_ID` FROM  `".esc_sql($this->plugin->utils_db->wp->comments)."`".
+
+				       " WHERE  `comment_post_ID` = '".esc_sql($post_id)."".
+				       " AND  `comment_author_email` = '".esc_sql($email)."'".
+				       " AND `comment_status` IN('approve', 'approved', '1')".
+
+				       " ORDER BY `comment_date` ASC"; // Oldest to newest.
+
+				if(($get_col_results = $this->plugin->utils_db->wp->get_col($sql)))
+					$comment_ids = array_map('intval', $get_col_results);
+
+				return $comment_ids; // All of their comment IDs.
+			}
+
+			/**
+			 * Subscriber's user object.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $email Email address (i.e. subscriber).
+			 *
+			 * @return \WP_User|null Their user object; else `NULL`.
+			 */
+			protected function sub_user($email)
+			{
+				if(!($email = (string)$email))
+					return NULL; // Not possible.
+
+				if(!($data = \WP_User::get_data_by('email', $email)))
+					return NULL; // Unable to locate a user ID.
+
+				return new \WP_User($data->ID);
+			}
+
+			/**
+			 * Up to `$max_limit` unimported post IDs.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $max_limit Max IDs to return.
+			 *
+			 * @return array Up to `$max_limit` unimported post IDs.
+			 */
+			protected function unimported_post_ids($max_limit = 0)
+			{
+				if(($max_limit = (integer)$max_limit) < 1)
+					$max_limit = $this->max_post_ids_limit + 1;
+
+				$post_ids_with_stcr_meta = // Those with StCR metadata.
+					"SELECT DISTINCT `post_id` FROM `".esc_sql($this->plugin->utils_db->wp->postmeta)."`".
+					" WHERE `meta_key` LIKE '%%_stcr@_%%'";
+
+				$post_ids_imported_already = // Those already imported by this class.
+					"SELECT DISTINCT `post_id` FROM `".esc_sql($this->plugin->utils_db->wp->postmeta)."`".
+					" WHERE `meta_key` = '".esc_sql(__NAMESPACE__.'imported_stcr_subs')."'";
+
+				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->wp->posts)."`".
+
+				       " WHERE `post_status` = 'publish'".
+				       " `post_type` NOT IN('revision', 'nav_menu_item')".
+
+				       " AND `ID` IN (".$post_ids_with_stcr_meta.")".
+				       " AND `ID` NOT IN (".$post_ids_imported_already.")".
+
+				       " LIMIT ".$max_limit; // Limit results.
+
+				if(($post_ids = $this->plugin->utils_db->wp->get_col($sql)))
+					$post_ids = array_map('intval', $post_ids);
+				else $post_ids = array(); // Default; empty array.
+
+				return $post_ids; // Up to `$max_limit` unimported post IDs.
 			}
 		}
 	}
