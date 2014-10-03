@@ -145,7 +145,7 @@ namespace comment_mail // Root namespace.
 				if(!($post_id = (integer)$post_id))
 					return; // Nothing to do.
 
-				update_post_meta($post_id, __NAMESPACE__.'imported_stcr_subs', '1');
+				update_post_meta($post_id, __NAMESPACE__.'_imported_stcr_subs', '1');
 			}
 
 			/**
@@ -345,7 +345,7 @@ namespace comment_mail // Root namespace.
 
 				$post_ids_imported_already = // Those already imported by this class.
 					"SELECT DISTINCT `post_id` FROM `".esc_sql($this->plugin->utils_db->wp->postmeta)."`".
-					" WHERE `meta_key` = '".esc_sql(__NAMESPACE__.'imported_stcr_subs')."'";
+					" WHERE `meta_key` = '".esc_sql(__NAMESPACE__.'_imported_stcr_subs')."'";
 
 				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->wp->posts)."`".
 
