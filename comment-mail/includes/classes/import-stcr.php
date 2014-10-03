@@ -231,7 +231,7 @@ namespace comment_mail // Root namespace.
 				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->wp->postmeta)."`".
 
 				       " WHERE `post_id` = '".esc_sql($post_id)."'".
-				       " AND `meta_key` LIKE '%%_stcr@_%%'";
+				       " AND `meta_key` LIKE '%%\\_stcr@\\_%%'";
 
 				if(!($results = $this->plugin->utils_db->wp->get_results($sql)))
 					return array(); // Nothing to do; no results.
@@ -343,7 +343,7 @@ namespace comment_mail // Root namespace.
 
 				$post_ids_with_stcr_meta = // Those with StCR metadata.
 					"SELECT DISTINCT `post_id` FROM `".esc_sql($this->plugin->utils_db->wp->postmeta)."`".
-					" WHERE `meta_key` LIKE '%%_stcr@_%%'";
+					" WHERE `meta_key` LIKE '%%\\_stcr@\\_%%'";
 
 				$post_ids_imported_already = // Those already imported by this class.
 					"SELECT DISTINCT `post_id` FROM `".esc_sql($this->plugin->utils_db->wp->postmeta)."`".
