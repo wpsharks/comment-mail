@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS `%%prefix%%queue_event_log` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key.',
   `queue_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Queue entry ID from the `queue` table. The entry may or may not still exist.',
+  `dby_queue_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Digested by queue entry ID from the `queue` table. The entry may or may not still exist.',
   `sub_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Subscriber ID from the `subs` table. The subscriber may or may not still exist.',
   `user_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'User ID from the `wp_users` table, if applicable. The user may or may not still exist.',
   `post_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Post ID from the `wp_posts` table. The post may or may not still exist.',

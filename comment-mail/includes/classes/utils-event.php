@@ -48,7 +48,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string Full description for the code; else an empty string.
 			 *
-			 * @see queue_processor::process_log_entry()
+			 * @see queue_processor::log_entry()
 			 */
 			public function queue_note_code($note_code)
 			{

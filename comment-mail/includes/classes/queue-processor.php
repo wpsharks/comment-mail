@@ -79,6 +79,27 @@ namespace comment_mail // Root namespace.
 			protected $message_template; // Set by constructor.
 
 			/**
+			 * @var \stdClass[] Entries being processed.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $entries; // Set by constructor.
+
+			/**
+			 * @var integer Total entries.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $total_entries; // Set by constructor.
+
+			/**
+			 * @var integer Processed entry counter.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $processed_entry_counter; // Set by constructor.
+
+			/**
 			 * Class constructor.
 			 *
 			 * @since 14xxxx First documented version.
@@ -140,6 +161,10 @@ namespace comment_mail // Root namespace.
 				$this->subject_template = new template('email/comment-notification-subject.php');
 				$this->message_template = new template('email/comment-notification-message.php');
 
+				$this->entries                 = array(); // Initialize.
+				$this->total_entries           = 0; // Initialize; zero for now.
+				$this->processed_entry_counter = 0; // Initialize; zero for now.
+
 				$this->maybe_prep_cron_job();
 				$this->maybe_process();
 			}
@@ -173,26 +198,22 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_process()
 			{
-				if(!($entries = $this->entries()))
+				if(!($this->entries = $this->entries()))
 					return; // Nothing to do.
 
-				$total_entries = count($entries);
+				$this->total_entries = count($this->entries);
 
-				foreach($entries as $_key => $_entry)
+				foreach($this->entries as $_entry_id_key => $_entry)
 				{
 					$this->process_entry($_entry);
 					$this->delete_entry($_entry);
 
-					if($this->is_out_of_time())
-						return; // Out of time.
+					$this->processed_entry_counter++;
 
-					if($this->delay && $_key + 1 < $total_entries)
-						usleep($this->delay * 1000);
-
-					if($this->is_out_of_time())
-						return; // Out of time.
+					if($this->is_out_of_time() || $this->is_delay_out_of_time())
+						break; // Out of time now; or after a possible delay.
 				}
-				unset($_key, $_entry); // Housekeeping.
+				unset($_entry_id_key, $_entry); // Housekeeping.
 			}
 
 			/**
@@ -204,67 +225,39 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function process_entry(\stdClass $entry)
 			{
-				$entry_props = $this->compile_check_entry_props($entry);
+				if($entry->dby_queue_id) // Digested?
+					return; // Already done; indirectly.
 
-				if($entry_props->event === 'invalidated')
-					return $this->process_log_entry($entry_props);
+				if(!($entry_props = $this->validated_entry_props($entry)))
+					return; // Unable to validate entry props.
 
-				if(($entry_hold_until_time = $this->check_entry_hold_until_time($entry_props)))
-					return $this->update_entry_hold_until_time($entry_props, $entry_hold_until_time);
+				if($this->check_entry_hold_until_time($entry_props))
+					return; // Holding; nothing more to do.
 
-				if(($entry_digestable_entries = $this->check_entry_digestable_entries($entry_props)))
-					$entry_props->comments = $entry_digestable_entries;
-
-				// @TODO Move everything above this line into its own method.
+				$is_digest = $this->check_entry_digestable_entries($entry_props);
+				// @TODO log each digestable entry too.
 
 				if(!($entry_subject = $this->entry_subject($entry_props)))
 				{
-					$entry_props->event     = 'invalidated';
+					$entry_props->event     = 'invalidated'; // Invalidate.
 					$entry_props->note_code = 'comment_notification_subject_empty';
+					$this->log_entry($entry_props); // Log invalidation.
 
-					return $this->process_log_entry($entry_props);
+					return; // Not possible; subject line is empty.
 				}
 				if(!($entry_message = $this->entry_message($entry_props)))
 				{
-					$entry_props->event     = 'invalidated';
+					$entry_props->event     = 'invalidated'; // Invalidate.
 					$entry_props->note_code = 'comment_notification_message_empty';
+					$this->log_entry($entry_props); // Log invalidation.
 
-					return $this->process_log_entry($entry_props);
+					return; // Not possible; message body is empty.
 				}
-				$this->plugin->utils_mail->send($entry_props->sub->email, $entry_subject, $entry_message);
-
-				$entry_props->event     = 'notified';
+				$entry_props->event     = 'notified'; // Notifying now.
 				$entry_props->note_code = 'comment_notification_sent_successfully';
+				$this->log_entry($entry_props); // Log successful processing.
 
-				return $this->process_log_entry($entry_props);
-			}
-
-			/**
-			 * Event log entry processor.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param \stdClass $entry_props Entry properties.
-			 */
-			protected function process_log_entry(\stdClass $entry_props)
-			{
-				$entry = array(
-					'queue_id'          => $entry_props->entry->ID,
-					'sub_id'            => $entry_props->sub ? $entry_props->sub->ID : $entry_props->entry->sub_id,
-					'user_id'           => $entry_props->sub ? $entry_props->sub->user_id : 0, // Default; no user.
-					'post_id'           => $entry_props->post ? $entry_props->post->ID : ($entry_props->comment ? $entry_props->comment->post_ID : ($entry_props->sub ? $entry_props->sub->post_id : 0)),
-					'comment_id'        => $entry_props->comment ? $entry_props->comment->comment_ID : $entry_props->entry->comment_id,
-					'comment_parent_id' => $entry_props->comment ? $entry_props->comment->comment_parent : $entry_props->entry->comment_parent_id,
-
-					'fname'             => $entry_props->sub ? $entry_props->sub->fname : '',
-					'lname'             => $entry_props->sub ? $entry_props->sub->lname : '',
-					'email'             => $entry_props->sub ? $entry_props->sub->email : '',
-					'ip'                => $entry_props->sub ? $entry_props->sub->last_ip : '',
-
-					'event'             => $entry_props->event,
-					'note_code'         => $entry_props->note_code
-				);
-				new queue_event_log_inserter($entry);
+				$this->plugin->utils_mail->send($entry_props->sub->email, $entry_subject, $entry_message);
 			}
 
 			/**
@@ -286,67 +279,113 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Compile/check entry properties.
+			 * Log entry event w/ note code.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $entry_props Entry properties.
+			 */
+			protected function log_entry(\stdClass $entry_props)
+			{
+				if($entry_props->logged)
+					return; // Already did this.
+
+				$log_entry = array(
+					'queue_id'          => $entry_props->entry->ID,
+					'dby_queue_id'      => $entry_props->dby_queue_id, // Digested?
+					'sub_id'            => $entry_props->sub ? $entry_props->sub->ID : $entry_props->entry->sub_id,
+					'user_id'           => $entry_props->sub ? $entry_props->sub->user_id : 0, // Default; no user.
+					'post_id'           => $entry_props->post ? $entry_props->post->ID : ($entry_props->comment ? $entry_props->comment->post_ID : ($entry_props->sub ? $entry_props->sub->post_id : 0)),
+					'comment_id'        => $entry_props->comment ? $entry_props->comment->comment_ID : $entry_props->entry->comment_id,
+					'comment_parent_id' => $entry_props->comment ? $entry_props->comment->comment_parent : $entry_props->entry->comment_parent_id,
+
+					'fname'             => $entry_props->sub ? $entry_props->sub->fname : '',
+					'lname'             => $entry_props->sub ? $entry_props->sub->lname : '',
+					'email'             => $entry_props->sub ? $entry_props->sub->email : '',
+					'ip'                => $entry_props->sub ? $entry_props->sub->last_ip : '',
+
+					'event'             => $entry_props->event,
+					'note_code'         => $entry_props->note_code
+				);
+				new queue_event_log_inserter($log_entry);
+				$entry_props->logged = TRUE; // Flag as `TRUE` now.
+			}
+
+			/**
+			 * Validated entry properties.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param \stdClass $entry Queue entry.
 			 *
-			 * @return object Object with properties.
+			 * @return object|null Object with properties.
+			 *    If unable to validate, returns `NULL`.
 			 *
 			 *    Object properties will include:
 			 *
 			 *    - `event` the event type.
 			 *    - `note_code` the note code.
+			 *
 			 *    - `entry` the entry.
 			 *    - `sub` the subscriber.
 			 *    - `post` the post.
 			 *    - `comment` the comment.
 			 *
+			 *    - `comments` digestable comments.
+			 *
+			 *    - `held` held?
+			 *    - `dby_queue_id` digested?
+			 *    - `logged` logged?
+			 *
 			 * @see utils_event::queue_note_code()
 			 */
-			protected function compile_check_entry_props(\stdClass $entry)
+			protected function validated_entry_props(\stdClass $entry)
 			{
 				if(!$entry->sub_id) // Not possible; data missing.
-					return $this->checked_entry_props('invalidated', 'entry_sub_id_empty', $entry);
+					$invalidated_entry_props = $this->entry_props('invalidated', 'entry_sub_id_empty', $entry);
 
-				if(!$entry->comment_id) // Not possible; data missing.
-					return $this->checked_entry_props('invalidated', 'entry_comment_id_empty', $entry);
+				else if(!$entry->comment_id) // Not possible; data missing.
+					$invalidated_entry_props = $this->entry_props('invalidated', 'entry_comment_id_empty', $entry);
 
-				if(!($sub = $this->plugin->utils_sub->get($entry->sub_id))) // Unsubscribed?
-					return $this->checked_entry_props('invalidated', 'entry_sub_id_missing', $entry);
+				else if(!($sub = $this->plugin->utils_sub->get($entry->sub_id))) // Sub. missing?
+					$invalidated_entry_props = $this->entry_props('invalidated', 'entry_sub_id_missing', $entry);
 
-				if(!$sub->email) // Missing the subscriber's email address?
-					return $this->checked_entry_props('invalidated', 'sub_email_empty', $entry, $sub);
+				else if(!$sub->email) // WP config. issue? i.e. missing subscriber's email address?
+					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_email_empty', $entry, $sub);
 
-				if($sub->status !== 'subscribed') // Subscriber no longer `subscribed`?
-					return $this->checked_entry_props('invalidated', 'sub_status_not_subscribed', $entry, $sub);
+				else if($sub->status !== 'subscribed') // Subscriber is no longer `subscribed`?
+					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_status_not_subscribed', $entry, $sub);
 
-				if(!($comment = get_comment($entry->comment_id))) // Comment is missing?
-					return $this->checked_entry_props('invalidated', 'entry_comment_id_missing', $entry, $sub);
+				else if(!($comment = get_comment($entry->comment_id))) // Comment is missing?
+					$invalidated_entry_props = $this->entry_props('invalidated', 'entry_comment_id_missing', $entry, $sub);
 
-				if($comment->comment_type !== 'comment') // It's a pingback or a trackback?
-					return $this->checked_entry_props('invalidated', 'comment_type_not_comment', $entry, $sub, NULL, $comment, array($comment));
+				else if($comment->comment_type !== 'comment') // It's a pingback or a trackback?
+					$invalidated_entry_props = $this->entry_props('invalidated', 'comment_type_not_comment', $entry, $sub, NULL, $comment);
 
-				if(!$comment->comment_content) // An empty commen; i.e. no content?
-					return $this->checked_entry_props('invalidated', 'comment_content_empty', $entry, $sub, NULL, $comment, array($comment));
+				else if(!$comment->comment_content) // An empty comment; i.e. no content for the comment?
+					$invalidated_entry_props = $this->entry_props('invalidated', 'comment_content_empty', $entry, $sub, NULL, $comment);
 
-				if($this->plugin->comment_status__($comment->comment_approved) !== 'approve')
-					return $this->checked_entry_props('invalidated', 'comment_status_not_approve', $entry, $sub, NULL, $comment, array($comment));
+				else if($this->plugin->comment_status__($comment->comment_approved) !== 'approve') // No longer approved?
+					$invalidated_entry_props = $this->entry_props('invalidated', 'comment_status_not_approve', $entry, $sub, NULL, $comment);
 
-				if(!($post = get_post($comment->post_ID))) // Post is missing?
-					return $this->checked_entry_props('invalidated', 'comment_post_id_missing', $entry, $sub, NULL, $comment, array($comment));
+				else if(!($post = get_post($comment->post_ID))) // Post is missing? Perhaps deleted since the comment came in.
+					$invalidated_entry_props = $this->entry_props('invalidated', 'comment_post_id_missing', $entry, $sub, NULL, $comment);
 
-				if(!$post->post_title) // An empty post title; i.e. we have nothing for a subject line?
-					return $this->checked_entry_props('invalidated', 'post_title_empty', $entry, $sub, $post, $comment, array($comment));
+				else if(!$post->post_title) // An empty post title; i.e. we have nothing for a subject line?
+					$invalidated_entry_props = $this->entry_props('invalidated', 'post_title_empty', $entry, $sub, $post, $comment);
 
-				if($post->post_status !== 'publish') // Unavailable; i.e. not published?
-					return $this->checked_entry_props('invalidated', 'post_status_not_publish', $entry, $sub, $post, $comment, array($comment));
+				else if($post->post_status !== 'publish') // Unavailable; i.e. the post is no longer published?
+					$invalidated_entry_props = $this->entry_props('invalidated', 'post_status_not_publish', $entry, $sub, $post, $comment);
 
-				if(in_array($post->post_type, array('revision', 'nav_menu_item'), TRUE))
-					return $this->checked_entry_props('invalidated', 'post_type_auto_excluded', $entry, $sub, $post, $comment, array($comment));
+				else if(in_array($post->post_type, array('revision', 'nav_menu_item'), TRUE)) // Excluded post type?
+					$invalidated_entry_props = $this->entry_props('invalidated', 'post_type_auto_excluded', $entry, $sub, $post, $comment);
 
-				return $this->checked_entry_props('', '', $entry, $sub, $post, $comment, array($comment));
+				else return $this->entry_props('', '', $entry, $sub, $post, $comment); // Validated entry props.
+
+				if(isset($invalidated_entry_props)) // Unable to validate/initialize entry props?
+					$this->log_entry($invalidated_entry_props); // Log invalidation.
+
+				return NULL; // Unable to validate/initialize entry props.
 			}
 
 			/**
@@ -361,7 +400,12 @@ namespace comment_mail // Root namespace.
 			 * @param \stdClass   $sub Subscriber.
 			 * @param \WP_Post    $post Post.
 			 * @param \stdClass   $comment Comment.
+			 *
 			 * @param \stdClass[] $comments Digestable comments.
+			 *
+			 * @param boolean     $held Held? Defaults to `FALSE`.
+			 * @param integer     $dby_queue_id Digested by queue ID.
+			 * @param boolean     $logged Logged? Defaults to `FALSE`.
 			 *
 			 * @return object Object with properties.
 			 *
@@ -369,20 +413,41 @@ namespace comment_mail // Root namespace.
 			 *
 			 *    - `event` the event type.
 			 *    - `note_code` the note code.
+			 *
 			 *    - `entry` the entry.
 			 *    - `sub` the subscriber.
 			 *    - `post` the post.
 			 *    - `comment` the comment.
+			 *
 			 *    - `comments` digestable comments.
+			 *
+			 *    - `held` held?
+			 *    - `dby_queue_id` digested?
+			 *    - `logged` logged?
 			 *
 			 * @see utils_event::queue_note_code()
 			 */
-			protected function checked_entry_props($event = '', $note_code = '', \stdClass $entry, \stdClass $sub = NULL, \WP_Post $post = NULL, \stdClass $comment = NULL, array $comments = array())
+			protected function entry_props($event = '', $note_code = '',
+			                               \stdClass $entry, \stdClass $sub = NULL, \WP_Post $post = NULL, \stdClass $comment = NULL,
+			                               array $comments = array(), // All digestable comments.
+			                               $held = FALSE, $dby_queue_id = 0, $logged = FALSE)
 			{
 				$event     = (string)$event;
 				$note_code = (string)$note_code;
 
-				return (object)compact('event', 'note_code', 'entry', 'sub', 'post', 'comment', 'comments');
+				if(!$comments && $comment) // Not passed in?
+					$comments = array($comment->comment_ID => $comment);
+
+				$held         = (boolean)$held;
+				$dby_queue_id = (integer)$dby_queue_id;
+				$logged       = (boolean)$logged;
+
+				return (object)compact(
+					'event', 'note_code',
+					'held', 'dby_queue_id', 'logged',
+					'entry', 'sub', 'post', 'comment',
+					'comments' // All digestable comments.
+				);
 			}
 
 			/**
@@ -392,15 +457,19 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param \stdClass $entry_props Entry properties.
 			 *
-			 * @return boolean TRUE if the notification should be hold, for now.
+			 * @return boolean TRUE if the notification should be held, for now.
 			 */
 			protected function check_entry_hold_until_time(\stdClass $entry_props)
 			{
-				if($entry_props->sub->deliver !== 'asap')
-					if($entry_props->entry->time < ($entry_hold_until_time = $this->entry_hold_until_time($entry_props)))
-						return $entry_hold_until_time;
+				if($entry_props->sub->deliver === 'asap')
+					return FALSE; // Do not hold; n/a.
 
-				return 0; // No need to hold this one.
+				if(time() >= ($entry_hold_until_time = $this->entry_hold_until_time($entry_props)))
+					return FALSE; // Don't hold any longer.
+
+				$this->update_entry_hold_until_time($entry_props, $entry_hold_until_time);
+
+				return TRUE; // Yes, holding this entry (for now).
 			}
 
 			/**
@@ -444,6 +513,9 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function update_entry_hold_until_time(\stdClass $entry_props, $entry_hold_until_time)
 			{
+				if($entry_props->held)
+					return; // Already did this.
+
 				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
 
 				       " SET `last_update_time` = '".esc_sql(time())."', `hold_until_time` = '".esc_sql((integer)$entry_hold_until_time)."'".
@@ -454,6 +526,7 @@ namespace comment_mail // Root namespace.
 					throw new \exception(sprintf(__('Dntry update failure. ID: `%1$s`.', $this->plugin->text_domain), $entry_props->entry->ID));
 
 				$entry_props->entry->hold_until_time = (integer)$entry_hold_until_time;
+				$entry_props->held                   = TRUE; // Flag as `TRUE` now.
 			}
 
 			/**
@@ -482,20 +555,40 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Check digestable entries.
+			 * Compile digestable entries.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param \stdclass $entry_props entry properties.
 			 *
-			 * @return array An array of all queued digestable entries.
+			 * @return boolean TRUE if the entry has other digestable entries.
 			 */
 			protected function check_entry_digestable_entries(\stdClass $entry_props)
 			{
 				if($entry_props->sub->deliver === 'asap')
-					return array(); // Not applicable.
+					return FALSE; // Not applicable; i.e. no other digestables.
 
-				return $this->entry_digestable_entries($entry_props);
+				if(!($entry_digestable_entries = $this->entry_digestable_entries($entry_props)))
+					return FALSE; // Not applicable; i.e. no other digestables.
+
+				if(isset($entry_digestable_entries[$entry_props->entry->ID]) && count($entry_digestable_entries) === 1)
+					return FALSE; // Only itself; i.e. no other digestables.
+
+				foreach($entry_digestable_entries as $_entry_digestable_entry_id_key => $_entry_digestable_entry)
+				{
+					if($_entry_digestable_entry->ID !== $entry_props->entry->ID && isset($this->entries[$_entry_digestable_entry->ID]))
+						$this->entries[$_entry_digestable_entry->ID]->dby_queue_id = $entry_props->entry->ID;
+
+					if($_entry_digestable_entry->ID === $entry_props->entry->ID)
+						$_entry_digestable_entry_props = $entry_props; // No need to validate again.
+					else $_entry_digestable_entry_props = $this->validated_entry_props($_entry_digestable_entry);
+
+					if($_entry_digestable_entry_props) // Do we have validated entry props?
+						$entry_props->comments[$_entry_digestable_entry_props->comment->comment_ID] = $_entry_digestable_entry_props->comment;
+				}
+				unset($_entry_digestable_entry_id_key, $_entry_digestable_entry, $_entry_digestable_entry_props); // Housekeeping.
+
+				return TRUE; // Yes, this entry has at least one other digestable entry.
 			}
 
 			/**
@@ -517,10 +610,13 @@ namespace comment_mail // Root namespace.
 
 				       " ORDER BY `insertion_time` ASC";
 
-				if(($digestable_entries = $this->plugin->utils_db->wp->get_results($sql)))
-					$digestable_entries = $this->plugin->utils_db->typify_deep($digestable_entries);
-
-				return $digestable_entries ? $digestable_entries : array();
+				if(($entries = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
+				{
+					foreach(($entries = $this->plugin->utils_db->typify_deep($entries)) as $_entry_id_key => $_entry)
+						$_entry->dby_queue_id = $entry_props->entry->ID;
+					unset($_entry_id_key, $_entry); // Housekeeping.
+				}
+				return $entries ? $entries : array();
 			}
 
 			/**
@@ -534,7 +630,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function entry_subject(\stdclass $entry_props)
 			{
-				return $this->subject_template->parse(array('sub' => $entry_props->sub, 'post' => $entry_props->post, 'comment' => $entry_props->comment));
+				return $this->subject_template->parse((array)$entry_props);
 			}
 
 			/**
@@ -548,7 +644,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function entry_message(\stdclass $entry_props)
 			{
-				return $this->message_template->parse(array('sub' => $entry_props->sub, 'post' => $entry_props->post, 'comment' => $entry_props->comment));
+				return $this->message_template->parse((array)$entry_props);
 			}
 
 			/**
@@ -568,9 +664,12 @@ namespace comment_mail // Root namespace.
 
 				       " LIMIT ".$this->max_limit;
 
-				if(($entries = $this->plugin->utils_db->wp->get_results($sql)))
-					$entries = $this->plugin->utils_db->typify_deep($entries);
-
+				if(($entries = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
+				{
+					foreach(($entries = $this->plugin->utils_db->typify_deep($entries)) as $_entry_id_key => $_entry)
+						$_entry->dby_queue_id = 0; // Initialize; `0` by default.
+					unset($_entry_id_key, $_entry); // Housekeeping.
+				}
 				return $entries ? $entries : array();
 			}
 
@@ -578,6 +677,8 @@ namespace comment_mail // Root namespace.
 			 * Out of time yet?
 			 *
 			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean TRUE if out of time.
 			 */
 			protected function is_out_of_time()
 			{
@@ -585,6 +686,26 @@ namespace comment_mail // Root namespace.
 					return TRUE; // Out of time.
 
 				return FALSE; // Let's keep mailing!
+			}
+
+			/**
+			 * Out of time after a possible delay?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean TRUE if out of time.
+			 */
+			protected function is_delay_out_of_time()
+			{
+				if(!$this->delay) // No delay?
+					return FALSE; // Nope; nothing to do here.
+
+				if($this->processed_entry_counter >= $this->total_entries)
+					return FALSE; // No delay on last entry.
+
+				usleep($this->delay * 1000); // Delay.
+
+				return $this->is_out_of_time();
 			}
 		}
 	}

@@ -51,6 +51,7 @@ namespace comment_mail // Root namespace.
 
 				$defaults = array(
 					'queue_id'          => 0,
+					'dby_queue_id'      => 0,
 					'sub_id'            => 0,
 					'user_id'           => 0,
 					'post_id'           => 0,
