@@ -20,15 +20,8 @@ namespace comment_mail // Root namespace.
 		 * @package import_stcr
 		 * @since 14xxxx First documented version.
 		 */
-		class import_stcr // StCR importer.
+		class import_stcr extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var integer Max number of post IDs.
 			 *
@@ -44,13 +37,6 @@ namespace comment_mail // Root namespace.
 			protected $unimported_post_ids; // Set by constructor.
 
 			/**
-			 * @var integer Total unimported post IDs.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $total_unimported_post_ids; // Set by constructor.
-
-			/**
 			 * @var array Imported post IDs.
 			 *
 			 * @since 14xxxx First documented version.
@@ -63,6 +49,13 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 */
 			protected $total_imported_post_ids; // Set by constructor.
+
+			/**
+			 * @var integer Total imported subs.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $total_imported_subs; // Set by constructor.
 
 			/**
 			 * @var boolean Has more posts to import?
@@ -81,7 +74,7 @@ namespace comment_mail // Root namespace.
 			 *    This cannot be less than `1`.
 			 *    This cannot be greater than `1000` (filterable).
 			 *
-			 *    * A default value of `30` is used if not passed in explicitly.
+			 *    * A default value of `15` is used if not passed in explicitly.
 			 *
 			 * @note The `$has_more_posts_to_import` property should be read from this class.
 			 *    If this property is `TRUE`, additional class instances should be instantiated until
@@ -89,29 +82,49 @@ namespace comment_mail // Root namespace.
 			 *
 			 *    * A UI should be built to help spread this out over multiple server processes.
 			 */
-			public function __construct($max_post_ids_limit = 30)
+			public function __construct($max_post_ids_limit = 15)
 			{
-				$this->plugin = plugin();
+				parent::__construct(); // Parent constructor.
 
 				$this->max_post_ids_limit = (integer)$max_post_ids_limit;
 				if($this->max_post_ids_limit < 1) $this->max_post_ids_limit = 1;
 				$upper_max_post_ids_limit = (integer)apply_filters(__CLASS__.'_upper_max_post_ids_limit', 1000);
 				if($this->max_post_ids_limit > $upper_max_post_ids_limit) $this->max_post_ids_limit = $upper_max_post_ids_limit;
 
-				$this->has_more_posts_to_import  = FALSE; // Initialize.
-				$this->unimported_post_ids       = $this->unimported_post_ids($this->max_post_ids_limit + 1);
-				$this->total_unimported_post_ids = count($this->unimported_post_ids);
+				$this->has_more_posts_to_import = FALSE; // Initialize.
+				$this->unimported_post_ids      = $this->unimported_post_ids($this->max_post_ids_limit + 1);
 
-				if($this->total_unimported_post_ids > $this->max_post_ids_limit)
+				if(count($this->unimported_post_ids) > $this->max_post_ids_limit)
 				{
-					$this->has_more_posts_to_import  = TRUE;
-					$this->unimported_post_ids       = array_slice($this->unimported_post_ids, 0, $this->max_post_ids_limit);
-					$this->total_unimported_post_ids = count($this->unimported_post_ids);
+					$this->has_more_posts_to_import = TRUE; // Yes, there are more to import later.
+					$this->unimported_post_ids      = array_slice($this->unimported_post_ids, 0, $this->max_post_ids_limit);
 				}
 				$this->imported_post_ids       = array(); // Initialize.
-				$this->total_imported_post_ids = 0; // Initialize.
+				$this->total_imported_post_ids = $this->total_imported_subs = 0;
 
 				$this->maybe_import(); // Handle importation.
+			}
+
+			/**
+			 * Output status; for public API use.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			public function output_status()
+			{
+				status_header(200); // OK status.
+				nocache_headers(); // No browser cache.
+				header('Content-Type: text/html; charset=UTF-8');
+
+				while(@ob_end_clean()) ;  // Clean buffers.
+
+				$class_var        = str_replace('\\', '_', __CLASS__);
+				$child_status_var = $class_var.'_child_status';
+				$child_status_uri = add_query_arg($child_status_var, '1');
+
+				if(!empty($_REQUEST[$child_status_var]))
+					exit($this->child_output_status($child_status_uri));
+				exit($this->parent_output_status($child_status_uri));
 			}
 
 			/**
@@ -197,10 +210,17 @@ namespace comment_mail // Root namespace.
 				if($sub->status === 'R') // Specific comment(s); i.e. "Replies Only"?
 				{
 					foreach($comment_ids as $_comment_id) // Comment subscriptions.
+					{
+						$this->total_imported_subs++; // Increment counter.
 						new sub_inserter($user, $_comment_id, 'comment', 'asap', TRUE);
+					}
 					unset($_comment_id); // A little housekeeping.
 				}
-				else new sub_inserter($user, $comment_ids[0], 'comments', 'asap', TRUE);
+				else // Subscribe them to all comments on this post ID.
+				{
+					$this->total_imported_subs++; // Increment counter.
+					new sub_inserter($user, $comment_ids[0], 'comments', 'asap', TRUE);
+				}
 			}
 
 			/**
@@ -364,6 +384,116 @@ namespace comment_mail // Root namespace.
 				else $post_ids = array(); // Default; empty array.
 
 				return $post_ids; // Up to `$max_limit` unimported post IDs.
+			}
+
+			/**
+			 * Parent output status.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $child_status_uri Child status URI.
+			 *
+			 * @return string HTML markup for the status.
+			 */
+			protected function parent_output_status($child_status_uri)
+			{
+				$status = '<!DOCTYPE html>'."\n";
+				$status .= '<html>'."\n";
+
+				$status .= '   <head>'."\n";
+
+				$status .= '      <meta charset="UTF-8" />'."\n";
+				$status .= '      <title>'.esc_html(__('StCR Importer', $this->plugin->text_domain)).'</title>'."\n";
+
+				$status .= '      <style type="text/css">'."\n";
+				$status .= '         body { background: #FFFFFF; color: #000000; }'."\n";
+				$status .= '         body { font-size: 13px; line-height: 1em; font-family: sans-serif; }'."\n";
+				$status .= '         body { padding: 5px; text-align: center; }'."\n";
+				$status .= '      </style>'."\n";
+
+				$status .= '      <script type="text/javascript"'. // jQuery dependency.
+				           '         src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js">'.
+				           '      </script>'."\n";
+
+				$status .= '      <script type="text/javascript">'."\n";
+				$status .= '         function updateCounters(childTotalPostIds, childTotalSubs)'."\n".
+				           '            {'."\n".
+				           '               var $totalImportedPostIds = $("#total-imported-post-ids");'."\n".
+				           '               var $totalImportedSubs = $("#total-imported-subs");'."\n".
+
+				           '               $totalImportedPostIds.html(Number($totalImportedPostIds.text()) + Number(childTotalPostIds));'."\n".
+				           '               $totalImportedSubs.html(Number($totalImportedSubs.text()) + Number(childTotalSubs));'."\n".
+				           '            }'."\n";
+				$status .= '         function importComplete()'."\n".
+				           '            {'."\n".
+				           '               $("#importing").remove();'."\n". // Removing importing div/animation.
+				           '               $("body").append("<div><strong>'.__('Import complete!', $this->plugin->text_domain).'</strong></div>");'."\n".
+				           '            }'."\n";
+				$status .= '      </script>'."\n";
+
+				$status .= '   </head>'."\n"; // End `<head>`.
+
+				$status .= '   <body>'."\n"; // Main output status.
+
+				if($this->has_more_posts_to_import) // Import will contiue w/ child processes?
+					$status .= '   <div id="importing">'.
+					           '      <strong>'.__('Importing StCR Subscribers', $this->plugin->text_domain).'</strong>'.
+					           '       &nbsp;&nbsp; <img src="'.esc_html($this->plugin->utils_url->to('/client-s/images/tiny-progress-bar.gif')).'"'.
+					           '                        style="width:16px; height:11px; border:0; vertical-align:middle;" />'.
+					           '   </div>'."\n";
+
+				$status .= '      <code id="total-imported-post-ids">'.esc_html($this->total_imported_post_ids).'</code> '.__('post IDs', $this->plugin->text_domain).';'.
+				           '      <code id="total-imported-subs">'.esc_html($this->total_imported_subs).'</code> '.__('subscriptions', $this->plugin->text_domain).'.'."\n";
+
+				if($this->has_more_posts_to_import) // Import will contiue w/ child processes?
+					$status .= '   <iframe src="'.esc_attr((string)$child_status_uri).'" style="width:1px; height:1px; border:0; visibility:hidden;"></iframe>';
+				else $status .= ' <div><strong>'.__('Import complete!', $this->plugin->text_domain).'</strong></div>';
+
+				$status .= '   </body>'."\n";
+
+				$status .= '</html>';
+
+				return $status; // HTML markup.
+			}
+
+			/**
+			 * Child output status.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string HTML markup for the status.
+			 */
+			protected function child_output_status()
+			{
+				$status = '<!DOCTYPE html>'."\n";
+				$status .= '<html>'."\n";
+
+				$status .= '   <head>'."\n";
+
+				$status .= '      <title>...</title>'."\n";
+				$status .= '      <meta charset="UTF-8" />'."\n";
+
+				$status .= '      <script type="text/javascript">'."\n";
+				$status .= '         parent.updateCounters('.$this->total_imported_post_ids.', '.$this->total_imported_subs.');'."\n";
+				$status .= '      </script>'."\n";
+
+				if($this->has_more_posts_to_import)
+					$status .= '   <meta http-equiv="refresh" content="1" />';
+
+				else // Import complete; signal the parent output status window.
+				{
+					$status .= '   <script type="text/javascript">'."\n";
+					$status .= '      parent.importComplete();'."\n";
+					$status .= '   </script>'."\n";
+				}
+				$status .= '   </head>'."\n"; // End `<head>`.
+
+				$status .= '   <body>'."\n"; // Child output status.
+				$status .= '   </body>'."\n";
+
+				$status .= '</html>';
+
+				return $status; // HTML markup.
 			}
 		}
 	}

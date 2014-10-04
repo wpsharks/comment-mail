@@ -20,15 +20,8 @@ namespace comment_mail // Root namespace.
 		 * @package sub_inserter
 		 * @since 14xxxx First documented version.
 		 */
-		class sub_inserter // Sub inserter.
+		class sub_inserter extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var \stdClass|null Comment object (now).
 			 *
@@ -81,6 +74,13 @@ namespace comment_mail // Root namespace.
 			protected $auto_confirm; // Set by constructor.
 
 			/**
+			 * @var boolean Sub. already exists?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $sub_exists; // Set by constructor.
+
+			/**
 			 * @var integer Insertion ID.
 			 *
 			 * @since 14xxxx First documented version.
@@ -110,12 +110,12 @@ namespace comment_mail // Root namespace.
 			 * @param string         $deliver Delivery cycle. Defaults to `asap`.
 			 *    Please pass one of: `asap`, `hourly`, `daily`, `weekly`.
 			 *
-			 * @param null|boolean $auto_confirm Auto-confirm subscriber?
+			 * @param null|boolean   $auto_confirm Auto-confirm subscriber?
 			 *    If `NULL`, use current plugin option value.
 			 */
 			public function __construct($user, $comment_id, $type = 'comment', $deliver = 'asap', $auto_confirm = NULL)
 			{
-				$this->plugin = plugin();
+				parent::__construct(); // Parent constructor.
 
 				if($user instanceof \WP_User)
 					$this->user = $user;
@@ -139,7 +139,8 @@ namespace comment_mail // Root namespace.
 
 				$this->auto_confirm = isset($auto_confirm) ? (boolean)$auto_confirm : NULL;
 
-				$this->insert_id = 0; // Default value.
+				$this->sub_exists = FALSE; // Initialize.
+				$this->insert_id  = 0; // Initialize.
 
 				$this->keygen = new keygen();
 
@@ -168,7 +169,7 @@ namespace comment_mail // Root namespace.
 				if(!$this->type || !$this->deliver)
 					return; // Not applicable.
 
-				if($this->check_existing())
+				if(($this->sub_exists = $this->check_existing()))
 					return; // Can't subscribe again.
 
 				$insertion_ip = $last_ip = $this->user_ip();
@@ -206,7 +207,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Check existing subscription(s).
+			 * Check existing email/sub.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -217,14 +218,14 @@ namespace comment_mail // Root namespace.
 				$existing_sub = $this->check_existing_sub();
 
 				if($existing_sub && $existing_sub->status === 'subscribed')
-					return TRUE; // A subscription already exists.
+					return TRUE; // Already exists.
 
 				if($existing_sub && $existing_sub->status !== 'subscribed')
 				{
 					$this->maybe_reconfirm($existing_sub);
-					return TRUE; // All done here.
+					return TRUE; // Already exists.
 				}
-				return FALSE; // Does NOT exist yet.
+				return FALSE; // Nope, does not exist yet.
 			}
 
 			/**

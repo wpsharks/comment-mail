@@ -210,6 +210,29 @@ namespace comment_mail // Root namespace.
 				}
 				return $deleted; // TRUE if deleted successfully.
 			}
+
+			/**
+			 * Check existing email address.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $email Email address to check.
+			 *
+			 * @return boolean TRUE if email exists already.
+			 */
+			public function email_exists($email)
+			{
+				if(!($email = (string)$email))
+					return FALSE; // Not possible.
+
+				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " WHERE `email` = '".esc_sql($email)."'".
+
+				       " LIMIT 1"; // Only need one row to check this.
+
+				return (boolean)$this->plugin->utils_db->wp->get_var($sql);
+			}
 		}
 	}
 }

@@ -149,6 +149,32 @@ namespace comment_mail // Root namespace.
 
 				wp_redirect(remove_query_arg(__NAMESPACE__)).exit();
 			}
+
+			/**
+			 * Runs a specific import type.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $args Input argument(s).
+			 */
+			protected function import($args)
+			{
+				$args = (array)$args; // Expecting an array.
+
+				if(empty($args['type']) || !is_string($args['type']))
+					return; // Missing and/or invalid import type.
+
+				if(!in_array($args['type'], array('stcr'), TRUE))
+					return; // Invalid import type.
+
+				$class    = 'import_'.$args['type'];
+				$importer = new $class; // Instantiate.
+
+				/**
+				 * @var $importer import_stcr For IDEs.
+				 */
+				$importer->output_status();
+			}
 		}
 	}
 }
