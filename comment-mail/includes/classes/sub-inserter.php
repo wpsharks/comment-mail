@@ -90,7 +90,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param \WP_User|null  Subscribing user.
+			 * @param \WP_User|null  $user Subscribing user.
 			 *    Use `NULL` to indicate they are NOT a user.
 			 *
 			 * @param integer|string $comment_id Comment ID.

@@ -173,9 +173,9 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function sub_vars(\stdClass $sub)
 			{
-				$confirm_url     = add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('confirm' => $sub->key))), home_url('/'));
-				$unsubscribe_url = add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('unsubscribe' => $sub->key))), home_url('/'));
-				$manage_url      = add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('manage' => $sub->key))), home_url('/'));
+				$confirm_url     = $this->plugin->utils_sub->confirm_url($sub->key);
+				$unsubscribe_url = $this->plugin->utils_sub->unsubscribe_url($sub->key);
+				$manage_url      = $this->plugin->utils_sub->manage_url($sub->email);
 
 				return compact('confirm_url', 'unsubscribe_url', 'manage_url');
 			}

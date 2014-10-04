@@ -255,15 +255,17 @@ namespace comment_mail
 					'smtp_from_email'                             => '', // SMTP from email.
 					'smtp_force_from'                             => '1', // `0|1`; force?
 
-					'template_site_common_header'                 => '', // HTML/PHP code.
-					'template_site_common_footer'                 => '', // HTML/PHP code.
+					'template_site_site_header'                   => '', // HTML/PHP code.
+					'template_site_site_footer'                   => '', // HTML/PHP code.
 
 					'template_site_comment_form_subscription_ops' => '', // HTML/PHP code.
+
 					'template_site_sub_actions_confirmed'         => '', // HTML/PHP code.
 					'template_site_sub_actions_unsubscribed'      => '', // HTML/PHP code.
+					'template_site_sub_actions_manage_summary'    => '', // HTML/PHP code.
 
-					'template_email_common_header'                => '', // HTML/PHP code.
-					'template_email_common_footer'                => '', // HTML/PHP code.
+					'template_email_email_header'                 => '', // HTML/PHP code.
+					'template_email_email_footer'                 => '', // HTML/PHP code.
 
 					'template_email_confirmation_request_subject' => '', // HTML/PHP code.
 					'template_email_confirmation_request_message' => '', // HTML/PHP code.

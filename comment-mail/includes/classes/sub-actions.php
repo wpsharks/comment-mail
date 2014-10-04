@@ -51,7 +51,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Confirm subscription.
+			 * Confirm handler.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -72,7 +72,7 @@ namespace comment_mail // Root namespace.
 				if(!$error_code && !($confirm = $this->plugin->utils_sub->confirm($sub->ID, TRUE, $this->plugin->utils_env->user_ip())))
 					$error_code = $confirm === NULL ? 'invalid_key' : 'already_confirmed';
 
-				$template_vars = compact('sub', 'error_code');
+				$template_vars = compact('key', 'sub', 'error_code');
 				$template      = new template('site/sub-actions/confirmed.php');
 
 				status_header(200); // Status header.
@@ -83,7 +83,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Unsubscribe.
+			 * Unsubscribe handler.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -104,7 +104,7 @@ namespace comment_mail // Root namespace.
 				if(!$error_code && !($delete = $this->plugin->utils_sub->delete($sub->ID, TRUE, $this->plugin->utils_env->user_ip())))
 					$error_code = $delete === NULL ? 'invalid_key' : 'already_unsubscribed';
 
-				$template_vars = compact('sub', 'error_code');
+				$template_vars = compact('key', 'sub', 'error_code');
 				$template      = new template('site/sub-actions/unsubscribed.php');
 
 				status_header(200); // Status header.
@@ -115,35 +115,22 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Manage.
+			 * Manage handler w/ sub. actions.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param mixed $args Input argument(s).
 			 */
-			protected function manage($args) // @TODO
+			protected function manage($args)
 			{
-				$key        = '';
-				$sub        = NULL;
-				$error_code = '';
+				if(is_string($args) && ($email = trim($args)))
+					$this->plugin->utils_sub->set_current_email($email);
+				$email = $this->plugin->utils_sub->current_email();
 
-				if(!$error_code && !($key = trim((string)$args)))
-					$error_code = 'missing_key';
+				if(!is_array($args)) // If NOT a sub action, redirect to one.
+					wp_redirect($this->plugin->utils_sub->manage_summary_url($email)).exit();
 
-				if(!$error_code && !($sub = $this->plugin->utils_sub->get($key)))
-					$error_code = 'invalid_key';
-
-				if(!$error_code && !($delete = $this->plugin->utils_sub->delete($sub->ID, TRUE, $this->plugin->utils_env->user_ip())))
-					$error_code = $delete === NULL ? 'invalid_key' : 'already_unsubscribed';
-
-				$template_vars = compact('sub', 'error_code');
-				$template      = new template('site/sub-actions/unsubscribed.php');
-
-				status_header(200); // Status header.
-				nocache_headers(); // Disallow caching.
-				header('Content-Type: text/html; charset=UTF-8');
-
-				exit($template->parse($template_vars));
+				new sub_manage_actions(); // Handle sub. manage actions.
 			}
 		}
 	}

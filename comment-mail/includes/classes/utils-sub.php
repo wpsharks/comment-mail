@@ -217,6 +217,125 @@ namespace comment_mail // Root namespace.
 
 				return (boolean)$this->plugin->utils_db->wp->get_var($sql);
 			}
+
+			/**
+			 * Current sub's email address.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string Current subscriber's email address.
+			 */
+			public function current_email()
+			{
+				if(($user = wp_get_current_user()) && $user->exists() && $user->user_email)
+					return (string)$user->user_email;
+
+				if(($sub_email = $this->plugin->utils_enc->get_cookie(__NAMESPACE__.'_sub_email')))
+					return (string)$sub_email;
+
+				if(($commenter = wp_get_current_commenter()) && !empty($commenter['comment_author_email']))
+					return (string)$commenter['comment_author_email'];
+
+				return ''; // Not possible.
+			}
+
+			/**
+			 * Set current sub's email address.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $email Subscriber's current email address.
+			 */
+			public function set_current_email($email)
+			{
+				$email = trim((string)$email);
+
+				$this->plugin->utils_enc->set_cookie(__NAMESPACE__.'_sub_email', $email);
+			}
+
+			/**
+			 * Confirmation URL for a specific sub. key.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string      $sub_key Unique subscription key.
+			 * @param string|null $scheme Optiona. Defaults to a `NULL` value.
+			 *    See `home_url()` in WordPress for further details on this.
+			 *
+			 * @return string URL w/ the given `$scheme`.
+			 */
+			public function confirm_url($sub_key, $scheme = NULL)
+			{
+				$sub_key = trim((string)$sub_key);
+
+				return add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('confirm' => $sub_key))), home_url('/', $scheme));
+			}
+
+			/**
+			 * Unsubscribe URL for a specific sub. key.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string      $sub_key Unique subscription key.
+			 * @param string|null $scheme Optiona. Defaults to a `NULL` value.
+			 *    See `home_url()` in WordPress for further details on this.
+			 *
+			 * @return string URL w/ the given `$scheme`.
+			 */
+			public function unsubscribe_url($sub_key, $scheme = NULL)
+			{
+				$sub_key = trim((string)$sub_key);
+
+				return add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('unsubscribe' => $sub_key))), home_url('/', $scheme));
+			}
+
+			/**
+			 * Manage URL for a specific email address.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param null|string $sub_email Subscribers email address.
+			 *    This is optional. If `NULL` we use `current_email()`.
+			 *
+			 * @param string|null $scheme Optiona. Defaults to a `NULL` value.
+			 *    See `home_url()` in WordPress for further details on this.
+			 *
+			 * @return string URL w/ the given `$scheme`.
+			 */
+			public function manage_url($sub_email = NULL, $scheme = NULL)
+			{
+				if(!isset($sub_email))
+					$sub_email = $this->current_email();
+				$sub_email = trim((string)$sub_email);
+
+				$encrypted_sub_email = $this->plugin->utils_enc->encrypt($sub_email);
+
+				return add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('manage' => $encrypted_sub_email))), home_url('/', $scheme));
+			}
+
+			/**
+			 * Manage URL for a specific email address.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param null|string $sub_email Subscribers email address.
+			 *    This is optional. If `NULL` we use `current_email()`.
+			 *
+			 * @param string|null $scheme Optiona. Defaults to a `NULL` value.
+			 *    See `home_url()` in WordPress for further details on this.
+			 *
+			 * @return string URL w/ the given `$scheme`.
+			 */
+			public function manage_summary_url($sub_email = NULL, $scheme = NULL)
+			{
+				if(!isset($sub_email))
+					$sub_email = $this->current_email();
+				$sub_email = trim((string)$sub_email);
+
+				$encrypted_sub_email = $this->plugin->utils_enc->encrypt($sub_email);
+
+				return add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('manage' => array('summary' => $encrypted_sub_email)))), home_url('/', $scheme));
+			}
 		}
 	}
 }
