@@ -2,7 +2,6 @@
 /**
  * SMTP Mailer
  *
- * @package mail_smtp
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,18 +16,10 @@ namespace comment_mail // Root namespace.
 		/**
 		 * SMTP Mailer
 		 *
-		 * @package mail_smtp
 		 * @since 14xxxx First documented version.
 		 */
-		class mail_smtp // SMTP mailer.
+		class mail_smtp extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var string From name.
 			 *
@@ -92,7 +83,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct()
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				if(!class_exists('\\PHPMailer'))
 					require_once ABSPATH.WPINC.'/class-phpmailer.php';
@@ -247,7 +238,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param mixed   $value Any input value.
+			 * @param mixed $value Any input value.
 			 *
 			 * @return array Unique array of all parsed headers.
 			 */
@@ -344,7 +335,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param mixed   $value Any input value.
+			 * @param mixed $value Any input value.
 			 *
 			 * @return array Unique array of all parsed attachments.
 			 */

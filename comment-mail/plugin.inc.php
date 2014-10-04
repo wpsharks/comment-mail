@@ -2,7 +2,6 @@
 /**
  * Plugin Class
  *
- * @package plugin
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -12,30 +11,31 @@ namespace comment_mail
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
+	require_once dirname(__FILE__).'/abstract-base.php';
+
 	if(!class_exists('\\'.__NAMESPACE__.'\\plugin'))
 	{
 		/**
 		 * Plugin Class
 		 *
-		 * @package plugin
-		 * @since 14xxxx First documented version.
+		 * @property utils_array  $utils_array
+		 * @property utils_cond   $utils_cond
+		 * @property utils_db     $utils_db
+		 * @property utils_enc    $utils_enc
+		 * @property utils_env    $utils_env
+		 * @property utils_event  $utils_event
+		 * @property utils_mail   $utils_mail
+		 * @property utils_php    $utils_php
+		 * @property utils_string $utils_string
+		 * @property utils_sub    $utils_sub
+		 * @property utils_url    $utils_url
 		 *
-		 * @property utils_array    $utils_array
-		 * @property utils_cond     $utils_cond
-		 * @property utils_db       $utils_db
-		 * @property utils_env      $utils_env
-		 * @property utils_event    $utils_event
-		 * @property utils_mail     $utils_mail
-		 * @property utils_string   $utils_string
-		 * @property utils_sub      $utils_sub
-		 * @property utils_url      $utils_url
+		 * @since 14xxxx First documented version.
 		 */
-		class plugin // The heart of this plugin.
+		class plugin extends abstract_base
 		{
-			/********************************************************************************************************/
-
 			/*
-			 * Public Properties Defined by Constructor
+			 * Public Properties
 			 */
 
 			/**
@@ -110,10 +110,8 @@ namespace comment_mail
 			 */
 			public $version = '14xxxx';
 
-			/********************************************************************************************************/
-
 			/*
-			 * Public Properties Defined @ Setup
+			 * Public Properties (Defined @ Setup)
 			 */
 
 			/**
@@ -152,32 +150,6 @@ namespace comment_mail
 			 */
 			public $uninstall_cap;
 
-			/********************************************************************************************************/
-
-			/*
-			 * Protected Cache-Related Properties
-			 */
-
-			/**
-			 * An instance-based cache for class members.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @var array An instance-based cache for class members.
-			 */
-			protected $cache = array();
-
-			/**
-			 * A global static cache for class members.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @var array Global static cache for class members.
-			 */
-			protected static $static = array();
-
-			/********************************************************************************************************/
-
 			/*
 			 * Plugin Constructor
 			 */
@@ -192,107 +164,38 @@ namespace comment_mail
 			 */
 			public function __construct($enable_hooks = TRUE)
 			{
+				/*
+				 * Parent constructor.
+				 */
+				$GLOBALS[__NAMESPACE__] = $this; // Global ref.
+				parent::__construct(); // Run parent constructor.
+
+				/*
+				 * Initialize properties.
+				 */
 				$this->enable_hooks = (boolean)$enable_hooks;
 				$this->text_domain  = $this->slug = str_replace('_', '-', __NAMESPACE__);
 				$this->file         = preg_replace('/\.inc\.php$/', '.php', __FILE__);
 
-				/* -------------------------------------------------------------- */
-
+				/*
+				 * Initialize autoloader.
+				 */
 				require_once dirname(__FILE__).'/includes/classes/autoloader.php';
 				new autoloader(); // Register the plugin's autoloader.
 
-				/* -------------------------------------------------------------- */
-
+				/*
+				 * With or without hooks?
+				 */
 				if(!$this->enable_hooks) // Without hooks?
 					return; // Stop here; construct without hooks.
 
-				/* -------------------------------------------------------------- */
-
+				/*
+				 * Setup primary plugin hooks.
+				 */
 				add_action('after_setup_theme', array($this, 'setup'));
 				register_activation_hook($this->file, array($this, 'activate'));
 				register_deactivation_hook($this->file, array($this, 'deactivate'));
 			}
-
-			/********************************************************************************************************/
-
-			/*
-			 * Magic Methods
-			 */
-
-			/**
-			 * Magic/overload property getter.
-			 *
-			 * @param string $property A `utils_*` class instance.
-			 *
-			 * @return object A singleton class instance for the requested `utils_*` class.
-			 *
-			 * @throws \exception If the `$property` is undefined; i.e. not a `utils_*` class.
-			 *
-			 * @see http://php.net/manual/en/language.oop5.overloading.php
-			 */
-			public function __get($property)
-			{
-				$property = (string)$property;
-
-				if(!$property || stripos($property, 'utils_') !== 0 || !class_exists('\\'.__NAMESPACE__.'\\'.$property))
-					throw new \exception(sprintf(__('Undefined utility/property: `%1$s`.', $this->text_domain), $property));
-
-				if(isset($this->cache[__FUNCTION__][$property]))
-					return $this->cache[__FUNCTION__][$property];
-
-				return ($this->cache[__FUNCTION__][$property] = new $property);
-			}
-
-			/**
-			 * Magic `isset()` check.
-			 *
-			 * @param string $property Property to check.
-			 *
-			 * @return boolean TRUE if the property has been set.
-			 *
-			 * @see http://php.net/manual/en/language.oop5.overloading.php
-			 */
-			public function __isset($property)
-			{
-				$property = (string)$property;
-
-				if($property && stripos($property, 'utils_') === 0 && class_exists('\\'.__NAMESPACE__.'\\'.$property))
-					return TRUE; // It's a valid `utils_*` class/property reference.
-
-				return FALSE; // Default return value.
-			}
-
-			/**
-			 * Magic/overload property setter.
-			 *
-			 * @param string $property Property to set.
-			 *
-			 * @throws \exception We do NOT allow magic/overload properties to be set.
-			 *    Magic/overload properties in this class are read-only.
-			 *
-			 * @see http://php.net/manual/en/language.oop5.overloading.php
-			 */
-			public function __set($property)
-			{
-				throw new \exception(sprintf(__('Refused to set magic/overload property: `%1$s`.', $this->text_domain), (string)$property));
-			}
-
-			/**
-			 * Magic `unset()` handler.
-			 *
-			 * @param string $property Property to unset.
-			 *
-			 * @throws \exception We do NOT allow magic/overload properties to be unset.
-			 *    Magic/overload properties in this class are read-only.
-			 *
-			 * @see http://php.net/manual/en/language.oop5.overloading.php
-			 */
-			public function __unset($property)
-			{
-				throw new \exception(sprintf(__('Refused to unset magic/overload property: `%1$s`.', $this->text_domain), (string)$property));
-			}
-
-			/********************************************************************************************************/
 
 			/*
 			 * Setup Routine(s)
@@ -305,17 +208,27 @@ namespace comment_mail
 			 */
 			public function setup()
 			{
+				/*
+				 * Setup already?
+				 */
 				if(isset($this->cache[__FUNCTION__]))
 					return; // Already setup. Once only!
 				$this->cache[__FUNCTION__] = -1;
 
+				/*
+				 * Fire pre-setup hooks.
+				 */
 				if($this->enable_hooks) // Hooks enabled?
 					do_action('before__'.__METHOD__, get_defined_vars());
 
-				/* -------------------------------------------------------------- */
-
+				/*
+				 * Load the plugin's text domain for translations.
+				 */
 				load_plugin_textdomain($this->text_domain); // For translations.
 
+				/*
+				 * Setup additional class properties.
+				 */
 				$this->default_options = array( // Option defaults.
 				                                'version'                                     => $this->version,
 				                                'enable'                                      => '0', // `0|1`; enable?
@@ -378,13 +291,15 @@ namespace comment_mail
 				$this->cap           = apply_filters(__METHOD__.'__cap', 'activate_plugins');
 				$this->uninstall_cap = apply_filters(__METHOD__.'__uninstall_cap', 'delete_plugins');
 
-				/* -------------------------------------------------------------- */
-
+				/*
+				 * With or without hooks?
+				 */
 				if(!$this->enable_hooks) // Without hooks?
 					return; // Stop here; setup without hooks.
 
-				/* -------------------------------------------------------------- */
-
+				/*
+				 * Setup all secondary plugin hooks.
+				 */
 				add_action('wp_loaded', array($this, 'actions'));
 				add_action('admin_init', array($this, 'check_version'));
 
@@ -409,8 +324,9 @@ namespace comment_mail
 				add_action('wpmu_delete_user', array($this, 'user_delete'), 10, 1);
 				add_action('remove_user_from_blog', array($this, 'user_delete'), 10, 2);
 
-				/* -------------------------------------------------------------- */
-
+				/*
+				 * Setup CRON-related hooks.
+				 */
 				add_filter('cron_schedules', array($this, 'extend_cron_schedules'));
 
 				if((integer)$this->options['crons_setup'] < 1382523750)
@@ -427,13 +343,38 @@ namespace comment_mail
 				add_action('_cron_'.__NAMESPACE__.'_queue_processor', array($this, 'queue_processor'));
 				add_action('_cron_'.__NAMESPACE__.'_sub_cleaner', array($this, '_sub_cleaner'));
 
-				/* -------------------------------------------------------------- */
-
+				/*
+				 * Fire setup completion hooks.
+				 */
 				do_action('after__'.__METHOD__, get_defined_vars());
 				do_action(__METHOD__.'_complete', get_defined_vars());
 			}
 
-			/********************************************************************************************************/
+			/*
+			 * Magic Methods
+			 */
+
+			/**
+			 * Magic/overload property getter.
+			 *
+			 * @param string $property Property to get.
+			 *
+			 * @return mixed The value of `$this->___overload->{$property}`.
+			 *
+			 * @throws \exception If the `$___overload` property is undefined.
+			 *
+			 * @see http://php.net/manual/en/language.oop5.overloading.php
+			 */
+			public function __get($property)
+			{
+				$property = (string)$property; // Force string.
+
+				if(stripos($property, 'utils_') === 0 && class_exists('\\'.__NAMESPACE__.'\\'.$property))
+					if(!isset($this->___overload->{$property})) // Not defined yet?
+						$this->___overload->{$property} = new $property;
+
+				return parent::__get($property);
+			}
 
 			/*
 			 * Install-Related Methods
@@ -466,8 +407,6 @@ namespace comment_mail
 				new upgrader(); // Upgrade handler.
 			}
 
-			/********************************************************************************************************/
-
 			/*
 			 * Uninstall-Related Methods
 			 */
@@ -496,8 +435,6 @@ namespace comment_mail
 				new uninstaller(); // Uninstall handler.
 			}
 
-			/********************************************************************************************************/
-
 			/*
 			 * Action-Related Methods
 			 */
@@ -516,8 +453,6 @@ namespace comment_mail
 
 				new actions(); // Handle action(s).
 			}
-
-			/********************************************************************************************************/
 
 			/*
 			 * Admin UI-Related Methods
@@ -629,8 +564,6 @@ namespace comment_mail
 				$menu_pages = new menu_pages();
 				$menu_pages->queue();
 			}
-
-			/********************************************************************************************************/
 
 			/*
 			 * Admin Notice/Error Methods
@@ -778,8 +711,6 @@ namespace comment_mail
 				unset($_key, $_error, $_dismiss_css, $_dismiss); // Housekeeping.
 			}
 
-			/********************************************************************************************************/
-
 			/*
 			 * Post-Related Methods
 			 */
@@ -846,8 +777,6 @@ namespace comment_mail
 			{
 				new post_delete($post_id);
 			}
-
-			/********************************************************************************************************/
 
 			/*
 			 * Comment-Related Methods
@@ -961,8 +890,6 @@ namespace comment_mail
 				}
 			}
 
-			/********************************************************************************************************/
-
 			/*
 			 * User-Related Methods
 			 */
@@ -997,8 +924,6 @@ namespace comment_mail
 			{
 				new user_delete($user_id, $blog_id);
 			}
-
-			/********************************************************************************************************/
 
 			/*
 			 * CRON-Related Methods
@@ -1048,8 +973,6 @@ namespace comment_mail
 			}
 		}
 
-		/***********************************************************************************************************/
-
 		/*
 		 * Namespaced Functions
 		 */
@@ -1067,8 +990,6 @@ namespace comment_mail
 			return $GLOBALS[__NAMESPACE__];
 		}
 
-		/***********************************************************************************************************/
-
 		/*
 		 * Automatic Plugin Loader
 		 */
@@ -1083,7 +1004,6 @@ namespace comment_mail
 		if(!isset($GLOBALS[__NAMESPACE__.'_autoload_plugin']) || $GLOBALS[__NAMESPACE__.'_autoload_plugin'])
 			$GLOBALS[__NAMESPACE__] = new plugin(); // Load plugin automatically.
 	}
-	/**************************************************************************************************************/
 
 	/*
 	 * Catch a scenario where the plugin class already exists.

@@ -1,8 +1,7 @@
 <?php
 /**
- * Key Generator
+ * Encryption Utilities
  *
- * @package keygen
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -12,23 +11,15 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\keygen'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\utils_enc'))
 	{
 		/**
-		 * Key Generator
+		 * Encryption Utilities
 		 *
-		 * @package keygen
 		 * @since 14xxxx First documented version.
 		 */
-		class keygen // Key generator.
+		class utils_enc extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * Class constructor.
 			 *
@@ -36,7 +27,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct()
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 			}
 
 			/**
@@ -57,7 +48,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string A unique, unguessable, non-numeric, caSe-insensitive key (20 chars max).
 			 */
-			public function uunnci_20_max()
+			public function uunnci_key_20_max()
 			{
 				$microtime_19_max = number_format(microtime(TRUE), 9, '.', '');
 				// e.g. `9999999999`.`999999999` (max decimals: `9`, max overall precision: `19`).

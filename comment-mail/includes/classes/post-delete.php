@@ -2,7 +2,6 @@
 /**
  * Post Deletion Handler
  *
- * @package post_delete
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,35 +16,27 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Post Deletion Handler
 		 *
-		 * @package post_delete
 		 * @since 14xxxx First documented version.
 		 */
-		class post_delete // Post deletion handler.
+		class post_delete extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var integer Post ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $post_id; // Set by constructor.
+			protected $post_id;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @param integer|string $post_id Post ID.
-			 *
 			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer|string $post_id Post ID.
 			 */
 			public function __construct($post_id)
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$this->post_id = (integer)$post_id;
 

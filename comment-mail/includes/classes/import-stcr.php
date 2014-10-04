@@ -2,7 +2,6 @@
 /**
  * StCR Importer
  *
- * @package import_stcr
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,7 +16,6 @@ namespace comment_mail // Root namespace.
 		/**
 		 * StCR Importer
 		 *
-		 * @package import_stcr
 		 * @since 14xxxx First documented version.
 		 */
 		class import_stcr extends abstract_base
@@ -27,42 +25,42 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $max_post_ids_limit; // Set by constructor.
+			protected $max_post_ids_limit;
 
 			/**
 			 * @var array Unimported post IDs.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $unimported_post_ids; // Set by constructor.
+			protected $unimported_post_ids;
 
 			/**
 			 * @var array Imported post IDs.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $imported_post_ids; // Set by constructor.
+			protected $imported_post_ids;
 
 			/**
 			 * @var integer Total imported post IDs.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $total_imported_post_ids; // Set by constructor.
+			protected $total_imported_post_ids;
 
 			/**
 			 * @var integer Total imported subs.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $total_imported_subs; // Set by constructor.
+			protected $total_imported_subs;
 
 			/**
 			 * @var boolean Has more posts to import?
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $has_more_posts_to_import; // Set by constructor.
+			protected $has_more_posts_to_import;
 
 			/**
 			 * Class constructor.
@@ -84,7 +82,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($max_post_ids_limit = 15)
 			{
-				parent::__construct(); // Parent constructor.
+				parent::__construct();
 
 				$this->max_post_ids_limit = (integer)$max_post_ids_limit;
 				if($this->max_post_ids_limit < 1) $this->max_post_ids_limit = 1;

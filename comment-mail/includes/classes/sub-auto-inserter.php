@@ -2,7 +2,6 @@
 /**
  * Auto Sub Inserter
  *
- * @package sub_auto_inserter
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,59 +16,44 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Auto Sub Inserter
 		 *
-		 * @package sub_auto_inserter
 		 * @since 14xxxx First documented version.
 		 */
-		class sub_auto_inserter // Auto sub inserter.
+		class sub_auto_inserter extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var \stdClass|null Post object.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $post; // Set by constructor.
+			protected $post;
 
 			/**
 			 * @var \WP_User|null Post author.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $post_author; // Set by constructor.
+			protected $post_author;
 
 			/**
 			 * @var array Auto-subscribable post types.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $post_types; // Set by constructor.
+			protected $post_types;
 
 			/**
 			 * @var \WP_User|null Current user.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $current_user; // Set by constructor.
+			protected $current_user;
 
 			/**
 			 * @var integer Insertion ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $insert_id; // Set by constructor.
-
-			/**
-			 * @var keygen Key generator.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $keygen; // Set by constructor.
+			protected $insert_id;
 
 			/**
 			 * Class constructor.
@@ -80,7 +64,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($post_id)
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$post_id = (integer)$post_id;
 
@@ -97,8 +81,6 @@ namespace comment_mail // Root namespace.
 				$this->current_user = wp_get_current_user();
 
 				$this->insert_id = 0; // Default value.
-
-				$this->keygen = new keygen();
 
 				$this->maybe_insert(); // If applicable.
 			}
@@ -165,7 +147,7 @@ namespace comment_mail // Root namespace.
 				$insertion_ip = $last_ip = $this->current_ip_post_author();
 
 				$data = array(
-					'key'              => $this->keygen->uunnci_20_max(),
+					'key'              => $this->plugin->utils_enc->uunnci_key_20_max(),
 					'user_id'          => (integer)$this->post_author->ID,
 					'post_id'          => (integer)$this->post->ID,
 					'comment_id'       => 0, // Auto-subscribe to all comments.
@@ -224,7 +206,7 @@ namespace comment_mail // Root namespace.
 					$_insertion_ip = $_last_ip = ''; // Unknown.
 
 					$_data = array(
-						'key'              => $this->keygen->uunnci_20_max(),
+						'key'              => $this->plugin->utils_enc->uunnci_key_20_max(),
 						'user_id'          => 0, // Unknown user ID.
 						'post_id'          => (integer)$this->post->ID,
 						'comment_id'       => 0, // Auto-subscribe to all comments.

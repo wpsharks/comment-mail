@@ -2,7 +2,6 @@
 /**
  * Queue Event Log Inserter
  *
- * @package queue_event_log_inserter
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,24 +16,16 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Queue Event Log Inserter
 		 *
-		 * @package queue_event_log_inserter
 		 * @since 14xxxx First documented version.
 		 */
-		class queue_event_log_inserter // Queue event log inserter.
+		class queue_event_log_inserter extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var array Log entry data.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $entry; // Set by constructor.
+			protected $entry;
 
 			/**
 			 * Class constructor.
@@ -47,7 +38,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct(array $entry)
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$defaults = array(
 					'queue_id'          => 0,

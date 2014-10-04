@@ -2,7 +2,6 @@
 /**
  * Actions
  *
- * @package actions
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,7 +16,6 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Actions
 		 *
-		 * @package actions
 		 * @since 14xxxx First documented version.
 		 *
 		 * @note (front|back)-end actions share the SAME namespace.
@@ -28,15 +26,8 @@ namespace comment_mail // Root namespace.
 		 *    Front-end actions CAN have the same `[action]` name as a back-end action,
 		 *    since they're already called from completely different contexts on-site.
 		 */
-		class actions // Action handlers.
+		class actions extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * Class constructor.
 			 *
@@ -44,7 +35,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct()
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$this->maybe_do_sub_actions();
 				$this->maybe_do_menu_page_actions();

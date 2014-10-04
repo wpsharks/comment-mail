@@ -2,7 +2,6 @@
 /**
  * Comment Form
  *
- * @package comment_form
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,24 +16,16 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Comment Form
 		 *
-		 * @package comment_form
 		 * @since 14xxxx First documented version.
 		 */
-		class comment_form // Comment form.
+		class comment_form extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var integer Post ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $post_id; // Set by constructor.
+			protected $post_id;
 
 			/**
 			 * Class constructor.
@@ -45,7 +36,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($post_id)
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$this->post_id = (integer)$post_id;
 

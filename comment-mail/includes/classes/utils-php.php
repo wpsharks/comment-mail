@@ -2,7 +2,6 @@
 /**
  * PHP Utilities
  *
- * @package php
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -12,23 +11,15 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\php'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\utils_php'))
 	{
 		/**
 		 * PHP Utilities
 		 *
-		 * @package php
 		 * @since 14xxxx First documented version.
 		 */
-		class php // PHP utilities.
+		class utils_php extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * PHP's language constructs.
 			 *
@@ -56,20 +47,13 @@ namespace comment_mail // Root namespace.
 			);
 
 			/**
-			 * @var array Global static cache.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected static $static = array();
-
-			/**
 			 * Class constructor.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
 			public function __construct()
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 			}
 
 			/**
@@ -100,12 +84,14 @@ namespace comment_mail // Root namespace.
 				if($___vars) // Extract variables.
 					extract($___vars, EXTR_PREFIX_SAME, 'xps');
 
-				if($this->is_function_possible('eval'))
+				if($this->is_possible('eval'))
 				{
 					ob_start();
-					if($___no_tags) eval($___string);
-					else // Mixed content in this case.
-						eval('?>'.$___string.'<?php ');
+
+					if($___no_tags)
+						eval($___string);
+					else eval('?>'.$___string.'<?php ');
+
 					return ob_get_clean();
 				}
 				throw new \exception(__('The PHP `eval()` function (an application requirement) has been disabled on this server. Please check with your hosting provider to resolve this issue and have the PHP `eval()` function enabled.', $this->plugin->text_domain).
@@ -123,30 +109,30 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string  $function The name of a function, a static method, or a PHP language construct.
+			 * @param string  $fsmlc The name of a function, a static method, or a PHP language construct.
 			 *
 			 * @param boolean $no_cache Defaults to a FALSE value.
 			 *    TRUE to avoid a potentially cached value.
 			 *
-			 * @return boolean TRUE if (in `$this->constructs` || `is_callable()` || `function_exists()`),
-			 *    and it's NOT been disabled via `ini_get('disable_functions')` (or via Suhosin).
+			 * @return boolean TRUE if (in `$this->constructs` || `is_callable()` || `function_exists()`).
+			 *    And, if not disabled at runtime via `ini_get('disable_functions')` or with the Suhosin extension.
 			 */
-			public function is_function_possible($function, $no_cache = FALSE)
+			public function is_possible($fsmlc, $no_cache = FALSE)
 			{
-				$function = (string)$function;
-				$function = ltrim(strtolower($function), '\\');
-				if(!$function) return FALSE; // Not possible.
+				$fsmlc = (string)$fsmlc;
+				$fsmlc = ltrim(strtolower($fsmlc), '\\');
+				if(!$fsmlc) return FALSE; // Not possible.
 
-				if(!$no_cache && isset(static::$static[__FUNCTION__][$function]))
-					return static::$static[__FUNCTION__][$function];
+				if(!$no_cache && isset($this->static[__FUNCTION__][$fsmlc]))
+					return $this->static[__FUNCTION__][$fsmlc];
 
-				$possible = &static::$static[__FUNCTION__][$function];
+				$possible = &$this->static[__FUNCTION__][$fsmlc];
 
-				if((in_array($function, $this->constructs, TRUE) || is_callable($function) || function_exists($function))
-				   && !in_array($function, $this->disabled_functions(), TRUE) // And it is NOT disabled in some way.
+				if((in_array($fsmlc, $this->constructs, TRUE) || is_callable($fsmlc) || function_exists($fsmlc))
+				   && !in_array($fsmlc, $this->disabled_functions(), TRUE) // And it is NOT disabled in some way.
 				) return ($possible = TRUE);
 
-				return ($possible = FALSE); // Default.
+				return ($possible = FALSE);
 			}
 
 			/**
@@ -158,11 +144,11 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function disabled_functions()
 			{
-				if(isset(static::$static[__FUNCTION__]))
-					return static::$static[__FUNCTION__];
+				if(isset($this->static[__FUNCTION__]))
+					return $this->static[__FUNCTION__];
 
-				static::$static[__FUNCTION__] = array();
-				$disabled                     = &static::$static[__FUNCTION__];
+				$this->static[__FUNCTION__] = array();
+				$disabled                   = &$this->static[__FUNCTION__];
 
 				if(!function_exists('ini_get'))
 					return $disabled; // Not possible.

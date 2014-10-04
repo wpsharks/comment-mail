@@ -2,7 +2,6 @@
 /**
  * Comment Status
  *
- * @package comment_status
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,38 +16,32 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Comment Status
 		 *
-		 * @package comment_status
 		 * @since 14xxxx First documented version.
 		 */
-		class comment_status // Comment status.
+		class comment_status extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var \stdClass|null Comment object (now).
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $comment; // Set by constructor.
+			protected $comment;
 
 			/**
-			 * @var string New comment status; `approve`, `hold`, `trash`, `spam`, `delete`.
+			 * @var string New comment status applied now.
+			 *    One of: `approve`, `hold`, `trash`, `spam`, `delete`.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $new_comment_status; // Set by constructor.
+			protected $new_comment_status;
 
 			/**
-			 * @var string Old comment status; `approve`, `hold`, `trash`, `spam`, `delete`.
+			 * @var string Old comment status from before.
+			 *    One of: `approve`, `hold`, `trash`, `spam`, `delete`.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $old_comment_status; // Set by constructor.
+			protected $old_comment_status;
 
 			/**
 			 * Class constructor.
@@ -73,7 +66,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($new_comment_status, $old_comment_status, $comment)
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$this->comment            = is_object($comment) ? $comment : NULL;
 				$this->new_comment_status = $this->plugin->comment_status__($new_comment_status);

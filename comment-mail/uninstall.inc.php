@@ -2,7 +2,6 @@
 /**
  * Uninstaller
  *
- * @package uninstall
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -22,29 +21,19 @@ namespace comment_mail
 		/**
 		 * Uninstaller
 		 *
-		 * @package uninstall
 		 * @since 14xxxx First documented version.
 		 */
-		class uninstall // Uninstall handler.
+		class uninstall // Stand-alone class.
 		{
 			/**
-			 * @since 14xxxx First documented version.
-			 *
-			 * @var plugin Primary plugin class instance.
-			 */
-			protected $plugin; // Set by constructor.
-
-			/**
-			 * Uninstall constructor.
+			 * Class constructor.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
 			public function __construct()
 			{
-				$GLOBALS[__NAMESPACE__] // Without hooks.
-					= $this->plugin = new plugin(FALSE);
-
-				$this->plugin->uninstall();
+				$GLOBALS[__NAMESPACE__] = new plugin(FALSE);
+				$GLOBALS[__NAMESPACE__]->uninstall();
 			}
 		}
 	}

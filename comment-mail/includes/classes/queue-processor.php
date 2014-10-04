@@ -2,7 +2,6 @@
 /**
  * Queue Processor
  *
- * @package queue_processor
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,87 +16,79 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Queue Processor
 		 *
-		 * @package queue_processor
 		 * @since 14xxxx First documented version.
 		 */
-		class queue_processor // Queue processor.
+		class queue_processor extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var boolean Is a CRON job?
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $is_cron; // Set by constructor.
+			protected $is_cron;
 
 			/**
 			 * @var integer Start time.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $start_time; // Set by constructor.
+			protected $start_time;
 
 			/**
 			 * @var integer Max time (in seconds).
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $max_time; // Set by constructor.
+			protected $max_time;
 
 			/**
 			 * @var integer Delay (in milliseconds).
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $delay; // Set by constructor.
+			protected $delay;
 
 			/**
 			 * @var integer Max entries to process.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $max_limit; // Set by constructor.
+			protected $max_limit;
 
 			/**
 			 * @var template Subject template.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $subject_template; // Set by constructor.
+			protected $subject_template;
 
 			/**
 			 * @var template Message template.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $message_template; // Set by constructor.
+			protected $message_template;
 
 			/**
 			 * @var \stdClass[] Entries being processed.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $entries; // Set by constructor.
+			protected $entries;
 
 			/**
 			 * @var integer Total entries.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $total_entries; // Set by constructor.
+			protected $total_entries;
 
 			/**
 			 * @var integer Processed entry counter.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $processed_entry_counter; // Set by constructor.
+			protected $processed_entry_counter;
 
 			/**
 			 * Class constructor.
@@ -129,7 +120,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($is_cron = TRUE, $max_time = NULL, $delay = NULL, $max_limit = NULL)
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$this->is_cron = (boolean)$is_cron;
 

@@ -2,7 +2,6 @@
 /**
  * User Deletion Handler
  *
- * @package user_delete
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,31 +16,23 @@ namespace comment_mail // Root namespace.
 		/**
 		 * User Deletion Handler
 		 *
-		 * @package user_delete
 		 * @since 14xxxx First documented version.
 		 */
-		class user_delete // User deletion handler.
+		class user_delete extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var integer User ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $user_id; // Set by constructor.
+			protected $user_id;
 
 			/**
 			 * @var integer Blog ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $blog_id; // Set by constructor.
+			protected $blog_id;
 
 			/**
 			 * @var boolean Switched blog?
@@ -60,7 +51,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($user_id, $blog_id = 0)
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$this->user_id = (integer)$user_id;
 				$this->blog_id = (integer)$blog_id;

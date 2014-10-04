@@ -2,7 +2,6 @@
 /**
  * Conditional Utilities
  *
- * @package utils_cond
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,25 +16,10 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Conditional Utilities
 		 *
-		 * @package utils_cond
 		 * @since 14xxxx First documented version.
 		 */
-		class utils_cond // Conditional utilities.
+		class utils_cond extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
-			/**
-			 * @var array Global static cache.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected static $static = array();
-
 			/**
 			 * Class constructor.
 			 *
@@ -43,7 +27,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct()
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 			}
 		}
 	}

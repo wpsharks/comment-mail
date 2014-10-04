@@ -2,7 +2,6 @@
 /**
  * Sub Deleter
  *
- * @package sub_deleter
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,38 +16,30 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Sub Deleter
 		 *
-		 * @package sub_deleter
 		 * @since 14xxxx First documented version.
 		 */
-		class sub_deleter // Sub deleter.
+		class sub_deleter extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var integer Post ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $post_id; // Set by constructor.
+			protected $post_id;
 
 			/**
 			 * @var integer Comment ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $comment_id; // Set by constructor.
+			protected $comment_id;
 
 			/**
 			 * @var integer User ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $user_id; // Set by constructor.
+			protected $user_id;
 
 			/**
 			 * Class constructor.
@@ -63,7 +54,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($post_id, $comment_id = 0, $user_id = 0)
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$this->post_id    = (integer)$post_id;
 				$this->comment_id = (integer)$comment_id;

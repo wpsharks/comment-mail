@@ -2,7 +2,6 @@
 /**
  * Comment Post
  *
- * @package comment_post
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,31 +16,24 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Comment Post
 		 *
-		 * @package comment_post
 		 * @since 14xxxx First documented version.
 		 */
-		class comment_post // Comment post.
+		class comment_post extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var integer Comment ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $comment_id; // Set by constructor.
+			protected $comment_id;
 
 			/**
-			 * @var string Comment status; `approve`, `hold`, `trash`, `spam`, `delete`.
+			 * @var string Current/initial comment status.
+			 *    One of: `approve`, `hold`, `trash`, `spam`, `delete`.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $comment_status; // Set by constructor.
+			protected $comment_status;
 
 			/**
 			 * Class constructor.
@@ -59,7 +51,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($comment_id, $comment_status)
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$this->comment_id     = (integer)$comment_id;
 				$this->comment_status = $this->plugin->comment_status__($comment_status);

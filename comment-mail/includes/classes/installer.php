@@ -2,7 +2,6 @@
 /**
  * Install Routines
  *
- * @package installer
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,18 +16,10 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Install Routines
 		 *
-		 * @package installer
 		 * @since 14xxxx First documented version.
 		 */
-		class installer
+		class installer extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * Class constructor.
 			 *
@@ -36,9 +27,9 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct()
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
-				$this->plugin->setup(); // Setup.
+				$this->plugin->setup();
 
 				$this->create_db_tables();
 			}

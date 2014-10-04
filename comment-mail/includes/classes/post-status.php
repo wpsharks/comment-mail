@@ -2,7 +2,6 @@
 /**
  * Post Status Change Handler
  *
- * @package post_status
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,24 +16,16 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Post Status Change Handler
 		 *
-		 * @package post_status
 		 * @since 14xxxx First documented version.
 		 */
-		class post_status // Post status change handler.
+		class post_status extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var \WP_Post|null Post object (now).
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $post; // Set by constructor.
+			protected $post;
 
 			/**
 			 * @var string New post status.
@@ -56,7 +47,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $new_post_status; // Set by constructor.
+			protected $new_post_status;
 
 			/**
 			 * @var string Old post status.
@@ -79,7 +70,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $old_post_status; // Set by constructor.
+			protected $old_post_status;
 
 			/**
 			 * Class constructor.
@@ -125,7 +116,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($new_post_status, $old_post_status, $post)
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$this->post            = is_object($post) ? $post : NULL;
 				$this->new_post_status = (string)$new_post_status;

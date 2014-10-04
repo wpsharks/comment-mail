@@ -2,7 +2,6 @@
 /**
  * Autoloader
  *
- * @package autoloader
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -12,30 +11,17 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
+	require_once dirname(__FILE__).'/abstract-base.php';
+
 	if(!class_exists('\\'.__NAMESPACE__.'\\autoloader'))
 	{
 		/**
 		 * Autoloader
 		 *
-		 * @package autoloader
 		 * @since 14xxxx First documented version.
 		 */
-		class autoloader // Autoloader.
+		class autoloader extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
-			/**
-			 * @var boolean Registered already?
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected static $registered = FALSE;
-
 			/**
 			 * Class constructor.
 			 *
@@ -43,7 +29,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct()
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$this->register();
 			}
@@ -74,11 +60,11 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function register()
 			{
-				if(static::$registered)
+				if(isset($this->static[__FUNCTION__]))
 					return; // Already done.
 
+				$this->static[__FUNCTION__] = TRUE;
 				spl_autoload_register(array($this, 'autoload'));
-				static::$registered = TRUE;
 			}
 		}
 	}

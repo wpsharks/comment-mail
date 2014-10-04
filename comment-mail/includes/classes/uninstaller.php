@@ -2,7 +2,6 @@
 /**
  * Uninstall Routines
  *
- * @package uninstaller
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,18 +16,10 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Uninstall Routines
 		 *
-		 * @package uninstaller
 		 * @since 14xxxx First documented version.
 		 */
-		class uninstaller
+		class uninstaller extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * Class constructor.
 			 *
@@ -36,7 +27,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct()
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				if($this->plugin->enable_hooks)
 					return; // Not a good idea.

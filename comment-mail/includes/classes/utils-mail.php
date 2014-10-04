@@ -2,7 +2,6 @@
 /**
  * Mail Utilities
  *
- * @package utils_mail
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,25 +16,10 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Mail Utilities
 		 *
-		 * @package utils_mail
 		 * @since 14xxxx First documented version.
 		 */
-		class utils_mail // Mail utilities.
+		class utils_mail extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
-			/**
-			 * @var array Instance cache.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $cache = array();
-
 			/**
 			 * Class constructor.
 			 *
@@ -43,7 +27,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct()
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 			}
 
 			/**

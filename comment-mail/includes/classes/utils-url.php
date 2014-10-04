@@ -2,7 +2,6 @@
 /**
  * URL Utilities
  *
- * @package utils_url
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,25 +16,10 @@ namespace comment_mail // Root namespace.
 		/**
 		 * URL Utilities
 		 *
-		 * @package utils_url
 		 * @since 14xxxx First documented version.
 		 */
-		class utils_url // URL utilities.
+		class utils_url extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
-			/**
-			 * @var array Global static cache.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected static $static = array();
-
 			/**
 			 * Class constructor.
 			 *
@@ -43,7 +27,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct()
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 			}
 
 			/**
@@ -58,10 +42,10 @@ namespace comment_mail // Root namespace.
 			 */
 			public function to($file = '', $scheme = NULL)
 			{
-				if(!isset(static::$static[__FUNCTION__]['plugin_dir']))
-					static::$static[__FUNCTION__]['plugin_dir'] = rtrim(plugin_dir_url($this->plugin->file), '/');
+				if(!isset($this->static[__FUNCTION__]['plugin_dir']))
+					$this->static[__FUNCTION__]['plugin_dir'] = rtrim(plugin_dir_url($this->plugin->file), '/');
 
-				$url = static::$static[__FUNCTION__]['plugin_dir'].(string)$file;
+				$url = $this->static[__FUNCTION__]['plugin_dir'].(string)$file;
 				$url = set_url_scheme($url, $scheme);
 
 				return $url;

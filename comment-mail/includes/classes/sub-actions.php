@@ -2,7 +2,6 @@
 /**
  * Subscriber Actions
  *
- * @package sub_actions
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,18 +16,10 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Subscriber Actions
 		 *
-		 * @package sub_actions
 		 * @since 14xxxx First documented version.
 		 */
-		class sub_actions // Subscriber actions.
+		class sub_actions extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * Class constructor.
 			 *
@@ -36,7 +27,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct()
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$this->maybe_handle();
 			}

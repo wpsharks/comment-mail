@@ -2,7 +2,6 @@
 /**
  * Queue Inserter
  *
- * @package queue_inserter
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,24 +16,16 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Queue Inserter
 		 *
-		 * @package queue_inserter
 		 * @since 14xxxx First documented version.
 		 */
-		class queue_inserter // Queue inserter.
+		class queue_inserter extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var \stdClass|null Comment object.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $comment; // Set by constructor.
+			protected $comment;
 
 			/**
 			 * Class constructor.
@@ -45,7 +36,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($comment_id)
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$comment_id = (integer)$comment_id;
 

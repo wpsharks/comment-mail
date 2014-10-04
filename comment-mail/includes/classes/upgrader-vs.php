@@ -2,7 +2,6 @@
 /**
  * Upgrader (Version-Specific)
  *
- * @package upgrader_vs
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,24 +16,16 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Upgrader (Version-Specific)
 		 *
-		 * @package upgrader_vs
 		 * @since 14xxxx First documented version.
 		 */
-		class upgrader_vs // Version-specific upgraders.
+		class upgrader_vs extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var string Version they are upgrading from.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $prev_version; // Set by constructor.
+			protected $prev_version;
 
 			/**
 			 * Class constructor.
@@ -45,7 +36,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($prev_version)
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$this->prev_version = (string)$prev_version;
 

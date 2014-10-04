@@ -2,7 +2,6 @@
 /**
  * Environment Utilities
  *
- * @package utils_env
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,25 +16,10 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Environment Utilities
 		 *
-		 * @package utils_env
 		 * @since 14xxxx First documented version.
 		 */
-		class utils_env // Environment utilities.
+		class utils_env extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
-			/**
-			 * @var array Global static cache.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected static $static = array();
-
 			/**
 			 * Class constructor.
 			 *
@@ -43,7 +27,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct()
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 			}
 
 			/**
@@ -73,10 +57,10 @@ namespace comment_mail // Root namespace.
 			 */
 			public function is_pro_preview()
 			{
-				if(isset(static::$static[__FUNCTION__]))
-					return static::$static[__FUNCTION__];
+				if(isset($this->static[__FUNCTION__]))
+					return $this->static[__FUNCTION__];
 
-				$is = &static::$static[__FUNCTION__];
+				$is = &$this->static[__FUNCTION__];
 
 				if(!empty($_REQUEST[__NAMESPACE__.'_pro_preview']))
 					return ($is = TRUE);

@@ -2,7 +2,6 @@
 /**
  * Sub Inserter
  *
- * @package sub_inserter
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,7 +16,6 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Sub Inserter
 		 *
-		 * @package sub_inserter
 		 * @since 14xxxx First documented version.
 		 */
 		class sub_inserter extends abstract_base
@@ -27,28 +25,28 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $comment; // Set by constructor.
+			protected $comment;
 
 			/**
 			 * @var \WP_User|null Subscribing user.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $user; // Set by constructor.
+			protected $user;
 
 			/**
 			 * @var \WP_User|null Current user.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $current_user; // Set by constructor.
+			protected $current_user;
 
 			/**
 			 * @var boolean Subscribing current user?
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $is_current_user; // Set by constructor.
+			protected $is_current_user;
 
 			/**
 			 * @var string Subscription type.
@@ -56,7 +54,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $type; // Set by constructor.
+			protected $type;
 
 			/**
 			 * @var string Subscription delivery cycle.
@@ -64,35 +62,28 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $deliver; // Set by constructor.
+			protected $deliver;
 
 			/**
 			 * @var null|boolean Auto-confirm?
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $auto_confirm; // Set by constructor.
+			protected $auto_confirm;
 
 			/**
 			 * @var boolean Sub. already exists?
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $sub_exists; // Set by constructor.
+			protected $sub_exists;
 
 			/**
 			 * @var integer Insertion ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $insert_id; // Set by constructor.
-
-			/**
-			 * @var keygen Key generator.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $keygen; // Set by constructor.
+			protected $insert_id;
 
 			/**
 			 * Class constructor.
@@ -115,7 +106,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($user, $comment_id, $type = 'comment', $deliver = 'asap', $auto_confirm = NULL)
 			{
-				parent::__construct(); // Parent constructor.
+				parent::__construct();
 
 				if($user instanceof \WP_User)
 					$this->user = $user;
@@ -141,8 +132,6 @@ namespace comment_mail // Root namespace.
 
 				$this->sub_exists = FALSE; // Initialize.
 				$this->insert_id  = 0; // Initialize.
-
-				$this->keygen = new keygen();
 
 				$this->maybe_insert();
 			}
@@ -175,7 +164,7 @@ namespace comment_mail // Root namespace.
 				$insertion_ip = $last_ip = $this->user_ip();
 
 				$data = array(
-					'key'              => $this->keygen->uunnci_20_max(),
+					'key'              => $this->plugin->utils_enc->uunnci_key_20_max(),
 					'user_id'          => $this->user ? (integer)$this->user->ID : 0,
 					'post_id'          => (integer)$this->comment->post_ID,
 					'comment_id'       => $this->type === 'comments'

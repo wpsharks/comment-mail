@@ -2,7 +2,6 @@
 /**
  * Template
  *
- * @package template
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,52 +16,30 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Template
 		 *
-		 * @package template
 		 * @since 14xxxx First documented version.
 		 */
-		class template // User deletion handler.
+		class template extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var string Template file.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $file; // Set by constructor.
+			protected $file;
 
 			/**
 			 * @var string Template file option key.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $file_option_key; // Set by constructor.
+			protected $file_option_key;
 
 			/**
 			 * @var string Template file contents.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $file_contents; // Set by constructor.
-
-			/**
-			 * @var php PHP Utilities.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $php; // Set by constructor.
-
-			/**
-			 * @var array Instance cache.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $cache = array();
+			protected $file_contents;
 
 			/**
 			 * Class constructor.
@@ -75,7 +52,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($file)
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$this->file = (string)$file;
 				$this->file = $this->plugin->utils_string->trim_deep($this->file, '', '/');
@@ -92,8 +69,6 @@ namespace comment_mail // Root namespace.
 				$this->file_option_key = 'template_'.$this->file_option_key;
 
 				$this->file_contents = $this->get_file_contents();
-
-				$this->php = new php(); // Utilities.
 			}
 
 			/**
@@ -116,7 +91,7 @@ namespace comment_mail // Root namespace.
 				if(!empty($vars['sub']) && $vars['sub'] instanceof \stdClass)
 					$vars = array_merge($vars, $this->sub_vars($vars['sub']));
 
-				return $this->php->evaluate($this->file_contents, $vars);
+				return $this->plugin->utils_php->evaluate($this->file_contents, $vars);
 			}
 
 			/**

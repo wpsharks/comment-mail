@@ -2,7 +2,6 @@
 /**
  * Sub Cleaner
  *
- * @package sub_cleaner
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,18 +16,10 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Sub Cleaner
 		 *
-		 * @package sub_cleaner
 		 * @since 14xxxx First documented version.
 		 */
-		class sub_cleaner // Sub cleaner.
+		class sub_cleaner extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * Class constructor.
 			 *
@@ -36,7 +27,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct()
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$this->prep_cron_job();
 				$this->clean_nonexistent_users();

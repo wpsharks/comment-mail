@@ -2,7 +2,6 @@
 /**
  * Sub Confirmer
  *
- * @package sub_confirmer
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
@@ -17,31 +16,23 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Sub Confirmer
 		 *
-		 * @package sub_confirmer
 		 * @since 14xxxx First documented version.
 		 */
-		class sub_confirmer // Sub confirmer.
+		class sub_confirmer extends abstract_base
 		{
-			/**
-			 * @var plugin Plugin reference.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $plugin; // Set by constructor.
-
 			/**
 			 * @var \stdClass|null Subscriber.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $sub; // Set by constructor.
+			protected $sub;
 
 			/**
 			 * @var null|boolean Auto-confirm?
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $auto_confirm; // Set by constructor.
+			protected $auto_confirm;
 
 			/**
 			 * Class constructor.
@@ -55,7 +46,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function __construct($sub_id, $auto_confirm = NULL)
 			{
-				$this->plugin = plugin();
+				parent::__construct();
 
 				$sub_id             = (integer)$sub_id;
 				$this->sub          = $this->plugin->utils_sub->get($sub_id);
