@@ -229,57 +229,57 @@ namespace comment_mail
 				/*
 				 * Setup additional class properties.
 				 */
-				$this->default_options = array( // Option defaults.
-				                                'version'                                     => $this->version,
-				                                'enable'                                      => '0', // `0|1`; enable?
-				                                'crons_setup'                                 => '0', // `0` or timestamp.
-				                                'uninstall_on_deletion'                       => '0', // `0|1`; run uninstaller?
+				$this->default_options = array(
+					'version'                                     => $this->version,
+					'enable'                                      => '0', // `0|1`; enable?
+					'crons_setup'                                 => '0', // `0` or timestamp.
+					'uninstall_on_deletion'                       => '0', // `0|1`; run uninstaller?
 
-				                                'auto_confirm_enable'                         => '0', // `0|1`; auto-confirm enable?
+					'auto_confirm_enable'                         => '0', // `0|1`; auto-confirm enable?
 
-				                                'auto_subscribe_enable'                       => '1', // `0|1`; auto-subscribe enable?
-				                                'auto_subscribe_deliver'                      => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
-				                                'auto_subscribe_post_types'                   => 'post,page', // Comma-delimited post types.
-				                                'auto_subscribe_post_author'                  => '1', // `0|1`; auto-subscribe post authors?
-				                                'auto_subscribe_recipients'                   => '', // Others `;|,` delimited emails.
+					'auto_subscribe_enable'                       => '1', // `0|1`; auto-subscribe enable?
+					'auto_subscribe_deliver'                      => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
+					'auto_subscribe_post_types'                   => 'post,page', // Comma-delimited post types.
+					'auto_subscribe_post_author'                  => '1', // `0|1`; auto-subscribe post authors?
+					'auto_subscribe_recipients'                   => '', // Others `;|,` delimited emails.
 
-				                                'smtp_enable'                                 => '0', // `0|1`; enable?
-				                                'smtp_host'                                   => '', // SMTP host name.
-				                                'smtp_port'                                   => '', // SMTP port number.
-				                                'smtp_secure'                                 => '', // ``, `ssl` or `tls`.
+					'smtp_enable'                                 => '0', // `0|1`; enable?
+					'smtp_host'                                   => '', // SMTP host name.
+					'smtp_port'                                   => '', // SMTP port number.
+					'smtp_secure'                                 => '', // ``, `ssl` or `tls`.
 
-				                                'smtp_username'                               => '', // SMTP username.
-				                                'smtp_password'                               => '', // SMTP password.
+					'smtp_username'                               => '', // SMTP username.
+					'smtp_password'                               => '', // SMTP password.
 
-				                                'smtp_from_name'                              => '', // SMTP from name.
-				                                'smtp_from_email'                             => '', // SMTP from email.
-				                                'smtp_force_from'                             => '1', // `0|1`; force?
+					'smtp_from_name'                              => '', // SMTP from name.
+					'smtp_from_email'                             => '', // SMTP from email.
+					'smtp_force_from'                             => '1', // `0|1`; force?
 
-				                                'template_site_common_header'                 => '', // HTML/PHP code.
-				                                'template_site_common_footer'                 => '', // HTML/PHP code.
+					'template_site_common_header'                 => '', // HTML/PHP code.
+					'template_site_common_footer'                 => '', // HTML/PHP code.
 
-				                                'template_site_comment_form_subscription_ops' => '', // HTML/PHP code.
-				                                'template_site_sub_actions_confirmed'         => '', // HTML/PHP code.
-				                                'template_site_sub_actions_unsubscribed'      => '', // HTML/PHP code.
+					'template_site_comment_form_subscription_ops' => '', // HTML/PHP code.
+					'template_site_sub_actions_confirmed'         => '', // HTML/PHP code.
+					'template_site_sub_actions_unsubscribed'      => '', // HTML/PHP code.
 
-				                                'template_email_common_header'                => '', // HTML/PHP code.
-				                                'template_email_common_footer'                => '', // HTML/PHP code.
+					'template_email_common_header'                => '', // HTML/PHP code.
+					'template_email_common_footer'                => '', // HTML/PHP code.
 
-				                                'template_email_confirmation_request_subject' => '', // HTML/PHP code.
-				                                'template_email_confirmation_request_message' => '', // HTML/PHP code.
+					'template_email_confirmation_request_subject' => '', // HTML/PHP code.
+					'template_email_confirmation_request_message' => '', // HTML/PHP code.
 
-				                                'template_email_comment_notification_subject' => '', // HTML/PHP code.
-				                                'template_email_comment_notification_message' => '', // HTML/PHP code.
+					'template_email_comment_notification_subject' => '', // HTML/PHP code.
+					'template_email_comment_notification_message' => '', // HTML/PHP code.
 
-				                                'queue_processor_max_time'                    => '30', // In seconds.
-				                                'queue_processor_delay'                       => '250', // In milliseconds.
-				                                'queue_processor_max_limit'                   => '100', // Total queue entries.
+					'queue_processor_max_time'                    => '30', // In seconds.
+					'queue_processor_delay'                       => '250', // In milliseconds.
+					'queue_processor_max_limit'                   => '100', // Total queue entries.
 
-				                                'queue_processor_immediate_max_time'          => '10', // In seconds.
-				                                'queue_processor_immediate_max_limit'         => '5', // Total queue entries.
+					'queue_processor_immediate_max_time'          => '10', // In seconds.
+					'queue_processor_immediate_max_limit'         => '5', // Total queue entries.
 
-				                                'unconfirmed_expiration_time'                 => '60 days', // `strtotime()` compatible.
-				                                // Or, this can be left empty to disable automatic expirations altogether.
+					'unconfirmed_expiration_time'                 => '60 days', // `strtotime()` compatible.
+					// Or, this can be left empty to disable automatic expirations altogether.
 
 				); // Default options are merged with those defined by the site owner.
 				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options, get_defined_vars());
