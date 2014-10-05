@@ -114,13 +114,14 @@ namespace comment_mail // Root namespace.
 			 * Magic/overload property setter.
 			 *
 			 * @param string $property Property to set.
+			 * @param mixed  $value The value for this property.
 			 *
 			 * @throws \exception We do NOT allow magic/overload properties to be set.
 			 *    Magic/overload properties in this class are read-only.
 			 *
 			 * @see http://php.net/manual/en/language.oop5.overloading.php
 			 */
-			public function __set($property)
+			public function __set($property, $value)
 			{
 				$property = (string)$property; // Force string.
 
