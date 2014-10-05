@@ -22,6 +22,7 @@ Enables email subscriptions for comments in WordPress.
 if(!defined('WPINC')) // MUST have WordPress.
 	exit('Do NOT access this file directly: '.basename(__FILE__));
 
-if(require(dirname(__FILE__).'/includes/wp-php53.php'))
+$GLOBALS['wp_php_rv'] = '5.3'; // Minimum version.
+if(require(dirname(__FILE__).'/submodules/wp-php-rv/wp-php-rv.php'))
 	require_once dirname(__FILE__).'/plugin.inc.php';
-else wp_php53_notice(basename(dirname(__FILE__)));
+else wp_php_rv_notice(basename(dirname(__FILE__)));
