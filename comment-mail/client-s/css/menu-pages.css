@@ -1,5 +1,12 @@
-@import url('//netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.min.css');
+@import url('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css');
 
+/*
+Alter WordPress wrap on s2Member menu pages.
+*/
+body[class*='comment_mail'] #wpwrap
+{
+	background : #C7C7C7;
+}
 /*
 Align these with menu page.
 */
@@ -8,7 +15,6 @@ div.updated, div.error
 	font-size : 120%;
 	margin    : 25px 25px 25px 5px;
 }
-
 /*
 Menu page styles.
 */
@@ -20,9 +26,23 @@ Menu page styles.
 	margin        : 25px 25px 25px 5px;
 
 	border-radius : 5px;
-	background    : #ECECEC;
-	border        : 1px solid #A4A4A4;
-	box-shadow    : 0 0 2px 0 rgba(0, 0, 0, 0.2) !important;
+	border        : 1px solid #333333;
+	box-shadow    : 0 0 8px 0 rgba(0, 0, 0, 0.2) !important;
+	background    : #FFFFFF url('../images/trans-bg.png') repeat left top;
+}
+.plugin-menu-page a
+{
+	color : #003E75;
+}
+.plugin-menu-page a:hover,
+.plugin-menu-page a:active
+{
+	color : #027E02;
+}
+.plugin-menu-page p,
+.plugin-menu-page code
+{
+	font-size : inherit;
 }
 .plugin-menu-page p:first-child,
 .plugin-menu-page pre:first-child
@@ -36,7 +56,10 @@ Menu page styles.
 }
 .plugin-menu-page code
 {
-	font-family : 'Monaco', 'Menlo', 'Consolas', 'Courier New', monospace;
+	border-radius : 3px;
+	padding       : 1px 5px 1px 5px;
+	background    : rgba(255, 255, 255, 0.25);
+	font-family   : 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
 }
 .plugin-menu-page pre.code
 {
@@ -46,31 +69,27 @@ Menu page styles.
 .plugin-menu-page pre.code > code
 {
 	font-size     : 90%;
-	color         : #EEEEEE;
-	background    : #222222;
+	color         : #F7F7F7;
+	background    : #2D2D2D;
 	overflow-x    : auto;
 	max-width     : 100%;
 
-	border-radius : 5px;
+	border-radius : 4px;
 	padding       : 10px;
 	display       : block;
-	box-shadow    : 0 0 5px 1px #000000 inset, 0 0 1px 1px rgba(223, 245, 165, 0.5);
+	box-shadow    : 0 0 2px 1px #000000 inset, 0 0 1px 1px rgba(223, 245, 165, 0.5);
 }
 .plugin-menu-page img
 {
 	border : 0;
 }
-.plugin-menu-page img.screenshot
+.plugin-menu-page img.bordered
 {
-	float         : right;
-	margin        : 0 0 15px 25px;
-
-	border-radius : 5px;
-	border        : 1px solid #AFAFAF;
-
-	box-shadow    : 0 0 5px 0 rgba(0, 0, 0, 0.2) inset, 0 0 1px 0 rgba(72, 155, 88, 0.2);
-	background    : #FFFFFF;
+	border-radius : 4px;
 	padding       : 10px;
+	background    : #FFFFFF;
+	border        : 1px solid #AFAFAF;
+	box-shadow    : 0 0 2px 1px #D8D8D8 inset, 0 0 1px 1px rgba(223, 245, 165, 0.5);
 }
 .plugin-menu-page hr
 {
@@ -83,66 +102,89 @@ Menu page styles.
 	-moz-user-select    : none;
 	user-select         : none;
 }
-.plugin-menu-page label.switch-primary
+.plugin-menu-page select, .plugin-menu-page select:focus,
+.plugin-menu-page textarea, .plugin-menu-page textarea:focus,
+.plugin-menu-page input:not([type='radio']):not([type='checkbox']),
+.plugin-menu-page input:not([type='radio']):not([type='checkbox']):focus
 {
-	display       : inline;
-	font-size     : 130%;
-	color         : #000000;
+	margin      : 0;
+	width       : 100%;
+	height      : 2em;
 
-	margin        : 0;
-	padding       : 10px;
+	font-size   : 1em;
+	line-height : 1em;
+	font-weight : normal;
 
-	border-radius : 5px;
-	background    : #F1E982;
-	border        : 1px solid rgba(72, 82, 48, 0.2);
-	box-shadow    : -1px -1px 0 0 rgba(0, 0, 0, 0.25) inset, 1px 1px 0 0 #FFFFFF inset;
+	box-sizing  : border-box;
 }
+.plugin-menu-page textarea, .plugin-menu-page textarea:focus,
 .plugin-menu-page input:not([type='radio']):not([type='checkbox']),
 .plugin-menu-page input:not([type='radio']):not([type='checkbox']):focus,
-.plugin-menu-page select, .plugin-menu-page select:focus,
+.plugin-menu-page /* CodeMirror wrappers. */.cm, .plugin-menu-page .cm .CodeMirror
+{
+	font-size   : 1em; /* Font size again, for CodeMirror too. */
+	font-family : 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
+}
 .plugin-menu-page textarea, .plugin-menu-page textarea:focus
 {
-	width       : 100%;
-	height      : auto;
-
-	margin      : 0;
-	padding     : 5px;
-	line-height : 1em;
-	box-sizing  : border-box;
-	border      : 1px solid rgba(13, 31, 47, 0.5);
-
-	color       : #FFFFFF;
-	background  : #73834B;
-	box-shadow  : 0 0 1px 0 rgba(0, 0, 0, 0.5) inset, 0 0 1px 1px rgba(223, 245, 165, 0.5);
+	height      : auto; /* Textareas auto. */
+	white-space : pre; /* Preserve whitespace. */
 }
+.plugin-menu-page select, .plugin-menu-page select:focus,
+.plugin-menu-page textarea, .plugin-menu-page textarea:focus,
+.plugin-menu-page input:not([type='radio']):not([type='checkbox']),
 .plugin-menu-page input:not([type='radio']):not([type='checkbox']):focus,
-.plugin-menu-page select:focus, .plugin-menu-page textarea:focus
+.plugin-menu-page /* CodeMirror wrappers. */.cm
+{
+	border        : 0;
+	padding       : 5px;
+	border-radius : 4px;
+	box-shadow    : 0 0 1px 1px rgba(37, 47, 26, 0.75) inset, 0 0 1px 1px rgba(223, 245, 165, 0.5);
+}
+.plugin-menu-page select,
+.plugin-menu-page textarea,
+.plugin-menu-page input:not([type='radio']):not([type='checkbox'])
+{
+	color      : #F7F7F7;
+	background : #73834B;
+}
+.plugin-menu-page select:focus,
+.plugin-menu-page textarea:focus,
+.plugin-menu-page input:not([type='radio']):not([type='checkbox']):focus,
+.plugin-menu-page /* CodeMirror wrappers. */.cm
 {
 	background : #637041;
 }
+.plugin-menu-page select.max-width,
+.plugin-menu-page textarea.max-width,
+.plugin-menu-page input.max-width:not([type='radio']):not([type='checkbox'])
+{
+	width     : auto;
+	min-width : 400px;
+}
 .plugin-menu-page input::-webkit-input-placeholder
 {
-	color       : rgba(255, 255, 255, 0.2);
-	font-style  : italic;
 	padding-top : 3px;
+	font-style  : italic;
+	color       : rgba(255, 255, 255, 0.2);
 }
 .plugin-menu-page input::-moz-placeholder
 {
-	color       : rgba(255, 255, 255, 0.2);
-	font-style  : italic;
 	padding-top : 3px;
+	font-style  : italic;
+	color       : rgba(255, 255, 255, 0.2);
 }
 .plugin-menu-page input:-moz-placeholder
 {
-	color       : rgba(255, 255, 255, 0.2);
-	font-style  : italic;
 	padding-top : 3px;
+	font-style  : italic;
+	color       : rgba(255, 255, 255, 0.2);
 }
 .plugin-menu-page input:-ms-input-placeholder
 {
-	color       : rgba(255, 255, 255, 0.2);
-	font-style  : italic;
 	padding-top : 3px;
+	font-style  : italic;
+	color       : rgba(255, 255, 255, 0.2);
 }
 .plugin-menu-page input[disabled],
 .plugin-menu-page select[disabled],
@@ -164,7 +206,7 @@ Menu page styles.
 
 	border-radius       : 4px;
 	border              : 1px solid rgba(0, 0, 0, 0.5);
-	box-shadow          : 0 1px 1px 0 rgba(0, 0, 0, 0.25), -1px -1px 0 1px rgba(0, 0, 0, 0.2) inset, 1px 1px 0 1px rgba(255, 255, 255, 0.1) inset;
+	box-shadow          : 0 1px 1px 0 rgba(0, 0, 0, 0.25), -1px -1px 0 0 rgba(0, 0, 0, 0.2) inset, 1px 1px 0 0 rgba(255, 255, 255, 0.1) inset;
 
 	margin              : 0;
 	box-sizing          : border-box;
@@ -203,38 +245,30 @@ Menu page styles.
 .plugin-menu-page .warning,
 .plugin-menu-page .error
 {
+	border-radius : 5px;
 	font-size     : 120%;
 	padding       : 10px;
 	margin        : 0 0 25px 0;
-	border-radius : 5px;
 }
 .plugin-menu-page .info
 {
-	border     : 1px solid #35558A;
 	background : #C9E0FA;
+	border     : 1px solid #35558A;
 }
 .plugin-menu-page .notice
 {
-	border     : 1px solid #E6DB55;
 	background : #FFFBCC;
+	border     : 1px solid #E6DB55;
 }
 .plugin-menu-page .warning
 {
-	border     : 1px solid #D29A04;
 	background : #FADDAB;
+	border     : 1px solid #D29A04;
 }
 .plugin-menu-page .error
 {
-	border     : 1px solid #711E1E;
 	background : #FABBC6;
-}
-.plugin-menu-page .monospace
-{
-	font-family : 'Monaco', 'Menlo', 'Consolas', 'Courier New', monospace;
-}
-.plugin-menu-page textarea.monospace
-{
-	white-space : pre;
+	border     : 1px solid #711E1E;
 }
 .plugin-menu-page .clearfix:before,
 .plugin-menu-page .clearfix:after
@@ -246,7 +280,6 @@ Menu page styles.
 {
 	clear : both;
 }
-
 /*
 Heading styles.
 */
@@ -265,7 +298,7 @@ Heading styles.
 .plugin-menu-page-heading .plugin-menu-page-restore-defaults,
 .plugin-menu-page-heading .plugin-menu-page-panel-togglers
 {
-	margin : 0 15px 0 0;
+	margin : 0 25px 0 0;
 }
 .plugin-menu-page-heading .plugin-menu-page-upsells
 {
@@ -284,12 +317,6 @@ Heading styles.
 	margin          : 0 5px 0 5px;
 	display         : inline-block;
 }
-.plugin-menu-page-heading img
-{
-	width  : 403px;
-	height : 77px;
-}
-
 /*
 Panel styles.
 */
@@ -312,10 +339,10 @@ Panel styles.
 	padding             : 10px;
 	font-size           : 150%;
 	font-weight         : bold;
-	color               : #EEEEEE;
 	background          : #173B47;
+	color               : #EEEEEE !important;
 
-	border-radius       : 5px;
+	border-radius       : 4px;
 	box-shadow          : 0 2px 2px 0 rgba(0, 0, 0, 0.25);
 
 	cursor              : pointer;
@@ -326,8 +353,8 @@ Panel styles.
 .plugin-menu-page-panel-heading:hover,
 .plugin-menu-page-panel-heading.open
 {
-	color      : #FFFFFF;
 	background : #0D1F2F;
+	color      : #FFFFFF !important;
 }
 .plugin-menu-page-panel-heading:after
 {
@@ -352,6 +379,10 @@ Panel styles.
 }
 .plugin-menu-page-panel-body
 {
+	width                      : 99%;
+	margin                     : 0 auto 0 auto;
+	box-sizing                 : border-box;
+
 	z-index                    : 0;
 	position                   : relative;
 	display                    : none;
@@ -360,8 +391,8 @@ Panel styles.
 	color                      : #333333;
 	background                 : #D0DDAD;
 
-	border-bottom-left-radius  : 5px;
-	border-bottom-right-radius : 5px;
+	border-bottom-left-radius  : 4px;
+	border-bottom-right-radius : 4px;
 
 	box-shadow                 : 0 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
@@ -374,12 +405,8 @@ Panel styles.
 .plugin-menu-page-panel-body .warning,
 .plugin-menu-page-panel-body .error
 {
-	font-size  : 100%;
-	font-style : italic;
-
-	padding    : 5px;
-	margin     : 1em 0 1em 0;
-	display    : table;
+	display   : table;
+	font-size : inherit;
 }
 .plugin-menu-page-panel-body h3
 {
@@ -393,7 +420,6 @@ Panel styles.
 {
 	margin-top : 0;
 }
-
 /*
 Save button styles.
 */
@@ -401,4 +427,17 @@ Save button styles.
 {
 	width       : 100%;
 	line-height : 1.3em;
+}
+/*
+Utility styles.
+*/
+.plugin-menu-page .float-left
+{
+	margin : 0 25px 15px 0;
+	float  : left !important;
+}
+.plugin-menu-page .float-right
+{
+	margin : 0 0 15px 25px;
+	float  : right !important;
 }
