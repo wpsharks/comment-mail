@@ -81,7 +81,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function drop_db_tables()
 			{
-				foreach(scandir($tables_dir = dirname(__FILE__).'/tables') as $_sql_file)
+				foreach(scandir($tables_dir = dirname(dirname(__FILE__)).'/tables') as $_sql_file)
 					if(substr($_sql_file, -4) === '.sql' && is_file($tables_dir.'/'.$_sql_file))
 					{
 						$_sql_file_table = substr($_sql_file, 0, -4);
