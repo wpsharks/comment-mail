@@ -369,11 +369,12 @@ namespace comment_mail
 			 */
 			public function __get($property)
 			{
-				$property = (string)$property; // Force string.
+				$property          = (string)$property;
+				$ns_class_property = '\\'.__NAMESPACE__.'\\'.$property;
 
-				if(stripos($property, 'utils_') === 0 && class_exists('\\'.__NAMESPACE__.'\\'.$property))
+				if(stripos($property, 'utils_') === 0 && class_exists($ns_class_property))
 					if(!isset($this->___overload->{$property})) // Not defined yet?
-						$this->___overload->{$property} = new $property;
+						$this->___overload->{$property} = new $ns_class_property;
 
 				return parent::__get($property);
 			}
