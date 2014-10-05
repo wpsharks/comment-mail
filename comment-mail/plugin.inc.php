@@ -54,7 +54,7 @@ namespace comment_mail
 			 *
 			 * @var string Plugin name.
 			 */
-			public $name = 'Comment Mail™';
+			public $name = 'Comment Mail';
 
 			/**
 			 * Plugin name (abbreviated).
@@ -63,7 +63,7 @@ namespace comment_mail
 			 *
 			 * @var string Plugin name (abbreviated).
 			 */
-			public $name_abbr = 'CM™';
+			public $name_abbr = 'CM';
 
 			/**
 			 * Used by the plugin's uninstall handler.
@@ -522,7 +522,7 @@ namespace comment_mail
 			 */
 			public function add_settings_link($links)
 			{
-				$links[] = '<a href="options-general.php?page='.urlencode(__NAMESPACE__).'">'.__('Settings', $this->text_domain).'</a><br/>';
+				$links[] = '<a href="'.esc_attr(add_query_arg(urlencode_deep(array('page' => __NAMESPACE__,)), self_admin_url('/admin.php'))).'">'.__('Settings', $this->text_domain).'</a><br/>';
 				$links[] = '<a href="'.esc_attr(add_query_arg(urlencode_deep(array('page' => __NAMESPACE__, __NAMESPACE__.'_pro_preview' => '1')), self_admin_url('/admin.php'))).'">'.__('Preview Pro Features', $this->text_domain).'</a>';
 				$links[] = '<a href="'.esc_attr('http://www.websharks-inc.com/product/'.str_replace('_', '-', __NAMESPACE__).'/').'" target="_blank">'.__('Upgrade', $this->text_domain).'</a>';
 
