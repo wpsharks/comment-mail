@@ -11,7 +11,7 @@ namespace comment_mail
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	require_once dirname(__FILE__).'/abstract-base.php';
+	require_once dirname(__FILE__).'/includes/classes/abstract-base.php';
 
 	if(!class_exists('\\'.__NAMESPACE__.'\\plugin'))
 	{
