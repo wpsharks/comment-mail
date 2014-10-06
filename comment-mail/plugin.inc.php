@@ -243,6 +243,8 @@ namespace comment_mail
 					'auto_subscribe_post_author'                  => '1', // `0|1`; auto-subscribe post authors?
 					'auto_subscribe_recipients'                   => '', // Others `;|,` delimited emails.
 
+					'reply_to_email'                              => '', // Reply-To header.
+
 					'smtp_enable'                                 => '0', // `0|1`; enable?
 					'smtp_host'                                   => '', // SMTP host name.
 					'smtp_port'                                   => '', // SMTP port number.
