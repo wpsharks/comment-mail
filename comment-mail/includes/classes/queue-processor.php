@@ -70,6 +70,13 @@ namespace comment_mail // Root namespace.
 			protected $message_template;
 
 			/**
+			 * @var array Message headers.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $message_headers;
+
+			/**
 			 * @var \stdClass[] Entries being processed.
 			 *
 			 * @since 14xxxx First documented version.
@@ -151,6 +158,10 @@ namespace comment_mail // Root namespace.
 
 				$this->subject_template = new template('email/comment-notification-subject.php');
 				$this->message_template = new template('email/comment-notification-message.php');
+
+				$this->message_headers = array(); // Initialize.
+				if($this->plugin->options['reply_to_email']) // Reply-To?
+					$this->message_headers = array('Reply-To: '.$this->plugin->options['reply_to_email']);
 
 				$this->entries                 = array(); // Initialize.
 				$this->total_entries           = 0; // Initialize; zero for now.
@@ -243,11 +254,13 @@ namespace comment_mail // Root namespace.
 
 					return; // Not possible; message body is empty.
 				}
+				$entry_headers = $this->message_headers; // Defaults.
+
 				$entry_props->event     = 'notified'; // Notifying now.
 				$entry_props->note_code = 'comment_notification_sent_successfully';
 				$this->log_entry($entry_props); // Log successful processing.
 
-				$this->plugin->utils_mail->send($entry_props->sub->email, $entry_subject, $entry_message);
+				$this->plugin->utils_mail->send($entry_props->sub->email, $entry_subject, $entry_message, $entry_headers);
 			}
 
 			/**
