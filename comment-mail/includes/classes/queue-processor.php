@@ -254,7 +254,9 @@ namespace comment_mail // Root namespace.
 
 					return; // Not possible; message body is empty.
 				}
-				$entry_headers = $this->message_headers; // Defaults.
+				$entry_headers   = $this->message_headers; // Defaults.
+				$entry_headers[] = 'X-Comment-Id: '.$entry_props->comment->comment_ID;
+				$entry_headers[] = 'X-Comment-Parent-Id: '.$entry_props->comment->comment_parent_ID;
 
 				$entry_props->event     = 'notified'; // Notifying now.
 				$entry_props->note_code = 'comment_notification_sent_successfully';
