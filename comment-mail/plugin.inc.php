@@ -345,7 +345,7 @@ namespace comment_mail
 					update_option(__NAMESPACE__.'_options', $this->options);
 				}
 				add_action('_cron_'.__NAMESPACE__.'_queue_processor', array($this, 'queue_processor'));
-				add_action('_cron_'.__NAMESPACE__.'_sub_cleaner', array($this, '_sub_cleaner'));
+				add_action('_cron_'.__NAMESPACE__.'_sub_cleaner', array($this, 'sub_cleaner'));
 
 				/*
 				 * Fire setup completion hooks.
