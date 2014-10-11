@@ -56,8 +56,8 @@ namespace comment_mail // Root namespace.
 				$this->plural   = 'queued notifications';
 
 				$args = array(
-					'singular' => $this->singular,
-					'plural'   => $this->plural,
+					'singular' => $this->singular, 'plural' => $this->plural,
+					'screen'   => $this->plugin->menu_page_hooks[__NAMESPACE__.'_queue'],
 				);
 				parent::__construct($args);
 

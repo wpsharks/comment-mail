@@ -19,7 +19,6 @@ namespace comment_mail
 		 * Plugin Class
 		 *
 		 * @property utils_array  $utils_array
-		 * @property utils_cond   $utils_cond
 		 * @property utils_db     $utils_db
 		 * @property utils_enc    $utils_enc
 		 * @property utils_env    $utils_env
@@ -29,6 +28,7 @@ namespace comment_mail
 		 * @property utils_string $utils_string
 		 * @property utils_sub    $utils_sub
 		 * @property utils_url    $utils_url
+		 * @property utils_user   $utils_user
 		 *
 		 * @since 14xxxx First documented version.
 		 */
@@ -63,7 +63,7 @@ namespace comment_mail
 			 *
 			 * @var string Plugin name (abbreviated).
 			 */
-			public $name_abbr = 'CM';
+			public $short_name = 'CM';
 
 			/**
 			 * Used by the plugin's uninstall handler.
@@ -149,6 +149,12 @@ namespace comment_mail
 			 * @var string Capability required to uninstall.
 			 */
 			public $uninstall_cap;
+
+			/*
+			 * Public Properties (Defined by Various Hooks)
+			 */
+
+			public $menu_page_hooks = array();
 
 			/*
 			 * Plugin Constructor
@@ -314,6 +320,7 @@ namespace comment_mail
 				add_action('all_admin_notices', array($this, 'all_admin_errors'));
 
 				add_action('admin_menu', array($this, 'add_menu_pages'));
+				add_filter('set-screen-option', array($this, 'set_screen_option'), 10, 3);
 				add_filter('plugin_action_links_'.plugin_basename($this->file), array($this, 'add_settings_link'));
 
 				add_action('transition_post_status', array($this, 'post_status'), 10, 3);
@@ -506,9 +513,20 @@ namespace comment_mail
 			 */
 			public function add_menu_pages()
 			{
-				add_comments_page($this->name.'™', $this->name.'™', $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
-				add_comments_page($this->short_name.'™ '.__('Subscribers', $this->text_domain), $this->short_name.'™ '.__('Subscribers', $this->text_domain), $this->cap, __NAMESPACE__.'_subscribers', array($this, 'menu_page_subscribers'));
-				add_comments_page($this->short_name.'™ '.__('Mail Queue', $this->text_domain), $this->short_name.'™ '.__('Mail Queue', $this->text_domain), $this->cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
+				if(!current_user_can($this->cap))
+					return; // Nothing to do.
+
+				$title                                = $this->name.'™';
+				$this->menu_page_hooks[__NAMESPACE__] = add_comments_page($title, $title, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
+				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__], array($this, 'menu_page_options_screen'));
+
+				$title                                               = $this->short_name.'™ '.__('Subscribers', $this->text_domain);
+				$this->menu_page_hooks[__NAMESPACE__.'_subscribers'] = add_comments_page($title, $title, $this->cap, __NAMESPACE__.'_subscribers', array($this, 'menu_page_subscribers'));
+				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_subscribers'], array($this, 'menu_page_subscribers_screen'));
+
+				$title                                         = $this->short_name.'™ '.__('Mail Queue', $this->text_domain);
+				$this->menu_page_hooks[__NAMESPACE__.'_queue'] = add_comments_page($title, $title, $this->cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
+				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue'], array($this, 'menu_page_queue_screen'));
 			}
 
 			/**
@@ -532,6 +550,53 @@ namespace comment_mail
 			}
 
 			/**
+			 * Set plugin-related screen options.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `set-screen-option` filter.
+			 *
+			 * @param mixed|boolean $what_wp_says `FALSE` if not saving (default).
+			 *    If we set this to any value besides `FALSE`, the option will be saved by WP.
+			 *
+			 * @param string        $option The option being checked; i.e. should we save this option?
+			 *
+			 * @param mixed         $value The current value for this option.
+			 *
+			 * @return mixed|boolean Returns `$value` for plugin-related options.
+			 *    Other we simply return `$what_wp_says`.
+			 */
+			public function set_screen_option($what_wp_says, $option, $value)
+			{
+				if(strpos($option, __NAMESPACE__.'_') === 0)
+					return $value; // Yes, save this.
+
+				return $what_wp_says;
+			}
+
+			/**
+			 * Menu page screen; for options.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__]` action.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_options_screen()
+			{
+				$screen = get_current_screen();
+				if(!($screen instanceof \WP_Screen))
+					return; // Not possible.
+
+				if(empty($this->menu_page_hooks[__NAMESPACE__])
+				   || $screen->id !== $this->menu_page_hooks[__NAMESPACE__]
+				) return; // Not applicable.
+
+				return; // No screen for this page right now.
+			}
+
+			/**
 			 * Menu page for options.
 			 *
 			 * @since 14xxxx First documented version.
@@ -544,6 +609,32 @@ namespace comment_mail
 			}
 
 			/**
+			 * Menu page screen; for subscribers.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_subscribers]` action.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_subscribers_screen()
+			{
+				$screen = get_current_screen();
+				if(!($screen instanceof \WP_Screen))
+					return; // Not possible.
+
+				if(empty($this->menu_page_hooks[__NAMESPACE__.'_subscribers'])
+				   || $screen->id !== $this->menu_page_hooks[__NAMESPACE__.'_subscribers']
+				) return; // Not applicable.
+
+				add_screen_option('per_page', array(
+					'default' => '50', // Default items per page.
+					'label'   => __('Per Page', $this->text_domain),
+					'option'  => __NAMESPACE__.'_subscribers_per_page',
+				));
+			}
+
+			/**
 			 * Menu page for subscribers.
 			 *
 			 * @since 14xxxx First documented version.
@@ -553,6 +644,32 @@ namespace comment_mail
 			public function menu_page_subscribers()
 			{
 				new menu_page('subscribers');
+			}
+
+			/**
+			 * Menu page screen; for queue.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue]` action.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_queue_screen()
+			{
+				$screen = get_current_screen();
+				if(!($screen instanceof \WP_Screen))
+					return; // Not possible.
+
+				if(empty($this->menu_page_hooks[__NAMESPACE__.'_queue'])
+				   || $screen->id !== $this->menu_page_hooks[__NAMESPACE__.'_queue']
+				) return; // Not applicable.
+
+				add_screen_option('per_page', array(
+					'default' => '50', // Default items per page.
+					'label'   => __('Per Page', $this->text_domain),
+					'option'  => __NAMESPACE__.'_queue_per_page',
+				));
 			}
 
 			/**

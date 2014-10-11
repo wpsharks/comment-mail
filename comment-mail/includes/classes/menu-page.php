@@ -11,7 +11,7 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\menu_pages'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\menu_page'))
 	{
 		/**
 		 * Menu Pages

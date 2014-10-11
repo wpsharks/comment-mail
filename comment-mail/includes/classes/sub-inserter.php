@@ -57,7 +57,7 @@ namespace comment_mail // Root namespace.
 			protected $type;
 
 			/**
-			 * @var string Subscription delivery cycle.
+			 * @var string Subscription delivery option.
 			 *    `asap`, `hourly`, `daily`, `weekly`.
 			 *
 			 * @since 14xxxx First documented version.
@@ -98,7 +98,7 @@ namespace comment_mail // Root namespace.
 			 * @param string         $type Type of subscription.
 			 *    Please pass one of: `comments`, `comment`.
 			 *
-			 * @param string         $deliver Delivery cycle. Defaults to `asap`.
+			 * @param string         $deliver Delivery option. Defaults to `asap`.
 			 *    Please pass one of: `asap`, `hourly`, `daily`, `weekly`.
 			 *
 			 * @param null|boolean   $auto_confirm Auto-confirm subscriber?
@@ -126,7 +126,7 @@ namespace comment_mail // Root namespace.
 
 				$this->deliver = strtolower((string)$deliver);
 				if(!in_array($this->deliver, array('asap', 'hourly', 'daily', 'weekly'), TRUE))
-					$this->deliver = ''; // Default cycle.
+					$this->deliver = ''; // Default option.
 
 				$this->auto_confirm = isset($auto_confirm) ? (boolean)$auto_confirm : NULL;
 
@@ -230,7 +230,7 @@ namespace comment_mail // Root namespace.
 
 				       " WHERE `post_id` = '".esc_sql($this->comment->post_ID)."'".
 				       " AND `comment_id` = '".esc_sql($this->type === 'comments' ? 0 : $this->comment->comment_ID)."'".
-				       " AND `deliver` = '".esc_sql($this->deliver)."'". // Delivery cycle.
+				       " AND `deliver` = '".esc_sql($this->deliver)."'". // Delivery option.
 
 				       ($this->user && $this->user->ID // Has a user ID?
 					       ? " AND (`user_id` = '".esc_sql($this->user->ID)."'".

@@ -546,15 +546,15 @@ namespace comment_mail // Root namespace.
 			{
 				switch($entry_props->sub->deliver) // Check for digests.
 				{
-					case 'hourly': // Delivery cycle/format = hourly digest.
+					case 'hourly': // Delivery option = hourly digest.
 						if(($entry_last_notified_time = $this->entry_last_notified_time($entry_props)))
 							return $entry_last_notified_time + 3600;
 
-					case 'daily': // Delivery cycle/format = daily digest.
+					case 'daily': // Delivery option = daily digest.
 						if(($entry_last_notified_time = $this->entry_last_notified_time($entry_props)))
 							return $entry_last_notified_time + 86400;
 
-					case 'weekly': // Delivery cycle/format = weekly digest.
+					case 'weekly': // Delivery option = weekly digest.
 						if(($entry_last_notified_time = $this->entry_last_notified_time($entry_props)))
 							return $entry_last_notified_time + 604800;
 				}
