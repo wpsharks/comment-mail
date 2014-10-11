@@ -472,7 +472,7 @@ namespace comment_mail
 			 */
 			public function enqueue_admin_styles()
 			{
-				if(empty($_GET['page']) || strpos($_GET['page'], __NAMESPACE__) !== 0)
+				if(empty($_REQUEST['page']) || strpos($_REQUEST['page'], __NAMESPACE__) !== 0)
 					return; // Nothing to do; NOT a plugin page in the administrative area.
 
 				$deps = array(); // Plugin dependencies.
@@ -489,7 +489,7 @@ namespace comment_mail
 			 */
 			public function enqueue_admin_scripts()
 			{
-				if(empty($_GET['page']) || strpos($_GET['page'], __NAMESPACE__) !== 0)
+				if(empty($_REQUEST['page']) || strpos($_REQUEST['page'], __NAMESPACE__) !== 0)
 					return; // Nothing to do; NOT a plugin page in the administrative area.
 
 				$deps = array('jquery'); // Plugin dependencies.
@@ -506,9 +506,9 @@ namespace comment_mail
 			 */
 			public function add_menu_pages()
 			{
-				add_comments_page($this->name, $this->name, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
-				add_comments_page($this->name, $this->name, $this->cap, __NAMESPACE__.'_subscribers', array($this, 'menu_page_subscribers'));
-				add_comments_page($this->name, $this->name, $this->cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
+				add_comments_page($this->name.'™', $this->name.'™', $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
+				add_comments_page($this->short_name.'™ '.__('Subscribers', $this->text_domain), $this->short_name.'™ '.__('Subscribers', $this->text_domain), $this->cap, __NAMESPACE__.'_subscribers', array($this, 'menu_page_subscribers'));
+				add_comments_page($this->short_name.'™ '.__('Mail Queue', $this->text_domain), $this->short_name.'™ '.__('Mail Queue', $this->text_domain), $this->cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
 			}
 
 			/**
@@ -524,9 +524,9 @@ namespace comment_mail
 			 */
 			public function add_settings_link($links)
 			{
-				$links[] = '<a href="'.esc_attr(add_query_arg(urlencode_deep(array('page' => __NAMESPACE__,)), self_admin_url('/admin.php'))).'">'.__('Settings', $this->text_domain).'</a><br/>';
-				$links[] = '<a href="'.esc_attr(add_query_arg(urlencode_deep(array('page' => __NAMESPACE__, __NAMESPACE__.'_pro_preview' => '1')), self_admin_url('/admin.php'))).'">'.__('Preview Pro Features', $this->text_domain).'</a>';
-				$links[] = '<a href="'.esc_attr('http://www.websharks-inc.com/product/'.str_replace('_', '-', __NAMESPACE__).'/').'" target="_blank">'.__('Upgrade', $this->text_domain).'</a>';
+				$links[] = '<a href="'.esc_attr($this->utils_url->main_menu_page_only()).'">'.__('Settings', $this->text_domain).'</a><br/>';
+				$links[] = '<a href="'.esc_attr($this->utils_url->pro_preview()).'">'.__('Preview Pro Features', $this->text_domain).'</a>';
+				$links[] = '<a href="'.esc_attr($this->utils_url->product_page()).'" target="_blank">'.__('Upgrade', $this->text_domain).'</a>';
 
 				return apply_filters(__METHOD__, $links, get_defined_vars());
 			}
@@ -540,8 +540,7 @@ namespace comment_mail
 			 */
 			public function menu_page_options()
 			{
-				$menu_pages = new menu_pages();
-				$menu_pages->options();
+				new menu_page('options');
 			}
 
 			/**
@@ -553,8 +552,7 @@ namespace comment_mail
 			 */
 			public function menu_page_subscribers()
 			{
-				$menu_pages = new menu_pages();
-				$menu_pages->subscribers();
+				new menu_page('subscribers');
 			}
 
 			/**
@@ -566,8 +564,7 @@ namespace comment_mail
 			 */
 			public function menu_page_queue()
 			{
-				$menu_pages = new menu_pages();
-				$menu_pages->queue();
+				new menu_page('queue');
 			}
 
 			/*
@@ -659,7 +656,10 @@ namespace comment_mail
 			 */
 			public function all_admin_notices()
 			{
-				if(($notices = (is_array($notices = get_option(__NAMESPACE__.'_notices'))) ? $notices : array()))
+				$notices = get_option(__NAMESPACE__.'_notices');
+				if(!is_array($notices)) $notices = array();
+
+				if($notices) // Do we have notices to display at this time?
 				{
 					$notices = $updated_notices = array_unique($notices); // De-dupe.
 
@@ -671,16 +671,16 @@ namespace comment_mail
 				}
 				if(current_user_can($this->cap)) foreach($notices as $_key => $_notice)
 				{
-					$_dismiss = ''; // Initialize empty string; e.g. reset value on each pass.
-					if(strpos($_key, 'persistent-') === 0) // A dismissal link is needed in this case?
-					{
-						$_dismiss_css = 'display:inline-block; float:right; margin:0 0 0 15px; text-decoration:none; font-weight:bold;';
-						$_dismiss     = add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('dismiss_notice' => array('key' => $_key)), '_wpnonce' => wp_create_nonce())));
-						$_dismiss     = '<a style="'.esc_attr($_dismiss_css).'" href="'.esc_attr($_dismiss).'">'.__('dismiss &times;', $this->text_domain).'</a>';
-					}
-					echo apply_filters(__METHOD__.'__notice', '<div class="updated"><p>'.$_notice.$_dismiss.'</p></div>', get_defined_vars());
+					if(strpos($_key, 'persistent-') === 0) // A dismissal link is needed?
+						$_dismiss = '<a href="'.esc_attr($this->utils_url->dismiss_notice($_key)).'"'.
+						            '  style="display:inline-block; float:right; margin:0 0 0 15px; text-decoration:none; font-weight:bold;">'.
+						            '  '.__('dismiss &times;', $this->text_domain).
+						            '</a>';
+					else $_dismiss = ''; // Initialize empty string; e.g. reset value on each pass.
+
+					echo apply_filters(__METHOD__.'_notice', '<div class="updated"><p>'.$_notice.$_dismiss.'</p></div>', get_defined_vars());
 				}
-				unset($_key, $_notice, $_dismiss_css, $_dismiss); // Housekeeping.
+				unset($_key, $_notice, $_dismiss); // Housekeeping.
 			}
 
 			/**
@@ -692,28 +692,31 @@ namespace comment_mail
 			 */
 			public function all_admin_errors()
 			{
-				if(($errors = (is_array($errors = get_option(__NAMESPACE__.'_errors'))) ? $errors : array()))
+				$errors = get_option(__NAMESPACE__.'_errors');
+				if(!is_array($errors)) $errors = array();
+
+				if($errors) // Do we have errors to display at this time?
 				{
 					$errors = $updated_errors = array_unique($errors); // De-dupe.
 
 					foreach(array_keys($updated_errors) as $_key) if(strpos($_key, 'persistent-') !== 0)
 						unset($updated_errors[$_key]); // Leave persistent errors; ditch others.
-					unset($_key); // Housekeeping after updating notices.
+					unset($_key); // Housekeeping after updating errors.
 
 					update_option(__NAMESPACE__.'_errors', $updated_errors);
 				}
 				if(current_user_can($this->cap)) foreach($errors as $_key => $_error)
 				{
-					$_dismiss = ''; // Initialize empty string; e.g. reset value on each pass.
-					if(strpos($_key, 'persistent-') === 0) // A dismissal link is needed in this case?
-					{
-						$_dismiss_css = 'display:inline-block; float:right; margin:0 0 0 15px; text-decoration:none; font-weight:bold;';
-						$_dismiss     = add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('dismiss_error' => array('key' => $_key)), '_wpnonce' => wp_create_nonce())));
-						$_dismiss     = '<a style="'.esc_attr($_dismiss_css).'" href="'.esc_attr($_dismiss).'">'.__('dismiss &times;', $this->text_domain).'</a>';
-					}
-					echo apply_filters(__METHOD__.'__error', '<div class="error"><p>'.$_error.$_dismiss.'</p></div>', get_defined_vars());
+					if(strpos($_key, 'persistent-') === 0) // A dismissal link is needed?
+						$_dismiss = '<a href="'.esc_attr($this->utils_url->dismiss_error($_key)).'"'.
+						            '  style="display:inline-block; float:right; margin:0 0 0 15px; text-decoration:none; font-weight:bold;">'.
+						            '  '.__('dismiss &times;', $this->text_domain).
+						            '</a>';
+					else $_dismiss = ''; // Initialize empty string; e.g. reset value on each pass.
+
+					echo apply_filters(__METHOD__.'_error', '<div class="error"><p>'.$_error.$_dismiss.'</p></div>', get_defined_vars());
 				}
-				unset($_key, $_error, $_dismiss_css, $_dismiss); // Housekeeping.
+				unset($_key, $_error, $_dismiss); // Housekeeping.
 			}
 
 			/*
