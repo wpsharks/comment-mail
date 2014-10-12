@@ -543,7 +543,7 @@ namespace comment_mail
 			public function add_settings_link($links)
 			{
 				$links[] = '<a href="'.esc_attr($this->utils_url->main_menu_page_only()).'">'.__('Settings', $this->text_domain).'</a><br/>';
-				$links[] = '<a href="'.esc_attr($this->utils_url->pro_preview()).'">'.__('Preview Pro Features', $this->text_domain).'</a>';
+				$links[] = '<a href="'.esc_attr($this->utils_url->pro_preview($this->utils_url->main_menu_page_only())).'">'.__('Preview Pro Features', $this->text_domain).'</a>';
 				$links[] = '<a href="'.esc_attr($this->utils_url->product_page()).'" target="_blank">'.__('Upgrade', $this->text_domain).'</a>';
 
 				return apply_filters(__METHOD__, $links, get_defined_vars());
@@ -616,6 +616,7 @@ namespace comment_mail
 			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_subscribers]` action.
 			 *
 			 * @see add_menu_pages()
+			 * @see subs_table::get_hidden_columns()
 			 */
 			public function menu_page_subscribers_screen()
 			{
@@ -632,6 +633,14 @@ namespace comment_mail
 					'label'   => __('Per Page', $this->text_domain),
 					'option'  => __NAMESPACE__.'_subscribers_per_page',
 				));
+				add_filter("manage_'.$screen->id.'_columns", function ()
+				{
+					return subs_table::get_columns_();
+				});
+				add_filter('get_user_option_manage'.$screen->id.'columnshidden', function ($value)
+				{
+					return is_array($value) ? $value : subs_table::get_hidden_columns_();
+				});
 			}
 
 			/**

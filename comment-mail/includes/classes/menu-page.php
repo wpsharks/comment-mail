@@ -61,6 +61,24 @@ namespace comment_mail // Root namespace.
 
 				echo '      </div>'."\n";
 
+				echo '      <div class="plugin-menu-page-panel">'."\n";
+
+				echo '         <a href="#" class="plugin-menu-page-panel-heading">'."\n";
+				echo '            <i class="fa fa-shield"></i> '.__('Plugin Deletion Safeguards', $this->plugin->text_domain)."\n";
+				echo '         </a>'."\n";
+
+				echo '         <div class="plugin-menu-page-panel-body clearfix">'."\n";
+				echo '            <i class="fa fa-shield fa-4x" style="float:right; margin: 0 0 0 25px;"></i>'."\n";
+				echo '            <h3>'.__('Uninstall on Plugin Deletion; or Safeguard Options?', $this->plugin->text_domain).'</h3>'."\n";
+				echo '            <p>'.sprintf(__('<strong>Tip:</strong> By default, if you delete %1$s using the plugins menu in WordPress, nothing is lost. However, if you want to completely uninstall %1$s you should set this to <code>Yes</code> and <strong>THEN</strong> deactivate &amp; delete %1$s from the plugins menu in WordPress. This way %1$s will erase your options for the plugin, erase database tables created by the plugin, remove subscribers, terminate CRON jobs, etc. It erases itself from existence completely.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'."\n";
+				echo '            <p><select name="'.esc_attr(__NAMESPACE__).'[save_options][uninstall_on_deletion]">'."\n";
+				echo '                  <option value="0"'.selected($this->plugin->options['uninstall_on_deletion'], '0', FALSE).'>'.__('Safeguard my options and subscribers (recommended).', $this->plugin->text_domain).'</option>'."\n";
+				echo '                  <option value="1"'.selected($this->plugin->options['uninstall_on_deletion'], '1', FALSE).'>'.sprintf(__('Yes, uninstall (completely erase) %1$s on plugin deletion.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</option>'."\n";
+				echo '               </select></p>'."\n";
+				echo '         </div>'."\n";
+
+				echo '      </div>'."\n";
+
 				echo '      <div class="plugin-menu-page-save">'."\n";
 				echo '         <button type="submit">'.__('Save All Changes', $this->plugin->text_domain).' <i class="fa fa-save"></i></button>'."\n";
 				echo '      </div>'."\n";
@@ -139,7 +157,11 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function heading($title, $icon)
 			{
-				$heading = '<div class="plugin-menu-page-heading">'."\n";
+				$heading = ''; // Initialize heading.
+				$title   = (string)$title; // Force string.
+				$icon    = (string)$icon; // Force string.
+
+				$heading .= '<div class="plugin-menu-page-heading">'."\n";
 
 				$heading .= '  <button type="button" class="plugin-menu-page-restore-defaults"'. // Restores default options.
 				            '     data-confirmation="'.esc_attr(__('Restore default plugin options? You will lose all of your current settings! Are you absolutely sure?', $this->plugin->text_domain)).'"'.
@@ -153,7 +175,7 @@ namespace comment_mail // Root namespace.
 				$heading .= '  </div>'."\n";
 
 				$heading .= '  <div class="plugin-menu-page-upsells">'."\n";
-				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->pro_preview($this->plugin->utils_url->current_page_only())).'"><i class="fa fa-eye"></i> Preview Pro Features</a>'."\n";
+				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->pro_preview()).'"><i class="fa fa-eye"></i> Preview Pro Features</a>'."\n";
 				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->product_page()).'" target="_blank"><i class="fa fa-heart-o"></i> '.__('Pro Upgrade', $this->plugin->text_domain).'</a>'."\n";
 				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->subscribe_page()).'" target="_blank"><i class="fa fa-envelope"></i> '.__('Newsletter (Subscribe)', $this->plugin->text_domain).'</a>'."\n";
 				$heading .= '  </div>'."\n";
@@ -161,6 +183,8 @@ namespace comment_mail // Root namespace.
 				$heading .= '  <img src="'.$this->plugin->utils_url->to('/client-s/images/'.$icon).'" alt="'.esc_attr($title).'" style="max-width:400px;" />'."\n";
 
 				$heading .= '</div>'."\n";
+
+				return $heading; // Menu page heading.
 			}
 
 			/**
@@ -174,27 +198,27 @@ namespace comment_mail // Root namespace.
 			{
 				$notices = ''; // Initialize notices.
 
-				if(!empty($_REQUEST[__NAMESPACE__.'__updated'])) // Options updated successfully?
+				if($this->plugin->utils_env->is_options_updated())
 				{
 					$notices .= '<div class="plugin-menu-page-notice notice">'."\n";
 					$notices .= '  <i class="fa fa-thumbs-up"></i> '.__('Options updated successfully.', $this->plugin->text_domain)."\n";
 					$notices .= '</div>'."\n";
 				}
-				if(!empty($_REQUEST[__NAMESPACE__.'__restored'])) // Restored default options?
+				if($this->plugin->utils_env->is_options_restored())
 				{
 					$notices .= '<div class="plugin-menu-page-notice notice">'."\n";
 					$notices .= '  <i class="fa fa-thumbs-up"></i> '.__('Default options successfully restored.', $this->plugin->text_domain)."\n";
 					$notices .= '</div>'."\n";
 				}
-				if(!empty($_REQUEST[__NAMESPACE__.'_pro_preview']))
+				if($this->plugin->utils_env->is_pro_preview())
 				{
 					$notices .= '<div class="plugin-menu-page-notice info">'."\n";
-					$notices .= '  <a href="'.add_query_arg($this->plugin->utils_url->current_page_only()).'" class="pull-right" style="margin:0 0 15px 25px; font-variant:small-caps; text-decoration:none;">'.__('close', $this->plugin->text_domain).' <i class="fa fa-eye-slash"></i></a>'."\n";
+					$notices .= '  <a href="'.esc_attr($this->plugin->utils_url->current_page_only()).'" class="pull-right" style="margin:0 0 15px 25px; font-variant:small-caps; text-decoration:none;">'.__('close', $this->plugin->text_domain).' <i class="fa fa-eye-slash"></i></a>'."\n";
 					$notices .= '  <i class="fa fa-eye"></i> '.sprintf(__('<strong>Pro Features (Preview)</strong> ~ New option panels below. Please explore before <a href="%1$s" target="_blank">upgrading <i class="fa fa-heart-o"></i></a>.', $this->plugin->text_domain), esc_attr($this->plugin->utils_url->product_page())).'<br />'."\n";
 					$notices .= '  '.sprintf(__('<small>NOTE: the free version of %1$s (i.e. this lite version); is more-than-adequate for most sites. Please upgrade only if you desire advanced features or would like to support the developer.</small>', $this->plugin->text_domain), esc_html($this->plugin->name))."\n";
 					$notices .= '</div>'."\n";
 				}
-				if(!$this->plugin->options['enable']) // Not enabled yet?
+				if(!$this->plugin->options['enable'] && $this->plugin->utils_env->is_menu_page(__NAMESPACE__))
 				{
 					$notices .= '<div class="plugin-menu-page-notice warning">'."\n";
 					$notices .= '  <i class="fa fa-warning"></i> '.sprintf(__('%1$s is currently disabled; please review options below.', $this->plugin->text_domain), esc_html($this->plugin->name))."\n";

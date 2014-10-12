@@ -151,7 +151,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function main_menu_page_only()
 			{
-				return add_query_arg('page', urlencode(__NAMESPACE__), self_admin_url('/edit-comments.php'));
+				return add_query_arg('page', urlencode(__NAMESPACE__), admin_url('/edit-comments.php'));
 			}
 
 			/**
@@ -167,18 +167,62 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Restore default options URL; for main menu page w/ `_wpnonce`.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string Restore default options URL; for main menu page w/ `_wpnonce`.
+			 */
+			public function restore_default_options()
+			{
+				$args = array(__NAMESPACE__ => array('restore_default_options' => '1'));
+
+				return add_query_arg(urlencode_deep($args), $this->main_menu_page_nonce_only());
+			}
+
+			/**
+			 * Add options restored flag to a given URL.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $url The input URL to flag (optional).
+			 *    If empty, defaults to the current menu page.
+			 *
+			 * @return string The input `$url` with an options restored flag.
+			 */
+			public function options_restored($url = '')
+			{
+				return add_query_arg(__NAMESPACE__.'_options_restored', '1', $url ? (string)$url : $this->current_page_only());
+			}
+
+			/**
+			 * Add options updated flag to a given URL.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $url The input URL to flag (optional).
+			 *    If empty, defaults to the current menu page.
+			 *
+			 * @return string The input `$url` with an options updated flag.
+			 */
+			public function options_updated($url = '')
+			{
+				return add_query_arg(__NAMESPACE__.'_options_updated', '1', $url ? (string)$url : $this->current_page_only());
+			}
+
+			/**
 			 * Add pro preview action to a given URL.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string $url The input URL to preview (optional).
-			 *    If empty, defaults to the main menu page.
+			 *    If empty, defaults to the current menu page.
 			 *
 			 * @return string The input `$url` with a pro preview action.
 			 */
 			public function pro_preview($url = '')
 			{
-				return add_query_arg(__NAMESPACE__.'_pro_preview', '1', $url ? (string)$url : $this->main_menu_page_only());
+				return add_query_arg(__NAMESPACE__.'_pro_preview', '1', $url ? (string)$url : $this->current_page_only());
 			}
 
 			/**
@@ -198,6 +242,21 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Removes notice dismissal flag from a given URL.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $url The input URL to unflag (optional).
+			 *    If empty, defaults to the current menu page.
+			 *
+			 * @return string The input `$url` with a notice dismissal flag removed.
+			 */
+			public function notice_dismissed($url = '')
+			{
+				return remove_query_arg(__NAMESPACE__, $url ? (string)$url : $this->current());
+			}
+
+			/**
 			 * Error dimissal URL, for current URL w/ `_wpnonce`.
 			 *
 			 * @since 14xxxx First documented version.
@@ -214,17 +273,18 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Restore default options URL; for main menu page w/ `_wpnonce`.
+			 * Removes error dismissal flag from a given URL.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @return string Restore default options URL; for main menu page w/ `_wpnonce`.
+			 * @param string $url The input URL to unflag (optional).
+			 *    If empty, defaults to the current menu page.
+			 *
+			 * @return string The input `$url` with an error dismissal flag removed.
 			 */
-			public function restore_default_options()
+			public function error_dismissed($url = '')
 			{
-				$args = array(__NAMESPACE__ => array('restore_default_options' => '1'));
-
-				return add_query_arg(urlencode_deep($args), $this->main_menu_page_nonce_only());
+				return remove_query_arg(__NAMESPACE__, $url ? (string)$url : $this->current());
 			}
 
 			/**

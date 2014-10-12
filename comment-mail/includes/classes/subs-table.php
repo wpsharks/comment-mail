@@ -23,6 +23,10 @@ namespace comment_mail // Root namespace.
 		 */
 		class subs_table extends \WP_List_Table
 		{
+			/*
+			 * Protected properties.
+			 */
+
 			/**
 			 * @var plugin Plugin reference.
 			 *
@@ -58,6 +62,10 @@ namespace comment_mail // Root namespace.
 			 */
 			protected $comment_ids_regex;
 
+			/*
+			 * Class constructor.
+			 */
+
 			/**
 			 * Class constructor.
 			 *
@@ -79,13 +87,14 @@ namespace comment_mail // Root namespace.
 				);
 				parent::__construct($args); // Parent constructor.
 
-				add_filter('get_user_option_manage'.$this->screen->id.'columnshidden',
-				           array($this, 'get_hidden_columns'));
-
 				$this->maybe_process_bulk_action();
 				$this->prepare_items();
 				$this->display();
 			}
+
+			/*
+			 * Public API methods.
+			 */
 
 			/**
 			 * Table columns.
@@ -96,23 +105,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function get_columns()
 			{
-				return array(
-					'cb'               => '1', // Yes, include checkboxes.
-					'ID'               => __('ID', $this->plugin->text_domain),
-					'key'              => __('Key', $this->plugin->text_domain),
-					'user_id'          => __('User ID', $this->plugin->text_domain),
-					'post_id'          => __('Post ID', $this->plugin->text_domain),
-					'comment_id'       => __('Comment ID', $this->plugin->text_domain),
-					'deliver'          => __('Delivery Option', $this->plugin->text_domain),
-					'fname'            => __('First Name', $this->plugin->text_domain),
-					'lname'            => __('Last Name', $this->plugin->text_domain),
-					'email'            => __('Email', $this->plugin->text_domain),
-					'insertion_ip'     => __('Original IP', $this->plugin->text_domain),
-					'last_ip'          => __('Last Known IP', $this->plugin->text_domain),
-					'status'           => __('Status', $this->plugin->text_domain),
-					'insertion_time'   => __('Subscription Time', $this->plugin->text_domain),
-					'last_update_time' => __('Last Update Time', $this->plugin->text_domain),
-				);
+				return static::get_columns_();
 			}
 
 			/**
@@ -120,47 +113,68 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param mixed $value Current user-specific value.
-			 *
 			 * @return array An array of all table columns.
 			 */
-			public function get_hidden_columns($value)
+			public static function get_columns_()
 			{
-				return !is_array($value)
-					? array(
-						'ID',
-						'key',
-						'user_id',
-						# 'post_id',
-						# 'comment_id',
-						# 'deliver',
-						'fname',
-						'lname',
-						# 'email',
-						# 'insertion_ip',
-						'last_ip',
-						# 'status',
-						# 'insertion_time',
-						'last_update_time',
-					)
-					: $value;
+				$plugin = plugin(); // Plugin class instance.
+
+				return array(
+					'cb'               => '1', // Yes, include checkboxes.
+					'ID'               => __('ID', $plugin->text_domain),
+					'key'              => __('Key', $plugin->text_domain),
+					'user_id'          => __('User ID', $plugin->text_domain),
+					'post_id'          => __('Post ID', $plugin->text_domain),
+					'comment_id'       => __('Comment ID', $plugin->text_domain),
+					'deliver'          => __('Delivery Option', $plugin->text_domain),
+					'fname'            => __('First Name', $plugin->text_domain),
+					'lname'            => __('Last Name', $plugin->text_domain),
+					'email'            => __('Email', $plugin->text_domain),
+					'insertion_ip'     => __('Original IP', $plugin->text_domain),
+					'last_ip'          => __('Last Known IP', $plugin->text_domain),
+					'status'           => __('Status', $plugin->text_domain),
+					'insertion_time'   => __('Subscription Time', $plugin->text_domain),
+					'last_update_time' => __('Last Update Time', $plugin->text_domain),
+				);
 			}
 
 			/**
-			 * Sortable table columns.
+			 * Hidden table columns.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @return array An array of all sortable table columns.
+			 * @return array An array of all hidden table columns.
 			 */
-			public function get_sortable_columns()
+			public function get_hidden_columns()
 			{
-				foreach(array_keys($this->get_columns()) as $_column)
-					if($_column !== 'cb') // Checkbox col. not sortable.
-						$sortable[$_column] = array($_column, FALSE);
-				unset($_column); // Housekeeping.
+				return static::get_hidden_columns_();
+			}
 
-				return !empty($sortable) ? $sortable : array();
+			/**
+			 * Hidden table columns.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of all hidden table columns.
+			 */
+			public static function get_hidden_columns_()
+			{
+				return array(
+					'ID',
+					'key',
+					'user_id',
+					# 'post_id',
+					# 'comment_id',
+					# 'deliver',
+					'fname',
+					'lname',
+					# 'email',
+					# 'insertion_ip',
+					'last_ip',
+					# 'status',
+					# 'insertion_time',
+					'last_update_time',
+				);
 			}
 
 			/**
@@ -171,6 +185,18 @@ namespace comment_mail // Root namespace.
 			 * @return array An array of all fulltext searchables.
 			 */
 			public function get_ft_searchable_columns()
+			{
+				return static::get_ft_searchable_columns_();
+			}
+
+			/**
+			 * Fulltext searchable table columns.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of all fulltext searchables.
+			 */
+			public static function get_ft_searchable_columns_()
 			{
 				return array(
 					# 'ID',
@@ -189,6 +215,113 @@ namespace comment_mail // Root namespace.
 					# 'last_update_time',
 				);
 			}
+
+			/**
+			 * Sortable table columns.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of all sortable table columns.
+			 */
+			public function get_sortable_columns()
+			{
+				return static::get_sortable_columns_();
+			}
+
+			/**
+			 * Sortable table columns.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of all sortable table columns.
+			 */
+			public static function get_sortable_columns_()
+			{
+				foreach(array_keys(static::get_columns_()) as $_column) if($_column !== 'cb')
+					$sortable[$_column] = array($_column, FALSE);
+				unset($_column); // Housekeeping.
+
+				return !empty($sortable) ? $sortable : array();
+			}
+
+			/**
+			 * Display the table.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			public function display()
+			{
+				$this->search_box(__('Search', $this->plugin->text_domain), __CLASS__);
+
+				parent::display(); // Call parent handler now.
+			}
+
+			/**
+			 * Runs DB query; sets pagination args.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			public function prepare_items() // The heart of this class.
+			{
+				$max_limit       = $this->plugin->utils_user->screen_option($this->screen, 'per_page');
+				$upper_max_limit = (integer)apply_filters(__CLASS__.'_upper_max_limit', 1000);
+
+				$max_limit = $max_limit < 1 ? 1 : $max_limit;
+				$max_limit = $max_limit > $upper_max_limit ? 100 : $max_limit;
+
+				$per_page       = $max_limit;
+				$current_page   = $this->get_pagenum();
+				$current_offset = ($current_page - 1) * $per_page;
+				$total_items    = $total_pages = 0; // Initialize.
+
+				$clean_search_query          = $this->get_clean_search_query();
+				$post_ids_in_search_query    = $this->get_post_ids_in_search_query();
+				$comment_ids_in_search_query = $this->get_comment_ids_in_search_query();
+				$orderby                     = $this->get_orderby();
+				$order                       = $this->get_order();
+
+				$sql = "SELECT SQL_CALC_FOUND_ROWS *". // w/ calc enabled.
+
+				       ($clean_search_query && $orderby === 'relevance' // Fulltext search?
+					       ? ", MATCH(`".implode('`,`', array_map('esc_sql', $this->get_ft_searchable_columns()))."`)".
+					         "  AGAINST('".esc_sql($clean_search_query)."' IN BOOLEAN MODE) AS `relevance`"
+					       : ''). // Otherwise, we can simply exclude this.
+
+				       " FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " WHERE 1=1". // Default where clause.
+
+				       ($post_ids_in_search_query // Within certain post IDs?
+					       ? " AND `post_id` IN('".implode("','", array_map('esc_sql', $post_ids_in_search_query))."')"
+					       : ''). // Otherwise, we can simply exclude this.
+
+				       ($comment_ids_in_search_query // Within certain comment IDs?
+					       ? " AND `post_id` IN('".implode("','", array_map('esc_sql', $comment_ids_in_search_query))."')"
+					       : ''). // Otherwise, we can simply exclude this.
+
+				       ($clean_search_query // A fulltext search?
+					       ? " AND MATCH(`".implode('`,`', array_map('esc_sql', $this->get_ft_searchable_columns()))."`)".
+					         "     AGAINST('".esc_sql($clean_search_query)."' IN BOOLEAN MODE)"
+					       : ''). // Otherwise, we can simply exclude this.
+
+				       ($orderby // Ordering by a specific column, or relevance?
+					       ? " ORDER BY `".esc_sql($orderby)."`".($order ? " ".esc_sql($order) : '')
+					       : ''). // Otherwise, we can simply exclude this.
+
+				       " LIMIT ".esc_sql($current_offset).",".esc_sql($per_page);
+
+				if(is_array($results = $this->plugin->utils_db->wp->get_results($sql)))
+				{
+					$this->items = $this->plugin->utils_db->typify_deep($results);
+					$total_items = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
+					$total_pages = ceil($total_items / $per_page); // Based on total items available.
+				}
+				$this->set_pagination_args(compact('per_page', 'total_items', 'total_pages'));
+			}
+
+			/*
+			 * Protected methods.
+			 */
 
 			/**
 			 * Table column handler.
@@ -240,6 +373,9 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function column_default(\stdClass $item, $property)
 			{
+				if(!($property = trim((string)$property)))
+					return '—'; // Not applicable.
+
 				return isset($item->{$property}) ? esc_html($item->{$property}) : '—';
 			}
 
@@ -423,81 +559,6 @@ namespace comment_mail // Root namespace.
 						= $order = 'DESC'; // Force by relevance.
 
 				return $order; // Current orderby.
-			}
-
-			/**
-			 * Runs DB query; sets pagination args.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			public function prepare_items()
-			{
-				$max_limit       = $this->plugin->utils_user->screen_option($this->screen, 'per_page');
-				$upper_max_limit = (integer)apply_filters(__CLASS__.'_upper_max_limit', 1000);
-
-				$max_limit = $max_limit < 1 ? 1 : $max_limit;
-				$max_limit = $max_limit > $upper_max_limit ? 100 : $max_limit;
-
-				$per_page       = $max_limit;
-				$current_page   = $this->get_pagenum();
-				$current_offset = ($current_page - 1) * $per_page;
-				$total_items    = $total_pages = 0; // Initialize.
-
-				$clean_search_query          = $this->get_clean_search_query();
-				$post_ids_in_search_query    = $this->get_post_ids_in_search_query();
-				$comment_ids_in_search_query = $this->get_comment_ids_in_search_query();
-				$orderby                     = $this->get_orderby();
-				$order                       = $this->get_order();
-
-				$sql = "SELECT SQL_CALC_FOUND_ROWS *". // w/ calc enabled.
-
-				       ($clean_search_query && $orderby === 'relevance' // Fulltext search?
-					       ? ", MATCH(`".implode('`,`', array_map('esc_sql', $this->get_ft_searchable_columns()))."`)".
-					         "  AGAINST('".esc_sql($clean_search_query)."' IN BOOLEAN MODE) AS `relevance`"
-					       : ''). // Otherwise, we can simply exclude this.
-
-				       " FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-
-				       " WHERE 1=1". // Default where clause.
-
-				       ($post_ids_in_search_query // Within certain post IDs?
-					       ? " AND `post_id` IN('".implode("','", array_map('esc_sql', $post_ids_in_search_query))."')"
-					       : ''). // Otherwise, we can simply exclude this.
-
-				       ($comment_ids_in_search_query // Within certain comment IDs?
-					       ? " AND `post_id` IN('".implode("','", array_map('esc_sql', $comment_ids_in_search_query))."')"
-					       : ''). // Otherwise, we can simply exclude this.
-
-				       ($clean_search_query // A fulltext search?
-					       ? " AND MATCH(`".implode('`,`', array_map('esc_sql', $this->get_ft_searchable_columns()))."`)".
-					         "     AGAINST('".esc_sql($clean_search_query)."' IN BOOLEAN MODE)"
-					       : ''). // Otherwise, we can simply exclude this.
-
-				       ($orderby // Ordering by a specific column, or relevance?
-					       ? " ORDER BY `".esc_sql($orderby)."`".($order ? " ".esc_sql($order) : '')
-					       : ''). // Otherwise, we can simply exclude this.
-
-				       " LIMIT ".esc_sql($current_offset).",".esc_sql($per_page);
-
-				if(is_array($results = $this->plugin->utils_db->wp->get_results($sql)))
-				{
-					$this->items = $this->plugin->utils_db->typify_deep($results);
-					$total_items = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
-					$total_pages = ceil($total_items / $per_page); // Based on total items available.
-				}
-				$this->set_pagination_args(compact('per_page', 'total_items', 'total_pages'));
-			}
-
-			/**
-			 * Display the table.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			public function display()
-			{
-				$this->search_box(__('Search', $this->plugin->text_domain), __CLASS__);
-
-				parent::display(); // Call parent handler now.
 			}
 		}
 	}
