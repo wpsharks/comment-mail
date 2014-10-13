@@ -41,50 +41,48 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			public function options()
+			protected function options()
 			{
-				echo '<form id="plugin-menu-page" class="plugin-menu-page" method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
+				echo '<div id="plugin-menu-page" class="plugin-menu-page">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
 
-				echo $this->heading(__('Plugin Options', $this->plugin->text_domain), 'options.png').$this->notices(); // Heading/notices.
+				echo '      '.$this->heading(__('Plugin Options', $this->plugin->text_domain), 'options.png').$this->notices(); // Heading/notices.
 
-				echo '   <div class="plugin-menu-page-body">'."\n";
+				echo '      <div class="plugin-menu-page-body">'."\n";
 
-				echo '      <div class="plugin-menu-page-panel">'."\n";
+				echo '         <div class="plugin-menu-page-panel">'."\n";
+				echo '            <a href="#" class="plugin-menu-page-panel-heading'.((!$this->plugin->options['enable']) ? ' open' : '').'">'."\n";
+				echo '               <i class="fa fa-flag"></i> '.__('Enable/Disable', $this->plugin->text_domain)."\n";
+				echo '            </a>'."\n";
 
-				echo '         <a href="#" class="plugin-menu-page-panel-heading'.((!$this->plugin->options['enable']) ? ' open' : '').'">'."\n";
-				echo '            <i class="fa fa-flag"></i> '.__('Enable/Disable', $this->plugin->text_domain)."\n";
-				echo '         </a>'."\n";
+				echo '            <div class="plugin-menu-page-panel-body'.((!$this->plugin->options['enable']) ? ' open' : '').' clearfix">'."\n";
+				echo '               <p><label class="switch-primary"><input type="radio" name="'.esc_attr(__NAMESPACE__).'[save_options][enable]" value="1"'.checked($this->plugin->options['enable'], '1', FALSE).' /> <i class="fa fa-magic fa-flip-horizontal"></i> '.sprintf(__('Yes, enable %1$s™', $this->plugin->text_domain), esc_html($this->plugin->name)).'</label> &nbsp;&nbsp;&nbsp; <label><input type="radio" name="'.esc_attr(__NAMESPACE__).'[save_options][enable]" value="0"'.checked($this->plugin->options['enable'], '0', FALSE).' /> '.__('No, disable.', $this->plugin->text_domain).'</label></p>'."\n";
+				echo '            </div>'."\n";
+				echo '         </div>'."\n";
 
-				echo '         <div class="plugin-menu-page-panel-body'.((!$this->plugin->options['enable']) ? ' open' : '').' clearfix">'."\n";
-				echo '            <p><label class="switch-primary"><input type="radio" name="'.esc_attr(__NAMESPACE__).'[save_options][enable]" value="1"'.checked($this->plugin->options['enable'], '1', FALSE).' /> <i class="fa fa-magic fa-flip-horizontal"></i> '.sprintf(__('Yes, enable %1$s™', $this->plugin->text_domain), esc_html($this->plugin->name)).'</label> &nbsp;&nbsp;&nbsp; <label><input type="radio" name="'.esc_attr(__NAMESPACE__).'[save_options][enable]" value="0"'.checked($this->plugin->options['enable'], '0', FALSE).' /> '.__('No, disable.', $this->plugin->text_domain).'</label></p>'."\n";
+				echo '         <div class="plugin-menu-page-panel">'."\n";
+				echo '            <a href="#" class="plugin-menu-page-panel-heading">'."\n";
+				echo '               <i class="fa fa-shield"></i> '.__('Plugin Deletion Safeguards', $this->plugin->text_domain)."\n";
+				echo '            </a>'."\n";
+
+				echo '            <div class="plugin-menu-page-panel-body clearfix">'."\n";
+				echo '               <i class="fa fa-shield fa-4x" style="float:right; margin: 0 0 0 25px;"></i>'."\n";
+				echo '               <h3>'.__('Uninstall on Plugin Deletion; or Safeguard Options?', $this->plugin->text_domain).'</h3>'."\n";
+				echo '               <p>'.sprintf(__('<strong>Tip:</strong> By default, if you delete %1$s using the plugins menu in WordPress, nothing is lost. However, if you want to completely uninstall %1$s you should set this to <code>Yes</code> and <strong>THEN</strong> deactivate &amp; delete %1$s from the plugins menu in WordPress. This way %1$s will erase your options for the plugin, erase database tables created by the plugin, remove subscribers, terminate CRON jobs, etc. It erases itself from existence completely.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'."\n";
+				echo '               <p><select name="'.esc_attr(__NAMESPACE__).'[save_options][uninstall_on_deletion]">'."\n";
+				echo '                     <option value="0"'.selected($this->plugin->options['uninstall_on_deletion'], '0', FALSE).'>'.__('Safeguard my options and subscribers (recommended).', $this->plugin->text_domain).'</option>'."\n";
+				echo '                     <option value="1"'.selected($this->plugin->options['uninstall_on_deletion'], '1', FALSE).'>'.sprintf(__('Yes, uninstall (completely erase) %1$s on plugin deletion.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</option>'."\n";
+				echo '                  </select></p>'."\n";
+				echo '            </div>'."\n";
+				echo '         </div>'."\n";
+
+				echo '         <div class="plugin-menu-page-save">'."\n";
+				echo '            <button type="submit">'.__('Save All Changes', $this->plugin->text_domain).' <i class="fa fa-save"></i></button>'."\n";
 				echo '         </div>'."\n";
 
 				echo '      </div>'."\n";
-
-				echo '      <div class="plugin-menu-page-panel">'."\n";
-
-				echo '         <a href="#" class="plugin-menu-page-panel-heading">'."\n";
-				echo '            <i class="fa fa-shield"></i> '.__('Plugin Deletion Safeguards', $this->plugin->text_domain)."\n";
-				echo '         </a>'."\n";
-
-				echo '         <div class="plugin-menu-page-panel-body clearfix">'."\n";
-				echo '            <i class="fa fa-shield fa-4x" style="float:right; margin: 0 0 0 25px;"></i>'."\n";
-				echo '            <h3>'.__('Uninstall on Plugin Deletion; or Safeguard Options?', $this->plugin->text_domain).'</h3>'."\n";
-				echo '            <p>'.sprintf(__('<strong>Tip:</strong> By default, if you delete %1$s using the plugins menu in WordPress, nothing is lost. However, if you want to completely uninstall %1$s you should set this to <code>Yes</code> and <strong>THEN</strong> deactivate &amp; delete %1$s from the plugins menu in WordPress. This way %1$s will erase your options for the plugin, erase database tables created by the plugin, remove subscribers, terminate CRON jobs, etc. It erases itself from existence completely.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'."\n";
-				echo '            <p><select name="'.esc_attr(__NAMESPACE__).'[save_options][uninstall_on_deletion]">'."\n";
-				echo '                  <option value="0"'.selected($this->plugin->options['uninstall_on_deletion'], '0', FALSE).'>'.__('Safeguard my options and subscribers (recommended).', $this->plugin->text_domain).'</option>'."\n";
-				echo '                  <option value="1"'.selected($this->plugin->options['uninstall_on_deletion'], '1', FALSE).'>'.sprintf(__('Yes, uninstall (completely erase) %1$s on plugin deletion.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</option>'."\n";
-				echo '               </select></p>'."\n";
-				echo '         </div>'."\n";
-
-				echo '      </div>'."\n";
-
-				echo '      <div class="plugin-menu-page-save">'."\n";
-				echo '         <button type="submit">'.__('Save All Changes', $this->plugin->text_domain).' <i class="fa fa-save"></i></button>'."\n";
-				echo '      </div>'."\n";
-
-				echo '   </div>'."\n";
-				echo '</form>';
+				echo '   </form>'."\n";
+				echo '</div>';
 			}
 
 			/**
@@ -92,28 +90,16 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			public function subscribers()
+			protected function subscribers()
 			{
-				echo '<form id="plugin-menu-page" class="plugin-menu-page" method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
+				echo '<div id="plugin-menu-page" class="plugin-menu-page-subscribers plugin-menu-page-table wrap">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
 
-				echo $this->heading(__('Comment Subscribers', $this->plugin->text_domain), 'subscribers.png').$this->notices(); // Heading/notices.
+				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Subscribers', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-groups" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
+				new subs_table(); // Displays table.
 
-				echo '   <div class="plugin-menu-page-body">'."\n";
-
-				echo '      <div class="plugin-menu-page-panel">'."\n";
-
-				echo '         <a href="#" class="plugin-menu-page-panel-heading'.((!$this->plugin->options['enable']) ? ' open' : '').'">'."\n";
-				echo '            <i class="fa fa-flag"></i> '.__('Comment Subscribers', $this->plugin->text_domain)."\n";
-				echo '         </a>'."\n";
-
-				echo '         <div class="plugin-menu-page-panel-body open clearfix">'."\n";
-				new subs_table(); // Subscribers table.
-				echo '         </div>'."\n";
-
-				echo '      </div>'."\n";
-
-				echo '   </div>'."\n";
-				echo '</form>';
+				echo '   </form>';
+				echo '</div>'."\n";
 			}
 
 			/**
@@ -121,28 +107,16 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			public function queue()
+			protected function queue()
 			{
-				echo '<form id="plugin-menu-page" class="plugin-menu-page" method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
+				echo '<div id="plugin-menu-page" class="plugin-menu-page-queue plugin-menu-page-table wrap">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
 
-				echo $this->heading(__('Queued Notifications', $this->plugin->text_domain), 'queue.png').$this->notices(); // Heading/notices.
+				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Queue', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-email" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
+				new queue_table(); // Displays table.
 
-				echo '   <div class="plugin-menu-page-body">'."\n";
-
-				echo '      <div class="plugin-menu-page-panel">'."\n";
-
-				echo '         <a href="#" class="plugin-menu-page-panel-heading'.((!$this->plugin->options['enable']) ? ' open' : '').'">'."\n";
-				echo '            <i class="fa fa-flag"></i> '.__('Queued Notifications', $this->plugin->text_domain)."\n";
-				echo '         </a>'."\n";
-
-				echo '         <div class="plugin-menu-page-panel-body open clearfix">'."\n";
-				new queue_table(); // Queue table.
-				echo '         </div>'."\n";
-
-				echo '      </div>'."\n";
-
-				echo '   </div>'."\n";
-				echo '</form>';
+				echo '   </form>';
+				echo '</div>'."\n";
 			}
 
 			/**

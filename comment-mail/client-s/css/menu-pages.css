@@ -1,16 +1,16 @@
 @import url('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css');
-
 /*
 Alter WordPress wrap on s2Member menu pages.
 */
-body[class*='comment_mail'] #wpwrap
+body.comments_page_comment_mail #wpwrap
 {
 	background : #C7C7C7;
 }
 /*
 Align these with menu page.
 */
-div.updated, div.error
+body.comments_page_comment_mail div.updated,
+body.comments_page_comment_mail div.error
 {
 	font-size : 120%;
 	margin    : 25px 25px 25px 5px;
@@ -440,4 +440,118 @@ Utility styles.
 {
 	margin : 0 0 15px 25px;
 	float  : right !important;
+}
+/*
+Table styles.
+*/
+.plugin-menu-page-table ul.search-filters,
+.plugin-menu-page-table ul.search-filters > li > ul
+{
+	list-style  : disc;
+	margin-left : 40px;
+}
+.plugin-menu-page-table ul.search-filters > li > ul
+{
+	list-style : circle;
+}
+.plugin-menu-page-table .post-com-count
+{
+	padding-bottom : 0;
+}
+.plugin-menu-page-table .post-sub-count
+{
+	border-radius : 3px;
+	text-align    : left;
+	background    : #BBBBBB;
+	padding       : 0 5px 0 4px;
+	display       : inline-block;
+}
+.plugin-menu-page-table .post-sub-count::before
+{
+	content                : '\f0c0';
+	color                  : #5A5A5A;
+	font-family            : FontAwesome;
+	-webkit-font-smoothing : antialiased;
+	text-rendering         : auto;
+
+	float                  : left;
+	margin                 : 0 5px 0 0;
+	display                : inline-block;
+}
+.plugin-menu-page-table .post-sub-count > .subscriber-count
+{
+	font-weight : bold;
+	color       : #FFFFFF;
+}
+.plugin-menu-page-table .post-sub-count:hover
+{
+	background : #2EA2CC;
+}
+.plugin-menu-page-table .post-sub-count:hover::before
+{
+	color : #FFFFFF;
+}
+/*
+Table column sizes; i.e. media queries.
+*/
+@media (max-width : 767px)
+{
+	.plugin-menu-page-subscribers .column-email
+	{
+		display : table-cell !important;
+	}
+	.plugin-menu-page-subscribers th:not(.check-column):not(.column-email),
+	.plugin-menu-page-subscribers td:not(.check-column):not(.column-email)
+	{
+		display : none !important;
+	}
+}
+@media (min-width : 768px) and (max-width : 991px)
+{
+	.plugin-menu-page-subscribers .column-email,
+	.plugin-menu-page-subscribers .column-post_id
+	{
+		display : table-cell !important;
+	}
+	.plugin-menu-page-subscribers th:not(.check-column):not(.column-email):not(.column-post_id),
+	.plugin-menu-page-subscribers td:not(.check-column):not(.column-email):not(.column-post_id)
+	{
+		display : none !important;
+	}
+}
+@media (min-width : 992px) and (max-width : 1199px)
+{
+	.plugin-menu-page-subscribers .column-email,
+	.plugin-menu-page-subscribers .column-post_id
+	{
+		width : 200px;
+	}
+	.plugin-menu-page-subscribers .column-comment_id
+	{
+		width : 150px;
+	}
+}
+@media (min-width : 1200px) and (max-width : 1599px)
+{
+	.plugin-menu-page-subscribers .column-email,
+	.plugin-menu-page-subscribers .column-post_id
+	{
+		width : 250px;
+	}
+	.plugin-menu-page-subscribers .column-comment_id
+	{
+		width : 200px;
+	}
+}
+@media (min-width : 1600px)
+{
+	.plugin-menu-page-subscribers .column-email,
+	.plugin-menu-page-subscribers .column-post_id
+	{
+		width : 300px;
+	}
+	.plugin-menu-page-subscribers .column-comment_id
+	{
+		width : 250px;
+	}
 }

@@ -73,7 +73,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Confirm subscriber via email.
+			 * Reconfirm subscriber via email.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -81,13 +81,13 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param string         $last_ip Most recent IP address, when possible.
 			 *
-			 * @return boolean|null TRUE if subscriber is confirmed successfully.
-			 *    Or, FALSE if unable to confirm (e.g. already confirmed).
+			 * @return boolean|null TRUE if subscriber is reconfirmed successfully.
+			 *    Or, FALSE if unable to reconfirm (e.g. already confirmed).
 			 *    Or, NULL on complete failure (e.g. invalid ID or key).
 			 *
 			 * @throws \exception If an update failure occurs.
 			 */
-			public function confirm_via_email($sub_id_or_key, $last_ip = '')
+			public function reconfirm($sub_id_or_key, $last_ip = '')
 			{
 				if(!$sub_id_or_key)
 					return NULL; // Not possible.
@@ -124,33 +124,32 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Bulk confirm subscribers via email.
+			 * Bulk reconfirm subscribers via email.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
 			 *
-			 * @return boolean|null TRUE if subscribers were confirmed successfully.
-			 *    Or, NULL on complete failure (e.g. invalid IDs or keys).
-			 *
-			 * @throws \exception If a DB update failure occurs.
+			 * @return integer Number of suscribers reconfirmed successfully.
 			 */
-			public function bulk_confirm_via_email(array $sub_ids_or_keys)
+			public function bulk_reconfirm(array $sub_ids_or_keys)
 			{
+				$counter = 0; // Initialize.
+
 				if(!$sub_ids_or_keys)
-					return NULL; // Not possible.
+					return $counter; // Not possible.
 
 				@set_time_limit(300); // Give this time.
 				@set_time_limit(900); // Give this time.
 
 				foreach($sub_ids_or_keys as $_sub_id_or_key)
-					if($this->confirm_via_email($_sub_id_or_key))
-						$confirmed = TRUE; // At least one confirmed.
+					if($this->reconfirm($_sub_id_or_key))
+						$counter++; // Updated counter.
 				unset($_sub_id_or_key); // Housekeeping.
 
 				$this->nullify_cache($sub_ids_or_keys);
 
-				return !empty($confirmed);
+				return $counter;
 			}
 
 			/**
@@ -214,25 +213,27 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
 			 *
-			 * @return boolean|null TRUE if subscribers were confirmed successfully.
-			 *    Or, NULL on complete failure (e.g. invalid IDs or keys).
+			 * @return integer Number of suscribers confirmed successfully.
 			 *
 			 * @throws \exception If a DB update failure occurs.
 			 */
 			public function bulk_confirm(array $sub_ids_or_keys)
 			{
+				$counter = 0; // Initialize.
+
 				if(!$sub_ids_or_keys)
-					return NULL; // Not possible.
+					return $counter; // Not possible.
 
 				$separate // Separate IDs from keys.
 					= $this->separate_ids_keys($sub_ids_or_keys);
 
 				if(!$separate['sub_ids'] && !$separate['sub_keys'])
-					return NULL; // Not possible.
+					return $counter; // Not possible.
 
 				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " SET `status` = '".esc_sql('subscribed')."'".
+				       ", `last_update_time` = '".esc_sql(time())."'".
 
 				       " WHERE". // Begin MySQL where clause.
 
@@ -247,11 +248,11 @@ namespace comment_mail // Root namespace.
 
 				if(($confirmed = $this->plugin->utils_db->wp->query($sql)) === FALSE)
 					throw new \exception(__('Update failure.', $this->plugin->text_domain));
-				$confirmed = (boolean)$confirmed; // Convert to boolean.
+				$counter += (integer)$confirmed; // Bump counter.
 
 				$this->nullify_cache($sub_ids_or_keys);
 
-				return $confirmed;
+				return $counter;
 			}
 
 			/**
@@ -310,25 +311,27 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
 			 *
-			 * @return boolean|null TRUE if subscribers were unconfirmed successfully.
-			 *    Or, NULL on complete failure (e.g. invalid IDs or keys).
+			 * @return integer Number of suscribers unconfirmed successfully.
 			 *
 			 * @throws \exception If a DB update failure occurs.
 			 */
 			public function bulk_unconfirm(array $sub_ids_or_keys)
 			{
+				$counter = 0; // Initialize.
+
 				if(!$sub_ids_or_keys)
-					return NULL; // Not possible.
+					return $counter; // Not possible.
 
 				$separate // Separate IDs from keys.
 					= $this->separate_ids_keys($sub_ids_or_keys);
 
 				if(!$separate['sub_ids'] && !$separate['sub_keys'])
-					return NULL; // Not possible.
+					return $counter; // Not possible.
 
 				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " SET `status` = '".esc_sql('unconfirmed')."'".
+				       ", `last_update_time` = '".esc_sql(time())."'".
 
 				       " WHERE". // Begin MySQL where clause.
 
@@ -343,11 +346,11 @@ namespace comment_mail // Root namespace.
 
 				if(($unconfirmed = $this->plugin->utils_db->wp->query($sql)) === FALSE)
 					throw new \exception(__('Update failure.', $this->plugin->text_domain));
-				$unconfirmed = (boolean)$unconfirmed; // Convert to boolean.
+				$counter += (integer)$unconfirmed; // Bump counter.
 
 				$this->nullify_cache($sub_ids_or_keys);
 
-				return $unconfirmed;
+				return $counter;
 			}
 
 			/**
@@ -411,25 +414,27 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
 			 *
-			 * @return boolean|null TRUE if subscribers were suspended successfully.
-			 *    Or, NULL on complete failure (e.g. invalid IDs or keys).
+			 * @return integer Number of suscribers suspended successfully.
 			 *
 			 * @throws \exception If a DB update failure occurs.
 			 */
 			public function bulk_suspend(array $sub_ids_or_keys)
 			{
+				$counter = 0; // Initialize.
+
 				if(!$sub_ids_or_keys)
-					return NULL; // Not possible.
+					return $counter; // Not possible.
 
 				$separate // Separate IDs from keys.
 					= $this->separate_ids_keys($sub_ids_or_keys);
 
 				if(!$separate['sub_ids'] && !$separate['sub_keys'])
-					return NULL; // Not possible.
+					return $counter; // Not possible.
 
 				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " SET `status` = '".esc_sql('suspended')."'".
+				       ", `last_update_time` = '".esc_sql(time())."'".
 
 				       " WHERE". // Begin MySQL where clause.
 
@@ -444,11 +449,11 @@ namespace comment_mail // Root namespace.
 
 				if(($suspended = $this->plugin->utils_db->wp->query($sql)) === FALSE)
 					throw new \exception(__('Update failure.', $this->plugin->text_domain));
-				$suspended = (boolean)$suspended; // Convert to boolean.
+				$counter += (integer)$suspended; // Bump counter.
 
 				$this->nullify_cache($sub_ids_or_keys);
 
-				return $suspended;
+				return $counter;
 			}
 
 			/**
@@ -510,21 +515,22 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
 			 *
-			 * @return boolean|null TRUE if subscribers were deleted successfully.
-			 *    Or, NULL on complete failure (e.g. invalid IDs or keys).
+			 * @return integer Number of suscribers deleted successfully.
 			 *
 			 * @throws \exception If a deletion failure occurs.
 			 */
 			public function bulk_delete(array $sub_ids_or_keys)
 			{
+				$counter = 0; // Initialize.
+
 				if(!$sub_ids_or_keys)
-					return NULL; // Not possible.
+					return $counter; // Not possible.
 
 				$separate // Separate IDs from keys.
 					= $this->separate_ids_keys($sub_ids_or_keys);
 
 				if(!$separate['sub_ids'] && !$separate['sub_keys'])
-					return NULL; // Not possible.
+					return $counter; // Not possible.
 
 				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
@@ -541,11 +547,11 @@ namespace comment_mail // Root namespace.
 
 				if(($deleted = $this->plugin->utils_db->wp->query($sql)) === FALSE)
 					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
-				$deleted = (boolean)$deleted; // Convert to boolean.
+				$counter += (integer)$deleted; // Bump counter.
 
 				$this->nullify_cache($sub_ids_or_keys);
 
-				return $deleted;
+				return $counter;
 			}
 
 			/**

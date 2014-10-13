@@ -48,7 +48,7 @@ namespace comment_mail // Root namespace.
 				if(!current_user_can($this->plugin->cap))
 					return; // Unauthenticated; ignore.
 
-				if(empty($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce']))
+				if(!$this->plugin->utils_url->has_valid_nonce())
 					return; // Unauthenticated; ignore.
 
 				foreach((array)$_REQUEST[__NAMESPACE__] as $action => $args)

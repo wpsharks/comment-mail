@@ -105,6 +105,29 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Escapes single quotes deeply.
+			 *
+			 * @param mixed   $value Any value can be converted into an escaped string.
+			 *    Actually, objects can't, but this recurses into objects.
+			 *
+			 * @param integer $times Number of escapes. Defaults to `1`.
+			 *
+			 * @return string|array|object Escaped string, array, object.
+			 */
+			public function esc_sq_deep($value, $times = 1)
+			{
+				if(is_array($value) || is_object($value))
+				{
+					foreach($value as &$_value)
+						$_value = $this->esc_sq_deep($_value, $times);
+					unset($_value); // Housekeeping.
+
+					return $value; // All done.
+				}
+				return str_replace("'", str_repeat('\\', abs((integer)$times))."'", (string)$value);
+			}
+
+			/**
 			 * Cleans a full name.
 			 *
 			 * @since 14xxxx First documented version.

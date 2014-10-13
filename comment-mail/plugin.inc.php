@@ -19,11 +19,14 @@ namespace comment_mail
 		 * Plugin Class
 		 *
 		 * @property utils_array  $utils_array
+		 * @property utils_date   $utils_date
 		 * @property utils_db     $utils_db
 		 * @property utils_enc    $utils_enc
 		 * @property utils_env    $utils_env
 		 * @property utils_event  $utils_event
+		 * @property utils_i18n   $utils_i18n
 		 * @property utils_mail   $utils_mail
+		 * @property utils_markup $utils_markup
 		 * @property utils_php    $utils_php
 		 * @property utils_string $utils_string
 		 * @property utils_sub    $utils_sub
@@ -323,6 +326,8 @@ namespace comment_mail
 				add_filter('set-screen-option', array($this, 'set_screen_option'), 10, 3);
 				add_filter('plugin_action_links_'.plugin_basename($this->file), array($this, 'add_settings_link'));
 
+				add_action('init', array($this, 'comment_shortlink_redirect'), -(PHP_INT_MAX - 10));
+
 				add_action('transition_post_status', array($this, 'post_status'), 10, 3);
 				add_action('before_delete_post', array($this, 'post_delete'), 10, 1);
 
@@ -479,8 +484,8 @@ namespace comment_mail
 			 */
 			public function enqueue_admin_styles()
 			{
-				if(empty($_REQUEST['page']) || strpos($_REQUEST['page'], __NAMESPACE__) !== 0)
-					return; // Nothing to do; NOT a plugin page in the administrative area.
+				if(!$this->utils_env->is_menu_page(__NAMESPACE__.'*'))
+					return; // Nothing to do; NOT a plugin menu page.
 
 				$deps = array(); // Plugin dependencies.
 
@@ -496,12 +501,16 @@ namespace comment_mail
 			 */
 			public function enqueue_admin_scripts()
 			{
-				if(empty($_REQUEST['page']) || strpos($_REQUEST['page'], __NAMESPACE__) !== 0)
-					return; // Nothing to do; NOT a plugin page in the administrative area.
+				if(!$this->utils_env->is_menu_page(__NAMESPACE__.'*'))
+					return; // Nothing to do; NOT a plugin menu page.
 
 				$deps = array('jquery'); // Plugin dependencies.
 
 				wp_enqueue_script(__NAMESPACE__, $this->utils_url->to('/client-s/js/menu-pages.min.js'), $deps, $this->version, TRUE);
+				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_i18n', array(
+					'bulk_reconfirm_confirmation' => __('Resend email confirmation link? Are you sure?', $this->text_domain),
+					'bulk_delete_confirmation'    => __('Delete permanently? Are you sure?', $this->text_domain),
+				));
 			}
 
 			/**
@@ -516,16 +525,17 @@ namespace comment_mail
 				if(!current_user_can($this->cap))
 					return; // Nothing to do.
 
-				$title                                = $this->name.'™';
-				$this->menu_page_hooks[__NAMESPACE__] = add_comments_page($title, $title, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
+				$this->menu_page_hooks[__NAMESPACE__] = add_comments_page($this->name.'™', $this->name.'™', $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__], array($this, 'menu_page_options_screen'));
 
-				$title                                               = $this->short_name.'™ '.__('Subscribers', $this->text_domain);
-				$this->menu_page_hooks[__NAMESPACE__.'_subscribers'] = add_comments_page($title, $title, $this->cap, __NAMESPACE__.'_subscribers', array($this, 'menu_page_subscribers'));
+				$menu_title                                          = '⥱ '.__('Subscribers', $this->text_domain);
+				$page_title                                          = $this->name.'™ ⥱ '.__('Subscribers', $this->text_domain);
+				$this->menu_page_hooks[__NAMESPACE__.'_subscribers'] = add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__.'_subscribers', array($this, 'menu_page_subscribers'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_subscribers'], array($this, 'menu_page_subscribers_screen'));
 
-				$title                                         = $this->short_name.'™ '.__('Mail Queue', $this->text_domain);
-				$this->menu_page_hooks[__NAMESPACE__.'_queue'] = add_comments_page($title, $title, $this->cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
+				$menu_title                                    = '⥱ '.__('Mail Queue', $this->text_domain);
+				$page_title                                    = $this->name.'™ ⥱ '.__('Mail Queue', $this->text_domain);
+				$this->menu_page_hooks[__NAMESPACE__.'_queue'] = add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue'], array($this, 'menu_page_queue_screen'));
 			}
 
@@ -633,7 +643,7 @@ namespace comment_mail
 					'label'   => __('Per Page', $this->text_domain),
 					'option'  => __NAMESPACE__.'_subscribers_per_page',
 				));
-				add_filter("manage_'.$screen->id.'_columns", function ()
+				add_filter('manage_'.$screen->id.'_columns', function ()
 				{
 					return subs_table::get_columns_();
 				});
@@ -917,6 +927,27 @@ namespace comment_mail
 			 */
 
 			/**
+			 * Comment shortlink redirections.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `init` action.
+			 */
+			public function comment_shortlink_redirect()
+			{
+				if(empty($_REQUEST['c']) || is_admin())
+					return; // Nothing to do.
+
+				if(!($comment_id = (integer)$_REQUEST['c']))
+					return; // Not applicable.
+
+				if(!($comment_link = get_comment_link($comment_id)))
+					return; // Not possible.
+
+				wp_redirect($comment_link, 301).exit();
+			}
+
+			/**
 			 * Comment form handler.
 			 *
 			 * @since 14xxxx First documented version.
@@ -942,7 +973,7 @@ namespace comment_mail
 			 * @param integer|string $comment_status Initial comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: `hold`, `unapprove`, `unapproved`),
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`),
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `spam`, `delete`.
 			 */
@@ -961,14 +992,14 @@ namespace comment_mail
 			 * @param integer|string $new_comment_status New comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: `hold`, `unapprove`, `unapproved`),
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`),
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `spam`, `delete`.
 			 *
 			 * @param integer|string $old_comment_status Old comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: `hold`, `unapprove`, `unapproved`),
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`),
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `spam`, `delete`.
 			 *
@@ -987,17 +1018,19 @@ namespace comment_mail
 			 * @param integer|string $status
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: `hold`, `unapprove`, `unapproved`),
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`),
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `spam`, `delete`.
 			 *
 			 * @return string `approve`, `hold`, `trash`, `spam`, `delete`.
 			 *
 			 * @throws \exception If an unexpected status is encountered.
+			 *
+			 * @TODO move this into a utility class.
 			 */
 			public function comment_status__($status)
 			{
-				switch(strtolower((string)$status))
+				switch(trim(strtolower((string)$status)))
 				{
 					case '1':
 					case 'approve':
@@ -1005,6 +1038,7 @@ namespace comment_mail
 						return 'approve';
 
 					case '0':
+					case '':
 					case 'hold':
 					case 'unapprove':
 					case 'unapproved':
@@ -1021,6 +1055,44 @@ namespace comment_mail
 
 					default: // Throw exception on anything else.
 						throw new \exception(sprintf(__('Unexpected comment status: `%1$s`.'), $status));
+				}
+			}
+
+			/**
+			 * Post comment status translator.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer|string $status
+			 *
+			 *    One of the following:
+			 *       - `0` (aka: ``, `closed`, `close`).
+			 *       - `1` (aka: `opened`, `open`).
+			 *       - `` (i.e. undefined).
+			 *
+			 * @return string `open`, `closed`.
+			 *
+			 * @throws \exception If an unexpected status is encountered.
+			 *
+			 * @TODO move this into a utility class.
+			 */
+			public function post_comment_status__($status)
+			{
+				switch(trim(strtolower((string)$status)))
+				{
+					case '1':
+					case 'open':
+					case 'opened':
+						return 'open';
+
+					case '0':
+					case '':
+					case 'close':
+					case 'closed':
+						return 'closed';
+
+					default: // Throw exception on anything else.
+						throw new \exception(sprintf(__('Unexpected post comment status: `%1$s`.'), $status));
 				}
 			}
 
