@@ -493,6 +493,9 @@ namespace comment_mail
 			 */
 			public function add_meta_boxes($post_type)
 			{
+				if(!current_user_can($this->cap))
+					return; // Nothing to do.
+
 				$post_type           = strtolower((string)$post_type);
 				$excluded_post_types = $this->options['excluded_meta_box_post_types'];
 				$excluded_post_types = preg_split('/[\s;,]+/', $excluded_post_types, NULL, PREG_SPLIT_NO_EMPTY);
