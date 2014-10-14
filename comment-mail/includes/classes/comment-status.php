@@ -69,8 +69,8 @@ namespace comment_mail // Root namespace.
 				parent::__construct();
 
 				$this->comment            = is_object($comment) ? $comment : NULL;
-				$this->new_comment_status = $this->plugin->comment_status__($new_comment_status);
-				$this->old_comment_status = $this->plugin->comment_status__($old_comment_status);
+				$this->new_comment_status = $this->plugin->utils_db->comment_status__($new_comment_status);
+				$this->old_comment_status = $this->plugin->utils_db->comment_status__($old_comment_status);
 
 				$this->maybe_insert_queue();
 				$this->maybe_delete_subs();

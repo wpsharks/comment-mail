@@ -429,31 +429,52 @@ Save button styles.
 	line-height : 1.3em;
 }
 /*
-Utility styles.
+Table filter styles.
 */
-.plugin-menu-page .float-left
+.plugin-menu-page-table ul.filters,
+.plugin-menu-page-table ul.filters ul,
+.plugin-menu-page-table ul.filters li
 {
-	margin : 0 25px 15px 0;
-	float  : left !important;
+	margin-left : 0;
+	list-style  : none;
 }
-.plugin-menu-page .float-right
-{
-	margin : 0 0 15px 25px;
-	float  : right !important;
-}
-/*
-Table styles.
-*/
 .plugin-menu-page-table ul.search-filters,
-.plugin-menu-page-table ul.search-filters > li > ul
+.plugin-menu-page-table ul.search-filters ul
 {
 	list-style  : disc;
 	margin-left : 40px;
 }
-.plugin-menu-page-table ul.search-filters > li > ul
+.plugin-menu-page-table ul.search-filters ul
 {
 	list-style : circle;
 }
+.plugin-menu-page-table ul.navigable-filters li
+{
+	margin  : 0 10px 0 0;
+	display : inline-block;
+}
+.plugin-menu-page-table ul.navigable-filters li > a
+{
+	border-radius   : 3px;
+	text-decoration : none;
+	color           : #A6A6A6;
+	background      : #EAEAEA;
+	padding         : 0 5px 0 5px;
+	display         : inline-block;
+}
+.plugin-menu-page-table ul.navigable-filters li > a:hover,
+.plugin-menu-page-table ul.navigable-filters li > a.active
+{
+	color      : #FFFFFF;
+	background : #2EA2CC;
+}
+.plugin-menu-page-table ul.navigable-filters li > a.active
+{
+	font-weight : bold;
+}
+/*
+Table bubble styles.
+*/
 .plugin-menu-page-table .post-com-count
 {
 	padding-bottom : 0;
@@ -492,7 +513,7 @@ Table styles.
 	color : #FFFFFF;
 }
 /*
-Table column sizes; i.e. media queries.
+Table columns; i.e. media queries.
 */
 @media (max-width : 767px)
 {
@@ -554,4 +575,17 @@ Table column sizes; i.e. media queries.
 	{
 		width : 250px;
 	}
+}
+/*
+Utility styles.
+*/
+.plugin-menu-page .float-left
+{
+	margin : 0 25px 15px 0;
+	float  : left !important;
+}
+.plugin-menu-page .float-right
+{
+	margin : 0 0 15px 25px;
+	float  : right !important;
 }

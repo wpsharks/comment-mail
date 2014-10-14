@@ -237,6 +237,8 @@ namespace comment_mail // Root namespace.
 					         "       OR `email` = '".esc_sql($this->comment->comment_author_email)."')"
 					       : " AND `email` = '".esc_sql($this->comment->comment_author_email)."'").
 
+				       " AND `status` != '".esc_sql('trashed')."'". // Not in the trash.
+
 				       " ORDER BY `insertion_time` ASC"; // For the loop below.
 
 				if(!($results = $this->plugin->utils_db->wp->get_results($sql)))

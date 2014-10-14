@@ -32,6 +32,7 @@ namespace comment_mail // Root namespace.
 				$this->prep_cron_job();
 				$this->clean_nonexistent_users();
 				$this->maybe_clean_unconfirmed_expirations();
+				$this->maybe_clean_trashed_expirations();
 			}
 
 			/**
@@ -71,7 +72,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Cleanup nonexistent users.
+			 * Cleanup unconfirmed subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -88,6 +89,30 @@ namespace comment_mail // Root namespace.
 				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `status` = 'unconfirmed'".
+				       " AND `last_update_time` < '".esc_sql($exp_time)."'";
+
+				if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
+			}
+
+			/**
+			 * Cleanup trashed subscriptions.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @throws \exception If a deletion failure occurs.
+			 */
+			protected function maybe_clean_trashed_expirations()
+			{
+				if(!$this->plugin->options['trashed_expiration_time'])
+					return; // Not applicable; functionality disabled.
+
+				if(!($exp_time = strtotime('-'.$this->plugin->options['trashed_expiration_time'])))
+					return; // Invalid time. Not compatible with `strtotime()`.
+
+				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " WHERE `status` = 'trashed'".
 				       " AND `last_update_time` < '".esc_sql($exp_time)."'";
 
 				if($this->plugin->utils_db->wp->query($sql) === FALSE)

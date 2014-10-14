@@ -42,6 +42,13 @@ namespace comment_mail // Root namespace.
 			protected $user_id;
 
 			/**
+			 * @var integer Total deletions.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $deleted;
+
+			/**
 			 * Class constructor.
 			 *
 			 * @param integer|string $post_id Post ID.
@@ -59,6 +66,7 @@ namespace comment_mail // Root namespace.
 				$this->post_id    = (integer)$post_id;
 				$this->comment_id = (integer)$comment_id;
 				$this->user_id    = (integer)$user_id;
+				$this->deleted    = 0; // Initialize.
 
 				$this->maybe_delete(); // If applicable.
 			}
@@ -91,8 +99,10 @@ namespace comment_mail // Root namespace.
 				       " WHERE `post_id` = '".esc_sql($this->post_id)."'".
 				       ($this->comment_id ? " AND `comment_id` = '".esc_sql($this->comment_id)."'" : '');
 
-				if($this->plugin->utils_db->wp->query($sql) === FALSE)
+				if(($deleted = $this->plugin->utils_db->wp->query($sql)) === FALSE)
 					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
+
+				$this->deleted += (integer)$deleted;
 			}
 
 			/**
@@ -117,8 +127,10 @@ namespace comment_mail // Root namespace.
 				       " WHERE `user_id` = '".esc_sql($user->ID)."'".
 				       ($user->user_email ? " OR `email` = '".esc_sql($user->user_email)."'" : '');
 
-				if($this->plugin->utils_db->wp->query($sql) === FALSE)
+				if(($deleted = $this->plugin->utils_db->wp->query($sql)) === FALSE)
 					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
+
+				$this->deleted += (integer)$deleted;
 			}
 		}
 	}

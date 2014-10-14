@@ -21,11 +21,11 @@ namespace comment_mail // Root namespace.
 		class utils_i18n extends abstract_base
 		{
 			/**
-			 * `X subscriber` or `X subscribers`, translated w/ singlular/plural context.
+			 * `X subscriber` or `X subscribers`.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer $counter Total subscribers; i.e. the counter.
+			 * @param integer $counter Total subscribers; i.e. a counter value.
 			 *
 			 * @return string The phrase `X subscriber` or `X subscribers`.
 			 */
@@ -37,7 +37,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * String translation for a given action; past tense.
+			 * Action past tense translation.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -63,6 +63,9 @@ namespace comment_mail // Root namespace.
 					case 'suspend':
 						return __('suspended', $this->plugin->text_domain);
 
+					case 'trash':
+						return __('trashed', $this->plugin->text_domain);
+
 					case 'delete':
 						return __('deleted', $this->plugin->text_domain);
 				}
@@ -70,12 +73,11 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * String translation for a given status; i.e. a label.
+			 * Status label translation.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $status A status e.g. `approve`, `hold`,
-			 *    `trash`, `spam`, `delete`, `open`, `closed`, etc.
+			 * @param string $status A status e.g. `approve`, `hold`, `unconfirmed`, etc.
 			 *
 			 * @return string The string translation for the given `$status`.
 			 */
@@ -105,12 +107,24 @@ namespace comment_mail // Root namespace.
 
 					case 'closed':
 						return __('closed', $this->plugin->text_domain);
+
+					case 'unconfirmed':
+						return __('unconfirmed', $this->plugin->text_domain);
+
+					case 'subscribed':
+						return __('subscribed', $this->plugin->text_domain);
+
+					case 'suspended':
+						return __('suspended', $this->plugin->text_domain);
+
+					case 'trashed':
+						return __('trashed', $this->plugin->text_domain);
 				}
 				return __(rtrim($status, 'ed').'ed', $this->plugin->text_domain);
 			}
 
 			/**
-			 * String translation for a given subscr. type; i.e. a label.
+			 * Subscr. type label translation.
 			 *
 			 * @since 14xxxx First documented version.
 			 *

@@ -294,6 +294,11 @@ namespace comment_mail
 					'unconfirmed_expiration_time'                 => '60 days', // `strtotime()` compatible.
 					// Or, this can be left empty to disable automatic expirations altogether.
 
+					'trashed_expiration_time'                     => '60 days', // `strtotime()` compatible.
+					// Or, this can be left empty to disable automatic deletions altogether.
+
+					'excluded_meta_box_post_types'                => 'link,comment,revision,attachment,nav_menu_item,snippet,redirect',
+
 				); // Default options are merged with those defined by the site owner.
 				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options, get_defined_vars());
 
@@ -339,6 +344,8 @@ namespace comment_mail
 				add_action('delete_user', array($this, 'user_delete'), 10, 1);
 				add_action('wpmu_delete_user', array($this, 'user_delete'), 10, 1);
 				add_action('remove_user_from_blog', array($this, 'user_delete'), 10, 2);
+
+				add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
 
 				/*
 				 * Setup CRON-related hooks.
@@ -472,7 +479,62 @@ namespace comment_mail
 			}
 
 			/*
-			 * Admin UI-Related Methods
+			 * Admin Meta-Box-Related Methods
+			 */
+
+			/**
+			 * Adds plugin meta boxes.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `add_meta_boxes` action.
+			 *
+			 * @param string $post_type The current post type.
+			 */
+			public function add_meta_boxes($post_type)
+			{
+				$post_type           = strtolower((string)$post_type);
+				$excluded_post_types = $this->options['excluded_meta_box_post_types'];
+				$excluded_post_types = preg_split('/[\s;,]+/', $excluded_post_types, NULL, PREG_SPLIT_NO_EMPTY);
+
+				if(in_array($post_type, $excluded_post_types, TRUE))
+					return; // Ignore; this post type excluded.
+
+				add_meta_box(__NAMESPACE__.'_small', $this->name.'™', array($this, 'post_small_meta_box'), $post_type, 'side', 'high');
+				add_meta_box(__NAMESPACE__.'_large', $this->name.'™ '.__('Subscribers', $this->text_domain),
+				             array($this, 'post_large_meta_box'), $post_type, 'normal', 'high');
+			}
+
+			/**
+			 * Builds small meta box for this plugin.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \WP_Post $post A WP post object reference.
+			 *
+			 * @see add_meta_boxes()
+			 */
+			public function post_small_meta_box(\WP_Post $post)
+			{
+				new post_small_meta_box($post);
+			}
+
+			/**
+			 * Builds large meta box for this plugin.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \WP_Post $post A WP post object reference.
+			 *
+			 * @see add_meta_boxes()
+			 */
+			public function post_large_meta_box(\WP_Post $post)
+			{
+				new post_large_meta_box($post);
+			}
+
+			/*
+			 * Admin Menu-Page-Related Methods
 			 */
 
 			/**
@@ -537,26 +599,6 @@ namespace comment_mail
 				$page_title                                    = $this->name.'™ ⥱ '.__('Mail Queue', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_queue'] = add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue'], array($this, 'menu_page_queue_screen'));
-			}
-
-			/**
-			 * Adds link(s) to plugin row on the WP plugins page.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @attaches-to `plugin_action_links_'.plugin_basename($this->file)` filter.
-			 *
-			 * @param array $links An array of the existing links provided by WordPress.
-			 *
-			 * @return array Revised array of links.
-			 */
-			public function add_settings_link($links)
-			{
-				$links[] = '<a href="'.esc_attr($this->utils_url->main_menu_page_only()).'">'.__('Settings', $this->text_domain).'</a><br/>';
-				$links[] = '<a href="'.esc_attr($this->utils_url->pro_preview($this->utils_url->main_menu_page_only())).'">'.__('Preview Pro Features', $this->text_domain).'</a>';
-				$links[] = '<a href="'.esc_attr($this->utils_url->product_page()).'" target="_blank">'.__('Upgrade', $this->text_domain).'</a>';
-
-				return apply_filters(__METHOD__, $links, get_defined_vars());
 			}
 
 			/**
@@ -703,8 +745,28 @@ namespace comment_mail
 				new menu_page('queue');
 			}
 
+			/**
+			 * Adds link(s) to plugin row on the WP plugins page.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `plugin_action_links_'.plugin_basename($this->file)` filter.
+			 *
+			 * @param array $links An array of the existing links provided by WordPress.
+			 *
+			 * @return array Revised array of links.
+			 */
+			public function add_settings_link($links)
+			{
+				$links[] = '<a href="'.esc_attr($this->utils_url->main_menu_page_only()).'">'.__('Settings', $this->text_domain).'</a><br/>';
+				$links[] = '<a href="'.esc_attr($this->utils_url->pro_preview($this->utils_url->main_menu_page_only())).'">'.__('Preview Pro Features', $this->text_domain).'</a>';
+				$links[] = '<a href="'.esc_attr($this->utils_url->product_page()).'" target="_blank">'.__('Upgrade', $this->text_domain).'</a>';
+
+				return apply_filters(__METHOD__, $links, get_defined_vars());
+			}
+
 			/*
-			 * Admin Notice/Error Methods
+			 * Admin Notice/Error Related Methods
 			 */
 
 			/**
@@ -938,13 +1000,7 @@ namespace comment_mail
 				if(empty($_REQUEST['c']) || is_admin())
 					return; // Nothing to do.
 
-				if(!($comment_id = (integer)$_REQUEST['c']))
-					return; // Not applicable.
-
-				if(!($comment_link = get_comment_link($comment_id)))
-					return; // Not possible.
-
-				wp_redirect($comment_link, 301).exit();
+				new comment_shortlink_redirect();
 			}
 
 			/**
@@ -1008,92 +1064,6 @@ namespace comment_mail
 			public function comment_status($new_comment_status, $old_comment_status, $comment)
 			{
 				new comment_status($new_comment_status, $old_comment_status, $comment);
-			}
-
-			/**
-			 * Comment status translator.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param integer|string $status
-			 *
-			 *    One of the following:
-			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`),
-			 *       - `1` (aka: `approve`, `approved`),
-			 *       - or `trash`, `spam`, `delete`.
-			 *
-			 * @return string `approve`, `hold`, `trash`, `spam`, `delete`.
-			 *
-			 * @throws \exception If an unexpected status is encountered.
-			 *
-			 * @TODO move this into a utility class.
-			 */
-			public function comment_status__($status)
-			{
-				switch(trim(strtolower((string)$status)))
-				{
-					case '1':
-					case 'approve':
-					case 'approved':
-						return 'approve';
-
-					case '0':
-					case '':
-					case 'hold':
-					case 'unapprove':
-					case 'unapproved':
-						return 'hold';
-
-					case 'trash':
-						return 'trash';
-
-					case 'spam':
-						return 'spam';
-
-					case 'delete':
-						return 'delete';
-
-					default: // Throw exception on anything else.
-						throw new \exception(sprintf(__('Unexpected comment status: `%1$s`.'), $status));
-				}
-			}
-
-			/**
-			 * Post comment status translator.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param integer|string $status
-			 *
-			 *    One of the following:
-			 *       - `0` (aka: ``, `closed`, `close`).
-			 *       - `1` (aka: `opened`, `open`).
-			 *       - `` (i.e. undefined).
-			 *
-			 * @return string `open`, `closed`.
-			 *
-			 * @throws \exception If an unexpected status is encountered.
-			 *
-			 * @TODO move this into a utility class.
-			 */
-			public function post_comment_status__($status)
-			{
-				switch(trim(strtolower((string)$status)))
-				{
-					case '1':
-					case 'open':
-					case 'opened':
-						return 'open';
-
-					case '0':
-					case '':
-					case 'close':
-					case 'closed':
-						return 'closed';
-
-					default: // Throw exception on anything else.
-						throw new \exception(sprintf(__('Unexpected post comment status: `%1$s`.'), $status));
-				}
 			}
 
 			/*

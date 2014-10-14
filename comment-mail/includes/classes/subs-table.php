@@ -133,6 +133,172 @@ namespace comment_mail // Root namespace.
 			}
 
 			/*
+			 * Public filter-related methods.
+			 */
+
+			/**
+			 * Navigable table filters.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of all navigable table filters.
+			 */
+			public static function get_navigable_filters_()
+			{
+				$plugin = plugin(); // Needed for translations.
+
+				return array(
+					'status::unconfirmed' => $plugin->utils_i18n->status_label('unconfirmed'),
+					'status::subscribed'  => $plugin->utils_i18n->status_label('subscribed'),
+					'status::suspended'   => $plugin->utils_i18n->status_label('suspended'),
+					'status::trashed'     => $plugin->utils_i18n->status_label('trashed'),
+				);
+			}
+
+			/*
+			 * Protected column-related methods.
+			 */
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_email(\stdClass $item)
+			{
+				$name       = $item->fname.' '.$item->lname; // Concatenate.
+				$email_info = '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
+				              ' <span style="font-weight:bold;" title="'.esc_attr($item->key).'">ID #'.esc_html($item->ID).'</span>'.
+				              ' '.$this->plugin->utils_markup->name_email($name, $item->email, '<br />', FALSE, TRUE, '', 'font-weight:bold;');
+
+				$edit_url      = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'edit'); // @TODO
+				$reconfirm_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'reconfirm');
+				$confirm_url   = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'confirm');
+				$unconfirm_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'unconfirm');
+				$suspend_url   = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'suspend');
+				$trash_url     = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'trash');
+				$delete_url    = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'delete');
+
+				$row_actions = array(
+					'edit'      => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscr.', $this->plugin->text_domain).'</a>',
+
+					'reconfirm' => '<a href="#"'.  // Depends on `menu-pages.js`.
+					               ' data-action="'.esc_attr($reconfirm_url).'"'. // The action URL.
+					               ' data-confirmation="'.esc_attr(__('Resend email confirmation link? Are you sure?', $this->plugin->text_domain)).'">'.
+					               '  '.__('Reconfirm', $this->plugin->text_domain).
+					               '</a>',
+
+					'confirm'   => '<a href="'.esc_attr($confirm_url).'">'.__('Confirm', $this->plugin->text_domain).'</a>',
+					'unconfirm' => '<a href="'.esc_attr($unconfirm_url).'">'.__('Unconfirm', $this->plugin->text_domain).'</a>',
+					'suspend'   => '<a href="'.esc_attr($suspend_url).'">'.__('Suspend', $this->plugin->text_domain).'</a>',
+					'trash'     => '<a href="'.esc_attr($trash_url).'" title="'.esc_attr(__('Trash', $this->plugin->text_domain)).'"><i class="fa fa-trash-o"></i></a>',
+
+					'delete'    => '<a href="#"'.  // Depends on `menu-pages.js`.
+					               ' data-action="'.esc_attr($delete_url).'"'. // The action URL.
+					               ' data-confirmation="'.esc_attr(__('Delete permanently? Are you sure?', $this->plugin->text_domain)).'"'.
+					               ' title="'.esc_attr(__('Delete', $this->plugin->text_domain)).'">'.
+					               '  <i class="fa fa-times-circle"></i>'.
+					               '</a>',
+				);
+				if($item->status === 'unconfirmed') unset($row_actions['unconfirm'], $row_actions['suspend']);
+				if($item->status === 'subscribed') unset($row_actions['reconfirm'], $row_actions['confirm']);
+				if($item->status === 'suspended') unset($row_actions['suspend'], $row_actions['unconfirm']);
+
+				return $email_info.$this->row_actions($row_actions);
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_post_id(\stdClass $item)
+			{
+				if(!$item->post_id || !$item->post_type)
+					return '—'; // Not applicable.
+
+				if(!($post_type = get_post_type_object($item->post_type)))
+					return '—'; // Not applicable.
+
+				$post_type_label        = $post_type->labels->singular_name;
+				$post_title_clip        = $this->plugin->utils_string->mid_clip($item->post_title);
+				$post_date              = $this->plugin->utils_date->i18n('M j, Y', strtotime($item->post_date_gmt));
+				$post_date_ago          = $this->plugin->utils_date->approx_time_difference(strtotime($item->post_date_gmt));
+				$post_comments_status   = $this->plugin->utils_i18n->status_label($this->plugin->utils_db->post_comment_status__($item->post_comment_status));
+				$post_edit_comments_url = $this->plugin->utils_url->post_edit_comments_short($item->post_id);
+				$post_total_subscribers = $this->plugin->utils_sub->query_total('', $item->post_id);
+				$post_total_comments    = (integer)$item->post_comment_count; // Total comments.
+
+				$post_info = $this->plugin->utils_markup->subscriber_count($item->post_id, $post_total_subscribers, 'float:right; margin-left:5px;').
+				             $this->plugin->utils_markup->comment_count($item->post_id, $post_total_comments, 'float:right; margin-left:5px;').
+				             '<span style="font-weight:bold;">'.esc_html($post_type_label).' ID #'.esc_html($item->post_id).'</span>'.
+				             ' <span style="font-style:italic;">('.__('comments', $this->plugin->text_domain).' '.esc_html($post_comments_status).')</span><br />'.
+				             '<span title="'.esc_attr($post_date).'">“'.esc_html($post_title_clip).'”</span>';
+
+				$post_view_url    = $this->plugin->utils_url->post_short($item->post_id);
+				$post_edit_url    = $this->plugin->utils_url->post_edit_short($item->post_id);
+				$post_row_actions = array(
+					'edit' => '<a href="'.esc_attr($post_edit_url).'">'.sprintf(__('Edit %1$s', $this->plugin->text_domain), esc_html($post_type_label)).'</a>',
+					'view' => '<a href="'.esc_attr($post_view_url).'">'.sprintf(__('View', $this->plugin->text_domain), esc_html($post_type_label)).'</a>',
+				);
+				return $post_info.$this->row_actions($post_row_actions);
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_comment_id(\stdClass $item)
+			{
+				if(!$item->post_id || !$item->comment_id)
+					return '— all —'; // All of them.
+
+				$comment_date_time = $this->plugin->utils_date->i18n('M j, Y, g:i a', strtotime($item->comment_date_gmt));
+				$comment_time_ago  = $this->plugin->utils_date->approx_time_difference(strtotime($item->comment_date_gmt));
+				$comment_status    = $this->plugin->utils_i18n->status_label($this->plugin->utils_db->comment_status__($item->comment_approved));
+
+				$comment_info = '<span style="font-weight:bold;">'.esc_html(__('Comment', $this->plugin->text_domain)).' ID #'.esc_html($item->comment_id).'</span>'.
+				                ' <span style="font-style:italic;">('.esc_html($comment_status).')</span><br />'.
+				                '<span style="font-style:italic;">'.__('by:', $this->plugin->text_domain).'</span>'.
+				                ' '.$this->plugin->utils_markup->name_email($item->comment_author, $item->comment_author_email);
+
+				$comment_view_url    = $this->plugin->utils_url->comment_short($item->comment_id);
+				$comment_edit_url    = $this->plugin->utils_url->comment_edit_short($item->comment_id);
+				$comment_row_actions = array(
+					'edit' => '<a href="'.esc_attr($comment_edit_url).'">'.__('Edit Comment', $this->plugin->text_domain).'</a>',
+					'view' => '<a href="'.esc_attr($comment_view_url).'">'.__('View', $this->plugin->text_domain).'</a>',
+				);
+				return $comment_info.$this->row_actions($comment_row_actions);
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_subscr_type(\stdClass $item)
+			{
+				return esc_html($this->plugin->utils_i18n->subscr_type_label($item->subscr_type));
+			}
+
+			/*
 			 * Public query-related methods.
 			 */
 
@@ -148,6 +314,7 @@ namespace comment_mail // Root namespace.
 				$clean_search_query          = $this->get_clean_search_query();
 				$post_ids_in_search_query    = $this->get_post_ids_in_search_query();
 				$comment_ids_in_search_query = $this->get_comment_ids_in_search_query();
+				$statuses_in_search_query    = $this->get_statuses_in_search_query();
 				$orderby                     = $this->get_orderby();
 				$order                       = $this->get_order();
 
@@ -175,6 +342,10 @@ namespace comment_mail // Root namespace.
 					       : ($comment_ids_in_search_query // Within certain comment IDs?
 						       ? " AND `comment_id` IN('".implode("','", array_map('esc_sql', $comment_ids_in_search_query))."')"
 						       : '')). // Otherwise, we can simply exclude this.
+
+				       ($statuses_in_search_query // Specific statuses?
+					       ? " AND `status` IN('".implode("','", array_map('esc_sql', $statuses_in_search_query))."')"
+					       : " AND `status` != '".esc_sql('trashed')."'").
 
 				       ($clean_search_query // A fulltext search?
 					       ? " AND MATCH(`".implode('`,`', array_map('esc_sql', $this->get_searchable_columns()))."`)".
@@ -216,6 +387,7 @@ namespace comment_mail // Root namespace.
 					'confirm'   => __('Confirm', $this->plugin->text_domain),
 					'unconfirm' => __('Unconfirm', $this->plugin->text_domain),
 					'suspend'   => __('Suspend', $this->plugin->text_domain),
+					'trash'     => __('Trash', $this->plugin->text_domain),
 					'delete'    => __('Delete', $this->plugin->text_domain),
 				);
 			}
@@ -248,6 +420,10 @@ namespace comment_mail // Root namespace.
 
 					case 'suspend': // Suspend/unsubscribe?
 						$counter = $this->plugin->utils_sub->bulk_suspend($ids);
+						break; // Break switch handler.
+
+					case 'trash': // Trashing/unsubscribe?
+						$counter = $this->plugin->utils_sub->bulk_trash($ids);
 						break; // Break switch handler.
 
 					case 'delete': // Deleting/unsubscribe?

@@ -79,6 +79,8 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param integer|string $sub_id_or_key Subscriber ID.
 			 *
+			 * @param boolean        $log_subscribed_event Log `subscribed` event?
+			 *
 			 * @param string         $last_ip Most recent IP address, when possible.
 			 *
 			 * @return boolean|null TRUE if subscriber is reconfirmed successfully.
@@ -87,7 +89,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @throws \exception If an update failure occurs.
 			 */
-			public function reconfirm($sub_id_or_key, $last_ip = '')
+			public function reconfirm($sub_id_or_key, $log_subscribed_event = FALSE, $last_ip = '')
 			{
 				if(!$sub_id_or_key)
 					return NULL; // Not possible.
@@ -99,6 +101,9 @@ namespace comment_mail // Root namespace.
 					return FALSE; // Already confirmed.
 
 				$last_ip = (string)$last_ip; // Force string.
+
+				if($log_subscribed_event) // Log `subscribed` event?
+					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'subscribed')));
 
 				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
@@ -117,6 +122,8 @@ namespace comment_mail // Root namespace.
 					$sub->status = 'unconfirmed'; // Obj. properties.
 					if($last_ip) $sub->last_ip = $last_ip;
 					$sub->last_update_time = time();
+
+					$this->nullify_cache();
 
 					new sub_confirmer($sub->ID);
 				}
@@ -202,6 +209,8 @@ namespace comment_mail // Root namespace.
 					$sub->status = 'subscribed'; // Obj. properties.
 					if($last_ip) $sub->last_ip = $last_ip;
 					$sub->last_update_time = time();
+
+					$this->nullify_cache();
 				}
 				return $confirmed;
 			}
@@ -262,6 +271,8 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param integer|string $sub_id_or_key Subscriber ID.
 			 *
+			 * @param boolean        $log_unsubscribed_event Log `unsubscribed` event?
+			 *
 			 * @param string         $last_ip Most recent IP address, when possible.
 			 *
 			 * @return boolean|null TRUE if subscriber is unconfirmed successfully.
@@ -270,7 +281,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @throws \exception If an update failure occurs.
 			 */
-			public function unconfirm($sub_id_or_key, $last_ip = '')
+			public function unconfirm($sub_id_or_key, $log_unsubscribed_event = FALSE, $last_ip = '')
 			{
 				if(!$sub_id_or_key)
 					return NULL; // Not possible.
@@ -282,6 +293,9 @@ namespace comment_mail // Root namespace.
 					return FALSE; // Already unconfirmed.
 
 				$last_ip = (string)$last_ip; // Force string.
+
+				if($log_unsubscribed_event) // Log `unsubscribed` event?
+					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'unsubscribed')));
 
 				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
@@ -300,6 +314,8 @@ namespace comment_mail // Root namespace.
 					$sub->status = 'unconfirmed'; // Obj. properties.
 					if($last_ip) $sub->last_ip = $last_ip;
 					$sub->last_update_time = time();
+
+					$this->nullify_cache();
 				}
 				return $unconfirmed;
 			}
@@ -383,7 +399,7 @@ namespace comment_mail // Root namespace.
 
 				$last_ip = (string)$last_ip; // Force string.
 
-				if($log_suspended_event) // Log `confirmed` event?
+				if($log_suspended_event) // Log `suspended` event?
 					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'suspended')));
 
 				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
@@ -403,6 +419,8 @@ namespace comment_mail // Root namespace.
 					$sub->status = 'suspended'; // Obj. properties.
 					if($last_ip) $sub->last_ip = $last_ip;
 					$sub->last_update_time = time();
+
+					$this->nullify_cache();
 				}
 				return $suspended;
 			}
@@ -457,6 +475,111 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Trash subscriber.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer|string $sub_id_or_key Subscriber ID.
+			 *
+			 * @param boolean        $log_unsubscribed_event Log `unsubscribed` event?
+			 *
+			 * @param string         $last_ip Most recent IP address, when possible.
+			 *
+			 * @return boolean|null TRUE if subscriber is trashed successfully.
+			 *    Or, FALSE if unable to trash (e.g. already trashed).
+			 *    Or, NULL on complete failure (e.g. invalid ID or key).
+			 *
+			 * @throws \exception If an update failure occurs.
+			 */
+			public function trash($sub_id_or_key, $log_unsubscribed_event = FALSE, $last_ip = '')
+			{
+				if(!$sub_id_or_key)
+					return NULL; // Not possible.
+
+				if(!($sub = $this->get($sub_id_or_key)))
+					return NULL; // Not possible.
+
+				if($sub->status === 'trashed')
+					return FALSE; // Already trashed.
+
+				$last_ip = (string)$last_ip; // Force string.
+
+				if($log_unsubscribed_event) // Log `unsubscribed` event?
+					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'unsubscribed')));
+
+				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " SET `status` = '".esc_sql('trashed')."'".
+				       ($last_ip ? ", `last_ip` = '".esc_sql($last_ip)."'" : '').
+				       ", `last_update_time` = '".esc_sql(time())."'".
+
+				       " WHERE `ID` = '".esc_sql($sub->ID)."'";
+
+				if(($trashed = $this->plugin->utils_db->wp->query($sql)) === FALSE)
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
+				$trashed = (boolean)$trashed; // Convert to boolean.
+
+				if($trashed) // Trashed successfully?
+				{
+					$sub->status = 'trashed'; // Obj. properties.
+					if($last_ip) $sub->last_ip = $last_ip;
+					$sub->last_update_time = time();
+
+					$this->nullify_cache();
+				}
+				return $trashed;
+			}
+
+			/**
+			 * Bulk trash subscribers.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
+			 *
+			 * @return integer Number of suscribers trashed successfully.
+			 *
+			 * @throws \exception If a DB update failure occurs.
+			 */
+			public function bulk_trash(array $sub_ids_or_keys)
+			{
+				$counter = 0; // Initialize.
+
+				if(!$sub_ids_or_keys)
+					return $counter; // Not possible.
+
+				$separate // Separate IDs from keys.
+					= $this->separate_ids_keys($sub_ids_or_keys);
+
+				if(!$separate['sub_ids'] && !$separate['sub_keys'])
+					return $counter; // Not possible.
+
+				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " SET `status` = '".esc_sql('trashed')."'".
+				       ", `last_update_time` = '".esc_sql(time())."'".
+
+				       " WHERE". // Begin MySQL where clause.
+
+				       ($separate['sub_ids'] ? // Have subscriber IDs?
+					       " `ID` IN ('".implode("','", array_map('esc_sql', $separate['sub_ids']))."')"
+					       : ''). // Otherwise, we can simply exlude this.
+
+				       ($separate['sub_keys'] ? // Have subscriber keys?
+					       ($separate['sub_ids'] ? " OR" : ''). // Need the `OR` here?
+					       " `key` IN ('".implode("','", array_map('esc_sql', $separate['sub_keys']))."')"
+					       : ''); // Otherwise, we can simply exlude this.
+
+				if(($trashed = $this->plugin->utils_db->wp->query($sql)) === FALSE)
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
+				$counter += (integer)$trashed; // Bump counter.
+
+				$this->nullify_cache($sub_ids_or_keys);
+
+				return $counter;
+			}
+
+			/**
 			 * Delete subscriber.
 			 *
 			 * @since 14xxxx First documented version.
@@ -498,12 +621,11 @@ namespace comment_mail // Root namespace.
 
 				if($deleted) // Deleted successfully?
 				{
-					$this->cache['get'][$sub->ID] // Nullify cache.
-						= $this->cache['get'][$sub->key] = NULL;
-
 					$sub->status = 'deleted'; // Obj. properties.
 					if($last_ip) $sub->last_ip = $last_ip;
 					$sub->last_update_time = time();
+
+					$this->nullify_cache(array($sub->ID, $sub->key));
 				}
 				return $deleted;
 			}
@@ -555,13 +677,64 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Query total subscribers.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string|null  $status Defaults to an empty string.
+			 *    i.e. defaults to any status. Pass this to limit the query.
+			 *
+			 * @param integer|null $post_id Defaults to a `NULL` value.
+			 *    i.e. defaults to any post ID. Pass this to limit the query.
+			 *
+			 * @param integer|null $comment_id Defaults to a `NULL` value.
+			 *    i.e. defaults to any comment ID. Pass this to limit the query.
+			 *
+			 * @param boolean      $auto_discount_trash Defaults to a `TRUE` value.
+			 *    This applies to the case where `$status` is empty.
+			 *    i.e. do not count subscribers in the trash.
+			 *
+			 * @return integer Total subscribers for the given query.
+			 */
+			public function query_total($status = '', $post_id = NULL, $comment_id = NULL, $auto_discount_trash = TRUE)
+			{
+				$status_key              = $status = (string)$status;
+				$post_id_key             = isset($post_id) ? (integer)$post_id : -1;
+				$comment_id_key          = isset($comment_id) ? (integer)$comment_id : -1;
+				$auto_discount_trash_key = $auto_discount_trash ? 1 : 0;
+
+				if(isset($this->cache[__FUNCTION__][$status_key][$post_id_key][$comment_id_key][$auto_discount_trash_key]))
+					return $this->cache[__FUNCTION__][$status_key][$post_id_key][$comment_id_key][$auto_discount_trash_key];
+				$total = &$this->cache[__FUNCTION__][$status_key][$post_id_key][$comment_id_key][$auto_discount_trash_key];
+
+				$sql = "SELECT SQL_CALC_FOUND_ROWS `ID`".
+				       " FROM `".esc_html($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " WHERE 1=1". // Initialize where clause.
+
+				       ($status // A specific status?
+					       ? " AND `status` = '".esc_sql((string)$status)."'"
+					       : ($auto_discount_trash ? " AND `status` != '".esc_sql('trashed')."'" : '')).
+
+				       (isset($post_id) ? " AND `post_id` = '".esc_sql((integer)$post_id)."'" : '').
+				       (isset($comment_id) ? " AND `comment_id` = '".esc_sql((integer)$comment_id)."'" : '').
+
+				       " LIMIT 1"; // Just one to check.
+
+				if($this->plugin->utils_db->wp->query($sql))
+					return ($total = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()"));
+
+				return ($total = 0); // Default value.
+			}
+
+			/**
 			 * Nullify the object cache for IDs/keys.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param array $sub_ids_or_keys An array of IDs/keys.
 			 */
-			public function nullify_cache(array $sub_ids_or_keys)
+			public function nullify_cache(array $sub_ids_or_keys = array())
 			{
 				$separate // Separate IDs from keys.
 					= $this->separate_ids_keys($sub_ids_or_keys);
@@ -573,6 +746,8 @@ namespace comment_mail // Root namespace.
 				foreach($separate['sub_keys'] as $_sub_key)
 					$this->cache['get'][$_sub_key] = NULL;
 				unset($_sub_key); // Housekeeping.
+
+				unset($this->cache['query_total']); // Recalculate.
 
 				// This prevents odd cache conflicts at runtime.
 			}
@@ -698,8 +873,9 @@ namespace comment_mail // Root namespace.
 			public function confirm_url($sub_key, $scheme = NULL)
 			{
 				$sub_key = trim((string)$sub_key);
+				$args    = array(__NAMESPACE__ => array('confirm' => $sub_key));
 
-				return add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('confirm' => $sub_key))), home_url('/', $scheme));
+				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
 			}
 
 			/**
@@ -716,8 +892,9 @@ namespace comment_mail // Root namespace.
 			public function unsubscribe_url($sub_key, $scheme = NULL)
 			{
 				$sub_key = trim((string)$sub_key);
+				$args    = array(__NAMESPACE__ => array('unsubscribe' => $sub_key));
 
-				return add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('unsubscribe' => $sub_key))), home_url('/', $scheme));
+				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
 			}
 
 			/**
@@ -740,8 +917,9 @@ namespace comment_mail // Root namespace.
 				$sub_email = trim((string)$sub_email);
 
 				$encrypted_sub_email = $this->plugin->utils_enc->encrypt($sub_email);
+				$args                = array(__NAMESPACE__ => array('manage' => $encrypted_sub_email));
 
-				return add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('manage' => $encrypted_sub_email))), home_url('/', $scheme));
+				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
 			}
 
 			/**
@@ -764,8 +942,9 @@ namespace comment_mail // Root namespace.
 				$sub_email = trim((string)$sub_email);
 
 				$encrypted_sub_email = $this->plugin->utils_enc->encrypt($sub_email);
+				$args                = array(__NAMESPACE__ => array('manage' => array('summary' => $encrypted_sub_email)));
 
-				return add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('manage' => array('summary' => $encrypted_sub_email)))), home_url('/', $scheme));
+				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
 			}
 		}
 	}

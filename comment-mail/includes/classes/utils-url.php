@@ -131,9 +131,9 @@ namespace comment_mail // Root namespace.
 			public function current_page_only()
 			{
 				$page = !empty($_REQUEST['page']) ? stripslashes((string)$_REQUEST['page']) : '';
-				$args = array('page' => $page); // Only used when applicable.
+				$args = $page ? array('page' => $page) : array(); // If applicable.
 
-				return $page ? add_query_arg(urlencode_deep($args), $this->current_no_query()) : $this->current_no_query();
+				return add_query_arg(urlencode_deep($args), $this->current_no_query());
 			}
 
 			/**
@@ -264,6 +264,93 @@ namespace comment_mail // Root namespace.
 				$args = array(__NAMESPACE__.'_pro_preview' => '1');
 
 				return add_query_arg(urlencode_deep($args), $url ? (string)$url : $this->current_page_only());
+			}
+
+			/**
+			 * Adds search filter(s) to a given URL.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string|array A string or an array of filters.
+			 *    e.g. `array('post_ids:1,2,3', 'comment_ids:4,5,6')`.
+			 *    e.g. `post_ids:1,2,3 comment_ids:4,5,6`.
+			 *
+			 *    You can pass `:` or `::` to remove existing filters in that specific <group>;
+			 *       i.e. without adding new filters; it just removes all filters in <group>.
+			 *
+			 *    You can pass `type:` or `type::` to remove existing filters of that specific <type><group>;
+			 *       i.e. without adding new filters; it just removes all filters of <type><group>.
+			 *
+			 * @param string       $url The input URL to search (optional).
+			 *    If empty, defaults to the current URL.
+			 *
+			 * @return string URL w/ search filters added to the `s` key.
+			 */
+			public function search_filter($filters, $url = '')
+			{
+				if(is_array($filters)) // Force string.
+					$filters = implode(' ', $filters);
+				$filters = trim((string)$filters);
+
+				if(!($url = trim((string)$url)))
+					$url = $this->current();
+
+				$query = (string)parse_url($url, PHP_URL_QUERY);
+				wp_parse_str($query, $query_vars); // Parse query.
+
+				$s            = !empty($query_vars['s']) ? (string)$query_vars['s'] : '';
+				$filters      = preg_split('/\s+/', $filters, NULL, PREG_SPLIT_NO_EMPTY);
+				$filter_regex = '/\b(?P<type>\w+)(?P<group>\:+)(?P<values>[\w+|;,]+)?/i';
+
+				foreach($filters as $_filter) // Remove filters in <group> or of <type><group>.
+				{
+					if(preg_match('/^\:+$/', $_filter)) // Specifies a <group> to remove only?
+						$s = preg_replace(str_replace('<group>\:+', // Remove filters in this <group>.
+						                              '<group>\:{'.strlen($_filter).'}', $filter_regex), '', $s);
+
+					else if(preg_match($filter_regex, $_filter, $_filter_m)) // Remove <type><group>?
+						$s = preg_replace(str_replace('<type>\w+', // Remove filters of this <type><group>.
+						                              '<type>'.preg_quote(rtrim($_filter_m['type'], 's'), '/').'s*',
+						                              str_replace('<group>\:+', // We convert the <group> first; nested inside.
+						                                          '<group>\:{'.strlen($_filter_m['group']).'}', $filter_regex)), '', $s);
+				}
+				foreach($filters as $_filter) // Add each of the new filters.
+				{
+					if(preg_match($filter_regex, $_filter, $_filter_m) && isset($_filter_m['values'][0]))
+						$s .= ' '.$_filter; // Only if valid; and only if it has values.
+				}
+				unset($_filter, $_filter_m); // Just housekeeping.
+
+				$s = trim(preg_replace('/\s+/', ' ', $s));
+				// Note: `FALSE` tells `add_query_arg()` to remove `s`.
+				return add_query_arg('s', $s ? urlencode($s) : FALSE, $url);
+			}
+
+			/**
+			 * Bulk action URL generator.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $plural Plural name/key.
+			 * @param array  $ids An array of IDs to act upon.
+			 * @param string $action The bulk action to perform.
+			 *
+			 * @param string $url The input URL to act on (optional).
+			 *    If empty, defaults to the current URL.
+			 *
+			 * @return string URL leading to the bulk action necessary.
+			 */
+			public function bulk_action($plural, array $ids, $action, $url = '')
+			{
+				$plural = (string)$plural; // Force string.
+				$action = (string)$action; // Force string.
+
+				if(!($url = trim((string)$url)))
+					$url = $this->current();
+
+				$args = array($plural => $ids, 'action' => $action, '_wpnonce' => wp_create_nonce('bulk-'.$plural));
+
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**

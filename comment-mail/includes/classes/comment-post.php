@@ -54,7 +54,7 @@ namespace comment_mail // Root namespace.
 				parent::__construct();
 
 				$this->comment_id     = (integer)$comment_id;
-				$this->comment_status = $this->plugin->comment_status__($comment_status);
+				$this->comment_status = $this->plugin->utils_db->comment_status__($comment_status);
 
 				$this->maybe_insert_sub();
 				$this->maybe_insert_queue();
