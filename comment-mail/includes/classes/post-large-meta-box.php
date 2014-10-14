@@ -44,29 +44,14 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Display meta box.
+			 * Display meta box. @TODO
 			 *
 			 * @since 14xxxx First documented version.
-			 *
-			 * @TODO
 			 */
 			protected function maybe_display()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-area').'">'."\n";
-				new subs_table();
 				echo '</div>';
-			}
-
-			/**
-			 * Total subscribers bubble.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected function subscriber_count()
-			{
-				$total_subscribers = $this->plugin->utils_sub->query_total($this->post->ID);
-
-				return $this->plugin->utils_markup->subscriber_count($this->post->ID, $total_subscribers);
 			}
 		}
 	}
