@@ -164,9 +164,9 @@ namespace comment_mail // Root namespace.
 			 * @param integer|string $status
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`),
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`, `moderated`),
 			 *       - `1` (aka: `approve`, `approved`),
-			 *       - or `trash`, `spam`, `delete`.
+			 *       - or `trash`, `post-trashed`, `spam`, `delete`.
 			 *
 			 * @return string `approve`, `hold`, `trash`, `spam`, `delete`.
 			 *
@@ -186,9 +186,11 @@ namespace comment_mail // Root namespace.
 					case 'hold':
 					case 'unapprove':
 					case 'unapproved':
+					case 'moderated':
 						return 'hold';
 
 					case 'trash':
+					case 'post-trashed':
 						return 'trash';
 
 					case 'spam':

@@ -141,6 +141,7 @@ namespace comment_mail // Root namespace.
 				if(!($name = trim((string)$name)))
 					return ''; // Nothing to do.
 
+				$name = $name ? str_replace('"', '', $name) : '';
 				$name = $name ? preg_replace('/^(?:Mr\.?|Mrs\.?|Ms\.?|Dr\.?)\s+/i', '', $name) : '';
 				$name = $name ? preg_replace('/\s+(?:Sr\.?|Jr\.?|IV|I+)$/i', '', $name) : '';
 				$name = $name ? preg_replace('/\s+/', ' ', $name) : '';

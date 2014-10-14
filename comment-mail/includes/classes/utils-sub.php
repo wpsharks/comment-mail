@@ -681,14 +681,14 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string|null  $status Defaults to an empty string.
-			 *    i.e. defaults to any status. Pass this to limit the query.
-			 *
 			 * @param integer|null $post_id Defaults to a `NULL` value.
 			 *    i.e. defaults to any post ID. Pass this to limit the query.
 			 *
 			 * @param integer|null $comment_id Defaults to a `NULL` value.
 			 *    i.e. defaults to any comment ID. Pass this to limit the query.
+			 *
+			 * @param string|null  $status Defaults to an empty string.
+			 *    i.e. defaults to any status. Pass this to limit the query.
 			 *
 			 * @param boolean      $auto_discount_trash Defaults to a `TRUE` value.
 			 *    This applies to the case where `$status` is empty.
@@ -696,16 +696,16 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return integer Total subscribers for the given query.
 			 */
-			public function query_total($status = '', $post_id = NULL, $comment_id = NULL, $auto_discount_trash = TRUE)
+			public function query_total($post_id = NULL, $comment_id = NULL, $status = '', $auto_discount_trash = TRUE)
 			{
-				$status_key              = $status = (string)$status;
 				$post_id_key             = isset($post_id) ? (integer)$post_id : -1;
 				$comment_id_key          = isset($comment_id) ? (integer)$comment_id : -1;
+				$status_key              = $status = (string)$status; // Force string.
 				$auto_discount_trash_key = $auto_discount_trash ? 1 : 0;
 
-				if(isset($this->cache[__FUNCTION__][$status_key][$post_id_key][$comment_id_key][$auto_discount_trash_key]))
-					return $this->cache[__FUNCTION__][$status_key][$post_id_key][$comment_id_key][$auto_discount_trash_key];
-				$total = &$this->cache[__FUNCTION__][$status_key][$post_id_key][$comment_id_key][$auto_discount_trash_key];
+				if(isset($this->cache[__FUNCTION__][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key]))
+					return $this->cache[__FUNCTION__][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key];
+				$total = &$this->cache[__FUNCTION__][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key];
 
 				$sql = "SELECT SQL_CALC_FOUND_ROWS `ID`".
 				       " FROM `".esc_html($this->plugin->utils_db->prefix().'subs')."`".
@@ -728,6 +728,60 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Last X subscribers w/ a given status.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer      $x The total number to return.
+			 *
+			 * @param integer|null $post_id Defaults to a `NULL` value.
+			 *    i.e. defaults to any post ID. Pass this to limit the query.
+			 *
+			 * @param integer|null $comment_id Defaults to a `NULL` value.
+			 *    i.e. defaults to any comment ID. Pass this to limit the query.
+			 *
+			 * @param string|null  $status Defaults to an empty string.
+			 *    i.e. defaults to any status. Pass this to limit the query.
+			 *
+			 * @param boolean      $auto_discount_trash Defaults to a `TRUE` value.
+			 *    This applies to the case where `$status` is empty.
+			 *    i.e. do not count subscribers in the trash.
+			 *
+			 * @return \stdClass[] Last X subscribers w/ a given status.
+			 */
+			public function last_x($x = 0, $post_id = NULL, $comment_id = NULL, $status = '', $auto_discount_trash = TRUE)
+			{
+				if(($x = (integer)$x) <= 0) $x = 10; // Default value.
+				$post_id_key             = isset($post_id) ? (integer)$post_id : -1;
+				$comment_id_key          = isset($comment_id) ? (integer)$comment_id : -1;
+				$status_key              = $status = (string)$status; // Force string.
+				$auto_discount_trash_key = $auto_discount_trash ? 1 : 0;
+
+				if(isset($this->cache[__FUNCTION__][$x][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key]))
+					return $this->cache[__FUNCTION__][$x][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key];
+				$results = &$this->cache[__FUNCTION__][$x][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key];
+
+				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " WHERE 1=1". // Initialize where clause.
+
+				       ($status // A specific status?
+					       ? " AND `status` = '".esc_sql((string)$status)."'"
+					       : ($auto_discount_trash ? " AND `status` != '".esc_sql('trashed')."'" : '')).
+
+				       (isset($post_id) ? " AND `post_id` = '".esc_sql((integer)$post_id)."'" : '').
+				       (isset($comment_id) ? " AND `comment_id` = '".esc_sql((integer)$comment_id)."'" : '').
+
+				       " GROUP BY `email` ORDER BY `insertion_time` DESC".
+				       " LIMIT ".esc_sql($x); // X rows only please.
+
+				if(($results = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
+					return ($results = $this->plugin->utils_db->typify_deep($results));
+
+				return ($results = array()); // Default value.
+			}
+
+			/**
 			 * Nullify the object cache for IDs/keys.
 			 *
 			 * @since 14xxxx First documented version.
@@ -736,6 +790,10 @@ namespace comment_mail // Root namespace.
 			 */
 			public function nullify_cache(array $sub_ids_or_keys = array())
 			{
+				unset($this->cache['query_total'], $this->cache['last_x']);
+
+				if(!$sub_ids_or_keys) return; // Nothing more to do.
+
 				$separate // Separate IDs from keys.
 					= $this->separate_ids_keys($sub_ids_or_keys);
 
@@ -746,8 +804,6 @@ namespace comment_mail // Root namespace.
 				foreach($separate['sub_keys'] as $_sub_key)
 					$this->cache['get'][$_sub_key] = NULL;
 				unset($_sub_key); // Housekeeping.
-
-				unset($this->cache['query_total']); // Recalculate.
 
 				// This prevents odd cache conflicts at runtime.
 			}

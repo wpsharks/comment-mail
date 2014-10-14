@@ -47,26 +47,16 @@ namespace comment_mail // Root namespace.
 			 * Display meta box.
 			 *
 			 * @since 14xxxx First documented version.
-			 *
-			 * @TODO
 			 */
 			protected function maybe_display()
 			{
-				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-area').'">'."\n";
-				echo '   '.$this->subscriber_count();
-				echo '</div>';
-			}
+				$total_subs        = $this->plugin->utils_sub->query_total($this->post->ID);
+				$total_subs_bubble = $this->plugin->utils_markup->subscriber_count($this->post->ID, $total_subs);
 
-			/**
-			 * Total subscribers bubble.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected function subscriber_count()
-			{
-				$total_subscribers = $this->plugin->utils_sub->query_total('', $this->post->ID);
-
-				return $this->plugin->utils_markup->subscriber_count($this->post->ID, $total_subscribers, 'width:100%;');
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-area').'">'.
+				     '   <h4 style="margin-bottom:5px;">'.$total_subs_bubble.__('Most Recent Subscribers:', $this->plugin->text_domain).'</h4>'.
+				     '   '.$this->plugin->utils_markup->last_x_subs(5, $this->post->ID).
+				     '</div>';
 			}
 		}
 	}

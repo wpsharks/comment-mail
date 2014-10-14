@@ -571,6 +571,23 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Creates an edit subscriber shortlink w/o a DB query.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $sub_id Subscriber ID.
+			 *
+			 * @return string Edit subscriber shortlink.
+			 */
+			public function edit_subscriber_short($sub_id)
+			{
+				$sub_id = (integer)$sub_id; // Force integer.
+				$args   = array('subscriber' => $sub_id); // @TODO
+
+				return add_query_arg(urlencode_deep($args), $this->subscribers_menu_page_only());
+			}
+
+			/**
 			 * Creates a comment shortlink w/o a DB query.
 			 *
 			 * @since 14xxxx First documented version.

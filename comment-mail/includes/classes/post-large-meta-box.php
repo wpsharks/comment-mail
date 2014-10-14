@@ -53,10 +53,9 @@ namespace comment_mail // Root namespace.
 			protected function maybe_display()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-area').'">'."\n";
-				echo '   '.$this->subscriber_count();
+				new subs_table();
 				echo '</div>';
 			}
-
 
 			/**
 			 * Total subscribers bubble.
@@ -65,7 +64,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function subscriber_count()
 			{
-				$total_subscribers = $this->plugin->utils_sub->query_total('', $this->post->ID);
+				$total_subscribers = $this->plugin->utils_sub->query_total($this->post->ID);
 
 				return $this->plugin->utils_markup->subscriber_count($this->post->ID, $total_subscribers);
 			}

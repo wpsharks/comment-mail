@@ -51,16 +51,16 @@ namespace comment_mail // Root namespace.
 			 * @param integer|string $new_comment_status New comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`),
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`, `moderated`),
 			 *       - `1` (aka: `approve`, `approved`),
-			 *       - or `trash`, `spam`, `delete`.
+			 *       - or `trash`, `post-trashed`, `spam`, `delete`.
 			 *
 			 * @param integer|string $old_comment_status Old comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`),
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`, `moderated`),
 			 *       - `1` (aka: `approve`, `approved`),
-			 *       - or `trash`, `spam`, `delete`.
+			 *       - or `trash`, `post-trashed`, `spam`, `delete`.
 			 *
 			 * @param \stdClass|null $comment Comment object (now).
 			 */

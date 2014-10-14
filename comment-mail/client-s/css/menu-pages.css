@@ -415,25 +415,88 @@ Menu page save button styles.
 	line-height : 1.3em;
 }
 /*
-Menu page table filter styles.
+A menu page area ~ list items.
 */
-.comment-mail-menu-page-table ul.pmp-filters,
-.comment-mail-menu-page-table ul.pmp-filters ul,
-.comment-mail-menu-page-table ul.pmp-filters li
+.comment-mail-menu-page-area ul.pmp-list-items,
+.comment-mail-menu-page-area ul.pmp-list-items ul
 {
-	margin-left : 0;
-	list-style  : none;
+	padding-left : 0;
+	margin-left  : 40px;
+	list-style   : disc;
 }
-.comment-mail-menu-page-table ul.pmp-search-filters,
-.comment-mail-menu-page-table ul.pmp-search-filters ul
-{
-	list-style  : disc;
-	margin-left : 40px;
-}
-.comment-mail-menu-page-table ul.pmp-search-filters ul
+.comment-mail-menu-page-area ul.pmp-list-items ul
 {
 	list-style : circle;
 }
+.comment-mail-menu-page-area ul.pmp-list-items li
+{
+	list-style : inherit;
+}
+/*
+A menu page area ~ clean list items.
+*/
+.comment-mail-menu-page-area ul.pmp-clean-list-items,
+.comment-mail-menu-page-area ul.pmp-clean-list-items ul
+{
+	padding-left : 0;
+	margin-left  : 0;
+	list-style   : none;
+}
+.comment-mail-menu-page-area ul.pmp-clean-list-items ul
+{
+	margin-left : 20px;
+	list-style  : circle;
+}
+.comment-mail-menu-page-area ul.pmp-clean-list-items li
+{
+	list-style : inherit;
+}
+/*
+A menu page area ~ post com/sub bubbles.
+*/
+.comment-mail-menu-page-area .pmp-post-com-count
+{
+	padding-bottom  : 0;
+	text-decoration : none;
+}
+.comment-mail-menu-page-area .pmp-post-sub-count
+{
+	border-radius   : 3px;
+	text-align      : left;
+	text-decoration : none;
+	background      : #BBBBBB;
+	padding         : 0 5px 0 4px;
+	display         : inline-block;
+}
+.comment-mail-menu-page-area .pmp-post-sub-count::before
+{
+	text-rendering         : auto;
+	font-weight            : normal;
+	content                : '\f0c0';
+	color                  : #5A5A5A;
+	font-family            : FontAwesome;
+	-webkit-font-smoothing : antialiased;
+
+	float                  : left;
+	margin                 : 0 5px 0 0;
+	display                : inline-block;
+}
+.comment-mail-menu-page-area .pmp-post-sub-count > .pmp-subscriber-count
+{
+	font-weight : bold;
+	color       : #FFFFFF;
+}
+.comment-mail-menu-page-area .pmp-post-sub-count:hover
+{
+	background : #2EA2CC;
+}
+.comment-mail-menu-page-area .pmp-post-sub-count:hover::before
+{
+	color : #FFFFFF;
+}
+/*
+Menu page table filter styles.
+*/
 .comment-mail-menu-page-table ul.pmp-navigable-filters li
 {
 	margin  : 0 10px 0 0;
@@ -521,49 +584,6 @@ Menu page table columns; i.e. media queries.
 	{
 		width : 250px;
 	}
-}
-/*
-A menu page area in any location.
-	~ post com/sub bubbles.
-*/
-.comment-mail-menu-page-area .pmp-post-com-count
-{
-	padding-bottom  : 0;
-	text-decoration : none;
-}
-.comment-mail-menu-page-area .pmp-post-sub-count
-{
-	border-radius   : 3px;
-	text-align      : left;
-	text-decoration : none;
-	background      : #BBBBBB;
-	padding         : 0 5px 0 4px;
-	display         : inline-block;
-}
-.comment-mail-menu-page-area .pmp-post-sub-count::before
-{
-	content                : '\f0c0';
-	color                  : #5A5A5A;
-	font-family            : FontAwesome;
-	-webkit-font-smoothing : antialiased;
-	text-rendering         : auto;
-
-	float                  : left;
-	margin                 : 0 5px 0 0;
-	display                : inline-block;
-}
-.comment-mail-menu-page-area .pmp-post-sub-count > .pmp-subscriber-count
-{
-	font-weight : bold;
-	color       : #FFFFFF;
-}
-.comment-mail-menu-page-area .pmp-post-sub-count:hover
-{
-	background : #2EA2CC;
-}
-.comment-mail-menu-page-area .pmp-post-sub-count:hover::before
-{
-	color : #FFFFFF;
 }
 /* ------------------------------------------------------------- */
 /*

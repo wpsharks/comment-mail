@@ -1033,9 +1033,9 @@ namespace comment_mail
 			 * @param integer|string $comment_status Initial comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`),
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`, `moderated`),
 			 *       - `1` (aka: `approve`, `approved`),
-			 *       - or `trash`, `spam`, `delete`.
+			 *       - or `trash`, `post-trashed`, `spam`, `delete`.
 			 */
 			public function comment_post($comment_id, $comment_status)
 			{
@@ -1052,16 +1052,16 @@ namespace comment_mail
 			 * @param integer|string $new_comment_status New comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`),
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`, `moderated`),
 			 *       - `1` (aka: `approve`, `approved`),
-			 *       - or `trash`, `spam`, `delete`.
+			 *       - or `trash`, `post-trashed`, `spam`, `delete`.
 			 *
 			 * @param integer|string $old_comment_status Old comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`),
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`, `moderated`),
 			 *       - `1` (aka: `approve`, `approved`),
-			 *       - or `trash`, `spam`, `delete`.
+			 *       - or `trash`, `post-trashed`, `spam`, `delete`.
 			 *
 			 * @param \stdClass|null $comment Comment object (now).
 			 */

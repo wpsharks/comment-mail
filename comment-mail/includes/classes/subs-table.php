@@ -173,9 +173,9 @@ namespace comment_mail // Root namespace.
 				$name       = $item->fname.' '.$item->lname; // Concatenate.
 				$email_info = '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
 				              ' <span style="font-weight:bold;" title="'.esc_attr($item->key).'">ID #'.esc_html($item->ID).'</span>'.
-				              ' '.$this->plugin->utils_markup->name_email($name, $item->email, '<br />', FALSE, TRUE, '', 'font-weight:bold;');
+				              ' '.$this->plugin->utils_markup->name_email($name, $item->email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
 
-				$edit_url      = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'edit'); // @TODO
+				$edit_url      = $this->plugin->utils_url->edit_subscriber_short($item->ID);
 				$reconfirm_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'reconfirm');
 				$confirm_url   = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'confirm');
 				$unconfirm_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'unconfirm');
@@ -234,11 +234,11 @@ namespace comment_mail // Root namespace.
 				$post_date_ago          = $this->plugin->utils_date->approx_time_difference(strtotime($item->post_date_gmt));
 				$post_comments_status   = $this->plugin->utils_i18n->status_label($this->plugin->utils_db->post_comment_status__($item->post_comment_status));
 				$post_edit_comments_url = $this->plugin->utils_url->post_edit_comments_short($item->post_id);
-				$post_total_subscribers = $this->plugin->utils_sub->query_total('', $item->post_id);
+				$post_total_subscribers = $this->plugin->utils_sub->query_total($item->post_id);
 				$post_total_comments    = (integer)$item->post_comment_count; // Total comments.
 
-				$post_info = $this->plugin->utils_markup->subscriber_count($item->post_id, $post_total_subscribers, 'float:right; margin-left:5px;').
-				             $this->plugin->utils_markup->comment_count($item->post_id, $post_total_comments, 'float:right; margin-left:5px;').
+				$post_info = $this->plugin->utils_markup->subscriber_count($item->post_id, $post_total_subscribers).
+				             $this->plugin->utils_markup->comment_count($item->post_id, $post_total_comments).
 				             '<span style="font-weight:bold;">'.esc_html($post_type_label).' ID #'.esc_html($item->post_id).'</span>'.
 				             ' <span style="font-style:italic;">('.__('comments', $this->plugin->text_domain).' '.esc_html($post_comments_status).')</span><br />'.
 				             '<span title="'.esc_attr($post_date).'">“'.esc_html($post_title_clip).'”</span>';
