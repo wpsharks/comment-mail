@@ -554,16 +554,18 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param integer|object $post_id A WP post ID; or a post object.
+			 * @param string         $s Any additional search words/filters.
 			 *
 			 * @return string Post edit subscribers shortlink.
 			 */
-			public function post_edit_subscribers_short($post_id)
+			public function post_edit_subscribers_short($post_id, $s = '')
 			{
 				if(is_object($post_id) && !empty($post_id->ID))
 					$post_id = $post_id->ID;
 
 				$post_id = (integer)$post_id; // Force integer.
-				$args    = array('s' => 'post_id:'.$post_id); // Search filter.
+				$s       = trim((string)$s); // Force trimmed string.
+				$args    = array('s' => 'post_id:'.$post_id.($s ? ' '.$s : ''));
 
 				return add_query_arg(urlencode_deep($args), $this->subscribers_menu_page_only());
 			}
