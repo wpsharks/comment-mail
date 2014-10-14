@@ -95,8 +95,8 @@ namespace comment_mail // Root namespace.
 				                                       $post_total_comments, $this->plugin->text_domain), esc_html($post_total_comments));
 				$post_edit_comments_url   = $this->plugin->utils_url->post_edit_comments_short($post_id);
 
-				return '<a href="'.esc_attr($post_edit_comments_url).'" class="post-com-count" style="'.esc_attr($style).'" title="'.esc_attr($post_total_comments_desc).'">'.
-				       '  <span class="comment-count">'.esc_html($post_total_comments).'</span>'.
+				return '<a href="'.esc_attr($post_edit_comments_url).'" class="pmp-post-com-count post-com-count" style="'.esc_attr($style).'" title="'.esc_attr($post_total_comments_desc).'">'.
+				       '  <span class="pmp-comment-count comment-count">'.esc_html($post_total_comments).'</span>'.
 				       '</a>';
 			}
 
@@ -122,8 +122,8 @@ namespace comment_mail // Root namespace.
 				                                          $post_total_subscribers, $this->plugin->text_domain), esc_html($post_total_subscribers));
 				$post_edit_subscribers_url   = $this->plugin->utils_url->post_edit_subscribers_short($post_id);
 
-				return '<a href="'.esc_attr($post_edit_subscribers_url).'" class="post-sub-count" style="'.esc_attr($style).'" title="'.esc_attr($post_total_subscribers_desc).'">'.
-				       '  <span class="subscriber-count">'.esc_html($post_total_subscribers).'</span>'.
+				return '<a href="'.esc_attr($post_edit_subscribers_url).'" class="pmp-post-sub-count" style="'.esc_attr($style).'" title="'.esc_attr($post_total_subscribers_desc).'">'.
+				       '  <span class="pmp-subscriber-count">'.esc_html($post_total_subscribers).'</span>'.
 				       '</a>';
 			}
 		}

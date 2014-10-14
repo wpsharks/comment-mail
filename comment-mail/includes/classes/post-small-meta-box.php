@@ -52,7 +52,9 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_display()
 			{
-				echo $this->subscriber_count();
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-area').'">'."\n";
+				echo '   '.$this->subscriber_count();
+				echo '</div>';
 			}
 
 			/**
@@ -64,7 +66,7 @@ namespace comment_mail // Root namespace.
 			{
 				$total_subscribers = $this->plugin->utils_sub->query_total('', $this->post->ID);
 
-				return $this->plugin->utils_markup->subscriber_count($this->post->ID, $total_subscribers);
+				return $this->plugin->utils_markup->subscriber_count($this->post->ID, $total_subscribers, 'width:100%;');
 			}
 		}
 	}

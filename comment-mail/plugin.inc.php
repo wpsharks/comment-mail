@@ -549,8 +549,9 @@ namespace comment_mail
 			 */
 			public function enqueue_admin_styles()
 			{
-				if(!$this->utils_env->is_menu_page(__NAMESPACE__.'*'))
-					return; // Nothing to do; NOT a plugin menu page.
+				if(!$this->utils_env->is_menu_page(__NAMESPACE__.'*')
+				   && !$this->utils_env->is_menu_page('post.php')
+				) return; // Nothing to do; not applicable.
 
 				$deps = array(); // Plugin dependencies.
 

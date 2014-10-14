@@ -1,24 +1,8 @@
 @import url('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css');
 /*
-Alter WordPress wrap on s2Member menu pages.
-*/
-body.comments_page_comment_mail #wpwrap
-{
-	background : #C7C7C7;
-}
-/*
-Align these with menu page.
-*/
-body.comments_page_comment_mail div.updated,
-body.comments_page_comment_mail div.error
-{
-	font-size : 120%;
-	margin    : 25px 25px 25px 5px;
-}
-/*
 Menu page styles.
 */
-.plugin-menu-page
+.comment-mail-menu-page
 {
 	font-size     : 14px;
 	padding       : 25px;
@@ -30,43 +14,43 @@ Menu page styles.
 	box-shadow    : 0 0 8px 0 rgba(0, 0, 0, 0.2) !important;
 	background    : #FFFFFF url('../images/trans-bg.png') repeat left top;
 }
-.plugin-menu-page a
+.comment-mail-menu-page a
 {
 	color : #003E75;
 }
-.plugin-menu-page a:hover,
-.plugin-menu-page a:active
+.comment-mail-menu-page a:hover,
+.comment-mail-menu-page a:active
 {
 	color : #027E02;
 }
-.plugin-menu-page p,
-.plugin-menu-page code
+.comment-mail-menu-page p,
+.comment-mail-menu-page code
 {
 	font-size : inherit;
 }
-.plugin-menu-page p:first-child,
-.plugin-menu-page pre:first-child
+.comment-mail-menu-page p:first-child,
+.comment-mail-menu-page pre:first-child
 {
 	margin-top : 0;
 }
-.plugin-menu-page p:last-child,
-.plugin-menu-page pre:last-child
+.comment-mail-menu-page p:last-child,
+.comment-mail-menu-page pre:last-child
 {
 	margin-bottom : 0;
 }
-.plugin-menu-page code
+.comment-mail-menu-page code
 {
 	border-radius : 3px;
 	padding       : 1px 5px 1px 5px;
 	background    : rgba(255, 255, 255, 0.25);
 	font-family   : 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
 }
-.plugin-menu-page pre.code
+.comment-mail-menu-page pre.pmp-code
 {
 	padding    : 0;
 	background : none;
 }
-.plugin-menu-page pre.code > code
+.comment-mail-menu-page pre.pmp-code > code
 {
 	font-size     : 90%;
 	color         : #F7F7F7;
@@ -79,11 +63,11 @@ Menu page styles.
 	display       : block;
 	box-shadow    : 0 0 2px 1px #000000 inset, 0 0 1px 1px rgba(223, 245, 165, 0.5);
 }
-.plugin-menu-page img
+.comment-mail-menu-page img
 {
 	border : 0;
 }
-.plugin-menu-page img.bordered
+.comment-mail-menu-page img.pmp-bordered
 {
 	border-radius : 4px;
 	padding       : 10px;
@@ -91,21 +75,21 @@ Menu page styles.
 	border        : 1px solid #AFAFAF;
 	box-shadow    : 0 0 2px 1px #D8D8D8 inset, 0 0 1px 1px rgba(223, 245, 165, 0.5);
 }
-.plugin-menu-page hr
+.comment-mail-menu-page hr
 {
 	margin : 25px 0 25px 0;
 	border : 1px solid #91DD97;
 }
-.plugin-menu-page label
+.comment-mail-menu-page label
 {
 	-webkit-user-select : none;
 	-moz-user-select    : none;
 	user-select         : none;
 }
-.plugin-menu-page select, .plugin-menu-page select:focus,
-.plugin-menu-page textarea, .plugin-menu-page textarea:focus,
-.plugin-menu-page input:not([type='radio']):not([type='checkbox']),
-.plugin-menu-page input:not([type='radio']):not([type='checkbox']):focus
+.comment-mail-menu-page select, .comment-mail-menu-page select:focus,
+.comment-mail-menu-page textarea, .comment-mail-menu-page textarea:focus,
+.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']),
+.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus
 {
 	margin      : 0;
 	width       : 100%;
@@ -117,86 +101,86 @@ Menu page styles.
 
 	box-sizing  : border-box;
 }
-.plugin-menu-page textarea, .plugin-menu-page textarea:focus,
-.plugin-menu-page input:not([type='radio']):not([type='checkbox']),
-.plugin-menu-page input:not([type='radio']):not([type='checkbox']):focus,
-.plugin-menu-page /* CodeMirror wrappers. */.cm, .plugin-menu-page .cm .CodeMirror
+.comment-mail-menu-page textarea, .comment-mail-menu-page textarea:focus,
+.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']),
+.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus,
+.comment-mail-menu-page /* CodeMirror wrappers. */.cm, .comment-mail-menu-page .cm .CodeMirror
 {
 	font-size   : 1em; /* Font size again, for CodeMirror too. */
 	font-family : 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
 }
-.plugin-menu-page textarea, .plugin-menu-page textarea:focus
+.comment-mail-menu-page textarea, .comment-mail-menu-page textarea:focus
 {
 	height      : auto; /* Textareas auto. */
 	white-space : pre; /* Preserve whitespace. */
 }
-.plugin-menu-page select, .plugin-menu-page select:focus,
-.plugin-menu-page textarea, .plugin-menu-page textarea:focus,
-.plugin-menu-page input:not([type='radio']):not([type='checkbox']),
-.plugin-menu-page input:not([type='radio']):not([type='checkbox']):focus,
-.plugin-menu-page /* CodeMirror wrappers. */.cm
+.comment-mail-menu-page select, .comment-mail-menu-page select:focus,
+.comment-mail-menu-page textarea, .comment-mail-menu-page textarea:focus,
+.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']),
+.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus,
+.comment-mail-menu-page /* CodeMirror wrappers. */.cm
 {
 	border        : 0;
 	padding       : 5px;
 	border-radius : 4px;
 	box-shadow    : 0 0 1px 1px rgba(37, 47, 26, 0.75) inset, 0 0 1px 1px rgba(223, 245, 165, 0.5);
 }
-.plugin-menu-page select,
-.plugin-menu-page textarea,
-.plugin-menu-page input:not([type='radio']):not([type='checkbox'])
+.comment-mail-menu-page select,
+.comment-mail-menu-page textarea,
+.comment-mail-menu-page input:not([type='radio']):not([type='checkbox'])
 {
 	color      : #F7F7F7;
 	background : #73834B;
 }
-.plugin-menu-page select:focus,
-.plugin-menu-page textarea:focus,
-.plugin-menu-page input:not([type='radio']):not([type='checkbox']):focus,
-.plugin-menu-page /* CodeMirror wrappers. */.cm
+.comment-mail-menu-page select:focus,
+.comment-mail-menu-page textarea:focus,
+.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus,
+.comment-mail-menu-page /* CodeMirror wrappers. */.cm
 {
 	background : #637041;
 }
-.plugin-menu-page select.max-width,
-.plugin-menu-page textarea.max-width,
-.plugin-menu-page input.max-width:not([type='radio']):not([type='checkbox'])
+.comment-mail-menu-page select.pmp-max-width,
+.comment-mail-menu-page textarea.pmp-max-width,
+.comment-mail-menu-page input.pmp-max-width:not([type='radio']):not([type='checkbox'])
 {
 	width     : auto;
 	min-width : 400px;
 }
-.plugin-menu-page input::-webkit-input-placeholder
+.comment-mail-menu-page input::-webkit-input-placeholder
 {
 	padding-top : 3px;
 	font-style  : italic;
 	color       : rgba(255, 255, 255, 0.2);
 }
-.plugin-menu-page input::-moz-placeholder
+.comment-mail-menu-page input::-moz-placeholder
 {
 	padding-top : 3px;
 	font-style  : italic;
 	color       : rgba(255, 255, 255, 0.2);
 }
-.plugin-menu-page input:-moz-placeholder
+.comment-mail-menu-page input:-moz-placeholder
 {
 	padding-top : 3px;
 	font-style  : italic;
 	color       : rgba(255, 255, 255, 0.2);
 }
-.plugin-menu-page input:-ms-input-placeholder
+.comment-mail-menu-page input:-ms-input-placeholder
 {
 	padding-top : 3px;
 	font-style  : italic;
 	color       : rgba(255, 255, 255, 0.2);
 }
-.plugin-menu-page input[disabled],
-.plugin-menu-page select[disabled],
-.plugin-menu-page textarea[disabled]
+.comment-mail-menu-page input[disabled],
+.comment-mail-menu-page select[disabled],
+.comment-mail-menu-page textarea[disabled]
 {
 	opacity : 0.5;
 }
-.plugin-menu-page table
+.comment-mail-menu-page table
 {
 	margin : 1em 0 1em 0;
 }
-.plugin-menu-page button
+.comment-mail-menu-page button
 {
 	line-height         : 1em;
 	font-size           : 150%;
@@ -206,7 +190,9 @@ Menu page styles.
 
 	border-radius       : 4px;
 	border              : 1px solid rgba(0, 0, 0, 0.5);
-	box-shadow          : 0 1px 1px 0 rgba(0, 0, 0, 0.25), -1px -1px 0 0 rgba(0, 0, 0, 0.2) inset, 1px 1px 0 0 rgba(255, 255, 255, 0.1) inset;
+	box-shadow          : 0 1px 1px 0 rgba(0, 0, 0, 0.25),
+	-1px -1px 0 0 rgba(0, 0, 0, 0.2) inset,
+	1px 1px 0 0 rgba(255, 255, 255, 0.1) inset;
 
 	margin              : 0;
 	box-sizing          : border-box;
@@ -219,88 +205,88 @@ Menu page styles.
 	-moz-user-select    : none;
 	user-select         : none;
 }
-.plugin-menu-page button:hover
+.comment-mail-menu-page button:hover
 {
 	background : #0D1F2F;
 }
-.plugin-menu-page button:active
+.comment-mail-menu-page button:active
 {
 	-webkit-transform : scale(0.98, 0.98);
 	transform         : scale(0.98, 0.98);
 }
-.plugin-menu-page button[type='submit']
+.comment-mail-menu-page button[type='submit']
 {
 	background : #5F7523;
 }
-.plugin-menu-page button[type='submit']:hover
+.comment-mail-menu-page button[type='submit']:hover
 {
 	background : #4C6324;
 }
-.plugin-menu-page .pro-preview
+.comment-mail-menu-page .pmp-pro-preview
 {
 	opacity : 0.5;
 }
-.plugin-menu-page .info,
-.plugin-menu-page .notice,
-.plugin-menu-page .warning,
-.plugin-menu-page .error
+.comment-mail-menu-page .pmp-info,
+.comment-mail-menu-page .pmp-notice,
+.comment-mail-menu-page .pmp-warning,
+.comment-mail-menu-page .pmp-error
 {
 	border-radius : 5px;
 	font-size     : 120%;
 	padding       : 10px;
 	margin        : 0 0 25px 0;
 }
-.plugin-menu-page .info
+.comment-mail-menu-page .pmp-info
 {
 	background : #C9E0FA;
 	border     : 1px solid #35558A;
 }
-.plugin-menu-page .notice
+.comment-mail-menu-page .pmp-notice
 {
 	background : #FFFBCC;
 	border     : 1px solid #E6DB55;
 }
-.plugin-menu-page .warning
+.comment-mail-menu-page .pmp-warning
 {
 	background : #FADDAB;
 	border     : 1px solid #D29A04;
 }
-.plugin-menu-page .error
+.comment-mail-menu-page .pmp-error
 {
 	background : #FABBC6;
 	border     : 1px solid #711E1E;
 }
-.plugin-menu-page .clearfix:before,
-.plugin-menu-page .clearfix:after
+.comment-mail-menu-page .pmp-clearfix:before,
+.comment-mail-menu-page .pmp-clearfix:after
 {
 	display : table;
 	content : ' ';
 }
-.plugin-menu-page .clearfix:after
+.comment-mail-menu-page .pmp-clearfix:after
 {
 	clear : both;
 }
 /*
-Heading styles.
+Menu page heading styles.
 */
-.plugin-menu-page-heading
+.comment-mail-menu-page .pmp-heading
 {
 	padding-bottom : 15px;
 	margin-bottom  : 25px;
 	border-bottom  : 1px solid #CCCCCC;
 }
-.plugin-menu-page-heading button[type='submit'],
-.plugin-menu-page-heading .plugin-menu-page-restore-defaults,
-.plugin-menu-page-heading .plugin-menu-page-panel-togglers
+.comment-mail-menu-page .pmp-heading button[type='submit'],
+.comment-mail-menu-page .pmp-heading .pmp-restore-defaults,
+.comment-mail-menu-page .pmp-heading .pmp-panel-togglers
 {
 	float : right;
 }
-.plugin-menu-page-heading .plugin-menu-page-restore-defaults,
-.plugin-menu-page-heading .plugin-menu-page-panel-togglers
+.comment-mail-menu-page .pmp-heading .pmp-restore-defaults,
+.comment-mail-menu-page .pmp-heading .pmp-panel-togglers
 {
 	margin : 0 25px 0 0;
 }
-.plugin-menu-page-heading .plugin-menu-page-upsells
+.comment-mail-menu-page .pmp-heading .pmp-upsells
 {
 	float      : right;
 	clear      : right;
@@ -310,7 +296,7 @@ Heading styles.
 
 	text-align : center;
 }
-.plugin-menu-page-heading .plugin-menu-page-upsells a
+.comment-mail-menu-page .pmp-heading .pmp-upsells a
 {
 	line-height     : 1.5em;
 	text-decoration : none;
@@ -318,17 +304,17 @@ Heading styles.
 	display         : inline-block;
 }
 /*
-Panel styles.
+Menu page panel styles.
 */
-.plugin-menu-page-panel
+.comment-mail-menu-page .pmp-panel
 {
 	margin : 25px 0 25px 0;
 }
-.plugin-menu-page-panel:first-child
+.comment-mail-menu-page .pmp-panel:first-child
 {
 	margin-top : 0;
 }
-.plugin-menu-page-panel-heading
+.comment-mail-menu-page .pmp-panel-heading
 {
 	display             : block;
 	text-decoration     : none;
@@ -350,13 +336,13 @@ Panel styles.
 	-moz-user-select    : none;
 	user-select         : none;
 }
-.plugin-menu-page-panel-heading:hover,
-.plugin-menu-page-panel-heading.open
+.comment-mail-menu-page .pmp-panel-heading:hover,
+.comment-mail-menu-page .pmp-panel-heading.open
 {
 	background : #0D1F2F;
 	color      : #FFFFFF !important;
 }
-.plugin-menu-page-panel-heading:after
+.comment-mail-menu-page .pmp-panel-heading:after
 {
 	font-size   : 80%;
 	content     : '\f078';
@@ -367,17 +353,17 @@ Panel styles.
 	margin      : 0 0 0 5px;
 	display     : inline-block;
 }
-.plugin-menu-page-panel-heading.open:after
+.comment-mail-menu-page .pmp-panel-heading.open:after
 {
 	content : '\f077';
 }
-.pro-preview .plugin-menu-page-panel-heading:after
+.comment-mail-menu-page .pmp-pro-preview .pmp-panel-heading:after
 {
 	font-variant : small-caps !important;
 	font-family  : sans-serif !important;
 	content      : 'pro version only' !important;
 }
-.plugin-menu-page-panel-body
+.comment-mail-menu-page .pmp-panel-body
 {
 	width                      : 99%;
 	margin                     : 0 auto 0 auto;
@@ -396,64 +382,64 @@ Panel styles.
 
 	box-shadow                 : 0 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
-.plugin-menu-page-panel-body.open
+.comment-mail-menu-page .pmp-panel-body.open
 {
 	display : block;
 }
-.plugin-menu-page-panel-body .notice,
-.plugin-menu-page-panel-body .info,
-.plugin-menu-page-panel-body .warning,
-.plugin-menu-page-panel-body .error
+.comment-mail-menu-page .pmp-panel-body .pmp-notice,
+.comment-mail-menu-page .pmp-panel-body .pmp-info,
+.comment-mail-menu-page .pmp-panel-body .pmp-warning,
+.comment-mail-menu-page .pmp-panel-body .pmp-error
 {
 	display   : table;
 	font-size : inherit;
 }
-.plugin-menu-page-panel-body h3
+.comment-mail-menu-page .pmp-panel-body h3
 {
 	margin : 0 0 5px 0;
 }
-.plugin-menu-page-panel-body h3:first-child
+.comment-mail-menu-page .pmp-panel-body h3:first-child
 {
 	margin-top : 0;
 }
-.plugin-menu-page-panel-body h3 + p
+.comment-mail-menu-page .pmp-panel-body h3 + p
 {
 	margin-top : 0;
 }
 /*
-Save button styles.
+Menu page save button styles.
 */
-.plugin-menu-page-save button[type='submit']
+.comment-mail-menu-page .pmp-save button[type='submit']
 {
 	width       : 100%;
 	line-height : 1.3em;
 }
 /*
-Table filter styles.
+Menu page table filter styles.
 */
-.plugin-menu-page-table ul.filters,
-.plugin-menu-page-table ul.filters ul,
-.plugin-menu-page-table ul.filters li
+.comment-mail-menu-page-table ul.pmp-filters,
+.comment-mail-menu-page-table ul.pmp-filters ul,
+.comment-mail-menu-page-table ul.pmp-filters li
 {
 	margin-left : 0;
 	list-style  : none;
 }
-.plugin-menu-page-table ul.search-filters,
-.plugin-menu-page-table ul.search-filters ul
+.comment-mail-menu-page-table ul.pmp-search-filters,
+.comment-mail-menu-page-table ul.pmp-search-filters ul
 {
 	list-style  : disc;
 	margin-left : 40px;
 }
-.plugin-menu-page-table ul.search-filters ul
+.comment-mail-menu-page-table ul.pmp-search-filters ul
 {
 	list-style : circle;
 }
-.plugin-menu-page-table ul.navigable-filters li
+.comment-mail-menu-page-table ul.pmp-navigable-filters li
 {
 	margin  : 0 10px 0 0;
 	display : inline-block;
 }
-.plugin-menu-page-table ul.navigable-filters li > a
+.comment-mail-menu-page-table ul.pmp-navigable-filters li > a
 {
 	border-radius   : 3px;
 	text-decoration : none;
@@ -462,32 +448,99 @@ Table filter styles.
 	padding         : 0 5px 0 5px;
 	display         : inline-block;
 }
-.plugin-menu-page-table ul.navigable-filters li > a:hover,
-.plugin-menu-page-table ul.navigable-filters li > a.active
+.comment-mail-menu-page-table ul.pmp-navigable-filters li > a:hover,
+.comment-mail-menu-page-table ul.pmp-navigable-filters li > a.pmp-active
 {
 	color      : #FFFFFF;
 	background : #2EA2CC;
 }
-.plugin-menu-page-table ul.navigable-filters li > a.active
+.comment-mail-menu-page-table ul.pmp-navigable-filters li > a.pmp-active
 {
 	font-weight : bold;
 }
 /*
-Table bubble styles.
+Menu page table columns; i.e. media queries.
 */
-.plugin-menu-page-table .post-com-count
+@media (max-width : 767px)
 {
-	padding-bottom : 0;
+	.comment-mail-menu-page-subscribers .column-email
+	{
+		display : table-cell !important;
+	}
+	.comment-mail-menu-page-subscribers th:not(.check-column):not(.column-email),
+	.comment-mail-menu-page-subscribers td:not(.check-column):not(.column-email)
+	{
+		display : none !important;
+	}
 }
-.plugin-menu-page-table .post-sub-count
+@media (min-width : 768px) and (max-width : 991px)
 {
-	border-radius : 3px;
-	text-align    : left;
-	background    : #BBBBBB;
-	padding       : 0 5px 0 4px;
-	display       : inline-block;
+	.comment-mail-menu-page-subscribers .column-email,
+	.comment-mail-menu-page-subscribers .column-post_id
+	{
+		display : table-cell !important;
+	}
+	.comment-mail-menu-page-subscribers th:not(.check-column):not(.column-email):not(.column-post_id),
+	.comment-mail-menu-page-subscribers td:not(.check-column):not(.column-email):not(.column-post_id)
+	{
+		display : none !important;
+	}
 }
-.plugin-menu-page-table .post-sub-count::before
+@media (min-width : 992px) and (max-width : 1199px)
+{
+	.comment-mail-menu-page-subscribers .column-email,
+	.comment-mail-menu-page-subscribers .column-post_id
+	{
+		width : 200px;
+	}
+	.comment-mail-menu-page-subscribers .column-comment_id
+	{
+		width : 150px;
+	}
+}
+@media (min-width : 1200px) and (max-width : 1599px)
+{
+	.comment-mail-menu-page-subscribers .column-email,
+	.comment-mail-menu-page-subscribers .column-post_id
+	{
+		width : 250px;
+	}
+	.comment-mail-menu-page-subscribers .column-comment_id
+	{
+		width : 200px;
+	}
+}
+@media (min-width : 1600px)
+{
+	.comment-mail-menu-page-subscribers .column-email,
+	.comment-mail-menu-page-subscribers .column-post_id
+	{
+		width : 300px;
+	}
+	.comment-mail-menu-page-subscribers .column-comment_id
+	{
+		width : 250px;
+	}
+}
+/*
+A menu page area in any location.
+	~ post com/sub bubbles.
+*/
+.comment-mail-menu-page-area .pmp-post-com-count
+{
+	padding-bottom  : 0;
+	text-decoration : none;
+}
+.comment-mail-menu-page-area .pmp-post-sub-count
+{
+	border-radius   : 3px;
+	text-align      : left;
+	text-decoration : none;
+	background      : #BBBBBB;
+	padding         : 0 5px 0 4px;
+	display         : inline-block;
+}
+.comment-mail-menu-page-area .pmp-post-sub-count::before
 {
 	content                : '\f0c0';
 	color                  : #5A5A5A;
@@ -499,93 +552,33 @@ Table bubble styles.
 	margin                 : 0 5px 0 0;
 	display                : inline-block;
 }
-.plugin-menu-page-table .post-sub-count > .subscriber-count
+.comment-mail-menu-page-area .pmp-post-sub-count > .pmp-subscriber-count
 {
 	font-weight : bold;
 	color       : #FFFFFF;
 }
-.plugin-menu-page-table .post-sub-count:hover
+.comment-mail-menu-page-area .pmp-post-sub-count:hover
 {
 	background : #2EA2CC;
 }
-.plugin-menu-page-table .post-sub-count:hover::before
+.comment-mail-menu-page-area .pmp-post-sub-count:hover::before
 {
 	color : #FFFFFF;
 }
+/* ------------------------------------------------------------- */
 /*
-Table columns; i.e. media queries.
+Alter WP wrap background color.
 */
-@media (max-width : 767px)
+body.comments_page_comment_mail #wpwrap
 {
-	.plugin-menu-page-subscribers .column-email
-	{
-		display : table-cell !important;
-	}
-	.plugin-menu-page-subscribers th:not(.check-column):not(.column-email),
-	.plugin-menu-page-subscribers td:not(.check-column):not(.column-email)
-	{
-		display : none !important;
-	}
-}
-@media (min-width : 768px) and (max-width : 991px)
-{
-	.plugin-menu-page-subscribers .column-email,
-	.plugin-menu-page-subscribers .column-post_id
-	{
-		display : table-cell !important;
-	}
-	.plugin-menu-page-subscribers th:not(.check-column):not(.column-email):not(.column-post_id),
-	.plugin-menu-page-subscribers td:not(.check-column):not(.column-email):not(.column-post_id)
-	{
-		display : none !important;
-	}
-}
-@media (min-width : 992px) and (max-width : 1199px)
-{
-	.plugin-menu-page-subscribers .column-email,
-	.plugin-menu-page-subscribers .column-post_id
-	{
-		width : 200px;
-	}
-	.plugin-menu-page-subscribers .column-comment_id
-	{
-		width : 150px;
-	}
-}
-@media (min-width : 1200px) and (max-width : 1599px)
-{
-	.plugin-menu-page-subscribers .column-email,
-	.plugin-menu-page-subscribers .column-post_id
-	{
-		width : 250px;
-	}
-	.plugin-menu-page-subscribers .column-comment_id
-	{
-		width : 200px;
-	}
-}
-@media (min-width : 1600px)
-{
-	.plugin-menu-page-subscribers .column-email,
-	.plugin-menu-page-subscribers .column-post_id
-	{
-		width : 300px;
-	}
-	.plugin-menu-page-subscribers .column-comment_id
-	{
-		width : 250px;
-	}
+	background : #C7C7C7;
 }
 /*
-Utility styles.
+Align w/ menu page.
 */
-.plugin-menu-page .float-left
+body.comments_page_comment_mail div.updated,
+body.comments_page_comment_mail div.error
 {
-	margin : 0 25px 15px 0;
-	float  : left !important;
-}
-.plugin-menu-page .float-right
-{
-	margin : 0 0 15px 25px;
-	float  : right !important;
+	font-size : 120%;
+	margin    : 25px 25px 25px 5px;
 }

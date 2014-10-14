@@ -133,13 +133,15 @@ namespace comment_mail // Root namespace.
 				if(!is_admin()) // In an admin area?
 					return ($is = FALSE); // Nope.
 
-				if(!($current_page = !empty($_REQUEST['page']) ? stripslashes((string)$_REQUEST['page']) : ''))
-					return ($is = FALSE); // Not on a menu page.
+				$current_page = !empty($_REQUEST['page'])
+					? stripslashes((string)$_REQUEST['page'])
+					: (!empty($GLOBALS['pagenow']) ? (string)$GLOBALS['pagenow'] : '');
 
-				if($page_to_check) // Support wildcards in the page to check.
-					$page_to_check_regex = '/^'.preg_replace('/\\\\\*/', '.*?', preg_quote($page_to_check, '/')).'$/i';
+				if(!$current_page) return ($is = FALSE); // Not on a menu page.
+				if(!$page_to_check) return ($is = TRUE); // Any page; and it is.
 
-				return ($is = empty($page_to_check_regex) ? TRUE : (boolean)preg_match($page_to_check_regex, $current_page));
+				$page_to_check_regex = '/^'.preg_replace('/\\\\\*/', '.*?', preg_quote($page_to_check, '/')).'$/i';
+				return ($is = (boolean)preg_match($page_to_check_regex, $current_page));
 			}
 		}
 	}

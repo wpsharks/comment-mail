@@ -988,13 +988,13 @@ namespace comment_mail // Root namespace.
 					if(!$navigable_filter_lis) // `all` first; i.e. a way to remove all navigable filters.
 						$navigable_filter_lis[] = '<li>'. // List item for special navigable filter `all`.
 						                          '   <a href="'.esc_attr($this->plugin->utils_url->search_filter('::')).'"'.
-						                          (!$query_contains_navigable_filters ? ' class="active"' : '').'>'.
+						                          (!$query_contains_navigable_filters ? ' class="pmp-active"' : '').'>'.
 						                          '      '.__('all', $this->plugin->text_domain).
 						                          '   </a>'.
 						                          '</li>';
 					$navigable_filter_lis[] = '<li>'. // List item for a navigable filter in this table.
 					                          '   <a href="'.esc_attr($this->plugin->utils_url->search_filter($_navigable_filter_s)).'"'.
-					                          (stripos($raw_search_query, $_navigable_filter_s) !== FALSE ? ' class="active"' : '').'>'.
+					                          (stripos($raw_search_query, $_navigable_filter_s) !== FALSE ? ' class="pmp-active"' : '').'>'.
 					                          '      '.esc_html($_navigable_filter_label).
 					                          '   </a>'.
 					                          '</li>';
@@ -1013,13 +1013,13 @@ namespace comment_mail // Root namespace.
 					     '   <i class="fa fa-filter"></i>'. // Filter icon.
 					     '   '.sprintf(__('<strong>Search Filters Applied</strong> :: only showing %1$s for:', $this->plugin->text_domain), esc_html($this->plural_label)).
 					     '</h3>';
-					if($post_lis) echo '<ul class="search-filters filters">'.implode('', $post_lis).'</ul>';
-					if($comment_lis) echo '<ul class="search-filters filters">'.implode('', $comment_lis).'</ul>';
-					if($unknown_lis) echo '<ul class="search-filters filters">'.implode('', $unknown_lis).'</ul>';
+					if($post_lis) echo '<ul class="pmp-search-filters pmp-filters">'.implode('', $post_lis).'</ul>';
+					if($comment_lis) echo '<ul class="pmp-search-filters pmp-filters">'.implode('', $comment_lis).'</ul>';
+					if($unknown_lis) echo '<ul class="pmp-search-filters pmp-filters">'.implode('', $unknown_lis).'</ul>';
 				}
 				if($navigable_filter_lis_exist && $navigable_filter_lis)
-					echo '<ul class="navigable-filters filters">'.
-					     ' <li class="leader">'.__('Navigable Filters:', $this->plugin->text_domain).'</li>'.
+					echo '<ul class="pmp-navigable-filters pmp-filters">'.
+					     ' <li>'.__('Navigable Filters:', $this->plugin->text_domain).'</li>'.
 					     ' '.implode('', $navigable_filter_lis).
 					     '</ul>';
 			}

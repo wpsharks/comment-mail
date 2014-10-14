@@ -187,8 +187,8 @@ namespace comment_mail // Root namespace.
 					'edit'      => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscr.', $this->plugin->text_domain).'</a>',
 
 					'reconfirm' => '<a href="#"'.  // Depends on `menu-pages.js`.
-					               ' data-action="'.esc_attr($reconfirm_url).'"'. // The action URL.
-					               ' data-confirmation="'.esc_attr(__('Resend email confirmation link? Are you sure?', $this->plugin->text_domain)).'">'.
+					               ' data-pmp-action="'.esc_attr($reconfirm_url).'"'. // The action URL.
+					               ' data-pmp-confirmation="'.esc_attr(__('Resend email confirmation link? Are you sure?', $this->plugin->text_domain)).'">'.
 					               '  '.__('Reconfirm', $this->plugin->text_domain).
 					               '</a>',
 
@@ -198,8 +198,8 @@ namespace comment_mail // Root namespace.
 					'trash'     => '<a href="'.esc_attr($trash_url).'" title="'.esc_attr(__('Trash', $this->plugin->text_domain)).'"><i class="fa fa-trash-o"></i></a>',
 
 					'delete'    => '<a href="#"'.  // Depends on `menu-pages.js`.
-					               ' data-action="'.esc_attr($delete_url).'"'. // The action URL.
-					               ' data-confirmation="'.esc_attr(__('Delete permanently? Are you sure?', $this->plugin->text_domain)).'"'.
+					               ' data-pmp-action="'.esc_attr($delete_url).'"'. // The action URL.
+					               ' data-pmp-confirmation="'.esc_attr(__('Delete permanently? Are you sure?', $this->plugin->text_domain)).'"'.
 					               ' title="'.esc_attr(__('Delete', $this->plugin->text_domain)).'">'.
 					               '  <i class="fa fa-times-circle"></i>'.
 					               '</a>',

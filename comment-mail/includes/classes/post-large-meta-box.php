@@ -52,8 +52,11 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_display()
 			{
-				echo $this->subscriber_count();
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-area').'">'."\n";
+				echo '   '.$this->subscriber_count();
+				echo '</div>';
 			}
+
 
 			/**
 			 * Total subscribers bubble.
