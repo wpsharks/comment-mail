@@ -875,8 +875,9 @@ namespace comment_mail // Root namespace.
 
 				$regex = '/\bname\s*\=\s*(["\']).*?\\1\s+id\s*\=\s*(["\'])search\-submit\\2/i';
 
-				if(!($search_box = preg_replace($regex, 'name="search-submit" id="search-submit"', $search_box, 1, $replacements)) || !$replacements)
-					throw new \exception(__('Unable to set `name="search-submit"` attribute.', $this->plugin->text_domain));
+				if($search_box) // Only if there is a search box; it doesn't always display.
+					if(!($search_box = preg_replace($regex, 'name="search-submit" id="search-submit"', $search_box, 1, $replacements)) || !$replacements)
+						throw new \exception(__('Unable to set `name="search-submit"` attribute.', $this->plugin->text_domain));
 
 				echo $search_box; // Display.
 			}
@@ -995,7 +996,8 @@ namespace comment_mail // Root namespace.
 					$navigable_filter_lis[] = '<li>'. // List item for a navigable filter in this table.
 					                          '   <a href="'.esc_attr($this->plugin->utils_url->search_filter($_navigable_filter_s)).'"'.
 					                          (stripos($raw_search_query, $_navigable_filter_s) !== FALSE ? ' class="pmp-active"' : '').'>'.
-					                          '      '.esc_html($_navigable_filter_label).
+					                          '      <span style="'.esc_attr($_navigable_filter_s === 'status::trashed' ? 'font-style:italic;' : '').'">'.
+					                          '         '.esc_html($_navigable_filter_label).'</span>'.
 					                          '   </a>'.
 					                          '</li>';
 				}

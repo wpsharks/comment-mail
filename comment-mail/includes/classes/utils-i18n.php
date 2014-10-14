@@ -69,7 +69,7 @@ namespace comment_mail // Root namespace.
 					case 'delete':
 						return __('deleted', $this->plugin->text_domain);
 				}
-				return __(rtrim($action, 'ed').'ed', $this->plugin->text_domain);
+				return !$action ? '' : __(rtrim($action, 'ed').'ed', $this->plugin->text_domain);
 			}
 
 			/**
@@ -120,7 +120,7 @@ namespace comment_mail // Root namespace.
 					case 'trashed':
 						return __('trashed', $this->plugin->text_domain);
 				}
-				return __(rtrim($status, 'ed').'ed', $this->plugin->text_domain);
+				return !$status ? '' : __(rtrim($status, 'ed').'ed', $this->plugin->text_domain);
 			}
 
 			/**
@@ -144,7 +144,7 @@ namespace comment_mail // Root namespace.
 					case 'comment':
 						return __('replies only', $this->plugin->text_domain);
 				}
-				return __($subscr_type, $this->plugin->text_domain);
+				return !$subscr_type ? '' : __($subscr_type, $this->plugin->text_domain);
 			}
 		}
 	}
