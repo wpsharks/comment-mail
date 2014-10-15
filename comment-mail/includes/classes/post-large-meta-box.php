@@ -56,6 +56,8 @@ namespace comment_mail // Root namespace.
 				if($post_comment_status !== 'open')
 					return; // Not applicable.
 
+				// @TODO this needs to display even when comments are closed; if the post has comments.
+
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-area').'">'."\n";
 				echo '</div>';
 			}

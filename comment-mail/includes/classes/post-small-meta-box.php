@@ -56,6 +56,8 @@ namespace comment_mail // Root namespace.
 				if($post_comment_status !== 'open')
 					return; // Not applicable.
 
+				// @TODO this needs to display even when comments are closed; if the post has comments.
+
 				$total_subs        = $this->plugin->utils_sub->query_total($this->post->ID);
 				$total_subs_bubble = $this->plugin->utils_markup->subscriber_count($this->post->ID, $total_subs);
 
