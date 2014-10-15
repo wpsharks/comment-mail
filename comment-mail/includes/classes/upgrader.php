@@ -59,14 +59,19 @@ namespace comment_mail // Root namespace.
 				if(version_compare($this->current_version, $this->plugin->version, '>='))
 					return; // Nothing to do; already @ latest version.
 
-				$this->plugin->options['version'] = $this->current_version = $this->plugin->version;
+				$this->plugin->options['version'] // Update.
+					= $this->current_version = $this->plugin->version;
 				update_option(__NAMESPACE__.'_options', $this->plugin->options);
 
 				new upgrader_vs($this->prev_version); // Run version-specific upgrader(s).
 
-				$notice = __('<strong>%1$s</strong> detected a new version of itself. Recompiling... All done :-)', $this->plugin->text_domain);
+				$this->plugin->enqueue_notice // Notify site owner about this upgrade process.
+				(
+					sprintf(__('<strong>%1$s</strong> detected a new version of itself. Recompiling... All done :-)',
+					           $this->plugin->text_domain), esc_html($this->plugin->name)),
 
-				$this->plugin->enqueue_notice(sprintf($notice, esc_html($this->plugin->name)), '', TRUE); // Push this to the top.
+					array('requires_cap' => 'manage_network_plugins', 'push_to_top' => TRUE)
+				);
 			}
 		}
 	}

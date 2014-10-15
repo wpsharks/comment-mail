@@ -145,6 +145,15 @@ namespace comment_mail
 			public $cap;
 
 			/**
+			 * Management capability requirement.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @var string Capability required to manage.
+			 */
+			public $manage_cap;
+
+			/**
 			 * Uninstall capability requirement.
 			 *
 			 * @since 14xxxx First documented version.
@@ -238,11 +247,16 @@ namespace comment_mail
 				/*
 				 * Setup additional class properties.
 				 */
+				$this->cap = apply_filters(__METHOD__.'_cap', 'activate_plugins');
+
 				$this->default_options = array(
 					'version'                                     => $this->version,
 					'enable'                                      => '0', // `0|1`; enable?
 					'crons_setup'                                 => '0', // `0` or timestamp.
 					'uninstall_on_deletion'                       => '0', // `0|1`; run uninstaller?
+
+					'manage_cap'                                  => $this->cap, // Capability.
+					'uninstall_cap'                               => 'delete_plugins', // Capability.
 
 					'auto_confirm_enable'                         => '0', // `0|1`; auto-confirm enable?
 
@@ -300,14 +314,14 @@ namespace comment_mail
 					'excluded_meta_box_post_types'                => 'link,comment,revision,attachment,nav_menu_item,snippet,redirect',
 
 				); // Default options are merged with those defined by the site owner.
-				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options, get_defined_vars());
+				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options); // Allow filters.
+				$this->options         = is_array($this->options = get_option(__NAMESPACE__.'_options')) ? $this->options : array();
+				$this->options         = array_merge($this->default_options, $this->options); // Merge into default options.
+				$this->options         = array_intersect_key($this->options, $this->default_options); // Valid keys only.
+				$this->options         = apply_filters(__METHOD__.'__options', $this->options); // Allow filters.
 
-				$options       = (is_array($options = get_option(__NAMESPACE__.'_options'))) ? $options : array();
-				$this->options = array_merge($this->default_options, $options); // Merge into default options.
-				$this->options = apply_filters(__METHOD__.'__options', $this->options, get_defined_vars());
-
-				$this->cap           = apply_filters(__METHOD__.'__cap', 'activate_plugins');
-				$this->uninstall_cap = apply_filters(__METHOD__.'__uninstall_cap', 'delete_plugins');
+				$this->manage_cap    = $this->options['manage_cap'] ? (string)$this->options['manage_cap'] : $this->cap;
+				$this->uninstall_cap = $this->options['uninstall_cap'] ? (string)$this->options['uninstall_cap'] : 'delete_plugins';
 
 				/*
 				 * With or without hooks?
@@ -319,13 +333,12 @@ namespace comment_mail
 				 * Setup all secondary plugin hooks.
 				 */
 				add_action('wp_loaded', array($this, 'actions'));
+
 				add_action('admin_init', array($this, 'check_version'));
+				add_action('all_admin_notices', array($this, 'all_admin_notices'));
 
 				add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
 				add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
-
-				add_action('all_admin_notices', array($this, 'all_admin_notices'));
-				add_action('all_admin_notices', array($this, 'all_admin_errors'));
 
 				add_action('admin_menu', array($this, 'add_menu_pages'));
 				add_filter('set-screen-option', array($this, 'set_screen_option'), 10, 3);
@@ -493,8 +506,9 @@ namespace comment_mail
 			 */
 			public function add_meta_boxes($post_type)
 			{
-				if(!current_user_can($this->cap))
-					return; // Nothing to do.
+				if(!current_user_can($this->manage_cap))
+					if(!current_user_can($this->cap))
+						return; // Do not add meta boxes.
 
 				$post_type           = strtolower((string)$post_type);
 				$excluded_post_types = $this->options['excluded_meta_box_post_types'];
@@ -588,20 +602,21 @@ namespace comment_mail
 			 */
 			public function add_menu_pages()
 			{
-				if(!current_user_can($this->cap))
-					return; // Nothing to do.
+				if(!current_user_can($this->manage_cap))
+					if(!current_user_can($this->cap))
+						return; // Do not add meta boxes.
 
 				$this->menu_page_hooks[__NAMESPACE__] = add_comments_page($this->name.'™', $this->name.'™', $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__], array($this, 'menu_page_options_screen'));
 
 				$menu_title                                          = '⥱ '.__('Subscribers', $this->text_domain);
 				$page_title                                          = $this->name.'™ ⥱ '.__('Subscribers', $this->text_domain);
-				$this->menu_page_hooks[__NAMESPACE__.'_subscribers'] = add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__.'_subscribers', array($this, 'menu_page_subscribers'));
+				$this->menu_page_hooks[__NAMESPACE__.'_subscribers'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_subscribers', array($this, 'menu_page_subscribers'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_subscribers'], array($this, 'menu_page_subscribers_screen'));
 
 				$menu_title                                    = '⥱ '.__('Mail Queue', $this->text_domain);
 				$page_title                                    = $this->name.'™ ⥱ '.__('Mail Queue', $this->text_domain);
-				$this->menu_page_hooks[__NAMESPACE__.'_queue'] = add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
+				$this->menu_page_hooks[__NAMESPACE__.'_queue'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue'], array($this, 'menu_page_queue_screen'));
 			}
 
@@ -778,37 +793,69 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string  $notice HTML markup containing the notice itself.
-			 *
-			 * @param string  $persistent_key Optional. A unique key which identifies a particular type of persistent notice.
-			 *    This defaults to an empty string. If this is passed, the notice is persistent; i.e. it continues to be displayed until dismissed by the site owner.
-			 *
-			 * @param boolean $push_to_top Optional. Defaults to a `FALSE` value.
-			 *    If `TRUE`, the notice is pushed to the top of the stack; i.e. displayed above any others.
+			 * @param string $markup HTML markup containing the notice itself.
+			 * @param array  $args An array of additional args; i.e. presentation/style.
 			 */
-			public function enqueue_notice($notice, $persistent_key = '', $push_to_top = FALSE)
+			public function enqueue_notice($markup, array $args = array())
 			{
-				$notice         = (string)$notice;
-				$persistent_key = (string)$persistent_key;
+				if(!($markup = trim((string)$markup)))
+					return; // Nothing to do here.
 
-				$notices = get_option(__NAMESPACE__.'_notices');
-				if(!is_array($notices)) $notices = array();
+				$default_args   = array(
+					'markup'       => '',
+					'requires_cap' => '',
+					'for_user_id'  => 0,
+					'for_page'     => '',
+					'persistent'   => FALSE,
+					'transient'    => FALSE,
+					'push_to_top'  => FALSE,
+					'type'         => 'notice',
+				);
+				$args['markup'] = (string)$markup; // + markup.
+				$args           = array_merge($default_args, $args);
+				$args           = array_intersect_key($args, $default_args);
 
-				if($persistent_key) // A persistent notice?
-				{
-					if(strpos($persistent_key, 'persistent-') !== 0)
-						$persistent_key = 'persistent-'.$persistent_key;
+				$args['requires_cap'] = trim((string)$args['requires_cap']);
+				$args['requires_cap'] = $args['requires_cap'] // Force valid format.
+					? strtolower(preg_replace('/\W/', '_', $args['requires_cap'])) : '';
 
-					if($push_to_top) // Push this notice to the top?
-						$notices = array($persistent_key => $notice) + $notices;
-					else $notices[$persistent_key] = $notice;
-				}
-				else if($push_to_top) // Push to the top?
-					array_unshift($notices, $notice);
+				$args['for_user_id'] = (integer)$args['for_user_id'];
+				$args['for_page']    = trim((string)$args['for_page']);
 
-				else $notices[] = $notice; // Default behavior.
+				$args['persistent']  = (boolean)$args['persistent'];
+				$args['transient']   = (boolean)$args['transient'];
+				$args['push_to_top'] = (boolean)$args['push_to_top'];
+
+				if(!in_array($args['type'], array('notice', 'error'), TRUE))
+					$args['type'] = 'notice'; // Use default type.
+
+				ksort($args); // Sort args (by key) for key generation.
+				$key = $this->utils_enc->hmac_sha256_sign(serialize($args));
+
+				if(!is_array($notices = get_option(__NAMESPACE__.'_notices')))
+					$notices = array(); // Force an array of notices.
+
+				if($args['push_to_top']) // Push this notice to the top?
+					$this->utils_array->unshift_assoc($notices, $key, $args);
+				else $notices[$key] = $args; // Default behavior.
 
 				update_option(__NAMESPACE__.'_notices', $notices);
+			}
+
+			/**
+			 * Enqueue an administrative notice; for a particular user.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $markup HTML markup. See {@link enqueue_notice()}.
+			 * @param array  $args Additional args. See {@link enqueue_notice()}.
+			 */
+			public function enqueue_user_notice($markup, array $args = array())
+			{
+				if(!isset($args['for_user_id']))
+					$args['for_user_id'] = get_current_user_id();
+
+				$this->enqueue_notice($markup, $args);
 			}
 
 			/**
@@ -816,37 +863,28 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string  $error HTML markup containing the error itself.
-			 *
-			 * @param string  $persistent_key Optional. A unique key which identifies a particular type of persistent error.
-			 *    This defaults to an empty string. If this is passed, the error is persistent; i.e. it continues to be displayed until dismissed by the site owner.
-			 *
-			 * @param boolean $push_to_top Optional. Defaults to a `FALSE` value.
-			 *    If `TRUE`, the error is pushed to the top of the stack; i.e. displayed above any others.
+			 * @param string $markup HTML markup. See {@link enqueue_notice()}.
+			 * @param array  $args Additional args. See {@link enqueue_notice()}.
 			 */
-			public function enqueue_error($error, $persistent_key = '', $push_to_top = FALSE)
+			public function enqueue_error($markup, array $args = array())
 			{
-				$error          = (string)$error;
-				$persistent_key = (string)$persistent_key;
+				$this->enqueue_notice($markup, array_merge($args, array('type' => 'error')));
+			}
 
-				$errors = get_option(__NAMESPACE__.'_errors');
-				if(!is_array($errors)) $errors = array();
+			/**
+			 * Enqueue an administrative error; for a particular user.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $markup HTML markup. See {@link enqueue_error()}.
+			 * @param array  $args Additional args. See {@link enqueue_notice()}.
+			 */
+			public function enqueue_user_error($markup, array $args = array())
+			{
+				if(!isset($args['for_user_id']))
+					$args['for_user_id'] = get_current_user_id();
 
-				if($persistent_key) // A persistent notice?
-				{
-					if(strpos($persistent_key, 'persistent-') !== 0)
-						$persistent_key = 'persistent-'.$persistent_key;
-
-					if($push_to_top) // Push this notice to the top?
-						$errors = array($persistent_key => $error) + $errors;
-					else $errors[$persistent_key] = $error;
-				}
-				else if($push_to_top) // Push to the top?
-					array_unshift($errors, $error);
-
-				else $errors[] = $error; // Default behavior.
-
-				update_option(__NAMESPACE__.'_errors', $errors);
+				$this->enqueue_error($markup, $args);
 			}
 
 			/**
@@ -858,67 +896,90 @@ namespace comment_mail
 			 */
 			public function all_admin_notices()
 			{
-				$notices = get_option(__NAMESPACE__.'_notices');
-				if(!is_array($notices)) $notices = array();
+				if(!is_array($notices = get_option(__NAMESPACE__.'_notices')))
+					update_option(__NAMESPACE__.'_notices', ($notices = array()));
 
-				if($notices) // Do we have notices to display at this time?
+				if(!$notices) return; // Nothing more to do in this case.
+
+				$user_can_view_notices // All notices require one of the following caps.
+					= current_user_can($this->manage_cap) || current_user_can($this->cap);
+
+				$original_notices = $notices; // Copy.
+
+				foreach($notices as $_key => $_args)
 				{
-					$notices = $updated_notices = array_unique($notices); // De-dupe.
+					$default_args = array(
+						'markup'       => '',
+						'requires_cap' => '',
+						'for_user_id'  => 0,
+						'for_page'     => '',
+						'persistent'   => FALSE,
+						'transient'    => FALSE,
+						'push_to_top'  => FALSE,
+						'type'         => 'notice',
+					);
+					$_args        = array_merge($default_args, $_args);
+					$_args        = array_intersect_key($_args, $default_args);
 
-					foreach(array_keys($updated_notices) as $_key) if(strpos($_key, 'persistent-') !== 0)
-						unset($updated_notices[$_key]); // Leave persistent notices; ditch others.
-					unset($_key); // Housekeeping after updating notices.
+					$_args['markup'] = trim((string)$_args['markup']);
 
-					update_option(__NAMESPACE__.'_notices', $updated_notices);
+					$_args['requires_cap'] = trim((string)$_args['requires_cap']);
+					$_args['requires_cap'] = $_args['requires_cap'] // Force valid format.
+						? strtolower(preg_replace('/\W/', '_', $_args['requires_cap'])) : '';
+
+					$_args['for_user_id'] = (integer)$_args['for_user_id'];
+					$_args['for_page']    = trim((string)$_args['for_page']);
+
+					$_args['persistent']  = (boolean)$_args['persistent'];
+					$_args['transient']   = (boolean)$_args['transient'];
+					$_args['push_to_top'] = (boolean)$_args['push_to_top'];
+
+					if(!in_array($_args['type'], array('notice', 'error'), TRUE))
+						$_args['type'] = 'notice'; // Use default type.
+
+					if($_args['transient']) // Transient; i.e. single pass only?
+						unset($notices[$_key]); // Remove always in this case.
+
+					if(!$user_can_view_notices) // Primary capability check.
+						continue;  // Don't display to this user under any circumstance.
+
+					if($_args['requires_cap'] && !current_user_can($_args['requires_cap']))
+						continue; // Don't display to this user; lacks required cap.
+
+					if($_args['for_user_id'] && get_current_user_id() !== $_args['for_user_id'])
+						continue; // Don't display to this particular user ID.
+
+					if($_args['for_page'] && !$this->utils_env->is_menu_page($_args['for_page']))
+						continue; // Don't display on this page; i.e. pattern match failure.
+
+					if($_args['markup']) // Only display non-empty notices.
+					{
+						if($_args['persistent']) // Need [dismiss] link?
+						{
+							$_dismiss_style  = 'float: right;'.
+							                   'margin: 0 0 0 15px;'.
+							                   'display: inline-block;'.
+							                   'text-decoration: none;'.
+							                   'font-weight: bold;';
+							$_dismiss_url    = $this->utils_url->dismiss_notice($_key);
+							$_dismiss_anchor = '<a href="'.esc_attr($_dismiss_url).'"'.
+							                   '  style="'.esc_attr($_dismiss_style).'">'.
+							                   '  '.__('dismiss &times;', $this->text_domain).
+							                   '</a>';
+						}
+						else $_dismiss_anchor = ''; // Define a default value.
+
+						$_full_markup = // Put together the full markup; including other pieces.
+							'<div class="'.esc_attr($_args['type'] === 'error' ? 'error' : 'updated').'">'.
+							'  <p>'.$_args['markup'].$_dismiss_anchor.'</p>'.
+							'</div>';
+						echo apply_filters(__METHOD__.'_notice', $_full_markup, get_defined_vars());
+					}
+					if(!$_args['persistent']) unset($notices[$_key]); // Once only; i.e. don't show again.
 				}
-				if(current_user_can($this->cap)) foreach($notices as $_key => $_notice)
-				{
-					if(strpos($_key, 'persistent-') === 0) // A dismissal link is needed?
-						$_dismiss = '<a href="'.esc_attr($this->utils_url->dismiss_notice($_key)).'"'.
-						            '  style="display:inline-block; float:right; margin:0 0 0 15px; text-decoration:none; font-weight:bold;">'.
-						            '  '.__('dismiss &times;', $this->text_domain).
-						            '</a>';
-					else $_dismiss = ''; // Initialize empty string; e.g. reset value on each pass.
+				unset($_key, $_args, $_dismiss_style, $_dismiss_url, $_dismiss_anchor, $_full_markup); // Housekeeping.
 
-					echo apply_filters(__METHOD__.'_notice', '<div class="updated"><p>'.$_notice.$_dismiss.'</p></div>', get_defined_vars());
-				}
-				unset($_key, $_notice, $_dismiss); // Housekeeping.
-			}
-
-			/**
-			 * Render admin errors; across all admin dashboard views.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @attaches-to `all_admin_notices` action.
-			 */
-			public function all_admin_errors()
-			{
-				$errors = get_option(__NAMESPACE__.'_errors');
-				if(!is_array($errors)) $errors = array();
-
-				if($errors) // Do we have errors to display at this time?
-				{
-					$errors = $updated_errors = array_unique($errors); // De-dupe.
-
-					foreach(array_keys($updated_errors) as $_key) if(strpos($_key, 'persistent-') !== 0)
-						unset($updated_errors[$_key]); // Leave persistent errors; ditch others.
-					unset($_key); // Housekeeping after updating errors.
-
-					update_option(__NAMESPACE__.'_errors', $updated_errors);
-				}
-				if(current_user_can($this->cap)) foreach($errors as $_key => $_error)
-				{
-					if(strpos($_key, 'persistent-') === 0) // A dismissal link is needed?
-						$_dismiss = '<a href="'.esc_attr($this->utils_url->dismiss_error($_key)).'"'.
-						            '  style="display:inline-block; float:right; margin:0 0 0 15px; text-decoration:none; font-weight:bold;">'.
-						            '  '.__('dismiss &times;', $this->text_domain).
-						            '</a>';
-					else $_dismiss = ''; // Initialize empty string; e.g. reset value on each pass.
-
-					echo apply_filters(__METHOD__.'_error', '<div class="error"><p>'.$_error.$_dismiss.'</p></div>', get_defined_vars());
-				}
-				unset($_key, $_error, $_dismiss); // Housekeeping.
+				if($original_notices !== $notices) update_option(__NAMESPACE__.'_notices', $notices);
 			}
 
 			/*

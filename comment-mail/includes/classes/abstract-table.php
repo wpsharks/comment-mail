@@ -796,16 +796,20 @@ namespace comment_mail // Root namespace.
 				if(!($ids = array_map('intval', $_REQUEST[$this->plural_name])))
 					return; // Nothing to do; i.e. we have no IDs.
 
-				if(!current_user_can($this->plugin->cap))
-					return; // Unauthenticated; ignore.
+				if(!current_user_can($this->plugin->manage_cap))
+					if(!current_user_can($this->plugin->cap))
+						return; // Unauthenticated; ignore.
 
 				$counter = $this->process_bulk_action($bulk_action, $ids);
 
 				if(method_exists($this->plugin->utils_i18n, $this->plural_name))
-					$this->plugin->enqueue_notice(
+					$this->plugin->enqueue_user_notice
+					(
 						sprintf(__('Action complete. %1$s %2$s.', $this->plugin->text_domain),
 						        esc_html($this->plugin->utils_i18n->{$this->plural_name}($counter)),
-						        esc_html($this->plugin->utils_i18n->action_ed($bulk_action)))
+						        esc_html($this->plugin->utils_i18n->action_ed($bulk_action))),
+
+						array('transient' => TRUE, 'for_page' => $this->plugin->utils_env->current_menu_page())
 					);
 				$_r          = stripslashes_deep($_REQUEST);
 				$redirect_to = remove_query_arg(array('_wpnonce', 'action', $this->plural_name, $this->singular_name));

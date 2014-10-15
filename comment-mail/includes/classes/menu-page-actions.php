@@ -45,9 +45,6 @@ namespace comment_mail // Root namespace.
 				if(empty($_REQUEST[__NAMESPACE__]))
 					return; // Not applicable.
 
-				if(!current_user_can($this->plugin->cap))
-					return; // Unauthenticated; ignore.
-
 				if(!$this->plugin->utils_url->has_valid_nonce())
 					return; // Unauthenticated; ignore.
 
@@ -67,6 +64,9 @@ namespace comment_mail // Root namespace.
 			{
 				$args = NULL; // Not used here.
 
+				if(!current_user_can($this->plugin->cap))
+					return; // Unauthenticated; ignore.
+
 				delete_option(__NAMESPACE__.'_options');
 				$this->plugin->options = $this->plugin->default_options;
 
@@ -83,6 +83,9 @@ namespace comment_mail // Root namespace.
 			protected function save_options($args)
 			{
 				$args = (array)$args; // Expecting an array.
+
+				if(!current_user_can($this->plugin->cap))
+					return; // Unauthenticated; ignore.
 
 				$this->plugin->options = array_merge($this->plugin->default_options, $this->plugin->options, $args);
 				$this->plugin->options = array_intersect_key($this->plugin->options, $this->plugin->default_options);
@@ -105,6 +108,10 @@ namespace comment_mail // Root namespace.
 				if(empty($args['key'])) // Missing key?
 					return; // Nothing to dismiss.
 
+				if(!current_user_can($this->plugin->manage_cap))
+					if(!current_user_can($this->plugin->cap))
+						return; // Unauthenticated; ignore.
+
 				$notices = get_option(__NAMESPACE__.'_notices');
 				if(!is_array($notices)) $notices = array();
 
@@ -112,29 +119,6 @@ namespace comment_mail // Root namespace.
 				update_option(__NAMESPACE__.'_notices', $notices);
 
 				wp_redirect($this->plugin->utils_url->notice_dismissed()).exit();
-			}
-
-			/**
-			 * Dismisses a persistent error.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param mixed $args Input argument(s).
-			 */
-			protected function dismiss_error($args)
-			{
-				$args = (array)$args; // Expecting an array.
-
-				if(empty($args['key'])) // Missing key?
-					return; // Nothing to dismiss.
-
-				$errors = get_option(__NAMESPACE__.'_errors');
-				if(!is_array($errors)) $errors = array();
-
-				unset($errors[$args['key']]); // Dismiss.
-				update_option(__NAMESPACE__.'_errors', $errors);
-
-				wp_redirect($this->plugin->utils_url->error_dismissed()).exit();
 			}
 
 			/**
@@ -153,6 +137,9 @@ namespace comment_mail // Root namespace.
 
 				if(!in_array($args['type'], array('stcr'), TRUE))
 					return; // Invalid import type.
+
+				if(!current_user_can($this->plugin->cap))
+					return; // Unauthenticated; ignore.
 
 				$class    = 'import_'.$args['type'];
 				$importer = new $class; // Instantiate.

@@ -82,7 +82,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Nnique values (deeply; preserving keys).
+			 * Unique values (deeply; preserving keys).
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -112,6 +112,27 @@ namespace comment_mail // Root namespace.
 				unset($_key, $_value); // Housekeeping.
 
 				return $array; // Unique deep.
+			}
+
+			/**
+			 * Prepend a key/value pair onto an array.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array          $array An input array; by reference.
+			 * @param string|integer New array key; string or integer.
+			 * @param mixed          $value New array value.
+			 *
+			 * @return integer Like {@link \array_unshift}, returns the new number of elements.
+			 */
+			public function unshift_assoc(&$array, $key, $value)
+			{
+				unset($array[$key]); // Unset first.
+				$array       = array_reverse($array, TRUE);
+				$array[$key] = $value; // Add to the end here.
+				$array       = array_reverse($array, TRUE); // Flip again.
+
+				return count($array); // New number of elements.
 			}
 		}
 	}

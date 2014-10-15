@@ -108,6 +108,29 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Current admin menu page.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string Current admin menu page.
+			 */
+			public function current_menu_page()
+			{
+				if(isset($this->static[__FUNCTION__]))
+					return $this->static[__FUNCTION__];
+
+				$page = &$this->static[__FUNCTION__];
+
+				if(!is_admin()) return ($page = '');
+
+				$page = !empty($_REQUEST['page'])
+					? stripslashes((string)$_REQUEST['page'])
+					: (!empty($GLOBALS['pagenow']) ? (string)$GLOBALS['pagenow'] : '');
+
+				return $page; // Current menu page.
+			}
+
+			/**
 			 * Checks if current page is a menu page.
 			 *
 			 * @since 14xxxx First documented version.
@@ -133,14 +156,13 @@ namespace comment_mail // Root namespace.
 				if(!is_admin()) // In an admin area?
 					return ($is = FALSE); // Nope.
 
-				$current_page = !empty($_REQUEST['page'])
-					? stripslashes((string)$_REQUEST['page'])
-					: (!empty($GLOBALS['pagenow']) ? (string)$GLOBALS['pagenow'] : '');
+				if(!($current_page = $this->current_menu_page()))
+					return ($is = FALSE); // Not on a menu page.
 
-				if(!$current_page) return ($is = FALSE); // Not on a menu page.
 				if(!$page_to_check) return ($is = TRUE); // Any page; and it is.
 
 				$page_to_check_regex = '/^'.preg_replace('/\\\\\*/', '.*?', preg_quote($page_to_check, '/')).'$/i';
+
 				return ($is = (boolean)preg_match($page_to_check_regex, $current_page));
 			}
 		}

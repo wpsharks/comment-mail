@@ -46,6 +46,24 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Generates an HMAC-SHA256 signature.
+			 *
+			 * @param string  $string Input string/data, to be signed by this routine.
+			 *
+			 * @param string  $key Optional. Key used for encryption.
+			 *    Defaults to the one configured for the plugin.
+			 *
+			 * @param boolean $raw Optional. Defaults to a FALSE value.
+			 *    If true, the signature is returned as raw binary data, as opposed to lowercase hexits.
+			 *
+			 * @return string An HMAC-SHA256 signature string. Always 64 characters in length (URL safe).
+			 */
+			public function hmac_sha256_sign($string, $key = '', $raw = FALSE)
+			{
+				return hash_hmac('sha256', (string)$string, $this->key((string)$key), (boolean)$raw);
+			}
+
+			/**
 			 * A unique, unguessable, non-numeric, caSe-insensitive key (20 chars max).
 			 *
 			 * @since 14xxxx First documented version.

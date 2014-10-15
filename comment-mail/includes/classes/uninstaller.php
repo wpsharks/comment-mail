@@ -46,6 +46,9 @@ namespace comment_mail // Root namespace.
 				if(!current_user_can($this->plugin->uninstall_cap))
 					return; // Extra layer of security.
 
+				if(!current_user_can($this->plugin->cap))
+					return; // Extra layer of security.
+
 				$this->delete_options();
 				$this->clear_cron_hooks();
 				$this->drop_db_tables();
@@ -60,7 +63,6 @@ namespace comment_mail // Root namespace.
 			{
 				delete_option(__NAMESPACE__.'_options');
 				delete_option(__NAMESPACE__.'_notices');
-				delete_option(__NAMESPACE__.'_errors');
 			}
 
 			/**
