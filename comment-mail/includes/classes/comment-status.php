@@ -51,16 +51,16 @@ namespace comment_mail // Root namespace.
 			 * @param integer|string $new_comment_status New comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: `hold`, `unapprove`, `unapproved`),
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`, `moderated`),
 			 *       - `1` (aka: `approve`, `approved`),
-			 *       - or `trash`, `spam`, `delete`.
+			 *       - or `trash`, `post-trashed`, `spam`, `delete`.
 			 *
 			 * @param integer|string $old_comment_status Old comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: `hold`, `unapprove`, `unapproved`),
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`, `moderated`),
 			 *       - `1` (aka: `approve`, `approved`),
-			 *       - or `trash`, `spam`, `delete`.
+			 *       - or `trash`, `post-trashed`, `spam`, `delete`.
 			 *
 			 * @param \stdClass|null $comment Comment object (now).
 			 */
@@ -69,8 +69,8 @@ namespace comment_mail // Root namespace.
 				parent::__construct();
 
 				$this->comment            = is_object($comment) ? $comment : NULL;
-				$this->new_comment_status = $this->plugin->comment_status__($new_comment_status);
-				$this->old_comment_status = $this->plugin->comment_status__($old_comment_status);
+				$this->new_comment_status = $this->plugin->utils_db->comment_status__($new_comment_status);
+				$this->old_comment_status = $this->plugin->utils_db->comment_status__($old_comment_status);
 
 				$this->maybe_insert_queue();
 				$this->maybe_delete_subs();

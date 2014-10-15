@@ -48,7 +48,7 @@ namespace comment_mail // Root namespace.
 				if(!current_user_can($this->plugin->cap))
 					return; // Unauthenticated; ignore.
 
-				if(empty($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce']))
+				if(!$this->plugin->utils_url->has_valid_nonce())
 					return; // Unauthenticated; ignore.
 
 				foreach((array)$_REQUEST[__NAMESPACE__] as $action => $args)
@@ -70,11 +70,7 @@ namespace comment_mail // Root namespace.
 				delete_option(__NAMESPACE__.'_options');
 				$this->plugin->options = $this->plugin->default_options;
 
-				$redirect_to = self_admin_url('/admin.php');
-				$query_args  = array('page' => __NAMESPACE__, __NAMESPACE__.'__restored' => '1');
-				$redirect_to = add_query_arg(urlencode_deep($query_args), $redirect_to);
-
-				wp_redirect($redirect_to).exit();
+				wp_redirect($this->plugin->utils_url->options_restored()).exit();
 			}
 
 			/**
@@ -90,13 +86,9 @@ namespace comment_mail // Root namespace.
 
 				$this->plugin->options = array_merge($this->plugin->default_options, $this->plugin->options, $args);
 				$this->plugin->options = array_intersect_key($this->plugin->options, $this->plugin->default_options);
-				update_option(__NAMESPACE__.'_options', $this->plugin->options);
+				update_option(__NAMESPACE__.'_options', $this->plugin->options); // Update.
 
-				$redirect_to = self_admin_url('/admin.php');
-				$query_args  = array('page' => __NAMESPACE__, __NAMESPACE__.'__updated' => '1');
-				$redirect_to = add_query_arg(urlencode_deep($query_args), $redirect_to);
-
-				wp_redirect($redirect_to).exit();
+				wp_redirect($this->plugin->utils_url->options_updated()).exit();
 			}
 
 			/**
@@ -113,11 +105,13 @@ namespace comment_mail // Root namespace.
 				if(empty($args['key'])) // Missing key?
 					return; // Nothing to dismiss.
 
-				$notices = (is_array($notices = get_option(__NAMESPACE__.'_notices'))) ? $notices : array();
-				unset($notices[$args['key']]); // Dismiss this notice.
+				$notices = get_option(__NAMESPACE__.'_notices');
+				if(!is_array($notices)) $notices = array();
+
+				unset($notices[$args['key']]); // Dismiss.
 				update_option(__NAMESPACE__.'_notices', $notices);
 
-				wp_redirect(remove_query_arg(__NAMESPACE__)).exit();
+				wp_redirect($this->plugin->utils_url->notice_dismissed()).exit();
 			}
 
 			/**
@@ -134,11 +128,13 @@ namespace comment_mail // Root namespace.
 				if(empty($args['key'])) // Missing key?
 					return; // Nothing to dismiss.
 
-				$errors = (is_array($errors = get_option(__NAMESPACE__.'_errors'))) ? $errors : array();
-				unset($errors[$args['key']]); // Dismiss this error.
+				$errors = get_option(__NAMESPACE__.'_errors');
+				if(!is_array($errors)) $errors = array();
+
+				unset($errors[$args['key']]); // Dismiss.
 				update_option(__NAMESPACE__.'_errors', $errors);
 
-				wp_redirect(remove_query_arg(__NAMESPACE__)).exit();
+				wp_redirect($this->plugin->utils_url->error_dismissed()).exit();
 			}
 
 			/**

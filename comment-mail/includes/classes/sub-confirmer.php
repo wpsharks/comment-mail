@@ -95,10 +95,12 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_auto_confirm()
 			{
+				if($this->auto_confirm === FALSE)
+					return FALSE; // Nope.
+
 				if($this->auto_confirm) // Auto-confirm?
 				{
 					$this->plugin->utils_sub->confirm($this->sub->ID);
-
 					return TRUE; // Confirmed automatically.
 				}
 				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
@@ -115,7 +117,6 @@ namespace comment_mail // Root namespace.
 				if((integer)$this->plugin->utils_db->wp->get_var($sql))
 				{
 					$this->plugin->utils_sub->confirm($this->sub->ID);
-
 					return TRUE; // Confirmed automatically.
 				}
 				return FALSE; // Not subscribed already.

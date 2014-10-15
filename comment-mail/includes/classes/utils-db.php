@@ -91,7 +91,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return boolean TRUE if the key should contain an integer value.
 			 */
-			protected function is_integer_key($key)
+			public function is_integer_key($key)
 			{
 				if(!$key || !is_string($key))
 					return FALSE;
@@ -116,9 +116,127 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return boolean TRUE if the key should contain a float value.
 			 */
-			protected function is_float_key($key)
+			public function is_float_key($key)
 			{
 				return FALSE; // Default; no float keys at this time.
+			}
+
+			/**
+			 * Check DB engine compat. w/ fulltext indexes.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $sql Input SQL to check.
+			 *
+			 * @return string Output `$sql` w/ possible engine modification.
+			 *    Only MySQL v5.6+ supports fulltext indexes with the InnoDB engine.
+			 *    Otherwise, we use MyISAM for any table that includes a fulltext index.
+			 *
+			 * @note MySQL v5.6+ supports fulltext indexes w/ InnoDB.
+			 *    See: <http://bit.ly/ZVeF42>
+			 */
+			public function fulltext_compat($sql)
+			{
+				if(!($sql = trim((string)$sql)))
+					return $sql; // Empty.
+
+				if(!preg_match('/^CREATE\s+TABLE\s+/i', $sql))
+					return $sql; // Not applicable.
+
+				if(!preg_match('/\bFULLTEXT\s+KEY\b/i', $sql))
+					return $sql; // No fulltext index.
+
+				if(!preg_match('/\bENGINE\=InnoDB\b/i', $sql))
+					return $sql; // Not using InnoDB anyway.
+
+				$mysql_version = $this->wp->db_version();
+				if($mysql_version && version_compare($mysql_version, '5.6', '>='))
+					return $sql; // MySQL v5.6+ supports fulltext indexes.
+
+				return preg_replace('/\bENGINE\=InnoDB\b/i', 'ENGINE=MyISAM', $sql);
+			}
+
+			/**
+			 * Comment status translator.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer|string $status
+			 *
+			 *    One of the following:
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`, `moderated`),
+			 *       - `1` (aka: `approve`, `approved`),
+			 *       - or `trash`, `post-trashed`, `spam`, `delete`.
+			 *
+			 * @return string `approve`, `hold`, `trash`, `spam`, `delete`.
+			 *
+			 * @throws \exception If an unexpected status is encountered.
+			 */
+			public function comment_status__($status)
+			{
+				switch(trim(strtolower((string)$status)))
+				{
+					case '1':
+					case 'approve':
+					case 'approved':
+						return 'approve';
+
+					case '0':
+					case '':
+					case 'hold':
+					case 'unapprove':
+					case 'unapproved':
+					case 'moderated':
+						return 'hold';
+
+					case 'trash':
+					case 'post-trashed':
+						return 'trash';
+
+					case 'spam':
+						return 'spam';
+
+					case 'delete':
+						return 'delete';
+
+					default: // Throw exception on anything else.
+						throw new \exception(sprintf(__('Unexpected comment status: `%1$s`.', $this->plugin->text_domain), $status));
+				}
+			}
+
+			/**
+			 * Post comment status translator.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer|string $status
+			 *
+			 *    One of the following:
+			 *       - `0` (aka: ``, `closed`, `close`).
+			 *       - `1` (aka: `opened`, `open`).
+			 *
+			 * @return string `open`, `closed`.
+			 *
+			 * @throws \exception If an unexpected status is encountered.
+			 */
+			public function post_comment_status__($status)
+			{
+				switch(trim(strtolower((string)$status)))
+				{
+					case '1':
+					case 'open':
+					case 'opened':
+						return 'open';
+
+					case '0':
+					case '':
+					case 'close':
+					case 'closed':
+						return 'closed';
+
+					default: // Throw exception on anything else.
+						throw new \exception(sprintf(__('Unexpected post comment status: `%1$s`.', $this->plugin->text_domain), $status));
+				}
 			}
 		}
 	}

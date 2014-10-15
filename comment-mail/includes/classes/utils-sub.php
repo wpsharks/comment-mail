@@ -31,27 +31,6 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Subscriber key to ID.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string $key Input key to convert to an ID.
-			 *
-			 * @return integer The subscriber ID matching the input `$key`.
-			 *    If the `$key` is not found, this returns `0`.
-			 */
-			public function key_to_id($key)
-			{
-				if(!($key = trim((string)$key)))
-					return 0; // Not possible.
-
-				if(!($sub = $this->get($key)))
-					return 0; // Not found.
-
-				return $sub->ID;
-			}
-
-			/**
 			 * Get subscriber.
 			 *
 			 * @since 14xxxx First documented version.
@@ -90,7 +69,94 @@ namespace comment_mail // Root namespace.
 				if(($row = $this->plugin->utils_db->wp->get_row($sql)))
 					return ($cache[$row->ID] = $cache[$row->key] = $row = $this->plugin->utils_db->typify_deep($row));
 
-				return ($cache[$sub_id_or_key] = NULL); // Default.
+				return ($cache[$sub_id_or_key] = NULL);
+			}
+
+			/**
+			 * Reconfirm subscriber via email.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer|string $sub_id_or_key Subscriber ID.
+			 *
+			 * @param boolean        $log_subscribed_event Log `subscribed` event?
+			 *
+			 * @param string         $last_ip Most recent IP address, when possible.
+			 *
+			 * @return boolean|null TRUE if subscriber is reconfirmed successfully.
+			 *    Or, FALSE if unable to reconfirm (e.g. already confirmed).
+			 *    Or, NULL on complete failure (e.g. invalid ID or key).
+			 *
+			 * @throws \exception If an update failure occurs.
+			 */
+			public function reconfirm($sub_id_or_key, $log_subscribed_event = FALSE, $last_ip = '')
+			{
+				if(!$sub_id_or_key)
+					return NULL; // Not possible.
+
+				if(!($sub = $this->get($sub_id_or_key)))
+					return NULL; // Not possible.
+
+				if($sub->status === 'subscribed')
+					return FALSE; // Already confirmed.
+
+				$last_ip = (string)$last_ip; // Force string.
+
+				if($log_subscribed_event) // Log `subscribed` event?
+					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'subscribed')));
+
+				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " SET `status` = '".esc_sql('unconfirmed')."'".
+				       ($last_ip ? ", `last_ip` = '".esc_sql($last_ip)."'" : '').
+				       ", `last_update_time` = '".esc_sql(time())."'".
+
+				       " WHERE `ID` = '".esc_sql($sub->ID)."'";
+
+				if(($confirmed = $this->plugin->utils_db->wp->query($sql)) === FALSE)
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
+				$confirmed = (boolean)$confirmed; // Convert to boolean.
+
+				if($confirmed) // Confirmed successfully?
+				{
+					$sub->status = 'unconfirmed'; // Obj. properties.
+					if($last_ip) $sub->last_ip = $last_ip;
+					$sub->last_update_time = time();
+
+					$this->nullify_cache();
+
+					new sub_confirmer($sub->ID);
+				}
+				return $confirmed;
+			}
+
+			/**
+			 * Bulk reconfirm subscribers via email.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
+			 *
+			 * @return integer Number of suscribers reconfirmed successfully.
+			 */
+			public function bulk_reconfirm(array $sub_ids_or_keys)
+			{
+				$counter = 0; // Initialize.
+
+				if(!$sub_ids_or_keys)
+					return $counter; // Not possible.
+
+				@set_time_limit(300); // Give this time.
+				@set_time_limit(900); // Give this time.
+
+				foreach($sub_ids_or_keys as $_sub_id_or_key)
+					if($this->reconfirm($_sub_id_or_key))
+						$counter++; // Updated counter.
+				unset($_sub_id_or_key); // Housekeeping.
+
+				$this->nullify_cache($sub_ids_or_keys);
+
+				return $counter;
 			}
 
 			/**
@@ -118,6 +184,9 @@ namespace comment_mail // Root namespace.
 				if(!($sub = $this->get($sub_id_or_key)))
 					return NULL; // Not possible.
 
+				if($sub->status === 'subscribed')
+					return FALSE; // Already confirmed.
+
 				$last_ip = (string)$last_ip; // Force string.
 
 				if($log_confirmed_event) // Log `confirmed` event?
@@ -133,14 +202,381 @@ namespace comment_mail // Root namespace.
 
 				if(($confirmed = $this->plugin->utils_db->wp->query($sql)) === FALSE)
 					throw new \exception(__('Update failure.', $this->plugin->text_domain));
+				$confirmed = (boolean)$confirmed; // Convert to boolean.
 
-				if(($confirmed = (boolean)$confirmed)) // Convert to boolean.
+				if($confirmed) // Confirmed successfully?
 				{
 					$sub->status = 'subscribed'; // Obj. properties.
 					if($last_ip) $sub->last_ip = $last_ip;
 					$sub->last_update_time = time();
+
+					$this->nullify_cache();
 				}
-				return $confirmed; // TRUE if confirmed successfully.
+				return $confirmed;
+			}
+
+			/**
+			 * Bulk confirm subscribers.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
+			 *
+			 * @return integer Number of suscribers confirmed successfully.
+			 *
+			 * @throws \exception If a DB update failure occurs.
+			 */
+			public function bulk_confirm(array $sub_ids_or_keys)
+			{
+				$counter = 0; // Initialize.
+
+				if(!$sub_ids_or_keys)
+					return $counter; // Not possible.
+
+				$separate // Separate IDs from keys.
+					= $this->separate_ids_keys($sub_ids_or_keys);
+
+				if(!$separate['sub_ids'] && !$separate['sub_keys'])
+					return $counter; // Not possible.
+
+				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " SET `status` = '".esc_sql('subscribed')."'".
+				       ", `last_update_time` = '".esc_sql(time())."'".
+
+				       " WHERE". // Begin MySQL where clause.
+
+				       ($separate['sub_ids'] ? // Have subscriber IDs?
+					       " `ID` IN ('".implode("','", array_map('esc_sql', $separate['sub_ids']))."')"
+					       : ''). // Otherwise, we can simply exlude this.
+
+				       ($separate['sub_keys'] ? // Have subscriber keys?
+					       ($separate['sub_ids'] ? " OR" : ''). // Need the `OR` here?
+					       " `key` IN ('".implode("','", array_map('esc_sql', $separate['sub_keys']))."')"
+					       : ''); // Otherwise, we can simply exlude this.
+
+				if(($confirmed = $this->plugin->utils_db->wp->query($sql)) === FALSE)
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
+				$counter += (integer)$confirmed; // Bump counter.
+
+				$this->nullify_cache($sub_ids_or_keys);
+
+				return $counter;
+			}
+
+			/**
+			 * Unconfirm subscriber.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer|string $sub_id_or_key Subscriber ID.
+			 *
+			 * @param boolean        $log_unsubscribed_event Log `unsubscribed` event?
+			 *
+			 * @param string         $last_ip Most recent IP address, when possible.
+			 *
+			 * @return boolean|null TRUE if subscriber is unconfirmed successfully.
+			 *    Or, FALSE if unable to unconfirm (e.g. already unconfirmed).
+			 *    Or, NULL on complete failure (e.g. invalid ID or key).
+			 *
+			 * @throws \exception If an update failure occurs.
+			 */
+			public function unconfirm($sub_id_or_key, $log_unsubscribed_event = FALSE, $last_ip = '')
+			{
+				if(!$sub_id_or_key)
+					return NULL; // Not possible.
+
+				if(!($sub = $this->get($sub_id_or_key)))
+					return NULL; // Not possible.
+
+				if($sub->status === 'unconfirmed')
+					return FALSE; // Already unconfirmed.
+
+				$last_ip = (string)$last_ip; // Force string.
+
+				if($log_unsubscribed_event) // Log `unsubscribed` event?
+					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'unsubscribed')));
+
+				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " SET `status` = '".esc_sql('unconfirmed')."'".
+				       ($last_ip ? ", `last_ip` = '".esc_sql($last_ip)."'" : '').
+				       ", `last_update_time` = '".esc_sql(time())."'".
+
+				       " WHERE `ID` = '".esc_sql($sub->ID)."'";
+
+				if(($unconfirmed = $this->plugin->utils_db->wp->query($sql)) === FALSE)
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
+				$unconfirmed = (boolean)$unconfirmed; // Convert to boolean.
+
+				if($unconfirmed) // Unconfirmed successfully?
+				{
+					$sub->status = 'unconfirmed'; // Obj. properties.
+					if($last_ip) $sub->last_ip = $last_ip;
+					$sub->last_update_time = time();
+
+					$this->nullify_cache();
+				}
+				return $unconfirmed;
+			}
+
+			/**
+			 * Bulk unconfirm subscribers.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
+			 *
+			 * @return integer Number of suscribers unconfirmed successfully.
+			 *
+			 * @throws \exception If a DB update failure occurs.
+			 */
+			public function bulk_unconfirm(array $sub_ids_or_keys)
+			{
+				$counter = 0; // Initialize.
+
+				if(!$sub_ids_or_keys)
+					return $counter; // Not possible.
+
+				$separate // Separate IDs from keys.
+					= $this->separate_ids_keys($sub_ids_or_keys);
+
+				if(!$separate['sub_ids'] && !$separate['sub_keys'])
+					return $counter; // Not possible.
+
+				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " SET `status` = '".esc_sql('unconfirmed')."'".
+				       ", `last_update_time` = '".esc_sql(time())."'".
+
+				       " WHERE". // Begin MySQL where clause.
+
+				       ($separate['sub_ids'] ? // Have subscriber IDs?
+					       " `ID` IN ('".implode("','", array_map('esc_sql', $separate['sub_ids']))."')"
+					       : ''). // Otherwise, we can simply exlude this.
+
+				       ($separate['sub_keys'] ? // Have subscriber keys?
+					       ($separate['sub_ids'] ? " OR" : ''). // Need the `OR` here?
+					       " `key` IN ('".implode("','", array_map('esc_sql', $separate['sub_keys']))."')"
+					       : ''); // Otherwise, we can simply exlude this.
+
+				if(($unconfirmed = $this->plugin->utils_db->wp->query($sql)) === FALSE)
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
+				$counter += (integer)$unconfirmed; // Bump counter.
+
+				$this->nullify_cache($sub_ids_or_keys);
+
+				return $counter;
+			}
+
+			/**
+			 * Suspend subscriber.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer|string $sub_id_or_key Subscriber ID.
+			 *
+			 * @param boolean        $log_suspended_event Log `suspended` event?
+			 *
+			 * @param string         $last_ip Most recent IP address, when possible.
+			 *
+			 * @return boolean|null TRUE if subscriber is suspended successfully.
+			 *    Or, FALSE if unable to suspend (e.g. already suspended).
+			 *    Or, NULL on complete failure (e.g. invalid ID or key).
+			 *
+			 * @throws \exception If an update failure occurs.
+			 */
+			public function suspend($sub_id_or_key, $log_suspended_event = FALSE, $last_ip = '')
+			{
+				if(!$sub_id_or_key)
+					return NULL; // Not possible.
+
+				if(!($sub = $this->get($sub_id_or_key)))
+					return NULL; // Not possible.
+
+				if($sub->status === 'suspended')
+					return FALSE; // Already suspended.
+
+				$last_ip = (string)$last_ip; // Force string.
+
+				if($log_suspended_event) // Log `suspended` event?
+					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'suspended')));
+
+				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " SET `status` = '".esc_sql('suspended')."'".
+				       ($last_ip ? ", `last_ip` = '".esc_sql($last_ip)."'" : '').
+				       ", `last_update_time` = '".esc_sql(time())."'".
+
+				       " WHERE `ID` = '".esc_sql($sub->ID)."'";
+
+				if(($suspended = $this->plugin->utils_db->wp->query($sql)) === FALSE)
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
+				$suspended = (boolean)$suspended; // Convert to boolean.
+
+				if($suspended) // Suspended successfully?
+				{
+					$sub->status = 'suspended'; // Obj. properties.
+					if($last_ip) $sub->last_ip = $last_ip;
+					$sub->last_update_time = time();
+
+					$this->nullify_cache();
+				}
+				return $suspended;
+			}
+
+			/**
+			 * Bulk suspend subscribers.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
+			 *
+			 * @return integer Number of suscribers suspended successfully.
+			 *
+			 * @throws \exception If a DB update failure occurs.
+			 */
+			public function bulk_suspend(array $sub_ids_or_keys)
+			{
+				$counter = 0; // Initialize.
+
+				if(!$sub_ids_or_keys)
+					return $counter; // Not possible.
+
+				$separate // Separate IDs from keys.
+					= $this->separate_ids_keys($sub_ids_or_keys);
+
+				if(!$separate['sub_ids'] && !$separate['sub_keys'])
+					return $counter; // Not possible.
+
+				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " SET `status` = '".esc_sql('suspended')."'".
+				       ", `last_update_time` = '".esc_sql(time())."'".
+
+				       " WHERE". // Begin MySQL where clause.
+
+				       ($separate['sub_ids'] ? // Have subscriber IDs?
+					       " `ID` IN ('".implode("','", array_map('esc_sql', $separate['sub_ids']))."')"
+					       : ''). // Otherwise, we can simply exlude this.
+
+				       ($separate['sub_keys'] ? // Have subscriber keys?
+					       ($separate['sub_ids'] ? " OR" : ''). // Need the `OR` here?
+					       " `key` IN ('".implode("','", array_map('esc_sql', $separate['sub_keys']))."')"
+					       : ''); // Otherwise, we can simply exlude this.
+
+				if(($suspended = $this->plugin->utils_db->wp->query($sql)) === FALSE)
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
+				$counter += (integer)$suspended; // Bump counter.
+
+				$this->nullify_cache($sub_ids_or_keys);
+
+				return $counter;
+			}
+
+			/**
+			 * Trash subscriber.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer|string $sub_id_or_key Subscriber ID.
+			 *
+			 * @param boolean        $log_unsubscribed_event Log `unsubscribed` event?
+			 *
+			 * @param string         $last_ip Most recent IP address, when possible.
+			 *
+			 * @return boolean|null TRUE if subscriber is trashed successfully.
+			 *    Or, FALSE if unable to trash (e.g. already trashed).
+			 *    Or, NULL on complete failure (e.g. invalid ID or key).
+			 *
+			 * @throws \exception If an update failure occurs.
+			 */
+			public function trash($sub_id_or_key, $log_unsubscribed_event = FALSE, $last_ip = '')
+			{
+				if(!$sub_id_or_key)
+					return NULL; // Not possible.
+
+				if(!($sub = $this->get($sub_id_or_key)))
+					return NULL; // Not possible.
+
+				if($sub->status === 'trashed')
+					return FALSE; // Already trashed.
+
+				$last_ip = (string)$last_ip; // Force string.
+
+				if($log_unsubscribed_event) // Log `unsubscribed` event?
+					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'unsubscribed')));
+
+				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " SET `status` = '".esc_sql('trashed')."'".
+				       ($last_ip ? ", `last_ip` = '".esc_sql($last_ip)."'" : '').
+				       ", `last_update_time` = '".esc_sql(time())."'".
+
+				       " WHERE `ID` = '".esc_sql($sub->ID)."'";
+
+				if(($trashed = $this->plugin->utils_db->wp->query($sql)) === FALSE)
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
+				$trashed = (boolean)$trashed; // Convert to boolean.
+
+				if($trashed) // Trashed successfully?
+				{
+					$sub->status = 'trashed'; // Obj. properties.
+					if($last_ip) $sub->last_ip = $last_ip;
+					$sub->last_update_time = time();
+
+					$this->nullify_cache();
+				}
+				return $trashed;
+			}
+
+			/**
+			 * Bulk trash subscribers.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
+			 *
+			 * @return integer Number of suscribers trashed successfully.
+			 *
+			 * @throws \exception If a DB update failure occurs.
+			 */
+			public function bulk_trash(array $sub_ids_or_keys)
+			{
+				$counter = 0; // Initialize.
+
+				if(!$sub_ids_or_keys)
+					return $counter; // Not possible.
+
+				$separate // Separate IDs from keys.
+					= $this->separate_ids_keys($sub_ids_or_keys);
+
+				if(!$separate['sub_ids'] && !$separate['sub_keys'])
+					return $counter; // Not possible.
+
+				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " SET `status` = '".esc_sql('trashed')."'".
+				       ", `last_update_time` = '".esc_sql(time())."'".
+
+				       " WHERE". // Begin MySQL where clause.
+
+				       ($separate['sub_ids'] ? // Have subscriber IDs?
+					       " `ID` IN ('".implode("','", array_map('esc_sql', $separate['sub_ids']))."')"
+					       : ''). // Otherwise, we can simply exlude this.
+
+				       ($separate['sub_keys'] ? // Have subscriber keys?
+					       ($separate['sub_ids'] ? " OR" : ''). // Need the `OR` here?
+					       " `key` IN ('".implode("','", array_map('esc_sql', $separate['sub_keys']))."')"
+					       : ''); // Otherwise, we can simply exlude this.
+
+				if(($trashed = $this->plugin->utils_db->wp->query($sql)) === FALSE)
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
+				$counter += (integer)$trashed; // Bump counter.
+
+				$this->nullify_cache($sub_ids_or_keys);
+
+				return $counter;
 			}
 
 			/**
@@ -177,22 +613,248 @@ namespace comment_mail // Root namespace.
 					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'unsubscribed')));
 
 				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-
 				       " WHERE `ID` = '".esc_sql($sub->ID)."'";
 
 				if(($deleted = $this->plugin->utils_db->wp->query($sql)) === FALSE)
 					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
+				$deleted = (boolean)$deleted; // Convert to boolean.
 
-				if(($deleted = (boolean)$deleted)) // Convert to boolean.
+				if($deleted) // Deleted successfully?
 				{
-					$this->cache['get'][$sub->ID] // Nullify cache.
-						= $this->cache['get'][$sub->key] = NULL;
-
 					$sub->status = 'deleted'; // Obj. properties.
 					if($last_ip) $sub->last_ip = $last_ip;
 					$sub->last_update_time = time();
+
+					$this->nullify_cache(array($sub->ID, $sub->key));
 				}
-				return $deleted; // TRUE if deleted successfully.
+				return $deleted;
+			}
+
+			/**
+			 * Bulk delete subscribers.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
+			 *
+			 * @return integer Number of suscribers deleted successfully.
+			 *
+			 * @throws \exception If a deletion failure occurs.
+			 */
+			public function bulk_delete(array $sub_ids_or_keys)
+			{
+				$counter = 0; // Initialize.
+
+				if(!$sub_ids_or_keys)
+					return $counter; // Not possible.
+
+				$separate // Separate IDs from keys.
+					= $this->separate_ids_keys($sub_ids_or_keys);
+
+				if(!$separate['sub_ids'] && !$separate['sub_keys'])
+					return $counter; // Not possible.
+
+				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " WHERE". // Begin MySQL where clause.
+
+				       ($separate['sub_ids'] ? // Have subscriber IDs?
+					       " `ID` IN ('".implode("','", array_map('esc_sql', $separate['sub_ids']))."')"
+					       : ''). // Otherwise, we can simply exlude this.
+
+				       ($separate['sub_keys'] ? // Have subscriber keys?
+					       ($separate['sub_ids'] ? " OR" : ''). // Need the `OR` here?
+					       " `key` IN ('".implode("','", array_map('esc_sql', $separate['sub_keys']))."')"
+					       : ''); // Otherwise, we can simply exlude this.
+
+				if(($deleted = $this->plugin->utils_db->wp->query($sql)) === FALSE)
+					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
+				$counter += (integer)$deleted; // Bump counter.
+
+				$this->nullify_cache($sub_ids_or_keys);
+
+				return $counter;
+			}
+
+			/**
+			 * Query total subscribers.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer|null $post_id Defaults to a `NULL` value.
+			 *    i.e. defaults to any post ID. Pass this to limit the query.
+			 *
+			 * @param integer|null $comment_id Defaults to a `NULL` value.
+			 *    i.e. defaults to any comment ID. Pass this to limit the query.
+			 *
+			 * @param string|null  $status Defaults to an empty string.
+			 *    i.e. defaults to any status. Pass this to limit the query.
+			 *
+			 * @param boolean      $auto_discount_trash Defaults to a `TRUE` value.
+			 *    This applies to the case where `$status` is empty.
+			 *    i.e. do not count subscribers in the trash.
+			 *
+			 * @return integer Total subscribers for the given query.
+			 */
+			public function query_total($post_id = NULL, $comment_id = NULL, $status = '', $auto_discount_trash = TRUE)
+			{
+				$post_id_key             = isset($post_id) ? (integer)$post_id : -1;
+				$comment_id_key          = isset($comment_id) ? (integer)$comment_id : -1;
+				$status_key              = $status = (string)$status; // Force string.
+				$auto_discount_trash_key = $auto_discount_trash ? 1 : 0;
+
+				if(isset($this->cache[__FUNCTION__][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key]))
+					return $this->cache[__FUNCTION__][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key];
+				$total = &$this->cache[__FUNCTION__][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key];
+
+				$sql = "SELECT SQL_CALC_FOUND_ROWS `ID`".
+				       " FROM `".esc_html($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " WHERE 1=1". // Initialize where clause.
+
+				       ($status // A specific status?
+					       ? " AND `status` = '".esc_sql((string)$status)."'"
+					       : ($auto_discount_trash ? " AND `status` != '".esc_sql('trashed')."'" : '')).
+
+				       (isset($post_id) ? " AND `post_id` = '".esc_sql((integer)$post_id)."'" : '').
+				       (isset($comment_id) ? " AND `comment_id` = '".esc_sql((integer)$comment_id)."'" : '').
+
+				       " LIMIT 1"; // Just one to check.
+
+				if($this->plugin->utils_db->wp->query($sql))
+					return ($total = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()"));
+
+				return ($total = 0); // Default value.
+			}
+
+			/**
+			 * Last X subscribers w/ a given status.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer      $x The total number to return.
+			 *
+			 * @param integer|null $post_id Defaults to a `NULL` value.
+			 *    i.e. defaults to any post ID. Pass this to limit the query.
+			 *
+			 * @param integer|null $comment_id Defaults to a `NULL` value.
+			 *    i.e. defaults to any comment ID. Pass this to limit the query.
+			 *
+			 * @param string|null  $status Defaults to an empty string.
+			 *    i.e. defaults to any status. Pass this to limit the query.
+			 *
+			 * @param boolean      $auto_discount_trash Defaults to a `TRUE` value.
+			 *    This applies to the case where `$status` is empty.
+			 *    i.e. do not count subscribers in the trash.
+			 *
+			 * @return \stdClass[] Last X subscribers w/ a given status.
+			 */
+			public function last_x($x = 0, $post_id = NULL, $comment_id = NULL, $status = '', $auto_discount_trash = TRUE)
+			{
+				if(($x = (integer)$x) <= 0) $x = 10; // Default value.
+				$post_id_key             = isset($post_id) ? (integer)$post_id : -1;
+				$comment_id_key          = isset($comment_id) ? (integer)$comment_id : -1;
+				$status_key              = $status = (string)$status; // Force string.
+				$auto_discount_trash_key = $auto_discount_trash ? 1 : 0;
+
+				if(isset($this->cache[__FUNCTION__][$x][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key]))
+					return $this->cache[__FUNCTION__][$x][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key];
+				$results = &$this->cache[__FUNCTION__][$x][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key];
+
+				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " WHERE 1=1". // Initialize where clause.
+
+				       ($status // A specific status?
+					       ? " AND `status` = '".esc_sql((string)$status)."'"
+					       : ($auto_discount_trash ? " AND `status` != '".esc_sql('trashed')."'" : '')).
+
+				       (isset($post_id) ? " AND `post_id` = '".esc_sql((integer)$post_id)."'" : '').
+				       (isset($comment_id) ? " AND `comment_id` = '".esc_sql((integer)$comment_id)."'" : '').
+
+				       " GROUP BY `email` ORDER BY `insertion_time` DESC".
+				       " LIMIT ".esc_sql($x); // X rows only please.
+
+				if(($results = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
+					return ($results = $this->plugin->utils_db->typify_deep($results));
+
+				return ($results = array()); // Default value.
+			}
+
+			/**
+			 * Nullify the object cache for IDs/keys.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $sub_ids_or_keys An array of IDs/keys.
+			 */
+			public function nullify_cache(array $sub_ids_or_keys = array())
+			{
+				unset($this->cache['query_total'], $this->cache['last_x']);
+
+				if(!$sub_ids_or_keys) return; // Nothing more to do.
+
+				$separate // Separate IDs from keys.
+					= $this->separate_ids_keys($sub_ids_or_keys);
+
+				foreach($separate['sub_ids'] as $_sub_id)
+					$this->cache['get'][$_sub_id] = NULL;
+				unset($_sub_id); // Housekeeping.
+
+				foreach($separate['sub_keys'] as $_sub_key)
+					$this->cache['get'][$_sub_key] = NULL;
+				unset($_sub_key); // Housekeeping.
+
+				// This prevents odd cache conflicts at runtime.
+			}
+
+			/**
+			 * Separates IDs from keys.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $sub_ids_or_keys An array of IDs/keys.
+			 *
+			 * @return array An array with two elements.
+			 *    - `sub_ids`, an array of all of the sub IDs.
+			 *    - `sub_keys`, an array of all of the sub keys.
+			 */
+			public function separate_ids_keys(array $sub_ids_or_keys)
+			{
+				$sub_ids = $sub_keys = array(); // Initialize.
+
+				foreach($sub_ids_or_keys as $_sub_id_or_key)
+				{
+					if(is_numeric($_sub_id_or_key) && (integer)$_sub_id_or_key > 0)
+						$sub_ids[] = (integer)$_sub_id_or_key;
+
+					else if(is_string($_sub_id_or_key) && $_sub_id_or_key)
+						$sub_keys[] = $_sub_id_or_key;
+				}
+				unset($_sub_id_or_key); // Housekeeping.
+
+				return compact('sub_ids', 'sub_keys');
+			}
+
+			/**
+			 * Subscriber key to ID.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $key Input key to convert to an ID.
+			 *
+			 * @return integer The subscriber ID matching the input `$key`.
+			 *    If the `$key` is not found, this returns `0`.
+			 */
+			public function key_to_id($key)
+			{
+				if(!($key = trim((string)$key)))
+					return 0; // Not possible.
+
+				if(!($sub = $this->get($key)))
+					return 0; // Not found.
+
+				return $sub->ID;
 			}
 
 			/**
@@ -267,8 +929,9 @@ namespace comment_mail // Root namespace.
 			public function confirm_url($sub_key, $scheme = NULL)
 			{
 				$sub_key = trim((string)$sub_key);
+				$args    = array(__NAMESPACE__ => array('confirm' => $sub_key));
 
-				return add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('confirm' => $sub_key))), home_url('/', $scheme));
+				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
 			}
 
 			/**
@@ -285,8 +948,9 @@ namespace comment_mail // Root namespace.
 			public function unsubscribe_url($sub_key, $scheme = NULL)
 			{
 				$sub_key = trim((string)$sub_key);
+				$args    = array(__NAMESPACE__ => array('unsubscribe' => $sub_key));
 
-				return add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('unsubscribe' => $sub_key))), home_url('/', $scheme));
+				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
 			}
 
 			/**
@@ -309,8 +973,9 @@ namespace comment_mail // Root namespace.
 				$sub_email = trim((string)$sub_email);
 
 				$encrypted_sub_email = $this->plugin->utils_enc->encrypt($sub_email);
+				$args                = array(__NAMESPACE__ => array('manage' => $encrypted_sub_email));
 
-				return add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('manage' => $encrypted_sub_email))), home_url('/', $scheme));
+				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
 			}
 
 			/**
@@ -333,8 +998,9 @@ namespace comment_mail // Root namespace.
 				$sub_email = trim((string)$sub_email);
 
 				$encrypted_sub_email = $this->plugin->utils_enc->encrypt($sub_email);
+				$args                = array(__NAMESPACE__ => array('manage' => array('summary' => $encrypted_sub_email)));
 
-				return add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('manage' => array('summary' => $encrypted_sub_email)))), home_url('/', $scheme));
+				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
 			}
 		}
 	}

@@ -19,16 +19,19 @@ namespace comment_mail
 		 * Plugin Class
 		 *
 		 * @property utils_array  $utils_array
-		 * @property utils_cond   $utils_cond
+		 * @property utils_date   $utils_date
 		 * @property utils_db     $utils_db
 		 * @property utils_enc    $utils_enc
 		 * @property utils_env    $utils_env
 		 * @property utils_event  $utils_event
+		 * @property utils_i18n   $utils_i18n
 		 * @property utils_mail   $utils_mail
+		 * @property utils_markup $utils_markup
 		 * @property utils_php    $utils_php
 		 * @property utils_string $utils_string
 		 * @property utils_sub    $utils_sub
 		 * @property utils_url    $utils_url
+		 * @property utils_user   $utils_user
 		 *
 		 * @since 14xxxx First documented version.
 		 */
@@ -63,7 +66,7 @@ namespace comment_mail
 			 *
 			 * @var string Plugin name (abbreviated).
 			 */
-			public $name_abbr = 'CM';
+			public $short_name = 'CM';
 
 			/**
 			 * Used by the plugin's uninstall handler.
@@ -149,6 +152,12 @@ namespace comment_mail
 			 * @var string Capability required to uninstall.
 			 */
 			public $uninstall_cap;
+
+			/*
+			 * Public Properties (Defined by Various Hooks)
+			 */
+
+			public $menu_page_hooks = array();
 
 			/*
 			 * Plugin Constructor
@@ -285,6 +294,11 @@ namespace comment_mail
 					'unconfirmed_expiration_time'                 => '60 days', // `strtotime()` compatible.
 					// Or, this can be left empty to disable automatic expirations altogether.
 
+					'trashed_expiration_time'                     => '60 days', // `strtotime()` compatible.
+					// Or, this can be left empty to disable automatic deletions altogether.
+
+					'excluded_meta_box_post_types'                => 'link,comment,revision,attachment,nav_menu_item,snippet,redirect',
+
 				); // Default options are merged with those defined by the site owner.
 				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options, get_defined_vars());
 
@@ -314,7 +328,10 @@ namespace comment_mail
 				add_action('all_admin_notices', array($this, 'all_admin_errors'));
 
 				add_action('admin_menu', array($this, 'add_menu_pages'));
+				add_filter('set-screen-option', array($this, 'set_screen_option'), 10, 3);
 				add_filter('plugin_action_links_'.plugin_basename($this->file), array($this, 'add_settings_link'));
+
+				add_action('init', array($this, 'comment_shortlink_redirect'), -(PHP_INT_MAX - 10));
 
 				add_action('transition_post_status', array($this, 'post_status'), 10, 3);
 				add_action('before_delete_post', array($this, 'post_delete'), 10, 1);
@@ -327,6 +344,8 @@ namespace comment_mail
 				add_action('delete_user', array($this, 'user_delete'), 10, 1);
 				add_action('wpmu_delete_user', array($this, 'user_delete'), 10, 1);
 				add_action('remove_user_from_blog', array($this, 'user_delete'), 10, 2);
+
+				add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
 
 				/*
 				 * Setup CRON-related hooks.
@@ -460,7 +479,65 @@ namespace comment_mail
 			}
 
 			/*
-			 * Admin UI-Related Methods
+			 * Admin Meta-Box-Related Methods
+			 */
+
+			/**
+			 * Adds plugin meta boxes.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `add_meta_boxes` action.
+			 *
+			 * @param string $post_type The current post type.
+			 */
+			public function add_meta_boxes($post_type)
+			{
+				if(!current_user_can($this->cap))
+					return; // Nothing to do.
+
+				$post_type           = strtolower((string)$post_type);
+				$excluded_post_types = $this->options['excluded_meta_box_post_types'];
+				$excluded_post_types = preg_split('/[\s;,]+/', $excluded_post_types, NULL, PREG_SPLIT_NO_EMPTY);
+
+				if(in_array($post_type, $excluded_post_types, TRUE))
+					return; // Ignore; this post type excluded.
+
+				add_meta_box(__NAMESPACE__.'_small', $this->name.'™', array($this, 'post_small_meta_box'), $post_type, 'side', 'high');
+				add_meta_box(__NAMESPACE__.'_large', $this->name.'™ '.__('Subscribers', $this->text_domain),
+				             array($this, 'post_large_meta_box'), $post_type, 'normal', 'high');
+			}
+
+			/**
+			 * Builds small meta box for this plugin.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \WP_Post $post A WP post object reference.
+			 *
+			 * @see add_meta_boxes()
+			 */
+			public function post_small_meta_box(\WP_Post $post)
+			{
+				new post_small_meta_box($post);
+			}
+
+			/**
+			 * Builds large meta box for this plugin.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \WP_Post $post A WP post object reference.
+			 *
+			 * @see add_meta_boxes()
+			 */
+			public function post_large_meta_box(\WP_Post $post)
+			{
+				new post_large_meta_box($post);
+			}
+
+			/*
+			 * Admin Menu-Page-Related Methods
 			 */
 
 			/**
@@ -472,8 +549,9 @@ namespace comment_mail
 			 */
 			public function enqueue_admin_styles()
 			{
-				if(empty($_GET['page']) || strpos($_GET['page'], __NAMESPACE__) !== 0)
-					return; // Nothing to do; NOT a plugin page in the administrative area.
+				if(!$this->utils_env->is_menu_page(__NAMESPACE__.'*')
+				   && !$this->utils_env->is_menu_page('post.php')
+				) return; // Nothing to do; not applicable.
 
 				$deps = array(); // Plugin dependencies.
 
@@ -489,12 +567,16 @@ namespace comment_mail
 			 */
 			public function enqueue_admin_scripts()
 			{
-				if(empty($_GET['page']) || strpos($_GET['page'], __NAMESPACE__) !== 0)
-					return; // Nothing to do; NOT a plugin page in the administrative area.
+				if(!$this->utils_env->is_menu_page(__NAMESPACE__.'*'))
+					return; // Nothing to do; NOT a plugin menu page.
 
 				$deps = array('jquery'); // Plugin dependencies.
 
 				wp_enqueue_script(__NAMESPACE__, $this->utils_url->to('/client-s/js/menu-pages.min.js'), $deps, $this->version, TRUE);
+				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_i18n', array(
+					'bulk_reconfirm_confirmation' => __('Resend email confirmation link? Are you sure?', $this->text_domain),
+					'bulk_delete_confirmation'    => __('Delete permanently? Are you sure?', $this->text_domain),
+				));
 			}
 
 			/**
@@ -506,9 +588,165 @@ namespace comment_mail
 			 */
 			public function add_menu_pages()
 			{
-				add_comments_page($this->name, $this->name, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
-				add_comments_page($this->name, $this->name, $this->cap, __NAMESPACE__.'_subscribers', array($this, 'menu_page_subscribers'));
-				add_comments_page($this->name, $this->name, $this->cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
+				if(!current_user_can($this->cap))
+					return; // Nothing to do.
+
+				$this->menu_page_hooks[__NAMESPACE__] = add_comments_page($this->name.'™', $this->name.'™', $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
+				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__], array($this, 'menu_page_options_screen'));
+
+				$menu_title                                          = '⥱ '.__('Subscribers', $this->text_domain);
+				$page_title                                          = $this->name.'™ ⥱ '.__('Subscribers', $this->text_domain);
+				$this->menu_page_hooks[__NAMESPACE__.'_subscribers'] = add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__.'_subscribers', array($this, 'menu_page_subscribers'));
+				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_subscribers'], array($this, 'menu_page_subscribers_screen'));
+
+				$menu_title                                    = '⥱ '.__('Mail Queue', $this->text_domain);
+				$page_title                                    = $this->name.'™ ⥱ '.__('Mail Queue', $this->text_domain);
+				$this->menu_page_hooks[__NAMESPACE__.'_queue'] = add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
+				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue'], array($this, 'menu_page_queue_screen'));
+			}
+
+			/**
+			 * Set plugin-related screen options.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `set-screen-option` filter.
+			 *
+			 * @param mixed|boolean $what_wp_says `FALSE` if not saving (default).
+			 *    If we set this to any value besides `FALSE`, the option will be saved by WP.
+			 *
+			 * @param string        $option The option being checked; i.e. should we save this option?
+			 *
+			 * @param mixed         $value The current value for this option.
+			 *
+			 * @return mixed|boolean Returns `$value` for plugin-related options.
+			 *    Other we simply return `$what_wp_says`.
+			 */
+			public function set_screen_option($what_wp_says, $option, $value)
+			{
+				if(strpos($option, __NAMESPACE__.'_') === 0)
+					return $value; // Yes, save this.
+
+				return $what_wp_says;
+			}
+
+			/**
+			 * Menu page screen; for options.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__]` action.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_options_screen()
+			{
+				$screen = get_current_screen();
+				if(!($screen instanceof \WP_Screen))
+					return; // Not possible.
+
+				if(empty($this->menu_page_hooks[__NAMESPACE__])
+				   || $screen->id !== $this->menu_page_hooks[__NAMESPACE__]
+				) return; // Not applicable.
+
+				return; // No screen for this page right now.
+			}
+
+			/**
+			 * Menu page for options.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_options()
+			{
+				new menu_page('options');
+			}
+
+			/**
+			 * Menu page screen; for subscribers.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_subscribers]` action.
+			 *
+			 * @see add_menu_pages()
+			 * @see subs_table::get_hidden_columns()
+			 */
+			public function menu_page_subscribers_screen()
+			{
+				$screen = get_current_screen();
+				if(!($screen instanceof \WP_Screen))
+					return; // Not possible.
+
+				if(empty($this->menu_page_hooks[__NAMESPACE__.'_subscribers'])
+				   || $screen->id !== $this->menu_page_hooks[__NAMESPACE__.'_subscribers']
+				) return; // Not applicable.
+
+				add_screen_option('per_page', array(
+					'default' => '50', // Default items per page.
+					'label'   => __('Per Page', $this->text_domain),
+					'option'  => __NAMESPACE__.'_subscribers_per_page',
+				));
+				add_filter('manage_'.$screen->id.'_columns', function ()
+				{
+					return subs_table::get_columns_();
+				});
+				add_filter('get_user_option_manage'.$screen->id.'columnshidden', function ($value)
+				{
+					return is_array($value) ? $value : subs_table::get_hidden_columns_();
+				});
+			}
+
+			/**
+			 * Menu page for subscribers.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_subscribers()
+			{
+				new menu_page('subscribers');
+			}
+
+			/**
+			 * Menu page screen; for queue.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue]` action.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_queue_screen()
+			{
+				$screen = get_current_screen();
+				if(!($screen instanceof \WP_Screen))
+					return; // Not possible.
+
+				if(empty($this->menu_page_hooks[__NAMESPACE__.'_queue'])
+				   || $screen->id !== $this->menu_page_hooks[__NAMESPACE__.'_queue']
+				) return; // Not applicable.
+
+				add_screen_option('per_page', array(
+					'default' => '50', // Default items per page.
+					'label'   => __('Per Page', $this->text_domain),
+					'option'  => __NAMESPACE__.'_queue_per_page',
+				));
+			}
+
+			/**
+			 * Menu page for mail queue.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_queue()
+			{
+				new menu_page('queue');
 			}
 
 			/**
@@ -524,54 +762,15 @@ namespace comment_mail
 			 */
 			public function add_settings_link($links)
 			{
-				$links[] = '<a href="'.esc_attr(add_query_arg(urlencode_deep(array('page' => __NAMESPACE__,)), self_admin_url('/admin.php'))).'">'.__('Settings', $this->text_domain).'</a><br/>';
-				$links[] = '<a href="'.esc_attr(add_query_arg(urlencode_deep(array('page' => __NAMESPACE__, __NAMESPACE__.'_pro_preview' => '1')), self_admin_url('/admin.php'))).'">'.__('Preview Pro Features', $this->text_domain).'</a>';
-				$links[] = '<a href="'.esc_attr('http://www.websharks-inc.com/product/'.str_replace('_', '-', __NAMESPACE__).'/').'" target="_blank">'.__('Upgrade', $this->text_domain).'</a>';
+				$links[] = '<a href="'.esc_attr($this->utils_url->main_menu_page_only()).'">'.__('Settings', $this->text_domain).'</a><br/>';
+				$links[] = '<a href="'.esc_attr($this->utils_url->pro_preview($this->utils_url->main_menu_page_only())).'">'.__('Preview Pro Features', $this->text_domain).'</a>';
+				$links[] = '<a href="'.esc_attr($this->utils_url->product_page()).'" target="_blank">'.__('Upgrade', $this->text_domain).'</a>';
 
 				return apply_filters(__METHOD__, $links, get_defined_vars());
 			}
 
-			/**
-			 * Menu page for options.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @see add_menu_pages()
-			 */
-			public function menu_page_options()
-			{
-				$menu_pages = new menu_pages();
-				$menu_pages->options();
-			}
-
-			/**
-			 * Menu page for subscribers.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @see add_menu_pages()
-			 */
-			public function menu_page_subscribers()
-			{
-				$menu_pages = new menu_pages();
-				$menu_pages->subscribers();
-			}
-
-			/**
-			 * Menu page for mail queue.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @see add_menu_pages()
-			 */
-			public function menu_page_queue()
-			{
-				$menu_pages = new menu_pages();
-				$menu_pages->queue();
-			}
-
 			/*
-			 * Admin Notice/Error Methods
+			 * Admin Notice/Error Related Methods
 			 */
 
 			/**
@@ -659,7 +858,10 @@ namespace comment_mail
 			 */
 			public function all_admin_notices()
 			{
-				if(($notices = (is_array($notices = get_option(__NAMESPACE__.'_notices'))) ? $notices : array()))
+				$notices = get_option(__NAMESPACE__.'_notices');
+				if(!is_array($notices)) $notices = array();
+
+				if($notices) // Do we have notices to display at this time?
 				{
 					$notices = $updated_notices = array_unique($notices); // De-dupe.
 
@@ -671,16 +873,16 @@ namespace comment_mail
 				}
 				if(current_user_can($this->cap)) foreach($notices as $_key => $_notice)
 				{
-					$_dismiss = ''; // Initialize empty string; e.g. reset value on each pass.
-					if(strpos($_key, 'persistent-') === 0) // A dismissal link is needed in this case?
-					{
-						$_dismiss_css = 'display:inline-block; float:right; margin:0 0 0 15px; text-decoration:none; font-weight:bold;';
-						$_dismiss     = add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('dismiss_notice' => array('key' => $_key)), '_wpnonce' => wp_create_nonce())));
-						$_dismiss     = '<a style="'.esc_attr($_dismiss_css).'" href="'.esc_attr($_dismiss).'">'.__('dismiss &times;', $this->text_domain).'</a>';
-					}
-					echo apply_filters(__METHOD__.'__notice', '<div class="updated"><p>'.$_notice.$_dismiss.'</p></div>', get_defined_vars());
+					if(strpos($_key, 'persistent-') === 0) // A dismissal link is needed?
+						$_dismiss = '<a href="'.esc_attr($this->utils_url->dismiss_notice($_key)).'"'.
+						            '  style="display:inline-block; float:right; margin:0 0 0 15px; text-decoration:none; font-weight:bold;">'.
+						            '  '.__('dismiss &times;', $this->text_domain).
+						            '</a>';
+					else $_dismiss = ''; // Initialize empty string; e.g. reset value on each pass.
+
+					echo apply_filters(__METHOD__.'_notice', '<div class="updated"><p>'.$_notice.$_dismiss.'</p></div>', get_defined_vars());
 				}
-				unset($_key, $_notice, $_dismiss_css, $_dismiss); // Housekeeping.
+				unset($_key, $_notice, $_dismiss); // Housekeeping.
 			}
 
 			/**
@@ -692,28 +894,31 @@ namespace comment_mail
 			 */
 			public function all_admin_errors()
 			{
-				if(($errors = (is_array($errors = get_option(__NAMESPACE__.'_errors'))) ? $errors : array()))
+				$errors = get_option(__NAMESPACE__.'_errors');
+				if(!is_array($errors)) $errors = array();
+
+				if($errors) // Do we have errors to display at this time?
 				{
 					$errors = $updated_errors = array_unique($errors); // De-dupe.
 
 					foreach(array_keys($updated_errors) as $_key) if(strpos($_key, 'persistent-') !== 0)
 						unset($updated_errors[$_key]); // Leave persistent errors; ditch others.
-					unset($_key); // Housekeeping after updating notices.
+					unset($_key); // Housekeeping after updating errors.
 
 					update_option(__NAMESPACE__.'_errors', $updated_errors);
 				}
 				if(current_user_can($this->cap)) foreach($errors as $_key => $_error)
 				{
-					$_dismiss = ''; // Initialize empty string; e.g. reset value on each pass.
-					if(strpos($_key, 'persistent-') === 0) // A dismissal link is needed in this case?
-					{
-						$_dismiss_css = 'display:inline-block; float:right; margin:0 0 0 15px; text-decoration:none; font-weight:bold;';
-						$_dismiss     = add_query_arg(urlencode_deep(array(__NAMESPACE__ => array('dismiss_error' => array('key' => $_key)), '_wpnonce' => wp_create_nonce())));
-						$_dismiss     = '<a style="'.esc_attr($_dismiss_css).'" href="'.esc_attr($_dismiss).'">'.__('dismiss &times;', $this->text_domain).'</a>';
-					}
-					echo apply_filters(__METHOD__.'__error', '<div class="error"><p>'.$_error.$_dismiss.'</p></div>', get_defined_vars());
+					if(strpos($_key, 'persistent-') === 0) // A dismissal link is needed?
+						$_dismiss = '<a href="'.esc_attr($this->utils_url->dismiss_error($_key)).'"'.
+						            '  style="display:inline-block; float:right; margin:0 0 0 15px; text-decoration:none; font-weight:bold;">'.
+						            '  '.__('dismiss &times;', $this->text_domain).
+						            '</a>';
+					else $_dismiss = ''; // Initialize empty string; e.g. reset value on each pass.
+
+					echo apply_filters(__METHOD__.'_error', '<div class="error"><p>'.$_error.$_dismiss.'</p></div>', get_defined_vars());
 				}
-				unset($_key, $_error, $_dismiss_css, $_dismiss); // Housekeeping.
+				unset($_key, $_error, $_dismiss); // Housekeeping.
 			}
 
 			/*
@@ -788,6 +993,21 @@ namespace comment_mail
 			 */
 
 			/**
+			 * Comment shortlink redirections.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `init` action.
+			 */
+			public function comment_shortlink_redirect()
+			{
+				if(empty($_REQUEST['c']) || is_admin())
+					return; // Nothing to do.
+
+				new comment_shortlink_redirect();
+			}
+
+			/**
 			 * Comment form handler.
 			 *
 			 * @since 14xxxx First documented version.
@@ -813,9 +1033,9 @@ namespace comment_mail
 			 * @param integer|string $comment_status Initial comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: `hold`, `unapprove`, `unapproved`),
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`, `moderated`),
 			 *       - `1` (aka: `approve`, `approved`),
-			 *       - or `trash`, `spam`, `delete`.
+			 *       - or `trash`, `post-trashed`, `spam`, `delete`.
 			 */
 			public function comment_post($comment_id, $comment_status)
 			{
@@ -832,67 +1052,22 @@ namespace comment_mail
 			 * @param integer|string $new_comment_status New comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: `hold`, `unapprove`, `unapproved`),
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`, `moderated`),
 			 *       - `1` (aka: `approve`, `approved`),
-			 *       - or `trash`, `spam`, `delete`.
+			 *       - or `trash`, `post-trashed`, `spam`, `delete`.
 			 *
 			 * @param integer|string $old_comment_status Old comment status.
 			 *
 			 *    One of the following:
-			 *       - `0` (aka: `hold`, `unapprove`, `unapproved`),
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`, `moderated`),
 			 *       - `1` (aka: `approve`, `approved`),
-			 *       - or `trash`, `spam`, `delete`.
+			 *       - or `trash`, `post-trashed`, `spam`, `delete`.
 			 *
 			 * @param \stdClass|null $comment Comment object (now).
 			 */
 			public function comment_status($new_comment_status, $old_comment_status, $comment)
 			{
 				new comment_status($new_comment_status, $old_comment_status, $comment);
-			}
-
-			/**
-			 * Comment status translator.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param integer|string $status
-			 *
-			 *    One of the following:
-			 *       - `0` (aka: `hold`, `unapprove`, `unapproved`),
-			 *       - `1` (aka: `approve`, `approved`),
-			 *       - or `trash`, `spam`, `delete`.
-			 *
-			 * @return string `approve`, `hold`, `trash`, `spam`, `delete`.
-			 *
-			 * @throws \exception If an unexpected status is encountered.
-			 */
-			public function comment_status__($status)
-			{
-				switch(strtolower((string)$status))
-				{
-					case '1':
-					case 'approve':
-					case 'approved':
-						return 'approve';
-
-					case '0':
-					case 'hold':
-					case 'unapprove':
-					case 'unapproved':
-						return 'hold';
-
-					case 'trash':
-						return 'trash';
-
-					case 'spam':
-						return 'spam';
-
-					case 'delete':
-						return 'delete';
-
-					default: // Throw exception on anything else.
-						throw new \exception(sprintf(__('Unexpected comment status: `%1$s`.'), $status));
-				}
 			}
 
 			/*
