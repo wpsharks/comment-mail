@@ -53,10 +53,8 @@ namespace comment_mail // Root namespace.
 				$post_comment_status // Translate/standardize this.
 					= $this->plugin->utils_db->post_comment_status__($this->post->comment_status);
 
-				if($post_comment_status !== 'open')
+				if($post_comment_status !== 'open' && !$this->post->comment_count)
 					return; // Not applicable.
-
-				// @TODO this needs to display even when comments are closed; if the post has comments.
 
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-area').'">'."\n";
 				echo '</div>';
