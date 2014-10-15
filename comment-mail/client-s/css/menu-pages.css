@@ -1,4 +1,112 @@
+/* ------------------------------------------------------------------------------------------------------------
+	Icon font(s) compatible w/ the WP core.
+------------------------------------------------------------------------------------------------------------ */
 @import url('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css');
+/* ------------------------------------------------------------------------------------------------------------
+	WP core elements under plugin-specific conditions.
+------------------------------------------------------------------------------------------------------------ */
+/*
+Alter wrap bg color.
+*/
+.comments_page_comment_mail #wpwrap
+{
+	background : #C7C7C7;
+}
+/*
+Align w/ menu page.
+*/
+.comments_page_comment_mail div.updated,
+.comments_page_comment_mail div.error
+{
+	font-size : 120%;
+	margin    : 25px 25px 25px 5px;
+}
+/* ------------------------------------------------------------------------------------------------------------
+	Plugin-specific styles in ANY area of the dashboard.
+------------------------------------------------------------------------------------------------------------ */
+/*
+A menu page area ~ list items.
+*/
+.comment-mail-menu-page-area ul.pmp-list-items,
+.comment-mail-menu-page-area ul.pmp-list-items ul
+{
+	padding-left : 0;
+	margin-left  : 40px;
+	list-style   : disc;
+}
+.comment-mail-menu-page-area ul.pmp-list-items ul
+{
+	list-style : circle;
+}
+.comment-mail-menu-page-area ul.pmp-list-items li
+{
+	list-style : inherit;
+}
+/*
+A menu page area ~ clean list items.
+*/
+.comment-mail-menu-page-area ul.pmp-clean-list-items,
+.comment-mail-menu-page-area ul.pmp-clean-list-items ul
+{
+	padding-left : 0;
+	margin-left  : 0;
+	list-style   : none;
+}
+.comment-mail-menu-page-area ul.pmp-clean-list-items ul
+{
+	margin-left : 20px;
+	list-style  : circle;
+}
+.comment-mail-menu-page-area ul.pmp-clean-list-items li
+{
+	list-style : inherit;
+}
+/*
+A menu page area ~ post com/sub bubbles.
+*/
+.comment-mail-menu-page-area .pmp-post-com-count
+{
+	padding-bottom  : 0;
+	text-decoration : none;
+}
+.comment-mail-menu-page-area .pmp-post-sub-count
+{
+	border-radius   : 3px;
+	text-align      : left;
+	text-decoration : none;
+	background      : #BBBBBB;
+	padding         : 0 5px 0 4px;
+	display         : inline-block;
+}
+.comment-mail-menu-page-area .pmp-post-sub-count::before
+{
+	text-rendering         : auto;
+	font-weight            : normal;
+	content                : '\f0c0';
+	color                  : #5A5A5A;
+	font-family            : FontAwesome;
+	-webkit-font-smoothing : antialiased;
+
+	float                  : left;
+	margin                 : 0 5px 0 0;
+	display                : inline-block;
+}
+.comment-mail-menu-page-area .pmp-post-sub-count > .pmp-subscriber-count
+{
+	font-weight : bold;
+	color       : #FFFFFF;
+}
+.comment-mail-menu-page-area .pmp-post-sub-count:hover
+{
+	background : #2EA2CC;
+}
+.comment-mail-menu-page-area .pmp-post-sub-count:hover::before
+{
+	color : #FFFFFF;
+}
+/* ------------------------------------------------------------------------------------------------------------
+	Plugin styles for an actual/standard plugin menu page; e.g. options.
+------------------------------------------------------------------------------------------------------------ */
 /*
 Menu page styles.
 */
@@ -414,86 +522,9 @@ Menu page save button styles.
 	width       : 100%;
 	line-height : 1.3em;
 }
-/*
-A menu page area ~ list items.
-*/
-.comment-mail-menu-page-area ul.pmp-list-items,
-.comment-mail-menu-page-area ul.pmp-list-items ul
-{
-	padding-left : 0;
-	margin-left  : 40px;
-	list-style   : disc;
-}
-.comment-mail-menu-page-area ul.pmp-list-items ul
-{
-	list-style : circle;
-}
-.comment-mail-menu-page-area ul.pmp-list-items li
-{
-	list-style : inherit;
-}
-/*
-A menu page area ~ clean list items.
-*/
-.comment-mail-menu-page-area ul.pmp-clean-list-items,
-.comment-mail-menu-page-area ul.pmp-clean-list-items ul
-{
-	padding-left : 0;
-	margin-left  : 0;
-	list-style   : none;
-}
-.comment-mail-menu-page-area ul.pmp-clean-list-items ul
-{
-	margin-left : 20px;
-	list-style  : circle;
-}
-.comment-mail-menu-page-area ul.pmp-clean-list-items li
-{
-	list-style : inherit;
-}
-/*
-A menu page area ~ post com/sub bubbles.
-*/
-.comment-mail-menu-page-area .pmp-post-com-count
-{
-	padding-bottom  : 0;
-	text-decoration : none;
-}
-.comment-mail-menu-page-area .pmp-post-sub-count
-{
-	border-radius   : 3px;
-	text-align      : left;
-	text-decoration : none;
-	background      : #BBBBBB;
-	padding         : 0 5px 0 4px;
-	display         : inline-block;
-}
-.comment-mail-menu-page-area .pmp-post-sub-count::before
-{
-	text-rendering         : auto;
-	font-weight            : normal;
-	content                : '\f0c0';
-	color                  : #5A5A5A;
-	font-family            : FontAwesome;
-	-webkit-font-smoothing : antialiased;
-
-	float                  : left;
-	margin                 : 0 5px 0 0;
-	display                : inline-block;
-}
-.comment-mail-menu-page-area .pmp-post-sub-count > .pmp-subscriber-count
-{
-	font-weight : bold;
-	color       : #FFFFFF;
-}
-.comment-mail-menu-page-area .pmp-post-sub-count:hover
-{
-	background : #2EA2CC;
-}
-.comment-mail-menu-page-area .pmp-post-sub-count:hover::before
-{
-	color : #FFFFFF;
-}
+/* ------------------------------------------------------------------------------------------------------------
+	Tables; i.e. menu pages that follow a WP standard; but need a few plugin-specific styles.
+------------------------------------------------------------------------------------------------------------ */
 /*
 Menu page table filter styles.
 */
@@ -521,6 +552,9 @@ Menu page table filter styles.
 {
 	font-weight : bold;
 }
+/* ------------------------------------------------------------------------------------------------------------
+	Specific menu page elements that need adjustments for responsive behavior.
+------------------------------------------------------------------------------------------------------------ */
 /*
 Menu page table columns; i.e. media queries.
 */
@@ -584,21 +618,4 @@ Menu page table columns; i.e. media queries.
 	{
 		width : 250px;
 	}
-}
-/* ------------------------------------------------------------- */
-/*
-Alter WP wrap background color.
-*/
-body.comments_page_comment_mail #wpwrap
-{
-	background : #C7C7C7;
-}
-/*
-Align w/ menu page.
-*/
-body.comments_page_comment_mail div.updated,
-body.comments_page_comment_mail div.error
-{
-	font-size : 120%;
-	margin    : 25px 25px 25px 5px;
 }
