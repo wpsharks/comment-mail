@@ -50,6 +50,12 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_display()
 			{
+				$post_comment_status // Translate/standardize this.
+					= $this->plugin->utils_db->post_comment_status__($this->post->comment_status);
+
+				if($post_comment_status !== 'open')
+					return; // Not applicable.
+
 				$total_subs        = $this->plugin->utils_sub->query_total($this->post->ID);
 				$total_subs_bubble = $this->plugin->utils_markup->subscriber_count($this->post->ID, $total_subs);
 

@@ -50,6 +50,12 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_display()
 			{
+				$post_comment_status // Translate/standardize this.
+					= $this->plugin->utils_db->post_comment_status__($this->post->comment_status);
+
+				if($post_comment_status !== 'open')
+					return; // Not applicable.
+
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-area').'">'."\n";
 				echo '</div>';
 			}

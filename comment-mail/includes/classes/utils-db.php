@@ -214,7 +214,6 @@ namespace comment_mail // Root namespace.
 			 *    One of the following:
 			 *       - `0` (aka: ``, `closed`, `close`).
 			 *       - `1` (aka: `opened`, `open`).
-			 *       - `` (i.e. undefined).
 			 *
 			 * @return string `open`, `closed`.
 			 *
