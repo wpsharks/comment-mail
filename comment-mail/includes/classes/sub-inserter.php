@@ -49,11 +49,11 @@ namespace comment_mail // Root namespace.
 			protected $request_args;
 
 			/**
-			 * @var boolean Process events?
+			 * @var array Behavioral args.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $process_events;
+			protected $args; // Behavioral.
 
 			/**
 			 * @var boolean An update?
@@ -92,10 +92,9 @@ namespace comment_mail // Root namespace.
 			 *    Use `NULL` to indicate they are NOT a user.
 			 *
 			 * @param array         $request_args Array of subscriber data.
-			 *
-			 * @param boolean       $process_events Should we process any events?
+			 * @param array         $args Any additional behavioral args.
 			 */
-			public function __construct($user, array $request_args, $process_events = FALSE)
+			public function __construct($user, array $request_args, array $args = array())
 			{
 				parent::__construct();
 
@@ -127,12 +126,23 @@ namespace comment_mail // Root namespace.
 				$this->request_args   = array_merge($default_request_args, $request_args);
 				$this->request_args   = array_intersect_key($request_args, $default_request_args);
 
-				$this->process_events = (boolean)$process_events;
+				$defaults_args                      = array(
+					'process_event'        => TRUE,
+					'process_confirmation' => FALSE
+				);
+				$this->args                         = array_merge($defaults_args, $args);
+				$this->args                         = array_intersect_key($args, $defaults_args);
+				$this->args['process_event']        = (boolean)$this->args['process_event'];
+				$this->args['process_confirmation'] = (boolean)$this->args['process_confirmation'];
 
 				$this->is_update    = isset($this->request_args['ID']);
 				$this->is_insert    = !isset($this->request_args['ID']);
 				$this->is_menu_page = $this->plugin->utils_env->is_menu_page();
-				$this->errors       = array(); // Initialize.
+
+				if($this->is_menu_page) // Force off in this case.
+					$this->process_event = FALSE; // Disable.
+
+				$this->errors = array(); // Initialize.
 
 				$this->maybe_update_insert();
 			}
@@ -154,10 +164,6 @@ namespace comment_mail // Root namespace.
 
 				else if($this->is_insert)
 					$this->insert();
-
-				new sub_event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
-
-				new sub_confirmer($sub_id, $this->auto_confirm); // Confirm; before deletion of others.
 			}
 
 			/**
@@ -167,13 +173,38 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function update()
 			{
-				$args                     = $this->request_args;
-				$args['last_update_time'] = time(); // Force this.
-				$ID                       = $this->request_args['ID'];
+				$data                     = $this->request_args;
+				$data['last_update_time'] = time(); // Force this.
 				$table                    = $this->plugin->utils_db->prefix().'subs';
+				$sub_before               = $this->plugin->utils_sub->get($data['ID']);
 
-				if($this->plugin->utils_db->wp->update($table, $args, compact('ID')) === FALSE)
+				if($this->plugin->utils_db->wp->update($table, $data, array('ID' => $data['ID'])) === FALSE)
 					throw new \exception(__('Update failure.', $this->plugin->text_domain));
+
+				$this->plugin->utils_sub->nullify_cache(array($data['ID'], $data['key']));
+
+				if(!$this->args['process_event'] || !isset($data['status']))
+					return; // Nothing more to do here.
+
+				if($sub_before->status === $data['status'])
+					return; // Nothing more to do here.
+
+				$sub_after = $this->plugin->utils_sub->get($data['ID'], TRUE);
+
+				switch($sub_after->status)
+				{
+					case 'unconfirmed':
+						new sub_event_log_inserter(array_merge((array)$sub_after, array('event' => 'unsubscribed')));
+						break; // Break switch handler.
+
+					case 'subscribed':
+						new sub_event_log_inserter(array_merge((array)$sub_after, array('event' => 'subscribed')));
+						break; // Break switch handler.
+
+					case 'suspended':
+						new sub_event_log_inserter(array_merge((array)$sub_after, array('event' => 'suspended')));
+						break; // Break switch handler.
+				}
 			}
 
 			/**
@@ -183,12 +214,21 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function insert()
 			{
-				$args                     = $this->request_args;
-				$args['last_update_time'] = time(); // Force this.
+				$data                     = $this->request_args;
+				$data['insertion_time']   = time(); // Force this.
+				$data['last_update_time'] = time(); // Force this.
 				$table                    = $this->plugin->utils_db->prefix().'subs';
 
-				if($this->plugin->utils_db->wp->replace($table, $args) === FALSE)
+				if($this->plugin->utils_db->wp->replace($table, $data) === FALSE)
 					throw new \exception(__('Insertion failure.', $this->plugin->text_domain));
+
+				if(!($sub_id = (integer)$this->plugin->utils_db->wp->insert_id))
+					throw new \exception(__('Insertion failure.', $this->plugin->text_domain));
+
+				$this->plugin->utils_sub->nullify_cache(array($sub_id, $data['key']));
+
+				if($this->args['process_confirmation'] && $data['status'] === 'unconfirmed')
+					new sub_confirmer($sub_id); // Confirm.
 			}
 
 			/**
