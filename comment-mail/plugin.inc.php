@@ -24,6 +24,7 @@ namespace comment_mail
 		 * @property utils_enc    $utils_enc
 		 * @property utils_env    $utils_env
 		 * @property utils_event  $utils_event
+		 * @property utils_fs     $utils_fs
 		 * @property utils_i18n   $utils_i18n
 		 * @property utils_mail   $utils_mail
 		 * @property utils_markup $utils_markup
@@ -970,7 +971,8 @@ namespace comment_mail
 						else $_dismiss_anchor = ''; // Define a default value.
 
 						$_full_markup = // Put together the full markup; including other pieces.
-							'<div class="'.esc_attr($_args['type'] === 'error' ? 'error' : 'updated').'">'.
+							'<div class="'.esc_attr($this->slug.'-menu-page-area pmp-'.($_args['type'] === 'error' ? 'error' : 'notice')).
+							' '.esc_attr($_args['type'] === 'error' ? 'error' : 'updated').'">'.
 							'  <p>'.$_args['markup'].$_dismiss_anchor.'</p>'.
 							'</div>';
 						echo apply_filters(__METHOD__.'_notice', $_full_markup, get_defined_vars());

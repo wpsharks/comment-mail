@@ -67,27 +67,27 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer $max_post_ids_limit Max post ID to process.
-			 *
-			 *    This cannot be less than `1`.
-			 *    This cannot be greater than `1000` (filterable).
-			 *
-			 *    * A default value of `15` is used if not passed in explicitly.
-			 *
-			 * @note The `$has_more_posts_to_import` property should be read from this class.
-			 *    If this property is `TRUE`, additional class instances should be instantiated until
-			 *    such time as it has as `FALSE` value; i.e. until there are no more posts to import.
-			 *
-			 *    * A UI should be built to help spread this out over multiple server processes.
+			 * @param array $request_args Arguments to the constructor.
+			 *    These should NOT be trusted; they come from a `$_REQUEST` action.
 			 */
-			public function __construct($max_post_ids_limit = 15)
+			public function __construct(array $request_args = array())
 			{
 				parent::__construct();
 
-				$this->max_post_ids_limit = (integer)$max_post_ids_limit;
-				if($this->max_post_ids_limit < 1) $this->max_post_ids_limit = 1;
+				$default_request_args = array(
+					'max_post_ids_limit' => 15,
+				);
+				$request_args         = array_merge($default_request_args, $request_args);
+				$request_args         = array_intersect_key($request_args, $default_request_args);
+
+				$this->max_post_ids_limit = (integer)$request_args['max_post_ids_limit'];
+
+				if($this->max_post_ids_limit < 1) // Too low?
+					$this->max_post_ids_limit = 1; // At least one.
+
 				$upper_max_post_ids_limit = (integer)apply_filters(__CLASS__.'_upper_max_post_ids_limit', 1000);
-				if($this->max_post_ids_limit > $upper_max_post_ids_limit) $this->max_post_ids_limit = $upper_max_post_ids_limit;
+				if($this->max_post_ids_limit > $upper_max_post_ids_limit)
+					$this->max_post_ids_limit = $upper_max_post_ids_limit;
 
 				$this->has_more_posts_to_import = FALSE; // Initialize.
 				$this->unimported_post_ids      = $this->unimported_post_ids($this->max_post_ids_limit + 1);
@@ -101,28 +101,6 @@ namespace comment_mail // Root namespace.
 				$this->total_imported_post_ids = $this->total_imported_subs = 0;
 
 				$this->maybe_import(); // Handle importation.
-			}
-
-			/**
-			 * Output status; for public API use.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			public function output_status()
-			{
-				status_header(200); // OK status.
-				nocache_headers(); // No browser cache.
-				header('Content-Type: text/html; charset=UTF-8');
-
-				while(@ob_end_clean()) ;  // Clean buffers.
-
-				$class_var        = str_replace('\\', '_', __CLASS__);
-				$child_status_var = $class_var.'_child_status';
-				$child_status_uri = add_query_arg($child_status_var, '1');
-
-				if(!empty($_REQUEST[$child_status_var]))
-					exit($this->child_output_status($child_status_uri));
-				exit($this->parent_output_status($child_status_uri));
 			}
 
 			/**
@@ -144,6 +122,8 @@ namespace comment_mail // Root namespace.
 					$this->maybe_import_post($_post_id);
 				}
 				unset($_post_id); // Housekeeping.
+
+				$this->output_status();
 			}
 
 			/**
@@ -210,14 +190,14 @@ namespace comment_mail // Root namespace.
 					foreach($comment_ids as $_comment_id) // Comment subscriptions.
 					{
 						$this->total_imported_subs++; // Increment counter.
-						new sub_inserter($user, $_comment_id, 'comment', 'asap', TRUE);
+						new sub_injector($user, $_comment_id, 'comment', 'asap', TRUE);
 					}
 					unset($_comment_id); // A little housekeeping.
 				}
 				else // Subscribe them to all comments on this post ID.
 				{
 					$this->total_imported_subs++; // Increment counter.
-					new sub_inserter($user, $comment_ids[0], 'comments', 'asap', TRUE);
+					new sub_injector($user, $comment_ids[0], 'comments', 'asap', TRUE);
 				}
 			}
 
@@ -369,8 +349,8 @@ namespace comment_mail // Root namespace.
 
 				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->wp->posts)."`".
 
-				       " WHERE `post_status` = 'publish'".
-				       " `post_type` NOT IN('revision', 'nav_menu_item')".
+				       " WHERE `post_status` = 'publish'". // Published posts only.
+				       " AND `post_type` NOT IN('revision', 'nav_menu_item', 'redirect', 'snippet')".
 
 				       " AND `ID` IN (".$post_ids_with_stcr_meta.")".
 				       " AND `ID` NOT IN (".$post_ids_imported_already.")".
@@ -382,6 +362,28 @@ namespace comment_mail // Root namespace.
 				else $post_ids = array(); // Default; empty array.
 
 				return $post_ids; // Up to `$max_limit` unimported post IDs.
+			}
+
+			/**
+			 * Output status; for public API use.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function output_status()
+			{
+				$this->plugin->utils_env->prep_for_output();
+
+				status_header(200); // OK status.
+				nocache_headers(); // No browser cache.
+				header('Content-Type: text/html; charset=UTF-8');
+
+				$class_var        = str_replace('\\', '_', __CLASS__);
+				$child_status_var = $class_var.'_child_status';
+				$child_status_uri = add_query_arg($child_status_var, '1');
+
+				if(!empty($_REQUEST[$child_status_var]))
+					exit($this->child_output_status($child_status_uri));
+				exit($this->parent_output_status($child_status_uri));
 			}
 
 			/**

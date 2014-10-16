@@ -72,22 +72,22 @@ namespace comment_mail // Root namespace.
 				$this->new_comment_status = $this->plugin->utils_db->comment_status__($new_comment_status);
 				$this->old_comment_status = $this->plugin->utils_db->comment_status__($old_comment_status);
 
-				$this->maybe_insert_queue();
+				$this->maybe_inject_queue();
 				$this->maybe_delete_subs();
 			}
 
 			/**
-			 * Insert/queue emails.
+			 * Inject/queue emails.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function maybe_insert_queue()
+			protected function maybe_inject_queue()
 			{
 				if(!isset($this->comment))
 					return; // Not applicable.
 
 				if($this->new_comment_status === 'approve' && $this->old_comment_status === 'hold')
-					new queue_inserter($this->comment->comment_ID);
+					new queue_injector($this->comment->comment_ID);
 			}
 
 			/**

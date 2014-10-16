@@ -130,7 +130,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function current_page_only()
 			{
-				$page = !empty($_REQUEST['page']) ? stripslashes((string)$_REQUEST['page']) : '';
+				$page = !empty($_REQUEST['page'])
+					? stripslashes((string)$_REQUEST['page']) : '';
 				$args = $page ? array('page' => $page) : array(); // If applicable.
 
 				return add_query_arg(urlencode_deep($args), $this->current_no_query());

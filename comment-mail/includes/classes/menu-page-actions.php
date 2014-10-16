@@ -135,19 +135,38 @@ namespace comment_mail // Root namespace.
 				if(empty($args['type']) || !is_string($args['type']))
 					return; // Missing and/or invalid import type.
 
-				if(!in_array($args['type'], array('stcr'), TRUE))
+				if(!in_array($args['type'], array('subs', 'stcr'), TRUE))
 					return; // Invalid import type.
 
 				if(!current_user_can($this->plugin->cap))
 					return; // Unauthenticated; ignore.
 
 				$class    = 'import_'.$args['type'];
-				$importer = new $class; // Instantiate.
+				$importer = new $class($args); // Instantiate.
+			}
 
-				/**
-				 * @var $importer import_stcr For IDEs.
-				 */
-				$importer->output_status();
+			/**
+			 * Runs a specific export type.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $args Input argument(s).
+			 */
+			protected function export($args)
+			{
+				$args = (array)$args; // Expecting an array.
+
+				if(empty($args['type']) || !is_string($args['type']))
+					return; // Missing and/or invalid import type.
+
+				if(!in_array($args['type'], array('subs'), TRUE))
+					return; // Invalid import type.
+
+				if(!current_user_can($this->plugin->cap))
+					return; // Unauthenticated; ignore.
+
+				$class    = 'export_'.$args['type'];
+				$exporter = new $class($args); // Instantiate.
 			}
 		}
 	}

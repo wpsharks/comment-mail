@@ -56,17 +56,17 @@ namespace comment_mail // Root namespace.
 				$this->comment_id     = (integer)$comment_id;
 				$this->comment_status = $this->plugin->utils_db->comment_status__($comment_status);
 
-				$this->maybe_insert_sub();
-				$this->maybe_insert_queue();
+				$this->maybe_inject_sub();
+				$this->maybe_inject_queue();
 				$this->maybe_set_sub_current_email();
 			}
 
 			/**
-			 * Insert subscriber.
+			 * Inject subscriber.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function maybe_insert_sub()
+			protected function maybe_inject_sub()
 			{
 				if(!$this->comment_id)
 					return; // Not applicable.
@@ -85,15 +85,15 @@ namespace comment_mail // Root namespace.
 				if(!($sub_deliver = $this->plugin->utils_string->trim_strip_deep($sub_deliver)))
 					return; // Not applicable.
 
-				new sub_inserter(wp_get_current_user(), $this->comment_id, $sub_type, $sub_deliver);
+				new sub_injector(wp_get_current_user(), $this->comment_id, $sub_type, $sub_deliver);
 			}
 
 			/**
-			 * Insert/queue emails.
+			 * Inject/queue emails.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function maybe_insert_queue()
+			protected function maybe_inject_queue()
 			{
 				if(!$this->comment_id)
 					return; // Not applicable.
@@ -101,7 +101,7 @@ namespace comment_mail // Root namespace.
 				if($this->comment_status !== 'approve')
 					return; // Not applicable.
 
-				new queue_inserter($this->comment_id);
+				new queue_injector($this->comment_id);
 
 				$this->maybe_immediately_process_queue();
 			}

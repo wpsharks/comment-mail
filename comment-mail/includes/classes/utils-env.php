@@ -165,6 +165,46 @@ namespace comment_mail // Root namespace.
 
 				return ($is = (boolean)preg_match($page_to_check_regex, $current_page));
 			}
+
+			/**
+			 * Maxmizes available memory.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			public function maximize_memory()
+			{
+				if(is_admin()) // In an admin area?
+					@ini_set('memory_limit', // Maximize memory.
+					         apply_filters('admin_memory_limit', WP_MAX_MEMORY_LIMIT));
+				else @ini_set('memory_limit', WP_MAX_MEMORY_LIMIT);
+			}
+
+			/**
+			 * Prepares for output delivery.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			public function prep_for_output()
+			{
+				@set_time_limit(0);
+
+				@ini_set('zlib.output_compression', 0);
+				if(function_exists('apache_setenv'))
+					@apache_setenv('no-gzip', '1');
+
+				while(@ob_end_clean()) ;
+			}
+
+			/**
+			 * Prepares for large output delivery.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			public function prep_for_large_output()
+			{
+				$this->maximize_memory();
+				$this->prep_for_output();
+			}
 		}
 	}
 }
