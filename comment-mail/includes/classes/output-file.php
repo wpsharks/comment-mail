@@ -67,11 +67,11 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param array $request_args Configuration arguments.
+			 * @param array $args Configuration arguments.
 			 *
 			 * @throws \exception If a security flag is triggered on `$this->data_file`.
 			 */
-			public function __construct(array $request_args)
+			public function __construct(array $args)
 			{
 				parent::__construct();
 
@@ -83,11 +83,11 @@ namespace comment_mail // Root namespace.
 					'content_disposition' => 'attachment',
 					'chunk_size'          => 2097152,
 				);
-				$request_args = array_merge($default_args, $request_args);
-				$request_args = array_intersect_key($request_args, $default_args);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
 
-				$this->data      = (string)$request_args['data'];
-				$this->data_file = (string)$request_args['data_file'];
+				$this->data      = (string)$args['data'];
+				$this->data_file = (string)$args['data_file'];
 
 				if($this->data_file) // Run security flag checks on the path.
 					$this->plugin->utils_fs->check_path_security($this->data_file);
@@ -95,11 +95,11 @@ namespace comment_mail // Root namespace.
 				if($this->data_file && is_file($this->data_file) && is_readable($this->data_file))
 					$this->data = ''; // Favor the data file over raw data.
 
-				$this->file_name           = (string)$request_args['file_name'];
-				$this->content_type        = (string)$request_args['content_type'];
-				$this->content_disposition = (string)$request_args['content_disposition'];
+				$this->file_name           = (string)$args['file_name'];
+				$this->content_type        = (string)$args['content_type'];
+				$this->content_disposition = (string)$args['content_disposition'];
 
-				$this->chunk_size = (integer)$request_args['chunk_size'];
+				$this->chunk_size = (integer)$args['chunk_size'];
 				$this->chunk_size = $this->chunk_size < 1 ? 1 : $this->chunk_size;
 
 				$this->maybe_output();

@@ -42,18 +42,25 @@ namespace comment_mail // Root namespace.
 			protected $is_current_user;
 
 			/**
-			 * @var array Request args.
+			 * @var array Based on request args.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $request_args;
+			protected $data; // An array.
 
 			/**
-			 * @var array Behavioral args.
+			 * @var boolean Process events?
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $args; // Behavioral.
+			protected $process_events;
+
+			/**
+			 * @var boolean Process confirmation?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $process_confirmation;
 
 			/**
 			 * @var boolean An update?
@@ -70,13 +77,6 @@ namespace comment_mail // Root namespace.
 			protected $is_insert;
 
 			/**
-			 * @var boolean Is an admin menu page?
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $is_menu_page;
-
-			/**
 			 * @var array An array of any errors.
 			 *
 			 * @since 14xxxx First documented version.
@@ -88,10 +88,11 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param \WP_User|null $user Subscribing user.
-			 *    Use `NULL` to indicate they are NOT a user.
+			 * @param \WP_User|null $user Subscriber.
 			 *
-			 * @param array         $request_args Array of subscriber data.
+			 * @param array         $request_args Arguments to the constructor.
+			 *    These should NOT be trusted; they come from a `$_REQUEST` action.
+			 *
 			 * @param array         $args Any additional behavioral args.
 			 */
 			public function __construct($user, array $request_args, array $args = array())
@@ -100,6 +101,14 @@ namespace comment_mail // Root namespace.
 
 				if($user instanceof \WP_User)
 					$this->user = $user;
+
+				if(!isset($user) && !empty($request_args['user_id']))
+					$this->user = new \WP_User((integer)$request_args['user_id']);
+
+				else if(!isset($user) && !empty($request_args['email']))
+					if(($_user = \WP_User::get_data_by('email', (string)$request_args['email'])))
+						$this->user = new \WP_User($_user->ID);
+				unset($_user); // Housekeeping.
 
 				$this->current_user = wp_get_current_user();
 
@@ -123,28 +132,50 @@ namespace comment_mail // Root namespace.
 					'insertion_time'   => NULL,
 					'last_update_time' => NULL,
 				);
-				$this->request_args   = array_merge($default_request_args, $request_args);
-				$this->request_args   = array_intersect_key($request_args, $default_request_args);
+				$request_args         = array_merge($default_request_args, $request_args);
+				$request_args         = array_intersect_key($request_args, $default_request_args);
+				$this->data           = $request_args; // A copy of the request args.
 
-				$defaults_args                      = array(
-					'process_event'        => TRUE,
-					'process_confirmation' => FALSE
+				$defaults_args = array(
+					'process_events'       => TRUE,
+					'process_confirmation' => FALSE,
 				);
-				$this->args                         = array_merge($defaults_args, $args);
-				$this->args                         = array_intersect_key($args, $defaults_args);
-				$this->args['process_event']        = (boolean)$this->args['process_event'];
-				$this->args['process_confirmation'] = (boolean)$this->args['process_confirmation'];
+				$args          = array_merge($defaults_args, $args);
+				$args          = array_intersect_key($args, $defaults_args);
 
-				$this->is_update    = isset($this->request_args['ID']);
-				$this->is_insert    = !isset($this->request_args['ID']);
-				$this->is_menu_page = $this->plugin->utils_env->is_menu_page();
+				$this->process_events       = (boolean)$args['process_events'];
+				$this->process_confirmation = (boolean)$args['process_confirmation'];
 
-				if($this->is_menu_page) // Force off in this case.
-					$this->process_event = FALSE; // Disable.
+				$this->is_update = isset($this->data['ID']);
+				$this->is_insert = !isset($this->data['ID']);
 
 				$this->errors = array(); // Initialize.
 
 				$this->maybe_update_insert();
+			}
+
+			/**
+			 * Do we have errors?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean `TRUE` if has errors.
+			 */
+			public function has_errors()
+			{
+				return !empty($this->errors);
+			}
+
+			/**
+			 * Public access to errors.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of any/all errors.
+			 */
+			public function errors()
+			{
+				return $this->errors;
 			}
 
 			/**
@@ -154,7 +185,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_update_insert()
 			{
-				$this->sanitize_validate_request_args();
+				$this->sanitize_validate();
 
 				if($this->errors) // Have errors?
 					return; // Do nothing.
@@ -173,36 +204,48 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function update()
 			{
-				$data                     = $this->request_args;
-				$data['last_update_time'] = time(); // Force this.
-				$table                    = $this->plugin->utils_db->prefix().'subs';
-				$sub_before               = $this->plugin->utils_sub->get($data['ID']);
+				$this->data['last_update_time'] = time(); // Force this.
+				$table                          = $this->plugin->utils_db->prefix().'subs';
 
-				if($this->plugin->utils_db->wp->update($table, $data, array('ID' => $data['ID'])) === FALSE)
+				if(!$this->data['ID'] || !($sub_before = $this->plugin->utils_sub->get($this->data['ID'])))
+				{
+					$this->errors['ID'] = // Fail. Unable to locate a matching ID.
+						sprintf(__('Could not find ID: <code>%1$s</code>.', $this->plugin->text_domain),
+						        esc_html($this->data['ID'])); // Escape markup.
+					return; // Nothing more we can do here.
+				}
+				if($this->plugin->utils_db->wp->update($table, $this->data, array('ID' => $this->data['ID'])) === FALSE)
 					throw new \exception(__('Update failure.', $this->plugin->text_domain));
 
-				$this->plugin->utils_sub->nullify_cache(array($data['ID'], $data['key']));
+				$this->plugin->utils_sub->nullify_cache(array($this->data['ID'], $this->data['key']));
 
-				if(!$this->args['process_event'] || !isset($data['status']))
+				if(!$this->process_events || !isset($this->data['status']))
 					return; // Nothing more to do here.
 
-				if($sub_before->status === $data['status'])
+				if($sub_before->status === $this->data['status'])
 					return; // Nothing more to do here.
 
-				$sub_after = $this->plugin->utils_sub->get($data['ID'], TRUE);
+				$sub_after = $this->plugin->utils_sub->get($this->data['ID'], TRUE);
 
-				switch($sub_after->status)
+				switch($sub_after->status) // Handle event processing.
 				{
-					case 'unconfirmed':
+					case 'unconfirmed': // Unsubscribing?
+						if(in_array($sub_before->status, array('subscribed', 'suspended'), TRUE))
+							new sub_event_log_inserter(array_merge((array)$sub_after, array('event' => 'unsubscribed')));
+						break; // Break switch handler.
+
+					case 'subscribed': // Subscribing?
+						if(in_array($sub_before->status, array('unconfirmed', 'suspended'), TRUE))
+							new sub_event_log_inserter(array_merge((array)$sub_after, array('event' => 'subscribed')));
+						break; // Break switch handler.
+
+					case 'suspended': // Suspending?
+						if(in_array($sub_before->status, array('subscribed'), TRUE))
+							new sub_event_log_inserter(array_merge((array)$sub_after, array('event' => 'suspended')));
+						break; // Break switch handler.
+
+					case 'trashed': // Like being deleted; same thing really.
 						new sub_event_log_inserter(array_merge((array)$sub_after, array('event' => 'unsubscribed')));
-						break; // Break switch handler.
-
-					case 'subscribed':
-						new sub_event_log_inserter(array_merge((array)$sub_after, array('event' => 'subscribed')));
-						break; // Break switch handler.
-
-					case 'suspended':
-						new sub_event_log_inserter(array_merge((array)$sub_after, array('event' => 'suspended')));
 						break; // Break switch handler.
 				}
 			}
@@ -214,21 +257,23 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function insert()
 			{
-				$data                     = $this->request_args;
-				$data['insertion_time']   = time(); // Force this.
-				$data['last_update_time'] = time(); // Force this.
-				$table                    = $this->plugin->utils_db->prefix().'subs';
+				$this->data['insertion_time']   = time(); // Force this.
+				$this->data['last_update_time'] = time(); // Force this.
+				$table                          = $this->plugin->utils_db->prefix().'subs';
 
-				if($this->plugin->utils_db->wp->replace($table, $data) === FALSE)
+				if($this->plugin->utils_db->wp->replace($table, $this->data) === FALSE)
 					throw new \exception(__('Insertion failure.', $this->plugin->text_domain));
 
 				if(!($sub_id = (integer)$this->plugin->utils_db->wp->insert_id))
 					throw new \exception(__('Insertion failure.', $this->plugin->text_domain));
 
-				$this->plugin->utils_sub->nullify_cache(array($sub_id, $data['key']));
+				$this->plugin->utils_sub->nullify_cache(array($sub_id, $this->data['key']));
 
-				if($this->args['process_confirmation'] && $data['status'] === 'unconfirmed')
-					new sub_confirmer($sub_id); // Confirm.
+				if($this->process_events && $this->data['status'] !== 'trashed')
+					new sub_event_log_inserter(array_merge($this->data, array('event' => 'subscribed')));
+
+				if($this->process_confirmation && $this->data['status'] === 'unconfirmed')
+					new sub_confirmer($sub_id, array('process_events' => $this->process_events));
 			}
 
 			/**
@@ -236,11 +281,11 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function sanitize_validate_request_args()
+			protected function sanitize_validate()
 			{
-				foreach($this->request_args as $_arg => &$_value)
+				foreach($this->data as $_key => &$_value)
 				{
-					switch($_arg) // Validate each arg value.
+					switch($_key) // Validate each arg value.
 					{
 						case 'ID': // Primary key.
 
@@ -251,10 +296,10 @@ namespace comment_mail // Root namespace.
 								$_value = NULL; // We'll get a new ID.
 
 							if(($this->is_update || isset($_value)) && ($_value < 1 || strlen((string)$_value) > 20))
-								$this->errors[$_arg] = __('Invalid ID.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && isset($_value))
-								$this->errors[$_arg] = __('Invalid ID.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -267,10 +312,10 @@ namespace comment_mail // Root namespace.
 								$_value = $this->plugin->utils_enc->uunnci_key_20_max();
 
 							if(isset($_value) && (!$_value || strlen($_value) > 20))
-								$this->errors[$_arg] = __('Invalid key.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid key: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || !$_value || strlen($_value) > 20))
-								$this->errors[$_arg] = __('Invalid key.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid key: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -282,11 +327,14 @@ namespace comment_mail // Root namespace.
 							if($this->is_insert && !isset($_value))
 								$_value = 0; // Use a default value.
 
+							if(!$_value && $this->user)
+								$_value = $this->user->ID;
+
 							if(isset($_value) && ($_value < 0 || strlen((string)$_value) > 20))
-								$this->errors[$_arg] = __('Invalid user ID.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid user ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || $_value < 0 || strlen((string)$_value) > 20))
-								$this->errors[$_arg] = __('Invalid user ID.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid user ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -299,10 +347,10 @@ namespace comment_mail // Root namespace.
 								$_value = 0; // Use a default value.
 
 							if(isset($_value) && ($_value < 1 || strlen((string)$_value) > 20))
-								$this->errors[$_arg] = __('Invalid post ID.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid post ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || $_value < 1 || strlen((string)$_value) > 20))
-								$this->errors[$_arg] = __('Invalid post ID.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid post ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -315,10 +363,10 @@ namespace comment_mail // Root namespace.
 								$_value = 0; // Use a default value.
 
 							if(isset($_value) && ($_value < 0 || strlen((string)$_value) > 20))
-								$this->errors[$_arg] = __('Invalid comment ID.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid comment ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || $_value < 0 || strlen((string)$_value) > 20))
-								$this->errors[$_arg] = __('Invalid comment ID.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid comment ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -331,10 +379,10 @@ namespace comment_mail // Root namespace.
 								$_value = 'asap'; // Use a default value.
 
 							if(isset($_value) && !in_array($_value, array('asap', 'hourly', 'daily', 'weekly'), TRUE))
-								$this->errors[$_arg] = __('Invalid delivery option.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid delivery option: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || !in_array($_value, array('asap', 'hourly', 'daily', 'weekly'), TRUE)))
-								$this->errors[$_arg] = __('Invalid delivery option.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid delivery option: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -350,10 +398,10 @@ namespace comment_mail // Root namespace.
 								$_value = $this->plugin->utils_string->clean_name($_value);
 
 							if(isset($_value) && strlen($_value) > 50)
-								$this->errors[$_arg] = __('Invalid first name.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid first name: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || strlen($_value) > 50))
-								$this->errors[$_arg] = __('Invalid first name.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid first name: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -369,10 +417,10 @@ namespace comment_mail // Root namespace.
 								$_value = $this->plugin->utils_string->clean_name($_value);
 
 							if(isset($_value) && strlen($_value) > 100)
-								$this->errors[$_arg] = __('Invalid last name.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid last name: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || strlen($_value) > 100))
-								$this->errors[$_arg] = __('Invalid last name.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid last name: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -385,10 +433,10 @@ namespace comment_mail // Root namespace.
 								$_value = ''; // Use a default value.
 
 							if(isset($_value) && (!$_value || !is_email($_value) || strlen($_value) > 100))
-								$this->errors[$_arg] = __('Invalid email address.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid email address: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || !$_value || !is_email($_value) || strlen($_value) > 100))
-								$this->errors[$_arg] = __('Invalid email address.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid email address: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -400,14 +448,14 @@ namespace comment_mail // Root namespace.
 							if($this->is_insert && !isset($_value))
 								$_value = ''; // Use a default value.
 
-							if(!$_value && !$this->is_menu_page && $this->is_current_user)
+							if(!$_value && $this->is_current_user)
 								$_value = $this->plugin->utils_env->user_ip();
 
 							if(isset($_value) && strlen($_value) > 39)
-								$this->errors[$_arg] = __('Invalid insertion IP.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid insertion IP: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || strlen($_value) > 39))
-								$this->errors[$_arg] = __('Invalid insertion IP.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid insertion IP: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -419,14 +467,14 @@ namespace comment_mail // Root namespace.
 							if($this->is_insert && !isset($_value))
 								$_value = ''; // Use a default value.
 
-							if(!$_value && !$this->is_menu_page && $this->is_current_user)
+							if(!$_value && $this->is_current_user)
 								$_value = $this->plugin->utils_env->user_ip();
 
 							if(isset($_value) && strlen($_value) > 39)
-								$this->errors[$_arg] = __('Invalid last IP.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid last IP: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || strlen($_value) > 39))
-								$this->errors[$_arg] = __('Invalid last IP.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid last IP: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -439,10 +487,10 @@ namespace comment_mail // Root namespace.
 								$_value = 'unconfirmed'; // Use a default value.
 
 							if(isset($_value) && !in_array($_value, array('unconfirmed', 'subscribed', 'suspended', 'trashed'), TRUE))
-								$this->errors[$_arg] = __('Invalid status.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid status: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || !in_array($_value, array('unconfirmed', 'subscribed', 'suspended', 'trashed'), TRUE)))
-								$this->errors[$_arg] = __('Invalid status.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid status: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -457,10 +505,10 @@ namespace comment_mail // Root namespace.
 							if(!$_value) $_value = time();
 
 							if(isset($_value) && strlen((string)$_value) !== 10)
-								$this->errors[$_arg] = __('Invalid insertion time.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid insertion time: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || strlen((string)$_value) !== 10))
-								$this->errors[$_arg] = __('Invalid insertion time.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid insertion time: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -475,15 +523,15 @@ namespace comment_mail // Root namespace.
 							if(!$_value) $_value = time();
 
 							if(isset($_value) && strlen((string)$_value) !== 10)
-								$this->errors[$_arg] = __('Invalid last update time.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid last update time: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || strlen((string)$_value) !== 10))
-								$this->errors[$_arg] = __('Invalid last update time.', $this->plugin->text_domain);
+								$this->errors[$_key] = sprintf(__('Invalid last update time: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 					}
 				}
-				unset($_arg, $_value); // Housekeeping.
+				unset($_key, $_value); // Housekeeping.
 			}
 		}
 	}

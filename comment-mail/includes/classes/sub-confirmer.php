@@ -35,22 +35,37 @@ namespace comment_mail // Root namespace.
 			protected $auto_confirm;
 
 			/**
+			 * @var boolean Process events?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $process_events;
+
+			/**
 			 * Class constructor.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param integer|string $sub_id Comment ID.
 			 *
-			 * @param null|boolean   $auto_confirm Auto-confirm?
-			 *    If `NULL`, use current plugin option value.
+			 * @param array          $args Any additional behavioral args.
 			 */
-			public function __construct($sub_id, $auto_confirm = NULL)
+			public function __construct($sub_id, array $args = array())
 			{
 				parent::__construct();
 
-				$sub_id             = (integer)$sub_id;
-				$this->sub          = $this->plugin->utils_sub->get($sub_id);
-				$this->auto_confirm = isset($auto_confirm) ? (boolean)$auto_confirm : NULL;
+				$sub_id = (integer)$sub_id;
+
+				$defaults_args = array(
+					'auto_confirm'   => NULL,
+					'process_events' => TRUE,
+				);
+				$args          = array_merge($defaults_args, $args);
+				$args          = array_intersect_key($args, $defaults_args);
+
+				$this->sub            = $this->plugin->utils_sub->get($sub_id);
+				$this->auto_confirm   = isset($args['auto_confirm']) ? (boolean)$args['auto_confirm'] : NULL;
+				$this->process_events = (boolean)$args['process_events'];
 
 				if(!isset($this->auto_confirm)) // If not set explicitly, use option value.
 					$this->auto_confirm = (boolean)$this->plugin->options['auto_confirm_enable'];
@@ -100,7 +115,8 @@ namespace comment_mail // Root namespace.
 
 				if($this->auto_confirm) // Auto-confirm?
 				{
-					$this->plugin->utils_sub->confirm($this->sub->ID);
+					$this->plugin->utils_sub->confirm($this->sub->ID, $this->process_events);
+
 					return TRUE; // Confirmed automatically.
 				}
 				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
@@ -116,7 +132,8 @@ namespace comment_mail // Root namespace.
 
 				if((integer)$this->plugin->utils_db->wp->get_var($sql))
 				{
-					$this->plugin->utils_sub->confirm($this->sub->ID);
+					$this->plugin->utils_sub->confirm($this->sub->ID, $this->process_events);
+
 					return TRUE; // Confirmed automatically.
 				}
 				return FALSE; // Not subscribed already.

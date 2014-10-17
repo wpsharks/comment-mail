@@ -48,9 +48,10 @@ namespace comment_mail // Root namespace.
 				if(!$this->plugin->utils_url->has_valid_nonce())
 					return; // Unauthenticated; ignore.
 
-				foreach((array)$_REQUEST[__NAMESPACE__] as $action => $args)
-					if($action && is_string($action) && method_exists($this, $action))
-						$this->{$action}($this->plugin->utils_string->trim_strip_deep($args));
+				foreach((array)$_REQUEST[__NAMESPACE__] as $_action => $_request_args)
+					if($_action && is_string($_action) && method_exists($this, $_action))
+						$this->{$_action}($this->plugin->utils_string->trim_strip_deep($_request_args));
+				unset($_action, $_request_args); // Housekeeping.
 			}
 
 			/**
@@ -58,11 +59,11 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param mixed $args Input argument(s).
+			 * @param mixed $request_args Input argument(s).
 			 */
-			protected function restore_default_options($args)
+			protected function restore_default_options($request_args)
 			{
-				$args = NULL; // Not used here.
+				$request_args = NULL; // Not used here.
 
 				if(!current_user_can($this->plugin->cap))
 					return; // Unauthenticated; ignore.
@@ -78,16 +79,16 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param mixed $args Input argument(s).
+			 * @param mixed $request_args Input argument(s).
 			 */
-			protected function save_options($args)
+			protected function save_options($request_args)
 			{
-				$args = (array)$args; // Expecting an array.
+				$request_args = (array)$request_args;
 
 				if(!current_user_can($this->plugin->cap))
 					return; // Unauthenticated; ignore.
 
-				$this->plugin->options = array_merge($this->plugin->default_options, $this->plugin->options, $args);
+				$this->plugin->options = array_merge($this->plugin->default_options, $this->plugin->options, $request_args);
 				$this->plugin->options = array_intersect_key($this->plugin->options, $this->plugin->default_options);
 				update_option(__NAMESPACE__.'_options', $this->plugin->options); // Update.
 
@@ -99,13 +100,13 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param mixed $args Input argument(s).
+			 * @param mixed $request_args Input argument(s).
 			 */
-			protected function dismiss_notice($args)
+			protected function dismiss_notice($request_args)
 			{
-				$args = (array)$args; // Expecting an array.
+				$request_args = (array)$request_args;
 
-				if(empty($args['key'])) // Missing key?
+				if(empty($request_args['key'])) // Missing key?
 					return; // Nothing to dismiss.
 
 				if(!current_user_can($this->plugin->manage_cap))
@@ -115,7 +116,7 @@ namespace comment_mail // Root namespace.
 				$notices = get_option(__NAMESPACE__.'_notices');
 				if(!is_array($notices)) $notices = array();
 
-				unset($notices[$args['key']]); // Dismiss.
+				unset($notices[$request_args['key']]); // Dismiss.
 				update_option(__NAMESPACE__.'_notices', $notices);
 
 				wp_redirect($this->plugin->utils_url->notice_dismissed()).exit();
@@ -126,23 +127,23 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param mixed $args Input argument(s).
+			 * @param mixed $request_args Input argument(s).
 			 */
-			protected function import($args)
+			protected function import($request_args)
 			{
-				$args = (array)$args; // Expecting an array.
+				$request_args = (array)$request_args;
 
-				if(empty($args['type']) || !is_string($args['type']))
+				if(empty($request_args['type']) || !is_string($request_args['type']))
 					return; // Missing and/or invalid import type.
 
-				if(!in_array($args['type'], array('subs', 'stcr'), TRUE))
+				if(!in_array($request_args['type'], array('subs', 'stcr'), TRUE))
 					return; // Invalid import type.
 
 				if(!current_user_can($this->plugin->cap))
 					return; // Unauthenticated; ignore.
 
-				$class    = 'import_'.$args['type'];
-				$importer = new $class($args); // Instantiate.
+				$class    = 'import_'.$request_args['type'];
+				$importer = new $class($request_args); // Instantiate.
 			}
 
 			/**
@@ -150,23 +151,23 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param mixed $args Input argument(s).
+			 * @param mixed $request_args Input argument(s).
 			 */
-			protected function export($args)
+			protected function export($request_args)
 			{
-				$args = (array)$args; // Expecting an array.
+				$request_args = (array)$request_args;
 
-				if(empty($args['type']) || !is_string($args['type']))
+				if(empty($request_args['type']) || !is_string($request_args['type']))
 					return; // Missing and/or invalid import type.
 
-				if(!in_array($args['type'], array('subs'), TRUE))
+				if(!in_array($request_args['type'], array('subs'), TRUE))
 					return; // Invalid import type.
 
 				if(!current_user_can($this->plugin->cap))
 					return; // Unauthenticated; ignore.
 
-				$class    = 'export_'.$args['type'];
-				$exporter = new $class($args); // Instantiate.
+				$class    = 'export_'.$request_args['type'];
+				$exporter = new $class($request_args); // Instantiate.
 			}
 		}
 	}

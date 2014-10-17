@@ -183,21 +183,23 @@ namespace comment_mail // Root namespace.
 				if(!($comment_ids = $this->sub_comment_ids($post_id, $sub->email)))
 					return; // Not possible; could not find any comment IDs.
 
-				$user = $this->sub_user($sub->email); // `\WP_User` or `NULL`.
-
 				if($sub->status === 'R') // Specific comment(s); i.e. "Replies Only"?
 				{
 					foreach($comment_ids as $_comment_id) // Comment subscriptions.
 					{
+						new sub_injector(NULL, $_comment_id, // With behavioral args too.
+						                 array('type' => 'comment', 'deliver' => 'asap', 'auto_confirm' => TRUE));
+
 						$this->total_imported_subs++; // Increment counter.
-						new sub_injector($user, $_comment_id, 'comment', 'asap', TRUE);
 					}
 					unset($_comment_id); // A little housekeeping.
 				}
 				else // Subscribe them to all comments on this post ID.
 				{
+					new sub_injector(NULL, $comment_ids[0], // With behavioral args too.
+					                 array('type' => 'comments', 'deliver' => 'asap', 'auto_confirm' => TRUE));
+
 					$this->total_imported_subs++; // Increment counter.
-					new sub_injector($user, $comment_ids[0], 'comments', 'asap', TRUE);
 				}
 			}
 
@@ -303,26 +305,6 @@ namespace comment_mail // Root namespace.
 					$comment_ids = array_map('intval', $get_col_results);
 
 				return $comment_ids; // All of their comment IDs.
-			}
-
-			/**
-			 * Subscriber's user object.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string $email Email address (i.e. subscriber).
-			 *
-			 * @return \WP_User|null Their user object; else `NULL`.
-			 */
-			protected function sub_user($email)
-			{
-				if(!($email = (string)$email))
-					return NULL; // Not possible.
-
-				if(!($data = \WP_User::get_data_by('email', $email)))
-					return NULL; // Unable to locate a user ID.
-
-				return new \WP_User($data->ID);
 			}
 
 			/**

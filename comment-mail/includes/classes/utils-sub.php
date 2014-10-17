@@ -5,6 +5,8 @@
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
+ *
+ * @TODO check status before in each of these methods; before firing an event.
  */
 namespace comment_mail // Root namespace.
 {
@@ -79,7 +81,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param integer|string $sub_id_or_key Subscriber ID.
 			 *
-			 * @param boolean        $log_subscribed_event Log `subscribed` event?
+			 * @param boolean        $process_events Process events?
 			 *
 			 * @param string         $last_ip Most recent IP address, when possible.
 			 *
@@ -89,7 +91,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @throws \exception If an update failure occurs.
 			 */
-			public function reconfirm($sub_id_or_key, $log_subscribed_event = FALSE, $last_ip = '')
+			public function reconfirm($sub_id_or_key, $process_events = FALSE, $last_ip = '')
 			{
 				if(!$sub_id_or_key)
 					return NULL; // Not possible.
@@ -101,9 +103,6 @@ namespace comment_mail // Root namespace.
 					return FALSE; // Already confirmed.
 
 				$last_ip = (string)$last_ip; // Force string.
-
-				if($log_subscribed_event) // Log `subscribed` event?
-					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'subscribed')));
 
 				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
@@ -123,9 +122,11 @@ namespace comment_mail // Root namespace.
 					if($last_ip) $sub->last_ip = $last_ip;
 					$sub->last_update_time = time();
 
-					$this->nullify_cache();
+					$this->nullify_cache(); // Nullify cache.
 
-					new sub_confirmer($sub->ID);
+					if($process_events) // Log a `subscribed` event here?
+						new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'subscribed')));
+					new sub_confirmer($sub->ID, compact('process_events'));
 				}
 				return $confirmed;
 			}
@@ -166,7 +167,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param integer|string $sub_id_or_key Subscriber ID.
 			 *
-			 * @param boolean        $log_confirmed_event Log `confirmed` event?
+			 * @param boolean        $process_events Process events?
 			 *
 			 * @param string         $last_ip Most recent IP address, when possible.
 			 *
@@ -176,7 +177,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @throws \exception If an update failure occurs.
 			 */
-			public function confirm($sub_id_or_key, $log_confirmed_event = FALSE, $last_ip = '')
+			public function confirm($sub_id_or_key, $process_events = FALSE, $last_ip = '')
 			{
 				if(!$sub_id_or_key)
 					return NULL; // Not possible.
@@ -188,9 +189,6 @@ namespace comment_mail // Root namespace.
 					return FALSE; // Already confirmed.
 
 				$last_ip = (string)$last_ip; // Force string.
-
-				if($log_confirmed_event) // Log `confirmed` event?
-					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'confirmed')));
 
 				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
@@ -210,7 +208,10 @@ namespace comment_mail // Root namespace.
 					if($last_ip) $sub->last_ip = $last_ip;
 					$sub->last_update_time = time();
 
-					$this->nullify_cache();
+					$this->nullify_cache(); // Nullify cache.
+
+					if($process_events) // Log a `confirmed` event here?
+						new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'confirmed')));
 				}
 				return $confirmed;
 			}
@@ -271,7 +272,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param integer|string $sub_id_or_key Subscriber ID.
 			 *
-			 * @param boolean        $log_unsubscribed_event Log `unsubscribed` event?
+			 * @param boolean        $process_events Log `unsubscribed` event?
 			 *
 			 * @param string         $last_ip Most recent IP address, when possible.
 			 *
@@ -281,7 +282,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @throws \exception If an update failure occurs.
 			 */
-			public function unconfirm($sub_id_or_key, $log_unsubscribed_event = FALSE, $last_ip = '')
+			public function unconfirm($sub_id_or_key, $process_events = FALSE, $last_ip = '')
 			{
 				if(!$sub_id_or_key)
 					return NULL; // Not possible.
@@ -293,9 +294,6 @@ namespace comment_mail // Root namespace.
 					return FALSE; // Already unconfirmed.
 
 				$last_ip = (string)$last_ip; // Force string.
-
-				if($log_unsubscribed_event) // Log `unsubscribed` event?
-					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'unsubscribed')));
 
 				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
@@ -315,7 +313,10 @@ namespace comment_mail // Root namespace.
 					if($last_ip) $sub->last_ip = $last_ip;
 					$sub->last_update_time = time();
 
-					$this->nullify_cache();
+					$this->nullify_cache(); // Nullify cache.
+
+					if($process_events) // Log an `unsubscribed` event here?
+						new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'unsubscribed')));
 				}
 				return $unconfirmed;
 			}
@@ -376,7 +377,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param integer|string $sub_id_or_key Subscriber ID.
 			 *
-			 * @param boolean        $log_suspended_event Log `suspended` event?
+			 * @param boolean        $process_events Process events?
 			 *
 			 * @param string         $last_ip Most recent IP address, when possible.
 			 *
@@ -386,7 +387,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @throws \exception If an update failure occurs.
 			 */
-			public function suspend($sub_id_or_key, $log_suspended_event = FALSE, $last_ip = '')
+			public function suspend($sub_id_or_key, $process_events = FALSE, $last_ip = '')
 			{
 				if(!$sub_id_or_key)
 					return NULL; // Not possible.
@@ -398,9 +399,6 @@ namespace comment_mail // Root namespace.
 					return FALSE; // Already suspended.
 
 				$last_ip = (string)$last_ip; // Force string.
-
-				if($log_suspended_event) // Log `suspended` event?
-					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'suspended')));
 
 				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
@@ -420,7 +418,10 @@ namespace comment_mail // Root namespace.
 					if($last_ip) $sub->last_ip = $last_ip;
 					$sub->last_update_time = time();
 
-					$this->nullify_cache();
+					$this->nullify_cache(); // Nullify cache.
+
+					if($process_events) // Log a `suspended` event here?
+						new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'suspended')));
 				}
 				return $suspended;
 			}
@@ -481,7 +482,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param integer|string $sub_id_or_key Subscriber ID.
 			 *
-			 * @param boolean        $log_unsubscribed_event Log `unsubscribed` event?
+			 * @param boolean        $process_events Process events?
 			 *
 			 * @param string         $last_ip Most recent IP address, when possible.
 			 *
@@ -491,7 +492,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @throws \exception If an update failure occurs.
 			 */
-			public function trash($sub_id_or_key, $log_unsubscribed_event = FALSE, $last_ip = '')
+			public function trash($sub_id_or_key, $process_events = FALSE, $last_ip = '')
 			{
 				if(!$sub_id_or_key)
 					return NULL; // Not possible.
@@ -503,9 +504,6 @@ namespace comment_mail // Root namespace.
 					return FALSE; // Already trashed.
 
 				$last_ip = (string)$last_ip; // Force string.
-
-				if($log_unsubscribed_event) // Log `unsubscribed` event?
-					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'unsubscribed')));
 
 				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
@@ -525,7 +523,10 @@ namespace comment_mail // Root namespace.
 					if($last_ip) $sub->last_ip = $last_ip;
 					$sub->last_update_time = time();
 
-					$this->nullify_cache();
+					$this->nullify_cache(); // Nullify cache.
+
+					if($process_events) // Log an `unsubscribed` event here?
+						new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'unsubscribed')));
 				}
 				return $trashed;
 			}
@@ -586,7 +587,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param integer|string $sub_id_or_key Subscriber ID.
 			 *
-			 * @param boolean        $log_unsubscribed_event Log `unsubscribed` event?
+			 * @param boolean        $process_events Process events?
 			 *
 			 * @param string         $last_ip Most recent IP address, when possible.
 			 *
@@ -599,7 +600,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @throws \exception If a deletion failure occurs.
 			 */
-			public function delete($sub_id_or_key, $log_unsubscribed_event = FALSE, $last_ip = '')
+			public function delete($sub_id_or_key, $process_events = FALSE, $last_ip = '')
 			{
 				if(!$sub_id_or_key)
 					return NULL; // Not possible.
@@ -608,9 +609,6 @@ namespace comment_mail // Root namespace.
 					return FALSE; // Deleted already.
 
 				$last_ip = (string)$last_ip; // Force string.
-
-				if($log_unsubscribed_event) // Log `unsubscribed` event?
-					new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'unsubscribed')));
 
 				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 				       " WHERE `ID` = '".esc_sql($sub->ID)."'";
@@ -626,6 +624,9 @@ namespace comment_mail // Root namespace.
 					$sub->last_update_time = time();
 
 					$this->nullify_cache(array($sub->ID, $sub->key));
+
+					if($process_events) // Log an `unsubscribed` event here?
+						new sub_event_log_inserter(array_merge((array)$sub, array('event' => 'unsubscribed')));
 				}
 				return $deleted;
 			}

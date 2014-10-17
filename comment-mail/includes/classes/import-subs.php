@@ -132,39 +132,53 @@ namespace comment_mail // Root namespace.
 					}
 					if($current_csv_line_index >= 1 && !$csv_headers)
 					{
-						$this->errors[] = __('Missing first-line CSV headers; please try again.', $this->plugin->text_domain);
+						$this->errors[] = // Missing required headers.
+							__('Missing first-line CSV headers; please try again.', $this->plugin->text_domain);
 						break; // Stop here; we have no headers in this importation.
 					}
 					if($current_csv_line_index >= 1 && !in_array('ID', $csv_headers, TRUE))
 						if(!in_array('email', $csv_headers, TRUE) || !in_array('post_id', $csv_headers, TRUE))
 						{
-							$this->errors[] = __('First-line CSV headers MUST contain (at a minimum); one of: "ID", or "email" together with a "post_id".', $this->plugin->text_domain);
+							$this->errors[] = // Missing required headers.
+								__('First-line CSV headers MUST contain (at a minimum); one of:', $this->plugin->text_domain).
+								' '.__('<code>"ID"</code>, or <code>"email"</code> together with a <code>"post_id"</code>.', $this->plugin->text_domain);
 							break; // Stop here; we have no headers in this importation.
 						}
-					$_ID               = $this->csv_line_column_value_for('ID', $csv_headers, $_csv_line);
-					$_key              = $this->csv_line_column_value_for('key', $csv_headers, $_csv_line);
-					$_user_id          = $this->csv_line_column_value_for('user_id', $csv_headers, $_csv_line);
-					$_post_id          = $this->csv_line_column_value_for('post_id', $csv_headers, $_csv_line);
-					$_comment_id       = $this->csv_line_column_value_for('comment_id', $csv_headers, $_csv_line);
-					$_deliver          = $this->csv_line_column_value_for('deliver', $csv_headers, $_csv_line);
-					$_fname            = $this->csv_line_column_value_for('fname', $csv_headers, $_csv_line);
-					$_lname            = $this->csv_line_column_value_for('lname', $csv_headers, $_csv_line);
-					$_email            = $this->csv_line_column_value_for('email', $csv_headers, $_csv_line);
-					$_insertion_ip     = $this->csv_line_column_value_for('insertion_ip', $csv_headers, $_csv_line);
-					$_last_ip          = $this->csv_line_column_value_for('last_ip', $csv_headers, $_csv_line);
-					$_status           = $this->csv_line_column_value_for('status', $csv_headers, $_csv_line);
-					$_insertion_time   = $this->csv_line_column_value_for('insertion_time', $csv_headers, $_csv_line);
-					$_last_update_time = $this->csv_line_column_value_for('last_update_time', $csv_headers, $_csv_line);
+					$_import                     = array(); // Reset this on each pass.
+					$_import['ID']               = $this->csv_line_column_value_for('ID', $csv_headers, $_csv_line);
+					$_import['key']              = $this->csv_line_column_value_for('key', $csv_headers, $_csv_line);
+					$_import['user_id']          = $this->csv_line_column_value_for('user_id', $csv_headers, $_csv_line);
+					$_import['post_id']          = $this->csv_line_column_value_for('post_id', $csv_headers, $_csv_line);
+					$_import['comment_id']       = $this->csv_line_column_value_for('comment_id', $csv_headers, $_csv_line);
+					$_import['deliver']          = $this->csv_line_column_value_for('deliver', $csv_headers, $_csv_line);
+					$_import['fname']            = $this->csv_line_column_value_for('fname', $csv_headers, $_csv_line);
+					$_import['lname']            = $this->csv_line_column_value_for('lname', $csv_headers, $_csv_line);
+					$_import['email']            = $this->csv_line_column_value_for('email', $csv_headers, $_csv_line);
+					$_import['insertion_ip']     = $this->csv_line_column_value_for('insertion_ip', $csv_headers, $_csv_line);
+					$_import['last_ip']          = $this->csv_line_column_value_for('last_ip', $csv_headers, $_csv_line);
+					$_import['status']           = $this->csv_line_column_value_for('status', $csv_headers, $_csv_line);
+					$_import['insertion_time']   = $this->csv_line_column_value_for('insertion_time', $csv_headers, $_csv_line);
+					$_import['last_update_time'] = $this->csv_line_column_value_for('last_update_time', $csv_headers, $_csv_line);
 
-					$this->total_imported_subs++; // Increment counter.
-					// @TODO Integrate this with another class for sub creation/validation.
-					// @TODO Have this create a notice and perform a redirection.
+					$_sub_inserter = new sub_inserter(NULL, $_import); // Insert; or update existing ID.
+					if($_sub_inserter->has_errors()) // If the inserter has errors for this line; report those.
+					{
+						$_sub_inserter_errors       = array_values($_sub_inserter->errors()); // Values only; discard keys.
+						$_sub_inserter_error_prefix = sprintf(__('<em>Line #%1$s:</em>', $this->plugin->text_domain), esc_html($current_csv_line_number));
+
+						foreach($_sub_inserter_errors as &$_sub_inserter_error)
+							$_sub_inserter_error = $_sub_inserter_error_prefix.' '.$_sub_inserter_error;
+						$this->errors = array_merge($this->errors, $_sub_inserter_errors);
+					}
+					else $this->total_imported_subs++; // Increment counter; this was a success.
+
+					unset($_sub_inserter, $_sub_inserter_errors, // Housekeeping.
+						$_sub_inserter_error, $_sub_inserter_error_prefix);
 
 					if($current_csv_line_number + 1 > $this->max_limit)
 						break; // Reached the max limit.
 				}
-				unset($_csv_line, $_ID, $_key, $_user_id, $_post_id, $_comment_id, $_deliver, // Housekeeping.
-					$_fname, $_lname, $_email, $_insertion_ip, $_last_ip, $_status, $_insertion_time, $_last_update_time);
+				unset($_csv_line, $_import); // Housekeeping.
 				fclose($csv_resource_file); // Close resource file.
 
 				$this->enqueue_notices_and_redirect(); // Issue notice and redirect user.
@@ -177,20 +191,20 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function enqueue_notices_and_redirect()
 			{
-				$notice_markup   = $error_notice_markup = ''; // Initialize.
+				$notice_markup   = $error_markup = ''; // Initialize.
 				$subsribers_i18n = $this->plugin->utils_i18n->subscribers($this->total_imported_subs); // e.g. `X subscriber(s)`.
 				$notice_markup   = sprintf(__('<strong>Imported %1$s successfully.</strong>', $this->plugin->text_domain), esc_html($subsribers_i18n));
 
 				if($this->errors) // Do we have errors to report also? If so, present these as individual list items.
 				{
-					$error_notice_markup = __('<strong>The following errors were encountered during importation:</strong>', $this->plugin->text_domain);
-					$error_notice_markup .= '<ul class="pmp-list-items"><li>'.implode('</li><li>', array_map('esc_html', $this->errors)).'</li></ul>';
+					$error_markup = __('<strong>The following errors were encountered during importation:</strong>', $this->plugin->text_domain);
+					$error_markup .= '<ul class="pmp-list-items"><li>'.implode('</li><li>', $this->errors).'</li></ul>';
 				}
 				if($notice_markup) // This really should always be displayed; even if we imported `0` subscribers.
 					$this->plugin->enqueue_user_notice($notice_markup, array('transient' => TRUE, 'for_page' => $this->plugin->utils_env->current_menu_page()));
 
-				if($error_notice_markup) // Are there any specific error messages that we can report?
-					$this->plugin->enqueue_user_error($error_notice_markup, array('transient' => TRUE, 'for_page' => $this->plugin->utils_env->current_menu_page()));
+				if($error_markup) // Are there any specific error messages that we can report?
+					$this->plugin->enqueue_user_error($error_markup, array('transient' => TRUE, 'for_page' => $this->plugin->utils_env->current_menu_page()));
 
 				wp_redirect($this->plugin->utils_url->current_page_only()).exit();
 			}

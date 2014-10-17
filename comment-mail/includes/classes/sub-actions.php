@@ -45,9 +45,10 @@ namespace comment_mail // Root namespace.
 				if(empty($_REQUEST[__NAMESPACE__]))
 					return; // Not applicable.
 
-				foreach((array)$_REQUEST[__NAMESPACE__] as $action => $args)
-					if($action && is_string($action) && method_exists($this, $action))
-						$this->{$action}($this->plugin->utils_string->trim_strip_deep($args));
+				foreach((array)$_REQUEST[__NAMESPACE__] as $_action => $_request_args)
+					if($_action && is_string($_action) && method_exists($this, $_action))
+						$this->{$_action}($this->plugin->utils_string->trim_strip_deep($_request_args));
+				unset($_action, $_request_args); // Housekeeping.
 			}
 
 			/**
@@ -55,15 +56,15 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param mixed $args Input argument(s).
+			 * @param mixed $request_args Input argument(s).
 			 */
-			protected function confirm($args)
+			protected function confirm($request_args)
 			{
 				$key        = '';
 				$sub        = NULL;
 				$error_code = '';
 
-				if(!$error_code && !($key = trim((string)$args)))
+				if(!$error_code && !($key = trim((string)$request_args)))
 					$error_code = 'missing_key';
 
 				if(!$error_code && !($sub = $this->plugin->utils_sub->get($key)))
@@ -87,15 +88,15 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param mixed $args Input argument(s).
+			 * @param mixed $request_args Input argument(s).
 			 */
-			protected function unsubscribe($args)
+			protected function unsubscribe($request_args)
 			{
 				$key        = '';
 				$sub        = NULL;
 				$error_code = '';
 
-				if(!$error_code && !($key = trim((string)$args)))
+				if(!$error_code && !($key = trim((string)$request_args)))
 					$error_code = 'missing_key';
 
 				if(!$error_code && !($sub = $this->plugin->utils_sub->get($key)))
@@ -119,15 +120,17 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param mixed $args Input argument(s).
+			 * @param mixed $request_args Input argument(s).
+			 *
+			 * @TODO review this for security issues w/ email address.
 			 */
-			protected function manage($args)
+			protected function manage($request_args)
 			{
-				if(is_string($args) && ($email = trim($args)))
+				if(is_string($request_args) && ($email = trim($request_args)))
 					$this->plugin->utils_sub->set_current_email($email);
 				$email = $this->plugin->utils_sub->current_email();
 
-				if(!is_array($args)) // If NOT a sub action, redirect to one.
+				if(!is_array($request_args)) // If NOT a sub action, redirect to one.
 					wp_redirect($this->plugin->utils_sub->manage_summary_url($email)).exit();
 
 				new sub_manage_actions(); // Handle sub. manage actions.

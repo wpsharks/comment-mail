@@ -72,6 +72,13 @@ namespace comment_mail // Root namespace.
 			protected $auto_confirm;
 
 			/**
+			 * @var boolean Process events?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $process_events;
+
+			/**
 			 * @var boolean Sub. already exists?
 			 *
 			 * @since 14xxxx First documented version.
@@ -91,25 +98,23 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param \WP_User|null  $user Subscribing user.
-			 *    Use `NULL` to indicate they are NOT a user.
-			 *
 			 * @param integer|string $comment_id Comment ID.
-			 *
-			 * @param string         $type Type of subscription.
-			 *    Please pass one of: `comments`, `comment`.
-			 *
-			 * @param string         $deliver Delivery option. Defaults to `asap`.
-			 *    Please pass one of: `asap`, `hourly`, `daily`, `weekly`.
-			 *
-			 * @param null|boolean   $auto_confirm Auto-confirm subscriber?
-			 *    If `NULL`, use current plugin option value.
+			 * @param array          $args Any additional behavioral args.
 			 */
-			public function __construct($user, $comment_id, $type = 'comment', $deliver = 'asap', $auto_confirm = NULL)
+			public function __construct($user, $comment_id, array $args = array())
 			{
 				parent::__construct();
 
 				if($user instanceof \WP_User)
 					$this->user = $user;
+
+				if(($comment_id = (integer)$comment_id))
+					$this->comment = get_comment($comment_id);
+
+				if(!isset($this->user) && !empty($this->comment->comment_author_email))
+					if(($_user = \WP_User::get_data_by('email', $this->comment->comment_author_email)))
+						$this->user = new \WP_User($_user->ID);
+				unset($_user); // Housekeeping.
 
 				$this->current_user = wp_get_current_user();
 
@@ -117,18 +122,25 @@ namespace comment_mail // Root namespace.
 				if($this->user && $this->user->ID === $this->current_user->ID)
 					$this->is_current_user = TRUE; // Even if `ID` is `0`.
 
-				if(($comment_id = (integer)$comment_id))
-					$this->comment = get_comment($comment_id);
+				$defaults_args = array(
+					'type'           => 'comment',
+					'deliver'        => 'asap',
+					'auto_confirm'   => NULL,
+					'process_events' => TRUE,
+				);
+				$args          = array_merge($defaults_args, $args);
+				$args          = array_intersect_key($args, $defaults_args);
 
-				$this->type = strtolower((string)$type);
+				$this->type = strtolower((string)$args['type']);
 				if(!in_array($this->type, array('comments', 'comment'), TRUE))
 					$this->type = ''; // Default type.
 
-				$this->deliver = strtolower((string)$deliver);
+				$this->deliver = strtolower((string)$args['deliver']);
 				if(!in_array($this->deliver, array('asap', 'hourly', 'daily', 'weekly'), TRUE))
 					$this->deliver = ''; // Default option.
 
-				$this->auto_confirm = isset($auto_confirm) ? (boolean)$auto_confirm : NULL;
+				$this->auto_confirm   = isset($args['auto_confirm']) ? (boolean)$args['auto_confirm'] : NULL;
+				$this->process_events = (boolean)$args['process_events'];
 
 				$this->sub_exists = FALSE; // Initialize.
 				$this->insert_id  = 0; // Initialize.
@@ -180,7 +192,7 @@ namespace comment_mail // Root namespace.
 					'status'           => 'unconfirmed',
 
 					'insertion_time'   => time(),
-					'last_update_time' => time()
+					'last_update_time' => time(),
 				);
 				if(!$this->plugin->utils_db->wp->replace($this->plugin->utils_db->prefix().'subs', $data))
 					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
@@ -188,9 +200,9 @@ namespace comment_mail // Root namespace.
 				if(!($sub_id = $this->insert_id = (integer)$this->plugin->utils_db->wp->insert_id))
 					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
 
-				new sub_event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
-
-				new sub_confirmer($sub_id, $this->auto_confirm); // Confirm; before deletion of others.
+				if($this->process_events) // Process a `subscribed` event here?
+					new sub_event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
+				new sub_confirmer($sub_id, array('auto_confirm' => $this->auto_confirm, 'process_events' => $this->process_events));
 
 				$this->delete_others(); // Delete other subscriptions now.
 			}
@@ -276,7 +288,7 @@ namespace comment_mail // Root namespace.
 				if($existing_sub->insertion_time >= strtotime('-15 minutes'))
 					return; // Recently subscribed; give em' time.
 
-				new sub_confirmer($existing_sub->ID, $this->auto_confirm);
+				new sub_confirmer($existing_sub->ID, array('auto_confirm' => $this->auto_confirm, 'process_events' => $this->process_events));
 			}
 
 			/**
