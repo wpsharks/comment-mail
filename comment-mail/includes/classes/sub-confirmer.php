@@ -63,12 +63,14 @@ namespace comment_mail // Root namespace.
 				$args          = array_merge($defaults_args, $args);
 				$args          = array_intersect_key($args, $defaults_args);
 
+				if(isset($args['auto_confirm']))
+					$this->auto_confirm = (boolean)$args['auto_confirm'];
 				$this->sub            = $this->plugin->utils_sub->get($sub_id);
-				$this->auto_confirm   = isset($args['auto_confirm']) ? (boolean)$args['auto_confirm'] : NULL;
 				$this->process_events = (boolean)$args['process_events'];
 
 				if(!isset($this->auto_confirm)) // If not set explicitly, use option value.
-					$this->auto_confirm = (boolean)$this->plugin->options['auto_confirm_enable'];
+					if((boolean)$this->plugin->options['auto_confirm_enable'])
+						$this->auto_confirm = TRUE; // Yes.
 
 				$this->maybe_send_confirmation_request();
 			}
@@ -96,9 +98,11 @@ namespace comment_mail // Root namespace.
 				$subject_template = new template('email/confirmation-request-subject.php');
 				$message_template = new template('email/confirmation-request-message.php');
 
-				$this->plugin->utils_mail->send($this->sub->email, // To subscriber.
-				                                $subject_template->parse($template_vars),
-				                                $message_template->parse($template_vars));
+				$this->plugin->utils_mail->send(
+					$this->sub->email, // To subscriber.
+					$subject_template->parse($template_vars),
+					$message_template->parse($template_vars)
+				);
 			}
 
 			/**
@@ -110,15 +114,22 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_auto_confirm()
 			{
+				if(!$this->sub)
+					return FALSE; // Not possible.
+
 				if($this->auto_confirm === FALSE)
 					return FALSE; // Nope.
 
 				if($this->auto_confirm) // Auto-confirm?
 				{
-					$this->plugin->utils_sub->confirm($this->sub->ID, $this->process_events);
+					$this->plugin->utils_sub->confirm($this->sub->ID, array(
+						'process_events' => $this->process_events
+					)); // With behavioral args.
 
 					return TRUE; // Confirmed automatically.
 				}
+				// Else use default `NULL` behavior; i.e. check if they've already confirmed another.
+
 				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->sub->post_id)."'".
@@ -128,11 +139,15 @@ namespace comment_mail // Root namespace.
 					         "       OR `email` = '".esc_sql($this->sub->email)."')"
 					       : " AND `email` = '".esc_sql($this->sub->email)."'").
 
-				       " AND `status` = 'subscribed' LIMIT 1";
+				       " AND `status` = 'subscribed'".
+
+				       " LIMIT 1"; // One to check.
 
 				if((integer)$this->plugin->utils_db->wp->get_var($sql))
 				{
-					$this->plugin->utils_sub->confirm($this->sub->ID, $this->process_events);
+					$this->plugin->utils_sub->confirm($this->sub->ID, array(
+						'process_events' => $this->process_events
+					)); // With behavioral args.
 
 					return TRUE; // Confirmed automatically.
 				}

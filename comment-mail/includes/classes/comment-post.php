@@ -58,6 +58,7 @@ namespace comment_mail // Root namespace.
 
 				$this->maybe_inject_sub();
 				$this->maybe_inject_queue();
+				$this->maybe_immediately_process_queue();
 				$this->maybe_set_sub_current_email();
 			}
 
@@ -77,15 +78,19 @@ namespace comment_mail // Root namespace.
 				if(empty($_POST[__NAMESPACE__.'_sub_deliver']))
 					return; // Not applicable.
 
-				$type = (string)$_POST[__NAMESPACE__.'_sub_type'];
-				if(!($type = $this->plugin->utils_string->trim_strip_deep($type)))
+				$sub_type = (string)$_POST[__NAMESPACE__.'_sub_type'];
+				if(!($sub_type = $this->plugin->utils_string->trim_strip($sub_type)))
 					return; // Not applicable.
 
-				$deliver = (string)$_POST[__NAMESPACE__.'_sub_deliver'];
-				if(!($deliver = $this->plugin->utils_string->trim_strip_deep($deliver)))
+				$sub_deliver = (string)$_POST[__NAMESPACE__.'_sub_deliver'];
+				if(!($sub_deliver = $this->plugin->utils_string->trim_strip($sub_deliver)))
 					return; // Not applicable.
 
-				new sub_injector(wp_get_current_user(), $this->comment_id, compact('type', 'deliver'));
+				new sub_injector(wp_get_current_user(), $this->comment_id, array(
+					'type'           => $sub_type,
+					'deliver'        => $sub_deliver,
+					'user_initiated' => TRUE,
+				));
 			}
 
 			/**
@@ -102,8 +107,6 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				new queue_injector($this->comment_id);
-
-				$this->maybe_immediately_process_queue();
 			}
 
 			/**
@@ -113,6 +116,12 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_immediately_process_queue()
 			{
+				if(!$this->comment_id)
+					return; // Not applicable.
+
+				if($this->comment_status !== 'approve')
+					return; // Not applicable.
+
 				if(($immediate_max_time = (integer)$this->plugin->options['queue_processor_immediate_max_time']) <= 0)
 					return; // Immediate queue processing is not enabled right now.
 

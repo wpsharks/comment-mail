@@ -35,6 +35,13 @@ namespace comment_mail // Root namespace.
 			protected $data_file;
 
 			/**
+			 * @var boolean Process confirmations?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $process_confirmations;
+
+			/**
 			 * @var integer SQL max limit.
 			 *
 			 * @since 14xxxx First documented version.
@@ -70,9 +77,10 @@ namespace comment_mail // Root namespace.
 				parent::__construct();
 
 				$default_request_args = array(
-					'data'      => '',
-					'data_file' => '',
-					'max_limit' => 500,
+					'data'                  => '',
+					'data_file'             => '',
+					'process_confirmations' => FALSE,
+					'max_limit'             => 500,
 				);
 				$request_args         = array_merge($default_request_args, $request_args);
 				$request_args         = array_intersect_key($request_args, $default_request_args);
@@ -82,9 +90,9 @@ namespace comment_mail // Root namespace.
 
 				if($this->data_file) // Run security flag checks on the path.
 					$this->plugin->utils_fs->check_path_security($this->data_file, TRUE);
+				if($this->data_file) $this->data = ''; // Favor file over raw data.
 
-				if($this->data_file && is_file($this->data_file) && is_readable($this->data_file))
-					$this->data = ''; // Favor the data file over raw data.
+				$this->process_confirmations = (boolean)$request_args['process_confirmations'];
 
 				$this->max_limit = (integer)$request_args['max_limit'];
 
@@ -160,8 +168,14 @@ namespace comment_mail // Root namespace.
 					$_import['insertion_time']   = $this->csv_line_column_value_for('insertion_time', $csv_headers, $_csv_line);
 					$_import['last_update_time'] = $this->csv_line_column_value_for('last_update_time', $csv_headers, $_csv_line);
 
-					$_sub_inserter = new sub_inserter(NULL, $_import); // Insert; or update existing ID.
-					if($_sub_inserter->has_errors()) // If the inserter has errors for this line; report those.
+					$_sub_inserter = new sub_inserter($_import, array(
+						'process_confirmation' => $this->process_confirmations,
+					)); // Insert; or perhaps update existing subscription.
+
+					if($_sub_inserter->did_insert_update()) // Have insert|update success?
+						$this->total_imported_subs++; // Increment counter; this was a success.
+
+					else if($_sub_inserter->has_errors()) // If the inserter has errors for this line; report those.
 					{
 						$_sub_inserter_errors       = array_values($_sub_inserter->errors()); // Values only; discard keys.
 						$_sub_inserter_error_prefix = sprintf(__('<em>Line #%1$s:</em>', $this->plugin->text_domain), esc_html($current_csv_line_number));
@@ -170,8 +184,6 @@ namespace comment_mail // Root namespace.
 							$_sub_inserter_error = $_sub_inserter_error_prefix.' '.$_sub_inserter_error;
 						$this->errors = array_merge($this->errors, $_sub_inserter_errors);
 					}
-					else $this->total_imported_subs++; // Increment counter; this was a success.
-
 					unset($_sub_inserter, $_sub_inserter_errors, // Housekeeping.
 						$_sub_inserter_error, $_sub_inserter_error_prefix);
 
@@ -181,7 +193,27 @@ namespace comment_mail // Root namespace.
 				unset($_csv_line, $_import); // Housekeeping.
 				fclose($csv_resource_file); // Close resource file.
 
-				$this->enqueue_notices_and_redirect(); // Issue notice and redirect user.
+				$this->enqueue_notices_and_redirect(); // Issue notices and redirect user.
+			}
+
+			/**
+			 * Line column value for a particular CSV column.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $csv_column The CSV column value to acquire.
+			 * @param array  $csv_headers An array of CSV headers.
+			 * @param array  $csv_line Current CSV line data.
+			 *
+			 * @return string|null The CSV line column value; else `NULL` by default.
+			 */
+			protected function csv_line_column_value_for($csv_column, array $csv_headers, array $csv_line)
+			{
+				$key = array_search($csv_column, $csv_headers);
+
+				return $key !== FALSE && isset($csv_line[$key])
+				       && is_string($csv_line[$key]) && isset($csv_line[$key][0])
+					? (string)$csv_line[$key] : NULL;
 			}
 
 			/**
@@ -207,24 +239,6 @@ namespace comment_mail // Root namespace.
 					$this->plugin->enqueue_user_error($error_markup, array('transient' => TRUE, 'for_page' => $this->plugin->utils_env->current_menu_page()));
 
 				wp_redirect($this->plugin->utils_url->current_page_only()).exit();
-			}
-
-			/**
-			 * Line column value for a particular CSV column.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string $csv_column The CSV column value to acquire.
-			 * @param array  $csv_headers An array of CSV headers.
-			 * @param array  $csv_line Current CSV line data.
-			 *
-			 * @return string|null The CSV line column value; else `NULL` by default.
-			 */
-			protected function csv_line_column_value_for($csv_column, array $csv_headers, array $csv_line)
-			{
-				$key = array_search($csv_column, $csv_headers);
-
-				return $key !== FALSE && isset($csv_line[$key]) ? (string)$csv_line[$key] : NULL;
 			}
 
 			/**

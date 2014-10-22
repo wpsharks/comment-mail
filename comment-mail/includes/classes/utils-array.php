@@ -31,58 +31,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Shuffles an array (preserving keys).
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param array $array An input array to shuffle.
-			 *
-			 * @return array A shuffled output array, keys preserved.
-			 */
-			public function shuffle(array $array)
-			{
-				if(!$array) // Nothing to do.
-					return $array;
-
-				$_shuffled = array();
-				$_keys     = array_keys($array);
-				shuffle($_keys); // Keys only.
-
-				foreach($_keys as $_key)
-					$_shuffled[$_key] = $array[$_key];
-
-				$array = $_shuffled; // Overwrite existing.
-				unset($_shuffled, $_keys, $_key); // Housekeeping.
-
-				return $array; // Shuffled.
-			}
-
-			/**
-			 * Shuffles an array (deeply; preserving keys).
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param array $array An input array to shuffle.
-			 *
-			 * @return array A shuffled output array (deep), keys preserved.
-			 */
-			public function shuffle_deep(array $array)
-			{
-				if(!$array) // Nothing to do.
-					return $array;
-
-				$array = $this->shuffle($array);
-
-				foreach($array as $_key => &$_value)
-					if(is_array($_value)) // Recursion.
-						$_value = $this->shuffle($_value);
-				unset($_key, $_value); // Housekeeping.
-
-				return $array; // Shuffled deep.
-			}
-
-			/**
-			 * Unique values (deeply; preserving keys).
+			 * Unique values deeply (preserving keys).
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -93,6 +42,8 @@ namespace comment_mail // Root namespace.
 			 * @note Resource pointers CANNOT be serialized, and will therefore be lost (i.e. corrupted)
 			 *    when/if they're nested deeply inside the input array. Resources NOT nested deeply, DO remain intact (this is fine).
 			 *    Only resource pointers nested deeply are lost via `serialize()`.
+			 *
+			 * @see \array_unique()
 			 */
 			public function unique_deep(array $array)
 			{
@@ -123,16 +74,125 @@ namespace comment_mail // Root namespace.
 			 * @param string|integer New array key; string or integer.
 			 * @param mixed          $value New array value.
 			 *
-			 * @return integer Like {@link \array_unshift}, returns the new number of elements.
+			 * @return integer Like {@link \array_unshift()}, returns the new number of elements.
+			 *
+			 * @throws \exception If the input `$key` is not an integer|string.
+			 *
+			 * @see \array_unshift()
 			 */
-			public function unshift_assoc(&$array, $key, $value)
+			public function unshift_assoc(array &$array, $key, $value)
 			{
+				if(!is_integer($key) && !is_string($key))
+					throw new \exception(__('Invalid `$key` arg.', $this->plugin->text_domain));
+
 				unset($array[$key]); // Unset first.
+
 				$array       = array_reverse($array, TRUE);
 				$array[$key] = $value; // Add to the end here.
-				$array       = array_reverse($array, TRUE); // Flip again.
+				$array       = array_reverse($array, TRUE);
 
 				return count($array); // New number of elements.
+			}
+
+			/**
+			 * Shuffles an array (preserving keys).
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $array An input array; by reference.
+			 *
+			 * @return boolean Like {@link \shuffle()}, this returns `TRUE`.
+			 *
+			 * @see \shuffle()
+			 */
+			public function shuffle_assoc(array &$array)
+			{
+				if(!$array) // Nothing to do.
+					return TRUE;
+
+				$_shuffled = array();
+				$_keys     = array_keys($array);
+				shuffle($_keys); // Keys only.
+
+				foreach($_keys as $_key)
+					$_shuffled[$_key] = $array[$_key];
+
+				$array = $_shuffled; // Overwrite existing.
+				unset($_shuffled, $_keys, $_key); // Housekeeping.
+
+				return TRUE; // Always returns `TRUE`.
+			}
+
+			/**
+			 * Shuffles an array deeply (preserving keys).
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $array An input array; by reference.
+			 *
+			 * @return boolean Like {@link \shuffle()}, this returns `TRUE`.
+			 *
+			 * @see \shuffle()
+			 * @see shuffle_assoc()
+			 */
+			public function shuffle_assoc_deep(array &$array)
+			{
+				if(!$array) // Nothing to do.
+					return TRUE;
+
+				$this->shuffle_assoc($array);
+
+				foreach($array as $_key => &$_value)
+					if(is_array($_value)) // Recursion.
+						$this->shuffle_assoc_deep($_value);
+				unset($_key, $_value); // Housekeeping.
+
+				return TRUE; // Always returns `TRUE`.
+			}
+
+			/**
+			 * Removes `NULL` key/values.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $array An input array to work from.
+			 *
+			 * @return array Keys preserved; `NULL` key/values removed though.
+			 */
+			public function remove_nulls(array $array)
+			{
+				if(!$array) // Nothing to do.
+					return $array;
+
+				foreach($array as $_key => &$_value)
+					if(is_null($_value)) unset($array[$_key]);
+				unset($_key, $_value); // Housekeeping.
+
+				return $array; // No `NULL` values.
+			}
+
+			/**
+			 * Removes `NULL` key/values deeply.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $array An input array to work from.
+			 *
+			 * @return array Keys preserved; `NULL` key/values removed though.
+			 */
+			public function remove_nulls_deep(array $array)
+			{
+				if(!$array) // Nothing to do.
+					return $array;
+
+				$array = $this->remove_nulls($array);
+
+				foreach($array as $_key => &$_value)
+					if(is_array($_value)) // Recursion.
+						$_value = $this->remove_nulls_deep($_value);
+				unset($_key, $_value); // Housekeeping.
+
+				return $array; // `NULL` values removed deeply.
 			}
 		}
 	}

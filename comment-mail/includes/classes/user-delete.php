@@ -39,7 +39,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $switched_blog = FALSE;
+			protected $switched_blog;
 
 			/**
 			 * Class constructor.
@@ -53,18 +53,19 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
-				$this->user_id = (integer)$user_id;
-				$this->blog_id = (integer)$blog_id;
+				$this->switched_blog = FALSE;
+				$this->user_id       = (integer)$user_id;
+				$this->blog_id       = (integer)$blog_id;
 
-				$this->maybe_delete();
+				$this->maybe_purge_subs();
 			}
 
 			/**
-			 * Deletes subscriptions.
+			 * Purges subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function maybe_delete()
+			protected function maybe_purge_subs()
 			{
 				if(!$this->user_id)
 					return; // Nothing to do.
@@ -74,7 +75,7 @@ namespace comment_mail // Root namespace.
 					switch_to_blog($this->blog_id);
 					$this->switched_blog = TRUE;
 				}
-				new sub_deleter(0, 0, $this->user_id);
+				new sub_purger(0, 0, $this->user_id);
 
 				if($this->blog_id && $this->switched_blog)
 				{

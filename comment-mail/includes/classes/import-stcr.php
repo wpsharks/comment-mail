@@ -187,19 +187,25 @@ namespace comment_mail // Root namespace.
 				{
 					foreach($comment_ids as $_comment_id) // Comment subscriptions.
 					{
-						new sub_injector(NULL, $_comment_id, // With behavioral args too.
-						                 array('type' => 'comment', 'deliver' => 'asap', 'auto_confirm' => TRUE));
+						new sub_injector(NULL, $_comment_id, array(
+							'type'         => 'comment',
+							'deliver'      => 'asap',
+							'auto_confirm' => TRUE,
+						)); // With behavioral args.
 
-						$this->total_imported_subs++; // Increment counter.
+						$this->total_imported_subs++;
 					}
 					unset($_comment_id); // A little housekeeping.
 				}
 				else // Subscribe them to all comments on this post ID.
 				{
-					new sub_injector(NULL, $comment_ids[0], // With behavioral args too.
-					                 array('type' => 'comments', 'deliver' => 'asap', 'auto_confirm' => TRUE));
+					new sub_injector(NULL, $comment_ids[0], array(
+						'type'         => 'comments',
+						'deliver'      => 'asap',
+						'auto_confirm' => TRUE,
+					)); // With behavioral args.
 
-					$this->total_imported_subs++; // Increment counter.
+					$this->total_imported_subs++;
 				}
 			}
 
@@ -301,8 +307,8 @@ namespace comment_mail // Root namespace.
 
 				       " ORDER BY `comment_date` ASC"; // Oldest to newest.
 
-				if(($get_col_results = $this->plugin->utils_db->wp->get_col($sql)))
-					$comment_ids = array_map('intval', $get_col_results);
+				if(($comment_ids = $this->plugin->utils_db->wp->get_col($sql)))
+					$comment_ids = array_map('intval', $comment_ids);
 
 				return $comment_ids; // All of their comment IDs.
 			}

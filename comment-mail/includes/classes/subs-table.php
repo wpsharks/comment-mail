@@ -209,6 +209,9 @@ namespace comment_mail // Root namespace.
 				if($item->status === 'suspended') unset($row_actions['suspend'], $row_actions['unconfirm']);
 				if($item->status === 'trashed') unset($row_actions['trashed']);
 
+				if($this->plugin->options['auto_confirm_enable'])
+					unset($row_actions['reconfirm']); // N/A.
+
 				return $email_info.$this->row_actions($row_actions);
 			}
 

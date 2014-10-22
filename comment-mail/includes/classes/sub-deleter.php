@@ -21,28 +21,70 @@ namespace comment_mail // Root namespace.
 		class sub_deleter extends abstract_base
 		{
 			/**
-			 * @var integer Post ID.
+			 * @var \stdClass|null Subscriber.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $post_id;
+			protected $sub; // Subscriber.
 
 			/**
-			 * @var integer Comment ID.
+			 * @var string Status before deletion.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $comment_id;
+			protected $status_before;
 
 			/**
-			 * @var integer User ID.
+			 * @var string Last IP.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $user_id;
+			protected $last_ip;
 
 			/**
-			 * @var integer Total deletions.
+			 * @var integer Overwritten by subscriber ID.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $oby_sub_id;
+
+			/**
+			 * @var boolean Purging?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $purging;
+
+			/**
+			 * @var boolean Cleaning?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $cleaning;
+
+			/**
+			 * @var boolean Process events?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $process_events;
+
+			/**
+			 * @var boolean User initiated?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $user_initiated;
+
+			/**
+			 * @var string Event type.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $event_type;
+
+			/**
+			 * @var boolean Deleted?
 			 *
 			 * @since 14xxxx First documented version.
 			 */
@@ -51,86 +93,113 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Class constructor.
 			 *
-			 * @param integer|string $post_id Post ID.
-			 *
-			 * @param integer|string $comment_id Comment ID.
-			 *
-			 * @param integer|string $user_id User ID.
+			 * @param integer $sub_id Subscriber ID.
+			 * @param array   $args Any additional behavior args.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			public function __construct($post_id, $comment_id = 0, $user_id = 0)
+			public function __construct($sub_id, array $args = array())
 			{
 				parent::__construct();
 
-				$this->post_id    = (integer)$post_id;
-				$this->comment_id = (integer)$comment_id;
-				$this->user_id    = (integer)$user_id;
-				$this->deleted    = 0; // Initialize.
+				$this->sub           = // Subscriber.
+					$this->plugin->utils_sub->get((integer)$sub_id);
+				$this->status_before = $this->sub ? $this->sub->status : '';
 
-				$this->maybe_delete(); // If applicable.
+				$defaults_args = array(
+					'last_ip'        => '',
+					'oby_sub_id'     => 0,
+					'purging'        => FALSE,
+					'cleaning'       => FALSE,
+					'process_events' => TRUE,
+					'user_initiated' => FALSE,
+				);
+				$args          = array_merge($defaults_args, $args);
+				$args          = array_intersect_key($args, $defaults_args);
+
+				$this->last_ip        = (string)$args['last_ip'];
+				$this->oby_sub_id     = (integer)$args['oby_sub_id'];
+				$this->purging        = (boolean)$args['purging'];
+				$this->cleaning       = (boolean)$args['cleaning'];
+				$this->process_events = (boolean)$args['process_events'];
+				$this->user_initiated = (boolean)$args['user_initiated'];
+
+				if($this->oby_sub_id)
+					$this->purging = $this->cleaning = FALSE;
+
+				if($this->purging)
+					$this->cleaning = FALSE;
+
+				if($this->cleaning)
+					$this->purging = FALSE;
+
+				if($this->purging || $this->cleaning)
+					$this->oby_sub_id = 0;
+
+				if($this->oby_sub_id)
+					$this->event_type = 'overwritten';
+
+				else if($this->purging)
+					$this->event_type = 'purged';
+
+				else if($this->cleaning)
+					$this->event_type = 'cleaned';
+
+				else $this->event_type = 'deleted';
+
+				$this->deleted = FALSE; // Initialize.
+
+				$this->maybe_delete();
 			}
 
 			/**
-			 * Deletes subscriptions.
+			 * Public access to deleted property.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			public function did_delete()
+			{
+				return $this->deleted;
+			}
+
+			/**
+			 * Deletes subscription.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
 			protected function maybe_delete()
 			{
-				$this->maybe_delete_post_comment();
-				$this->maybe_delete_user();
-			}
+				if(!$this->sub)
+					return; // Deleted already.
 
-			/**
-			 * Deletes subscriptions on post/comment deletions.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @throws \exception If a deletion failure occurs.
-			 */
-			protected function maybe_delete_post_comment()
-			{
-				if(!$this->post_id)
-					return; // Not applicable.
+				if($this->sub->status === 'deleted')
+					return; // Deleted already.
 
 				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
-				       " WHERE `post_id` = '".esc_sql($this->post_id)."'".
-				       ($this->comment_id ? " AND `comment_id` = '".esc_sql($this->comment_id)."'" : '');
+				       " WHERE `ID` = '".esc_sql($this->sub->ID)."'";
 
-				if(($deleted = $this->plugin->utils_db->wp->query($sql)) === FALSE)
+				if(($this->deleted = $this->plugin->utils_db->wp->query($sql)) === FALSE)
 					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
 
-				$this->deleted += (integer)$deleted;
-			}
+				if(!($this->deleted = (boolean)$this->deleted))
+					return; // Nothing more to do here.
 
-			/**
-			 * Deletes subscriptions on user deletions.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @throws \exception If a deletion failure occurs.
-			 */
-			protected function maybe_delete_user()
-			{
-				if(!$this->user_id)
-					return; // Not applicable.
+				$this->sub->status = 'deleted'; // Obj. properties.
+				if($this->last_ip) $this->sub->last_ip = $this->last_ip;
+				$this->sub->last_update_time = time();
 
-				$user = new \WP_User($this->user_id);
+				$this->plugin->utils_sub->nullify_cache(array($this->sub->ID, $this->sub->key));
 
-				if(!$user->exists() || !$user->ID)
-					return; // Not applicable.
-
-				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-
-				       " WHERE `user_id` = '".esc_sql($user->ID)."'".
-				       ($user->user_email ? " OR `email` = '".esc_sql($user->user_email)."'" : '');
-
-				if(($deleted = $this->plugin->utils_db->wp->query($sql)) === FALSE)
-					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
-
-				$this->deleted += (integer)$deleted;
+				if($this->process_events) // Processing events?
+				{
+					new sub_event_log_inserter(array_merge((array)$this->sub, array(
+						'event'          => $this->event_type,
+						'oby_sub_id'     => $this->oby_sub_id,
+						'status_before'  => $this->status_before,
+						'user_initiated' => $this->user_initiated,
+					))); // Log event data.
+				}
 			}
 		}
 	}

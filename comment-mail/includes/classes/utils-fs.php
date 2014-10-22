@@ -31,6 +31,23 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Adds tmp suffix to a directory|file `/path`.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $path Directory|file `/path`.
+			 *
+			 * @return string Suffixed directory|file `/path`.
+			 */
+			public function tmp_suffix($path)
+			{
+				$path = (string)$path; // Force string value.
+				$path = rtrim($path, DIRECTORY_SEPARATOR.'\\/');
+
+				return $path.'-'.str_replace('.', '', uniqid('', TRUE)).'-tmp';
+			}
+
+			/**
 			 * Normalizes `/path` separators.
 			 *
 			 * @since 14xxxx First documented version.
@@ -69,23 +86,6 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Adds tmp suffix to a directory|file `/path`.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string $path Directory|file `/path`.
-			 *
-			 * @return string Suffixed directory|file `/path`.
-			 */
-			public function tmp_suffix($path)
-			{
-				$path = (string)$path; // Force string value.
-				$path = rtrim($path, DIRECTORY_SEPARATOR.'\\/');
-
-				return $path.'-'.str_replace('.', '', uniqid('', TRUE)).'-tmp';
-			}
-
-			/**
 			 * Checks an uploaded file `/path`.
 			 *
 			 * @since 14xxxx First documented version.
@@ -110,7 +110,7 @@ namespace comment_mail // Root namespace.
 				if(strpos($path, '~') !== FALSE // A backup file?
 				   || strpos($path, './') !== FALSE || strpos($path, '..') !== FALSE
 				   || strpos($path, '/.') !== FALSE || stripos(basename($path), 'config') !== FALSE
-				) throw new \exception(sprintf(__('Security flag. Invalid file path: `%1$s`.', $this->plugin->text_domain), $path));
+				) throw new \exception(sprintf(__('Security flag. Dangerous file path: `%1$s`.', $this->plugin->text_domain), $path));
 			}
 		}
 	}

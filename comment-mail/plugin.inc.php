@@ -306,6 +306,8 @@ namespace comment_mail
 					'queue_processor_immediate_max_time'          => '10', // In seconds.
 					'queue_processor_immediate_max_limit'         => '5', // Total queue entries.
 
+					'sub_cleaner_max_time'                        => '60', // In seconds.
+
 					'unconfirmed_expiration_time'                 => '60 days', // `strtotime()` compatible.
 					// Or, this can be left empty to disable automatic expirations altogether.
 
@@ -776,7 +778,7 @@ namespace comment_mail
 			 *
 			 * @return array Revised array of links.
 			 */
-			public function add_settings_link($links)
+			public function add_settings_link(array $links)
 			{
 				$links[] = '<a href="'.esc_attr($this->utils_url->main_menu_page_only()).'">'.__('Settings', $this->text_domain).'</a><br/>';
 				$links[] = '<a href="'.esc_attr($this->utils_url->pro_preview($this->utils_url->main_menu_page_only())).'">'.__('Preview Pro Features', $this->text_domain).'</a>';
@@ -1032,7 +1034,7 @@ namespace comment_mail
 			 *
 			 * @param \WP_Post|null $post Post object instance.
 			 */
-			public function post_status($new_post_status, $old_post_status, $post)
+			public function post_status($new_post_status, $old_post_status, \WP_Post $post = NULL)
 			{
 				new post_status($new_post_status, $old_post_status, $post);
 			}
@@ -1128,7 +1130,7 @@ namespace comment_mail
 			 *
 			 * @param \stdClass|null $comment Comment object (now).
 			 */
-			public function comment_status($new_comment_status, $old_comment_status, $comment)
+			public function comment_status($new_comment_status, $old_comment_status, \stdClass $comment = NULL)
 			{
 				new comment_status($new_comment_status, $old_comment_status, $comment);
 			}
@@ -1183,7 +1185,7 @@ namespace comment_mail
 			 *
 			 * @return array Revised array of WP-Cron schedules.
 			 */
-			public function extend_cron_schedules($schedules)
+			public function extend_cron_schedules(array $schedules)
 			{
 				$schedules['every5m']  = array('interval' => 300, 'display' => __('Every 5 Minutes', $this->text_domain));
 				$schedules['every15m'] = array('interval' => 900, 'display' => __('Every 15 Minutes', $this->text_domain));

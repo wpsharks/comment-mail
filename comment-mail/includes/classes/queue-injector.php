@@ -56,13 +56,13 @@ namespace comment_mail // Root namespace.
 			protected function maybe_inject()
 			{
 				if(!$this->comment)
-					return; // Not applicable.
+					return; // Not possible.
 
-				if(!$this->comment->post_ID)
-					return; // Not applicable.
+				if(!$this->comment->comment_post_ID)
+					return; // Not possible.
 
 				if(!$this->comment->comment_ID)
-					return; // Not applicable.
+					return; // Not possible.
 
 				if(!($sub_ids = $this->sub_ids()))
 					return; // No subscribers.
@@ -93,7 +93,7 @@ namespace comment_mail // Root namespace.
 
 				$sql = "SELECT `ID`, `email` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
-				       " WHERE `post_id` = '".esc_sql($this->comment->post_ID)."'".
+				       " WHERE `post_id` = '".esc_sql($this->comment->comment_post_ID)."'".
 				       " AND (`comment_id` = '0' OR `comment_id` = '".esc_sql($this->comment->comment_parent)."')".
 				       " AND `status` = 'subscribed'";
 

@@ -40,7 +40,7 @@ namespace comment_mail // Root namespace.
 
 				$this->post = $post;
 
-				$this->maybe_display();
+				$this->display();
 			}
 
 			/**
@@ -48,16 +48,16 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function maybe_display()
+			protected function display()
 			{
 				$post_comment_status // Translate/standardize this.
 					= $this->plugin->utils_db->post_comment_status__($this->post->comment_status);
 
-				if($post_comment_status !== 'open' && !$this->post->comment_count)
-					return; // Not applicable.
-
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-area').'">'."\n";
 				echo '</div>';
+
+				if($post_comment_status !== 'open' && !$this->post->comment_count)
+					return; // For future implementation.
 			}
 		}
 	}

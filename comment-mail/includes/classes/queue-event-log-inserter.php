@@ -54,7 +54,10 @@ namespace comment_mail // Root namespace.
 					'email'             => '',
 					'ip'                => '',
 
+					'status'            => '',
+
 					'event'             => '',
+
 					'note_code'         => '',
 
 					'time'              => time(),

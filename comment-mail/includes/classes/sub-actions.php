@@ -60,9 +60,9 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function confirm($request_args)
 			{
-				$key        = '';
-				$sub        = NULL;
-				$error_code = '';
+				$key        = ''; // Initialize.
+				$sub        = NULL; // Initialize.
+				$error_code = ''; // Initialize.
 
 				if(!$error_code && !($key = trim((string)$request_args)))
 					$error_code = 'missing_key';
@@ -70,7 +70,8 @@ namespace comment_mail // Root namespace.
 				if(!$error_code && !($sub = $this->plugin->utils_sub->get($key)))
 					$error_code = 'invalid_key';
 
-				if(!$error_code && !($confirm = $this->plugin->utils_sub->confirm($sub->ID, TRUE, $this->plugin->utils_env->user_ip())))
+				$confirm_args = array('user_initiated' => TRUE); // Confirmation args.
+				if(!$error_code && !($confirm = $this->plugin->utils_sub->confirm($sub->ID, $confirm_args)))
 					$error_code = $confirm === NULL ? 'invalid_key' : 'already_confirmed';
 
 				$template_vars = compact('key', 'sub', 'error_code');
@@ -92,9 +93,9 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function unsubscribe($request_args)
 			{
-				$key        = '';
-				$sub        = NULL;
-				$error_code = '';
+				$key        = ''; // Initialize.
+				$sub        = NULL; // Initialize.
+				$error_code = ''; // Initialize.
 
 				if(!$error_code && !($key = trim((string)$request_args)))
 					$error_code = 'missing_key';
@@ -102,7 +103,8 @@ namespace comment_mail // Root namespace.
 				if(!$error_code && !($sub = $this->plugin->utils_sub->get($key)))
 					$error_code = 'invalid_key';
 
-				if(!$error_code && !($delete = $this->plugin->utils_sub->delete($sub->ID, TRUE, $this->plugin->utils_env->user_ip())))
+				$delete_args = array('user_initiated' => TRUE); // Deletion args.
+				if(!$error_code && !($delete = $this->plugin->utils_sub->delete($sub->ID, $delete_args)))
 					$error_code = $delete === NULL ? 'invalid_key' : 'already_unsubscribed';
 
 				$template_vars = compact('key', 'sub', 'error_code');
@@ -121,17 +123,15 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param mixed $request_args Input argument(s).
-			 *
-			 * @TODO review this for security issues w/ email address.
 			 */
 			protected function manage($request_args)
 			{
-				if(is_string($request_args) && ($email = trim($request_args)))
-					$this->plugin->utils_sub->set_current_email($email);
-				$email = $this->plugin->utils_sub->current_email();
+				if(is_string($request_args)) // String indicates an email address.
+					if(($email = $this->plugin->utils_sub->decrypt_email($request_args)))
+						$this->plugin->utils_sub->set_current_email($email);
 
 				if(!is_array($request_args)) // If NOT a sub action, redirect to one.
-					wp_redirect($this->plugin->utils_sub->manage_summary_url($email)).exit();
+					wp_redirect($this->plugin->utils_sub->manage_summary_url($this->plugin->utils_sub->current_email())).exit();
 
 				new sub_manage_actions(); // Handle sub. manage actions.
 			}

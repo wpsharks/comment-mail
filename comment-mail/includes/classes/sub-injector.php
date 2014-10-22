@@ -21,36 +21,21 @@ namespace comment_mail // Root namespace.
 		class sub_injector extends abstract_base
 		{
 			/**
-			 * @var \stdClass|null Comment object (now).
+			 * @var \WP_User|null Subscriber.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $user;
+
+			/**
+			 * @var \stdClass|null Comment.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
 			protected $comment;
 
 			/**
-			 * @var \WP_User|null Subscriber.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $user; // Subscriber.
-
-			/**
-			 * @var \WP_User|null Current user.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $current_user;
-
-			/**
-			 * @var boolean Subscriber is current user?
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $is_current_user;
-
-			/**
 			 * @var string Subscription type.
-			 *    ``, `comments`, `comment`.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
@@ -58,7 +43,6 @@ namespace comment_mail // Root namespace.
 
 			/**
 			 * @var string Subscription delivery option.
-			 *    `asap`, `hourly`, `daily`, `weekly`.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
@@ -79,18 +63,18 @@ namespace comment_mail // Root namespace.
 			protected $process_events;
 
 			/**
-			 * @var boolean Sub. already exists?
+			 * @var boolean User initiated?
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $sub_exists;
+			protected $user_initiated;
 
 			/**
-			 * @var integer Insertion ID.
+			 * @var sub_inserter|null Sub inserter.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $insert_id;
+			protected $sub_inserter;
 
 			/**
 			 * Class constructor.
@@ -101,219 +85,134 @@ namespace comment_mail // Root namespace.
 			 * @param integer|string $comment_id Comment ID.
 			 * @param array          $args Any additional behavioral args.
 			 */
-			public function __construct($user, $comment_id, array $args = array())
+			public function __construct(\WP_User $user = NULL, $comment_id = 0, array $args = array())
 			{
 				parent::__construct();
 
-				if($user instanceof \WP_User)
-					$this->user = $user;
+				$this->user = $user; // \WP_user|null.
 
-				if(($comment_id = (integer)$comment_id))
+				if(($comment_id = (integer)$comment_id) > 0)
 					$this->comment = get_comment($comment_id);
-
-				if(!isset($this->user) && !empty($this->comment->comment_author_email))
-					if(($_user = \WP_User::get_data_by('email', $this->comment->comment_author_email)))
-						$this->user = new \WP_User($_user->ID);
-				unset($_user); // Housekeeping.
-
-				$this->current_user = wp_get_current_user();
-
-				$this->is_current_user = FALSE; // Default value.
-				if($this->user && $this->user->ID === $this->current_user->ID)
-					$this->is_current_user = TRUE; // Even if `ID` is `0`.
 
 				$defaults_args = array(
 					'type'           => 'comment',
 					'deliver'        => 'asap',
 					'auto_confirm'   => NULL,
 					'process_events' => TRUE,
+					'user_initiated' => FALSE,
 				);
 				$args          = array_merge($defaults_args, $args);
 				$args          = array_intersect_key($args, $defaults_args);
 
-				$this->type = strtolower((string)$args['type']);
-				if(!in_array($this->type, array('comments', 'comment'), TRUE))
-					$this->type = ''; // Default type.
-
+				$this->type    = strtolower((string)$args['type']);
 				$this->deliver = strtolower((string)$args['deliver']);
-				if(!in_array($this->deliver, array('asap', 'hourly', 'daily', 'weekly'), TRUE))
-					$this->deliver = ''; // Default option.
 
-				$this->auto_confirm   = isset($args['auto_confirm']) ? (boolean)$args['auto_confirm'] : NULL;
+				if(isset($args['auto_confirm']))
+					$this->auto_confirm = (boolean)$args['auto_confirm'];
 				$this->process_events = (boolean)$args['process_events'];
-
-				$this->sub_exists = FALSE; // Initialize.
-				$this->insert_id  = 0; // Initialize.
+				$this->user_initiated = (boolean)$args['user_initiated'];
 
 				$this->maybe_inject();
 			}
 
 			/**
-			 * Injects a new subscriber, if not already in the system.
+			 * Inserted successfully?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean Did we insert?
+			 */
+			public function did_insert()
+			{
+				if(!$this->sub_inserter)
+					return FALSE;
+
+				return $this->sub_inserter->did_insert();
+			}
+
+			/**
+			 * Insertion ID.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return integer Insertion ID; if applicable.
+			 */
+			public function insert_id()
+			{
+				if(!$this->sub_inserter)
+					return 0;
+
+				return $this->sub_inserter->insert_id();
+			}
+
+			/**
+			 * Do we have errors?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean `TRUE` if has errors.
+			 */
+			public function has_errors()
+			{
+				if(!$this->sub_inserter)
+					return FALSE;
+
+				return $this->sub_inserter->has_errors();
+			}
+
+			/**
+			 * Array of any errors.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of any/all errors.
+			 */
+			public function errors()
+			{
+				if(!$this->sub_inserter)
+					return array();
+
+				return $this->sub_inserter->errors();
+			}
+
+			/**
+			 * Injects a new subscriber.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
 			protected function maybe_inject()
 			{
 				if(!$this->comment)
-					return; // Not applicable.
+					return; // Not possible.
+
+				if(!$this->comment->comment_post_ID)
+					return; // Not possible.
+
+				if(!$this->comment->comment_ID)
+					return; // Not possible.
+
+				if(!$this->comment->comment_author_email)
+					return; // Not possible.
 
 				if($this->comment->comment_type !== 'comment')
 					return; // Not applicable.
 
-				if(!$this->comment->post_ID || !$this->comment->comment_ID)
-					return; // Not applicable.
+				$data               = array(
+					'post_id'    => $this->comment->comment_post_ID,
+					'user_id'    => $this->user ? $this->user->ID : NULL,
+					'comment_id' => $this->type === 'comments' ? 0 : $this->comment->comment_ID,
+					'deliver'    => $this->deliver, // Delivery option.
 
-				if(!$this->comment->comment_author_email)
-					return; // Not applicable.
-
-				if(!$this->type || !$this->deliver)
-					return; // Not applicable.
-
-				if(($this->sub_exists = $this->check_existing()))
-					return; // Can't subscribe again.
-
-				$insertion_ip = $last_ip = $this->user_ip();
-
-				$data = array(
-					'key'              => $this->plugin->utils_enc->uunnci_key_20_max(),
-					'user_id'          => $this->user ? (integer)$this->user->ID : 0,
-					'post_id'          => (integer)$this->comment->post_ID,
-					'comment_id'       => $this->type === 'comments'
-						? 0 : (integer)$this->comment->comment_ID,
-					'deliver'          => $this->deliver,
-
-					'fname'            => $this->first_name(),
-					'lname'            => $this->last_name(),
-					'email'            => $this->comment->comment_author_email,
-					'insertion_ip'     => $insertion_ip,
-					'last_ip'          => $last_ip,
-
-					'status'           => 'unconfirmed',
-
-					'insertion_time'   => time(),
-					'last_update_time' => time(),
+					'fname'      => $this->first_name(),
+					'lname'      => $this->last_name(),
+					'email'      => $this->comment->comment_author_email,
 				);
-				if(!$this->plugin->utils_db->wp->replace($this->plugin->utils_db->prefix().'subs', $data))
-					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
-
-				if(!($sub_id = $this->insert_id = (integer)$this->plugin->utils_db->wp->insert_id))
-					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
-
-				if($this->process_events) // Process a `subscribed` event here?
-					new sub_event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
-				new sub_confirmer($sub_id, array('auto_confirm' => $this->auto_confirm, 'process_events' => $this->process_events));
-
-				$this->delete_others(); // Delete other subscriptions now.
-			}
-
-			/**
-			 * Check existing email/sub.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return boolean TRUE if a subscription already exists.
-			 */
-			protected function check_existing()
-			{
-				$existing_sub = $this->check_existing_sub();
-
-				if($existing_sub && $existing_sub->status === 'subscribed')
-					return TRUE; // Already exists.
-
-				if($existing_sub && $existing_sub->status !== 'subscribed')
-				{
-					$this->maybe_reconfirm($existing_sub);
-					return TRUE; // Already exists.
-				}
-				return FALSE; // Nope, does not exist yet.
-			}
-
-			/**
-			 * Check existing subscription(s).
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return \stdClass|null Existing sub; else NULL.
-			 */
-			protected function check_existing_sub()
-			{
-				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-
-				       " WHERE `post_id` = '".esc_sql($this->comment->post_ID)."'".
-				       " AND `comment_id` = '".esc_sql($this->type === 'comments' ? 0 : $this->comment->comment_ID)."'".
-				       " AND `deliver` = '".esc_sql($this->deliver)."'". // Delivery option.
-
-				       ($this->user && $this->user->ID // Has a user ID?
-					       ? " AND (`user_id` = '".esc_sql($this->user->ID)."'".
-					         "       OR `email` = '".esc_sql($this->comment->comment_author_email)."')"
-					       : " AND `email` = '".esc_sql($this->comment->comment_author_email)."'").
-
-				       " AND `status` != '".esc_sql('trashed')."'". // Not in the trash.
-
-				       " ORDER BY `insertion_time` ASC"; // For the loop below.
-
-				if(!($results = $this->plugin->utils_db->wp->get_results($sql)))
-					return NULL; // Nothing exists.
-
-				$last = $last_subscribed = NULL; // Initialize.
-
-				foreach($results as $_result) switch($_result->status)
-				{
-					case 'subscribed': // Subscribed?
-						$last = $last_subscribed = $_result;
-
-					default: // Default case handler.
-						$last = $_result;
-				}
-				unset($_result); // Just a little housekeeping.
-
-				return $last_subscribed // Subscribed?
-					? $this->plugin->utils_db->typify_deep($last_subscribed)
-					: $this->plugin->utils_db->typify_deep($last);
-			}
-
-			/**
-			 * Maybe resend confirmation email.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param \stdClass $existing_sub Existing sub.
-			 */
-			protected function maybe_reconfirm(\stdClass $existing_sub)
-			{
-				if($existing_sub->status === 'subscribed')
-					return; // Not applicable.
-
-				if($existing_sub->insertion_time >= strtotime('-15 minutes'))
-					return; // Recently subscribed; give em' time.
-
-				new sub_confirmer($existing_sub->ID, array('auto_confirm' => $this->auto_confirm, 'process_events' => $this->process_events));
-			}
-
-			/**
-			 * Delete other subscriptions.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @throws \exception If a deletion failure occurs.
-			 */
-			protected function delete_others()
-			{
-				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-
-				       " WHERE `post_id` = '".esc_sql($this->comment->post_ID)."'".
-				       " AND (`comment_id` = '0' OR `comment_id` = '".esc_sql($this->comment->comment_ID)."')".
-
-				       ($this->user && $this->user->ID // Has a user ID?
-					       ? " AND (`user_id` = '".esc_sql($this->user->ID)."'".
-					         "       OR `email` = '".esc_sql($this->comment->comment_author_email)."')"
-					       : " AND `email` = '".esc_sql($this->comment->comment_author_email)."'").
-
-				       " AND `ID` != '".esc_sql($this->insert_id)."'";
-
-				if($this->plugin->utils_db->wp->query($sql) === FALSE)
-					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
+				$this->sub_inserter = new sub_inserter($data, array(
+					'process_confirmation' => TRUE, // Always.
+					'auto_confirm'         => $this->auto_confirm,
+					'process_events'       => $this->process_events,
+					'user_initiated'       => $this->user_initiated,
+				));
 			}
 
 			/**
@@ -325,16 +224,13 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function first_name()
 			{
-				$name  = $this->clean_name();
-				$fname = $name; // Full name.
+				$fname = $name =  // Start with a clean full name.
+					$this->plugin->utils_string->clean_name($this->comment->comment_author);
 
 				if(strpos($name, ' ', 1) !== FALSE)
 					list($fname,) = explode(' ', $name, 2);
 
 				$fname = trim($fname); // Cleanup first name.
-
-				if(!$fname) // Fallback on the email address.
-					$fname = strstr($this->comment->comment_author_email, '@', TRUE);
 
 				return $fname; // First name.
 			}
@@ -348,8 +244,9 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function last_name()
 			{
-				$name  = $this->clean_name();
-				$lname = ''; // Empty string.
+				$lname = ''; // Empty string; initialize.
+				$name  // Last part of full name might be useable.
+				       = $this->plugin->utils_string->clean_name($this->comment->comment_author);
 
 				if(strpos($name, ' ', 1) !== FALSE)
 					list(, $lname) = explode(' ', $name, 2);
@@ -357,33 +254,6 @@ namespace comment_mail // Root namespace.
 				$lname = trim($lname); // Cleanup last name.
 
 				return $lname; // Last name.
-			}
-
-			/**
-			 * Commenters clean name.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return string Commenters clean name; else empty string.
-			 */
-			protected function clean_name()
-			{
-				return $this->plugin->utils_string->clean_name($this->comment->comment_author);
-			}
-
-			/**
-			 * Commenters IP address.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return string Commenters IP address; else empty string.
-			 */
-			protected function user_ip()
-			{
-				if($this->user && $this->is_current_user)
-					return $this->plugin->utils_env->user_ip();
-
-				return ''; // Not current user.
 			}
 		}
 	}

@@ -519,6 +519,40 @@ namespace comment_mail // Root namespace.
 
 				return $string; // Mid-clipped.
 			}
+
+			/**
+			 * Is a string in HTML format?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $string Any input string to test here.
+			 *
+			 * @return boolean TRUE if string is HTML.
+			 */
+			public function is_html($string)
+			{
+				if(!$string || !is_string($string))
+					return FALSE; // Not possible.
+
+				return strpos($string, '<') !== FALSE && preg_match('/\<[^<>]+\>/', $string);
+			}
+
+			/**
+			 * Convert plain text to HTML markup.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $string Input string to convert.
+			 *
+			 * @return string Plain text converted to HTML markup.
+			 */
+			public function to_html($string)
+			{
+				if(!($string = trim((string)$string)))
+					return $string; // Not possible.
+
+				return nl2br(make_clickable(esc_html($string)));
+			}
 		}
 	}
 }

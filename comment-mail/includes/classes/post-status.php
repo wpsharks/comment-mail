@@ -114,30 +114,33 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param \WP_Post|null $post Post object (now).
 			 */
-			public function __construct($new_post_status, $old_post_status, $post)
+			public function __construct($new_post_status, $old_post_status, \WP_Post $post = NULL)
 			{
 				parent::__construct();
 
-				$this->post            = is_object($post) ? $post : NULL;
+				$this->post            = $post; // \WP_Post|null.
 				$this->new_post_status = (string)$new_post_status;
 				$this->old_post_status = (string)$old_post_status;
 
-				$this->maybe_sub_auto_insert();
+				$this->maybe_sub_auto_inject();
 			}
 
 			/**
-			 * Auto subscribe post author and/or recipients.
+			 * Auto inject post author and/or recipients.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function maybe_sub_auto_insert()
+			protected function maybe_sub_auto_inject()
 			{
 				if(!$this->post)
-					return; // Nothing to do.
+					return; // Not possible.
+
+				if(!$this->plugin->options['auto_subscribe_enable'])
+					return; // Not applicable.
 
 				if($this->new_post_status === 'publish' && $this->old_post_status !== 'publish')
 					if($this->old_post_status !== 'trash') // Ignore restorations.
-						new sub_auto_inserter($this->post->ID);
+						new sub_auto_injector($this->post->ID);
 			}
 		}
 	}

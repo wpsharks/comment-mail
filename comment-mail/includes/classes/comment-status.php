@@ -21,7 +21,7 @@ namespace comment_mail // Root namespace.
 		class comment_status extends abstract_base
 		{
 			/**
-			 * @var \stdClass|null Comment object (now).
+			 * @var \stdClass|null Comment.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
@@ -64,16 +64,16 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param \stdClass|null $comment Comment object (now).
 			 */
-			public function __construct($new_comment_status, $old_comment_status, $comment)
+			public function __construct($new_comment_status, $old_comment_status, \stdClass $comment = NULL)
 			{
 				parent::__construct();
 
-				$this->comment            = is_object($comment) ? $comment : NULL;
+				$this->comment            = $comment; // \stdClass|null.
 				$this->new_comment_status = $this->plugin->utils_db->comment_status__($new_comment_status);
 				$this->old_comment_status = $this->plugin->utils_db->comment_status__($old_comment_status);
 
 				$this->maybe_inject_queue();
-				$this->maybe_delete_subs();
+				$this->maybe_purge_subs();
 			}
 
 			/**
@@ -91,17 +91,17 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Delete subscriptions.
+			 * Purges subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function maybe_delete_subs()
+			protected function maybe_purge_subs()
 			{
 				if(!isset($this->comment))
 					return; // Not applicable.
 
 				if($this->new_comment_status === 'delete' && $this->old_comment_status !== 'delete')
-					new sub_deleter($this->comment->post_ID, $this->comment->comment_ID);
+					new sub_purger($this->comment->comment_post_ID, $this->comment->comment_ID);
 			}
 		}
 	}
