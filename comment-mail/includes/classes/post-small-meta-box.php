@@ -40,7 +40,7 @@ namespace comment_mail // Root namespace.
 
 				$this->post = $post;
 
-				$this->maybe_display();
+				$this->display();
 			}
 
 			/**
@@ -48,13 +48,10 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function maybe_display()
+			protected function display()
 			{
 				$post_comment_status // Translate/standardize this.
 					= $this->plugin->utils_db->post_comment_status__($this->post->comment_status);
-
-				if($post_comment_status !== 'open' && !$this->post->comment_count)
-					return; // Not applicable.
 
 				$total_subs        = $this->plugin->utils_sub->query_total($this->post->ID);
 				$total_subs_bubble = $this->plugin->utils_markup->subscriber_count($this->post->ID, $total_subs);
@@ -63,6 +60,9 @@ namespace comment_mail // Root namespace.
 				     '   <h4 style="margin-bottom:5px;">'.$total_subs_bubble.__('Most Recent Subscribers:', $this->plugin->text_domain).'</h4>'.
 				     '   '.$this->plugin->utils_markup->last_x_subs(5, $this->post->ID).
 				     '</div>';
+
+				if($post_comment_status !== 'open' && !$this->post->comment_count)
+					return; // For future implementation.
 			}
 		}
 	}

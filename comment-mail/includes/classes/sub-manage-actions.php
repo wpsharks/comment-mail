@@ -45,9 +45,10 @@ namespace comment_mail // Root namespace.
 				if(empty($_REQUEST[__NAMESPACE__]['manage']))
 					return; // Not applicable.
 
-				foreach((array)$_REQUEST[__NAMESPACE__]['manage'] as $action => $args)
-					if($action && is_string($action) && method_exists($this, $action))
-						$this->{$action}($this->plugin->utils_string->trim_strip_deep($args));
+				foreach((array)$_REQUEST[__NAMESPACE__]['manage'] as $_action => $_request_args)
+					if($_action && is_string($_action) && method_exists($this, $_action))
+						$this->{$_action}($this->plugin->utils_string->trim_strip_deep($_request_args));
+				unset($_action, $_request_args); // Housekeeping.
 			}
 
 			/**
@@ -55,14 +56,16 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param mixed $args Input argument(s).
+			 * @param mixed $request_args Input argument(s).
 			 */
-			protected function summary($args)
+			protected function summary($request_args)
 			{
-				$error_code = '';
+				$error_code = ''; // Initialize.
 
-				if(($email = trim((string)$args)))
-					$this->plugin->utils_sub->set_current_email($email);
+				if(is_string($request_args)) // String indicates an email address.
+					if(($email = $this->plugin->utils_sub->decrypt_email($request_args)))
+						$this->plugin->utils_sub->set_current_email($email);
+
 				$email = $this->plugin->utils_sub->current_email();
 
 				if(!$error_code && !$email)

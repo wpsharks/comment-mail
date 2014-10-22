@@ -130,7 +130,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function current_page_only()
 			{
-				$page = !empty($_REQUEST['page']) ? stripslashes((string)$_REQUEST['page']) : '';
+				$page = !empty($_REQUEST['page'])
+					? stripslashes((string)$_REQUEST['page']) : '';
 				$args = $page ? array('page' => $page) : array(); // If applicable.
 
 				return add_query_arg(urlencode_deep($args), $this->current_no_query());
@@ -383,40 +384,6 @@ namespace comment_mail // Root namespace.
 			 * @return string The input `$url` with a notice dismissal flag removed.
 			 */
 			public function notice_dismissed($url = '')
-			{
-				return remove_query_arg(__NAMESPACE__, $url ? (string)$url : $this->current());
-			}
-
-			/**
-			 * Error dimissal URL, for current URL w/ `_wpnonce`.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string $key The notice key to dismiss.
-			 *
-			 * @param string $nonce_action A specific nonce action.
-			 *    Defaults to `__NAMESPACE__`.
-			 *
-			 * @return string Error dimissal URL, for current URL w/ `_wpnonce`.
-			 */
-			public function dismiss_error($key, $nonce_action = __NAMESPACE__)
-			{
-				$args = array(__NAMESPACE__ => array('dismiss_error' => array('key' => (string)$key)));
-
-				return add_query_arg(urlencode_deep($args), $this->current_nonce($nonce_action));
-			}
-
-			/**
-			 * Removes error dismissal flag from a given URL.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string $url The input URL to unflag (optional).
-			 *    If empty, defaults to the current menu page.
-			 *
-			 * @return string The input `$url` with an error dismissal flag removed.
-			 */
-			public function error_dismissed($url = '')
 			{
 				return remove_query_arg(__NAMESPACE__, $url ? (string)$url : $this->current());
 			}

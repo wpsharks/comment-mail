@@ -56,17 +56,18 @@ namespace comment_mail // Root namespace.
 				$this->comment_id     = (integer)$comment_id;
 				$this->comment_status = $this->plugin->utils_db->comment_status__($comment_status);
 
-				$this->maybe_insert_sub();
-				$this->maybe_insert_queue();
+				$this->maybe_inject_sub();
+				$this->maybe_inject_queue();
+				$this->maybe_immediately_process_queue();
 				$this->maybe_set_sub_current_email();
 			}
 
 			/**
-			 * Insert subscriber.
+			 * Inject subscriber.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function maybe_insert_sub()
+			protected function maybe_inject_sub()
 			{
 				if(!$this->comment_id)
 					return; // Not applicable.
@@ -78,22 +79,26 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				$sub_type = (string)$_POST[__NAMESPACE__.'_sub_type'];
-				if(!($sub_type = $this->plugin->utils_string->trim_strip_deep($sub_type)))
+				if(!($sub_type = $this->plugin->utils_string->trim_strip($sub_type)))
 					return; // Not applicable.
 
 				$sub_deliver = (string)$_POST[__NAMESPACE__.'_sub_deliver'];
-				if(!($sub_deliver = $this->plugin->utils_string->trim_strip_deep($sub_deliver)))
+				if(!($sub_deliver = $this->plugin->utils_string->trim_strip($sub_deliver)))
 					return; // Not applicable.
 
-				new sub_inserter(wp_get_current_user(), $this->comment_id, $sub_type, $sub_deliver);
+				new sub_injector(wp_get_current_user(), $this->comment_id, array(
+					'type'           => $sub_type,
+					'deliver'        => $sub_deliver,
+					'user_initiated' => TRUE,
+				));
 			}
 
 			/**
-			 * Insert/queue emails.
+			 * Inject/queue emails.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function maybe_insert_queue()
+			protected function maybe_inject_queue()
 			{
 				if(!$this->comment_id)
 					return; // Not applicable.
@@ -101,9 +106,7 @@ namespace comment_mail // Root namespace.
 				if($this->comment_status !== 'approve')
 					return; // Not applicable.
 
-				new queue_inserter($this->comment_id);
-
-				$this->maybe_immediately_process_queue();
+				new queue_injector($this->comment_id);
 			}
 
 			/**
@@ -113,6 +116,12 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_immediately_process_queue()
 			{
+				if(!$this->comment_id)
+					return; // Not applicable.
+
+				if($this->comment_status !== 'approve')
+					return; // Not applicable.
+
 				if(($immediate_max_time = (integer)$this->plugin->options['queue_processor_immediate_max_time']) <= 0)
 					return; // Immediate queue processing is not enabled right now.
 

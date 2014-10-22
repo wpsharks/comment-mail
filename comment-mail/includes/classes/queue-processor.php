@@ -189,8 +189,8 @@ namespace comment_mail // Root namespace.
 
 				// The following may not work, but we can try :-)
 				if($this->delay) // Allow some extra time for the delay?
-					@set_time_limit(ceil($this->max_time + ($this->delay / 1000) + 30));
-				else @set_time_limit($this->max_time + 30);
+					@set_time_limit(min(300, ceil($this->max_time + ($this->delay / 1000) + 30)));
+				else @set_time_limit(min(300, $this->max_time + 30));
 			}
 
 			/**
@@ -285,7 +285,7 @@ namespace comment_mail // Root namespace.
 					'dby_queue_id'      => $entry_props->dby_queue_id, // Digested?
 					'sub_id'            => $entry_props->sub ? $entry_props->sub->ID : $entry_props->entry->sub_id,
 					'user_id'           => $entry_props->sub ? $entry_props->sub->user_id : 0, // Default; no user.
-					'post_id'           => $entry_props->post ? $entry_props->post->ID : ($entry_props->comment ? $entry_props->comment->post_ID : ($entry_props->sub ? $entry_props->sub->post_id : 0)),
+					'post_id'           => $entry_props->post ? $entry_props->post->ID : ($entry_props->comment ? $entry_props->comment->comment_post_ID : ($entry_props->sub ? $entry_props->sub->post_id : 0)),
 					'comment_id'        => $entry_props->comment ? $entry_props->comment->comment_ID : $entry_props->entry->comment_id,
 					'comment_parent_id' => $entry_props->comment ? $entry_props->comment->comment_parent : $entry_props->entry->comment_parent_id,
 
@@ -293,6 +293,7 @@ namespace comment_mail // Root namespace.
 					'lname'             => $entry_props->sub ? $entry_props->sub->lname : '',
 					'email'             => $entry_props->sub ? $entry_props->sub->email : '',
 					'ip'                => $entry_props->sub ? $entry_props->sub->last_ip : '',
+					'status'            => $entry_props->sub ? $entry_props->sub->status : '',
 
 					'event'             => $entry_props->event,
 					'note_code'         => $entry_props->note_code
@@ -359,6 +360,7 @@ namespace comment_mail // Root namespace.
 			protected function delete_entry(\stdClass $entry)
 			{
 				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
+
 				       " WHERE `ID` = '".esc_sql($entry->ID)."'";
 
 				if($this->plugin->utils_db->wp->query($sql) === FALSE)
@@ -423,7 +425,7 @@ namespace comment_mail // Root namespace.
 				else if($this->plugin->utils_db->comment_status__($comment->comment_approved) !== 'approve') // No longer approved?
 					$invalidated_entry_props = $this->entry_props('invalidated', 'comment_status_not_approve', $entry, $sub, NULL, $comment);
 
-				else if(!($post = get_post($comment->post_ID))) // Post is missing? Perhaps deleted since the comment came in.
+				else if(!($post = get_post($comment->comment_post_ID))) // Post is missing? Perhaps deleted since the comment came in.
 					$invalidated_entry_props = $this->entry_props('invalidated', 'comment_post_id_missing', $entry, $sub, NULL, $comment);
 
 				else if(!$post->post_title) // An empty post title; i.e. we have nothing for a subject line?
@@ -448,20 +450,20 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string      $event Event type; `invalidated` or `notified`.
-			 * @param string      $note_code See {@link utils_event::queue_note_code()}.
+			 * @param string         $event Event type; `invalidated` or `notified`.
+			 * @param string         $note_code See {@link utils_event::queue_note_code()}.
 			 *
-			 * @param \stdClass   $entry Queue entry.
-			 * @param \stdClass   $sub Subscriber.
-			 * @param \WP_Post    $post Post.
-			 * @param \stdClass   $comment Comment.
+			 * @param \stdClass      $entry Queue entry.
+			 * @param \stdClass|null $sub Subscriber.
+			 * @param \WP_Post|null  $post Post.
+			 * @param \stdClass|null $comment Comment.
 			 *
-			 * @param \stdClass[] $props Digestable entry props.
-			 * @param \stdClass[] $comments Digestable comments.
+			 * @param \stdClass[]    $props Digestable entry props.
+			 * @param \stdClass[]    $comments Digestable comments.
 			 *
-			 * @param boolean     $held Held? Defaults to `FALSE`.
-			 * @param integer     $dby_queue_id Digested by queue ID.
-			 * @param boolean     $logged Logged? Defaults to `FALSE`.
+			 * @param boolean        $held Held? Defaults to `FALSE`.
+			 * @param integer        $dby_queue_id Digested by queue ID.
+			 * @param boolean        $logged Logged? Defaults to `FALSE`.
 			 *
 			 * @return object Object with properties.
 			 *

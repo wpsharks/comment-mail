@@ -82,7 +82,7 @@ namespace comment_mail // Root namespace.
 						break; // Break switch handler.
 
 					case 'comment_post_id_missing':
-						$note = __('Not possible; `$comment->post_ID` was missing. The post may have been deleted before processing began.', $this->plugin->text_domain);
+						$note = __('Not possible; `$comment->comment_post_ID` was missing. The post may have been deleted before processing began.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'post_title_empty':

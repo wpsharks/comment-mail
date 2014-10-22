@@ -21,11 +21,11 @@ namespace comment_mail // Root namespace.
 		class user_register extends abstract_base
 		{
 			/**
-			 * @var integer User ID.
+			 * @var \WP_User|null
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $user_id;
+			protected $user;
 
 			/**
 			 * Class constructor.
@@ -38,7 +38,8 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
-				$this->user_id = (integer)$user_id;
+				if(($user_id = (integer)$user_id))
+					$this->user = new \WP_User($user_id);
 
 				$this->maybe_update_subs();
 			}
@@ -52,29 +53,25 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_update_subs()
 			{
-				if(!$this->user_id)
-					return; // Nothing to do.
+				if(!$this->user)
+					return; // Not possible.
 
-				$user = new \WP_User($this->user_id);
+				if(!$this->user->ID)
+					return; // Not possible.
 
-				if(!$user->exists() || !$user->ID || !$user->user_email)
-					return; // Not applicable.
+				if(!$this->user->user_email)
+					return; // Not possible.
 
-				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-				       " WHERE `user_id` = '".esc_sql($user->ID)."'";
+				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
-				if($this->plugin->utils_db->wp->query($sql) === FALSE)
-					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
-				// The user ID should NOT exist; we just make absolutely sure in case of corruption.
+				       " WHERE `email` = '".esc_sql($this->user->user_email)."'".
+				       " AND `user_id` = '0'"; // Not yet associated w/ a user ID.
 
-				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-				       " SET `user_id` = '".esc_sql($user->ID)."'".
+				if(($sub_ids = $this->plugin->utils_db->wp->get_col($sql)))
+					foreach($sub_ids as $_sub_id) // Update the `user_id` on each of these.
+						new sub_updater(array('ID' => $_sub_id, 'user_id' => $this->user->ID));
+				unset($_sub_id); // Housekeeping.
 
-				       " WHERE `user_id` = '0'".
-				       " AND `email` = '".esc_sql($user->user_email)."'";
-
-				if($this->plugin->utils_db->wp->query($sql) === FALSE)
-					throw new \exception(__('Update failure.', $this->plugin->text_domain));
 			}
 		}
 	}

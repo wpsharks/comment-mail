@@ -25,6 +25,38 @@ Align w/ menu page.
 	Plugin-specific styles in ANY area of the dashboard.
 ------------------------------------------------------------------------------------------------------------ */
 /*
+A menu page area ~ notices.
+*/
+.comment-mail-menu-page-area .pmp-info,
+.comment-mail-menu-page-area .pmp-notice,
+.comment-mail-menu-page-area .pmp-warning,
+.comment-mail-menu-page-area .pmp-error
+{
+	border-radius : 5px;
+	font-size     : 120%;
+	padding       : 10px;
+}
+.comment-mail-menu-page-area .pmp-info
+{
+	background : #C9E0FA;
+	border     : 1px solid #35558A;
+}
+.comment-mail-menu-page-area .pmp-notice
+{
+	background : #FFFBCC;
+	border     : 1px solid #E6DB55;
+}
+.comment-mail-menu-page-area .pmp-warning
+{
+	background : #FADDAB;
+	border     : 1px solid #D29A04;
+}
+.comment-mail-menu-page-area .pmp-error
+{
+	background : #FABBC6;
+	border     : 1px solid #711E1E;
+}
+/*
 A menu page area ~ list items.
 */
 .comment-mail-menu-page-area ul.pmp-list-items,
@@ -339,30 +371,7 @@ Menu page styles.
 .comment-mail-menu-page .pmp-warning,
 .comment-mail-menu-page .pmp-error
 {
-	border-radius : 5px;
-	font-size     : 120%;
-	padding       : 10px;
-	margin        : 0 0 25px 0;
-}
-.comment-mail-menu-page .pmp-info
-{
-	background : #C9E0FA;
-	border     : 1px solid #35558A;
-}
-.comment-mail-menu-page .pmp-notice
-{
-	background : #FFFBCC;
-	border     : 1px solid #E6DB55;
-}
-.comment-mail-menu-page .pmp-warning
-{
-	background : #FADDAB;
-	border     : 1px solid #D29A04;
-}
-.comment-mail-menu-page .pmp-error
-{
-	background : #FABBC6;
-	border     : 1px solid #711E1E;
+	margin : 0 0 25px 0;
 }
 .comment-mail-menu-page .pmp-clearfix:before,
 .comment-mail-menu-page .pmp-clearfix:after

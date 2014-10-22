@@ -1,6 +1,6 @@
 <?php
 /**
- * Queue Inserter
+ * Queue Injector
  *
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
@@ -11,14 +11,14 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\queue_inserter'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\queue_injector'))
 	{
 		/**
-		 * Queue Inserter
+		 * Queue Injector
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class queue_inserter extends abstract_base
+		class queue_injector extends abstract_base
 		{
 			/**
 			 * @var \stdClass|null Comment object.
@@ -43,26 +43,26 @@ namespace comment_mail // Root namespace.
 				if($comment_id) // If possible.
 					$this->comment = get_comment($comment_id);
 
-				$this->maybe_insert();
+				$this->maybe_inject();
 			}
 
 			/**
-			 * Queue insertions.
+			 * Queue injections.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
 			 * @throws \exception If an insertion failure occurs.
 			 */
-			protected function maybe_insert()
+			protected function maybe_inject()
 			{
 				if(!$this->comment)
-					return; // Not applicable.
+					return; // Not possible.
 
-				if(!$this->comment->post_ID)
-					return; // Not applicable.
+				if(!$this->comment->comment_post_ID)
+					return; // Not possible.
 
 				if(!$this->comment->comment_ID)
-					return; // Not applicable.
+					return; // Not possible.
 
 				if(!($sub_ids = $this->sub_ids()))
 					return; // No subscribers.
@@ -93,7 +93,7 @@ namespace comment_mail // Root namespace.
 
 				$sql = "SELECT `ID`, `email` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
-				       " WHERE `post_id` = '".esc_sql($this->comment->post_ID)."'".
+				       " WHERE `post_id` = '".esc_sql($this->comment->comment_post_ID)."'".
 				       " AND (`comment_id` = '0' OR `comment_id` = '".esc_sql($this->comment->comment_parent)."')".
 				       " AND `status` = 'subscribed'";
 

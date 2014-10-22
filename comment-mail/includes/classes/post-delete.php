@@ -40,20 +40,20 @@ namespace comment_mail // Root namespace.
 
 				$this->post_id = (integer)$post_id;
 
-				$this->maybe_delete();
+				$this->maybe_purge_subs();
 			}
 
 			/**
-			 * Delete subscriptions.
+			 * Purges subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function maybe_delete()
+			protected function maybe_purge_subs()
 			{
 				if(!$this->post_id)
 					return; // Nothing to do.
 
-				new sub_deleter($this->post_id);
+				new sub_purger($this->post_id);
 			}
 		}
 	}

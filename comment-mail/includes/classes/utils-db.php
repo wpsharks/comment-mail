@@ -98,6 +98,9 @@ namespace comment_mail // Root namespace.
 
 				$key = strtolower($key);
 
+				if(in_array($key, array('user_initiated'), TRUE))
+					return TRUE;
+
 				if(in_array($key, array('id', 'time'), TRUE))
 					return TRUE;
 

@@ -41,20 +41,26 @@ namespace comment_mail // Root namespace.
 				parent::__construct();
 
 				$defaults = array(
-					'sub_id'     => 0,
-					'user_id'    => 0,
-					'post_id'    => 0,
-					'comment_id' => 0,
-					'deliver'    => '',
+					'sub_id'         => 0,
+					'oby_sub_id'     => 0,
 
-					'fname'      => '',
-					'lname'      => '',
-					'email'      => '',
-					'ip'         => '',
+					'user_id'        => 0,
+					'post_id'        => 0,
+					'comment_id'     => 0,
+					'deliver'        => '',
 
-					'event'      => '',
+					'fname'          => '',
+					'lname'          => '',
+					'email'          => '',
+					'ip'             => '',
 
-					'time'       => time(),
+					'status_before'  => '',
+					'status'         => '',
+
+					'event'          => '',
+					'user_initiated' => 0,
+
+					'time'           => time(),
 				);
 				if(empty($entry['sub_id']) && !empty($entry['ID']))
 					$entry['sub_id'] = $entry['ID'];
@@ -89,6 +95,9 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				if(!$this->entry['email'])
+					return; // Not applicable.
+
+				if(!$this->entry['status'])
 					return; // Not applicable.
 
 				if(!$this->entry['event'])

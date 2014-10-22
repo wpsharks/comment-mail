@@ -21,62 +21,67 @@ namespace comment_mail // Root namespace.
 		class sub_inserter extends abstract_base
 		{
 			/**
-			 * @var \stdClass|null Comment object (now).
+			 * @var array Based on request args.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $comment;
+			protected $data; // An array.
 
 			/**
-			 * @var \WP_User|null Subscribing user.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $user;
-
-			/**
-			 * @var \WP_User|null Current user.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $current_user;
-
-			/**
-			 * @var boolean Subscribing current user?
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $is_current_user;
-
-			/**
-			 * @var string Subscription type.
-			 *    ``, `comments`, `comment`.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $type;
-
-			/**
-			 * @var string Subscription delivery option.
-			 *    `asap`, `hourly`, `daily`, `weekly`.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $deliver;
-
-			/**
-			 * @var null|boolean Auto-confirm?
+			 * @var boolean Auto-confirm?
 			 *
 			 * @since 14xxxx First documented version.
 			 */
 			protected $auto_confirm;
 
 			/**
-			 * @var boolean Sub. already exists?
+			 * @var boolean Process events?
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $sub_exists;
+			protected $process_events;
+
+			/**
+			 * @var boolean Process confirmation?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $process_confirmation;
+
+			/**
+			 * @var boolean User initiated?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $user_initiated;
+
+			/**
+			 * @var boolean Interpret `0` as current user?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $current_user_0;
+
+			/**
+			 * @var boolean Did we validate?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $validated;
+
+			/**
+			 * @var boolean An insert?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $is_insert;
+
+			/**
+			 * @var boolean Did we insert?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $inserted;
 
 			/**
 			 * @var integer Insertion ID.
@@ -86,292 +91,828 @@ namespace comment_mail // Root namespace.
 			protected $insert_id;
 
 			/**
+			 * @var boolean An update?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $is_update;
+
+			/**
+			 * @var \stdClass|null Subscriber.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $sub; // On update only.
+
+			/**
+			 * @var string Status before update.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $status_before;
+
+			/**
+			 * @var boolean Did we update?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $updated;
+
+			/**
+			 * @var array An array of any duplicate key IDs.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $duplicate_key_ids;
+
+			/**
+			 * @var array An array of any other duplicate IDs.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $other_duplicate_ids;
+
+			/**
+			 * @var \WP_User|null Subscriber.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $user; // Subscriber.
+
+			/**
+			 * @var \WP_User|null Current user.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $current_user;
+
+			/**
+			 * @var boolean Subscriber is current user?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $is_current_user;
+
+			/**
+			 * @var array An array of any errors.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $errors;
+
+			/**
 			 * Class constructor.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param \WP_User|null  $user Subscribing user.
-			 *    Use `NULL` to indicate they are NOT a user.
+			 * @param array $request_args Arguments to the constructor.
+			 *    These should NOT be trusted; they come from a `$_REQUEST` action.
 			 *
-			 * @param integer|string $comment_id Comment ID.
-			 *
-			 * @param string         $type Type of subscription.
-			 *    Please pass one of: `comments`, `comment`.
-			 *
-			 * @param string         $deliver Delivery option. Defaults to `asap`.
-			 *    Please pass one of: `asap`, `hourly`, `daily`, `weekly`.
-			 *
-			 * @param null|boolean   $auto_confirm Auto-confirm subscriber?
-			 *    If `NULL`, use current plugin option value.
+			 * @param array $args Any additional behavioral args.
 			 */
-			public function __construct($user, $comment_id, $type = 'comment', $deliver = 'asap', $auto_confirm = NULL)
+			public function __construct(array $request_args, array $args = array())
 			{
 				parent::__construct();
 
-				if($user instanceof \WP_User)
-					$this->user = $user;
-
-				$this->current_user = wp_get_current_user();
-
-				$this->is_current_user = FALSE; // Default value.
-				if($this->user && $this->user->ID === $this->current_user->ID)
-					$this->is_current_user = TRUE; // Even if `ID` is `0`.
-
-				if(($comment_id = (integer)$comment_id))
-					$this->comment = get_comment($comment_id);
-
-				$this->type = strtolower((string)$type);
-				if(!in_array($this->type, array('comments', 'comment'), TRUE))
-					$this->type = ''; // Default type.
-
-				$this->deliver = strtolower((string)$deliver);
-				if(!in_array($this->deliver, array('asap', 'hourly', 'daily', 'weekly'), TRUE))
-					$this->deliver = ''; // Default option.
-
-				$this->auto_confirm = isset($auto_confirm) ? (boolean)$auto_confirm : NULL;
-
-				$this->sub_exists = FALSE; // Initialize.
-				$this->insert_id  = 0; // Initialize.
-
-				$this->maybe_insert();
-			}
-
-			/**
-			 * Inserts a new subscriber, if not already in the system.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected function maybe_insert()
-			{
-				if(!$this->comment)
-					return; // Not applicable.
-
-				if($this->comment->comment_type !== 'comment')
-					return; // Not applicable.
-
-				if(!$this->comment->post_ID || !$this->comment->comment_ID)
-					return; // Not applicable.
-
-				if(!$this->comment->comment_author_email)
-					return; // Not applicable.
-
-				if(!$this->type || !$this->deliver)
-					return; // Not applicable.
-
-				if(($this->sub_exists = $this->check_existing()))
-					return; // Can't subscribe again.
-
-				$insertion_ip = $last_ip = $this->user_ip();
-
-				$data = array(
-					'key'              => $this->plugin->utils_enc->uunnci_key_20_max(),
-					'user_id'          => $this->user ? (integer)$this->user->ID : 0,
-					'post_id'          => (integer)$this->comment->post_ID,
-					'comment_id'       => $this->type === 'comments'
-						? 0 : (integer)$this->comment->comment_ID,
-					'deliver'          => $this->deliver,
-
-					'fname'            => $this->first_name(),
-					'lname'            => $this->last_name(),
-					'email'            => $this->comment->comment_author_email,
-					'insertion_ip'     => $insertion_ip,
-					'last_ip'          => $last_ip,
-
-					'status'           => 'unconfirmed',
-
-					'insertion_time'   => time(),
-					'last_update_time' => time()
+				$default_request_args = array(
+					'ID'               => NULL,
+					'key'              => NULL,
+					'user_id'          => NULL,
+					'post_id'          => NULL,
+					'comment_id'       => NULL,
+					'deliver'          => NULL,
+					'fname'            => NULL,
+					'lname'            => NULL,
+					'email'            => NULL,
+					'insertion_ip'     => NULL,
+					'last_ip'          => NULL,
+					'status'           => NULL,
+					'insertion_time'   => NULL,
+					'last_update_time' => NULL,
 				);
-				if(!$this->plugin->utils_db->wp->replace($this->plugin->utils_db->prefix().'subs', $data))
-					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
+				$request_args         = array_merge($default_request_args, $request_args);
+				$request_args         = array_intersect_key($request_args, $default_request_args);
+				$this->data           = $request_args; // A copy of the request args.
 
-				if(!($sub_id = $this->insert_id = (integer)$this->plugin->utils_db->wp->insert_id))
-					throw new \exception(__('Sub insertion failure.', $this->plugin->text_domain));
+				$defaults_args = array(
+					'auto_confirm'         => NULL,
+					'process_events'       => TRUE,
+					'process_confirmation' => FALSE,
+					'user_initiated'       => FALSE,
+					'current_user_0'       => NULL,
+				);
+				$args          = array_merge($defaults_args, $args);
+				$args          = array_intersect_key($args, $defaults_args);
 
-				new sub_event_log_inserter(array_merge($data, array('sub_id' => $sub_id, 'event' => 'subscribed')));
+				if(isset($args['auto_confirm']))
+					$this->auto_confirm = (boolean)$args['auto_confirm'];
 
-				new sub_confirmer($sub_id, $this->auto_confirm); // Confirm; before deletion of others.
+				$this->process_events       = (boolean)$args['process_events'];
+				$this->process_confirmation = (boolean)$args['process_confirmation'];
+				$this->user_initiated       = (boolean)$args['user_initiated'];
 
-				$this->delete_others(); // Delete other subscriptions now.
-			}
+				if(isset($args['current_user_0']))
+					$this->current_user_0 = (boolean)$args['current_user_0'];
+				else $this->current_user_0 = $this->user_initiated;
 
-			/**
-			 * Check existing email/sub.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return boolean TRUE if a subscription already exists.
-			 */
-			protected function check_existing()
-			{
-				$existing_sub = $this->check_existing_sub();
+				if(!$this->user_initiated) // Only if a user initiated this action.
+					$this->current_user_0 = FALSE; // Force `FALSE` in this case.
 
-				if($existing_sub && $existing_sub->status === 'subscribed')
-					return TRUE; // Already exists.
+				$this->validated = FALSE; // Initialize.
 
-				if($existing_sub && $existing_sub->status !== 'subscribed')
+				$this->is_insert = !isset($this->data['ID']);
+				$this->inserted  = FALSE; // Initialize.
+				$this->insert_id = 0; // Initialize.
+
+				$this->status_before = ''; // Initialize.
+				$this->is_update     = isset($this->data['ID']);
+				if($this->is_update && $this->data['ID'])
 				{
-					$this->maybe_reconfirm($existing_sub);
-					return TRUE; // Already exists.
+					$this->sub           = $this->plugin->utils_sub->get($this->data['ID']);
+					$this->status_before = $this->sub->status; // For updates only.
 				}
-				return FALSE; // Nope, does not exist yet.
+				$this->updated = FALSE; // Initialize.
+
+				$this->duplicate_key_ids   = array(); // Initialize.
+				$this->other_duplicate_ids = array(); // Initialize.
+
+				if((integer)$this->data['user_id'] > 0) // Have a user ID?
+					$this->user = new \WP_User((integer)$this->data['user_id']);
+
+				if(!isset($this->user) || !$this->user->ID)
+					if($this->is_update && $this->sub && $this->sub->user_id)
+						$this->user = new \WP_User($this->sub->user_id);
+
+				if(!isset($this->user) || !$this->user->ID)
+					if((string)$this->data['email']) // A potentially new email?
+						if(($_user = \WP_User::get_data_by('email', (string)$this->data['email'])))
+							$this->user = new \WP_User($_user->ID);
+				unset($_user); // Housekeeping.
+
+				if(!isset($this->user) || !$this->user->ID)
+					if($this->is_update && $this->sub && $this->sub->email)
+						if(($_user = \WP_User::get_data_by('email', $this->sub->email)))
+							$this->user = new \WP_User($_user->ID);
+				unset($_user); // Housekeeping.
+
+				$this->current_user    = wp_get_current_user();
+				$this->is_current_user = FALSE; // Initialize.
+
+				if( // Determine if this is the current user.
+
+					($this->current_user_0 // Interpret `0` as current user?
+					 && $this->data['user_id'] === 0 && $this->current_user->ID === 0)
+
+					|| ($this->user && ($this->user->ID || $this->current_user_0)
+					    && $this->user->ID === $this->current_user->ID)
+
+				) $this->is_current_user = TRUE; // Even if `ID` is `0`.
+
+				$this->errors = array(); // Initialize.
+
+				$this->maybe_insert_update();
 			}
 
 			/**
-			 * Check existing subscription(s).
+			 * Subscriber object reference.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @return \stdClass|null Existing sub; else NULL.
+			 * @return \stdClass|null Subscriber.
 			 */
-			protected function check_existing_sub()
+			public function sub()
 			{
-				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				return $this->sub;
+			}
 
-				       " WHERE `post_id` = '".esc_sql($this->comment->post_ID)."'".
-				       " AND `comment_id` = '".esc_sql($this->type === 'comments' ? 0 : $this->comment->comment_ID)."'".
-				       " AND `deliver` = '".esc_sql($this->deliver)."'". // Delivery option.
+			/**
+			 * Did insert|update successfully?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean Did we insert|update?
+			 */
+			public function did_insert_update()
+			{
+				return $this->inserted || $this->updated;
+			}
 
-				       ($this->user && $this->user->ID // Has a user ID?
-					       ? " AND (`user_id` = '".esc_sql($this->user->ID)."'".
-					         "       OR `email` = '".esc_sql($this->comment->comment_author_email)."')"
-					       : " AND `email` = '".esc_sql($this->comment->comment_author_email)."'").
+			/**
+			 * Inserted successfully?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean Did we insert?
+			 */
+			public function did_insert()
+			{
+				return $this->inserted;
+			}
 
-				       " AND `status` != '".esc_sql('trashed')."'". // Not in the trash.
+			/**
+			 * Insertion ID.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return integer Insertion ID; if applicable.
+			 */
+			public function insert_id()
+			{
+				return $this->insert_id;
+			}
 
-				       " ORDER BY `insertion_time` ASC"; // For the loop below.
+			/**
+			 * Updated successfully?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean Did we update?
+			 */
+			public function did_update()
+			{
+				return $this->updated;
+			}
 
-				if(!($results = $this->plugin->utils_db->wp->get_results($sql)))
-					return NULL; // Nothing exists.
+			/**
+			 * Do we have errors?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean `TRUE` if has errors.
+			 */
+			public function has_errors()
+			{
+				return !empty($this->errors);
+			}
 
-				$last = $last_subscribed = NULL; // Initialize.
+			/**
+			 * Array of any errors.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of any/all errors.
+			 */
+			public function errors()
+			{
+				return $this->errors;
+			}
 
-				foreach($results as $_result) switch($_result->status)
+			/**
+			 * Updates a subscriber; or inserts a new one.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function maybe_insert_update()
+			{
+				$this->sanitize_validate_data();
+
+				if($this->errors) // Have errors?
+					return; // Do nothing.
+
+				if($this->is_insert)
+					$this->insert();
+
+				else if($this->is_update)
+					$this->update();
+			}
+
+			/**
+			 * Inserts a subscriber.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @throws \exception If an insertion failure occurs.
+			 */
+			protected function insert()
+			{
+				$this->check_auto_confirm_before_insert_update();
+				$this->collect_duplicate_key_ids_before_insert();
+
+				$this->data['insertion_time']   = time(); // Force this.
+				$this->data['last_update_time'] = time(); // Force this too.
+				$table                          = $this->plugin->utils_db->prefix().'subs';
+				$data_to_insert                 = $this->plugin->utils_array->remove_nulls($this->data);
+
+				if($this->plugin->utils_db->wp->replace($table, $data_to_insert) === FALSE)
+					throw new \exception(__('Insertion failure.', $this->plugin->text_domain));
+
+				if(!($this->insert_id = (integer)$this->plugin->utils_db->wp->insert_id))
+					throw new \exception(__('Insertion failure.', $this->plugin->text_domain));
+
+				$this->inserted = TRUE; // Flag a `TRUE` now; i.e. the insertion was a success.
+
+				$this->overwrite_duplicate_key_ids_after_insert(); // Before nullifying cache.
+
+				$this->plugin->utils_sub->nullify_cache(array($this->insert_id, $this->data['key']));
+
+				if(!($this->sub = $this->plugin->utils_sub->get($this->insert_id)))
+					throw new \exception(__('Sub after insert failure.', $this->plugin->text_domain));
+
+				if($this->process_events) // Processing events? i.e. log this insertion?
 				{
-					case 'subscribed': // Subscribed?
-						$last = $last_subscribed = $_result;
-
-					default: // Default case handler.
-						$last = $_result;
+					new sub_event_log_inserter(array_merge((array)$this->sub, array(
+						'event'          => 'inserted',
+						'status_before'  => '', // New insertion.
+						'user_initiated' => $this->user_initiated,
+					))); // Log event data.
 				}
-				unset($_result); // Just a little housekeeping.
+				if($this->process_confirmation && $this->sub->status === 'unconfirmed')
+					new sub_confirmer($this->sub->ID, array(
+						'auto_confirm'   => $this->auto_confirm,
+						'process_events' => $this->process_events,
+					)); // With behavioral args.
 
-				return $last_subscribed // Subscribed?
-					? $this->plugin->utils_db->typify_deep($last_subscribed)
-					: $this->plugin->utils_db->typify_deep($last);
+				$this->overwrite_any_others_after_insert_update(); // Overwrites any others.
 			}
 
 			/**
-			 * Maybe resend confirmation email.
+			 * Updates a subscriber.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param \stdClass $existing_sub Existing sub.
+			 * @throws \exception If an update failure occurs.
 			 */
-			protected function maybe_reconfirm(\stdClass $existing_sub)
+			protected function update()
 			{
-				if($existing_sub->status === 'subscribed')
+				$this->check_auto_confirm_before_insert_update();
+				$this->overwrite_duplicate_key_ids_before_update();
+
+				$this->data['last_update_time'] = time(); // Force this.
+				$table                          = $this->plugin->utils_db->prefix().'subs';
+				$data_to_update                 = $this->plugin->utils_array->remove_nulls($this->data);
+
+				if($this->plugin->utils_db->wp->update($table, $data_to_update, array('ID' => $this->sub->ID)) === FALSE)
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
+
+				$this->updated = TRUE; // Flag as `TRUE` now; i.e. the update was a success.
+
+				$this->plugin->utils_sub->nullify_cache(array($this->sub->ID, $this->sub->key, $this->data['key']));
+
+				if(!($sub_after = $this->plugin->utils_sub->get($this->sub->ID)))
+					throw new \exception(__('Sub after update failure.', $this->plugin->text_domain));
+
+				foreach($sub_after as $_property => $_value) // Updates cached object properties.
+					$this->sub->{$_property} = $_value; // Update object properties.
+				$this->sub = $sub_after; // Now change object reference.
+				unset($_property, $_value); // Housekeeping.
+
+				if($this->process_events) // Processing events? i.e. log this update?
+				{
+					new sub_event_log_inserter(array_merge((array)$this->sub, array(
+						'event'          => 'updated',
+						'status_before'  => $this->status_before,
+						'user_initiated' => $this->user_initiated,
+					))); // Log event data.
+				}
+				if($this->process_confirmation && $this->sub->status === 'unconfirmed')
+					new sub_confirmer($this->sub->ID, array(
+						'auto_confirm'   => $this->auto_confirm,
+						'process_events' => $this->process_events,
+					)); // With behavioral args.
+
+				$this->overwrite_any_others_after_insert_update(); // Overwrites any others.
+			}
+
+			/**
+			 * Check if we can/should auto-confirm in this instance.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @note Only if {@link $auto_confirm} is `NULL` (i.e. the default value).
+			 */
+			protected function check_auto_confirm_before_insert_update()
+			{
+				if(isset($this->auto_confirm))
+					return; // Already set.
+
+				if(!$this->process_confirmation)
 					return; // Not applicable.
 
-				if($existing_sub->insertion_time >= strtotime('-15 minutes'))
-					return; // Recently subscribed; give em' time.
+				if(($this->new_value_for('status')) !== 'unconfirmed')
+					return; // Not applicable.
 
-				new sub_confirmer($existing_sub->ID, $this->auto_confirm);
+				$new_post_id = $this->new_value_for('post_id');
+				$new_user_id = $this->new_value_for('user_id');
+				$new_email   = $this->new_value_for('email');
+
+				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " WHERE `post_id` = '".esc_sql($new_post_id)."'".
+
+				       ($new_user_id // Has a user ID?
+					       ? " AND (`user_id` = '".esc_sql($new_user_id)."'".
+					         "       OR `email` = '".esc_sql($new_email)."')"
+					       : " AND `email` = '".esc_sql($new_email)."'").
+
+				       " AND `status` = 'subscribed'".
+
+				       " LIMIT 1"; // One to check.
+
+				if((integer)$this->plugin->utils_db->wp->get_var($sql))
+					$this->auto_confirm = TRUE; // Auto-confirm.
 			}
 
 			/**
-			 * Delete other subscriptions.
+			 * Collects duplicate key IDs before an insert occurs.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @throws \exception If a deletion failure occurs.
+			 * @note This also caches the underlying subs for deletion later.
+			 *    It's import NOT to nullify the cache until these are dealt with
+			 *    in the subsequent call to {@link overwrite_duplicate_key_ids_after_insert()}.
 			 */
-			protected function delete_others()
+			protected function collect_duplicate_key_ids_before_insert()
 			{
-				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				$new_user_id    = $this->new_value_for('user_id');
+				$new_post_id    = $this->new_value_for('post_id');
+				$new_comment_id = $this->new_value_for('comment_id');
+				$new_email      = $this->new_value_for('email');
 
-				       " WHERE `post_id` = '".esc_sql($this->comment->post_ID)."'".
-				       " AND (`comment_id` = '0' OR `comment_id` = '".esc_sql($this->comment->comment_ID)."')".
+				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
-				       ($this->user && $this->user->ID // Has a user ID?
-					       ? " AND (`user_id` = '".esc_sql($this->user->ID)."'".
-					         "       OR `email` = '".esc_sql($this->comment->comment_author_email)."')"
-					       : " AND `email` = '".esc_sql($this->comment->comment_author_email)."'").
+				       " WHERE `user_id` = '".esc_sql($new_user_id)."'".
+				       " AND `post_id` = '".esc_sql($new_post_id)."'".
+				       " AND `comment_id` = '".esc_sql($new_comment_id)."'".
+				       " AND `email` = '".esc_sql($new_email)."'";
 
-				       " AND `ID` != '".esc_sql($this->insert_id)."'";
-
-				if($this->plugin->utils_db->wp->query($sql) === FALSE)
-					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
+				if(($this->duplicate_key_ids = $this->plugin->utils_db->wp->get_col($sql)))
+					foreach($this->duplicate_key_ids as $_duplicate_key_id)
+						$this->plugin->utils_sub->get($_duplicate_key_id); // Cache.
+				unset($_duplicate_key_id); // Housekeeping.
 			}
 
 			/**
-			 * Commenters first name.
+			 * Overwrites duplicate key IDs after an insert occurs.
 			 *
 			 * @since 14xxxx First documented version.
-			 *
-			 * @return string Commenters first name; else `name` in email address.
 			 */
-			protected function first_name()
+			protected function overwrite_duplicate_key_ids_after_insert()
 			{
-				$name  = $this->clean_name();
-				$fname = $name; // Full name.
+				if(!$this->duplicate_key_ids)
+					return; // Not necessary.
 
-				if(strpos($name, ' ', 1) !== FALSE)
-					list($fname,) = explode(' ', $name, 2);
-
-				$fname = trim($fname); // Cleanup first name.
-
-				if(!$fname) // Fallback on the email address.
-					$fname = strstr($this->comment->comment_author_email, '@', TRUE);
-
-				return $fname; // First name.
+				$this->plugin->utils_sub->bulk_delete(
+					$this->duplicate_key_ids, array(
+						'oby_sub_id'     => $this->insert_id,
+						'process_events' => $this->process_events,
+					));
 			}
 
 			/**
-			 * Commenters last name.
+			 * Overwrites duplicate key IDs before an update occurs.
 			 *
 			 * @since 14xxxx First documented version.
-			 *
-			 * @return string Commenters last name; else empty string.
 			 */
-			protected function last_name()
+			protected function overwrite_duplicate_key_ids_before_update()
 			{
-				$name  = $this->clean_name();
-				$lname = ''; // Empty string.
+				if(!isset($this->data['user_id'])
+				   && !isset($this->data['post_id'])
+				   && !isset($this->data['comment_id'])
+				   && !isset($this->data['email'])
+				) return; // Not necessary.
 
-				if(strpos($name, ' ', 1) !== FALSE)
-					list(, $lname) = explode(' ', $name, 2);
+				$new_user_id    = $this->new_value_for('user_id');
+				$new_post_id    = $this->new_value_for('post_id');
+				$new_comment_id = $this->new_value_for('comment_id');
+				$new_email      = $this->new_value_for('email');
 
-				$lname = trim($lname); // Cleanup last name.
+				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
-				return $lname; // Last name.
+				       " WHERE `user_id` = '".esc_sql($new_user_id)."'".
+				       " AND `post_id` = '".esc_sql($new_post_id)."'".
+				       " AND `comment_id` = '".esc_sql($new_comment_id)."'".
+				       " AND `email` = '".esc_sql($new_email)."'".
+
+				       " AND `ID` != '".esc_sql($this->sub->ID)."'";
+
+				if(($this->duplicate_key_ids = $this->plugin->utils_db->wp->get_col($sql)))
+					$this->plugin->utils_sub->bulk_delete(
+						$this->duplicate_key_ids, array(
+							'oby_sub_id'     => $this->sub->ID,
+							'process_events' => $this->process_events,
+						));
 			}
 
 			/**
-			 * Commenters clean name.
+			 * Overwrites any other subscriptions after an insert|update occurs.
 			 *
 			 * @since 14xxxx First documented version.
-			 *
-			 * @return string Commenters clean name; else empty string.
 			 */
-			protected function clean_name()
+			protected function overwrite_any_others_after_insert_update()
 			{
-				return $this->plugin->utils_string->clean_name($this->comment->comment_author);
+				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " WHERE `post_id` = '".esc_sql($this->sub->post_id)."'".
+				       " AND (`comment_id` = '0' OR `comment_id` = '".esc_sql($this->sub->comment_id)."')".
+
+				       ($this->sub->user_id // Has a user ID?
+					       ? " AND (`user_id` = '".esc_sql($this->sub->user_id)."'".
+					         "       OR `email` = '".esc_sql($this->sub->email)."')"
+					       : " AND `email` = '".esc_sql($this->sub->email)."'").
+
+				       " AND `ID` != '".esc_sql($this->sub->ID)."'";
+
+				if(($this->other_duplicate_ids = $this->plugin->utils_db->wp->get_col($sql)))
+					$this->plugin->utils_sub->bulk_delete(
+						$this->other_duplicate_ids, array(
+							'oby_sub_id'     => $this->sub->ID,
+							'process_events' => $this->process_events,
+						));
 			}
 
 			/**
-			 * Commenters IP address.
+			 * New value for a key/property.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @return string Commenters IP address; else empty string.
+			 * @param string $key_prop The key/property to acquire.
+			 *
+			 * @return mixed The key/property value after an insert/update.
+			 *
+			 * @throws \exception If unable to acquire key/property value.
 			 */
-			protected function user_ip()
+			protected function new_value_for($key_prop)
 			{
-				if($this->user && $this->is_current_user)
-					return $this->plugin->utils_env->user_ip();
+				if(($key_prop = trim((string)$key_prop)))
+				{
+					if($this->is_insert && isset($this->data[$key_prop]))
+						return $this->data[$key_prop];
 
-				return ''; // Not current user.
+					if($this->is_update && isset($this->data[$key_prop]))
+						return $this->data[$key_prop];
+
+					if($this->is_update && isset($this->sub->{$key_prop}))
+						return $this->sub->{$key_prop};
+				}
+				throw new \exception(sprintf(__('Missing key/prop: `%1$s`.', $this->plugin->text_domain), $key_prop));
+			}
+
+			/**
+			 * Sanitizes/validates request args; i.e. {@link $data}.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @note Fill the {@link $errors} property on validation failure(s).
+			 */
+			protected function sanitize_validate_data()
+			{
+				foreach($this->data as $_key => &$_value)
+				{
+					switch($_key) // Validate each arg value.
+					{
+						case 'ID': // Primary key.
+
+							if(isset($_value))
+								$_value = (integer)$_value;
+
+							if($this->is_insert)
+								$_value = NULL; // We'll get a new ID.
+
+							if(($this->is_update || isset($_value)) && ($_value < 1 || strlen((string)$_value) > 20))
+								$this->errors[$_key] = sprintf(__('Invalid ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_update && (!$this->sub || $this->sub->ID !== $_value)) // ID must be associated w/ a subscriber.
+								$this->errors[$_key] = sprintf(__('Invalid ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && isset($_value))
+								$this->errors[$_key] = sprintf(__('Invalid; insertion w/ ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'key': // Unique key.
+
+							if(isset($_value))
+								$_value = (string)$_value;
+
+							if($this->is_insert && !isset($_value))
+								$_value = $this->plugin->utils_enc->uunnci_key_20_max();
+
+							if(isset($_value) && (!$_value || strlen($_value) > 20))
+								$this->errors[$_key] = sprintf(__('Invalid key: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || !$_value || strlen($_value) > 20))
+								$this->errors[$_key] = sprintf(__('Invalid key: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'user_id': // User ID.
+
+							if(isset($_value))
+								$_value = (integer)$_value;
+
+							if($this->is_insert && !isset($_value))
+								$_value = 0; // Use a default value.
+
+							if($this->user && $this->user->ID)
+								$_value = $this->user->ID;
+
+							if(isset($_value) && ($_value < 0 || strlen((string)$_value) > 20))
+								$this->errors[$_key] = sprintf(__('Invalid user ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || $_value < 0 || strlen((string)$_value) > 20))
+								$this->errors[$_key] = sprintf(__('Invalid user ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'post_id': // Post ID.
+
+							if(isset($_value))
+								$_value = (integer)$_value;
+
+							if($this->is_insert && !isset($_value))
+								$_value = 0; // Use a default value.
+
+							if(isset($_value) && ($_value < 1 || strlen((string)$_value) > 20))
+								$this->errors[$_key] = sprintf(__('Invalid post ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || $_value < 1 || strlen((string)$_value) > 20))
+								$this->errors[$_key] = sprintf(__('Invalid post ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'comment_id': // Comment ID.
+
+							if(isset($_value))
+								$_value = (integer)$_value;
+
+							if($this->is_insert && !isset($_value))
+								$_value = 0; // Use a default value.
+
+							if(isset($_value) && ($_value < 0 || strlen((string)$_value) > 20))
+								$this->errors[$_key] = sprintf(__('Invalid comment ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || $_value < 0 || strlen((string)$_value) > 20))
+								$this->errors[$_key] = sprintf(__('Invalid comment ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'deliver': // Delivery option.
+
+							if(isset($_value))
+								$_value = (string)$_value;
+
+							if($this->is_insert && !isset($_value))
+								$_value = 'asap'; // Use a default value.
+
+							if(isset($_value) && !in_array($_value, array('asap', 'hourly', 'daily', 'weekly'), TRUE))
+								$this->errors[$_key] = sprintf(__('Invalid delivery option: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || !in_array($_value, array('asap', 'hourly', 'daily', 'weekly'), TRUE)))
+								$this->errors[$_key] = sprintf(__('Invalid delivery option: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'fname': // First name.
+
+							if(isset($_value))
+								$_value = (string)$_value;
+
+							if($this->is_insert && !isset($_value))
+								$_value = ''; // Use a default value.
+
+							if($this->is_insert && !$_value && $this->data['email'])
+								$_value = (string)strstr(trim((string)$this->data['email']), '@', TRUE);
+
+							if(isset($_value)) // Clean the name.
+								$_value = $this->plugin->utils_string->clean_name($_value);
+
+							if(isset($_value) && strlen($_value) > 50)
+								$this->errors[$_key] = sprintf(__('Invalid first name: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || strlen($_value) > 50))
+								$this->errors[$_key] = sprintf(__('Invalid first name: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'lname': // Last name.
+
+							if(isset($_value))
+								$_value = (string)$_value;
+
+							if($this->is_insert && !isset($_value))
+								$_value = ''; // Use a default value.
+
+							if(isset($_value)) // Clean the name.
+								$_value = $this->plugin->utils_string->clean_name($_value);
+
+							if(isset($_value) && strlen($_value) > 100)
+								$this->errors[$_key] = sprintf(__('Invalid last name: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || strlen($_value) > 100))
+								$this->errors[$_key] = sprintf(__('Invalid last name: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'email': // Email address.
+
+							if(isset($_value))
+								$_value = (string)$_value;
+
+							if($this->is_insert && !isset($_value))
+								$_value = ''; // Use a default value.
+
+							if(isset($_value) && (!$_value || !is_email($_value) || strlen($_value) > 100))
+								$this->errors[$_key] = sprintf(__('Invalid email address: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || !$_value || !is_email($_value) || strlen($_value) > 100))
+								$this->errors[$_key] = sprintf(__('Invalid email address: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'insertion_ip': // Insertion IP address.
+
+							if(isset($_value))
+								$_value = (string)$_value;
+
+							if($this->is_insert && !isset($_value))
+								$_value = ''; // Use a default value.
+
+							if($this->is_insert && !$_value && $this->is_current_user)
+								$_value = $this->plugin->utils_env->user_ip();
+
+							if(isset($_value) && strlen($_value) > 39)
+								$this->errors[$_key] = sprintf(__('Invalid insertion IP: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || strlen($_value) > 39))
+								$this->errors[$_key] = sprintf(__('Invalid insertion IP: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'last_ip': // Last known IP address.
+
+							if(isset($_value))
+								$_value = (string)$_value;
+
+							if($this->is_insert && !isset($_value))
+								$_value = ''; // Use a default value.
+
+							if(!$_value && $this->is_current_user)
+								$_value = $this->plugin->utils_env->user_ip();
+
+							if(isset($_value) && strlen($_value) > 39)
+								$this->errors[$_key] = sprintf(__('Invalid last IP: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || strlen($_value) > 39))
+								$this->errors[$_key] = sprintf(__('Invalid last IP: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'status': // Status.
+
+							if(isset($_value))
+								$_value = (string)$_value;
+
+							if($this->is_insert && !isset($_value))
+								$_value = 'unconfirmed'; // Use a default value.
+
+							if(isset($_value) && !in_array($_value, array('unconfirmed', 'subscribed', 'suspended', 'trashed'), TRUE))
+								$this->errors[$_key] = sprintf(__('Invalid status: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || !in_array($_value, array('unconfirmed', 'subscribed', 'suspended', 'trashed'), TRUE)))
+								$this->errors[$_key] = sprintf(__('Invalid status: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'insertion_time': // Insertion time.
+
+							if(isset($_value))
+								$_value = (integer)$_value;
+
+							if($this->is_insert && !isset($_value))
+								$_value = time(); // Use a default value.
+
+							if($this->is_insert && !$_value) $_value = time();
+
+							if(isset($_value) && strlen((string)$_value) !== 10)
+								$this->errors[$_key] = sprintf(__('Invalid insertion time: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || strlen((string)$_value) !== 10))
+								$this->errors[$_key] = sprintf(__('Invalid insertion time: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'last_update_time': // Last update time.
+
+							if(isset($_value))
+								$_value = (integer)$_value;
+
+							if($this->is_insert && !isset($_value))
+								$_value = time(); // Use a default value.
+
+							if(!$_value) $_value = time(); // Update time.
+
+							if(isset($_value) && strlen((string)$_value) !== 10)
+								$this->errors[$_key] = sprintf(__('Invalid last update time: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || strlen((string)$_value) !== 10))
+								$this->errors[$_key] = sprintf(__('Invalid last update time: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+					}
+				}
+				unset($_key, $_value); // Housekeeping.
+
+				$this->validated = TRUE; // Flag as `TRUE`; data validated.
 			}
 		}
 	}
