@@ -581,7 +581,7 @@ Menu page table columns; i.e. media queries.
 }
 @media (max-width : 767px)
 {
-	.comment-mail-menu-page-subscribers tr > *.column-email,
+	.comment-mail-menu-page-subs tr > *.column-email,
 		/**/
 	.comment-mail-menu-page-queue tr > *.column-ID,
 	.comment-mail-menu-page-queue tr > *.column-sub_id,
@@ -592,7 +592,7 @@ Menu page table columns; i.e. media queries.
 	{
 		display : table-cell !important;
 	}
-	.comment-mail-menu-page-subscribers tr > *:not(.check-column):not(.column-email),
+	.comment-mail-menu-page-subs tr > *:not(.check-column):not(.column-email),
 		/**/
 	.comment-mail-menu-page-queue tr > *:not(.check-column):not(.column-ID):not(.column-sub_id),
 		/**/
@@ -603,8 +603,8 @@ Menu page table columns; i.e. media queries.
 }
 @media (min-width : 768px) and (max-width : 991px)
 {
-	.comment-mail-menu-page-subscribers tr > *.column-email,
-	.comment-mail-menu-page-subscribers tr > *.column-post_id,
+	.comment-mail-menu-page-subs tr > *.column-email,
+	.comment-mail-menu-page-subs tr > *.column-post_id,
 		/**/
 	.comment-mail-menu-page-queue tr > *.column-ID,
 	.comment-mail-menu-page-queue tr > *.column-sub_id,
@@ -616,7 +616,7 @@ Menu page table columns; i.e. media queries.
 	{
 		display : table-cell !important;
 	}
-	.comment-mail-menu-page-subscribers tr > *:not(.check-column):not(.column-email):not(.column-post_id),
+	.comment-mail-menu-page-subs tr > *:not(.check-column):not(.column-email):not(.column-post_id),
 		/**/
 	.comment-mail-menu-page-queue tr > *:not(.check-column):not(.column-ID):not(.column-sub_id):not(.column-hold_until_time),
 		/**/
@@ -627,9 +627,9 @@ Menu page table columns; i.e. media queries.
 }
 @media (min-width : 992px) and (max-width : 1199px)
 {
-	.comment-mail-menu-page-subscribers tr > *.column-email,
-	.comment-mail-menu-page-subscribers tr > *.column-user_id,
-	.comment-mail-menu-page-subscribers tr > *.column-post_id,
+	.comment-mail-menu-page-subs tr > *.column-email,
+	.comment-mail-menu-page-subs tr > *.column-user_id,
+	.comment-mail-menu-page-subs tr > *.column-post_id,
 		/**/
 	.comment-mail-menu-page-queue tr > *.column-sub_id,
 	.comment-mail-menu-page-queue tr > *.column-user_id,
@@ -641,7 +641,7 @@ Menu page table columns; i.e. media queries.
 	{
 		width : 200px;
 	}
-	.comment-mail-menu-page-subscribers tr > *.column-comment_id,
+	.comment-mail-menu-page-subs tr > *.column-comment_id,
 		/**/
 	.comment-mail-menu-page-queue tr > *.column-comment_parent_id,
 	.comment-mail-menu-page-queue tr > *.column-comment_id,
@@ -654,9 +654,9 @@ Menu page table columns; i.e. media queries.
 }
 @media (min-width : 1200px) and (max-width : 1599px)
 {
-	.comment-mail-menu-page-subscribers tr > *.column-email,
-	.comment-mail-menu-page-subscribers tr > *.column-user_id,
-	.comment-mail-menu-page-subscribers tr > *.column-post_id,
+	.comment-mail-menu-page-subs tr > *.column-email,
+	.comment-mail-menu-page-subs tr > *.column-user_id,
+	.comment-mail-menu-page-subs tr > *.column-post_id,
 		/**/
 	.comment-mail-menu-page-queue tr > *.column-sub_id,
 	.comment-mail-menu-page-queue tr > *.column-user_id,
@@ -668,7 +668,7 @@ Menu page table columns; i.e. media queries.
 	{
 		width : 250px;
 	}
-	.comment-mail-menu-page-subscribers tr > *.column-comment_id,
+	.comment-mail-menu-page-subs tr > *.column-comment_id,
 		/**/
 	.comment-mail-menu-page-queue tr > *.column-comment_parent_id,
 	.comment-mail-menu-page-queue tr > *.column-comment_id,
@@ -681,9 +681,9 @@ Menu page table columns; i.e. media queries.
 }
 @media (min-width : 1600px)
 {
-	.comment-mail-menu-page-subscribers tr > *.column-email,
-	.comment-mail-menu-page-subscribers tr > *.column-user_id,
-	.comment-mail-menu-page-subscribers tr > *.column-post_id,
+	.comment-mail-menu-page-subs tr > *.column-email,
+	.comment-mail-menu-page-subs tr > *.column-user_id,
+	.comment-mail-menu-page-subs tr > *.column-post_id,
 		/**/
 	.comment-mail-menu-page-queue tr > *.column-sub_id,
 	.comment-mail-menu-page-queue tr > *.column-user_id,
@@ -695,7 +695,7 @@ Menu page table columns; i.e. media queries.
 	{
 		width : 300px;
 	}
-	.comment-mail-menu-page-subscribers tr > *.column-comment_id,
+	.comment-mail-menu-page-subs tr > *.column-comment_id,
 		/**/
 	.comment-mail-menu-page-queue tr > *.column-comment_parent_id,
 	.comment-mail-menu-page-queue tr > *.column-comment_id,

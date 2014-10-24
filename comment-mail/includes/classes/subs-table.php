@@ -38,7 +38,7 @@ namespace comment_mail // Root namespace.
 					'plural_name'    => 'subscribers',
 					'singular_label' => __('subscriber', $plugin->text_domain),
 					'plural_label'   => __('subscribers', $plugin->text_domain),
-					'screen'         => $plugin->menu_page_hooks[__NAMESPACE__.'_subscribers'],
+					'screen'         => $plugin->menu_page_hooks[__NAMESPACE__.'_subs'],
 				);
 				parent::__construct($args); // Parent constructor.
 			}

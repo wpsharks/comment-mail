@@ -90,13 +90,30 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function subscribers()
+			protected function subs()
 			{
-				echo '<div id="'.esc_attr($this->plugin->slug.'-menu-page-table').'" class="'.esc_attr($this->plugin->slug.'-menu-page-subscribers '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
+				echo '<div id="'.esc_attr($this->plugin->slug.'-menu-page-table').'" class="'.esc_attr($this->plugin->slug.'-menu-page-subs '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
 
 				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Subscribers', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-groups" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
 				new subs_table(); // Displays table.
+
+				echo '   </form>';
+				echo '</div>'."\n";
+			}
+
+			/**
+			 * Displays menu page.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function sub_event_log()
+			{
+				echo '<div id="'.esc_attr($this->plugin->slug.'-menu-page-table').'" class="'.esc_attr($this->plugin->slug.'-menu-page-sub-event-log '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
+
+				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Subscriber Event Log', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-groups" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
+				new sub_event_log_table(); // Displays table.
 
 				echo '   </form>';
 				echo '</div>'."\n";
