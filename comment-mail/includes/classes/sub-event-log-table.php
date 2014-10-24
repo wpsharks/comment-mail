@@ -63,6 +63,8 @@ namespace comment_mail // Root namespace.
 				return array(
 					'cb'             => '1', // Include checkboxes.
 					'ID'             => __('ID', $plugin->text_domain),
+					'event'          => __('Event', $plugin->text_domain),
+					'time'           => __('Time', $plugin->text_domain),
 					'sub_id'         => __('Subscr. ID', $plugin->text_domain),
 					'oby_sub_id'     => __('Overwritten By', $plugin->text_domain),
 					'user_id'        => __('WP User ID', $plugin->text_domain),
@@ -75,9 +77,7 @@ namespace comment_mail // Root namespace.
 					'ip'             => __('IP Address', $plugin->text_domain),
 					'status_before'  => __('Status Prior', $plugin->text_domain),
 					'status'         => __('Status', $plugin->text_domain),
-					'event'          => __('Event', $plugin->text_domain),
 					'user_initiated' => __('User Initiated', $plugin->text_domain),
-					'time'           => __('Time', $plugin->text_domain),
 				);
 			}
 

@@ -61,6 +61,9 @@ namespace comment_mail // Root namespace.
 				return array(
 					'cb'                => '1', // Include checkboxes.
 					'ID'                => __('ID', $plugin->text_domain),
+					'event'             => __('Event', $plugin->text_domain),
+					'note_code'         => __('Note', $plugin->text_domain),
+					'time'              => __('Time', $plugin->text_domain),
 					'queue_id'          => __('Queue ID', $plugin->text_domain),
 					'dby_queue_id'      => __('Digested by Queue ID', $plugin->text_domain),
 					'sub_id'            => __('Subscr. ID', $plugin->text_domain),
@@ -73,9 +76,6 @@ namespace comment_mail // Root namespace.
 					'email'             => __('Subscr. Email', $plugin->text_domain),
 					'ip'                => __('Subscr. IP', $plugin->text_domain),
 					'status'            => __('Subscr. Status', $plugin->text_domain),
-					'event'             => __('Event', $plugin->text_domain),
-					'note_code'         => __('Note', $plugin->text_domain),
-					'time'              => __('Time', $plugin->text_domain),
 				);
 			}
 
@@ -89,6 +89,7 @@ namespace comment_mail // Root namespace.
 			public static function get_hidden_columns_()
 			{
 				return array(
+					'note_code',
 					'queue_id',
 					'dby_queue_id',
 					'user_id',
@@ -98,7 +99,6 @@ namespace comment_mail // Root namespace.
 					'email',
 					'ip',
 					'status',
-					'note_code',
 				);
 			}
 
