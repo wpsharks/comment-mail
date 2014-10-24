@@ -43,7 +43,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function options()
 			{
-				echo '<div id="'.esc_attr($this->plugin->slug.'-menu-page').'" class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-area').'">'."\n";
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-area').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
 
 				echo '      '.$this->heading(__('Plugin Options', $this->plugin->text_domain), 'options.png').$this->notices(); // Heading/notices.
@@ -92,11 +92,63 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function subs()
 			{
-				echo '<div id="'.esc_attr($this->plugin->slug.'-menu-page-table').'" class="'.esc_attr($this->plugin->slug.'-menu-page-subs '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
+				switch(!empty($_REQUEST['action']) ? $_REQUEST['action'] : '')
+				{
+					case 'new': // Add new subscriber.
+
+						$this->sub_new(); // Display form.
+
+						break; // Break switch handler.
+
+					case 'edit': // Edit existing subscriber.
+
+						$this->sub_edit(); // Display form.
+
+						break; // Break switch handler.
+
+					case '': // Also the default case handler.
+					default: // Everything else is handled by subs. table.
+
+						echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-subs '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
+						echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
+
+						echo '      <h2>'.sprintf(__('%1$s™ ⥱ Subscribers', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-groups" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
+						new subs_table(); // Displays table.
+
+						echo '   </form>';
+						echo '</div>'."\n";
+				}
+			}
+
+			/**
+			 * Displays menu page.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function sub_new()
+			{
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-sub-new '.$this->plugin->slug.'-menu-page-form '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
 
-				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Subscribers', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-groups" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
-				new subs_table(); // Displays table.
+				echo '      <h2>'.sprintf(__('%1$s™ ⥱ New Subscriber', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-id" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
+				new sub_new_form(); // Displays form to add new subscriber.
+
+				echo '   </form>';
+				echo '</div>'."\n";
+			}
+
+			/**
+			 * Displays menu page.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function sub_edit()
+			{
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-sub-edit '.$this->plugin->slug.'-menu-page-form '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
+
+				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Edit Subscriber', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-id" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
+				new sub_edit_form(!empty($_REQUEST['subscriber']) ? (integer)$_REQUEST['subscriber'] : 0); // Displays form.
 
 				echo '   </form>';
 				echo '</div>'."\n";
@@ -109,7 +161,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function sub_event_log()
 			{
-				echo '<div id="'.esc_attr($this->plugin->slug.'-menu-page-table').'" class="'.esc_attr($this->plugin->slug.'-menu-page-sub-event-log '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-sub-event-log '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
 
 				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Subscriber Event Log', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-groups" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
@@ -126,7 +178,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function queue()
 			{
-				echo '<div id="'.esc_attr($this->plugin->slug.'-menu-page-table').'" class="'.esc_attr($this->plugin->slug.'-menu-page-queue '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-queue '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
 
 				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Queued (Pending) Notifications', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-email" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
@@ -143,7 +195,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function queue_event_log()
 			{
-				echo '<div id="'.esc_attr($this->plugin->slug.'-menu-page-table').'" class="'.esc_attr($this->plugin->slug.'-menu-page-queue-event-log '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-queue-event-log '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
 
 				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Queue Event Log', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-email" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";

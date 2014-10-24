@@ -580,6 +580,20 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Creates a new subscriber shortlink w/o a DB query.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string New subscriber shortlink.
+			 */
+			public function new_subscriber_short()
+			{
+				$args = array('action' => 'new');
+
+				return add_query_arg(urlencode_deep($args), $this->subs_menu_page_only());
+			}
+
+			/**
 			 * Creates an edit subscriber shortlink w/o a DB query.
 			 *
 			 * @since 14xxxx First documented version.
@@ -591,7 +605,7 @@ namespace comment_mail // Root namespace.
 			public function edit_subscriber_short($sub_id)
 			{
 				$sub_id = (integer)$sub_id; // Force integer.
-				$args   = array('subscriber' => $sub_id); // @TODO
+				$args   = array('action' => 'edit', 'subscriber' => $sub_id);
 
 				return add_query_arg(urlencode_deep($args), $this->subs_menu_page_only());
 			}
