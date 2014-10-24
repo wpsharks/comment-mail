@@ -5,8 +5,6 @@
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
- *
- * @TODO
  */
 namespace comment_mail // Root namespace.
 {
@@ -202,20 +200,6 @@ namespace comment_mail // Root namespace.
 				return $id_info.$this->row_actions($row_actions);
 			}
 
-			/**
-			 * Table column handler.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param \stdClass $item Item object; i.e. a row from the DB.
-			 *
-			 * @return string HTML markup for this table column.
-			 */
-			protected function column_user_initiated(\stdClass $item)
-			{
-				return esc_html($item->user_initiated ? 'yes' : 'no');
-			}
-
 			/*
 			 * Public query-related methods.
 			 */
@@ -256,11 +240,11 @@ namespace comment_mail // Root namespace.
 				       ($sub_ids_in_search_query || $user_ids_in_search_query || $post_ids_in_search_query || $comment_ids_in_search_query
 					       ? " AND (".$this->plugin->utils_string->trim( // Trim the following...
 
-						       ($sub_ids_in_search_query ? " ".$and_or." `sub_id` IN('".implode("','", array_map('esc_sql', $sub_ids_in_search_query))."')" : '').
+						       ($sub_ids_in_search_query ? " ".$and_or." (`sub_id` IN('".implode("','", array_map('esc_sql', $sub_ids_in_search_query))."')".
+						                                   " OR `oby_sub_id` IN('".implode("','", array_map('esc_sql', $sub_ids_in_search_query))."'))" : '').
 						       ($user_ids_in_search_query ? " ".$and_or." `user_id` IN('".implode("','", array_map('esc_sql', $user_ids_in_search_query))."')" : '').
 						       ($post_ids_in_search_query ? " ".$and_or." `post_id` IN('".implode("','", array_map('esc_sql', $post_ids_in_search_query))."')" : '').
-						       ($comment_ids_in_search_query ? " ".$and_or." (`comment_parent_id` IN('".implode("','", array_map('esc_sql', $comment_ids_in_search_query))."')".
-						                                       " OR `comment_id` IN('".implode("','", array_map('esc_sql', $comment_ids_in_search_query))."'))" : '')
+						       ($comment_ids_in_search_query ? " ".$and_or." `comment_id` IN('".implode("','", array_map('esc_sql', $comment_ids_in_search_query))."')" : '')
 
 						       , '', 'AND OR').")" : ''). // Trims `AND OR` leftover after concatenation occurs.
 
@@ -287,6 +271,7 @@ namespace comment_mail // Root namespace.
 					$this->set_items($results = $this->plugin->utils_db->typify_deep($results));
 					$this->set_total_items_available((integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()"));
 
+					$this->prepare_items_merge_subscr_type_property(); // Merge property.
 					$this->prepare_items_merge_sub_properties(); // Merge additional properties.
 					$this->prepare_items_merge_user_properties(); // Merge additional properties.
 					$this->prepare_items_merge_post_properties(); // Merge additional properties.

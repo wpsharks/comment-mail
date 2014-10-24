@@ -174,25 +174,6 @@ namespace comment_mail // Root namespace.
 				return $id_info.$this->row_actions($row_actions);
 			}
 
-			/**
-			 * Table column handler.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param \stdClass $item Item object; i.e. a row from the DB.
-			 *
-			 * @return string HTML markup for this table column.
-			 */
-			protected function column_hold_until_time(\stdClass $item)
-			{
-				if(!$item->hold_until_time)
-					return __('n/a; awaiting processing', $this->plugin->text_domain);
-
-				return esc_html($this->plugin->utils_date->i18n('M j, Y, g:i a', $item->hold_until_time)).'<br />'.
-				       '<span style="font-style:italic;">('.esc_html($this->plugin->utils_date->approx_time_difference(time(), $item->hold_until_time, '')).')</span>'.
-				       ' '.__('~ part of a digest', $this->plugin->text_domain);
-			}
-
 			/*
 			 * Public query-related methods.
 			 */

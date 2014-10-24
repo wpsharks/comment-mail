@@ -1,6 +1,6 @@
 <?php
 /**
- * Menu Pages @TODO
+ * Menu Pages
  *
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
@@ -37,7 +37,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Displays menu page.
+			 * Displays menu page. @TODO
 			 *
 			 * @since 14xxxx First documented version.
 			 */

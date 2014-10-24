@@ -197,26 +197,6 @@ namespace comment_mail // Root namespace.
 				return $id_info.$this->row_actions($row_actions);
 			}
 
-			/**
-			 * Table column handler.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param \stdClass $item Item object; i.e. a row from the DB.
-			 *
-			 * @return string HTML markup for this table column.
-			 */
-			protected function column_note_code(\stdClass $item)
-			{
-				if(!$item->note_code)
-					return '—'; // Not applicable.
-
-				$note = $this->plugin->utils_event->queue_note_code($item->note_code);
-				$note = $this->plugin->utils_string->s_md_to_html($note);
-
-				return $note; // HTML markup via simple MD parsing.
-			}
-
 			/*
 			 * Public query-related methods.
 			 */
@@ -260,8 +240,8 @@ namespace comment_mail // Root namespace.
 						       ($sub_ids_in_search_query ? " ".$and_or." `sub_id` IN('".implode("','", array_map('esc_sql', $sub_ids_in_search_query))."')" : '').
 						       ($user_ids_in_search_query ? " ".$and_or." `user_id` IN('".implode("','", array_map('esc_sql', $user_ids_in_search_query))."')" : '').
 						       ($post_ids_in_search_query ? " ".$and_or." `post_id` IN('".implode("','", array_map('esc_sql', $post_ids_in_search_query))."')" : '').
-						       ($comment_ids_in_search_query ? " ".$and_or." (`comment_parent_id` IN('".implode("','", array_map('esc_sql', $comment_ids_in_search_query))."')".
-						                                       " OR `comment_id` IN('".implode("','", array_map('esc_sql', $comment_ids_in_search_query))."'))" : '')
+						       ($comment_ids_in_search_query ? " ".$and_or." (`comment_id` IN('".implode("','", array_map('esc_sql', $comment_ids_in_search_query))."')".
+						                                       " OR `comment_parent_id` IN('".implode("','", array_map('esc_sql', $comment_ids_in_search_query))."'))" : '')
 
 						       , '', 'AND OR').")" : ''). // Trims `AND OR` leftover after concatenation occurs.
 

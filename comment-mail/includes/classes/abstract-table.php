@@ -429,7 +429,7 @@ namespace comment_mail // Root namespace.
 					return '—'; // Not possible.
 
 				if(empty($this->merged_result_sets['subs'][$item->sub_id]))
-					return '—'; // Not possible.
+					return esc_html($item->sub_id);
 
 				$name     = $item->sub_fname.' '.$item->sub_lname; // Concatenate.
 				$sub_info = '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
@@ -453,6 +453,39 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string HTML markup for this table column.
 			 */
+			protected function column_oby_sub_id(\stdClass $item)
+			{
+				if(!isset($item->oby_sub_id))
+					return '—'; // Not possible.
+
+				if(!$item->oby_sub_id)
+					return '—'; // Not possible.
+
+				if(empty($this->merged_result_sets['subs'][$item->oby_sub_id]))
+					return esc_html($item->oby_sub_id);
+
+				$name         = $item->oby_sub_fname.' '.$item->oby_sub_lname; // Concatenate.
+				$oby_sub_info = '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
+				                ' <span style="font-weight:bold;" title="'.esc_attr($item->oby_sub_key).'">ID #'.esc_html($item->oby_sub_id).'</span>'.
+				                ' '.$this->plugin->utils_markup->name_email($name, $item->oby_sub_email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
+
+				$edit_url = $this->plugin->utils_url->edit_subscriber_short($item->oby_sub_id);
+
+				$row_actions = array(
+					'edit' => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscriber', $this->plugin->text_domain).'</a>',
+				);
+				return $oby_sub_info.$this->row_actions($row_actions);
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
 			protected function column_user_id(\stdClass $item)
 			{
 				if(!isset($item->user_id))
@@ -462,7 +495,7 @@ namespace comment_mail // Root namespace.
 					return '—'; // Not possible.
 
 				if(empty($this->merged_result_sets['users'][$item->user_id]))
-					return '—'; // Not possible.
+					return esc_html($item->user_id);
 
 				$user_info = '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ username in hover title.
 				             ' <span style="font-weight:bold;" title="'.esc_attr($item->user_login).'">ID #'.esc_html($item->user_id).'</span>'.
@@ -494,13 +527,13 @@ namespace comment_mail // Root namespace.
 					return '—'; // Not possible.
 
 				if(empty($this->merged_result_sets['posts'][$item->post_id]))
-					return '—'; // Not possible.
+					return esc_html($item->post_id);
 
 				if(!$item->post_type || !$item->post_title)
-					return '—'; // Not possible.
+					return esc_html($item->post_id);
 
 				if(!($post_type = get_post_type_object($item->post_type)))
-					return '—'; // Not possible.
+					return esc_html($item->post_id);
 
 				$post_type_label        = $post_type->labels->singular_name;
 				$post_title_clip        = $this->plugin->utils_string->mid_clip($item->post_title);
@@ -544,7 +577,7 @@ namespace comment_mail // Root namespace.
 					return '—'; // Not possible.
 
 				if(empty($this->merged_result_sets['comments'][$item->comment_parent_id]))
-					return '—'; // Not possible.
+					return esc_html($item->comment_parent_id);
 
 				$comment_parent_date_time = $this->plugin->utils_date->i18n('M j, Y, g:i a', strtotime($item->comment_parent_date_gmt));
 				$comment_parent_time_ago  = $this->plugin->utils_date->approx_time_difference(strtotime($item->comment_parent_date_gmt));
@@ -582,7 +615,7 @@ namespace comment_mail // Root namespace.
 					return '— all —'; // All of them.
 
 				if(empty($this->merged_result_sets['comments'][$item->comment_id]))
-					return '—'; // Not possible.
+					return esc_html($item->comment_id);
 
 				$comment_date_time = $this->plugin->utils_date->i18n('M j, Y, g:i a', strtotime($item->comment_date_gmt));
 				$comment_time_ago  = $this->plugin->utils_date->approx_time_difference(strtotime($item->comment_date_gmt));
@@ -600,6 +633,102 @@ namespace comment_mail // Root namespace.
 					'view' => '<a href="'.esc_attr($comment_view_url).'">'.__('View', $this->plugin->text_domain).'</a>',
 				);
 				return $comment_info.$this->row_actions($comment_row_actions);
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_status_before(\stdClass $item)
+			{
+				if(!isset($item->status_before))
+					return '—'; // Not possible.
+
+				return esc_html($this->plugin->utils_i18n->status_label($item->status_before));
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_status(\stdClass $item)
+			{
+				if(!isset($item->status))
+					return '—'; // Not possible.
+
+				return esc_html($this->plugin->utils_i18n->status_label($item->status));
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_note_code(\stdClass $item)
+			{
+				if(!isset($item->note_code))
+					return '—'; // Not possible.
+
+				if(!$item->note_code)
+					return '—'; // Not applicable.
+
+				$note = $this->plugin->utils_event->queue_note_code($item->note_code);
+				$note = $this->plugin->utils_string->s_md_to_html($note);
+
+				return $note; // HTML markup via simple MD parsing.
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_user_initiated(\stdClass $item)
+			{
+				if(!isset($item->user_initiated))
+					return '—'; // Not possible.
+
+				return esc_html($item->user_initiated ? 'yes' : 'no');
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_hold_until_time(\stdClass $item)
+			{
+				if(!isset($item->hold_until_time))
+					return '—'; // Not possible.
+
+				if(!$item->hold_until_time)
+					return __('n/a; awaiting processing', $this->plugin->text_domain);
+
+				return esc_html($this->plugin->utils_date->i18n('M j, Y, g:i a', $item->hold_until_time)).'<br />'.
+				       '<span style="font-style:italic;">('.esc_html($this->plugin->utils_date->approx_time_difference(time(), $item->hold_until_time, '')).')</span>'.
+				       ' '.__('~ part of a digest', $this->plugin->text_domain);
 			}
 
 			/**
@@ -626,9 +755,6 @@ namespace comment_mail // Root namespace.
 
 				else if(($property === 'ID' || substr($property, -3) === '_id') && is_integer($value))
 					$value = $value <= 0 ? '—' : esc_html((string)$value);
-
-				else if(($property === 'status' || substr($property, -7) === '_status') && is_string($value))
-					$value = esc_html($this->plugin->utils_i18n->status_label($value));
 
 				else $value = esc_html($this->plugin->utils_string->mid_clip((string)$value));
 
@@ -912,7 +1038,7 @@ namespace comment_mail // Root namespace.
 				$this->set_items(array()); // `$this->items` = an array of \stdClass objects.
 				$this->set_total_items_available((integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()"));
 
-				$this->prepare_items_merge_subscr_properties();
+				$this->prepare_items_merge_subscr_type_property();
 				$this->prepare_items_merge_sub_properties();
 				$this->prepare_items_merge_user_properties();
 				$this->prepare_items_merge_post_properties();
@@ -1040,7 +1166,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function prepare_items_merge_subscr_properties()
+			protected function prepare_items_merge_subscr_type_property()
 			{
 				foreach($this->items as $_item)
 				{
@@ -1072,6 +1198,11 @@ namespace comment_mail // Root namespace.
 				foreach($this->items as $_item)
 					if(!empty($_item->sub_id)) // Has a sub ID?
 						$sub_ids[$_item->sub_id] = $_item->sub_id;
+				unset($_item); // Housekeeping.
+
+				foreach($this->items as $_item)
+					if(!empty($_item->oby_sub_id)) // Overwritten by a sub ID?
+						$sub_ids[$_item->oby_sub_id] = $_item->oby_sub_id;
 				unset($_item); // Housekeeping.
 
 				$sql_columns      = array(
@@ -1117,6 +1248,25 @@ namespace comment_mail // Root namespace.
 						if(strpos($_sql_item_column, 'sub_') !== 0)
 							$_item->{'sub_'.$_sql_item_column} = $results[$_item->sub_id]->{$_sql_item_column};
 						else $_item->{$_sql_item_column} = $results[$_item->sub_id]->{$_sql_item_column};
+				}
+				unset($_item, $_sql_item_column); // Housekeeping.
+
+				foreach($this->items as $_item)
+				{
+					foreach($sql_item_columns as $_sql_item_column)
+						$_item->{'oby_sub_'. // Prefix each of these.
+						         preg_replace('/^sub_/i', '', $_sql_item_column)} = NULL;
+
+					if(!isset($_item->oby_sub_id))
+						continue; // Not possible.
+
+					if(empty($results) || empty($results[$_item->oby_sub_id]))
+						continue; // Not possible.
+
+					foreach($sql_item_columns as $_sql_item_column)
+						$_item->{'oby_sub_'. // Prefix each of these.
+						         preg_replace('/^sub_/i', '', $_sql_item_column)}
+							= $results[$_item->oby_sub_id]->{$_sql_item_column};
 				}
 				unset($_item, $_sql_item_column); // Housekeeping.
 
