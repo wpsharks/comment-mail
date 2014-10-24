@@ -572,8 +572,9 @@ namespace comment_mail // Root namespace.
 				$value = isset($item->{$property}) ? $item->{$property} : '';
 
 				if(($property === 'time' || substr($property, -5) === '_time') && is_integer($value))
-					$value = $value <= 0 ? '—' : esc_html($this->plugin->utils_date->i18n('M j, Y, g:i a', $value)).'<br />'.
-					                             '<span style="font-style:italic;">('.esc_html($this->plugin->utils_date->approx_time_difference($value)).')</span>';
+					$value = $value <= 0 ? '—' // Use a default value of `—` in this case.
+						: esc_html($this->plugin->utils_date->i18n('M j, Y, g:i a', $value)).'<br />'.
+						  '<span style="font-style:italic;">('.esc_html($this->plugin->utils_date->approx_time_difference($value)).')</span>';
 
 				else if(($property === 'ID' || substr($property, -3) === '_id') && is_integer($value))
 					$value = $value <= 0 ? '—' : esc_html((string)$value);

@@ -61,7 +61,7 @@ namespace comment_mail // Root namespace.
 				return array(
 					'cb'                => '1', // Include checkboxes.
 					'ID'                => __('ID', $plugin->text_domain),
-					'sub_id'            => __('Subscriber ID', $plugin->text_domain),
+					'sub_id'            => __('Subscr. ID', $plugin->text_domain),
 					'post_id'           => __('Subscr. to Post ID', $plugin->text_domain),
 					'comment_parent_id' => __('Subscr. to Comment ID', $plugin->text_domain),
 					'comment_id'        => __('Regarding Comment ID', $plugin->text_domain),
@@ -81,6 +81,8 @@ namespace comment_mail // Root namespace.
 			public static function get_hidden_columns_()
 			{
 				return array(
+					'comment_parent_id',
+					'insertion_time',
 					'last_update_time',
 				);
 			}
@@ -164,10 +166,29 @@ namespace comment_mail // Root namespace.
 					            ' data-pmp-action="'.esc_attr($delete_url).'"'. // The action URL.
 					            ' data-pmp-confirmation="'.esc_attr(__('Delete queued notification? Are you sure?', $this->plugin->text_domain)).'"'.
 					            ' title="'.esc_attr(__('Delete Queued Notification', $this->plugin->text_domain)).'">'.
-					            '  <i class="fa fa-times-circle"></i>'.
+					            '  <i class="fa fa-times-circle"></i> '.__('Delete', $this->plugin->text_domain).
 					            '</a>',
 				);
 				return $id_info.$this->row_actions($row_actions);
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_hold_until_time(\stdClass $item)
+			{
+				if(!$item->hold_until_time)
+					return __('n/a; awaiting processing', $this->plugin->text_domain);
+
+				return esc_html($this->plugin->utils_date->i18n('M j, Y, g:i a', $item->hold_until_time)).'<br />'.
+				       '<span style="font-style:italic;">('.esc_html($this->plugin->utils_date->approx_time_difference(time(), $item->hold_until_time, '')).')</span>'.
+				       ' '.__('~ part of a digest', $this->plugin->text_domain);
 			}
 
 			/*

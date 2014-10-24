@@ -112,7 +112,7 @@ namespace comment_mail // Root namespace.
 				echo '<div id="'.esc_attr($this->plugin->slug.'-menu-page-table').'" class="'.esc_attr($this->plugin->slug.'-menu-page-queue '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
 
-				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Queued Notifications', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-email" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
+				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Queued (Pending) Notifications', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-email" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
 				new queue_table(); // Displays table.
 
 				echo '   </form>';

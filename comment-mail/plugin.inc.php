@@ -981,16 +981,19 @@ namespace comment_mail
 						}
 						else $_dismiss_anchor = ''; // Define a default value.
 
+						$_classes = $this->slug.'-menu-page-area'; // Always.
+						$_classes .= ' pmp-'.($_args['type'] === 'error' ? 'error' : 'notice');
+						$_classes .= ' '.($_args['type'] === 'error' ? 'error' : 'updated');
+
 						$_full_markup = // Put together the full markup; including other pieces.
-							'<div class="'.esc_attr($this->slug.'-menu-page-area pmp-'.($_args['type'] === 'error' ? 'error' : 'notice')).
-							' '.esc_attr($_args['type'] === 'error' ? 'error' : 'updated').'">'.
+							'<div class="'.esc_attr($_classes).'">'.
 							'  <p>'.$_args['markup'].$_dismiss_anchor.'</p>'.
 							'</div>';
 						echo apply_filters(__METHOD__.'_notice', $_full_markup, get_defined_vars());
 					}
 					if(!$_args['persistent']) unset($notices[$_key]); // Once only; i.e. don't show again.
 				}
-				unset($_key, $_args, $_dismiss_style, $_dismiss_url, $_dismiss_anchor, $_full_markup); // Housekeeping.
+				unset($_key, $_args, $_dismiss_style, $_dismiss_url, $_dismiss_anchor, $_classes, $_full_markup); // Housekeeping.
 
 				if($original_notices !== $notices) update_option(__NAMESPACE__.'_notices', $notices);
 			}

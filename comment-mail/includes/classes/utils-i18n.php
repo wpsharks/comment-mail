@@ -21,22 +21,6 @@ namespace comment_mail // Root namespace.
 		class utils_i18n extends abstract_base
 		{
 			/**
-			 * `X subscriber` or `X subscribers`.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param integer $counter Total subscribers; i.e. a counter value.
-			 *
-			 * @return string The phrase `X subscriber` or `X subscribers`.
-			 */
-			public function subscribers($counter)
-			{
-				$counter = (integer)$counter; // Force integer.
-
-				return sprintf(_n('%1$s subscriber', '%1$s subscribers', $counter, $this->plugin->text_domain), $counter);
-			}
-
-			/**
 			 * Action past tense translation.
 			 *
 			 * @since 14xxxx First documented version.
@@ -145,6 +129,38 @@ namespace comment_mail // Root namespace.
 						return __('replies only', $this->plugin->text_domain);
 				}
 				return !$subscr_type ? '' : __($subscr_type, $this->plugin->text_domain);
+			}
+
+			/**
+			 * `X subscriber` or `X subscribers`.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $counter Total subscribers; i.e. a counter value.
+			 *
+			 * @return string The phrase `X subscriber` or `X subscribers`.
+			 */
+			public function subscribers($counter)
+			{
+				$counter = (integer)$counter; // Force integer.
+
+				return sprintf(_n('%1$s subscriber', '%1$s subscribers', $counter, $this->plugin->text_domain), $counter);
+			}
+
+			/**
+			 * `X queued notification` or `X queued notifications`.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $counter Total queued notifications; i.e. a counter value.
+			 *
+			 * @return string The phrase `X queued notification` or `X queued notifications`.
+			 */
+			public function queued_notifications($counter)
+			{
+				$counter = (integer)$counter; // Force integer.
+
+				return sprintf(_n('%1$s queued notification', '%1$s queued notifications', $counter, $this->plugin->text_domain), $counter);
 			}
 		}
 	}

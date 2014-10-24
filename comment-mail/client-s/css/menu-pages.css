@@ -3,39 +3,11 @@
 ------------------------------------------------------------------------------------------------------------ */
 @import url('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css');
 /* ------------------------------------------------------------------------------------------------------------
-	WP core elements under plugin-specific conditions.
------------------------------------------------------------------------------------------------------------- */
-/*
-Alter wrap bg color.
-*/
-.comments_page_comment_mail #wpwrap
-{
-	background : #C7C7C7;
-}
-/*
-Align w/ menu page.
-*/
-.comments_page_comment_mail div.updated,
-.comments_page_comment_mail div.error
-{
-	font-size : 120%;
-	margin    : 25px 25px 25px 5px;
-}
-/* ------------------------------------------------------------------------------------------------------------
-	Plugin-specific styles in ANY area of the dashboard.
+	Plugin-specific styles for any menu page area of the dashboard.
 ------------------------------------------------------------------------------------------------------------ */
 /*
 A menu page area ~ notices.
 */
-.comment-mail-menu-page-area .pmp-info,
-.comment-mail-menu-page-area .pmp-notice,
-.comment-mail-menu-page-area .pmp-warning,
-.comment-mail-menu-page-area .pmp-error
-{
-	border-radius : 5px;
-	font-size     : 120%;
-	padding       : 10px;
-}
 .comment-mail-menu-page-area .pmp-info
 {
 	background : #C9E0FA;
@@ -55,6 +27,21 @@ A menu page area ~ notices.
 {
 	background : #FABBC6;
 	border     : 1px solid #711E1E;
+}
+.comment-mail-menu-page-area .pmp-info,
+.comment-mail-menu-page-area .pmp-notice,
+.comment-mail-menu-page-area .pmp-warning,
+.comment-mail-menu-page-area .pmp-error
+{
+	border-radius : 5px;
+}
+.comment-mail-menu-page-area .pmp-info:not(.updated):not(.error),
+.comment-mail-menu-page-area .pmp-notice:not(.updated):not(.error),
+.comment-mail-menu-page-area .pmp-warning:not(.updated):not(.error),
+.comment-mail-menu-page-area .pmp-error:not(.updated):not(.error)
+{
+	padding    : 1px 12px 1px 12px;
+	box-shadow : 0 1px 1px 0 rgba(0, 0, 0, .1);
 }
 /*
 A menu page area ~ list items.
@@ -137,7 +124,26 @@ A menu page area ~ post com/sub bubbles.
 	color : #FFFFFF;
 }
 /* ------------------------------------------------------------------------------------------------------------
-	Plugin styles for an actual/standard plugin menu page; e.g. options.
+	WP core elements under plugin-specific conditions.
+------------------------------------------------------------------------------------------------------------ */
+/*
+Alter wrap bg color.
+*/
+.comments_page_comment_mail #wpwrap
+{
+	background : #C7C7C7;
+}
+/*
+Align w/ menu page.
+*/
+.comments_page_comment_mail div.updated,
+.comments_page_comment_mail div.error
+{
+	font-size : 120%;
+	margin    : 25px 25px 25px 5px;
+}
+/* ------------------------------------------------------------------------------------------------------------
+	Plugin-specific styles for an actual/standard plugin menu page; e.g. options.
 ------------------------------------------------------------------------------------------------------------ */
 /*
 Menu page styles.
@@ -532,7 +538,7 @@ Menu page save button styles.
 	line-height : 1.3em;
 }
 /* ------------------------------------------------------------------------------------------------------------
-	Tables; i.e. menu pages that follow a WP standard; but need a few plugin-specific styles.
+	Plugin-specific styles for menu page tables that follow a WP standard; but need a few tweaks.
 ------------------------------------------------------------------------------------------------------------ */
 /*
 Menu page table filter styles.
@@ -561,69 +567,90 @@ Menu page table filter styles.
 {
 	font-weight : bold;
 }
-/* ------------------------------------------------------------------------------------------------------------
-	Specific menu page elements that need adjustments for responsive behavior.
------------------------------------------------------------------------------------------------------------- */
 /*
 Menu page table columns; i.e. media queries.
 */
+@media all
+{
+	.comment-mail-menu-page-queue tr > *.column-ID
+	{
+		width : 100px;
+	}
+}
 @media (max-width : 767px)
 {
-	.comment-mail-menu-page-subscribers .column-email
+	.comment-mail-menu-page-subscribers tr > *.column-email,
+	.comment-mail-menu-page-queue tr > *.column-ID,
+	.comment-mail-menu-page-queue tr > *.column-sub_id
 	{
 		display : table-cell !important;
 	}
-	.comment-mail-menu-page-subscribers th:not(.check-column):not(.column-email),
-	.comment-mail-menu-page-subscribers td:not(.check-column):not(.column-email)
+	.comment-mail-menu-page-subscribers tr > *:not(.check-column):not(.column-email),
+	.comment-mail-menu-page-queue tr > *:not(.check-column):not(.column-ID):not(.column-sub_id)
 	{
 		display : none !important;
 	}
 }
 @media (min-width : 768px) and (max-width : 991px)
 {
-	.comment-mail-menu-page-subscribers .column-email,
-	.comment-mail-menu-page-subscribers .column-post_id
+	.comment-mail-menu-page-subscribers tr > *.column-email,
+	.comment-mail-menu-page-subscribers tr > *.column-post_id,
+	.comment-mail-menu-page-queue tr > *.column-ID,
+	.comment-mail-menu-page-queue tr > *.column-sub_id,
+	.comment-mail-menu-page-queue tr > *.column-hold_until_time
 	{
 		display : table-cell !important;
 	}
-	.comment-mail-menu-page-subscribers th:not(.check-column):not(.column-email):not(.column-post_id),
-	.comment-mail-menu-page-subscribers td:not(.check-column):not(.column-email):not(.column-post_id)
+	.comment-mail-menu-page-subscribers tr > *:not(.check-column):not(.column-email):not(.column-post_id),
+	.comment-mail-menu-page-queue tr > *:not(.column-ID):not(.column-sub_id):not(.column-hold_until_time)
 	{
 		display : none !important;
 	}
 }
 @media (min-width : 992px) and (max-width : 1199px)
 {
-	.comment-mail-menu-page-subscribers .column-email,
-	.comment-mail-menu-page-subscribers .column-post_id
+	.comment-mail-menu-page-subscribers tr > *.column-email,
+	.comment-mail-menu-page-subscribers tr > *.column-post_id,
+	.comment-mail-menu-page-queue tr > *.column-sub_id,
+	.comment-mail-menu-page-queue tr > *.column-post_id
 	{
 		width : 200px;
 	}
-	.comment-mail-menu-page-subscribers .column-comment_id
+	.comment-mail-menu-page-subscribers tr > *.column-comment_id,
+	.comment-mail-menu-page-queue tr > *.column-comment_parent_id,
+	.comment-mail-menu-page-queue tr > *.column-comment_id
 	{
 		width : 150px;
 	}
 }
 @media (min-width : 1200px) and (max-width : 1599px)
 {
-	.comment-mail-menu-page-subscribers .column-email,
-	.comment-mail-menu-page-subscribers .column-post_id
+	.comment-mail-menu-page-subscribers tr > *.column-email,
+	.comment-mail-menu-page-subscribers tr > *.column-post_id,
+	.comment-mail-menu-page-queue tr > *.column-sub_id,
+	.comment-mail-menu-page-queue tr > *.column-post_id
 	{
 		width : 250px;
 	}
-	.comment-mail-menu-page-subscribers .column-comment_id
+	.comment-mail-menu-page-subscribers tr > *.column-comment_id,
+	.comment-mail-menu-page-queue tr > *.column-comment_parent_id,
+	.comment-mail-menu-page-queue tr > *.column-comment_id
 	{
 		width : 200px;
 	}
 }
 @media (min-width : 1600px)
 {
-	.comment-mail-menu-page-subscribers .column-email,
-	.comment-mail-menu-page-subscribers .column-post_id
+	.comment-mail-menu-page-subscribers tr > *.column-email,
+	.comment-mail-menu-page-subscribers tr > *.column-post_id,
+	.comment-mail-menu-page-queue tr > *.column-sub_id,
+	.comment-mail-menu-page-queue tr > *.column-post_id
 	{
 		width : 300px;
 	}
-	.comment-mail-menu-page-subscribers .column-comment_id
+	.comment-mail-menu-page-subscribers tr > *.column-comment_id,
+	.comment-mail-menu-page-queue tr > *.column-comment_parent_id,
+	.comment-mail-menu-page-queue tr > *.column-comment_id
 	{
 		width : 250px;
 	}
