@@ -190,6 +190,22 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * `X sub. event log entry` or `X sub. event log entries`.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $counter Total sub. event log entries; i.e. a counter value.
+			 *
+			 * @return string The phrase `X sub. event log entry` or `X sub. event log entries`.
+			 */
+			public function sub_event_log_entries($counter)
+			{
+				$counter = (integer)$counter; // Force integer.
+
+				return sprintf(_n('%1$s sub. event log entry', '%1$s sub. event log entries', $counter, $this->plugin->text_domain), $counter);
+			}
+
+			/**
 			 * `X queued notification` or `X queued notifications`.
 			 *
 			 * @since 14xxxx First documented version.
@@ -203,6 +219,22 @@ namespace comment_mail // Root namespace.
 				$counter = (integer)$counter; // Force integer.
 
 				return sprintf(_n('%1$s queued notification', '%1$s queued notifications', $counter, $this->plugin->text_domain), $counter);
+			}
+
+			/**
+			 * `X queue event log entry` or `X queue event log entries`.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $counter Total queue event log entries; i.e. a counter value.
+			 *
+			 * @return string The phrase `X queue event log entry` or `X queue event log entries`.
+			 */
+			public function queue_event_log_entries($counter)
+			{
+				$counter = (integer)$counter; // Force integer.
+
+				return sprintf(_n('%1$s queue event log entry', '%1$s queue event log entries', $counter, $this->plugin->text_domain), $counter);
 			}
 		}
 	}
