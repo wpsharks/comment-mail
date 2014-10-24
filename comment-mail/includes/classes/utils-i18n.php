@@ -108,6 +108,48 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Event label translation.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $event An event e.g. `inserted`, `updated`, `deleted`, etc.
+			 *
+			 * @return string The string translation for the given `$event`.
+			 */
+			public function event_label($event)
+			{
+				$event = strtolower(trim((string)$event));
+
+				switch($event) // Convert to label.
+				{
+					case 'inserted':
+						return __('inserted', $this->plugin->text_domain);
+
+					case 'updated':
+						return __('updated', $this->plugin->text_domain);
+
+					case 'overwritten':
+						return __('overwritten', $this->plugin->text_domain);
+
+					case 'purged':
+						return __('purged', $this->plugin->text_domain);
+
+					case 'cleaned':
+						return __('cleaned', $this->plugin->text_domain);
+
+					case 'deleted':
+						return __('deleted', $this->plugin->text_domain);
+
+					case 'invalidated':
+						return __('invalidated', $this->plugin->text_domain);
+
+					case 'notified':
+						return __('notified', $this->plugin->text_domain);
+				}
+				return !$event ? '' : __(rtrim($event, 'ed').'ed', $this->plugin->text_domain);
+			}
+
+			/**
 			 * Subscr. type label translation.
 			 *
 			 * @since 14xxxx First documented version.

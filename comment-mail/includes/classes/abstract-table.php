@@ -428,8 +428,11 @@ namespace comment_mail // Root namespace.
 				if(!$item->sub_id)
 					return '—'; // Not possible.
 
+				$id_only = '<i class="fa fa-child"></i>'. // If it's all we can do.
+				           ' <span style="font-weight:bold;">ID #'.esc_html($item->sub_id).'</span>';
+
 				if(empty($this->merged_result_sets['subs'][$item->sub_id]))
-					return esc_html($item->sub_id);
+					return $id_only; // All we can do.
 
 				$name     = $item->sub_fname.' '.$item->sub_lname; // Concatenate.
 				$sub_info = '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
@@ -461,8 +464,11 @@ namespace comment_mail // Root namespace.
 				if(!$item->oby_sub_id)
 					return '—'; // Not possible.
 
+				$id_only = '<i class="fa fa-child"></i>'. // If it's all we can do.
+				           ' <span style="font-weight:bold;">ID #'.esc_html($item->oby_sub_id).'</span>';
+
 				if(empty($this->merged_result_sets['subs'][$item->oby_sub_id]))
-					return esc_html($item->oby_sub_id);
+					return $id_only; // All we can do.
 
 				$name         = $item->oby_sub_fname.' '.$item->oby_sub_lname; // Concatenate.
 				$oby_sub_info = '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
@@ -494,8 +500,11 @@ namespace comment_mail // Root namespace.
 				if(!$item->user_id)
 					return '—'; // Not possible.
 
+				$id_only = '<i class="fa fa-user"></i>'. // If it's all we can do.
+				           ' <span style="font-weight:bold;">ID #'.esc_html($item->user_id).'</span>';
+
 				if(empty($this->merged_result_sets['users'][$item->user_id]))
-					return esc_html($item->user_id);
+					return $id_only; // All we can do.
 
 				$user_info = '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ username in hover title.
 				             ' <span style="font-weight:bold;" title="'.esc_attr($item->user_login).'">ID #'.esc_html($item->user_id).'</span>'.
@@ -526,14 +535,17 @@ namespace comment_mail // Root namespace.
 				if(!$item->post_id)
 					return '—'; // Not possible.
 
+				$id_only = '<i class="fa fa-thumb-tack"></i>'. // If it's all we can do.
+				           ' <span style="font-weight:bold;">ID #'.esc_html($item->post_id).'</span>';
+
 				if(empty($this->merged_result_sets['posts'][$item->post_id]))
-					return esc_html($item->post_id);
+					return $id_only; // All we can do.
 
 				if(!$item->post_type || !$item->post_title)
-					return esc_html($item->post_id);
+					return $id_only; // All we can do.
 
 				if(!($post_type = get_post_type_object($item->post_type)))
-					return esc_html($item->post_id);
+					return $id_only; // All we can do.
 
 				$post_type_label        = $post_type->labels->singular_name;
 				$post_title_clip        = $this->plugin->utils_string->mid_clip($item->post_title);
@@ -546,7 +558,8 @@ namespace comment_mail // Root namespace.
 
 				$post_info = $this->plugin->utils_markup->subscriber_count($item->post_id, $post_total_subscribers).
 				             $this->plugin->utils_markup->comment_count($item->post_id, $post_total_comments).
-				             '<span style="font-weight:bold;">'.esc_html($post_type_label).' ID #'.esc_html($item->post_id).'</span>'.
+				             '<i class="fa fa-thumb-tack"></i>'. // Start w/ a thumb tack icon; works w/ any post type.
+				             ' <span style="font-weight:bold;">'.esc_html($post_type_label).' ID #'.esc_html($item->post_id).'</span>'.
 				             ' <span style="font-style:italic;">('.__('comments', $this->plugin->text_domain).' '.esc_html($post_comments_status).')</span><br />'.
 				             '<span title="'.esc_attr($post_date).'">“'.esc_html($post_title_clip).'”</span>';
 
@@ -576,14 +589,18 @@ namespace comment_mail // Root namespace.
 				if(!$item->comment_parent_id)
 					return '—'; // Not possible.
 
+				$id_only = '<i class="fa fa-comment"></i>'. // If it's all we can do.
+				           ' <span style="font-weight:bold;">ID #'.esc_html($item->comment_parent_id).'</span>';
+
 				if(empty($this->merged_result_sets['comments'][$item->comment_parent_id]))
-					return esc_html($item->comment_parent_id);
+					return $id_only; // All we can do.
 
 				$comment_parent_date_time = $this->plugin->utils_date->i18n('M j, Y, g:i a', strtotime($item->comment_parent_date_gmt));
 				$comment_parent_time_ago  = $this->plugin->utils_date->approx_time_difference(strtotime($item->comment_parent_date_gmt));
 				$comment_parent_status    = $this->plugin->utils_i18n->status_label($this->plugin->utils_db->comment_status__($item->comment_parent_approved));
 
-				$comment_parent_info = '<span style="font-weight:bold;">'.esc_html(__('Comment', $this->plugin->text_domain)).' ID #'.esc_html($item->comment_parent_id).'</span>'.
+				$comment_parent_info = '<i class="fa fa-comment"></i>'. // Start w/ a comment bubble icon.
+				                       ' <span style="font-weight:bold;">'.esc_html(__('Comment', $this->plugin->text_domain)).' ID #'.esc_html($item->comment_parent_id).'</span>'.
 				                       ' <span style="font-style:italic;">('.esc_html($comment_parent_status).')</span><br />'.
 				                       '<span style="font-style:italic;">'.__('by:', $this->plugin->text_domain).'</span>'.
 				                       ' '.$this->plugin->utils_markup->name_email($item->comment_parent_author, $item->comment_parent_author_email);
@@ -614,6 +631,9 @@ namespace comment_mail // Root namespace.
 				if(!$item->comment_id)
 					return '— all —'; // All of them.
 
+				$id_only = '<i class="fa fa-comment"></i>'. // If it's all we can do.
+				           ' <span style="font-weight:bold;">ID #'.esc_html($item->comment_id).'</span>';
+
 				if(empty($this->merged_result_sets['comments'][$item->comment_id]))
 					return esc_html($item->comment_id);
 
@@ -621,7 +641,8 @@ namespace comment_mail // Root namespace.
 				$comment_time_ago  = $this->plugin->utils_date->approx_time_difference(strtotime($item->comment_date_gmt));
 				$comment_status    = $this->plugin->utils_i18n->status_label($this->plugin->utils_db->comment_status__($item->comment_approved));
 
-				$comment_info = '<span style="font-weight:bold;">'.esc_html(__('Comment', $this->plugin->text_domain)).' ID #'.esc_html($item->comment_id).'</span>'.
+				$comment_info = '<i class="fa fa-comment"></i>'. // Start w/ a comment bubble icon.
+				                ' <span style="font-weight:bold;">'.esc_html(__('Comment', $this->plugin->text_domain)).' ID #'.esc_html($item->comment_id).'</span>'.
 				                ' <span style="font-style:italic;">('.esc_html($comment_status).')</span><br />'.
 				                '<span style="font-style:italic;">'.__('by:', $this->plugin->text_domain).'</span>'.
 				                ' '.$this->plugin->utils_markup->name_email($item->comment_author, $item->comment_author_email);

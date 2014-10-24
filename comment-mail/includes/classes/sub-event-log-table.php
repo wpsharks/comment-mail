@@ -60,9 +60,9 @@ namespace comment_mail // Root namespace.
 
 				return array(
 					'cb'             => '1', // Include checkboxes.
-					'ID'             => __('ID', $plugin->text_domain),
-					'event'          => __('Event', $plugin->text_domain),
+					'ID'             => __('Entry', $plugin->text_domain),
 					'time'           => __('Time', $plugin->text_domain),
+					'event'          => __('Event', $plugin->text_domain),
 					'sub_id'         => __('Subscr. ID', $plugin->text_domain),
 					'oby_sub_id'     => __('Overwritten By', $plugin->text_domain),
 					'user_id'        => __('WP User ID', $plugin->text_domain),
@@ -91,12 +91,12 @@ namespace comment_mail // Root namespace.
 				return array(
 					'oby_sub_id',
 					'user_id',
+					'comment_id',
 					'deliver',
 					'fname',
 					'lname',
 					'email',
 					'ip',
-					'status_before',
 					'user_initiated',
 				);
 			}
@@ -160,12 +160,12 @@ namespace comment_mail // Root namespace.
 				$plugin = plugin(); // Needed for translations.
 
 				return array(
-					'event::inserted'    => $plugin->utils_i18n->status_label('inserted'),
-					'event::updated'     => $plugin->utils_i18n->status_label('updated'),
-					'event::overwritten' => $plugin->utils_i18n->status_label('overwritten'),
-					'event::purged'      => $plugin->utils_i18n->status_label('purged'),
-					'event::cleaned'     => $plugin->utils_i18n->status_label('cleaned'),
-					'event::deleted'     => $plugin->utils_i18n->status_label('deleted'),
+					'event::inserted'    => $plugin->utils_i18n->event_label('inserted'),
+					'event::updated'     => $plugin->utils_i18n->event_label('updated'),
+					'event::overwritten' => $plugin->utils_i18n->event_label('overwritten'),
+					'event::purged'      => $plugin->utils_i18n->event_label('purged'),
+					'event::cleaned'     => $plugin->utils_i18n->event_label('cleaned'),
+					'event::deleted'     => $plugin->utils_i18n->event_label('deleted'),
 				);
 			}
 
@@ -184,8 +184,8 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function column_ID(\stdClass $item)
 			{
-				$id_info = '<i class="fa fa-history"></i>'. // Entry icon w/ ID.
-				           ' <span style="font-weight:bold;">ID #'.esc_html($item->ID).'</span>';
+				$id_info = '<i class="fa fa-bell-o"></i>'. // Entry icon w/ ID.
+				           ' <span style="font-weight:bold;">#'.esc_html($item->ID).'</span>';
 
 				$delete_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'delete');
 

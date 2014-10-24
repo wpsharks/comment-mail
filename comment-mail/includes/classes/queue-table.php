@@ -61,12 +61,12 @@ namespace comment_mail // Root namespace.
 				return array(
 					'cb'                => '1', // Include checkboxes.
 					'ID'                => __('ID', $plugin->text_domain),
+					'insertion_time'    => __('Time', $plugin->text_domain),
 					'sub_id'            => __('Subscr. ID', $plugin->text_domain),
-					'user_id'           => __('Subscr. User ID', $plugin->text_domain),
+					'user_id'           => __('WP User ID', $plugin->text_domain),
 					'post_id'           => __('Subscr. to Post ID', $plugin->text_domain),
 					'comment_parent_id' => __('Subscr. to Comment ID', $plugin->text_domain),
 					'comment_id'        => __('Regarding Comment ID', $plugin->text_domain),
-					'insertion_time'    => __('Queued Time', $plugin->text_domain),
 					'last_update_time'  => __('Last Update', $plugin->text_domain),
 					'hold_until_time'   => __('Holding Until', $plugin->text_domain),
 				);
@@ -84,7 +84,7 @@ namespace comment_mail // Root namespace.
 				return array(
 					'user_id',
 					'comment_parent_id',
-					'insertion_time',
+					'comment_id',
 					'last_update_time',
 				);
 			}
@@ -159,7 +159,7 @@ namespace comment_mail // Root namespace.
 			protected function column_ID(\stdClass $item)
 			{
 				$id_info = '<i class="fa fa-envelope-o"></i>'. // Notification icon w/ ID.
-				           ' <span style="font-weight:bold;">ID #'.esc_html($item->ID).'</span>';
+				           ' <span style="font-weight:bold;">#'.esc_html($item->ID).'</span>';
 
 				$delete_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'delete');
 

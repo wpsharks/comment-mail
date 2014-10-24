@@ -60,14 +60,14 @@ namespace comment_mail // Root namespace.
 
 				return array(
 					'cb'                => '1', // Include checkboxes.
-					'ID'                => __('ID', $plugin->text_domain),
+					'ID'                => __('Entry', $plugin->text_domain),
+					'time'              => __('Time', $plugin->text_domain),
 					'event'             => __('Event', $plugin->text_domain),
 					'note_code'         => __('Note', $plugin->text_domain),
-					'time'              => __('Time', $plugin->text_domain),
 					'queue_id'          => __('Queue ID', $plugin->text_domain),
 					'dby_queue_id'      => __('Digested by Queue ID', $plugin->text_domain),
 					'sub_id'            => __('Subscr. ID', $plugin->text_domain),
-					'user_id'           => __('Subscr. User ID', $plugin->text_domain),
+					'user_id'           => __('WP User ID', $plugin->text_domain),
 					'post_id'           => __('Subscr. to Post ID', $plugin->text_domain),
 					'comment_parent_id' => __('Subscr. to Comment ID', $plugin->text_domain),
 					'comment_id'        => __('Regarding Comment ID', $plugin->text_domain),
@@ -94,6 +94,7 @@ namespace comment_mail // Root namespace.
 					'dby_queue_id',
 					'user_id',
 					'comment_parent_id',
+					'comment_id',
 					'fname',
 					'lname',
 					'email',
@@ -161,8 +162,8 @@ namespace comment_mail // Root namespace.
 				$plugin = plugin(); // Needed for translations.
 
 				return array(
-					'event::invalidated' => $plugin->utils_i18n->status_label('invalidated'),
-					'event::notified'    => $plugin->utils_i18n->status_label('notified'),
+					'event::invalidated' => $plugin->utils_i18n->event_label('invalidated'),
+					'event::notified'    => $plugin->utils_i18n->event_label('notified'),
 				);
 			}
 
@@ -182,7 +183,7 @@ namespace comment_mail // Root namespace.
 			protected function column_ID(\stdClass $item)
 			{
 				$id_info = '<i class="fa fa-paper-plane"></i>'. // Entry icon w/ ID.
-				           ' <span style="font-weight:bold;">ID #'.esc_html($item->ID).'</span>';
+				           ' <span style="font-weight:bold;">#'.esc_html($item->ID).'</span>';
 
 				$delete_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'delete');
 
