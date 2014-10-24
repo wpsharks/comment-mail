@@ -555,6 +555,23 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Creates an edit user shortlink w/o a DB query.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $user_id User ID.
+			 *
+			 * @return string Edit user shortlink.
+			 */
+			public function edit_user_short($user_id)
+			{
+				$user_id = (integer)$user_id; // Force integer.
+				$args    = array('user_id' => $user_id);
+
+				return add_query_arg(urlencode_deep($args), admin_url('/user-edit.php'));
+			}
+
+			/**
 			 * Creates a comment shortlink w/o a DB query.
 			 *
 			 * @since 14xxxx First documented version.

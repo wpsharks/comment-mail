@@ -553,6 +553,30 @@ namespace comment_mail // Root namespace.
 
 				return nl2br(make_clickable(esc_html($string)));
 			}
+
+			/**
+			 * A very simple markdown parser.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $string Input string to convert.
+			 *
+			 * @return string Markdown converted to HTML markup.
+			 */
+			public function s_md_to_html($string)
+			{
+				if(!($string = trim((string)$string)))
+					return $string; // Not possible.
+
+				if($this->is_html($string))
+					return $string; // Not applicable.
+
+				$html = $this->to_html($string);
+				$html = preg_replace('/`{3,}([^`]+?)`+/', '<pre><code>'.'${1}'.'</code></pre>', $html);
+				$html = preg_replace('/`+([^`]+?)`+/', '<code>'.'${1}'.'</code>', $html);
+
+				return $html;
+			}
 		}
 	}
 }

@@ -15,5 +15,6 @@ CREATE TABLE IF NOT EXISTS `%%prefix%%queue_event_log` (
   `event` enum('invalidated', 'notified') COLLATE utf8_unicode_ci NOT NULL COMMENT 'Event type.',
   `note_code` varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Optional note during processing.',
   `time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Event time. Unix timestamp.',
-  PRIMARY KEY (`ID`) COMMENT 'Primary key.'
+  PRIMARY KEY (`ID`) COMMENT 'Primary key.',
+  FULLTEXT KEY `fulltext_search` (`fname`,`lname`,`email`,`ip`) COMMENT 'Fulltext search index.'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;

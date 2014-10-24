@@ -120,6 +120,23 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Displays menu page.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function queue_event_log()
+			{
+				echo '<div id="'.esc_attr($this->plugin->slug.'-menu-page-table').'" class="'.esc_attr($this->plugin->slug.'-menu-page-queue-event-log '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
+
+				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Queue Event Log', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-email" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
+				new queue_event_log_table(); // Displays table.
+
+				echo '   </form>';
+				echo '</div>'."\n";
+			}
+
+			/**
 			 * Constructs menu page heading.
 			 *
 			 * @since 14xxxx First documented version.

@@ -18,22 +18,23 @@ namespace comment_mail
 		/**
 		 * Plugin Class
 		 *
-		 * @property utils_array  $utils_array
-		 * @property utils_date   $utils_date
-		 * @property utils_db     $utils_db
-		 * @property utils_enc    $utils_enc
-		 * @property utils_env    $utils_env
-		 * @property utils_event  $utils_event
-		 * @property utils_fs     $utils_fs
-		 * @property utils_i18n   $utils_i18n
-		 * @property utils_mail   $utils_mail
-		 * @property utils_markup $utils_markup
-		 * @property utils_php    $utils_php
-		 * @property utils_queue  $utils_queue
-		 * @property utils_string $utils_string
-		 * @property utils_sub    $utils_sub
-		 * @property utils_url    $utils_url
-		 * @property utils_user   $utils_user
+		 * @property utils_array           $utils_array
+		 * @property utils_date            $utils_date
+		 * @property utils_db              $utils_db
+		 * @property utils_enc             $utils_enc
+		 * @property utils_env             $utils_env
+		 * @property utils_event           $utils_event
+		 * @property utils_fs              $utils_fs
+		 * @property utils_i18n            $utils_i18n
+		 * @property utils_mail            $utils_mail
+		 * @property utils_markup          $utils_markup
+		 * @property utils_php             $utils_php
+		 * @property utils_queue           $utils_queue
+		 * @property utils_queue_event_log $utils_queue_event_log
+		 * @property utils_string          $utils_string
+		 * @property utils_sub             $utils_sub
+		 * @property utils_url             $utils_url
+		 * @property utils_user            $utils_user
 		 *
 		 * @since 14xxxx First documented version.
 		 */
@@ -622,6 +623,11 @@ namespace comment_mail
 				$page_title                                    = $this->name.'™ ⥱ '.__('Mail Queue', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_queue'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue'], array($this, 'menu_page_queue_screen'));
+
+				$menu_title                                              = '⥱ '.__('Queue Event Log', $this->text_domain);
+				$page_title                                              = $this->name.'™ ⥱ '.__('Queue Event Log', $this->text_domain);
+				$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_queue_event_log', array($this, 'menu_page_queue_event_log'));
+				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'], array($this, 'menu_page_queue_event_log_screen'));
 			}
 
 			/**
@@ -688,7 +694,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_subscribers]` action.
+			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_subscribers']` action.
 			 *
 			 * @see add_menu_pages()
 			 * @see subs_table::get_hidden_columns()
@@ -735,7 +741,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue]` action.
+			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue']` action.
 			 *
 			 * @see add_menu_pages()
 			 */
@@ -765,6 +771,40 @@ namespace comment_mail
 			}
 
 			/**
+			 * Menu page screen; for queue event log.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log']` action.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_queue_event_log_screen()
+			{
+				$screen = get_current_screen();
+				if(!($screen instanceof \WP_Screen))
+					return; // Not possible.
+
+				if(empty($this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'])
+				   || $screen->id !== $this->menu_page_hooks[__NAMESPACE__.'_queue_event_log']
+				) return; // Not applicable.
+
+				add_screen_option('per_page', array(
+					'default' => '50', // Default items per page.
+					'label'   => __('Per Page', $this->text_domain),
+					'option'  => __NAMESPACE__.'_queue_event_log_per_page',
+				));
+				add_filter('manage_'.$screen->id.'_columns', function ()
+				{
+					return queue_event_log_table::get_columns_();
+				});
+				add_filter('get_user_option_manage'.$screen->id.'columnshidden', function ($value)
+				{
+					return is_array($value) ? $value : queue_event_log_table::get_hidden_columns_();
+				});
+			}
+
+			/**
 			 * Menu page for mail queue.
 			 *
 			 * @since 14xxxx First documented version.
@@ -774,6 +814,18 @@ namespace comment_mail
 			public function menu_page_queue()
 			{
 				new menu_page('queue');
+			}
+
+			/**
+			 * Menu page for mail queue event log.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_queue_event_log()
+			{
+				new menu_page('queue_event_log');
 			}
 
 			/**

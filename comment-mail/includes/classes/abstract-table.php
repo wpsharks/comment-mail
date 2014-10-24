@@ -70,6 +70,13 @@ namespace comment_mail // Root namespace.
 			protected $sub_ids_regex;
 
 			/**
+			 * @var string Regex for user IDs.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $user_ids_regex;
+
+			/**
 			 * @var string Regex for post IDs.
 			 *
 			 * @since 14xxxx First documented version.
@@ -96,6 +103,13 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 */
 			protected $statuses_regex;
+
+			/**
+			 * @var string Regex for events.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $events_regex;
 
 			/**
 			 * @var array Merged result sets.
@@ -142,9 +156,11 @@ namespace comment_mail // Root namespace.
 
 				// Filters; i.e. `:`= filter; `::` = navigable filter.
 				$this->sub_ids_regex     = '/\bsub_ids?\:(?P<sub_ids>[0-9|;,]+)/i';
+				$this->user_ids_regex    = '/\buser_ids?\:(?P<user_ids>[0-9|;,]+)/i';
 				$this->post_ids_regex    = '/\bpost_ids?\:(?P<post_ids>[0-9|;,]+)/i';
 				$this->comment_ids_regex = '/\bcomment_ids?\:(?P<comment_ids>[0-9|;,]+)/i';
 				$this->statuses_regex    = '/\bstatus(?:es)?\:\:(?P<statuses>[\w|;,]+)/i';
+				$this->events_regex      = '/\bevents?\:\:(?P<events>[\w|;,]+)/i';
 
 				$this->and_regex = '/(?:^|\s+)\+(?:\s+|$)/i';
 				// Must NOT conflict with SQL: <http://bit.ly/1tNam85>
@@ -437,6 +453,38 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string HTML markup for this table column.
 			 */
+			protected function column_user_id(\stdClass $item)
+			{
+				if(!isset($item->user_id))
+					return '—'; // Not possible.
+
+				if(!$item->user_id)
+					return '—'; // Not possible.
+
+				if(empty($this->merged_result_sets['users'][$item->user_id]))
+					return '—'; // Not possible.
+
+				$user_info = '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ username in hover title.
+				             ' <span style="font-weight:bold;" title="'.esc_attr($item->user_login).'">ID #'.esc_html($item->user_id).'</span>'.
+				             ' '.$this->plugin->utils_markup->name_email($item->user_display_name, $item->user_email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
+
+				$edit_url = $this->plugin->utils_url->edit_user_short($item->user_id);
+
+				$row_actions = array(
+					'edit' => '<a href="'.esc_attr($edit_url).'">'.__('Edit User', $this->plugin->text_domain).'</a>',
+				);
+				return $user_info.$this->row_actions($row_actions);
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
 			protected function column_post_id(\stdClass $item)
 			{
 				if(!isset($item->post_id))
@@ -624,9 +672,11 @@ namespace comment_mail // Root namespace.
 				$s = $this->get_raw_search_query();
 
 				$s = $s ? preg_replace($this->sub_ids_regex, '', $s) : '';
+				$s = $s ? preg_replace($this->user_ids_regex, '', $s) : '';
 				$s = $s ? preg_replace($this->post_ids_regex, '', $s) : '';
 				$s = $s ? preg_replace($this->comment_ids_regex, '', $s) : '';
 				$s = $s ? preg_replace($this->statuses_regex, '', $s) : '';
+				$s = $s ? preg_replace($this->events_regex, '', $s) : '';
 				$s = $s ? preg_replace($this->and_regex, '', $s) : '';
 				$s = $s ? trim(preg_replace('/\s+/', ' ', $s)) : '';
 
@@ -663,6 +713,26 @@ namespace comment_mail // Root namespace.
 				unset($_m, $_sub_id); // Housekeeping.
 
 				return $sub_ids;
+			}
+
+			/**
+			 * Get user IDs in the search query.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array User IDs in the search query.
+			 */
+			protected function get_user_ids_in_search_query()
+			{
+				$user_ids = array(); // Initialize.
+				$s        = $this->get_raw_search_query();
+
+				if($s && preg_match_all($this->user_ids_regex, $s, $_m))
+					foreach(preg_split('/[|;,]+/', implode(',', $_m['user_ids']), NULL, PREG_SPLIT_NO_EMPTY) as $_user_id)
+						if((integer)$_user_id > 0) $user_ids[$_user_id] = (integer)$_user_id;
+				unset($_m, $_user_id); // Housekeeping.
+
+				return $user_ids;
 			}
 
 			/**
@@ -726,6 +796,26 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Get events in the search query.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array Events in the search query.
+			 */
+			protected function get_events_in_search_query()
+			{
+				$events = array(); // Initialize.
+				$s      = $this->get_raw_search_query();
+
+				if($s && preg_match_all($this->events_regex, $s, $_m))
+					foreach(preg_split('/[|;,]+/', implode(',', $_m['events']), NULL, PREG_SPLIT_NO_EMPTY) as $_event)
+						if(isset($_event[0])) $events[$_event] = $_event;
+				unset($_m, $_event); // Housekeeping.
+
+				return $events;
+			}
+
+			/**
 			 * Are we dealing w/ an `AND` search?
 			 *
 			 * @since 14xxxx First documented version.
@@ -753,10 +843,10 @@ namespace comment_mail // Root namespace.
 					: ''; // Not specified explicitly by site owner.
 
 				if(!$orderby || !in_array($orderby, array_keys($this->get_columns()), TRUE))
-					$orderby = $this->get_clean_search_query() ? 'relevance' : '';
+					$orderby = $this->get_clean_search_query() && $this->get_ft_searchable_columns() ? 'relevance' : '';
 
-				if($this->is_clean_search_submit_post())
-					$orderby = 'relevance'; // Force by relevance.
+				if($this->is_clean_search_submit_post()) // Force `orderby`.
+					$orderby = $this->get_ft_searchable_columns() ? 'relevance' : '';
 
 				$_GET['orderby'] = $_REQUEST['orderby'] = addslashes($orderby);
 				if(isset($_POST['orderby'])) $_POST['orderby'] = addslashes($orderby);
@@ -810,9 +900,11 @@ namespace comment_mail // Root namespace.
 				$current_offset              = $this->get_current_offset();
 				$clean_search_query          = $this->get_clean_search_query();
 				$sub_ids_in_search_query     = $this->get_sub_ids_in_search_query();
+				$user_ids_in_search_query    = $this->get_user_ids_in_search_query();
 				$post_ids_in_search_query    = $this->get_post_ids_in_search_query();
 				$comment_ids_in_search_query = $this->get_comment_ids_in_search_query();
 				$statuses_in_search_query    = $this->get_statuses_in_search_query();
+				$events_in_search_query      = $this->get_events_in_search_query();
 				$is_and_search_query         = $this->is_and_search_query();
 				$orderby                     = $this->get_orderby();
 				$order                       = $this->get_order();
@@ -822,6 +914,7 @@ namespace comment_mail // Root namespace.
 
 				$this->prepare_items_merge_subscr_properties();
 				$this->prepare_items_merge_sub_properties();
+				$this->prepare_items_merge_user_properties();
 				$this->prepare_items_merge_post_properties();
 				$this->prepare_items_merge_comment_properties();
 			}
@@ -1024,6 +1117,64 @@ namespace comment_mail // Root namespace.
 						if(strpos($_sql_item_column, 'sub_') !== 0)
 							$_item->{'sub_'.$_sql_item_column} = $results[$_item->sub_id]->{$_sql_item_column};
 						else $_item->{$_sql_item_column} = $results[$_item->sub_id]->{$_sql_item_column};
+				}
+				unset($_item, $_sql_item_column); // Housekeeping.
+
+				$this->items = $this->plugin->utils_db->typify_deep($this->items);
+			}
+
+			/**
+			 * Assists w/ DB query; i.e. item preparations.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function prepare_items_merge_user_properties()
+			{
+				$user_ids = array(); // Initialize.
+
+				foreach($this->items as $_item)
+					if(!empty($_item->user_id)) // Has a user ID?
+						$user_ids[$_item->user_id] = $_item->user_id;
+				unset($_item); // Housekeeping.
+
+				$sql_columns      = array(
+					'ID',
+					'user_login',
+					'user_nicename',
+					'user_email',
+					'user_url',
+					'user_registered',
+					'user_activation_key',
+					'user_status',
+					'display_name',
+				);
+				$sql_item_columns = $sql_columns;
+				unset($sql_item_columns[0]); // Exclude `ID`.
+
+				$sql = "SELECT `".implode('`,`', array_map('esc_sql', $sql_columns))."`".
+				       " FROM `".esc_sql($this->plugin->utils_db->wp->users)."`".
+				       " WHERE `ID` IN('".implode("','", array_map('esc_sql', $user_ids))."')";
+
+				if($user_ids && ($results = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
+					$this->merged_result_sets['users'] = $results = $this->plugin->utils_db->typify_deep($results);
+
+				foreach($this->items as $_item)
+				{
+					foreach($sql_item_columns as $_sql_item_column)
+						if(strpos($_sql_item_column, 'user_') !== 0)
+							$_item->{'user_'.$_sql_item_column} = NULL;
+						else $_item->{$_sql_item_column} = NULL;
+
+					if(!isset($_item->user_id))
+						continue; // Not possible.
+
+					if(empty($results) || empty($results[$_item->user_id]))
+						continue; // Not possible.
+
+					foreach($sql_item_columns as $_sql_item_column)
+						if(strpos($_sql_item_column, 'user_') !== 0)
+							$_item->{'user_'.$_sql_item_column} = $results[$_item->user_id]->{$_sql_item_column};
+						else $_item->{$_sql_item_column} = $results[$_item->user_id]->{$_sql_item_column};
 				}
 				unset($_item, $_sql_item_column); // Housekeeping.
 
@@ -1303,26 +1454,33 @@ namespace comment_mail // Root namespace.
 			public function search_query_filter_descriptions()
 			{
 				$sub_ids           = $this->get_sub_ids_in_search_query();
+				$user_ids          = $this->get_user_ids_in_search_query();
 				$post_ids          = $this->get_post_ids_in_search_query();
 				$comment_ids       = $this->get_comment_ids_in_search_query();
 				$statuses          = $this->get_statuses_in_search_query();
+				$events            = $this->get_events_in_search_query();
 				$navigable_filters = $this->get_navigable_filters();
 				$raw_search_query  = $this->get_raw_search_query();
 
-				$query_contains_filters           = $sub_ids || $post_ids || $comment_ids;
+				$query_contains_filters           = $sub_ids || $user_ids || $post_ids || $comment_ids;
+				$query_contains_navigable_filters = !empty($statuses) || !empty($events);
 				$navigable_filters_exist          = !empty($navigable_filters);
-				$query_contains_navigable_filters = !empty($statuses);
 
 				if(!$query_contains_filters && !$navigable_filters_exist)
 					return; // Nothing to do here.
 
-				$subs    = $posts = $comments = array(); // Array of bject references.
-				$sub_lis = $post_lis = $comment_lis = $navigable_filter_lis = $unknown_lis = array();
+				$subs    = $users = $posts = $comments = array(); // Array of bject references.
+				$sub_lis = $user_lis = $post_lis = $comment_lis = $navigable_filter_lis = $unknown_lis = array();
 
 				foreach($sub_ids as $_sub_id)
 					if(($_sub = $this->plugin->utils_sub->get($_sub_id)))
 						$subs[] = $_sub;
 				unset($_sub_id, $_sub); // Housekeeping.
+
+				foreach($user_ids as $_user_id)
+					if(($_user = new \WP_User($_user_id)) && $_user->ID)
+						$users[] = $_user;
+				unset($_user_id, $_user); // Housekeeping.
 
 				foreach($post_ids as $_post_id)
 					if(($_post = get_post($_post_id)))
@@ -1353,6 +1511,25 @@ namespace comment_mail // Root namespace.
 					                      '</li>';
 				}
 				unset($_sub, $_sub_name, $_sub_edit_link); // Housekeeping.
+
+				foreach($users as $_user) // `\WP_User` objects.
+				{
+					/** @var $_user \WP_User Reference for IDEs. */
+
+					if(isset($user_lis[$_user->ID]))
+						continue; // Duplicate.
+
+					$_user_edit_link = get_edit_user_link($_user->ID);
+
+					$user_lis[$_user->ID] = '<li>'. // ♙ ID "Name" <email> [edit].
+					                        '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
+					                        ' <span style="font-weight:bold;" title="'.esc_attr($_user->user_login).'">ID #'.esc_html($_user->ID).'</span>'.
+					                        ' '.$this->plugin->utils_markup->name_email($_user->display_name, $_user->user_email, array('email_style' => 'font-weight:bold;')).
+					                        ($_user_edit_link // Only if they can edit the user ID; else this will be empty.
+						                        ? ' [<a href="'.esc_attr($_user_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
+					                        '</li>';
+				}
+				unset($_user, $_user_edit_link); // Housekeeping.
 
 				foreach($posts as $_post) // `\WP_Post` objects.
 				{
@@ -1442,7 +1619,7 @@ namespace comment_mail // Root namespace.
 				}
 				unset($_navigable_filter_s, $_navigable_filter_label); // Housekeeping.
 
-				$filter_lis_exist           = $sub_lis || $post_lis || $comment_lis; // Have any of these?
+				$filter_lis_exist           = $sub_lis || $user_lis || $post_lis || $comment_lis; // Have any of these?
 				$navigable_filter_lis_exist = !empty($navigable_filter_lis); // Have any navigable list items?
 
 				if($query_contains_filters) // If query contains non-navigable filters.
@@ -1455,6 +1632,7 @@ namespace comment_mail // Root namespace.
 					     '   '.sprintf(__('<strong>Search Filters Applied</strong> :: only showing %1$s for:', $this->plugin->text_domain), esc_html($this->plural_label)).
 					     '</h3>';
 					if($sub_lis) echo '<ul class="pmp-search-filters pmp-filters pmp-list-items">'.implode('', $sub_lis).'</ul>';
+					if($user_lis) echo '<ul class="pmp-search-filters pmp-filters pmp-list-items">'.implode('', $user_lis).'</ul>';
 					if($post_lis) echo '<ul class="pmp-search-filters pmp-filters pmp-list-items">'.implode('', $post_lis).'</ul>';
 					if($comment_lis) echo '<ul class="pmp-search-filters pmp-filters pmp-list-items">'.implode('', $comment_lis).'</ul>';
 					if($unknown_lis) echo '<ul class="pmp-search-filters pmp-filters pmp-list-items">'.implode('', $unknown_lis).'</ul>';

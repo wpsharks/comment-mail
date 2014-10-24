@@ -63,7 +63,7 @@ namespace comment_mail // Root namespace.
 					'email'            => __('Subscriber Email', $plugin->text_domain),
 					'fname'            => __('First Name', $plugin->text_domain),
 					'lname'            => __('Last Name', $plugin->text_domain),
-					'user_id'          => __('User ID', $plugin->text_domain),
+					'user_id'          => __('WP User ID', $plugin->text_domain),
 					'post_id'          => __('Subscr. to Post ID', $plugin->text_domain),
 					'comment_id'       => __('Subscr. to Comment ID', $plugin->text_domain),
 					'insertion_time'   => __('Subscr. Time', $plugin->text_domain),
@@ -244,9 +244,11 @@ namespace comment_mail // Root namespace.
 				$current_offset              = $this->get_current_offset();
 				$clean_search_query          = $this->get_clean_search_query();
 				$sub_ids_in_search_query     = $this->get_sub_ids_in_search_query();
+				$user_ids_in_search_query    = $this->get_user_ids_in_search_query();
 				$post_ids_in_search_query    = $this->get_post_ids_in_search_query();
 				$comment_ids_in_search_query = $this->get_comment_ids_in_search_query();
 				$statuses_in_search_query    = $this->get_statuses_in_search_query();
+				$events_in_search_query      = $this->get_events_in_search_query();
 				$is_and_search_query         = $this->is_and_search_query();
 				$orderby                     = $this->get_orderby();
 				$order                       = $this->get_order();
@@ -264,10 +266,11 @@ namespace comment_mail // Root namespace.
 
 				       " WHERE 1=1". // Default where clause.
 
-				       ($sub_ids_in_search_query || $post_ids_in_search_query || $comment_ids_in_search_query
+				       ($sub_ids_in_search_query || $user_ids_in_search_query || $post_ids_in_search_query || $comment_ids_in_search_query
 					       ? " AND (".$this->plugin->utils_string->trim( // Trim the following...
 
 						       ($sub_ids_in_search_query ? " ".$and_or." `ID` IN('".implode("','", array_map('esc_sql', $sub_ids_in_search_query))."')" : '').
+						       ($user_ids_in_search_query ? " ".$and_or." `user_id` IN('".implode("','", array_map('esc_sql', $user_ids_in_search_query))."')" : '').
 						       ($post_ids_in_search_query ? " ".$and_or." `post_id` IN('".implode("','", array_map('esc_sql', $post_ids_in_search_query))."')" : '').
 						       ($comment_ids_in_search_query ? " ".$and_or." `comment_id` IN('".implode("','", array_map('esc_sql', $comment_ids_in_search_query))."')" : '')
 
@@ -295,6 +298,7 @@ namespace comment_mail // Root namespace.
 					$this->set_total_items_available((integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()"));
 
 					$this->prepare_items_merge_subscr_properties(); // Merge additional properties.
+					$this->prepare_items_merge_user_properties(); // Merge additional properties.
 					$this->prepare_items_merge_post_properties(); // Merge additional properties.
 					$this->prepare_items_merge_comment_properties(); // Merge additional properties.
 				}
