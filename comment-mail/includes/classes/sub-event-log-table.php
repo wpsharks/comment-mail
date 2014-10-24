@@ -1,6 +1,6 @@
 <?php
 /**
- * Subscribers Table
+ * Sub Event Log Table
  *
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
@@ -11,14 +11,14 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\subs_table'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\sub_event_log_table'))
 	{
 		/**
-		 * Subscribers Table
+		 * Sub Event Log Table
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class subs_table extends abstract_table
+		class sub_event_log_table extends abstract_table
 		{
 			/*
 			 * Class constructor.
@@ -34,11 +34,11 @@ namespace comment_mail // Root namespace.
 				$plugin = plugin(); // Needed below.
 
 				$args = array(
-					'singular_name'  => 'subscriber',
-					'plural_name'    => 'subscribers',
-					'singular_label' => __('subscriber', $plugin->text_domain),
-					'plural_label'   => __('subscribers', $plugin->text_domain),
-					'screen'         => $plugin->menu_page_hooks[__NAMESPACE__.'_subs'],
+					'singular_name'  => 'sub_event_log_entry',
+					'plural_name'    => 'sub_event_log_entries',
+					'singular_label' => __('sub. event log entry', $plugin->text_domain),
+					'plural_label'   => __('sub. event log entries', $plugin->text_domain),
+					'screen'         => $plugin->menu_page_hooks[__NAMESPACE__.'_sub_event_log'],
 				);
 				parent::__construct($args); // Parent constructor.
 			}
@@ -59,22 +59,23 @@ namespace comment_mail // Root namespace.
 				$plugin = plugin(); // Plugin class instance.
 
 				return array(
-					'cb'               => '1', // Include checkboxes.
-					'email'            => __('Subscriber Email', $plugin->text_domain),
-					'fname'            => __('First Name', $plugin->text_domain),
-					'lname'            => __('Last Name', $plugin->text_domain),
-					'user_id'          => __('WP User ID', $plugin->text_domain),
-					'post_id'          => __('Subscr. to Post ID', $plugin->text_domain),
-					'comment_id'       => __('Subscr. to Comment ID', $plugin->text_domain),
-					'insertion_time'   => __('Subscr. Time', $plugin->text_domain),
-					'insertion_ip'     => __('Subscr. IP', $plugin->text_domain),
-					'subscr_type'      => __('Subscr. Type', $plugin->text_domain),
-					'deliver'          => __('Delivery', $plugin->text_domain),
-					'last_ip'          => __('Last IP', $plugin->text_domain),
-					'status'           => __('Status', $plugin->text_domain),
-					'last_update_time' => __('Last Update', $plugin->text_domain),
-					'key'              => __('Key', $plugin->text_domain),
-					'ID'               => __('ID', $plugin->text_domain),
+					'cb'             => '1', // Include checkboxes.
+					'ID'             => __('Entry', $plugin->text_domain),
+					'time'           => __('Time', $plugin->text_domain),
+					'event'          => __('Event', $plugin->text_domain),
+					'sub_id'         => __('Subscr. ID', $plugin->text_domain),
+					'oby_sub_id'     => __('Overwritten By', $plugin->text_domain),
+					'user_id'        => __('WP User ID', $plugin->text_domain),
+					'post_id'        => __('Subscr. to Post ID', $plugin->text_domain),
+					'comment_id'     => __('Subscr. to Comment ID', $plugin->text_domain),
+					'deliver'        => __('Delivery', $plugin->text_domain),
+					'fname'          => __('First Name', $plugin->text_domain),
+					'lname'          => __('Last Name', $plugin->text_domain),
+					'email'          => __('Email', $plugin->text_domain),
+					'ip'             => __('IP Address', $plugin->text_domain),
+					'status_before'  => __('Status Prior', $plugin->text_domain),
+					'status'         => __('Status', $plugin->text_domain),
+					'user_initiated' => __('User Initiated', $plugin->text_domain),
 				);
 			}
 
@@ -88,15 +89,15 @@ namespace comment_mail // Root namespace.
 			public static function get_hidden_columns_()
 			{
 				return array(
-					'fname',
-					'lname',
+					'oby_sub_id',
 					'user_id',
 					'comment_id',
-					'insertion_ip',
-					'last_ip',
-					'last_update_time',
-					'key',
-					'ID',
+					'deliver',
+					'fname',
+					'lname',
+					'email',
+					'ip',
+					'user_initiated',
 				);
 			}
 
@@ -110,12 +111,10 @@ namespace comment_mail // Root namespace.
 			public static function get_ft_searchable_columns_()
 			{
 				return array(
-					'email',
 					'fname',
 					'lname',
-					'insertion_ip',
-					'last_ip',
-					'key',
+					'email',
+					'ip',
 				);
 			}
 
@@ -142,9 +141,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public static function get_unsortable_columns_()
 			{
-				return array(
-					'subscr_type',
-				);
+				return array();
 			}
 
 			/*
@@ -163,10 +160,12 @@ namespace comment_mail // Root namespace.
 				$plugin = plugin(); // Needed for translations.
 
 				return array(
-					'status::unconfirmed' => $plugin->utils_i18n->status_label('unconfirmed'),
-					'status::subscribed'  => $plugin->utils_i18n->status_label('subscribed'),
-					'status::suspended'   => $plugin->utils_i18n->status_label('suspended'),
-					'status::trashed'     => $plugin->utils_i18n->status_label('trashed'),
+					'event::inserted'    => $plugin->utils_i18n->event_label('inserted'),
+					'event::updated'     => $plugin->utils_i18n->event_label('updated'),
+					'event::overwritten' => $plugin->utils_i18n->event_label('overwritten'),
+					'event::purged'      => $plugin->utils_i18n->event_label('purged'),
+					'event::cleaned'     => $plugin->utils_i18n->event_label('cleaned'),
+					'event::deleted'     => $plugin->utils_i18n->event_label('deleted'),
 				);
 			}
 
@@ -183,51 +182,22 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string HTML markup for this table column.
 			 */
-			protected function column_email(\stdClass $item)
+			protected function column_ID(\stdClass $item)
 			{
-				$name       = $item->fname.' '.$item->lname; // Concatenate.
-				$email_info = '<i class="fa fa-child"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
-				              ' <span style="font-weight:bold;" title="'.esc_attr($item->key).'">ID #'.esc_html($item->ID).'</span>'.
-				              ' '.$this->plugin->utils_markup->name_email($name, $item->email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
+				$id_info = '<i class="fa fa-bell-o"></i>'. // Entry icon w/ ID.
+				           ' <span style="font-weight:bold;">#'.esc_html($item->ID).'</span>';
 
-				$edit_url      = $this->plugin->utils_url->edit_subscriber_short($item->ID);
-				$reconfirm_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'reconfirm');
-				$confirm_url   = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'confirm');
-				$unconfirm_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'unconfirm');
-				$suspend_url   = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'suspend');
-				$trash_url     = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'trash');
-				$delete_url    = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'delete');
+				$delete_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'delete');
 
 				$row_actions = array(
-					'edit'      => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscr.', $this->plugin->text_domain).'</a>',
-
-					'reconfirm' => '<a href="#"'.  // Depends on `menu-pages.js`.
-					               ' data-pmp-action="'.esc_attr($reconfirm_url).'"'. // The action URL.
-					               ' data-pmp-confirmation="'.esc_attr(__('Resend email confirmation link? Are you sure?', $this->plugin->text_domain)).'">'.
-					               '  '.__('Reconfirm', $this->plugin->text_domain).
-					               '</a>',
-
-					'confirm'   => '<a href="'.esc_attr($confirm_url).'">'.__('Confirm', $this->plugin->text_domain).'</a>',
-					'unconfirm' => '<a href="'.esc_attr($unconfirm_url).'">'.__('Unconfirm', $this->plugin->text_domain).'</a>',
-					'suspend'   => '<a href="'.esc_attr($suspend_url).'">'.__('Suspend', $this->plugin->text_domain).'</a>',
-					'trash'     => '<a href="'.esc_attr($trash_url).'" title="'.esc_attr(__('Trash', $this->plugin->text_domain)).'"><i class="fa fa-trash-o"></i></a>',
-
-					'delete'    => '<a href="#"'.  // Depends on `menu-pages.js`.
-					               ' data-pmp-action="'.esc_attr($delete_url).'"'. // The action URL.
-					               ' data-pmp-confirmation="'.esc_attr(__('Delete permanently? Are you sure?', $this->plugin->text_domain)).'"'.
-					               ' title="'.esc_attr(__('Delete', $this->plugin->text_domain)).'">'.
-					               '  <i class="fa fa-times-circle"></i>'.
-					               '</a>',
+					'delete' => '<a href="#"'.  // Depends on `menu-pages.js`.
+					            ' data-pmp-action="'.esc_attr($delete_url).'"'. // The action URL.
+					            ' data-pmp-confirmation="'.esc_attr(__('Delete log entry? Are you sure?', $this->plugin->text_domain)).'"'.
+					            ' title="'.esc_attr(__('Delete Sub. Event Log Entry', $this->plugin->text_domain)).'">'.
+					            '  <i class="fa fa-times-circle"></i> '.__('Delete', $this->plugin->text_domain).
+					            '</a>',
 				);
-				if($item->status === 'unconfirmed') unset($row_actions['unconfirm'], $row_actions['suspend']);
-				if($item->status === 'subscribed') unset($row_actions['reconfirm'], $row_actions['confirm']);
-				if($item->status === 'suspended') unset($row_actions['suspend'], $row_actions['unconfirm']);
-				if($item->status === 'trashed') unset($row_actions['trashed']);
-
-				if($this->plugin->options['auto_confirm_enable'])
-					unset($row_actions['reconfirm']); // N/A.
-
-				return $email_info.$this->row_actions($row_actions);
+				return $id_info.$this->row_actions($row_actions);
 			}
 
 			/*
@@ -263,14 +233,15 @@ namespace comment_mail // Root namespace.
 					         "  AGAINST('".esc_sql($clean_search_query)."' IN BOOLEAN MODE) AS `relevance`"
 					       : ''). // Otherwise, we can simply exclude this.
 
-				       " FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				       " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
 
 				       " WHERE 1=1". // Default where clause.
 
 				       ($sub_ids_in_search_query || $user_ids_in_search_query || $post_ids_in_search_query || $comment_ids_in_search_query
 					       ? " AND (".$this->plugin->utils_string->trim( // Trim the following...
 
-						       ($sub_ids_in_search_query ? " ".$and_or." `ID` IN('".implode("','", array_map('esc_sql', $sub_ids_in_search_query))."')" : '').
+						       ($sub_ids_in_search_query ? " ".$and_or." (`sub_id` IN('".implode("','", array_map('esc_sql', $sub_ids_in_search_query))."')".
+						                                   " OR `oby_sub_id` IN('".implode("','", array_map('esc_sql', $sub_ids_in_search_query))."'))" : '').
 						       ($user_ids_in_search_query ? " ".$and_or." `user_id` IN('".implode("','", array_map('esc_sql', $user_ids_in_search_query))."')" : '').
 						       ($post_ids_in_search_query ? " ".$and_or." `post_id` IN('".implode("','", array_map('esc_sql', $post_ids_in_search_query))."')" : '').
 						       ($comment_ids_in_search_query ? " ".$and_or." `comment_id` IN('".implode("','", array_map('esc_sql', $comment_ids_in_search_query))."')" : '')
@@ -278,8 +249,10 @@ namespace comment_mail // Root namespace.
 						       , '', 'AND OR').")" : ''). // Trims `AND OR` leftover after concatenation occurs.
 
 				       ($statuses_in_search_query // Specific statuses?
-					       ? " AND `status` IN('".implode("','", array_map('esc_sql', $statuses_in_search_query))."')"
-					       : " AND `status` != '".esc_sql('trashed')."'").
+					       ? " AND `status` IN('".implode("','", array_map('esc_sql', $statuses_in_search_query))."')" : '').
+
+				       ($events_in_search_query // Specific events?
+					       ? " AND `event` IN('".implode("','", array_map('esc_sql', $events_in_search_query))."')" : '').
 
 				       ($clean_search_query // A fulltext search?
 					       ? " AND (MATCH(`".implode('`,`', array_map('esc_sql', $this->get_ft_searchable_columns()))."`)".
@@ -299,6 +272,7 @@ namespace comment_mail // Root namespace.
 					$this->set_total_items_available((integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()"));
 
 					$this->prepare_items_merge_subscr_type_property(); // Merge property.
+					$this->prepare_items_merge_sub_properties(); // Merge additional properties.
 					$this->prepare_items_merge_user_properties(); // Merge additional properties.
 					$this->prepare_items_merge_post_properties(); // Merge additional properties.
 					$this->prepare_items_merge_comment_properties(); // Merge additional properties.
@@ -319,12 +293,7 @@ namespace comment_mail // Root namespace.
 			protected function get_bulk_actions()
 			{
 				return array(
-					'reconfirm' => __('Reconfirm', $this->plugin->text_domain),
-					'confirm'   => __('Confirm', $this->plugin->text_domain),
-					'unconfirm' => __('Unconfirm', $this->plugin->text_domain),
-					'suspend'   => __('Suspend', $this->plugin->text_domain),
-					'trash'     => __('Trash', $this->plugin->text_domain),
-					'delete'    => __('Delete', $this->plugin->text_domain),
+					'delete' => __('Delete', $this->plugin->text_domain),
 				);
 			}
 
@@ -342,28 +311,8 @@ namespace comment_mail // Root namespace.
 			{
 				switch($bulk_action) // Bulk action handler.
 				{
-					case 'reconfirm': // Confirm via email?
-						$counter = $this->plugin->utils_sub->bulk_reconfirm($ids);
-						break; // Break switch handler.
-
-					case 'confirm': // Confirm silently?
-						$counter = $this->plugin->utils_sub->bulk_confirm($ids);
-						break; // Break switch handler.
-
-					case 'unconfirm': // Unconfirm/unsubscribe?
-						$counter = $this->plugin->utils_sub->bulk_unconfirm($ids);
-						break; // Break switch handler.
-
-					case 'suspend': // Suspend/unsubscribe?
-						$counter = $this->plugin->utils_sub->bulk_suspend($ids);
-						break; // Break switch handler.
-
-					case 'trash': // Trashing/unsubscribe?
-						$counter = $this->plugin->utils_sub->bulk_trash($ids);
-						break; // Break switch handler.
-
-					case 'delete': // Deleting/unsubscribe?
-						$counter = $this->plugin->utils_sub->bulk_delete($ids);
+					case 'delete': // Deleting log entries?
+						$counter = $this->plugin->utils_sub_event_log->bulk_delete($ids);
 						break; // Break switch handler.
 				}
 				return !empty($counter) ? (integer)$counter : 0;

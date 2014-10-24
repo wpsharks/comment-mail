@@ -62,12 +62,12 @@ namespace comment_mail // Root namespace.
 			 */
 			public function unique_ids_only(array $sub_ids_or_keys)
 			{
-				$sub_ids = $sub_keys = array(); // Initialize.
+				$unique_ids = $sub_keys = array();
 
 				foreach($sub_ids_or_keys as $_sub_id_or_key)
 				{
 					if(is_numeric($_sub_id_or_key) && (integer)$_sub_id_or_key > 0)
-						$sub_ids[] = (integer)$_sub_id_or_key;
+						$unique_ids[] = (integer)$_sub_id_or_key;
 
 					else if(is_string($_sub_id_or_key) && $_sub_id_or_key)
 						$sub_keys[] = $_sub_id_or_key; // String key.
@@ -76,13 +76,13 @@ namespace comment_mail // Root namespace.
 
 				foreach($sub_keys as $_sub_key)
 					if(($_sub_id = $this->key_to_id($_sub_key)) > 0)
-						$sub_ids[] = $_sub_id;
+						$unique_ids[] = $_sub_id;
 				unset($_sub_key, $_sub_id); // Housekeeping.
 
-				if($sub_ids) // Unique IDs only.
-					$sub_ids = array_unique($sub_ids);
+				if($unique_ids) // Unique IDs only.
+					$unique_ids = array_unique($unique_ids);
 
-				return $sub_ids;
+				return $unique_ids;
 			}
 
 			/**

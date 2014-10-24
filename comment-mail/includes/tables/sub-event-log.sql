@@ -15,5 +15,6 @@ CREATE TABLE IF NOT EXISTS `%%prefix%%sub_event_log` (
   `event` enum('inserted','updated','overwritten','purged','cleaned','deleted') COLLATE utf8_unicode_ci NOT NULL COMMENT 'Event type.',
   `user_initiated` int(1) unsigned NOT NULL DEFAULT '0' COMMENT 'This event was user initiated, or no?',
   `time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Event time. Unix timestamp.',
-  PRIMARY KEY (`ID`) COMMENT 'Primary key.'
+  PRIMARY KEY (`ID`) COMMENT 'Primary key.',
+  FULLTEXT KEY `fulltext_search` (`fname`,`lname`,`email`,`ip`) COMMENT 'Fulltext search index.'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;

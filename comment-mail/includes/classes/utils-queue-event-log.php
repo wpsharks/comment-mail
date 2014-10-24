@@ -1,6 +1,6 @@
 <?php
 /**
- * Queue Utilities
+ * Queue Event Log Utilities
  *
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
@@ -11,14 +11,14 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\utils_queue'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\utils_queue_event_log'))
 	{
 		/**
-		 * Queue Utilities
+		 * Queue Event Log Utilities
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class utils_queue extends abstract_base
+		class utils_queue_event_log extends abstract_base
 		{
 			/**
 			 * Class constructor.
@@ -35,20 +35,20 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param array $queue_ids Queued notification IDs.
+			 * @param array $log_entry_ids Event log entry IDs.
 			 *
 			 * @return array An array of unique IDs only.
 			 */
-			public function unique_ids_only(array $queue_ids)
+			public function unique_ids_only(array $log_entry_ids)
 			{
 				$unique_ids = array(); // Initialize.
 
-				foreach($queue_ids as $_queue_id)
+				foreach($log_entry_ids as $_log_entry_id)
 				{
-					if(is_numeric($_queue_id) && (integer)$_queue_id > 0)
-						$unique_ids[] = (integer)$_queue_id;
+					if(is_numeric($_log_entry_id) && (integer)$_log_entry_id > 0)
+						$unique_ids[] = (integer)$_log_entry_id;
 				}
-				unset($_queue_id); // Housekeeping.
+				unset($_log_entry_id); // Housekeeping.
 
 				if($unique_ids) // Unique IDs only.
 					$unique_ids = array_unique($unique_ids);
@@ -57,27 +57,27 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Delete queued notification.
+			 * Delete log entry.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|string $queue_id Queued notification ID.
+			 * @param integer|string $log_entry_id Log entry ID.
 			 * @param array          $args Any additional behavioral args.
 			 *
-			 * @return boolean|null TRUE if queued notification is deleted successfully.
+			 * @return boolean|null TRUE if log entry is deleted successfully.
 			 *    Or, FALSE if unable to delete (e.g. already deleted).
 			 *    Or, NULL on complete failure (e.g. invalid ID).
 			 *
 			 * @throws \exception If a deletion failure occurs.
 			 */
-			public function delete($queue_id, array $args = array())
+			public function delete($log_entry_id, array $args = array())
 			{
-				if(!($queue_id = (integer)$queue_id))
+				if(!($log_entry_id = (integer)$log_entry_id))
 					return NULL; // Not possible.
 
-				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
+				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'queue_event_log')."`".
 
-				       " WHERE `ID` = '".esc_sql($queue_id)."'";
+				       " WHERE `ID` = '".esc_sql($log_entry_id)."'";
 
 				if(($deleted = $this->plugin->utils_db->wp->query($sql)) === FALSE)
 					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
@@ -86,23 +86,23 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Bulk delete queued notifications.
+			 * Bulk delete log entries.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param array $queue_ids Queued notification IDs.
+			 * @param array $log_entry_ids Log entry IDs.
 			 * @param array $args Any additional behavioral args.
 			 *
-			 * @return integer Number of queued notifications deleted successfully.
+			 * @return integer Number of log entries deleted successfully.
 			 */
-			public function bulk_delete(array $queue_ids, array $args = array())
+			public function bulk_delete(array $log_entry_ids, array $args = array())
 			{
 				$counter = 0; // Initialize.
 
-				foreach($this->unique_ids_only($queue_ids) as $_queue_id)
-					if($this->delete($_queue_id, $args))
+				foreach($this->unique_ids_only($log_entry_ids) as $_log_entry_id)
+					if($this->delete($_log_entry_id, $args))
 						$counter++; // Bump counter.
-				unset($_queue_id); // Housekeeping.
+				unset($_log_entry_id); // Housekeeping.
 
 				return $counter;
 			}

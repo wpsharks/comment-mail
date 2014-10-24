@@ -64,45 +64,47 @@ namespace comment_mail // Root namespace.
 				if(!$this->comment->comment_ID)
 					return; // Not possible.
 
-				if(!($sub_ids = $this->sub_ids()))
+				if(!($subscribed_subs = $this->subscribed_subs()))
 					return; // No subscribers.
 
 				$time = time(); // Current timestamp.
 				$sql  = "INSERT INTO `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
-				        " (`sub_id`, `post_id`, `comment_parent_id`, `comment_id`, `insertion_time`, `last_update_time`, `hold_until_time`) VALUES";
+				        " (`sub_id`, `user_id`, `post_id`, `comment_parent_id`, `comment_id`, `insertion_time`, `last_update_time`, `hold_until_time`) VALUES";
 
-				foreach($sub_ids as $_key => $_sub_id)
-					$sql .= "('".esc_sql($_sub_id)."', '".esc_sql($this->comment->comment_post_ID)."', '".esc_sql($this->comment->comment_parent)."',".
-					        " '".esc_sql($this->comment->comment_ID)."', '".esc_sql($time)."', '".esc_sql($time)."', '0'),";
-				$sql = rtrim($sql, ','); // Trim leftover delimiter.
-				unset($_key, $_sub_id); // Housekeeping.
+				foreach($subscribed_subs as $_sub_id_key => $_sub)
+					$sql .= "('".esc_sql($_sub->ID)."', '".esc_sql($_sub->user_id)."', '".esc_sql($this->comment->comment_post_ID)."',".
+					        " '".esc_sql($this->comment->comment_parent)."', '".esc_sql($this->comment->comment_ID)."',".
+					        " '".esc_sql($time)."', '".esc_sql($time)."', '0'),";
+				unset($_sub_id_key, $_sub); // Housekeeping.
 
-				if(!$this->plugin->utils_db->wp->query($sql))
+				$sql = $this->plugin->utils_string->trim($sql, '', ','); // Trim leftover delimiter.
+
+				if(!$this->plugin->utils_db->wp->query($sql)) // Insert failure?
 					throw new \exception(__('Insertion failure.', $this->plugin->text_domain));
 			}
 
 			/**
-			 * Get subscribers IDs.
+			 * Get subscribers.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @return array All subscriber IDs.
+			 * @return \stdClass[] All subscribers.
 			 */
-			protected function sub_ids()
+			protected function subscribed_subs()
 			{
-				$emails = $sub_ids = array(); // Initialize.
+				$emails = $subs = array(); // Initialize.
 
-				$sql = "SELECT `ID`, `email` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->comment->comment_post_ID)."'".
 				       " AND (`comment_id` = '0' OR `comment_id` = '".esc_sql($this->comment->comment_parent)."')".
-				       " AND `status` = 'subscribed'";
+				       " AND `status` = 'subscribed'"; // Only those that are `subscribed` currently.
 
-				if(($subs = $this->plugin->utils_db->wp->get_results($sql)))
-					$subs = $this->plugin->utils_db->typify_deep($subs);
-				else $subs = array(); // Default; empty array.
+				if(($sub_results = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
+					$sub_results = $this->plugin->utils_db->typify_deep($sub_results);
+				else $sub_results = array(); // Default; empty array.
 
-				foreach($subs as $_key => $_sub)
+				foreach($sub_results as $_sub_id_key => $_sub)
 				{
 					if(!$_sub->email) // Email empty?
 						continue; // Missing email address.
@@ -116,11 +118,11 @@ namespace comment_mail // Root namespace.
 						continue; // Don't send an email to the comment author.
 
 					$emails[$_email_lowercase] = -1;
-					$sub_ids[]                 = $_sub->ID;
+					$subs[$_sub->ID]           = $_sub;
 				}
-				unset($_key, $_sub, $_email_lowercase); // Housekeeping.
+				unset($_sub_id_key, $_sub, $_email_lowercase); // Housekeeping.
 
-				return $sub_ids; // All valid/unique subscriber IDs.
+				return $subs; // All valid/unique subscribers.
 			}
 		}
 	}

@@ -192,9 +192,51 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string Subscribers menu page URL.
 			 */
-			public function subscribers_menu_page_only()
+			public function subs_menu_page_only()
 			{
-				$args = array('page' => __NAMESPACE__.'_subscribers');
+				$args = array('page' => __NAMESPACE__.'_subs');
+
+				return add_query_arg(urlencode_deep($args), admin_url('/edit-comments.php'));
+			}
+
+			/**
+			 * Sub. event log menu page URL.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string Sub. event log menu page URL.
+			 */
+			public function sub_event_log_menu_page_only()
+			{
+				$args = array('page' => __NAMESPACE__.'_sub_event_log');
+
+				return add_query_arg(urlencode_deep($args), admin_url('/edit-comments.php'));
+			}
+
+			/**
+			 * Queue menu page URL.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string Queue menu page URL.
+			 */
+			public function queue_menu_page_only()
+			{
+				$args = array('page' => __NAMESPACE__.'_queue');
+
+				return add_query_arg(urlencode_deep($args), admin_url('/edit-comments.php'));
+			}
+
+			/**
+			 * Queue event log menu page URL.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string Queue event log menu page URL.
+			 */
+			public function queue_event_log_menu_page_only()
+			{
+				$args = array('page' => __NAMESPACE__.'_queue_event_log');
 
 				return add_query_arg(urlencode_deep($args), admin_url('/edit-comments.php'));
 			}
@@ -534,7 +576,7 @@ namespace comment_mail // Root namespace.
 				$s       = trim((string)$s); // Force trimmed string.
 				$args    = array('s' => 'post_id:'.$post_id.($s ? ' '.$s : ''));
 
-				return add_query_arg(urlencode_deep($args), $this->subscribers_menu_page_only());
+				return add_query_arg(urlencode_deep($args), $this->subs_menu_page_only());
 			}
 
 			/**
@@ -551,7 +593,24 @@ namespace comment_mail // Root namespace.
 				$sub_id = (integer)$sub_id; // Force integer.
 				$args   = array('subscriber' => $sub_id); // @TODO
 
-				return add_query_arg(urlencode_deep($args), $this->subscribers_menu_page_only());
+				return add_query_arg(urlencode_deep($args), $this->subs_menu_page_only());
+			}
+
+			/**
+			 * Creates an edit user shortlink w/o a DB query.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $user_id User ID.
+			 *
+			 * @return string Edit user shortlink.
+			 */
+			public function edit_user_short($user_id)
+			{
+				$user_id = (integer)$user_id; // Force integer.
+				$args    = array('user_id' => $user_id);
+
+				return add_query_arg(urlencode_deep($args), admin_url('/user-edit.php'));
 			}
 
 			/**
