@@ -29,6 +29,7 @@ namespace comment_mail
 		 * @property utils_mail   $utils_mail
 		 * @property utils_markup $utils_markup
 		 * @property utils_php    $utils_php
+		 * @property utils_queue  $utils_queue
 		 * @property utils_string $utils_string
 		 * @property utils_sub    $utils_sub
 		 * @property utils_url    $utils_url
@@ -753,6 +754,14 @@ namespace comment_mail
 					'label'   => __('Per Page', $this->text_domain),
 					'option'  => __NAMESPACE__.'_queue_per_page',
 				));
+				add_filter('manage_'.$screen->id.'_columns', function ()
+				{
+					return queue_table::get_columns_();
+				});
+				add_filter('get_user_option_manage'.$screen->id.'columnshidden', function ($value)
+				{
+					return is_array($value) ? $value : queue_table::get_hidden_columns_();
+				});
 			}
 
 			/**
@@ -972,16 +981,19 @@ namespace comment_mail
 						}
 						else $_dismiss_anchor = ''; // Define a default value.
 
+						$_classes = $this->slug.'-menu-page-area'; // Always.
+						$_classes .= ' pmp-'.($_args['type'] === 'error' ? 'error' : 'notice');
+						$_classes .= ' '.($_args['type'] === 'error' ? 'error' : 'updated');
+
 						$_full_markup = // Put together the full markup; including other pieces.
-							'<div class="'.esc_attr($this->slug.'-menu-page-area pmp-'.($_args['type'] === 'error' ? 'error' : 'notice')).
-							' '.esc_attr($_args['type'] === 'error' ? 'error' : 'updated').'">'.
+							'<div class="'.esc_attr($_classes).'">'.
 							'  <p>'.$_args['markup'].$_dismiss_anchor.'</p>'.
 							'</div>';
 						echo apply_filters(__METHOD__.'_notice', $_full_markup, get_defined_vars());
 					}
 					if(!$_args['persistent']) unset($notices[$_key]); // Once only; i.e. don't show again.
 				}
-				unset($_key, $_args, $_dismiss_style, $_dismiss_url, $_dismiss_anchor, $_full_markup); // Housekeeping.
+				unset($_key, $_args, $_dismiss_style, $_dismiss_url, $_dismiss_anchor, $_classes, $_full_markup); // Housekeeping.
 
 				if($original_notices !== $notices) update_option(__NAMESPACE__.'_notices', $notices);
 			}

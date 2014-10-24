@@ -354,17 +354,10 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param \stdClass $entry Queue entry.
-			 *
-			 * @throws \exception If a deletion failure occurs.
 			 */
 			protected function delete_entry(\stdClass $entry)
 			{
-				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
-
-				       " WHERE `ID` = '".esc_sql($entry->ID)."'";
-
-				if($this->plugin->utils_db->wp->query($sql) === FALSE)
-					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
+				$this->plugin->utils_queue->delete($entry->ID);
 			}
 
 			/**
@@ -400,6 +393,9 @@ namespace comment_mail // Root namespace.
 			{
 				if(!$entry->sub_id) // Not possible; data missing.
 					$invalidated_entry_props = $this->entry_props('invalidated', 'entry_sub_id_empty', $entry);
+
+				else if(!$entry->post_id) // Not possible; data missing.
+					$invalidated_entry_props = $this->entry_props('invalidated', 'entry_post_id_empty', $entry);
 
 				else if(!$entry->comment_id) // Not possible; data missing.
 					$invalidated_entry_props = $this->entry_props('invalidated', 'entry_comment_id_empty', $entry);
@@ -579,16 +575,18 @@ namespace comment_mail // Root namespace.
 				if($entry_props->held)
 					return; // Already did this.
 
+				$entry_hold_until_time = (integer)$entry_hold_until_time;
+
 				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
 
-				       " SET `last_update_time` = '".esc_sql(time())."', `hold_until_time` = '".esc_sql((integer)$entry_hold_until_time)."'".
+				       " SET `last_update_time` = '".esc_sql(time())."', `hold_until_time` = '".esc_sql($entry_hold_until_time)."'".
 
 				       " WHERE `ID` = '".esc_sql($entry_props->entry->ID)."'";
 
 				if(!$this->plugin->utils_db->wp->query($sql))
 					throw new \exception(__('Update failure.', $this->plugin->text_domain));
 
-				$entry_props->entry->hold_until_time = (integer)$entry_hold_until_time;
+				$entry_props->entry->hold_until_time = $entry_hold_until_time;
 				$entry_props->held                   = TRUE; // Flag as `TRUE` now.
 			}
 

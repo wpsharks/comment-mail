@@ -6,9 +6,30 @@
 
 	plugin.onReady = function() // jQuery DOM ready event handler.
 	{
-		var $menuPage = $('#comment-mail-menu-page');
-		var $menuPageTable = $('#comment-mail-menu-page-table');
-		var i18n = window['comment_mail_i18n'];
+		/* ------------------------------------------------------------------------------------------------------------
+		 Plugin-specific selectors needed by routines below.
+		 ------------------------------------------------------------------------------------------------------------ */
+
+		var $menuPageArea = $('.comment-mail-menu-page-area'),
+			$menuPage = $('.comment-mail-menu-page'), $menuPageTable = $('.comment-mail-menu-page-table'),
+			i18n = window['comment_mail_i18n'];
+
+		/* ------------------------------------------------------------------------------------------------------------
+		 Plugin-specific JS for any menu page area of the dashboard.
+		 ------------------------------------------------------------------------------------------------------------ */
+
+		$menuPageArea.find('[data-pmp-action]').on('click', function(e)
+		{
+			e.preventDefault(), e.stopImmediatePropagation();
+
+			var $this = $(this), data = $this.data();
+			if(typeof data.pmpConfirmation !== 'string' || confirm(data.pmpConfirmation))
+				location.href = data.pmpAction;
+		});
+
+		/* ------------------------------------------------------------------------------------------------------------
+		 JS for an actual/standard plugin menu page; e.g. options.
+		 ------------------------------------------------------------------------------------------------------------ */
 
 		$menuPage.find('.pmp-panels-open').on('click', function()
 		{
@@ -27,14 +48,6 @@
 			$(this).toggleClass('open') // Toggle this panel now.
 				.next('.pmp-panel-body').toggleClass('open');
 		});
-		$menuPage.find('[data-pmp-action]').on('click', function(e)
-		{
-			e.preventDefault(), e.stopImmediatePropagation();
-
-			var $this = $(this), data = $this.data();
-			if(typeof data.pmpConfirmation !== 'string' || confirm(data.pmpConfirmation))
-				location.href = data.action;
-		});
 		$menuPage.find('select[name$="_enable\\]"], select[name$="_enable_flavor\\]"]').not('.no-if-enabled').on('change', function()
 		{
 			var $this = $(this), thisName = $this[0].name, thisValue = $this.val(),
@@ -46,6 +59,10 @@
 			else $thisPanel.find('.pmp-panel-if-enabled').css('opacity', 0.4).find(':input').attr('readonly', 'readonly');
 		})
 			.trigger('change'); // Initialize.
+
+		/* ------------------------------------------------------------------------------------------------------------
+		 Plugin-specific JS for menu page tables that follow a WP standard, but need a few tweaks.
+		 ------------------------------------------------------------------------------------------------------------ */
 
 		$menuPageTable.find('> form').on('submit', function()
 		{

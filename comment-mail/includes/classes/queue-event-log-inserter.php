@@ -46,8 +46,8 @@ namespace comment_mail // Root namespace.
 					'sub_id'            => 0,
 					'user_id'           => 0,
 					'post_id'           => 0,
-					'comment_id'        => 0,
 					'comment_parent_id' => 0,
+					'comment_id'        => 0,
 
 					'fname'             => '',
 					'lname'             => '',
