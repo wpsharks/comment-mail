@@ -53,6 +53,10 @@ namespace comment_mail // Root namespace.
 						$note = __('Not possible; `$entry->comment_id` was empty.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
+					case 'entry_post_id_empty':
+						$note = __('Not possible; `$entry->post_id` was empty.', $this->plugin->text_domain);
+						break; // Break switch handler.
+
 					case 'entry_sub_id_missing':
 						$note = __('Not possible; `$entry->sub_id` was missing. The subscriber was deleted (or unsubscribed) before processing began.', $this->plugin->text_domain);
 						break; // Break switch handler.

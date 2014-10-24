@@ -63,6 +63,13 @@ namespace comment_mail // Root namespace.
 			protected $plural_label;
 
 			/**
+			 * @var string Regex for sub IDs.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $sub_ids_regex;
+
+			/**
 			 * @var string Regex for post IDs.
 			 *
 			 * @since 14xxxx First documented version.
@@ -77,11 +84,25 @@ namespace comment_mail // Root namespace.
 			protected $comment_ids_regex;
 
 			/**
+			 * @var string Regex for `AND`.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $and_regex;
+
+			/**
 			 * @var string Regex for statuses.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
 			protected $statuses_regex;
+
+			/**
+			 * @var array Merged result sets.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $merged_result_sets;
 
 			/*
 			 * Class constructor.
@@ -120,9 +141,15 @@ namespace comment_mail // Root namespace.
 				$this->items = array(); // Initialize.
 
 				// Filters; i.e. `:`= filter; `::` = navigable filter.
+				$this->sub_ids_regex     = '/\bsub_ids?\:(?P<sub_ids>[0-9|;,]+)/i';
 				$this->post_ids_regex    = '/\bpost_ids?\:(?P<post_ids>[0-9|;,]+)/i';
 				$this->comment_ids_regex = '/\bcomment_ids?\:(?P<comment_ids>[0-9|;,]+)/i';
 				$this->statuses_regex    = '/\bstatus(?:es)?\:\:(?P<statuses>[\w|;,]+)/i';
+
+				$this->and_regex = '/(?:^|\s+)\+(?:\s+|$)/i';
+				// Must NOT conflict with SQL: <http://bit.ly/1tNam85>
+
+				$this->merged_result_sets = array(); // Initialize.
 
 				$this->maybe_process_bulk_action();
 				$this->prepare_items();
@@ -181,6 +208,32 @@ namespace comment_mail // Root namespace.
 			 * @extenders Extenders should normally override this.
 			 */
 			public static function get_hidden_columns_()
+			{
+				return array();
+			}
+
+			/**
+			 * Searchable fulltext table columns.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of all fulltext searchables.
+			 */
+			public function get_ft_searchable_columns()
+			{
+				return static::get_ft_searchable_columns_();
+			}
+
+			/**
+			 * Searchable fulltext table columns.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of all fulltext searchables.
+			 *
+			 * @extenders Extenders should normally override this.
+			 */
+			public static function get_ft_searchable_columns_()
 			{
 				return array();
 			}
@@ -328,6 +381,185 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_subscr_type(\stdClass $item)
+			{
+				if(!isset($item->subscr_type))
+					return '—'; // Not possible.
+
+				if(!$item->subscr_type)
+					return '—'; // Not possible.
+
+				return esc_html($this->plugin->utils_i18n->subscr_type_label($item->subscr_type));
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_sub_id(\stdClass $item)
+			{
+				if(!isset($item->sub_id))
+					return '—'; // Not possible.
+
+				if(!$item->sub_id)
+					return '—'; // Not possible.
+
+				if(empty($this->merged_result_sets['subs'][$item->sub_id]))
+					return '—'; // Not possible.
+
+				$name     = $item->sub_fname.' '.$item->sub_lname; // Concatenate.
+				$sub_info = '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
+				            ' <span style="font-weight:bold;" title="'.esc_attr($item->sub_key).'">ID #'.esc_html($item->sub_id).'</span>'.
+				            ' '.$this->plugin->utils_markup->name_email($name, $item->sub_email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
+
+				$edit_url = $this->plugin->utils_url->edit_subscriber_short($item->sub_id);
+
+				$row_actions = array(
+					'edit' => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscriber', $this->plugin->text_domain).'</a>',
+				);
+				return $sub_info.$this->row_actions($row_actions);
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_post_id(\stdClass $item)
+			{
+				if(!isset($item->post_id))
+					return '—'; // Not possible.
+
+				if(!$item->post_id)
+					return '—'; // Not possible.
+
+				if(empty($this->merged_result_sets['posts'][$item->post_id]))
+					return '—'; // Not possible.
+
+				if(!$item->post_type || !$item->post_title)
+					return '—'; // Not possible.
+
+				if(!($post_type = get_post_type_object($item->post_type)))
+					return '—'; // Not possible.
+
+				$post_type_label        = $post_type->labels->singular_name;
+				$post_title_clip        = $this->plugin->utils_string->mid_clip($item->post_title);
+				$post_date              = $this->plugin->utils_date->i18n('M j, Y', strtotime($item->post_date_gmt));
+				$post_date_ago          = $this->plugin->utils_date->approx_time_difference(strtotime($item->post_date_gmt));
+				$post_comments_status   = $this->plugin->utils_i18n->status_label($this->plugin->utils_db->post_comment_status__($item->post_comment_status));
+				$post_edit_comments_url = $this->plugin->utils_url->post_edit_comments_short($item->post_id);
+				$post_total_subscribers = $this->plugin->utils_sub->query_total($item->post_id);
+				$post_total_comments    = (integer)$item->post_comment_count; // Total comments.
+
+				$post_info = $this->plugin->utils_markup->subscriber_count($item->post_id, $post_total_subscribers).
+				             $this->plugin->utils_markup->comment_count($item->post_id, $post_total_comments).
+				             '<span style="font-weight:bold;">'.esc_html($post_type_label).' ID #'.esc_html($item->post_id).'</span>'.
+				             ' <span style="font-style:italic;">('.__('comments', $this->plugin->text_domain).' '.esc_html($post_comments_status).')</span><br />'.
+				             '<span title="'.esc_attr($post_date).'">“'.esc_html($post_title_clip).'”</span>';
+
+				$post_view_url    = $this->plugin->utils_url->post_short($item->post_id);
+				$post_edit_url    = $this->plugin->utils_url->post_edit_short($item->post_id);
+				$post_row_actions = array(
+					'edit' => '<a href="'.esc_attr($post_edit_url).'">'.sprintf(__('Edit %1$s', $this->plugin->text_domain), esc_html($post_type_label)).'</a>',
+					'view' => '<a href="'.esc_attr($post_view_url).'">'.sprintf(__('View', $this->plugin->text_domain), esc_html($post_type_label)).'</a>',
+				);
+				return $post_info.$this->row_actions($post_row_actions);
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_comment_parent_id(\stdClass $item)
+			{
+				if(!isset($item->comment_parent_id))
+					return '—'; // Not possible.
+
+				if(!$item->comment_parent_id)
+					return '—'; // Not possible.
+
+				if(empty($this->merged_result_sets['comments'][$item->comment_parent_id]))
+					return '—'; // Not possible.
+
+				$comment_parent_date_time = $this->plugin->utils_date->i18n('M j, Y, g:i a', strtotime($item->comment_parent_date_gmt));
+				$comment_parent_time_ago  = $this->plugin->utils_date->approx_time_difference(strtotime($item->comment_parent_date_gmt));
+				$comment_parent_status    = $this->plugin->utils_i18n->status_label($this->plugin->utils_db->comment_status__($item->comment_parent_approved));
+
+				$comment_parent_info = '<span style="font-weight:bold;">'.esc_html(__('Comment', $this->plugin->text_domain)).' ID #'.esc_html($item->comment_parent_id).'</span>'.
+				                       ' <span style="font-style:italic;">('.esc_html($comment_parent_status).')</span><br />'.
+				                       '<span style="font-style:italic;">'.__('by:', $this->plugin->text_domain).'</span>'.
+				                       ' '.$this->plugin->utils_markup->name_email($item->comment_parent_author, $item->comment_parent_author_email);
+
+				$comment_parent_view_url    = $this->plugin->utils_url->comment_short($item->comment_parent_id);
+				$comment_parent_edit_url    = $this->plugin->utils_url->comment_edit_short($item->comment_parent_id);
+				$comment_parent_row_actions = array(
+					'edit' => '<a href="'.esc_attr($comment_parent_edit_url).'">'.__('Edit Comment', $this->plugin->text_domain).'</a>',
+					'view' => '<a href="'.esc_attr($comment_parent_view_url).'">'.__('View', $this->plugin->text_domain).'</a>',
+				);
+				return $comment_parent_info.$this->row_actions($comment_parent_row_actions);
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_comment_id(\stdClass $item)
+			{
+				if(!isset($item->comment_id))
+					return '—'; // Not possible.
+
+				if(!$item->comment_id)
+					return '— all —'; // All of them.
+
+				if(empty($this->merged_result_sets['comments'][$item->comment_id]))
+					return '—'; // Not possible.
+
+				$comment_date_time = $this->plugin->utils_date->i18n('M j, Y, g:i a', strtotime($item->comment_date_gmt));
+				$comment_time_ago  = $this->plugin->utils_date->approx_time_difference(strtotime($item->comment_date_gmt));
+				$comment_status    = $this->plugin->utils_i18n->status_label($this->plugin->utils_db->comment_status__($item->comment_approved));
+
+				$comment_info = '<span style="font-weight:bold;">'.esc_html(__('Comment', $this->plugin->text_domain)).' ID #'.esc_html($item->comment_id).'</span>'.
+				                ' <span style="font-style:italic;">('.esc_html($comment_status).')</span><br />'.
+				                '<span style="font-style:italic;">'.__('by:', $this->plugin->text_domain).'</span>'.
+				                ' '.$this->plugin->utils_markup->name_email($item->comment_author, $item->comment_author_email);
+
+				$comment_view_url    = $this->plugin->utils_url->comment_short($item->comment_id);
+				$comment_edit_url    = $this->plugin->utils_url->comment_edit_short($item->comment_id);
+				$comment_row_actions = array(
+					'edit' => '<a href="'.esc_attr($comment_edit_url).'">'.__('Edit Comment', $this->plugin->text_domain).'</a>',
+					'view' => '<a href="'.esc_attr($comment_view_url).'">'.__('View', $this->plugin->text_domain).'</a>',
+				);
+				return $comment_info.$this->row_actions($comment_row_actions);
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 * @param string    $property Column we need to build markup for.
 			 *
 			 * @return string HTML markup for this table column.
@@ -390,9 +622,11 @@ namespace comment_mail // Root namespace.
 			{
 				$s = $this->get_raw_search_query();
 
+				$s = $s ? preg_replace($this->sub_ids_regex, '', $s) : '';
 				$s = $s ? preg_replace($this->post_ids_regex, '', $s) : '';
 				$s = $s ? preg_replace($this->comment_ids_regex, '', $s) : '';
 				$s = $s ? preg_replace($this->statuses_regex, '', $s) : '';
+				$s = $s ? preg_replace($this->and_regex, '', $s) : '';
 				$s = $s ? trim(preg_replace('/\s+/', ' ', $s)) : '';
 
 				return $s; // Search search query.
@@ -408,6 +642,26 @@ namespace comment_mail // Root namespace.
 			protected function is_clean_search_submit_post()
 			{
 				return !empty($_POST['search-submit']) && $this->get_clean_search_query();
+			}
+
+			/**
+			 * Get sub IDs in the search query.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array Sub IDs in the search query.
+			 */
+			protected function get_sub_ids_in_search_query()
+			{
+				$sub_ids = array(); // Initialize.
+				$s       = $this->get_raw_search_query();
+
+				if($s && preg_match_all($this->sub_ids_regex, $s, $_m))
+					foreach(preg_split('/[|;,]+/', implode(',', $_m['sub_ids']), NULL, PREG_SPLIT_NO_EMPTY) as $_sub_id)
+						if((integer)$_sub_id > 0) $sub_ids[$_sub_id] = (integer)$_sub_id;
+				unset($_m, $_sub_id); // Housekeeping.
+
+				return $sub_ids;
 			}
 
 			/**
@@ -468,6 +722,20 @@ namespace comment_mail // Root namespace.
 				unset($_m, $_status); // Housekeeping.
 
 				return $statuses;
+			}
+
+			/**
+			 * Are we dealing w/ an `AND` search?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean `TRUE` if it's an `AND` search.
+			 */
+			protected function is_and_search_query()
+			{
+				$s = $this->get_raw_search_query();
+
+				return $s && preg_match($this->and_regex, $s);
 			}
 
 			/**
@@ -540,9 +808,11 @@ namespace comment_mail // Root namespace.
 				$per_page                    = $this->get_per_page();
 				$current_offset              = $this->get_current_offset();
 				$clean_search_query          = $this->get_clean_search_query();
+				$sub_ids_in_search_query     = $this->get_sub_ids_in_search_query();
 				$post_ids_in_search_query    = $this->get_post_ids_in_search_query();
 				$comment_ids_in_search_query = $this->get_comment_ids_in_search_query();
 				$statuses_in_search_query    = $this->get_statuses_in_search_query();
+				$is_and_search_query         = $this->is_and_search_query();
 				$orderby                     = $this->get_orderby();
 				$order                       = $this->get_order();
 
@@ -550,8 +820,42 @@ namespace comment_mail // Root namespace.
 				$this->set_total_items_available((integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()"));
 
 				$this->prepare_items_merge_subscr_properties();
+				$this->prepare_items_merge_sub_properties();
 				$this->prepare_items_merge_post_properties();
 				$this->prepare_items_merge_comment_properties();
+			}
+
+			/**
+			 * Prepares searchable columns.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $template The template to use for matches.
+			 *    Defaults to `= %1$s` for exact matches.
+			 *
+			 * @return string A sequence of `OR ` checks for SQL matches.
+			 */
+			protected function prepare_searchable_or_cols($template = '')
+			{
+				if(!$this->get_searchable_columns())
+					return ''; // Not applicable.
+
+				if(!($clean_search_query = $this->get_clean_search_query()))
+					return ''; // Not applicable.
+
+				$search_like_cols            = ''; // Initialize.
+				$esc_clean_search_query      = esc_sql($clean_search_query);
+				$esc_like_clean_search_query = esc_sql($this->plugin->utils_db->wp->esc_like($clean_search_query));
+
+				if(!($template = trim(str_replace(array("'", '"'), '', (string)$template))))
+					$template = '= %1$s'; // Use the default template.
+
+				foreach($this->get_searchable_columns() as $_column)
+					$search_like_cols .= " OR `".esc_sql($_column)."`". // Using the template.
+					                     " ".sprintf($template, "'".$esc_clean_search_query."'", "'".$esc_like_clean_search_query."'");
+				unset($_column); // Housekeeping.
+
+				return $search_like_cols;
 			}
 
 			/*
@@ -646,7 +950,10 @@ namespace comment_mail // Root namespace.
 			{
 				foreach($this->items as $_item)
 				{
-					$_item->subscr_type = ''; // Initialize.
+					$_item->subscr_type = NULL; // Initialize.
+
+					if(!isset($_item->post_id, $_item->comment_id))
+						continue; // Not possible.
 
 					if($_item->post_id && !$_item->comment_id)
 						$_item->subscr_type = 'comments';
@@ -655,6 +962,71 @@ namespace comment_mail // Root namespace.
 						$_item->subscr_type = 'comment';
 				}
 				unset($_item); // Housekeeping.
+
+				$this->items = $this->plugin->utils_db->typify_deep($this->items);
+			}
+
+			/**
+			 * Assists w/ DB query; i.e. item preparations.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function prepare_items_merge_sub_properties()
+			{
+				$sub_ids = array(); // Initialize.
+
+				foreach($this->items as $_item)
+					if(!empty($_item->sub_id)) // Has a sub ID?
+						$sub_ids[$_item->sub_id] = $_item->sub_id;
+				unset($_item); // Housekeeping.
+
+				$sql_columns      = array(
+					'ID',
+					'key',
+					'user_id',
+					'post_id',
+					'comment_id',
+					'deliver',
+					'fname',
+					'lname',
+					'email',
+					'insertion_ip',
+					'last_ip',
+					'status',
+					'insertion_time',
+					'last_update_time',
+				);
+				$sql_item_columns = $sql_columns;
+				unset($sql_item_columns[0]); // Exclude `ID`.
+
+				$sql = "SELECT `".implode('`,`', array_map('esc_sql', $sql_columns))."`".
+				       " FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				       " WHERE `ID` IN('".implode("','", array_map('esc_sql', $sub_ids))."')";
+
+				if($sub_ids && ($results = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
+					$this->merged_result_sets['subs'] = $results = $this->plugin->utils_db->typify_deep($results);
+
+				foreach($this->items as $_item)
+				{
+					foreach($sql_item_columns as $_sql_item_column)
+						if(strpos($_sql_item_column, 'sub_') !== 0)
+							$_item->{'sub_'.$_sql_item_column} = NULL;
+						else $_item->{$_sql_item_column} = NULL;
+
+					if(!isset($_item->sub_id))
+						continue; // Not possible.
+
+					if(empty($results) || empty($results[$_item->sub_id]))
+						continue; // Not possible.
+
+					foreach($sql_item_columns as $_sql_item_column)
+						if(strpos($_sql_item_column, 'sub_') !== 0)
+							$_item->{'sub_'.$_sql_item_column} = $results[$_item->sub_id]->{$_sql_item_column};
+						else $_item->{$_sql_item_column} = $results[$_item->sub_id]->{$_sql_item_column};
+				}
+				unset($_item, $_sql_item_column); // Housekeeping.
+
+				$this->items = $this->plugin->utils_db->typify_deep($this->items);
 			}
 
 			/**
@@ -667,7 +1039,7 @@ namespace comment_mail // Root namespace.
 				$post_ids = array(); // Initialize.
 
 				foreach($this->items as $_item)
-					if($_item->post_id) // Has a post ID?
+					if(!empty($_item->post_id)) // Has a post ID?
 						$post_ids[$_item->post_id] = $_item->post_id;
 				unset($_item); // Housekeeping.
 
@@ -687,18 +1059,21 @@ namespace comment_mail // Root namespace.
 				       " FROM `".esc_sql($this->plugin->utils_db->wp->posts)."`".
 				       " WHERE `ID` IN('".implode("','", array_map('esc_sql', $post_ids))."')";
 
-				if($post_ids && is_array($results = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
-					$results = $this->plugin->utils_db->typify_deep($results);
+				if($post_ids && ($results = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
+					$this->merged_result_sets['posts'] = $results = $this->plugin->utils_db->typify_deep($results);
 
 				foreach($this->items as $_item)
 				{
 					foreach($sql_item_columns as $_sql_item_column)
 						if(strpos($_sql_item_column, 'post_') !== 0)
-							$_item->{'post_'.$_sql_item_column} = '';
-						else $_item->{$_sql_item_column} = '';
+							$_item->{'post_'.$_sql_item_column} = NULL;
+						else $_item->{$_sql_item_column} = NULL;
 
-					if(!$_item->post_id || empty($results) || empty($results[$_item->post_id]))
-						continue; // Nothing more we can do.
+					if(!isset($_item->post_id))
+						continue; // Not possible.
+
+					if(empty($results) || empty($results[$_item->post_id]))
+						continue; // Not possible.
 
 					foreach($sql_item_columns as $_sql_item_column)
 						if(strpos($_sql_item_column, 'post_') !== 0)
@@ -706,6 +1081,8 @@ namespace comment_mail // Root namespace.
 						else $_item->{$_sql_item_column} = $results[$_item->post_id]->{$_sql_item_column};
 				}
 				unset($_item, $_sql_item_column); // Housekeeping.
+
+				$this->items = $this->plugin->utils_db->typify_deep($this->items);
 			}
 
 			/**
@@ -718,8 +1095,13 @@ namespace comment_mail // Root namespace.
 				$comment_ids = array(); // Initialize.
 
 				foreach($this->items as $_item)
-					if($_item->comment_id) // Has a comment_id ID?
+					if(!empty($_item->comment_id)) // Has a comment ID?
 						$comment_ids[$_item->comment_id] = $_item->comment_id;
+				unset($_item); // Housekeeping.
+
+				foreach($this->items as $_item)
+					if(!empty($_item->comment_parent_id)) // Has a comment parent ID?
+						$comment_ids[$_item->comment_parent_id] = $_item->comment_parent_id;
 				unset($_item); // Housekeeping.
 
 				$sql_columns      = array(
@@ -738,18 +1120,21 @@ namespace comment_mail // Root namespace.
 				       " FROM `".esc_sql($this->plugin->utils_db->wp->comments)."`".
 				       " WHERE `comment_ID` IN('".implode("','", array_map('esc_sql', $comment_ids))."')";
 
-				if($comment_ids && is_array($results = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
-					$results = $this->plugin->utils_db->typify_deep($results);
+				if($comment_ids && ($results = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
+					$this->merged_result_sets['comments'] = $results = $this->plugin->utils_db->typify_deep($results);
 
 				foreach($this->items as $_item)
 				{
 					foreach($sql_item_columns as $_sql_item_column)
 						if(strpos($_sql_item_column, 'comment_') !== 0)
-							$_item->{'comment_'.$_sql_item_column} = '';
-						else $_item->{$_sql_item_column} = '';
+							$_item->{'comment_'.$_sql_item_column} = NULL;
+						else $_item->{$_sql_item_column} = NULL;
 
-					if(!$_item->comment_id || empty($results) || empty($results[$_item->comment_id]))
-						continue; // Nothing more we can do.
+					if(!isset($_item->comment_id))
+						continue; // Not possible.
+
+					if(empty($results) || empty($results[$_item->comment_id]))
+						continue; // Not possible.
 
 					foreach($sql_item_columns as $_sql_item_column)
 						if(strpos($_sql_item_column, 'comment_') !== 0)
@@ -757,6 +1142,27 @@ namespace comment_mail // Root namespace.
 						else $_item->{$_sql_item_column} = $results[$_item->comment_id]->{$_sql_item_column};
 				}
 				unset($_item, $_sql_item_column); // Housekeeping.
+
+				foreach($this->items as $_item)
+				{
+					foreach($sql_item_columns as $_sql_item_column)
+						$_item->{'comment_parent_'. // Prefix each of these.
+						         preg_replace('/^comment_/i', '', $_sql_item_column)} = NULL;
+
+					if(!isset($_item->comment_parent_id))
+						continue; // Not possible.
+
+					if(empty($results) || empty($results[$_item->comment_parent_id]))
+						continue; // Not possible.
+
+					foreach($sql_item_columns as $_sql_item_column)
+						$_item->{'comment_parent_'. // Prefix each of these.
+						         preg_replace('/^comment_/i', '', $_sql_item_column)}
+							= $results[$_item->comment_parent_id]->{$_sql_item_column};
+				}
+				unset($_item, $_sql_item_column); // Housekeeping.
+
+				$this->items = $this->plugin->utils_db->typify_deep($this->items);
 			}
 
 			/*
@@ -864,8 +1270,10 @@ namespace comment_mail // Root namespace.
 			 */
 			public function search_box($text = '', $input_id = '')
 			{
-				if(!$this->get_searchable_columns())
-					return; // Not applicable.
+				if(!$this->get_ft_searchable_columns()
+				   && !$this->get_searchable_columns()
+				   && !$this->get_navigable_filters()
+				) return; // Not applicable.
 
 				$text     = (string)$text;
 				$input_id = (string)$input_id;
@@ -893,21 +1301,27 @@ namespace comment_mail // Root namespace.
 			 */
 			public function search_query_filter_descriptions()
 			{
+				$sub_ids           = $this->get_sub_ids_in_search_query();
 				$post_ids          = $this->get_post_ids_in_search_query();
 				$comment_ids       = $this->get_comment_ids_in_search_query();
 				$statuses          = $this->get_statuses_in_search_query();
 				$navigable_filters = $this->get_navigable_filters();
 				$raw_search_query  = $this->get_raw_search_query();
 
-				$query_contains_filters           = $post_ids || $comment_ids;
+				$query_contains_filters           = $sub_ids || $post_ids || $comment_ids;
 				$navigable_filters_exist          = !empty($navigable_filters);
 				$query_contains_navigable_filters = !empty($statuses);
 
 				if(!$query_contains_filters && !$navigable_filters_exist)
 					return; // Nothing to do here.
 
-				$posts    = $comments = array(); // An array of object references.
-				$post_lis = $comment_lis = $navigable_filter_lis = $unknown_lis = array();
+				$subs    = $posts = $comments = array(); // Array of bject references.
+				$sub_lis = $post_lis = $comment_lis = $navigable_filter_lis = $unknown_lis = array();
+
+				foreach($sub_ids as $_sub_id)
+					if(($_sub = $this->plugin->utils_sub->get($_sub_id)))
+						$subs[] = $_sub;
+				unset($_sub_id, $_sub); // Housekeeping.
 
 				foreach($post_ids as $_post_id)
 					if(($_post = get_post($_post_id)))
@@ -918,6 +1332,26 @@ namespace comment_mail // Root namespace.
 					if(($_comment = get_comment($_comment_id)))
 						$comments[] = $_comment;
 				unset($_comment_id, $_comment); // Housekeeping.
+
+				foreach($subs as $_sub) // `\stdClass` objects.
+				{
+					/** @var $_sub \stdClass Reference for IDEs. */
+
+					if(isset($sub_lis[$_sub->ID]))
+						continue; // Duplicate.
+
+					$_sub_name      = $_sub->fname.' '.$_sub->lname; // Concatenate.
+					$_sub_edit_link = $this->plugin->utils_url->edit_subscriber_short($_sub->ID);
+
+					$sub_lis[$_sub->ID] = '<li>'. // ♙ ID "Name" <email> [edit].
+					                      '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
+					                      ' <span style="font-weight:bold;" title="'.esc_attr($_sub->key).'">ID #'.esc_html($_sub->ID).'</span>'.
+					                      ' '.$this->plugin->utils_markup->name_email($_sub_name, $_sub->email, array('email_style' => 'font-weight:bold;')).
+					                      ($_sub_edit_link // Only if they can edit the subscriber ID; else this will be empty.
+						                      ? ' [<a href="'.esc_attr($_sub_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
+					                      '</li>';
+				}
+				unset($_sub, $_sub_name, $_sub_edit_link); // Housekeeping.
 
 				foreach($posts as $_post) // `\WP_Post` objects.
 				{
@@ -1007,7 +1441,7 @@ namespace comment_mail // Root namespace.
 				}
 				unset($_navigable_filter_s, $_navigable_filter_label); // Housekeeping.
 
-				$filter_lis_exist           = $post_lis || $comment_lis; // Have any of these list items?
+				$filter_lis_exist           = $sub_lis || $post_lis || $comment_lis; // Have any of these?
 				$navigable_filter_lis_exist = !empty($navigable_filter_lis); // Have any navigable list items?
 
 				if($query_contains_filters) // If query contains non-navigable filters.
@@ -1019,6 +1453,7 @@ namespace comment_mail // Root namespace.
 					     '   <i class="fa fa-filter"></i>'. // Filter icon.
 					     '   '.sprintf(__('<strong>Search Filters Applied</strong> :: only showing %1$s for:', $this->plugin->text_domain), esc_html($this->plural_label)).
 					     '</h3>';
+					if($sub_lis) echo '<ul class="pmp-search-filters pmp-filters pmp-list-items">'.implode('', $sub_lis).'</ul>';
 					if($post_lis) echo '<ul class="pmp-search-filters pmp-filters pmp-list-items">'.implode('', $post_lis).'</ul>';
 					if($comment_lis) echo '<ul class="pmp-search-filters pmp-filters pmp-list-items">'.implode('', $comment_lis).'</ul>';
 					if($unknown_lis) echo '<ul class="pmp-search-filters pmp-filters pmp-list-items">'.implode('', $unknown_lis).'</ul>';

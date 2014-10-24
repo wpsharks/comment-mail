@@ -114,9 +114,6 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_auto_confirm()
 			{
-				if(!$this->sub)
-					return FALSE; // Not possible.
-
 				if($this->auto_confirm === FALSE)
 					return FALSE; // Nope.
 

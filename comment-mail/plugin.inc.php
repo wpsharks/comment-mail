@@ -29,6 +29,7 @@ namespace comment_mail
 		 * @property utils_mail   $utils_mail
 		 * @property utils_markup $utils_markup
 		 * @property utils_php    $utils_php
+		 * @property utils_queue  $utils_queue
 		 * @property utils_string $utils_string
 		 * @property utils_sub    $utils_sub
 		 * @property utils_url    $utils_url
@@ -753,6 +754,14 @@ namespace comment_mail
 					'label'   => __('Per Page', $this->text_domain),
 					'option'  => __NAMESPACE__.'_queue_per_page',
 				));
+				add_filter('manage_'.$screen->id.'_columns', function ()
+				{
+					return queue_table::get_columns_();
+				});
+				add_filter('get_user_option_manage'.$screen->id.'columnshidden', function ($value)
+				{
+					return is_array($value) ? $value : queue_table::get_hidden_columns_();
+				});
 			}
 
 			/**

@@ -69,10 +69,11 @@ namespace comment_mail // Root namespace.
 
 				$time = time(); // Current timestamp.
 				$sql  = "INSERT INTO `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
-				        " (`sub_id`, `comment_id`, `comment_parent_id`, `insertion_time`, `last_update_time`, `hold_until_time`) VALUES";
+				        " (`sub_id`, `post_id`, `comment_parent_id`, `comment_id`, `insertion_time`, `last_update_time`, `hold_until_time`) VALUES";
 
 				foreach($sub_ids as $_key => $_sub_id)
-					$sql .= "('".esc_sql($_sub_id)."', '".esc_sql($this->comment->comment_ID)."', '".esc_sql($this->comment->comment_parent)."', '".esc_sql($time)."', '".esc_sql($time)."', '0'),";
+					$sql .= "('".esc_sql($_sub_id)."', '".esc_sql($this->comment->comment_post_ID)."', '".esc_sql($this->comment->comment_parent)."',".
+					        " '".esc_sql($this->comment->comment_ID)."', '".esc_sql($time)."', '".esc_sql($time)."', '0'),";
 				$sql = rtrim($sql, ','); // Trim leftover delimiter.
 				unset($_key, $_sub_id); // Housekeeping.
 

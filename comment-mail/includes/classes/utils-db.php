@@ -98,13 +98,24 @@ namespace comment_mail // Root namespace.
 
 				$key = strtolower($key);
 
-				if(in_array($key, array('user_initiated'), TRUE))
+				$integer_keys             = array(
+					'id',
+					'parent',
+					'time',
+					'count',
+					'counter',
+					'user_initiated',
+				);
+				$preg_quoted_integer_keys = array_map(function ($key)
+				{
+					return preg_quote($key, '/'); #
+
+				}, $integer_keys);
+
+				if(in_array($key, $integer_keys, TRUE))
 					return TRUE;
 
-				if(in_array($key, array('id', 'time'), TRUE))
-					return TRUE;
-
-				if(preg_match('/_(?:id|time)$/', $key))
+				if(preg_match('/_(?:'.implode('|', $preg_quoted_integer_keys).')$/', $key))
 					return TRUE;
 
 				return FALSE; // Default.

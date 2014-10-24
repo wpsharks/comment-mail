@@ -254,7 +254,7 @@ namespace comment_mail // Root namespace.
 
 						default: // Everything else becomes a header.
 
-							$headers[$_header] = $_value; // Custom header.
+							$headers[strtolower($_header)] = $_value;
 
 							break; // Break switch handler.
 					}
