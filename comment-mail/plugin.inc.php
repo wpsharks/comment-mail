@@ -11,7 +11,7 @@ namespace comment_mail
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	require_once dirname(__FILE__).'/includes/classes/abstract-base.php';
+	require_once dirname(__FILE__).'/includes/classes/abs-base.php';
 
 	if(!class_exists('\\'.__NAMESPACE__.'\\plugin'))
 	{
@@ -39,7 +39,7 @@ namespace comment_mail
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class plugin extends abstract_base
+		class plugin extends abs_base
 		{
 			/*
 			 * Public Properties
@@ -287,7 +287,7 @@ namespace comment_mail
 					'template_site_site_header'                   => '', // HTML/PHP code.
 					'template_site_site_footer'                   => '', // HTML/PHP code.
 
-					'template_site_comment_form_subscription_ops' => '', // HTML/PHP code.
+					'template_site_comment_form_sub_ops'          => '', // HTML/PHP code.
 
 					'template_site_sub_actions_confirmed'         => '', // HTML/PHP code.
 					'template_site_sub_actions_unsubscribed'      => '', // HTML/PHP code.
@@ -524,7 +524,7 @@ namespace comment_mail
 					return; // Ignore; this post type excluded.
 
 				add_meta_box(__NAMESPACE__.'_small', $this->name.'™', array($this, 'post_small_meta_box'), $post_type, 'side', 'high');
-				add_meta_box(__NAMESPACE__.'_large', $this->name.'™ '.__('Subscribers', $this->text_domain),
+				add_meta_box(__NAMESPACE__.'_large', $this->name.'™ '.__('Subscriptions', $this->text_domain),
 				             array($this, 'post_large_meta_box'), $post_type, 'normal', 'high');
 			}
 
@@ -593,6 +593,10 @@ namespace comment_mail
 				$deps = array('jquery'); // Plugin dependencies.
 
 				wp_enqueue_script(__NAMESPACE__, $this->utils_url->to('/client-s/js/menu-pages.min.js'), $deps, $this->version, TRUE);
+				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_vars', array(
+					'plugin_url'    => rtrim($this->utils_url->to('/'), '/'),
+					'ajax_endpoint' => rtrim($this->utils_url->current_page_nonce_only(), '/')
+				));
 				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_i18n', array(
 					'bulk_reconfirm_confirmation' => __('Resend email confirmation link? Are you sure?', $this->text_domain),
 					'bulk_delete_confirmation'    => __('Delete permanently? Are you sure?', $this->text_domain),
@@ -615,8 +619,8 @@ namespace comment_mail
 				$this->menu_page_hooks[__NAMESPACE__] = add_comments_page($this->name.'™', $this->name.'™', $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__], array($this, 'menu_page_options_screen'));
 
-				$menu_title                                   = '⥱ '.__('Subscribers', $this->text_domain);
-				$page_title                                   = $this->name.'™ ⥱ '.__('Subscribers', $this->text_domain);
+				$menu_title                                   = '⥱ '.__('Subscriptions', $this->text_domain);
+				$page_title                                   = $this->name.'™ ⥱ '.__('Subscriptions', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_subs'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_subs', array($this, 'menu_page_subs'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_subs'], array($this, 'menu_page_subs_screen'));
 
@@ -722,16 +726,16 @@ namespace comment_mail
 				));
 				add_filter('manage_'.$screen->id.'_columns', function ()
 				{
-					return subs_table::get_columns_();
+					return menu_page_subs_table::get_columns_();
 				});
 				add_filter('get_user_option_manage'.$screen->id.'columnshidden', function ($value)
 				{
-					return is_array($value) ? $value : subs_table::get_hidden_columns_();
+					return is_array($value) ? $value : menu_page_subs_table::get_hidden_columns_();
 				});
 			}
 
 			/**
-			 * Menu page for subscribers.
+			 * Menu page for subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -769,11 +773,11 @@ namespace comment_mail
 				));
 				add_filter('manage_'.$screen->id.'_columns', function ()
 				{
-					return sub_event_log_table::get_columns_();
+					return menu_page_sub_event_log_table::get_columns_();
 				});
 				add_filter('get_user_option_manage'.$screen->id.'columnshidden', function ($value)
 				{
-					return is_array($value) ? $value : sub_event_log_table::get_hidden_columns_();
+					return is_array($value) ? $value : menu_page_sub_event_log_table::get_hidden_columns_();
 				});
 			}
 
@@ -815,11 +819,11 @@ namespace comment_mail
 				));
 				add_filter('manage_'.$screen->id.'_columns', function ()
 				{
-					return queue_table::get_columns_();
+					return menu_page_queue_table::get_columns_();
 				});
 				add_filter('get_user_option_manage'.$screen->id.'columnshidden', function ($value)
 				{
-					return is_array($value) ? $value : queue_table::get_hidden_columns_();
+					return is_array($value) ? $value : menu_page_queue_table::get_hidden_columns_();
 				});
 			}
 
@@ -861,11 +865,11 @@ namespace comment_mail
 				));
 				add_filter('manage_'.$screen->id.'_columns', function ()
 				{
-					return queue_event_log_table::get_columns_();
+					return menu_page_queue_event_log_table::get_columns_();
 				});
 				add_filter('get_user_option_manage'.$screen->id.'columnshidden', function ($value)
 				{
-					return is_array($value) ? $value : queue_event_log_table::get_hidden_columns_();
+					return is_array($value) ? $value : menu_page_queue_event_log_table::get_hidden_columns_();
 				});
 			}
 

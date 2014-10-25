@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class comment_shortlink_redirect extends abstract_base
+		class comment_shortlink_redirect extends abs_base
 		{
 			/**
 			 * Class constructor.

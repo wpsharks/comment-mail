@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class utils_date extends abstract_base
+		class utils_date extends abs_base
 		{
 			/**
 			 * Date translations (in local time, as configured by WordPress®).

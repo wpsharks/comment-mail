@@ -18,10 +18,10 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class sub_confirmer extends abstract_base
+		class sub_confirmer extends abs_base
 		{
 			/**
-			 * @var \stdClass|null Subscriber.
+			 * @var \stdClass|null Subscription.
 			 *
 			 * @since 14xxxx First documented version.
 			 */

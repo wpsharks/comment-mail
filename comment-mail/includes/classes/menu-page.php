@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class menu_page extends abstract_base
+		class menu_page extends abs_base
 		{
 			/**
 			 * Class constructor.
@@ -43,8 +43,8 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function options()
 			{
-				echo '<div id="'.esc_attr($this->plugin->slug.'-menu-page').'" class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-area').'">'."\n";
-				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-area').'">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'" novalidate="novalidate">'."\n";
 
 				echo '      '.$this->heading(__('Plugin Options', $this->plugin->text_domain), 'options.png').$this->notices(); // Heading/notices.
 
@@ -68,9 +68,9 @@ namespace comment_mail // Root namespace.
 				echo '            <div class="pmp-panel-body pmp-clearfix">'."\n";
 				echo '               <i class="fa fa-shield fa-4x" style="float:right; margin: 0 0 0 25px;"></i>'."\n";
 				echo '               <h3>'.__('Uninstall on Plugin Deletion; or Safeguard Options?', $this->plugin->text_domain).'</h3>'."\n";
-				echo '               <p>'.sprintf(__('<strong>Tip:</strong> By default, if you delete %1$s using the plugins menu in WordPress, nothing is lost. However, if you want to completely uninstall %1$s you should set this to <code>Yes</code> and <strong>THEN</strong> deactivate &amp; delete %1$s from the plugins menu in WordPress. This way %1$s will erase your options for the plugin, erase database tables created by the plugin, remove subscribers, terminate CRON jobs, etc. It erases itself from existence completely.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'."\n";
+				echo '               <p>'.sprintf(__('<strong>Tip:</strong> By default, if you delete %1$s using the plugins menu in WordPress, nothing is lost. However, if you want to completely uninstall %1$s you should set this to <code>Yes</code> and <strong>THEN</strong> deactivate &amp; delete %1$s from the plugins menu in WordPress. This way %1$s will erase your options for the plugin, erase database tables created by the plugin, remove subscriptions, terminate CRON jobs, etc. It erases itself from existence completely.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'."\n";
 				echo '               <p><select name="'.esc_attr(__NAMESPACE__).'[save_options][uninstall_on_deletion]">'."\n";
-				echo '                     <option value="0"'.selected($this->plugin->options['uninstall_on_deletion'], '0', FALSE).'>'.__('Safeguard my options and subscribers (recommended).', $this->plugin->text_domain).'</option>'."\n";
+				echo '                     <option value="0"'.selected($this->plugin->options['uninstall_on_deletion'], '0', FALSE).'>'.__('Safeguard my options and subscriptions (recommended).', $this->plugin->text_domain).'</option>'."\n";
 				echo '                     <option value="1"'.selected($this->plugin->options['uninstall_on_deletion'], '1', FALSE).'>'.sprintf(__('Yes, uninstall (completely erase) %1$s on plugin deletion.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</option>'."\n";
 				echo '                  </select></p>'."\n";
 				echo '            </div>'."\n";
@@ -92,11 +92,67 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function subs()
 			{
-				echo '<div id="'.esc_attr($this->plugin->slug.'-menu-page-table').'" class="'.esc_attr($this->plugin->slug.'-menu-page-subs '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
-				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
+				switch(!empty($_REQUEST['action']) ? $_REQUEST['action'] : '')
+				{
+					case 'new': // Add new subscription.
 
-				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Subscribers', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-groups" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
-				new subs_table(); // Displays table.
+						$this->sub_new(); // Display form.
+
+						break; // Break switch handler.
+
+					case 'edit': // Edit existing subscription.
+
+						$this->sub_edit(); // Display form.
+
+						break; // Break switch handler.
+
+					case '': // Also the default case handler.
+					default: // Everything else is handled by subs. table.
+
+						echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-subs '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
+						echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'" novalidate="novalidate">'."\n";
+
+						echo '      <h2>'.sprintf(__('%1$s™ ⥱ Subscriptions', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-groups" style="font-size:inherit; line-height:inherit;"></i>'.
+						     '       <a href="'.esc_attr($this->plugin->utils_url->new_sub_short()).'" class="add-new-h2">'.__('Add New', $this->plugin->text_domain).'</a></h2>'."\n";
+
+						new menu_page_subs_table(); // Displays table.
+
+						echo '   </form>';
+						echo '</div>'."\n";
+				}
+			}
+
+			/**
+			 * Displays menu page.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function sub_new()
+			{
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-sub-new '.$this->plugin->slug.'-menu-page-form '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'" novalidate="novalidate">'."\n";
+
+				echo '      <h2>'.sprintf(__('%1$s™ ⥱ New Subscription', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-id" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
+
+				new menu_page_sub_new_form(); // Displays form to add new subscription.
+
+				echo '   </form>';
+				echo '</div>'."\n";
+			}
+
+			/**
+			 * Displays menu page.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function sub_edit()
+			{
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-sub-edit '.$this->plugin->slug.'-menu-page-form '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'" novalidate="novalidate">'."\n";
+
+				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Edit Subscription', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-id" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
+
+				new menu_page_sub_edit_form(!empty($_REQUEST['subscription']) ? (integer)$_REQUEST['subscription'] : 0); // Displays form.
 
 				echo '   </form>';
 				echo '</div>'."\n";
@@ -109,11 +165,12 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function sub_event_log()
 			{
-				echo '<div id="'.esc_attr($this->plugin->slug.'-menu-page-table').'" class="'.esc_attr($this->plugin->slug.'-menu-page-sub-event-log '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
-				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-sub-event-log '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'" novalidate="novalidate">'."\n";
 
-				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Subscriber Event Log', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-groups" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
-				new sub_event_log_table(); // Displays table.
+				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Subscription Event Log', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-groups" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
+
+				new menu_page_sub_event_log_table(); // Displays table.
 
 				echo '   </form>';
 				echo '</div>'."\n";
@@ -126,11 +183,12 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function queue()
 			{
-				echo '<div id="'.esc_attr($this->plugin->slug.'-menu-page-table').'" class="'.esc_attr($this->plugin->slug.'-menu-page-queue '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
-				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-queue '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'" novalidate="novalidate">'."\n";
 
 				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Queued (Pending) Notifications', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-email" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
-				new queue_table(); // Displays table.
+
+				new menu_page_queue_table(); // Displays table.
 
 				echo '   </form>';
 				echo '</div>'."\n";
@@ -143,11 +201,12 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function queue_event_log()
 			{
-				echo '<div id="'.esc_attr($this->plugin->slug.'-menu-page-table').'" class="'.esc_attr($this->plugin->slug.'-menu-page-queue-event-log '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
-				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'">'."\n";
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-queue-event-log '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'" novalidate="novalidate">'."\n";
 
 				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Queue Event Log', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-email" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
-				new queue_event_log_table(); // Displays table.
+
+				new menu_page_queue_event_log_table(); // Displays table.
 
 				echo '   </form>';
 				echo '</div>'."\n";

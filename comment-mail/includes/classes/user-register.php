@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class user_register extends abstract_base
+		class user_register extends abs_base
 		{
 			/**
 			 * @var \WP_User|null
@@ -45,7 +45,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Update subscribers; set user ID.
+			 * Update subscriptions; set user ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 *

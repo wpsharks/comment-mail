@@ -1,6 +1,6 @@
 <?php
 /**
- * Subscriber Utilities
+ * Subscription Utilities
  *
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
@@ -14,11 +14,11 @@ namespace comment_mail // Root namespace.
 	if(!class_exists('\\'.__NAMESPACE__.'\\utils_sub'))
 	{
 		/**
-		 * Subscriber Utilities
+		 * Subscription Utilities
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class utils_sub extends abstract_base
+		class utils_sub extends abs_base
 		{
 			/**
 			 * Class constructor.
@@ -31,13 +31,13 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Subscriber key to ID.
+			 * Subscription key to ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string $key Input key to convert to an ID.
 			 *
-			 * @return integer The subscriber ID matching the input `$key`.
+			 * @return integer The subscription ID matching the input `$key`.
 			 *    If the `$key` is not found, this returns `0`.
 			 */
 			public function key_to_id($key)
@@ -95,23 +95,23 @@ namespace comment_mail // Root namespace.
 			public function nullify_cache(array $sub_ids_or_keys = array())
 			{
 				foreach($sub_ids_or_keys as $_sub_id_or_key)
-					$this->cache['get'][$_sub_id_or_key] = NULL;
+					unset($this->cache['get'][$_sub_id_or_key]);
 				unset($_sub_id_or_key); // Housekeeping.
 
 				unset($this->cache['query_total'], $this->cache['last_x']);
 			}
 
 			/**
-			 * Get subscriber.
+			 * Get subscription.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|string $sub_id_or_key Subscriber ID.
+			 * @param integer|string $sub_id_or_key Subscription ID.
 			 *
 			 * @param boolean        $no_cache Defaults to a FALSE value.
 			 *    TRUE if you want to avoid a potentially cached value.
 			 *
-			 * @return \stdClass|null Subscriber object, if possible.
+			 * @return \stdClass|null Subscription object, if possible.
 			 */
 			public function get($sub_id_or_key, $no_cache = FALSE)
 			{
@@ -149,14 +149,14 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Reconfirm subscriber via email.
+			 * Reconfirm subscription via email.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|string $sub_id_or_key Subscriber ID.
+			 * @param integer|string $sub_id_or_key Subscription ID.
 			 * @param array          $args Any additional behavioral args.
 			 *
-			 * @return boolean|null TRUE if subscriber is reconfirmed successfully.
+			 * @return boolean|null TRUE if subscription is reconfirmed successfully.
 			 *    Or, FALSE if unable to reconfirm (e.g. already confirmed).
 			 *    Or, NULL on complete failure (e.g. invalid ID or key).
 			 */
@@ -186,11 +186,11 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Bulk reconfirm subscribers via email.
+			 * Bulk reconfirm subscriptions via email.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
+			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
 			 * @return integer Number of suscribers reconfirmed successfully.
@@ -208,14 +208,14 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Confirm subscriber.
+			 * Confirm subscription.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|string $sub_id_or_key Subscriber ID.
+			 * @param integer|string $sub_id_or_key Subscription ID.
 			 * @param array          $args Any additional behavioral args.
 			 *
-			 * @return boolean|null TRUE if subscriber is confirmed successfully.
+			 * @return boolean|null TRUE if subscription is confirmed successfully.
 			 *    Or, FALSE if unable to confirm (e.g. already confirmed).
 			 *    Or, NULL on complete failure (e.g. invalid ID or key).
 			 */
@@ -239,11 +239,11 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Bulk confirm subscribers.
+			 * Bulk confirm subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
+			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
 			 * @return integer Number of suscribers confirmed successfully.
@@ -261,14 +261,14 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Unconfirm subscriber.
+			 * Unconfirm subscription.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|string $sub_id_or_key Subscriber ID.
+			 * @param integer|string $sub_id_or_key Subscription ID.
 			 * @param array          $args Any additional behavioral args.
 			 *
-			 * @return boolean|null TRUE if subscriber is unconfirmed successfully.
+			 * @return boolean|null TRUE if subscription is unconfirmed successfully.
 			 *    Or, FALSE if unable to unconfirm (e.g. already unconfirmed).
 			 *    Or, NULL on complete failure (e.g. invalid ID or key).
 			 */
@@ -292,11 +292,11 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Bulk unconfirm subscribers.
+			 * Bulk unconfirm subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
+			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
 			 * @return integer Number of suscribers unconfirmed successfully.
@@ -314,14 +314,14 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Suspend subscriber.
+			 * Suspend subscription.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|string $sub_id_or_key Subscriber ID.
+			 * @param integer|string $sub_id_or_key Subscription ID.
 			 * @param array          $args Any additional behavioral args.
 			 *
-			 * @return boolean|null TRUE if subscriber is suspended successfully.
+			 * @return boolean|null TRUE if subscription is suspended successfully.
 			 *    Or, FALSE if unable to suspend (e.g. already suspended).
 			 *    Or, NULL on complete failure (e.g. invalid ID or key).
 			 */
@@ -345,11 +345,11 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Bulk suspend subscribers.
+			 * Bulk suspend subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
+			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
 			 * @return integer Number of suscribers suspended successfully.
@@ -367,14 +367,14 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Trash subscriber.
+			 * Trash subscription.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|string $sub_id_or_key Subscriber ID.
+			 * @param integer|string $sub_id_or_key Subscription ID.
 			 * @param array          $args Any additional behavioral args.
 			 *
-			 * @return boolean|null TRUE if subscriber is trashed successfully.
+			 * @return boolean|null TRUE if subscription is trashed successfully.
 			 *    Or, FALSE if unable to trash (e.g. already trashed).
 			 *    Or, NULL on complete failure (e.g. invalid ID or key).
 			 */
@@ -398,11 +398,11 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Bulk trash subscribers.
+			 * Bulk trash subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
+			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
 			 * @return integer Number of suscribers trashed successfully.
@@ -420,14 +420,14 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Delete subscriber.
+			 * Delete subscription.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|string $sub_id_or_key Subscriber ID.
+			 * @param integer|string $sub_id_or_key Subscription ID.
 			 * @param array          $args Any additional behavioral args.
 			 *
-			 * @return boolean|null TRUE if subscriber is deleted successfully.
+			 * @return boolean|null TRUE if subscription is deleted successfully.
 			 *    Or, FALSE if unable to delete (e.g. already deleted).
 			 *    Or, NULL on complete failure (e.g. invalid ID or key).
 			 */
@@ -448,11 +448,11 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Bulk delete subscribers.
+			 * Bulk delete subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param array $sub_ids_or_keys Subscriber IDs/keys.
+			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
 			 * @return integer Number of suscribers deleted successfully.
@@ -470,35 +470,52 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Query total subscribers.
+			 * Query total subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param integer|null $post_id Defaults to a `NULL` value.
 			 *    i.e. defaults to any post ID. Pass this to limit the query.
 			 *
-			 * @param integer|null $comment_id Defaults to a `NULL` value.
-			 *    i.e. defaults to any comment ID. Pass this to limit the query.
+			 * @param array        $args Any additional behavioral args.
 			 *
-			 * @param string|null  $status Defaults to an empty string.
-			 *    i.e. defaults to any status. Pass this to limit the query.
+			 * @return integer Total subscriptions for the given query.
 			 *
-			 * @param boolean      $auto_discount_trash Defaults to a `TRUE` value.
-			 *    This applies to the case where `$status` is empty.
-			 *    i.e. do not count subscribers in the trash.
-			 *
-			 * @return integer Total subscribers for the given query.
+			 * @throws \exception If a query failure occurs.
 			 */
-			public function query_total($post_id = NULL, $comment_id = NULL, $status = '', $auto_discount_trash = TRUE)
+			public function query_total($post_id = NULL, array $args = array())
 			{
-				$post_id_key             = isset($post_id) ? (integer)$post_id : -1;
-				$comment_id_key          = isset($comment_id) ? (integer)$comment_id : -1;
-				$status_key              = $status = (string)$status; // Force string.
-				$auto_discount_trash_key = $auto_discount_trash ? 1 : 0;
+				if(isset($post_id)) // Force integer?
+					$post_id = (integer)$post_id;
 
-				if(isset($this->cache[__FUNCTION__][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key]))
-					return $this->cache[__FUNCTION__][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key];
-				$total = &$this->cache[__FUNCTION__][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key];
+				$default_args = array(
+					'status'              => '',
+					'comment_id'          => NULL,
+					'auto_discount_trash' => TRUE,
+					'group_by_email'      => FALSE,
+					'no_cache'            => FALSE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$status              = trim((string)$args['status']);
+				$comment_id          = $this->isset_or($args['comment_id'], NULL, 'integer');
+				$auto_discount_trash = (boolean)$args['auto_discount_trash'];
+				$group_by_email      = (boolean)$args['group_by_email'];
+				$no_cache            = (boolean)$args['no_cache'];
+
+				$post_id_key             = $this->isset_or($post_id, -1, 'integer');
+				$status_key              = strtolower((string)$status); // Lowercase.
+				$comment_id_key          = $this->isset_or($comment_id, -1, 'integer');
+				$auto_discount_trash_key = (integer)$auto_discount_trash;
+				$group_by_email_key      = (integer)$group_by_email;
+
+				if(!$no_cache && isset($this->cache[__FUNCTION__][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key]))
+					return $this->cache[__FUNCTION__][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key];
+
+				$this->cache[__FUNCTION__][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key]
+					    = 0; // Initialize this cache entry for the routines below; i.e. a shorter reference will be necesseary.
+				$total = &$this->cache[__FUNCTION__][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key];
 
 				$sql = "SELECT SQL_CALC_FOUND_ROWS `ID`".
 				       " FROM `".esc_html($this->plugin->utils_db->prefix().'subs')."`".
@@ -512,16 +529,18 @@ namespace comment_mail // Root namespace.
 				       (isset($post_id) ? " AND `post_id` = '".esc_sql((integer)$post_id)."'" : '').
 				       (isset($comment_id) ? " AND `comment_id` = '".esc_sql((integer)$comment_id)."'" : '').
 
+				       ($group_by_email ? " GROUP BY `email`" : '').
+
 				       " LIMIT 1"; // Just one to check.
 
-				if($this->plugin->utils_db->wp->query($sql))
-					return ($total = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()"));
+				if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					throw new \exception(__('Query failure.', $this->plugin->text_domain));
 
-				return ($total = 0); // Default value.
+				return ($total = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()"));
 			}
 
 			/**
-			 * Last X subscribers w/ a given status.
+			 * Last X subscriptions w/ a given status.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -530,48 +549,68 @@ namespace comment_mail // Root namespace.
 			 * @param integer|null $post_id Defaults to a `NULL` value.
 			 *    i.e. defaults to any post ID. Pass this to limit the query.
 			 *
-			 * @param integer|null $comment_id Defaults to a `NULL` value.
-			 *    i.e. defaults to any comment ID. Pass this to limit the query.
+			 * @param array        $args Any additional behavioral args.
 			 *
-			 * @param string|null  $status Defaults to an empty string.
-			 *    i.e. defaults to any status. Pass this to limit the query.
-			 *
-			 * @param boolean      $auto_discount_trash Defaults to a `TRUE` value.
-			 *    This applies to the case where `$status` is empty.
-			 *    i.e. do not count subscribers in the trash.
-			 *
-			 * @return \stdClass[] Last X subscribers w/ a given status.
+			 * @return \stdClass[] Last X subscriptions w/ a given status.
 			 */
-			public function last_x($x = 0, $post_id = NULL, $comment_id = NULL, $status = '', $auto_discount_trash = TRUE)
+			public function last_x($x = 0, $post_id = NULL, array $args = array())
 			{
-				if(($x = (integer)$x) <= 0) $x = 10; // Default value.
-				$post_id_key             = isset($post_id) ? (integer)$post_id : -1;
-				$comment_id_key          = isset($comment_id) ? (integer)$comment_id : -1;
-				$status_key              = $status = (string)$status; // Force string.
-				$auto_discount_trash_key = $auto_discount_trash ? 1 : 0;
+				if(($x = (integer)$x) <= 0)
+					$x = 10; // Default value.
 
-				if(isset($this->cache[__FUNCTION__][$x][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key]))
-					return $this->cache[__FUNCTION__][$x][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key];
-				$results = &$this->cache[__FUNCTION__][$x][$post_id_key][$comment_id_key][$status_key][$auto_discount_trash_key];
+				if(isset($post_id)) // Force integer?
+					$post_id = (integer)$post_id;
+
+				$default_args = array(
+					'status'              => '',
+					'comment_id'          => NULL,
+					'auto_discount_trash' => TRUE,
+					'group_by_email'      => TRUE,
+					'no_cache'            => FALSE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$status              = trim((string)$args['status']);
+				$comment_id          = $this->isset_or($args['comment_id'], NULL, 'integer');
+				$auto_discount_trash = (boolean)$args['auto_discount_trash'];
+				$group_by_email      = (boolean)$args['group_by_email'];
+				$no_cache            = (boolean)$args['no_cache'];
+
+				$post_id_key             = $this->isset_or($post_id, -1, 'integer');
+				$status_key              = strtolower((string)$status); // Force lowercase.
+				$comment_id_key          = $this->isset_or($comment_id, -1, 'integer');
+				$auto_discount_trash_key = (integer)$auto_discount_trash;
+				$group_by_email_key      = (integer)$group_by_email;
+
+				if(!$no_cache && isset($this->cache[__FUNCTION__][$x][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key]))
+					return $this->cache[__FUNCTION__][$x][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key];
+
+				$this->cache[__FUNCTION__][$x][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key]
+					     = array(); // Initialize this cache entry for the routines below; i.e. a shorter reference will be necesseary.
+				$last_x = &$this->cache[__FUNCTION__][$x][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key];
 
 				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE 1=1". // Initialize where clause.
 
-				       ($status // A specific status?
+				       ($status // A specific status in this case?
 					       ? " AND `status` = '".esc_sql((string)$status)."'"
 					       : ($auto_discount_trash ? " AND `status` != '".esc_sql('trashed')."'" : '')).
 
 				       (isset($post_id) ? " AND `post_id` = '".esc_sql((integer)$post_id)."'" : '').
 				       (isset($comment_id) ? " AND `comment_id` = '".esc_sql((integer)$comment_id)."'" : '').
 
-				       " GROUP BY `email` ORDER BY `insertion_time` DESC".
+				       ($group_by_email ? " GROUP BY `email`" : '').
+
+				       " ORDER BY `insertion_time` DESC".
+
 				       " LIMIT ".esc_sql($x); // X rows only please.
 
 				if(($results = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
-					return ($results = $this->plugin->utils_db->typify_deep($results));
+					return ($last_x = $results = $this->plugin->utils_db->typify_deep($results));
 
-				return ($results = array()); // Default value.
+				return ($last_x = array()); // Default value.
 			}
 
 			/**
@@ -695,7 +734,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param null|string $email Subscribers email address.
+			 * @param null|string $email Subscriber's email address.
 			 *    This is optional. If `NULL` we use `current_email()`.
 			 *
 			 * @param string|null $scheme Optiona. Defaults to a `NULL` value.
@@ -720,7 +759,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param null|string $email Subscribers email address.
+			 * @param null|string $email Subscriber's email address.
 			 *    This is optional. If `NULL` we use `current_email()`.
 			 *
 			 * @param string|null $scheme Optiona. Defaults to a `NULL` value.

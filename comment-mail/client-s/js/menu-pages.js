@@ -2,7 +2,9 @@
 {
 	'use strict'; // Standards.
 
-	var plugin = {}, $window = $(window), $document = $(document);
+	var plugin = {},
+		$window = $(window),
+		$document = $(document);
 
 	plugin.onReady = function() // jQuery DOM ready event handler.
 	{
@@ -10,9 +12,13 @@
 		 Plugin-specific selectors needed by routines below.
 		 ------------------------------------------------------------------------------------------------------------ */
 
-		var $menuPageArea = $('.comment-mail-menu-page-area'),
-			$menuPage = $('.comment-mail-menu-page'), $menuPageTable = $('.comment-mail-menu-page-table'),
-			i18n = window['comment_mail_i18n'];
+		var namespace = 'comment_mail',
+			namespaceSlug = 'comment-mail',
+			$menuPage = $('.' + namespaceSlug + '-menu-page'),
+			$menuPageArea = $('.' + namespaceSlug + '-menu-page-area'),
+			$menuPageTable = $('.' + namespaceSlug + '-menu-page-table'),
+			$menuPageForm = $('.' + namespaceSlug + '-menu-page-form'),
+			vars = window[namespace + '_vars'], i18n = window[namespace + '_i18n'];
 
 		/* ------------------------------------------------------------------------------------------------------------
 		 Plugin-specific JS for any menu page area of the dashboard.
@@ -78,6 +84,72 @@
 				return confirm(i18n.bulk_delete_confirmation);
 
 			return true; // Default behavior.
+		});
+
+		/* ------------------------------------------------------------------------------------------------------------
+		 Plugin-specific JS for menu page forms that follow a WP standard, but need a few tweaks.
+		 ------------------------------------------------------------------------------------------------------------ */
+
+		var subFormPostIdChangeHandler = function()
+		{
+			var $this = $(this), postId = $this.val(), requestVars = {},
+				$progressIcon = $('<img src="' + vars.plugin_url + '/client-s/images/tiny-progress-bar.gif" />'),
+				$commentIdRow = $menuPageForm.find('> form tr.pmp-sub-form-comment-id'),
+				$commentIdInput = $commentIdRow.find(':input');
+
+			if(!$commentIdRow.length || !$commentIdInput.length)
+				return; // Nothing we can do here.
+
+			$commentIdInput.replaceWith($progressIcon),
+				requestVars[namespace] = {comment_id_row_via_ajax: {post_id: postId}},
+				$.get(vars.ajax_endpoint, requestVars, function(newCommentIdRow)
+				{
+					$commentIdRow.replaceWith(newCommentIdRow);
+				});
+		}; // This function is needed by two different events.
+		$menuPageForm.find('> form tr.pmp-sub-form-post-id select').on('change', subFormPostIdChangeHandler),
+			$menuPageForm.find('> form tr.pmp-sub-form-post-id input').on('blur', subFormPostIdChangeHandler);
+
+		$menuPageForm.find('> form tr.pmp-sub-form-status select').on('change', function()
+		{
+			var $this = $(this), val = $this.val(),
+				$checkbox = $this.siblings('.checkbox').first();
+
+			if(!$checkbox.length)
+				return; // Not possible.
+
+			if($checkbox[0].checked || val === 'unconfirmed')
+				$checkbox.show(); // Display checkbox option.
+			else $checkbox.hide(), $checkbox[0].checked = false;
+
+		}).trigger('change'); // Fire immediately.
+
+		$menuPageForm.find('> form').on('submit', function(e)
+		{
+			var $this = $(this),
+				errors = '', // Initialize.
+				missingRequiredFields = [];
+
+			$this.find('.form-required :input[aria-required]')
+				.each(function(/* Missing required fields? */)
+				      {
+					      var $this = $(this),
+						      val = $.trim($this.val());
+
+					      if(val === '0' || val === '')
+						      missingRequiredFields.push(this);
+				      });
+			$.each(missingRequiredFields, function()
+			{
+				errors += $.trim($this.find('label[for="' + this.id + '"]').text().replace(/\s+/g, ' ')) + '\n';
+			});
+			if((errors = $.trim(errors)).length)
+			{
+				e.preventDefault(),
+					e.stopImmediatePropagation(),
+					alert(errors);
+				return false;
+			}
 		});
 	};
 	$document.ready(plugin.onReady); // On DOM ready.

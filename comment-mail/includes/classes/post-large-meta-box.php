@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class post_large_meta_box extends abstract_base
+		class post_large_meta_box extends abs_base
 		{
 			/**
 			 * @var \WP_Post A WP post object.

@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class comment_form extends abstract_base
+		class comment_form extends abs_base
 		{
 			/**
 			 * @var integer Post ID.
@@ -40,7 +40,7 @@ namespace comment_mail // Root namespace.
 
 				$this->post_id = (integer)$post_id;
 
-				$this->maybe_display_subscription_ops();
+				$this->maybe_display_sub_ops();
 			}
 
 			/**
@@ -48,7 +48,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			public function maybe_display_subscription_ops()
+			public function maybe_display_sub_ops()
 			{
 				if(!$this->post_id)
 					return; // Nothing to do.
@@ -56,7 +56,7 @@ namespace comment_mail // Root namespace.
 				// @TODO
 				// $_POST[__NAMESPACE__.'_sub_type']
 				// $_POST[__NAMESPACE__.'_sub_deliver']
-				// templates/site/subscription-ops.php
+				// templates/site/sub-ops.php
 			}
 		}
 	}

@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class uninstaller extends abstract_base
+		class uninstaller extends abs_base
 		{
 			/**
 			 * Class constructor.

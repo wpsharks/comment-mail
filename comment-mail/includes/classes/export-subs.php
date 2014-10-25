@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class export_subs extends abstract_base
+		class export_subs extends abs_base
 		{
 			/**
 			 * @var integer Starting row.

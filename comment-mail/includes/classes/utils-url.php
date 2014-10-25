@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class utils_url extends abstract_base
+		class utils_url extends abs_base
 		{
 			/**
 			 * Class constructor.
@@ -186,11 +186,11 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Subscribers menu page URL.
+			 * Subscriptions menu page URL.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @return string Subscribers menu page URL.
+			 * @return string Subscriptions menu page URL.
 			 */
 			public function subs_menu_page_only()
 			{
@@ -558,16 +558,16 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Creates an edit subscribers shortlink w/o a DB query.
+			 * Creates an edit subscriptions shortlink w/o a DB query.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param integer|object $post_id A WP post ID; or a post object.
 			 * @param string         $s Any additional search words/filters.
 			 *
-			 * @return string Post edit subscribers shortlink.
+			 * @return string Post edit subscriptions shortlink.
 			 */
-			public function post_edit_subscribers_short($post_id, $s = '')
+			public function post_edit_subs_short($post_id, $s = '')
 			{
 				if(is_object($post_id) && !empty($post_id->ID))
 					$post_id = $post_id->ID;
@@ -580,18 +580,32 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Creates an edit subscriber shortlink w/o a DB query.
+			 * Creates a new subscription shortlink w/o a DB query.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer $sub_id Subscriber ID.
-			 *
-			 * @return string Edit subscriber shortlink.
+			 * @return string New subscription shortlink.
 			 */
-			public function edit_subscriber_short($sub_id)
+			public function new_sub_short()
+			{
+				$args = array('action' => 'new');
+
+				return add_query_arg(urlencode_deep($args), $this->subs_menu_page_only());
+			}
+
+			/**
+			 * Creates an edit subscription shortlink w/o a DB query.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $sub_id Subscription ID.
+			 *
+			 * @return string Edit subscription shortlink.
+			 */
+			public function edit_sub_short($sub_id)
 			{
 				$sub_id = (integer)$sub_id; // Force integer.
-				$args   = array('subscriber' => $sub_id); // @TODO
+				$args   = array('action' => 'edit', 'subscription' => $sub_id);
 
 				return add_query_arg(urlencode_deep($args), $this->subs_menu_page_only());
 			}

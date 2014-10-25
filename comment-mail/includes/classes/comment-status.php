@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class comment_status extends abstract_base
+		class comment_status extends abs_base
 		{
 			/**
 			 * @var \stdClass|null Comment.

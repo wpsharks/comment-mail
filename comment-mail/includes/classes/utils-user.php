@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class utils_user extends abstract_base
+		class utils_user extends abs_base
 		{
 			/**
 			 * Class constructor.
@@ -46,7 +46,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function screen_option(\WP_Screen $screen, $option, $user_id = NULL)
 			{
-				$user_id       = !isset($user_id) ? (integer)get_current_user_id() : (integer)$user_id;
+				$user_id       = $this->isset_or($user_id, (integer)get_current_user_id(), 'integer');
 				$value         = get_user_meta($user_id, $screen->get_option($option, 'option'), TRUE);
 				$default_value = $screen->get_option($option, 'default');
 

@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `%%prefix%%queue` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key.',
-  `sub_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Subscriber ID from the `subs` table.',
+  `sub_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Subscription ID from the `subs` table.',
   `user_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'User ID from the `wp_users` table',
   `post_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Post ID from the `wp_posts` table.',
   `comment_parent_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Comment parent ID from the `wp_comments` table.',

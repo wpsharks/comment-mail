@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class sub_inserter extends abstract_base
+		class sub_inserter extends abs_base
 		{
 			/**
 			 * @var array Based on request args.
@@ -98,7 +98,7 @@ namespace comment_mail // Root namespace.
 			protected $is_update;
 
 			/**
-			 * @var \stdClass|null Subscriber.
+			 * @var \stdClass|null Subscription.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
@@ -133,7 +133,7 @@ namespace comment_mail // Root namespace.
 			protected $other_duplicate_ids;
 
 			/**
-			 * @var \WP_User|null Subscriber.
+			 * @var \WP_User|null Subscription.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
@@ -274,11 +274,11 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Subscriber object reference.
+			 * Subscription object reference.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @return \stdClass|null Subscriber.
+			 * @return \stdClass|null Subscription.
 			 */
 			public function sub()
 			{
@@ -358,7 +358,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Updates a subscriber; or inserts a new one.
+			 * Updates a subscription; or inserts a new one.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
@@ -377,7 +377,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Inserts a subscriber.
+			 * Inserts a subscription.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -426,7 +426,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Updates a subscriber.
+			 * Updates a subscription.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -671,7 +671,7 @@ namespace comment_mail // Root namespace.
 							if(($this->is_update || isset($_value)) && ($_value < 1 || strlen((string)$_value) > 20))
 								$this->errors[$_key] = sprintf(__('Invalid ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
-							else if($this->is_update && (!$this->sub || $this->sub->ID !== $_value)) // ID must be associated w/ a subscriber.
+							else if($this->is_update && (!$this->sub || $this->sub->ID !== $_value)) // ID must be associated w/ a subscription.
 								$this->errors[$_key] = sprintf(__('Invalid ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && isset($_value))

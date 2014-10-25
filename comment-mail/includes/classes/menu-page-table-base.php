@@ -1,6 +1,6 @@
 <?php
 /**
- * Table Abstraction
+ * Menu Page Table Base
  *
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
@@ -14,14 +14,14 @@ namespace comment_mail // Root namespace.
 	if(!class_exists('\\WP_List_Table')) // WP core.
 		require_once ABSPATH.'wp-admin/includes/class-wp-list-table.php';
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\abstract_table'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\menu_page_table_base'))
 	{
 		/**
-		 * Table Abstraction
+		 * Menu Page Table Base
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		abstract class abstract_table extends \WP_List_Table
+		abstract class menu_page_table_base extends \WP_List_Table
 		{
 			/*
 			 * Protected properties.
@@ -439,10 +439,10 @@ namespace comment_mail // Root namespace.
 				            ' <span style="font-weight:bold;" title="'.esc_attr($item->sub_key).'">ID #'.esc_html($item->sub_id).'</span>'.
 				            ' '.$this->plugin->utils_markup->name_email($name, $item->sub_email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
 
-				$edit_url = $this->plugin->utils_url->edit_subscriber_short($item->sub_id);
+				$edit_url = $this->plugin->utils_url->edit_sub_short($item->sub_id);
 
 				$row_actions = array(
-					'edit' => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscriber', $this->plugin->text_domain).'</a>',
+					'edit' => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscr.', $this->plugin->text_domain).'</a>',
 				);
 				return $sub_info.$this->row_actions($row_actions);
 			}
@@ -475,10 +475,10 @@ namespace comment_mail // Root namespace.
 				                ' <span style="font-weight:bold;" title="'.esc_attr($item->oby_sub_key).'">ID #'.esc_html($item->oby_sub_id).'</span>'.
 				                ' '.$this->plugin->utils_markup->name_email($name, $item->oby_sub_email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
 
-				$edit_url = $this->plugin->utils_url->edit_subscriber_short($item->oby_sub_id);
+				$edit_url = $this->plugin->utils_url->edit_sub_short($item->oby_sub_id);
 
 				$row_actions = array(
-					'edit' => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscriber', $this->plugin->text_domain).'</a>',
+					'edit' => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscr.', $this->plugin->text_domain).'</a>',
 				);
 				return $oby_sub_info.$this->row_actions($row_actions);
 			}
@@ -553,10 +553,10 @@ namespace comment_mail // Root namespace.
 				$post_date_ago          = $this->plugin->utils_date->approx_time_difference(strtotime($item->post_date_gmt));
 				$post_comments_status   = $this->plugin->utils_i18n->status_label($this->plugin->utils_db->post_comment_status__($item->post_comment_status));
 				$post_edit_comments_url = $this->plugin->utils_url->post_edit_comments_short($item->post_id);
-				$post_total_subscribers = $this->plugin->utils_sub->query_total($item->post_id);
+				$post_total_subs        = $this->plugin->utils_sub->query_total($item->post_id);
 				$post_total_comments    = (integer)$item->post_comment_count; // Total comments.
 
-				$post_info = $this->plugin->utils_markup->subscriber_count($item->post_id, $post_total_subscribers).
+				$post_info = $this->plugin->utils_markup->subs_count($item->post_id, $post_total_subs).
 				             $this->plugin->utils_markup->comment_count($item->post_id, $post_total_comments).
 				             '<i class="fa fa-thumb-tack"></i>'. // Start w/ a thumb tack icon; works w/ any post type.
 				             ' <span style="font-weight:bold;">'.esc_html($post_type_label).' ID #'.esc_html($item->post_id).'</span>'.
@@ -654,6 +654,23 @@ namespace comment_mail // Root namespace.
 					'view' => '<a href="'.esc_attr($comment_view_url).'">'.__('View', $this->plugin->text_domain).'</a>',
 				);
 				return $comment_info.$this->row_actions($comment_row_actions);
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_deliver(\stdClass $item)
+			{
+				if(!isset($item->deliver))
+					return '—'; // Not possible.
+
+				return esc_html($this->plugin->utils_i18n->deliver_label($item->deliver));
 			}
 
 			/**
@@ -767,7 +784,7 @@ namespace comment_mail // Root namespace.
 				if(!($property = trim((string)$property)))
 					return '—'; // Not applicable.
 
-				$value = isset($item->{$property}) ? $item->{$property} : '';
+				$value = $this->plugin->isset_or($item->{$property}, '');
 
 				if(($property === 'time' || substr($property, -5) === '_time') && is_integer($value))
 					$value = $value <= 0 ? '—' // Use a default value of `—` in this case.
@@ -1671,13 +1688,13 @@ namespace comment_mail // Root namespace.
 						continue; // Duplicate.
 
 					$_sub_name      = $_sub->fname.' '.$_sub->lname; // Concatenate.
-					$_sub_edit_link = $this->plugin->utils_url->edit_subscriber_short($_sub->ID);
+					$_sub_edit_link = $this->plugin->utils_url->edit_sub_short($_sub->ID);
 
 					$sub_lis[$_sub->ID] = '<li>'. // ♙ ID "Name" <email> [edit].
 					                      '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
 					                      ' <span style="font-weight:bold;" title="'.esc_attr($_sub->key).'">ID #'.esc_html($_sub->ID).'</span>'.
 					                      ' '.$this->plugin->utils_markup->name_email($_sub_name, $_sub->email, array('email_style' => 'font-weight:bold;')).
-					                      ($_sub_edit_link // Only if they can edit the subscriber ID; else this will be empty.
+					                      ($_sub_edit_link // Only if they can edit the subscription ID; else this will be empty.
 						                      ? ' [<a href="'.esc_attr($_sub_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
 					                      '</li>';
 				}

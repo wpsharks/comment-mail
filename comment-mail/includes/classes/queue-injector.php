@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class queue_injector extends abstract_base
+		class queue_injector extends abs_base
 		{
 			/**
 			 * @var \stdClass|null Comment object.
@@ -65,7 +65,7 @@ namespace comment_mail // Root namespace.
 					return; // Not possible.
 
 				if(!($subscribed_subs = $this->subscribed_subs()))
-					return; // No subscribers.
+					return; // No subscriptions.
 
 				$time = time(); // Current timestamp.
 				$sql  = "INSERT INTO `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
@@ -84,11 +84,11 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Get subscribers.
+			 * Get subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @return \stdClass[] All subscribers.
+			 * @return \stdClass[] All subscriptions.
 			 */
 			protected function subscribed_subs()
 			{
@@ -122,7 +122,7 @@ namespace comment_mail // Root namespace.
 				}
 				unset($_sub_id_key, $_sub, $_email_lowercase); // Housekeeping.
 
-				return $subs; // All valid/unique subscribers.
+				return $subs; // All valid/unique subscriptions.
 			}
 		}
 	}

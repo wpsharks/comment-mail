@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class utils_i18n extends abstract_base
+		class utils_i18n extends abs_base
 		{
 			/**
 			 * Action past tense translation.
@@ -150,6 +150,36 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Deliver option label translation.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $deliver A delivery option; e.g. `asap`, `hourly`, etc.
+			 *
+			 * @return string The string translation for the given `$deliver` option.
+			 */
+			public function deliver_label($deliver)
+			{
+				$deliver = strtolower(trim((string)$deliver));
+
+				switch($deliver) // Convert to label.
+				{
+					case 'asap':
+						return __('asap', $this->plugin->text_domain);
+
+					case 'hourly':
+						return __('hourly', $this->plugin->text_domain);
+
+					case 'daily':
+						return __('daily', $this->plugin->text_domain);
+
+					case 'weekly':
+						return __('weekly', $this->plugin->text_domain);
+				}
+				return !$deliver ? '' : __($deliver, $this->plugin->text_domain);
+			}
+
+			/**
 			 * Subscr. type label translation.
 			 *
 			 * @since 14xxxx First documented version.
@@ -174,19 +204,35 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * `X subscriber` or `X subscribers`.
+			 * `X subscription` or `X subscriptions`.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer $counter Total subscribers; i.e. a counter value.
+			 * @param integer $counter Total subscriptions; i.e. a counter value.
 			 *
-			 * @return string The phrase `X subscriber` or `X subscribers`.
+			 * @return string The phrase `X subscription` or `X subscriptions`.
 			 */
-			public function subscribers($counter)
+			public function subscriptions($counter)
 			{
 				$counter = (integer)$counter; // Force integer.
 
-				return sprintf(_n('%1$s subscriber', '%1$s subscribers', $counter, $this->plugin->text_domain), $counter);
+				return sprintf(_n('%1$s subscription', '%1$s subscriptions', $counter, $this->plugin->text_domain), $counter);
+			}
+
+			/**
+			 * `X sub. event log entry` or `X sub. event log entries`.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $counter Total sub. event log entries; i.e. a counter value.
+			 *
+			 * @return string The phrase `X sub. event log entry` or `X sub. event log entries`.
+			 */
+			public function sub_event_log_entries($counter)
+			{
+				$counter = (integer)$counter; // Force integer.
+
+				return sprintf(_n('%1$s sub. event log entry', '%1$s sub. event log entries', $counter, $this->plugin->text_domain), $counter);
 			}
 
 			/**
@@ -203,6 +249,22 @@ namespace comment_mail // Root namespace.
 				$counter = (integer)$counter; // Force integer.
 
 				return sprintf(_n('%1$s queued notification', '%1$s queued notifications', $counter, $this->plugin->text_domain), $counter);
+			}
+
+			/**
+			 * `X queue event log entry` or `X queue event log entries`.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $counter Total queue event log entries; i.e. a counter value.
+			 *
+			 * @return string The phrase `X queue event log entry` or `X queue event log entries`.
+			 */
+			public function queue_event_log_entries($counter)
+			{
+				$counter = (integer)$counter; // Force integer.
+
+				return sprintf(_n('%1$s queue event log entry', '%1$s queue event log entries', $counter, $this->plugin->text_domain), $counter);
 			}
 		}
 	}

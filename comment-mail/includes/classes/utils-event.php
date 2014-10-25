@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class utils_event extends abstract_base
+		class utils_event extends abs_base
 		{
 			/**
 			 * Class constructor.
@@ -58,11 +58,11 @@ namespace comment_mail // Root namespace.
 						break; // Break switch handler.
 
 					case 'entry_sub_id_missing':
-						$note = __('Not possible; `$entry->sub_id` was missing. The subscriber was deleted (or unsubscribed) before processing began.', $this->plugin->text_domain);
+						$note = __('Not possible; `$entry->sub_id` was missing. The subscription was deleted (or unsubscribed) before processing began.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'sub_email_empty':
-						$note = __('Not possible; `$sub->email` was empty. Could not notify the subscriber due to the lack of an email address.', $this->plugin->text_domain);
+						$note = __('Not possible; `$sub->email` was empty. Could not notify the subscription due to the lack of an email address.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'sub_status_not_subscribed':
@@ -74,7 +74,7 @@ namespace comment_mail // Root namespace.
 						break; // Break switch handler.
 
 					case 'comment_type_not_comment':
-						$note = __('Not applicable; `$comment->comment_type` was not `comment`. Perhaps it was a pingback/trackback.', $this->plugin->text_domain);
+						$note = __('Not applicable; `$comment->comment_type` was not `` or `comment`. Perhaps it was a pingback/trackback.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'comment_content_empty':

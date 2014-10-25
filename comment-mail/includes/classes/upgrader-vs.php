@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class upgrader_vs extends abstract_base
+		class upgrader_vs extends abs_base
 		{
 			/**
 			 * @var string Version they are upgrading from.

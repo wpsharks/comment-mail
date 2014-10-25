@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class template extends abstract_base
+		class template extends abs_base
 		{
 			/**
 			 * @var string Template file.
@@ -167,7 +167,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param \stdClass $sub Subscriber object.
+			 * @param \stdClass $sub Subscription object.
 			 *
 			 * @return array An array of all sub. template vars.
 			 */

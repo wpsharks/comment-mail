@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class post_status extends abstract_base
+		class post_status extends abs_base
 		{
 			/**
 			 * @var \WP_Post|null Post object (now).

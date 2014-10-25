@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class sub_manage_actions extends abstract_base
+		class sub_manage_actions extends abs_base
 		{
 			/**
 			 * Class constructor.
