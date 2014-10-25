@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class output_file extends abstract_base
+		class output_file extends abs_base
 		{
 			/**
 			 * @var string Data to output.
@@ -106,7 +106,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Exports subscribers.
+			 * Sends output file.
 			 *
 			 * @since 14xxxx First documented version.
 			 */

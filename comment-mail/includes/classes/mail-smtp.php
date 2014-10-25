@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class mail_smtp extends abstract_base
+		class mail_smtp extends abs_base
 		{
 			/**
 			 * @var string From name.

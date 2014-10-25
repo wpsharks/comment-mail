@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class comment_post extends abstract_base
+		class comment_post extends abs_base
 		{
 			/**
 			 * @var integer Comment ID.
@@ -63,7 +63,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Inject subscriber.
+			 * Inject subscription.
 			 *
 			 * @since 14xxxx First documented version.
 			 */

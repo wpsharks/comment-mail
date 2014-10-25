@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class queue_event_log_inserter extends abstract_base
+		class queue_event_log_inserter extends abs_base
 		{
 			/**
 			 * @var array Log entry data.

@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class import_stcr extends abstract_base
+		class import_stcr extends abs_base
 		{
 			/**
 			 * @var integer Max number of post IDs.
@@ -220,7 +220,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 *    Each object in the array will contain the following properties.
 			 *
-			 *    - `(string)email` The subscribers's email address (lowercase).
+			 *    - `(string)email` The subscriber's email address (lowercase).
 			 *          Note: each key in the array is also indexed by this email address.
 			 *
 			 *    - `(integer)time` The date the subscription was created; converted to a UTC timestamp.

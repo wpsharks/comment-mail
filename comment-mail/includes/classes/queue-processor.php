@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class queue_processor extends abstract_base
+		class queue_processor extends abs_base
 		{
 			/**
 			 * @var boolean Is a CRON job?
@@ -376,7 +376,7 @@ namespace comment_mail // Root namespace.
 			 *    - `note_code` the note code.
 			 *
 			 *    - `entry` the entry.
-			 *    - `sub` the subscriber.
+			 *    - `sub` the subscription.
 			 *    - `post` the post.
 			 *    - `comment` the comment.
 			 *
@@ -403,16 +403,16 @@ namespace comment_mail // Root namespace.
 				else if(!($sub = $this->plugin->utils_sub->get($entry->sub_id))) // Sub. missing?
 					$invalidated_entry_props = $this->entry_props('invalidated', 'entry_sub_id_missing', $entry);
 
-				else if(!$sub->email) // WP config. issue? i.e. missing subscriber's email address?
+				else if(!$sub->email) // WP config. issue? i.e. missing subscription's email address?
 					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_email_empty', $entry, $sub);
 
-				else if($sub->status !== 'subscribed') // Subscriber is no longer `subscribed`?
+				else if($sub->status !== 'subscribed') // Subscription is no longer `subscribed`?
 					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_status_not_subscribed', $entry, $sub);
 
 				else if(!($comment = get_comment($entry->comment_id))) // Comment is missing?
 					$invalidated_entry_props = $this->entry_props('invalidated', 'entry_comment_id_missing', $entry, $sub);
 
-				else if($comment->comment_type !== 'comment') // It's a pingback or a trackback?
+				else if($comment->comment_type && $comment->comment_type !== 'comment') // Not an actual comment?
 					$invalidated_entry_props = $this->entry_props('invalidated', 'comment_type_not_comment', $entry, $sub, NULL, $comment);
 
 				else if(!$comment->comment_content) // An empty comment; i.e. no content for the comment?
@@ -450,7 +450,7 @@ namespace comment_mail // Root namespace.
 			 * @param string         $note_code See {@link utils_event::queue_note_code()}.
 			 *
 			 * @param \stdClass      $entry Queue entry.
-			 * @param \stdClass|null $sub Subscriber.
+			 * @param \stdClass|null $sub Subscription.
 			 * @param \WP_Post|null  $post Post.
 			 * @param \stdClass|null $comment Comment.
 			 *
@@ -469,7 +469,7 @@ namespace comment_mail // Root namespace.
 			 *    - `note_code` the note code.
 			 *
 			 *    - `entry` the entry.
-			 *    - `sub` the subscriber.
+			 *    - `sub` the subscription.
 			 *    - `post` the post.
 			 *    - `comment` the comment.
 			 *

@@ -26,7 +26,7 @@ namespace comment_mail // Root namespace.
 		 *    Front-end actions CAN have the same `[action]` name as a back-end action,
 		 *    since they're already called from completely different contexts on-site.
 		 */
-		class actions extends abstract_base
+		class actions extends abs_base
 		{
 			/**
 			 * Class constructor.

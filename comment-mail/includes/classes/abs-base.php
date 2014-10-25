@@ -11,14 +11,14 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\abstract_base'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\abs_base'))
 	{
 		/**
 		 * Base Abstraction
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		abstract class abstract_base
+		abstract class abs_base
 		{
 			/**
 			 * @var plugin Plugin reference.
@@ -143,6 +143,50 @@ namespace comment_mail // Root namespace.
 				$property = (string)$property; // Force string.
 
 				throw new \exception(__('Refused to unset overload property.', $this->plugin->text_domain));
+			}
+
+			/*
+			 * Core Utilities
+			 */
+
+			/**
+			 * Utility Method; `isset()` or what?
+			 *
+			 * @param mixed  $var A variable; by reference.
+			 * @param mixed  $or If `$var` is not set, return this.
+			 * @param string $type Force a particular type if `isset()`?
+			 *
+			 * @return mixed `$var` if `isset()`; else `$or`.
+			 */
+			public function isset_or(&$var, $or = NULL, $type = '')
+			{
+				if(isset($var))
+				{
+					if($type) // Set type?
+						settype($var, $type);
+					return $var;
+				}
+				return $or; // Do not cast `$or`.
+			}
+
+			/**
+			 * Utility Method; `!empty()` or what?
+			 *
+			 * @param mixed  $var A variable; by reference.
+			 * @param mixed  $or If `$var` is empty, return this.
+			 * @param string $type Force a particular type if `!empty()`?
+			 *
+			 * @return mixed `$var` if `!empty()`; else `$or`.
+			 */
+			public function not_empty_or(&$var, $or = NULL, $type = '')
+			{
+				if(!empty($var))
+				{
+					if($type) // Set type?
+						settype($var, $type);
+					return $var;
+				}
+				return $or; // Do not cast `$or`.
 			}
 		}
 	}

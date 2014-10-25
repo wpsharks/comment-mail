@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class import_subs extends abstract_base
+		class import_subs extends abs_base
 		{
 			/**
 			 * @var string Input data.
@@ -224,15 +224,15 @@ namespace comment_mail // Root namespace.
 			protected function enqueue_notices_and_redirect()
 			{
 				$notice_markup   = $error_markup = ''; // Initialize.
-				$subsribers_i18n = $this->plugin->utils_i18n->subscribers($this->total_imported_subs); // e.g. `X subscriber(s)`.
-				$notice_markup   = sprintf(__('<strong>Imported %1$s successfully.</strong>', $this->plugin->text_domain), esc_html($subsribers_i18n));
+				$subs_i18n = $this->plugin->utils_i18n->subscriptions($this->total_imported_subs); // e.g. `X subscription(s)`.
+				$notice_markup   = sprintf(__('<strong>Imported %1$s successfully.</strong>', $this->plugin->text_domain), esc_html($subs_i18n));
 
 				if($this->errors) // Do we have errors to report also? If so, present these as individual list items.
 				{
 					$error_markup = __('<strong>The following errors were encountered during importation:</strong>', $this->plugin->text_domain);
 					$error_markup .= '<ul class="pmp-list-items"><li>'.implode('</li><li>', $this->errors).'</li></ul>';
 				}
-				if($notice_markup) // This really should always be displayed; even if we imported `0` subscribers.
+				if($notice_markup) // This really should always be displayed; even if we imported `0` subscriptions.
 					$this->plugin->enqueue_user_notice($notice_markup, array('transient' => TRUE, 'for_page' => $this->plugin->utils_env->current_menu_page()));
 
 				if($error_markup) // Are there any specific error messages that we can report?

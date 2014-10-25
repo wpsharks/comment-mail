@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class utils_db extends abstract_base
+		class utils_db extends abs_base
 		{
 			/**
 			 * @var \wpdb WP DB class reference.
@@ -115,7 +115,7 @@ namespace comment_mail // Root namespace.
 				if(in_array($key, $integer_keys, TRUE))
 					return TRUE;
 
-				if(preg_match('/_(?:'.implode('|', $preg_quoted_integer_keys).')$/', $key))
+				if(preg_match('/_(?:'.implode('|', $preg_quoted_integer_keys).')$/i', $key))
 					return TRUE;
 
 				return FALSE; // Default.
@@ -251,6 +251,349 @@ namespace comment_mail // Root namespace.
 					default: // Throw exception on anything else.
 						throw new \exception(sprintf(__('Unexpected post comment status: `%1$s`.', $this->plugin->text_domain), $status));
 				}
+			}
+
+			/**
+			 * Counts total users.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $args Behavioral args (optional).
+			 *
+			 * @return integer Total users available.
+			 *
+			 * @throws \exception If a query failure occurs.
+			 */
+			public function total_users(array $args = array())
+			{
+				$default_args = array(
+					'no_cache' => FALSE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$no_cache = (boolean)$args['no_cache'];
+
+				if(!$no_cache && isset($this->cache[__FUNCTION__]))
+					return $this->cache[__FUNCTION__];
+
+				$this->cache[__FUNCTION__] = 0; // Initialize.
+				$total                     = &$this->cache[__FUNCTION__];
+
+				$sql = "SELECT SQL_CALC_FOUND_ROWS `ID` FROM `".esc_html($this->wp->users)."`".
+
+				       " LIMIT 1"; // One to check.
+
+				if($this->wp->query($sql) === FALSE) // Initial query failure?
+					throw new \exception(__('Query failure.', $this->plugin->text_domain));
+
+				return ($total = (integer)$this->wp->get_var("SELECT FOUND_ROWS()"));
+			}
+
+			/**
+			 * All users quickly.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $args Behavioral args (optional).
+			 *
+			 * @return \stdClass[] An array of all users.
+			 *
+			 * @throws \exception If a query failure occurs.
+			 */
+			public function all_users(array $args = array())
+			{
+				$default_args = array(
+					'max'         => PHP_INT_MAX,
+					'fail_on_max' => FALSE,
+					'no_cache'    => FALSE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$max         = (integer)$args['max'];
+				$max         = $max < 1 ? 1 : $max;
+				$fail_on_max = (boolean)$args['fail_on_max'];
+				$no_cache    = (boolean)$args['no_cache'];
+
+				if(!$no_cache && isset($this->cache[__FUNCTION__][$max][(integer)$fail_on_max]))
+					return $this->cache[__FUNCTION__][$max][(integer)$fail_on_max];
+
+				$this->cache[__FUNCTION__][$max][(integer)$fail_on_max]
+					    = array(); // Initialize cache entry for reference used below.
+				$users = &$this->cache[__FUNCTION__][$max][(integer)$fail_on_max];
+
+				if($fail_on_max && $this->total_users($args) > $max)
+					return ($users = array()); // Fail when there are too many.
+
+				$columns = array(
+					'ID',
+					'user_login',
+					'user_nicename',
+					'user_email',
+					'user_url',
+					'user_registered',
+					'user_activation_key',
+					'user_status',
+					'display_name',
+				);
+				$sql     = "SELECT `".implode("`,`", array_map('esc_sql', $columns))."`".
+				           " FROM `".esc_html($this->wp->users)."`".
+
+				           ($max !== PHP_INT_MAX ? " LIMIT ".esc_sql($max) : '');
+
+				if(($results = $this->wp->get_results($sql, OBJECT_K)))
+					return ($users = $this->typify_deep($results));
+
+				return ($users = array()); // Default return value.
+			}
+
+			/**
+			 * Counts total posts.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $args Behavioral args (optional).
+			 *
+			 * @return integer Total posts available.
+			 *
+			 * @throws \exception If a query failure occurs.
+			 */
+			public function total_posts(array $args = array())
+			{
+				$default_args = array(
+					'for_comments_only' => FALSE,
+					'no_cache'          => FALSE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$for_comments_only = (boolean)$args['for_comments_only'];
+				$no_cache          = (boolean)$args['no_cache'];
+
+				if(!$no_cache && isset($this->cache[__FUNCTION__][(integer)$for_comments_only]))
+					return $this->cache[__FUNCTION__][(integer)$for_comments_only];
+
+				$this->cache[__FUNCTION__][(integer)$for_comments_only]
+					    = 0; // Initialize cache entry for reference used below.
+				$total = &$this->cache[__FUNCTION__][(integer)$for_comments_only];
+
+				$post_types    = get_post_types(array('exclude_from_search' => FALSE));
+				$post_statuses = get_post_stati(array('exclude_from_search' => FALSE));
+
+				$sql = "SELECT SQL_CALC_FOUND_ROWS `ID` FROM `".esc_html($this->wp->posts)."`".
+
+				       " WHERE `post_type` IN('".implode("','", array_map('esc_sql', $post_types))."')".
+				       " AND `post_status` IN('".implode("','", array_map('esc_sql', $post_statuses))."')".
+
+				       ($for_comments_only // For comments only?
+					       ? " AND (`comment_status` IN('1', 'open', 'opened')".
+					         "     OR `comment_count` > '0')"
+					       : '').
+
+				       " LIMIT 1"; // One to check.
+
+				if($this->wp->query($sql) === FALSE) // Initial query failure?
+					throw new \exception(__('Query failure.', $this->plugin->text_domain));
+
+				return ($total = (integer)$this->wp->get_var("SELECT FOUND_ROWS()"));
+			}
+
+			/**
+			 * All posts quickly.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $args Behavioral args (optional).
+			 *
+			 * @return \stdClass[] An array of all posts.
+			 *
+			 * @throws \exception If a query failure occurs.
+			 *
+			 * @TODO improve sorting to place posts/pages first.
+			 */
+			public function all_posts(array $args = array())
+			{
+				$default_args = array(
+					'max'               => PHP_INT_MAX,
+					'fail_on_max'       => FALSE,
+					'for_comments_only' => FALSE,
+					'no_cache'          => FALSE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$max               = (integer)$args['max'];
+				$max               = $max < 1 ? 1 : $max;
+				$fail_on_max       = (boolean)$args['fail_on_max'];
+				$for_comments_only = (boolean)$args['for_comments_only'];
+				$no_cache          = (boolean)$args['no_cache'];
+
+				if(!$no_cache && isset($this->cache[__FUNCTION__][$max][(integer)$fail_on_max][(integer)$for_comments_only]))
+					return $this->cache[__FUNCTION__][$max][(integer)$fail_on_max][(integer)$for_comments_only];
+
+				$this->cache[__FUNCTION__][$max][(integer)$fail_on_max][(integer)$for_comments_only]
+					    = array(); // Initialize cache entry for reference used below.
+				$posts = &$this->cache[__FUNCTION__][$max][(integer)$fail_on_max][(integer)$for_comments_only];
+
+				if($fail_on_max && $this->total_posts($args) > $max)
+					return ($posts = array()); // Fail when there are too many.
+
+				$post_types    = get_post_types(array('exclude_from_search' => FALSE));
+				$post_statuses = get_post_stati(array('exclude_from_search' => FALSE));
+
+				$columns = array(
+					'ID',
+					'post_author',
+					'post_date_gmt',
+					'post_title',
+					'post_status',
+					'comment_status',
+					'post_name',
+					'post_parent',
+					'post_type',
+					'comment_count',
+				);
+				$sql     = "SELECT `".implode("`,`", array_map('esc_sql', $columns))."`".
+				           " FROM `".esc_html($this->wp->posts)."`".
+
+				           " WHERE `post_type` IN('".implode("','", array_map('esc_sql', $post_types))."')".
+				           " AND `post_status` IN('".implode("','", array_map('esc_sql', $post_statuses))."')".
+
+				           ($for_comments_only // For comments only?
+					           ? " AND (`comment_status` IN('1', 'open', 'opened')".
+					             "     OR `comment_count` > '0')"
+					           : '').
+
+				           " ORDER BY `post_type` ASC, `post_title` ASC".
+
+				           ($max !== PHP_INT_MAX ? " LIMIT ".esc_sql($max) : '');
+
+				if(($results = $this->wp->get_results($sql, OBJECT_K)))
+					return ($posts = $this->typify_deep($results));
+
+				return ($posts = array()); // Default return value.
+			}
+
+			/**
+			 * Counts total comments.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $post_id A post ID.
+			 * @param array   $args Behavioral args (optional).
+			 *
+			 * @return integer Total comments available.
+			 *
+			 * @throws \exception If a query failure occurs.
+			 */
+			public function total_comments($post_id, array $args = array())
+			{
+				if(!($post_id = (integer)$post_id))
+					return 0; // Not possible.
+
+				$default_args = array(
+					'parents_only' => FALSE,
+					'no_cache'     => FALSE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$parents_only = (boolean)$args['parents_only'];
+				$no_cache     = (boolean)$args['no_cache'];
+
+				if(!$no_cache && isset($this->cache[__FUNCTION__][$post_id][(integer)$parents_only]))
+					return $this->cache[__FUNCTION__][$post_id][(integer)$parents_only];
+
+				$this->cache[__FUNCTION__][$post_id][(integer)$parents_only]
+					    = 0; // Initialize cache entry for reference used below.
+				$total = &$this->cache[__FUNCTION__][$post_id][(integer)$parents_only];
+
+				$sql = "SELECT SQL_CALC_FOUND_ROWS `comment_ID` FROM `".esc_html($this->wp->comments)."`".
+
+				       " WHERE `comment_post_ID` = '".esc_sql($post_id)."'".
+				       " AND (`comment_type` = '' OR `comment_type` = 'comment')".
+
+				       ($parents_only // Parents only?
+					       ? " AND `comment_parent` <= '0'" : '').
+
+				       " LIMIT 1"; // One to check.
+
+				if($this->wp->query($sql) === FALSE) // Initial query failure?
+					throw new \exception(__('Query failure.', $this->plugin->text_domain));
+
+				return ($total = (integer)$this->wp->get_var("SELECT FOUND_ROWS()"));
+			}
+
+			/**
+			 * All comments quickly.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $post_id A post ID.
+			 * @param array   $args Behavioral args (optional).
+			 *
+			 * @return \stdClass[] An array of all comments.
+			 *
+			 * @throws \exception If a query failure occurs.
+			 */
+			public function all_comments($post_id, array $args = array())
+			{
+				if(!($post_id = (integer)$post_id))
+					return array(); // Not possible.
+
+				$default_args = array(
+					'max'          => PHP_INT_MAX,
+					'fail_on_max'  => FALSE,
+					'parents_only' => FALSE,
+					'no_cache'     => FALSE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$max          = (integer)$args['max'];
+				$max          = $max < 1 ? 1 : $max;
+				$fail_on_max  = (boolean)$args['fail_on_max'];
+				$parents_only = (boolean)$args['parents_only'];
+				$no_cache     = (boolean)$args['no_cache'];
+
+				if(!$no_cache && isset($this->cache[__FUNCTION__][$post_id][$max][(integer)$fail_on_max][(integer)$parents_only]))
+					return $this->cache[__FUNCTION__][$post_id][$max][(integer)$fail_on_max][(integer)$parents_only];
+
+				$this->cache[__FUNCTION__][$post_id][$max][(integer)$fail_on_max][(integer)$parents_only]
+					       = array(); // Initialize cache entry for reference used below.
+				$comments = &$this->cache[__FUNCTION__][$post_id][$max][(integer)$fail_on_max][(integer)$parents_only];
+
+				if($fail_on_max && $this->total_comments($post_id, $args) > $max)
+					return ($comments = array()); // Fail when there are too many.
+
+				$columns = array(
+					'comment_ID',
+					'comment_post_ID',
+					'comment_author',
+					'comment_author_email',
+					'comment_date_gmt',
+					'comment_approved',
+					'comment_type',
+					'comment_parent',
+				);
+				$sql     = "SELECT `".implode("`,`", array_map('esc_sql', $columns))."`".
+				           " FROM `".esc_html($this->wp->comments)."`".
+
+				           " WHERE `comment_post_ID` = '".esc_sql($post_id)."'".
+				           " AND (`comment_type` = '' OR `comment_type` = 'comment')".
+
+				           ($parents_only // Parents only?
+					           ? " AND `comment_parent` <= '0'" : '').
+
+				           " ORDER BY `comment_date_gmt` ASC".
+
+				           ($max !== PHP_INT_MAX ? " LIMIT ".esc_sql($max) : '');
+
+				if(($results = $this->wp->get_results($sql, OBJECT_K)))
+					return ($comments = $this->typify_deep($results));
+
+				return ($comments = array()); // Default return value.
 			}
 		}
 	}

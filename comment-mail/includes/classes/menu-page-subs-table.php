@@ -1,6 +1,6 @@
 <?php
 /**
- * Subscribers Table
+ * Menu Page Subs. Table
  *
  * @since 14xxxx First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
@@ -11,14 +11,14 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\subs_table'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\menu_page_subs_table'))
 	{
 		/**
-		 * Subscribers Table
+		 * Menu Page Subs. Table
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class subs_table extends abstract_table
+		class menu_page_subs_table extends menu_page_table_base
 		{
 			/*
 			 * Class constructor.
@@ -34,10 +34,10 @@ namespace comment_mail // Root namespace.
 				$plugin = plugin(); // Needed below.
 
 				$args = array(
-					'singular_name'  => 'subscriber',
-					'plural_name'    => 'subscribers',
-					'singular_label' => __('subscriber', $plugin->text_domain),
-					'plural_label'   => __('subscribers', $plugin->text_domain),
+					'singular_name'  => 'subscription',
+					'plural_name'    => 'subscriptions',
+					'singular_label' => __('subscription', $plugin->text_domain),
+					'plural_label'   => __('subscriptions', $plugin->text_domain),
 					'screen'         => $plugin->menu_page_hooks[__NAMESPACE__.'_subs'],
 				);
 				parent::__construct($args); // Parent constructor.
@@ -190,7 +190,7 @@ namespace comment_mail // Root namespace.
 				              ' <span style="font-weight:bold;" title="'.esc_attr($item->key).'">ID #'.esc_html($item->ID).'</span>'.
 				              ' '.$this->plugin->utils_markup->name_email($name, $item->email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
 
-				$edit_url      = $this->plugin->utils_url->edit_subscriber_short($item->ID);
+				$edit_url      = $this->plugin->utils_url->edit_sub_short($item->ID);
 				$reconfirm_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'reconfirm');
 				$confirm_url   = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'confirm');
 				$unconfirm_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'unconfirm');

@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class installer extends abstract_base
+		class installer extends abs_base
 		{
 			/**
 			 * Class constructor.

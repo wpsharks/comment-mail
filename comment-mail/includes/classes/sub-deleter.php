@@ -18,14 +18,14 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class sub_deleter extends abstract_base
+		class sub_deleter extends abs_base
 		{
 			/**
-			 * @var \stdClass|null Subscriber.
+			 * @var \stdClass|null Subscription.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $sub; // Subscriber.
+			protected $sub; // Subscription.
 
 			/**
 			 * @var string Status before deletion.
@@ -42,7 +42,7 @@ namespace comment_mail // Root namespace.
 			protected $last_ip;
 
 			/**
-			 * @var integer Overwritten by subscriber ID.
+			 * @var integer Overwritten by subscription ID.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
@@ -93,7 +93,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Class constructor.
 			 *
-			 * @param integer $sub_id Subscriber ID.
+			 * @param integer $sub_id Subscription ID.
 			 * @param array   $args Any additional behavior args.
 			 *
 			 * @since 14xxxx First documented version.
@@ -102,7 +102,7 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
-				$this->sub           = // Subscriber.
+				$this->sub           = // Subscription.
 					$this->plugin->utils_sub->get((integer)$sub_id);
 				$this->status_before = $this->sub ? $this->sub->status : '';
 

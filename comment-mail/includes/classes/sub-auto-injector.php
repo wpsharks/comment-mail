@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class sub_auto_injector extends abstract_base
+		class sub_auto_injector extends abs_base
 		{
 			/**
 			 * @var \stdClass|null Post object.
@@ -82,7 +82,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Injects subscribers.
+			 * Injects subscriptions.
 			 *
 			 * @since 14xxxx First documented version.
 			 */

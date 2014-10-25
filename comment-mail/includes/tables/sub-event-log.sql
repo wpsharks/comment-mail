@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `%%prefix%%sub_event_log` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key.',
-  `sub_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Subscriber ID from the `subs` table; at the time of the event. The subscriber may or may not still exist.',
-  `oby_sub_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Overwritten by subscriber ID from the `subs` table? The subscriber may or may not still exist.',
+  `sub_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Subscription ID from the `subs` table; at the time of the event. The subscription may or may not still exist.',
+  `oby_sub_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Overwritten by subscription ID from the `subs` table? The subscription may or may not still exist.',
   `user_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'User ID from the `wp_users` table; at the time of the event, if applicable. The user may or may not still exist.',
   `post_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Post ID from the `wp_posts` table; at the time of the event. The post may or may not still exist.',
   `comment_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Comment ID from the `wp_comments` table; at the time of the event, if applicable. The comment may or may not still exist.',

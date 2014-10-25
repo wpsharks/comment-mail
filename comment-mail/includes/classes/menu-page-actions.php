@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class menu_page_actions extends abstract_base
+		class menu_page_actions extends abs_base
 		{
 			/**
 			 * Class constructor.
@@ -168,6 +168,32 @@ namespace comment_mail // Root namespace.
 
 				$class    = 'export_'.$request_args['type'];
 				$exporter = new $class($request_args); // Instantiate.
+			}
+
+			/**
+			 * Acquires comment ID row via AJAX.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $request_args Input argument(s).
+			 *
+			 * @see menu_page_sub_form_base::comment_id_row_via_ajax()
+			 */
+			protected function comment_id_row_via_ajax($request_args)
+			{
+				$request_args = (array)$request_args;
+
+				if(!isset($request_args['post_id']))
+					return; // Missing post ID.
+
+				if(($post_id = (integer)$request_args['post_id']) < 0)
+					return; // Invalid post ID.
+
+				if(!current_user_can($this->plugin->manage_cap))
+					if(!current_user_can($this->plugin->cap))
+						return; // Unauthenticated; ignore.
+
+				exit(menu_page_sub_form_base::comment_id_row_via_ajax($post_id));
 			}
 		}
 	}

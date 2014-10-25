@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class utils_mail extends abstract_base
+		class utils_mail extends abs_base
 		{
 			/**
 			 * Class constructor.

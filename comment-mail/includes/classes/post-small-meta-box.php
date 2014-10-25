@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class post_small_meta_box extends abstract_base
+		class post_small_meta_box extends abs_base
 		{
 			/**
 			 * @var \WP_Post A WP post object.
@@ -54,10 +54,10 @@ namespace comment_mail // Root namespace.
 					= $this->plugin->utils_db->post_comment_status__($this->post->comment_status);
 
 				$total_subs        = $this->plugin->utils_sub->query_total($this->post->ID);
-				$total_subs_bubble = $this->plugin->utils_markup->subscriber_count($this->post->ID, $total_subs);
+				$total_subs_bubble = $this->plugin->utils_markup->subs_count($this->post->ID, $total_subs);
 
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-area').'">'.
-				     '   <h4 style="margin-bottom:5px;">'.$total_subs_bubble.__('Most Recent Subscribers:', $this->plugin->text_domain).'</h4>'.
+				     '   <h4 style="margin-bottom:5px;">'.$total_subs_bubble.__('Most Recent Subscriptions:', $this->plugin->text_domain).'</h4>'.
 				     '   '.$this->plugin->utils_markup->last_x_subs(5, $this->post->ID).
 				     '</div>';
 

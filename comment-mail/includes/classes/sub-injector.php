@@ -18,10 +18,10 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class sub_injector extends abstract_base
+		class sub_injector extends abs_base
 		{
 			/**
-			 * @var \WP_User|null Subscriber.
+			 * @var \WP_User|null Subscription.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
@@ -176,7 +176,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Injects a new subscriber.
+			 * Injects a new subscription.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
@@ -194,8 +194,9 @@ namespace comment_mail // Root namespace.
 				if(!$this->comment->comment_author_email)
 					return; // Not possible.
 
-				if($this->comment->comment_type !== 'comment')
-					return; // Not applicable.
+				if($this->comment->comment_type)
+					if($this->comment->comment_type !== 'comment')
+						return; // Not applicable.
 
 				$data               = array(
 					'post_id'    => $this->comment->comment_post_ID,

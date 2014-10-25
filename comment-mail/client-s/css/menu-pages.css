@@ -110,7 +110,7 @@ A menu page area ~ post com/sub bubbles.
 	margin                 : 0 5px 0 0;
 	display                : inline-block;
 }
-.comment-mail-menu-page-area .pmp-post-sub-count > .pmp-subscriber-count
+.comment-mail-menu-page-area .pmp-post-sub-count > .pmp-sub-count
 {
 	font-weight : bold;
 	color       : #FFFFFF;
@@ -740,4 +740,17 @@ Menu page table columns; i.e. media queries.
 	{
 		width : 250px;
 	}
+}
+/* ------------------------------------------------------------------------------------------------------------
+	Plugin-specific styles for menu page forms that follow a WP standard; but need a few tweaks.
+------------------------------------------------------------------------------------------------------------ */
+/*
+Menu page table filter styles.
+*/
+.comment-mail-menu-page-form .form-field input:not([type='radio']):not([type='checkbox']),
+.comment-mail-menu-page-form .form-field select,
+.comment-mail-menu-page-form .form-field textarea
+{
+	width     : 100%;
+	max-width : 600px;
 }

@@ -18,7 +18,7 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 14xxxx First documented version.
 		 */
-		class post_delete extends abstract_base
+		class post_delete extends abs_base
 		{
 			/**
 			 * @var integer Post ID.

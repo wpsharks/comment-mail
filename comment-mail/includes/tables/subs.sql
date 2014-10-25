@@ -15,6 +15,6 @@ CREATE TABLE IF NOT EXISTS `%%prefix%%subs` (
   `last_update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Last row update time. Unix timestamp.',
   PRIMARY KEY (`ID`) COMMENT 'Primary key.',
   UNIQUE KEY `unique_key` (`key`) COMMENT 'Forces a unique key.',
-  UNIQUE KEY `unique_subscription` (`user_id`,`post_id`,`comment_id`,`email`) COMMENT 'Identifies a unique subscription.',
+  UNIQUE KEY `unique_sub` (`user_id`,`post_id`,`comment_id`,`email`) COMMENT 'Identifies a unique subscription.',
   FULLTEXT KEY `fulltext_search` (`fname`,`lname`,`email`,`insertion_ip`,`last_ip`) COMMENT 'Fulltext search index.'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
