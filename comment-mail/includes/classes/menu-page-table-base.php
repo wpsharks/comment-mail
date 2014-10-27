@@ -400,6 +400,26 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string HTML markup for this table column.
 			 */
+			protected function column_key(\stdClass $item)
+			{
+				if(!isset($item->key))
+					return '—'; // Not possible.
+
+				if(!$item->key)
+					return '—'; // Not possible.
+
+				return '<code>'.esc_html((string)$item->key).'</code>';
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
 			protected function column_subscr_type(\stdClass $item)
 			{
 				if(!isset($item->subscr_type))

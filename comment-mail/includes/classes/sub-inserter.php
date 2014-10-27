@@ -56,6 +56,13 @@ namespace comment_mail // Root namespace.
 			protected $user_initiated;
 
 			/**
+			 * @var \WP_User|null User initiating.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $user_initiated_user;
+
+			/**
 			 * @var boolean User-initiated data key protections?
 			 *
 			 * @since 14xxxx First documented version.
@@ -178,7 +185,7 @@ namespace comment_mail // Root namespace.
 			 * @param array $args Any additional behavioral args.
 			 *
 			 * @warning User-initiated actions (i.e. `user_initiated`) should NOT be allowed to push request arguments
-			 *    into this method that may update protected data keys such as: `key`, `user_id`, `insertion_ip`, and others.
+			 *    into this method that may update protected data keys such as: `user_id`, `insertion_ip`, `last_update_time`, and others.
 			 *
 			 *    To enable validation of protected data keys please pass both the `user_initiated` and `ui_protected_data_keys_enable` arguments as `TRUE`.
 			 *       This will automatically remove and/or sanitize protected data keys before an insertion or update occurs.
@@ -223,6 +230,7 @@ namespace comment_mail // Root namespace.
 					'process_confirmation'          => FALSE,
 
 					'user_initiated'                => FALSE,
+					'user_initiated_user'           => NULL,
 					'ui_protected_data_keys_enable' => FALSE,
 
 					'current_user_0'                => NULL,
@@ -236,7 +244,15 @@ namespace comment_mail // Root namespace.
 				$this->process_events       = (boolean)$args['process_events'];
 				$this->process_confirmation = (boolean)$args['process_confirmation'];
 
-				$this->user_initiated                = (boolean)$args['user_initiated'];
+				// @TODO check this some more.
+
+				$this->user_initiated = (boolean)$args['user_initiated'];
+				if($args['user_initiated_user'] instanceof \WP_User)
+				{
+					$this->user_initiated_user  = $this->user = $args['user_initiated_user'];
+					if($this->user && $this->user->ID) // Has an ID?
+						$this->data['user_id'] = $this->user->ID;
+				}
 				$this->ui_protected_data_keys_enable = // Applicable only w/ `user_initiated`.
 					$this->user_initiated && (boolean)$args['ui_protected_data_keys_enable'];
 
@@ -266,21 +282,24 @@ namespace comment_mail // Root namespace.
 				$this->other_duplicate_ids = array(); // Initialize.
 
 				if(!isset($this->user) || !$this->user->ID)
-					if($this->data['user_id'] === 0) // No user?
-						$this->user = new \WP_User(0);
+					if(!$this->user_initiated || !$this->ui_protected_data_keys_enable)
+						if($this->data['user_id'] === 0) // No user?
+							$this->user = new \WP_User(0);
 
 				if(!isset($this->user) || !$this->user->ID)
-					if((integer)$this->data['user_id'] > 0) // Have a user ID?
-						$this->user = new \WP_User((integer)$this->data['user_id']);
+					if(!$this->user_initiated || !$this->ui_protected_data_keys_enable)
+						if((integer)$this->data['user_id'] > 0) // Have a user ID?
+							$this->user = new \WP_User((integer)$this->data['user_id']);
 
 				if(!isset($this->user) || !$this->user->ID)
 					if($this->is_update && $this->sub && $this->sub->user_id)
 						$this->user = new \WP_User($this->sub->user_id);
 
 				if(!isset($this->user) || !$this->user->ID)
-					if((string)$this->data['email']) // A potentially new email?
-						if(($_user = \WP_User::get_data_by('email', (string)$this->data['email'])))
-							$this->user = new \WP_User($_user->ID);
+					if(!$this->user_initiated || !$this->ui_protected_data_keys_enable)
+						if((string)$this->data['email']) // A potentially new email?
+							if(($_user = \WP_User::get_data_by('email', (string)$this->data['email'])))
+								$this->user = new \WP_User($_user->ID);
 				unset($_user); // Housekeeping.
 
 				if(!isset($this->user) || !$this->user->ID)

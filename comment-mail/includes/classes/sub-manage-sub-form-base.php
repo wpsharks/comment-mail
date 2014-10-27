@@ -222,10 +222,10 @@ namespace comment_mail // Root namespace.
 
 				$reporting_errors = FALSE; // Initialize.
 
-				$request_args['user_id'] = get_current_user_id();
-				$args                    = array(
+				$args = array(
 					'process_confirmation'          => TRUE,
 					'user_initiated'                => TRUE,
+					'user_initiated_user'           => wp_get_current_user(),
 					'ui_protected_data_keys_enable' => TRUE,
 				); // Behavioral args.
 
