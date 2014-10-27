@@ -225,8 +225,8 @@ namespace comment_mail // Root namespace.
 				$args = array(
 					'process_confirmation'          => TRUE,
 					'user_initiated'                => TRUE,
-					'user_initiated_user'           => wp_get_current_user(),
 					'ui_protected_data_keys_enable' => TRUE,
+					'ui_protected_data_user'        => wp_get_current_user(),
 				); // Behavioral args.
 
 				if(isset($request_args['ID'])) // Updating an existing subscription via ID?

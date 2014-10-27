@@ -408,13 +408,17 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $string Input email address.
+			 * @param string  $string Input email address.
+			 * @param integer $max_length The maximum length of the name.
 			 *
 			 * @return string Name from email address; else an empty string.
 			 */
-			public function email_name($string)
+			public function email_name($string, $max_length = 50)
 			{
-				return (string)ucfirst(substr(strstr(trim((string)$string), '@', TRUE), 0, 50));
+				$string     = trim((string)$string);
+				$max_length = abs((integer)$max_length);
+
+				return (string)ucfirst(substr(strstr($string, '@', TRUE), 0, $max_length));
 			}
 
 			/**
