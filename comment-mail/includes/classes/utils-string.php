@@ -404,6 +404,20 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Name from email address.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $string Input email address.
+			 *
+			 * @return string Name from email address; else an empty string.
+			 */
+			public function email_name($string)
+			{
+				return (string)ucfirst(substr(strstr(trim((string)$string), '@', TRUE), 0, 50));
+			}
+
+			/**
 			 * Cleans a full name.
 			 *
 			 * @since 14xxxx First documented version.

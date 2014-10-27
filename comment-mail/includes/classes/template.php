@@ -169,9 +169,9 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function sub_vars(\stdClass $sub)
 			{
-				$confirm_url     = $this->plugin->utils_sub->confirm_url($sub->key);
-				$unsubscribe_url = $this->plugin->utils_sub->unsubscribe_url($sub->key);
-				$manage_url      = $this->plugin->utils_sub->manage_url($sub->email);
+				$confirm_url     = $this->plugin->utils_url->sub_confirm_url($sub->key);
+				$unsubscribe_url = $this->plugin->utils_url->sub_unsubscribe_url($sub->key);
+				$manage_url      = $this->plugin->utils_url->sub_manage_url($sub->key);
 
 				return compact('confirm_url', 'unsubscribe_url', 'manage_url');
 			}

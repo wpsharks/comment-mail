@@ -72,6 +72,7 @@ namespace comment_mail // Root namespace.
 						new sub_updater(array('ID' => $_sub_id, 'user_id' => $this->user->ID));
 				unset($_sub_id); // Housekeeping.
 
+				// @TODO should this update event logs too?
 			}
 		}
 	}

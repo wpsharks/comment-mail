@@ -119,7 +119,7 @@
 			commentIdProps.$lastChosenContainer.remove(), // Loading; i.e. prepare for new comment ID row.
 				commentIdProps.$lastInput.replaceWith('<img src="' + vars.plugin_url + '/client-s/images/tiny-progress-bar.gif" />');
 
-			requestVars[namespace] = {comment_id_row_via_ajax: {post_id: subFormPostIdProps.newId}},
+			requestVars[namespace] = {sub_form_comment_id_row_via_ajax: {post_id: subFormPostIdProps.newId}},
 				$.get(vars.ajax_endpoint, requestVars, function(newCommentIdRowMarkup)
 				{
 					commentIdProps.$newRow = $(newCommentIdRowMarkup),

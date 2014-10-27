@@ -292,6 +292,7 @@ namespace comment_mail
 					'template_site_sub_actions_confirmed'         => '', // HTML/PHP code.
 					'template_site_sub_actions_unsubscribed'      => '', // HTML/PHP code.
 					'template_site_sub_actions_manage_summary'    => '', // HTML/PHP code.
+					'template_site_sub_actions_manage_sub_form'   => '', // HTML/PHP code.
 
 					'template_email_email_header'                 => '', // HTML/PHP code.
 					'template_email_email_footer'                 => '', // HTML/PHP code.

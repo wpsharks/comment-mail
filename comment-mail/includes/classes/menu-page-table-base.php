@@ -793,7 +793,7 @@ namespace comment_mail // Root namespace.
 				if(!($property = trim((string)$property)))
 					return '—'; // Not applicable.
 
-				$value = $this->plugin->isset_or($item->{$property}, '');
+				$value = isset($item->{$property}) ? $item->{$property} : '';
 
 				if(($property === 'time' || substr($property, -5) === '_time') && is_integer($value))
 					$value = $value <= 0 ? '—' // Use a default value of `—` in this case.
