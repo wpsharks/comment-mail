@@ -111,13 +111,11 @@ namespace comment_mail // Root namespace.
 				if($this->file === 'site/site-footer.php')
 					return array(); // Prevent infinite loop.
 
-				if(!isset($this->cache[__FUNCTION__]['site_header_template']))
-					$this->cache[__FUNCTION__]['site_header_template'] = new template('site/site-header.php');
-				$site_header_template = &$this->cache[__FUNCTION__]['site_header_template'];
+				if(is_null($site_header_template = &$this->cache_key(__FUNCTION__, 'site_header_template')))
+					$site_header_template = new template('site/site-header.php');
 
-				if(!isset($this->cache[__FUNCTION__]['site_footer_template']))
-					$this->cache[__FUNCTION__]['site_footer_template'] = new template('site/site-footer.php');
-				$site_footer_template = &$this->cache[__FUNCTION__]['site_footer_template'];
+				if(is_null($site_footer_template = &$this->cache_key(__FUNCTION__, 'site_footer_template')))
+					$site_footer_template = new template('site/site-footer.php');
 				/**
 				 * @var $site_header_template template For IDEs.
 				 * @var $site_footer_template template For IDEs.
@@ -145,13 +143,11 @@ namespace comment_mail // Root namespace.
 				if($this->file === 'email/email-footer.php')
 					return array(); // Prevent infinite loop.
 
-				if(!isset($this->cache[__FUNCTION__]['email_header_template']))
-					$this->cache[__FUNCTION__]['email_header_template'] = new template('email/email-header.php');
-				$email_header_template = &$this->cache[__FUNCTION__]['email_header_template'];
+				if(is_null($email_header_template = &$this->cache_key(__FUNCTION__, 'email_header_template')))
+					$email_header_template = new template('email/email-header.php');
 
-				if(!isset($this->cache[__FUNCTION__]['email_footer_template']))
-					$this->cache[__FUNCTION__]['email_footer_template'] = new template('email/email-footer.php');
-				$email_footer_template = &$this->cache[__FUNCTION__]['email_footer_template'];
+				if(is_null($email_footer_template = &$this->cache_key(__FUNCTION__, 'email_footer_template')))
+					$email_footer_template = new template('email/email-footer.php');
 				/**
 				 * @var $email_header_template template For IDEs.
 				 * @var $email_footer_template template For IDEs.

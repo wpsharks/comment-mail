@@ -118,9 +118,8 @@ namespace comment_mail // Root namespace.
 				if(!$sub_id_or_key)
 					return NULL; // Not possible.
 
-				if(!isset($this->cache[__FUNCTION__]))
-					$this->cache[__FUNCTION__] = array();
-				$cache = &$this->cache[__FUNCTION__]; // Reference.
+				if(is_null($cache = &$this->cache_key(__FUNCTION__)))
+					$cache = array(); // Initialize array.
 
 				if(!$no_cache && $cache && array_key_exists($sub_id_or_key, $cache))
 					return $cache[$sub_id_or_key]; // From built-in object cache.
@@ -504,18 +503,9 @@ namespace comment_mail // Root namespace.
 				$group_by_email      = (boolean)$args['group_by_email'];
 				$no_cache            = (boolean)$args['no_cache'];
 
-				$post_id_key             = $this->isset_or($post_id, -1, 'integer');
-				$status_key              = strtolower((string)$status); // Lowercase.
-				$comment_id_key          = $this->isset_or($comment_id, -1, 'integer');
-				$auto_discount_trash_key = (integer)$auto_discount_trash;
-				$group_by_email_key      = (integer)$group_by_email;
-
-				if(!$no_cache && isset($this->cache[__FUNCTION__][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key]))
-					return $this->cache[__FUNCTION__][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key];
-
-				$this->cache[__FUNCTION__][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key]
-					    = 0; // Initialize this cache entry for the routines below; i.e. a shorter reference will be necesseary.
-				$total = &$this->cache[__FUNCTION__][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key];
+				$cache_keys = compact('post_id', 'status', 'comment_id', 'auto_discount_trash', 'group_by_email');
+				if(!is_null($total = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
+					return $total; // Already cached this.
 
 				$sql = "SELECT SQL_CALC_FOUND_ROWS `ID`".
 				       " FROM `".esc_html($this->plugin->utils_db->prefix().'subs')."`".
@@ -577,18 +567,9 @@ namespace comment_mail // Root namespace.
 				$group_by_email      = (boolean)$args['group_by_email'];
 				$no_cache            = (boolean)$args['no_cache'];
 
-				$post_id_key             = $this->isset_or($post_id, -1, 'integer');
-				$status_key              = strtolower((string)$status); // Force lowercase.
-				$comment_id_key          = $this->isset_or($comment_id, -1, 'integer');
-				$auto_discount_trash_key = (integer)$auto_discount_trash;
-				$group_by_email_key      = (integer)$group_by_email;
-
-				if(!$no_cache && isset($this->cache[__FUNCTION__][$x][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key]))
-					return $this->cache[__FUNCTION__][$x][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key];
-
-				$this->cache[__FUNCTION__][$x][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key]
-					     = array(); // Initialize this cache entry for the routines below; i.e. a shorter reference will be necesseary.
-				$last_x = &$this->cache[__FUNCTION__][$x][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key];
+				$cache_keys = compact('x', 'post_id', 'status', 'comment_id', 'auto_discount_trash', 'group_by_email');
+				if(!is_null($last_x = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
+					return $last_x; // Already cached this.
 
 				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 

@@ -274,11 +274,9 @@ namespace comment_mail // Root namespace.
 
 				$no_cache = (boolean)$args['no_cache'];
 
-				if(!$no_cache && isset($this->cache[__FUNCTION__]))
-					return $this->cache[__FUNCTION__];
-
-				$this->cache[__FUNCTION__] = 0; // Initialize.
-				$total                     = &$this->cache[__FUNCTION__];
+				$cache_keys = array(); // No cacheable keys at this time.
+				if(!is_null($total = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
+					return $total; // Already cached this.
 
 				$sql = "SELECT SQL_CALC_FOUND_ROWS `ID` FROM `".esc_html($this->wp->users)."`".
 
@@ -316,12 +314,9 @@ namespace comment_mail // Root namespace.
 				$fail_on_max = (boolean)$args['fail_on_max'];
 				$no_cache    = (boolean)$args['no_cache'];
 
-				if(!$no_cache && isset($this->cache[__FUNCTION__][$max][(integer)$fail_on_max]))
-					return $this->cache[__FUNCTION__][$max][(integer)$fail_on_max];
-
-				$this->cache[__FUNCTION__][$max][(integer)$fail_on_max]
-					    = array(); // Initialize cache entry for reference used below.
-				$users = &$this->cache[__FUNCTION__][$max][(integer)$fail_on_max];
+				$cache_keys = compact('max', 'fail_on_max');
+				if(!is_null($users = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
+					return $users; // Already cached this.
 
 				if($fail_on_max && $this->total_users($args) > $max)
 					return ($users = array()); // Fail when there are too many.
@@ -371,12 +366,9 @@ namespace comment_mail // Root namespace.
 				$for_comments_only = (boolean)$args['for_comments_only'];
 				$no_cache          = (boolean)$args['no_cache'];
 
-				if(!$no_cache && isset($this->cache[__FUNCTION__][(integer)$for_comments_only]))
-					return $this->cache[__FUNCTION__][(integer)$for_comments_only];
-
-				$this->cache[__FUNCTION__][(integer)$for_comments_only]
-					    = 0; // Initialize cache entry for reference used below.
-				$total = &$this->cache[__FUNCTION__][(integer)$for_comments_only];
+				$cache_keys = compact('for_comments_only');
+				if(!is_null($total = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
+					return $total; // Already cached this.
 
 				$post_types    = get_post_types(array('exclude_from_search' => FALSE));
 				$post_statuses = get_post_stati(array('exclude_from_search' => FALSE));
@@ -431,18 +423,9 @@ namespace comment_mail // Root namespace.
 				$exclude_post_statuses = (array)$args['exclude_post_statuses'];
 				$no_cache              = (boolean)$args['no_cache'];
 
-				$max_key                   = $max;
-				$fail_on_max_key           = (integer)$fail_on_max;
-				$for_comments_only_key     = (integer)$for_comments_only;
-				$exclude_post_types_key    = sha1(serialize($exclude_post_types));
-				$exclude_post_statuses_key = sha1(serialize($exclude_post_statuses));
-
-				if(!$no_cache && isset($this->cache[__FUNCTION__][$max_key][$fail_on_max_key][$for_comments_only_key][$exclude_post_types_key][$exclude_post_statuses_key]))
-					return $this->cache[__FUNCTION__][$max_key][$fail_on_max_key][$for_comments_only_key][$exclude_post_types_key][$exclude_post_statuses_key];
-
-				$this->cache[__FUNCTION__][$max_key][$fail_on_max_key][$for_comments_only_key][$exclude_post_types_key][$exclude_post_statuses_key]
-					    = array(); // Initialize cache entry for reference used below.
-				$posts = &$this->cache[__FUNCTION__][$max_key][$fail_on_max_key][$for_comments_only_key][$exclude_post_types_key][$exclude_post_statuses_key];
+				$cache_keys = compact('max', 'fail_on_max', 'for_comments_only', 'exclude_post_types', 'exclude_post_statuses');
+				if(!is_null($posts = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
+					return $posts; // Already cached this.
 
 				if($fail_on_max && $this->total_posts($args) > $max)
 					return ($posts = array()); // Fail when there are too many.
@@ -537,12 +520,9 @@ namespace comment_mail // Root namespace.
 				$parents_only = (boolean)$args['parents_only'];
 				$no_cache     = (boolean)$args['no_cache'];
 
-				if(!$no_cache && isset($this->cache[__FUNCTION__][$post_id][(integer)$parents_only]))
-					return $this->cache[__FUNCTION__][$post_id][(integer)$parents_only];
-
-				$this->cache[__FUNCTION__][$post_id][(integer)$parents_only]
-					    = 0; // Initialize cache entry for reference used below.
-				$total = &$this->cache[__FUNCTION__][$post_id][(integer)$parents_only];
+				$cache_keys = compact('post_id', 'parents_only');
+				if(!is_null($total = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
+					return $total; // Already cached this.
 
 				$sql = "SELECT SQL_CALC_FOUND_ROWS `comment_ID` FROM `".esc_html($this->wp->comments)."`".
 
@@ -592,12 +572,9 @@ namespace comment_mail // Root namespace.
 				$parents_only = (boolean)$args['parents_only'];
 				$no_cache     = (boolean)$args['no_cache'];
 
-				if(!$no_cache && isset($this->cache[__FUNCTION__][$post_id][$max][(integer)$fail_on_max][(integer)$parents_only]))
-					return $this->cache[__FUNCTION__][$post_id][$max][(integer)$fail_on_max][(integer)$parents_only];
-
-				$this->cache[__FUNCTION__][$post_id][$max][(integer)$fail_on_max][(integer)$parents_only]
-					       = array(); // Initialize cache entry for reference used below.
-				$comments = &$this->cache[__FUNCTION__][$post_id][$max][(integer)$fail_on_max][(integer)$parents_only];
+				$cache_keys = compact('post_id', 'max', 'fail_on_max', 'parents_only');
+				if(!is_null($comments = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
+					return $comments; // Already cached this.
 
 				if($fail_on_max && $this->total_comments($post_id, $args) > $max)
 					return ($comments = array()); // Fail when there are too many.

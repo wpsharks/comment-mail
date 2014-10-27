@@ -233,9 +233,9 @@ namespace comment_mail
 				/*
 				 * Setup already?
 				 */
-				if(isset($this->cache[__FUNCTION__]))
+				if(!is_null($setup = &$this->cache_key(__FUNCTION__)))
 					return; // Already setup. Once only!
-				$this->cache[__FUNCTION__] = -1; // Set this.
+				$setup = TRUE; // Once only please.
 
 				/*
 				 * Fire pre-setup hooks.
