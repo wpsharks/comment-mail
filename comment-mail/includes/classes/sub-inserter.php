@@ -358,6 +358,18 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Array of any errors using HTML markup.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of any/all errors.
+			 */
+			public function errors_html()
+			{
+				return array_map(array($this->plugin->utils_string, 'markdown'), $this->errors);
+			}
+
+			/**
 			 * Updates a subscription; or inserts a new one.
 			 *
 			 * @since 14xxxx First documented version.
@@ -669,13 +681,13 @@ namespace comment_mail // Root namespace.
 								$_value = NULL; // We'll get a new ID.
 
 							if(($this->is_update || isset($_value)) && ($_value < 1 || strlen((string)$_value) > 20))
-								$this->errors[$_key] = sprintf(__('Invalid ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid ID: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
-							else if($this->is_update && (!$this->sub || $this->sub->ID !== $_value)) // ID must be associated w/ a subscription.
-								$this->errors[$_key] = sprintf(__('Invalid ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+							else if($this->is_update && (!$this->sub || !$this->sub->ID || $this->sub->ID !== $_value))
+								$this->errors[$_key] = sprintf(__('Invalid ID: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && isset($_value))
-								$this->errors[$_key] = sprintf(__('Invalid; insertion w/ ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid; insertion w/ ID: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -684,14 +696,14 @@ namespace comment_mail // Root namespace.
 							if(isset($_value))
 								$_value = (string)$_value;
 
-							if($this->is_insert && !isset($_value))
+							if($this->is_insert && !$_value)
 								$_value = $this->plugin->utils_enc->uunnci_key_20_max();
 
 							if(isset($_value) && (!$_value || strlen($_value) > 20))
-								$this->errors[$_key] = sprintf(__('Invalid key: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid key: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || !$_value || strlen($_value) > 20))
-								$this->errors[$_key] = sprintf(__('Invalid key: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid key: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -700,17 +712,17 @@ namespace comment_mail // Root namespace.
 							if(isset($_value))
 								$_value = (integer)$_value;
 
-							if($this->is_insert && !isset($_value))
+							if($this->is_insert && !$_value)
 								$_value = 0; // Use a default value.
 
 							if($this->user && $this->user->ID)
 								$_value = $this->user->ID;
 
 							if(isset($_value) && ($_value < 0 || strlen((string)$_value) > 20))
-								$this->errors[$_key] = sprintf(__('Invalid user ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid user ID: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || $_value < 0 || strlen((string)$_value) > 20))
-								$this->errors[$_key] = sprintf(__('Invalid user ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid user ID: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -719,14 +731,14 @@ namespace comment_mail // Root namespace.
 							if(isset($_value))
 								$_value = (integer)$_value;
 
-							if($this->is_insert && !isset($_value))
+							if($this->is_insert && !$_value)
 								$_value = 0; // Use a default value.
 
 							if(isset($_value) && ($_value < 1 || strlen((string)$_value) > 20))
-								$this->errors[$_key] = sprintf(__('Invalid post ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid post ID: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || $_value < 1 || strlen((string)$_value) > 20))
-								$this->errors[$_key] = sprintf(__('Invalid post ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid post ID: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -735,14 +747,14 @@ namespace comment_mail // Root namespace.
 							if(isset($_value))
 								$_value = (integer)$_value;
 
-							if($this->is_insert && !isset($_value))
+							if($this->is_insert && !$_value)
 								$_value = 0; // Use a default value.
 
 							if(isset($_value) && ($_value < 0 || strlen((string)$_value) > 20))
-								$this->errors[$_key] = sprintf(__('Invalid comment ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid comment ID: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || $_value < 0 || strlen((string)$_value) > 20))
-								$this->errors[$_key] = sprintf(__('Invalid comment ID: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid comment ID: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -751,14 +763,14 @@ namespace comment_mail // Root namespace.
 							if(isset($_value))
 								$_value = (string)$_value;
 
-							if($this->is_insert && !isset($_value))
+							if($this->is_insert && !$_value)
 								$_value = 'asap'; // Use a default value.
 
 							if(isset($_value) && !in_array($_value, array('asap', 'hourly', 'daily', 'weekly'), TRUE))
-								$this->errors[$_key] = sprintf(__('Invalid delivery option: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid delivery option: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || !in_array($_value, array('asap', 'hourly', 'daily', 'weekly'), TRUE)))
-								$this->errors[$_key] = sprintf(__('Invalid delivery option: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid delivery option: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -767,7 +779,7 @@ namespace comment_mail // Root namespace.
 							if(isset($_value))
 								$_value = (string)$_value;
 
-							if($this->is_insert && !isset($_value))
+							if($this->is_insert && !$_value)
 								$_value = ''; // Use a default value.
 
 							if($this->is_insert && !$_value && $this->data['email'])
@@ -777,10 +789,10 @@ namespace comment_mail // Root namespace.
 								$_value = $this->plugin->utils_string->clean_name($_value);
 
 							if(isset($_value) && strlen($_value) > 50)
-								$this->errors[$_key] = sprintf(__('Invalid first name: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid first name: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || strlen($_value) > 50))
-								$this->errors[$_key] = sprintf(__('Invalid first name: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid first name: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -789,17 +801,17 @@ namespace comment_mail // Root namespace.
 							if(isset($_value))
 								$_value = (string)$_value;
 
-							if($this->is_insert && !isset($_value))
+							if($this->is_insert && !$_value)
 								$_value = ''; // Use a default value.
 
 							if(isset($_value)) // Clean the name.
 								$_value = $this->plugin->utils_string->clean_name($_value);
 
 							if(isset($_value) && strlen($_value) > 100)
-								$this->errors[$_key] = sprintf(__('Invalid last name: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid last name: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || strlen($_value) > 100))
-								$this->errors[$_key] = sprintf(__('Invalid last name: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid last name: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -808,14 +820,14 @@ namespace comment_mail // Root namespace.
 							if(isset($_value))
 								$_value = (string)$_value;
 
-							if($this->is_insert && !isset($_value))
+							if($this->is_insert && !$_value)
 								$_value = ''; // Use a default value.
 
 							if(isset($_value) && (!$_value || !is_email($_value) || strlen($_value) > 100))
-								$this->errors[$_key] = sprintf(__('Invalid email address: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid email address: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || !$_value || !is_email($_value) || strlen($_value) > 100))
-								$this->errors[$_key] = sprintf(__('Invalid email address: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid email address: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -824,17 +836,20 @@ namespace comment_mail // Root namespace.
 							if(isset($_value))
 								$_value = (string)$_value;
 
-							if($this->is_insert && !isset($_value))
+							if($this->is_insert && !$_value)
 								$_value = ''; // Use a default value.
 
 							if($this->is_insert && !$_value && $this->is_current_user)
 								$_value = $this->plugin->utils_env->user_ip();
 
+							if($this->is_update && $this->sub && !$_value && !$this->sub->insertion_ip && $this->is_current_user)
+								$_value = $this->plugin->utils_env->user_ip();
+
 							if(isset($_value) && strlen($_value) > 39)
-								$this->errors[$_key] = sprintf(__('Invalid insertion IP: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid insertion IP: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || strlen($_value) > 39))
-								$this->errors[$_key] = sprintf(__('Invalid insertion IP: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid insertion IP: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -843,17 +858,17 @@ namespace comment_mail // Root namespace.
 							if(isset($_value))
 								$_value = (string)$_value;
 
-							if($this->is_insert && !isset($_value))
+							if($this->is_insert && !$_value)
 								$_value = ''; // Use a default value.
 
 							if(!$_value && $this->is_current_user)
 								$_value = $this->plugin->utils_env->user_ip();
 
 							if(isset($_value) && strlen($_value) > 39)
-								$this->errors[$_key] = sprintf(__('Invalid last IP: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid last IP: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || strlen($_value) > 39))
-								$this->errors[$_key] = sprintf(__('Invalid last IP: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid last IP: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -862,14 +877,14 @@ namespace comment_mail // Root namespace.
 							if(isset($_value))
 								$_value = (string)$_value;
 
-							if($this->is_insert && !isset($_value))
+							if($this->is_insert && !$_value)
 								$_value = 'unconfirmed'; // Use a default value.
 
 							if(isset($_value) && !in_array($_value, array('unconfirmed', 'subscribed', 'suspended', 'trashed'), TRUE))
-								$this->errors[$_key] = sprintf(__('Invalid status: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid status: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || !in_array($_value, array('unconfirmed', 'subscribed', 'suspended', 'trashed'), TRUE)))
-								$this->errors[$_key] = sprintf(__('Invalid status: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid status: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -878,16 +893,14 @@ namespace comment_mail // Root namespace.
 							if(isset($_value))
 								$_value = (integer)$_value;
 
-							if($this->is_insert && !isset($_value))
+							if($this->is_insert && !$_value)
 								$_value = time(); // Use a default value.
 
-							if($this->is_insert && !$_value) $_value = time();
-
 							if(isset($_value) && strlen((string)$_value) !== 10)
-								$this->errors[$_key] = sprintf(__('Invalid insertion time: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid insertion time: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || strlen((string)$_value) !== 10))
-								$this->errors[$_key] = sprintf(__('Invalid insertion time: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid insertion time: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -896,16 +909,16 @@ namespace comment_mail // Root namespace.
 							if(isset($_value))
 								$_value = (integer)$_value;
 
-							if($this->is_insert && !isset($_value))
+							if($this->is_insert && !$_value)
 								$_value = time(); // Use a default value.
 
 							if(!$_value) $_value = time(); // Update time.
 
 							if(isset($_value) && strlen((string)$_value) !== 10)
-								$this->errors[$_key] = sprintf(__('Invalid last update time: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid last update time: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							else if($this->is_insert && (!isset($_value) || strlen((string)$_value) !== 10))
-								$this->errors[$_key] = sprintf(__('Invalid last update time: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($_value));
+								$this->errors[$_key] = sprintf(__('Invalid last update time: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 					}

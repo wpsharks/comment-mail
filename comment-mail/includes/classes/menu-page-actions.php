@@ -195,6 +195,27 @@ namespace comment_mail // Root namespace.
 
 				exit(menu_page_sub_form_base::comment_id_row_via_ajax($post_id));
 			}
+
+			/**
+			 * Processes sub. form inserts/updates.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $request_args Input argument(s).
+			 *
+			 * @see menu_page_sub_form_base::process()
+			 */
+			protected function sub_form($request_args)
+			{
+				if(!($request_args = (array)$request_args))
+					return; // Empty request args.
+
+				if(!current_user_can($this->plugin->manage_cap))
+					if(!current_user_can($this->plugin->cap))
+						return; // Unauthenticated; ignore.
+
+				menu_page_sub_form_base::process($request_args);
+			}
 		}
 	}
 }

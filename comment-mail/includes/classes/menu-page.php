@@ -44,7 +44,7 @@ namespace comment_mail // Root namespace.
 			protected function options()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-area').'">'."\n";
-				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'" novalidate="novalidate">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_only()).'" novalidate="novalidate">'."\n";
 
 				echo '      '.$this->heading(__('Plugin Options', $this->plugin->text_domain), 'options.png').$this->notices(); // Heading/notices.
 
@@ -110,7 +110,7 @@ namespace comment_mail // Root namespace.
 					default: // Everything else is handled by subs. table.
 
 						echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-subs '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
-						echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'" novalidate="novalidate">'."\n";
+						echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only()).'" novalidate="novalidate">'."\n";
 
 						echo '      <h2>'.sprintf(__('%1$s™ ⥱ Subscriptions', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-groups" style="font-size:inherit; line-height:inherit;"></i>'.
 						     '       <a href="'.esc_attr($this->plugin->utils_url->new_sub_short()).'" class="add-new-h2">'.__('Add New', $this->plugin->text_domain).'</a></h2>'."\n";
@@ -130,7 +130,7 @@ namespace comment_mail // Root namespace.
 			protected function sub_new()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-sub-new '.$this->plugin->slug.'-menu-page-form '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
-				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'" novalidate="novalidate">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only(array('action'))).'" novalidate="novalidate">'."\n";
 
 				echo '      <h2>'.sprintf(__('%1$s™ ⥱ New Subscription', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-id" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
 
@@ -148,7 +148,7 @@ namespace comment_mail // Root namespace.
 			protected function sub_edit()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-sub-edit '.$this->plugin->slug.'-menu-page-form '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
-				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'" novalidate="novalidate">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only(array('action', 'subscription'))).'" novalidate="novalidate">'."\n";
 
 				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Edit Subscription', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-id" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
 
@@ -166,7 +166,7 @@ namespace comment_mail // Root namespace.
 			protected function sub_event_log()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-sub-event-log '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
-				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'" novalidate="novalidate">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only()).'" novalidate="novalidate">'."\n";
 
 				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Subscription Event Log', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-groups" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
 
@@ -184,7 +184,7 @@ namespace comment_mail // Root namespace.
 			protected function queue()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-queue '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
-				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'" novalidate="novalidate">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only()).'" novalidate="novalidate">'."\n";
 
 				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Queued (Pending) Notifications', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-email" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
 
@@ -202,7 +202,7 @@ namespace comment_mail // Root namespace.
 			protected function queue_event_log()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-queue-event-log '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
-				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->current_page_nonce_only()).'" novalidate="novalidate">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only()).'" novalidate="novalidate">'."\n";
 
 				echo '      <h2>'.sprintf(__('%1$s™ ⥱ Queue Event Log', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="dashicons dashicons-email" style="font-size:inherit; line-height:inherit;"></i></h2>'."\n";
 
@@ -280,7 +280,7 @@ namespace comment_mail // Root namespace.
 				if($this->plugin->utils_env->is_pro_preview())
 				{
 					$notices .= '<div class="pmp-info">'."\n";
-					$notices .= '  <a href="'.esc_attr($this->plugin->utils_url->current_page_only()).'" style="float:right; margin:0 0 15px 25px; font-variant:small-caps; text-decoration:none;">'.__('close', $this->plugin->text_domain).' <i class="fa fa-eye-slash"></i></a>'."\n";
+					$notices .= '  <a href="'.esc_attr($this->plugin->utils_url->page_only()).'" style="float:right; margin:0 0 15px 25px; font-variant:small-caps; text-decoration:none;">'.__('close', $this->plugin->text_domain).' <i class="fa fa-eye-slash"></i></a>'."\n";
 					$notices .= '  <i class="fa fa-eye"></i> '.sprintf(__('<strong>Pro Features (Preview)</strong> ~ New option panels below. Please explore before <a href="%1$s" target="_blank">upgrading <i class="fa fa-heart-o"></i></a>.', $this->plugin->text_domain), esc_attr($this->plugin->utils_url->product_page())).'<br />'."\n";
 					$notices .= '  '.sprintf(__('<small>NOTE: the free version of %1$s (i.e. this lite version); is more-than-adequate for most sites. Please upgrade only if you desire advanced features or would like to support the developer.</small>', $this->plugin->text_domain), esc_html($this->plugin->name))."\n";
 					$notices .= '</div>'."\n";

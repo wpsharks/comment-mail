@@ -191,12 +191,12 @@ namespace comment_mail // Root namespace.
 				              ' '.$this->plugin->utils_markup->name_email($name, $item->email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
 
 				$edit_url      = $this->plugin->utils_url->edit_sub_short($item->ID);
-				$reconfirm_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'reconfirm');
-				$confirm_url   = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'confirm');
-				$unconfirm_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'unconfirm');
-				$suspend_url   = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'suspend');
-				$trash_url     = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'trash');
-				$delete_url    = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'delete');
+				$reconfirm_url = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'reconfirm');
+				$confirm_url   = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'confirm');
+				$unconfirm_url = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'unconfirm');
+				$suspend_url   = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'suspend');
+				$trash_url     = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'trash');
+				$delete_url    = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'delete');
 
 				$row_actions = array(
 					'edit'      => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscr.', $this->plugin->text_domain).'</a>',

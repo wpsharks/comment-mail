@@ -178,7 +178,7 @@ namespace comment_mail // Root namespace.
 					else if($_sub_inserter->has_errors()) // If the inserter has errors for this line; report those.
 					{
 						$_sub_inserter_errors       = array_values($_sub_inserter->errors()); // Values only; discard keys.
-						$_sub_inserter_error_prefix = sprintf(__('<em>Line #%1$s:</em>', $this->plugin->text_domain), esc_html($current_csv_line_number));
+						$_sub_inserter_error_prefix = sprintf(__('_Line #%1$s:_', $this->plugin->text_domain), esc_html($current_csv_line_number));
 
 						foreach($_sub_inserter_errors as &$_sub_inserter_error)
 							$_sub_inserter_error = $_sub_inserter_error_prefix.' '.$_sub_inserter_error;
@@ -223,14 +223,14 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function enqueue_notices_and_redirect()
 			{
-				$notice_markup   = $error_markup = ''; // Initialize.
-				$subs_i18n = $this->plugin->utils_i18n->subscriptions($this->total_imported_subs); // e.g. `X subscription(s)`.
-				$notice_markup   = sprintf(__('<strong>Imported %1$s successfully.</strong>', $this->plugin->text_domain), esc_html($subs_i18n));
+				$notice_markup = $error_markup = ''; // Initialize.
+				$subs_i18n     = $this->plugin->utils_i18n->subscriptions($this->total_imported_subs); // e.g. `X subscription(s)`.
+				$notice_markup = sprintf(__('<strong>Imported %1$s successfully.</strong>', $this->plugin->text_domain), esc_html($subs_i18n));
 
 				if($this->errors) // Do we have errors to report also? If so, present these as individual list items.
 				{
 					$error_markup = __('<strong>The following errors were encountered during importation:</strong>', $this->plugin->text_domain);
-					$error_markup .= '<ul class="pmp-list-items"><li>'.implode('</li><li>', $this->errors).'</li></ul>';
+					$error_markup .= '<ul class="pmp-list-items"><li>'.implode('</li><li>', $this->errors_html()).'</li></ul>';
 				}
 				if($notice_markup) // This really should always be displayed; even if we imported `0` subscriptions.
 					$this->plugin->enqueue_user_notice($notice_markup, array('transient' => TRUE, 'for_page' => $this->plugin->utils_env->current_menu_page()));
@@ -238,7 +238,7 @@ namespace comment_mail // Root namespace.
 				if($error_markup) // Are there any specific error messages that we can report?
 					$this->plugin->enqueue_user_error($error_markup, array('transient' => TRUE, 'for_page' => $this->plugin->utils_env->current_menu_page()));
 
-				wp_redirect($this->plugin->utils_url->current_page_only()).exit();
+				wp_redirect($this->plugin->utils_url->page_only()).exit();
 			}
 
 			/**
@@ -259,6 +259,18 @@ namespace comment_mail // Root namespace.
 					fseek($csv_resource_file, 0);
 				}
 				return is_resource($csv_resource_file) ? $csv_resource_file : FALSE;
+			}
+
+			/**
+			 * An array of all errors w/ HTML markup.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array Errors w/ HTML markup.
+			 */
+			protected function errors_html()
+			{
+				return array_map(array($this->plugin->utils_string, 'markdown'), $this->errors);
 			}
 		}
 	}

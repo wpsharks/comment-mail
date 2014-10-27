@@ -343,7 +343,7 @@ namespace comment_mail // Root namespace.
 				           ($max !== PHP_INT_MAX ? " LIMIT ".esc_sql($max) : '');
 
 				if(($results = $this->wp->get_results($sql, OBJECT_K)))
-					return ($users = $this->typify_deep($results));
+					return ($users = $results = $this->typify_deep($results));
 
 				return ($users = array()); // Default return value.
 			}
@@ -409,8 +409,6 @@ namespace comment_mail // Root namespace.
 			 * @return \stdClass[] An array of all posts.
 			 *
 			 * @throws \exception If a query failure occurs.
-			 *
-			 * @TODO improve sorting to place posts/pages first.
 			 */
 			public function all_posts(array $args = array())
 			{
@@ -470,8 +468,32 @@ namespace comment_mail // Root namespace.
 				           ($max !== PHP_INT_MAX ? " LIMIT ".esc_sql($max) : '');
 
 				if(($results = $this->wp->get_results($sql, OBJECT_K)))
-					return ($posts = $this->typify_deep($results));
+				{
+					$post_results = $page_results // Initialize.
+						= $media_results = $other_results = array();
 
+					foreach($results as $_key => $_result)
+					{
+						if($_result->post_type === 'post')
+							$post_results[$_key] = $_result;
+
+						else if($_result->post_type === 'page')
+							$page_results[$_key] = $_result;
+
+						else if($_result->post_type === 'media')
+							$media_results[$_key] = $_result;
+
+						else $other_results[$_key] = $_result;
+					}
+					unset($_key, $_result); // Housekeeping.
+
+					$results // Change precedence of certain post types.
+						= $post_results + $page_results  // Highest priority.
+						  + $other_results  // Everything else.
+						  + $media_results; // Lowest priority.
+
+					return ($posts = $results = $this->typify_deep($results));
+				}
 				return ($posts = array()); // Default return value.
 			}
 
@@ -591,7 +613,7 @@ namespace comment_mail // Root namespace.
 				           ($max !== PHP_INT_MAX ? " LIMIT ".esc_sql($max) : '');
 
 				if(($results = $this->wp->get_results($sql, OBJECT_K)))
-					return ($comments = $this->typify_deep($results));
+					return ($comments = $results = $this->typify_deep($results));
 
 				return ($comments = array()); // Default return value.
 			}

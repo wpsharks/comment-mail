@@ -61,11 +61,18 @@ namespace comment_mail // Root namespace.
 				return array(
 					'cb'             => '1', // Include checkboxes.
 					'ID'             => __('Entry', $plugin->text_domain),
-					'time'           => __('Time', $plugin->text_domain),
-					'event'          => __('Event', $plugin->text_domain),
+
 					'sub_id'         => __('Subscr. ID', $plugin->text_domain),
-					'oby_sub_id'     => __('Overwritten By', $plugin->text_domain),
 					'user_id'        => __('WP User ID', $plugin->text_domain),
+
+					'event'          => __('Event', $plugin->text_domain),
+					'time'           => __('Time', $plugin->text_domain),
+					'user_initiated' => __('User Initiated', $plugin->text_domain),
+
+					'oby_sub_id'     => __('Overwritten By', $plugin->text_domain),
+					'status_before'  => __('Status Before', $plugin->text_domain),
+					'status'         => __('Status After', $plugin->text_domain),
+
 					'post_id'        => __('Subscr. to Post ID', $plugin->text_domain),
 					'comment_id'     => __('Subscr. to Comment ID', $plugin->text_domain),
 					'deliver'        => __('Delivery', $plugin->text_domain),
@@ -73,9 +80,6 @@ namespace comment_mail // Root namespace.
 					'lname'          => __('Last Name', $plugin->text_domain),
 					'email'          => __('Email', $plugin->text_domain),
 					'ip'             => __('IP Address', $plugin->text_domain),
-					'status_before'  => __('Status Prior', $plugin->text_domain),
-					'status'         => __('Status', $plugin->text_domain),
-					'user_initiated' => __('User Initiated', $plugin->text_domain),
 				);
 			}
 
@@ -89,15 +93,15 @@ namespace comment_mail // Root namespace.
 			public static function get_hidden_columns_()
 			{
 				return array(
-					'oby_sub_id',
 					'user_id',
+					'user_initiated',
+					'oby_sub_id',
 					'comment_id',
 					'deliver',
 					'fname',
 					'lname',
 					'email',
 					'ip',
-					'user_initiated',
 				);
 			}
 
@@ -187,12 +191,12 @@ namespace comment_mail // Root namespace.
 				$id_info = '<i class="fa fa-bell-o"></i>'. // Entry icon w/ ID.
 				           ' <span style="font-weight:bold;">#'.esc_html($item->ID).'</span>';
 
-				$delete_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'delete');
+				$delete_url = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'delete');
 
 				$row_actions = array(
 					'delete' => '<a href="#"'.  // Depends on `menu-pages.js`.
 					            ' data-pmp-action="'.esc_attr($delete_url).'"'. // The action URL.
-					            ' data-pmp-confirmation="'.esc_attr(__('Delete log entry? Are you sure?', $this->plugin->text_domain)).'"'.
+					            ' data-pmp-confirmation="'.esc_attr($this->plugin->utils_i18n->log_entry_js_deletion_confirmation_warning()).'"'.
 					            ' title="'.esc_attr(__('Delete Sub. Event Log Entry', $this->plugin->text_domain)).'">'.
 					            '  <i class="fa fa-times-circle"></i> '.__('Delete', $this->plugin->text_domain).
 					            '</a>',

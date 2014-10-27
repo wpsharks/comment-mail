@@ -185,12 +185,12 @@ namespace comment_mail // Root namespace.
 				$id_info = '<i class="fa fa-paper-plane"></i>'. // Entry icon w/ ID.
 				           ' <span style="font-weight:bold;">#'.esc_html($item->ID).'</span>';
 
-				$delete_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'delete');
+				$delete_url = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'delete');
 
 				$row_actions = array(
 					'delete' => '<a href="#"'.  // Depends on `menu-pages.js`.
 					            ' data-pmp-action="'.esc_attr($delete_url).'"'. // The action URL.
-					            ' data-pmp-confirmation="'.esc_attr(__('Delete log entry? Are you sure?', $this->plugin->text_domain)).'"'.
+					            ' data-pmp-confirmation="'.esc_attr($this->plugin->utils_i18n->log_entry_js_deletion_confirmation_warning()).'"'.
 					            ' title="'.esc_attr(__('Delete Queue Event Log Entry', $this->plugin->text_domain)).'">'.
 					            '  <i class="fa fa-times-circle"></i> '.__('Delete', $this->plugin->text_domain).
 					            '</a>',

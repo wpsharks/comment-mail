@@ -161,7 +161,7 @@ namespace comment_mail // Root namespace.
 				$id_info = '<i class="fa fa-envelope-o"></i>'. // Notification icon w/ ID.
 				           ' <span style="font-weight:bold;">#'.esc_html($item->ID).'</span>';
 
-				$delete_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'delete');
+				$delete_url = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'delete');
 
 				$row_actions = array(
 					'delete' => '<a href="#"'.  // Depends on `menu-pages.js`.

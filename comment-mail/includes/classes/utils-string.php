@@ -195,6 +195,49 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Escapes JS line breaks (removes "\r"); and escapes single quotes.
+			 *
+			 * @param string  $string A string value.
+			 * @param integer $times Number of escapes. Defaults to `1`.
+			 *
+			 * @return string Escaped string, ready for JavaScript.
+			 */
+			public function esc_js_sq($string, $times = 1)
+			{
+				return $this->esc_js_sq_deep((string)$string, $times);
+			}
+
+			/**
+			 * Escapes JS; and escapes single quotes deeply.
+			 *
+			 * @note This follows {@link http://www.json.org JSON} standards, with TWO exceptions.
+			 *    1. Special handling for line breaks: `\r\n` and `\r` are converted to `\n`.
+			 *    2. This does NOT escape double quotes; only single quotes.
+			 *
+			 * @param mixed   $value Any value can be converted into an escaped string.
+			 *    Actually, objects can't, but this recurses into objects.
+			 *
+			 * @param integer $times Number of escapes. Defaults to `1`.
+			 *
+			 * @return string|array|object Escaped string, array, object (ready for JavaScript).
+			 */
+			public function esc_js_sq_deep($value, $times = 1)
+			{
+				if(is_array($value) || is_object($value))
+				{
+					foreach($value as $_key => &$_value)
+						$_value = $this->esc_js_sq_deep($_value, $times);
+					unset($_key, $_value); // Housekeeping.
+
+					return $value; // All done.
+				}
+				$value = str_replace(array("\r\n", "\r", '"'), array("\n", "\n", '%%!dq!%%'), (string)$value);
+				$value = str_replace(array('%%!dq!%%', "'"), array('"', "\\'"), trim(json_encode($value), '"'));
+
+				return str_replace('\\', str_repeat('\\', abs((integer)$times) - 1).'\\', $value);
+			}
+
+			/**
 			 * Escape double quotes.
 			 *
 			 * @since 14xxxx First documented version.
@@ -563,7 +606,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string Markdown converted to HTML markup.
 			 */
-			public function s_md_to_html($string)
+			public function markdown($string)
 			{
 				if(!($string = trim((string)$string)))
 					return $string; // Not possible.
@@ -572,6 +615,7 @@ namespace comment_mail // Root namespace.
 					return $string; // Not applicable.
 
 				$html = $this->to_html($string);
+
 				$html = preg_replace('/`{3,}([^`]+?)`+/', '<pre><code>'.'${1}'.'</code></pre>', $html);
 				$html = preg_replace('/`+([^`]+?)`+/', '<code>'.'${1}'.'</code>', $html);
 

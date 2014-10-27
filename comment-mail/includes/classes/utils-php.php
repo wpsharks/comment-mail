@@ -126,10 +126,16 @@ namespace comment_mail // Root namespace.
 				if(!$no_cache && isset($this->static[__FUNCTION__][$fsmlc]))
 					return $this->static[__FUNCTION__][$fsmlc];
 
-				$possible = &$this->static[__FUNCTION__][$fsmlc];
+				$this->static[__FUNCTION__][$fsmlc] = NULL; // Initialize.
+				$possible                           = &$this->static[__FUNCTION__][$fsmlc];
 
-				if((in_array($fsmlc, $this->constructs, TRUE) || is_callable($fsmlc) || function_exists($fsmlc))
-				   && !in_array($fsmlc, $this->disabled_functions(), TRUE) // And it is NOT disabled in some way.
+				if(( // A language construct, or callable.
+					   in_array($fsmlc, $this->constructs, TRUE)
+					   || is_callable($fsmlc) || function_exists($fsmlc)
+				   )
+				   // And only if it has not been disabled in some way.
+				   && !in_array($fsmlc, $this->disabled_functions(), TRUE)
+
 				) return ($possible = TRUE);
 
 				return ($possible = FALSE);
@@ -147,7 +153,7 @@ namespace comment_mail // Root namespace.
 				if(isset($this->static[__FUNCTION__]))
 					return $this->static[__FUNCTION__];
 
-				$this->static[__FUNCTION__] = array();
+				$this->static[__FUNCTION__] = array(); // Initalize.
 				$disabled                   = &$this->static[__FUNCTION__];
 
 				if(!function_exists('ini_get'))
