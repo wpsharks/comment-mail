@@ -39,11 +39,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function user_ip()
 			{
-				if(isset($this->static[__FUNCTION__]))
-					return $this->static[__FUNCTION__];
-
-				$this->static[__FUNCTION__] = NULL; // Initialize.
-				$ip                         = &$this->static[__FUNCTION__];
+				if(!is_null($ip = &$this->static_key(__FUNCTION__)))
+					return $ip; // Cached this already.
 
 				return ($ip = !empty($_SERVER['REMOTE_ADDR']) ? (string)$_SERVER['REMOTE_ADDR'] : '');
 			}
@@ -57,11 +54,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function is_options_restored()
 			{
-				if(isset($this->static[__FUNCTION__]))
-					return $this->static[__FUNCTION__];
-
-				$this->static[__FUNCTION__] = NULL; // Initialize.
-				$is                         = &$this->static[__FUNCTION__];
+				if(!is_null($is = &$this->static_key(__FUNCTION__)))
+					return $is; // Cached this already.
 
 				if(!$this->is_menu_page(__NAMESPACE__.'*'))
 					return ($is = FALSE);
@@ -78,11 +72,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function is_options_updated()
 			{
-				if(isset($this->static[__FUNCTION__]))
-					return $this->static[__FUNCTION__];
-
-				$this->static[__FUNCTION__] = NULL; // Initialize.
-				$is                         = &$this->static[__FUNCTION__];
+				if(!is_null($is = &$this->static_key(__FUNCTION__)))
+					return $is; // Cached this already.
 
 				if(!$this->is_menu_page(__NAMESPACE__.'*'))
 					return ($is = FALSE);
@@ -99,11 +90,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function is_pro_preview()
 			{
-				if(isset($this->static[__FUNCTION__]))
-					return $this->static[__FUNCTION__];
-
-				$this->static[__FUNCTION__] = NULL; // Initialize.
-				$is                         = &$this->static[__FUNCTION__];
+				if(!is_null($is = &$this->static_key(__FUNCTION__)))
+					return $is; // Cached this already.
 
 				if(!$this->is_menu_page(__NAMESPACE__.'*'))
 					return ($is = FALSE);
@@ -120,11 +108,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function current_menu_page()
 			{
-				if(isset($this->static[__FUNCTION__]))
-					return $this->static[__FUNCTION__];
-
-				$this->static[__FUNCTION__] = NULL; // Initialize.
-				$page                       = &$this->static[__FUNCTION__];
+				if(!is_null($page = &$this->static_key(__FUNCTION__)))
+					return $page; // Cached this already.
 
 				if(!is_admin()) return ($page = '');
 
@@ -153,11 +138,8 @@ namespace comment_mail // Root namespace.
 			{
 				$page_to_check = (string)$page_to_check;
 
-				if(isset($this->static[__FUNCTION__][$page_to_check]))
-					return $this->static[__FUNCTION__][$page_to_check];
-
-				$this->static[__FUNCTION__][$page_to_check] = NULL; // Initialize.
-				$is                                         = &$this->static[__FUNCTION__][$page_to_check];
+				if(!is_null($is = &$this->static_key(__FUNCTION__, $page_to_check)))
+					return $is; // Cached this already.
 
 				if(!is_admin()) // Not admin area?
 					return ($is = FALSE); // Nope!

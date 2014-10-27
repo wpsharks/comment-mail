@@ -109,30 +109,27 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string  $fsmlc The name of a function, a static method, or a PHP language construct.
+			 * @param string  $fsmlc Function, static method, or a PHP language construct.
 			 *
 			 * @param boolean $no_cache Defaults to a FALSE value.
 			 *    TRUE to avoid a potentially cached value.
 			 *
 			 * @return boolean TRUE if (in `$this->constructs` || `is_callable()` || `function_exists()`).
-			 *    And, if not disabled at runtime via `ini_get('disable_functions')` or with the Suhosin extension.
+			 *    Iff NOT disabled at runtime via `ini_get('disable_functions')` or with the Suhosin extension.
 			 */
 			public function is_possible($fsmlc, $no_cache = FALSE)
 			{
-				$fsmlc = (string)$fsmlc;
-				$fsmlc = ltrim(strtolower($fsmlc), '\\');
-				if(!$fsmlc) return FALSE; // Not possible.
+				$fsmlc = ltrim(strtolower((string)$fsmlc), '\\');
 
-				if(!$no_cache && isset($this->static[__FUNCTION__][$fsmlc]))
-					return $this->static[__FUNCTION__][$fsmlc];
+				if(!is_null($possible = &$this->static_key(__FUNCTION__, $fsmlc)) && !$no_cache)
+					return $possible; // Cached this already.
 
-				$this->static[__FUNCTION__][$fsmlc] = NULL; // Initialize.
-				$possible                           = &$this->static[__FUNCTION__][$fsmlc];
+				if($fsmlc // Do we even have something to check?
 
-				if(( // A language construct, or callable.
-					   in_array($fsmlc, $this->constructs, TRUE)
-					   || is_callable($fsmlc) || function_exists($fsmlc)
-				   )
+				   && ( // A language construct, or callable.
+						in_array($fsmlc, $this->constructs, TRUE)
+						|| is_callable($fsmlc) || function_exists($fsmlc)
+					)
 				   // And only if it has not been disabled in some way.
 				   && !in_array($fsmlc, $this->disabled_functions(), TRUE)
 
@@ -150,11 +147,9 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function disabled_functions()
 			{
-				if(isset($this->static[__FUNCTION__]))
-					return $this->static[__FUNCTION__];
-
-				$this->static[__FUNCTION__] = array(); // Initalize.
-				$disabled                   = &$this->static[__FUNCTION__];
+				if(!is_null($disabled = &$this->static_key(__FUNCTION__)))
+					return $disabled; // Cached this already.
+				$disabled = array(); // Initialize.
 
 				if(!function_exists('ini_get'))
 					return $disabled; // Not possible.

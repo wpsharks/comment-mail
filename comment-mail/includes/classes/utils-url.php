@@ -39,11 +39,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function current_scheme()
 			{
-				if(isset($this->static[__FUNCTION__]))
-					return $this->static[__FUNCTION__];
-
-				$this->static[__FUNCTION__] = NULL; // Initialize.
-				$scheme                     = &$this->static[__FUNCTION__];
+				if(!is_null($scheme = &$this->static_key(__FUNCTION__)))
+					return $scheme; // Cached this already.
 
 				return ($scheme = is_ssl() ? 'https' : 'http');
 			}
@@ -57,11 +54,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function current_host()
 			{
-				if(isset($this->static[__FUNCTION__]))
-					return $this->static[__FUNCTION__];
-
-				$this->static[__FUNCTION__] = NULL; // Initialize.
-				$host                       = &$this->static[__FUNCTION__];
+				if(!is_null($host = &$this->static_key(__FUNCTION__)))
+					return $host; // Cached this already.
 
 				return ($host = strtolower((string)$_SERVER['HTTP_HOST']));
 			}
@@ -75,11 +69,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function current_uri()
 			{
-				if(isset($this->static[__FUNCTION__]))
-					return $this->static[__FUNCTION__];
-
-				$this->static[__FUNCTION__] = NULL; // Initialize.
-				$uri                        = &$this->static[__FUNCTION__];
+				if(!is_null($uri = &$this->static_key(__FUNCTION__)))
+					return $uri; // Cached this already.
 
 				return ($uri = '/'.ltrim((string)$_SERVER['REQUEST_URI'], '/'));
 			}
@@ -93,11 +84,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function current_path()
 			{
-				if(isset($this->static[__FUNCTION__]))
-					return $this->static[__FUNCTION__];
-
-				$this->static[__FUNCTION__] = NULL; // Initialize.
-				$path                       = &$this->static[__FUNCTION__];
+				if(!is_null($path = &$this->static_key(__FUNCTION__)))
+					return $path; // Cached this already.
 
 				return ($path = '/'.ltrim((string)parse_url($this->current_uri(), PHP_URL_PATH), '/'));
 			}
@@ -111,11 +99,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function current()
 			{
-				if(isset($this->static[__FUNCTION__]))
-					return $this->static[__FUNCTION__];
-
-				$this->static[__FUNCTION__] = NULL; // Initialize.
-				$url                        = &$this->static[__FUNCTION__];
+				if(!is_null($url = &$this->static_key(__FUNCTION__)))
+					return $url; // Cached this already.
 
 				return ($url = $this->current_scheme().'://'.$this->current_host().$this->current_uri());
 			}
@@ -581,9 +566,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function to($file = '', $scheme = NULL)
 			{
-				if(!isset($this->static[__FUNCTION__]['plugin_dir_url']))
-					$this->static[__FUNCTION__]['plugin_dir_url'] = rtrim(plugin_dir_url($this->plugin->file), '/');
-				$plugin_dir_url = &$this->static[__FUNCTION__]['plugin_dir_url']; // Reference.
+				if(is_null($plugin_dir_url = &$this->static_key(__FUNCTION__, 'plugin_dir_url')))
+					$plugin_dir_url = rtrim(plugin_dir_url($this->plugin->file), '/');
 
 				return set_url_scheme($plugin_dir_url.(string)$file, $scheme);
 			}

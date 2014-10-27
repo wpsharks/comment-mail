@@ -254,9 +254,11 @@ namespace comment_mail // Root namespace.
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				if(!$this->plugin->options['user_select_options_enable']
-				   || !($users = $this->plugin->utils_db->all_users($args))
-				) return ''; // Use input field instead of options.
+				if(!$this->plugin->options['user_select_options_enable'])
+					return ''; // Use input field instead of options.
+
+				if(!($users = $this->plugin->utils_db->all_users($args)))
+					return ''; // Use input field instead of options.
 
 				$options = '<option value="0"></option>'; // Initialize.
 
@@ -299,9 +301,6 @@ namespace comment_mail // Root namespace.
 			 *    i.e. an input field should be used instead of a select menu.
 			 *
 			 * @see utils_db::all_posts()
-			 *
-			 * @TODO add option to exclude media here; to allow room for more meaningful posts.
-			 *    This should be a configurable option w/ media off by default.
 			 */
 			public function post_select_options($current_post_id = NULL, array $args = array())
 			{
@@ -310,17 +309,25 @@ namespace comment_mail // Root namespace.
 					? (integer)$current_post_id : NULL;
 
 				$default_args = array(
-					'max'               => 2000,
-					'fail_on_max'       => TRUE,
-					'for_comments_only' => FALSE,
-					'no_cache'          => FALSE,
+					'max'                   => 2000,
+					'fail_on_max'           => TRUE,
+					'for_comments_only'     => FALSE,
+					'exclude_post_types'    => array(),
+					'exclude_post_statuses' => array(),
+					'no_cache'              => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				if(!$this->plugin->options['post_select_options_enable']
-				   || !($posts = $this->plugin->utils_db->all_posts($args))
-				) return ''; // Use input field instead of options.
+				$args['exclude_post_types'] = (array)$args['exclude_post_types'];
+				if(!$this->plugin->options['post_select_options_media_enable'])
+					$args['exclude_post_types'][] = 'attachment';
+
+				if(!$this->plugin->options['post_select_options_enable'])
+					return ''; // Use input field instead of options.
+
+				if(!($posts = $this->plugin->utils_db->all_posts($args)))
+					return ''; // Use input field instead of options.
 
 				$options                 = '<option value="0"></option>'; // Initialize.
 				$default_post_type_label = __('Post', $this->plugin->text_domain);
@@ -387,9 +394,11 @@ namespace comment_mail // Root namespace.
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				if(!$this->plugin->options['comment_select_options_enable']
-				   || !($comments = $this->plugin->utils_db->all_comments($post_id, $args))
-				) return ''; // Use input field instead of options.
+				if(!$this->plugin->options['comment_select_options_enable'])
+					return ''; // Use input field instead of options.
+
+				if(!($comments = $this->plugin->utils_db->all_comments($post_id, $args)))
+					return ''; // Use input field instead of options.
 
 				$options = '<option value="0"></option>'; // Initialize.
 

@@ -321,6 +321,7 @@ namespace comment_mail
 
 					'user_select_options_enable'                  => '1', // `0|1`; enable?
 					'post_select_options_enable'                  => '1', // `0|1`; enable?
+					'post_select_options_media_enable'            => '0', // `0|1`; enable?
 					'comment_select_options_enable'               => '1', // `0|1`; enable?
 
 				); // Default options are merged with those defined by the site owner.
@@ -1099,7 +1100,6 @@ namespace comment_mail
 						else $_dismiss = ''; // Default value; n/a.
 
 						$_classes = $this->slug.'-menu-page-area'; // Always.
-						$_classes .= ' pmp-'.($_args['type'] === 'error' ? 'error' : 'notice');
 						$_classes .= ' '.($_args['type'] === 'error' ? 'error' : 'updated');
 
 						$_full_markup = // Put together the full markup; including other pieces.

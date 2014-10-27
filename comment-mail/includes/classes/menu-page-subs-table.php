@@ -222,7 +222,7 @@ namespace comment_mail // Root namespace.
 				if($item->status === 'unconfirmed') unset($row_actions['unconfirm'], $row_actions['suspend']);
 				if($item->status === 'subscribed') unset($row_actions['reconfirm'], $row_actions['confirm']);
 				if($item->status === 'suspended') unset($row_actions['suspend'], $row_actions['unconfirm']);
-				if($item->status === 'trashed') unset($row_actions['trashed']);
+				if($item->status === 'trashed') unset($row_actions['trash']);
 
 				if($this->plugin->options['auto_confirm_enable'])
 					unset($row_actions['reconfirm']); // N/A.

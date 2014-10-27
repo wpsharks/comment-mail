@@ -60,11 +60,11 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function register()
 			{
-				if(isset($this->static[__FUNCTION__]))
-					return; // Already done.
+				if(($registered = &$this->static_key(__FUNCTION__)))
+					return; // Already registered autoloader.
 
-				$this->static[__FUNCTION__] = TRUE;
 				spl_autoload_register(array($this, 'autoload'));
+				$registered = TRUE; // Flag as complete.
 			}
 		}
 	}

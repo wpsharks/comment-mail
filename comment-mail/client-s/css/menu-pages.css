@@ -6,42 +6,36 @@
 	Plugin-specific styles for any menu page area of the dashboard.
 ------------------------------------------------------------------------------------------------------------ */
 /*
-A menu page area ~ notices.
+A menu page area ~ notifications.
 */
-.comment-mail-menu-page-area .pmp-info
+.comment-mail-menu-page-area .pmp-notif-info,
+.comment-mail-menu-page-area .pmp-notif-notice,
+.comment-mail-menu-page-area .pmp-notif-warning,
+.comment-mail-menu-page-area .pmp-notif-error
+{
+	border-radius : 5px;
+	padding       : 1px 12px 1px 12px;
+	box-shadow    : 0 1px 1px 0 rgba(0, 0, 0, .1);
+}
+.comment-mail-menu-page-area .pmp-notif-info
 {
 	background : #C9E0FA;
 	border     : 1px solid #35558A;
 }
-.comment-mail-menu-page-area .pmp-notice
+.comment-mail-menu-page-area .pmp-notif-notice
 {
 	background : #FFFBCC;
 	border     : 1px solid #E6DB55;
 }
-.comment-mail-menu-page-area .pmp-warning
+.comment-mail-menu-page-area .pmp-notif-warning
 {
 	background : #FADDAB;
 	border     : 1px solid #D29A04;
 }
-.comment-mail-menu-page-area .pmp-error
+.comment-mail-menu-page-area .pmp-notif-error
 {
 	background : #FABBC6;
 	border     : 1px solid #711E1E;
-}
-.comment-mail-menu-page-area .pmp-info,
-.comment-mail-menu-page-area .pmp-notice,
-.comment-mail-menu-page-area .pmp-warning,
-.comment-mail-menu-page-area .pmp-error
-{
-	border-radius : 5px;
-}
-.comment-mail-menu-page-area .pmp-info:not(.updated):not(.error),
-.comment-mail-menu-page-area .pmp-notice:not(.updated):not(.error),
-.comment-mail-menu-page-area .pmp-warning:not(.updated):not(.error),
-.comment-mail-menu-page-area .pmp-error:not(.updated):not(.error)
-{
-	padding    : 1px 12px 1px 12px;
-	box-shadow : 0 1px 1px 0 rgba(0, 0, 0, .1);
 }
 /*
 A menu page area ~ list items.
@@ -372,10 +366,10 @@ Menu page styles.
 {
 	opacity : 0.5;
 }
-.comment-mail-menu-page .pmp-info,
-.comment-mail-menu-page .pmp-notice,
-.comment-mail-menu-page .pmp-warning,
-.comment-mail-menu-page .pmp-error
+.comment-mail-menu-page .pmp-notif-info,
+.comment-mail-menu-page .pmp-notif-notice,
+.comment-mail-menu-page .pmp-notif-warning,
+.comment-mail-menu-page .pmp-notif-error
 {
 	margin : 0 0 25px 0;
 }
@@ -509,10 +503,10 @@ Menu page panel styles.
 {
 	display : block;
 }
-.comment-mail-menu-page .pmp-panel-body .pmp-notice,
-.comment-mail-menu-page .pmp-panel-body .pmp-info,
-.comment-mail-menu-page .pmp-panel-body .pmp-warning,
-.comment-mail-menu-page .pmp-panel-body .pmp-error
+.comment-mail-menu-page .pmp-panel-body .pmp-notif-notice,
+.comment-mail-menu-page .pmp-panel-body .pmp-notif-info,
+.comment-mail-menu-page .pmp-panel-body .pmp-notif-warning,
+.comment-mail-menu-page .pmp-panel-body .pmp-notif-error
 {
 	display   : table;
 	font-size : inherit;

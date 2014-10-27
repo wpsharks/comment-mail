@@ -413,26 +413,36 @@ namespace comment_mail // Root namespace.
 			public function all_posts(array $args = array())
 			{
 				$default_args = array(
-					'max'               => PHP_INT_MAX,
-					'fail_on_max'       => FALSE,
-					'for_comments_only' => FALSE,
-					'no_cache'          => FALSE,
+					'max'                   => PHP_INT_MAX,
+					'fail_on_max'           => FALSE,
+					'for_comments_only'     => FALSE,
+					'exclude_post_types'    => array(),
+					'exclude_post_statuses' => array(),
+					'no_cache'              => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$max               = (integer)$args['max'];
-				$max               = $max < 1 ? 1 : $max;
-				$fail_on_max       = (boolean)$args['fail_on_max'];
-				$for_comments_only = (boolean)$args['for_comments_only'];
-				$no_cache          = (boolean)$args['no_cache'];
+				$max                   = (integer)$args['max'];
+				$max                   = $max < 1 ? 1 : $max;
+				$fail_on_max           = (boolean)$args['fail_on_max'];
+				$for_comments_only     = (boolean)$args['for_comments_only'];
+				$exclude_post_types    = (array)$args['exclude_post_types'];
+				$exclude_post_statuses = (array)$args['exclude_post_statuses'];
+				$no_cache              = (boolean)$args['no_cache'];
 
-				if(!$no_cache && isset($this->cache[__FUNCTION__][$max][(integer)$fail_on_max][(integer)$for_comments_only]))
-					return $this->cache[__FUNCTION__][$max][(integer)$fail_on_max][(integer)$for_comments_only];
+				$max_key                   = $max;
+				$fail_on_max_key           = (integer)$fail_on_max;
+				$for_comments_only_key     = (integer)$for_comments_only;
+				$exclude_post_types_key    = sha1(serialize($exclude_post_types));
+				$exclude_post_statuses_key = sha1(serialize($exclude_post_statuses));
 
-				$this->cache[__FUNCTION__][$max][(integer)$fail_on_max][(integer)$for_comments_only]
+				if(!$no_cache && isset($this->cache[__FUNCTION__][$max_key][$fail_on_max_key][$for_comments_only_key][$exclude_post_types_key][$exclude_post_statuses_key]))
+					return $this->cache[__FUNCTION__][$max_key][$fail_on_max_key][$for_comments_only_key][$exclude_post_types_key][$exclude_post_statuses_key];
+
+				$this->cache[__FUNCTION__][$max_key][$fail_on_max_key][$for_comments_only_key][$exclude_post_types_key][$exclude_post_statuses_key]
 					    = array(); // Initialize cache entry for reference used below.
-				$posts = &$this->cache[__FUNCTION__][$max][(integer)$fail_on_max][(integer)$for_comments_only];
+				$posts = &$this->cache[__FUNCTION__][$max_key][$fail_on_max_key][$for_comments_only_key][$exclude_post_types_key][$exclude_post_statuses_key];
 
 				if($fail_on_max && $this->total_posts($args) > $max)
 					return ($posts = array()); // Fail when there are too many.
@@ -456,7 +466,10 @@ namespace comment_mail // Root namespace.
 				           " FROM `".esc_html($this->wp->posts)."`".
 
 				           " WHERE `post_type` IN('".implode("','", array_map('esc_sql', $post_types))."')".
+				           ($exclude_post_types ? " AND `post_type` NOT IN('".implode("','", array_map('esc_sql', $exclude_post_types))."')" : '').
+
 				           " AND `post_status` IN('".implode("','", array_map('esc_sql', $post_statuses))."')".
+				           ($exclude_post_statuses ? " AND `post_status` NOT IN('".implode("','", array_map('esc_sql', $exclude_post_statuses))."')" : '').
 
 				           ($for_comments_only // For comments only?
 					           ? " AND (`comment_status` IN('1', 'open', 'opened')".
@@ -480,7 +493,7 @@ namespace comment_mail // Root namespace.
 						else if($_result->post_type === 'page')
 							$page_results[$_key] = $_result;
 
-						else if($_result->post_type === 'media')
+						else if($_result->post_type === 'attachment')
 							$media_results[$_key] = $_result;
 
 						else $other_results[$_key] = $_result;

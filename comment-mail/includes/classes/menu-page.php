@@ -46,7 +46,8 @@ namespace comment_mail // Root namespace.
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-area').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_only()).'" novalidate="novalidate">'."\n";
 
-				echo '      '.$this->heading(__('Plugin Options', $this->plugin->text_domain), 'options.png').$this->notices(); // Heading/notices.
+				echo '      '.$this->heading(__('Plugin Options', $this->plugin->text_domain), 'options.png').
+				     '      '.$this->notifications(); // Heading/notifications.
 
 				echo '      <div class="pmp-body">'."\n";
 
@@ -255,31 +256,31 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Constructs menu page notices.
+			 * Constructs menu page notifications.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @return string The notices for this menu page.
+			 * @return string The notifications for this menu page.
 			 */
-			protected function notices()
+			protected function notifications()
 			{
-				$notices = ''; // Initialize notices.
+				$notices = ''; // Initialize notifications.
 
 				if($this->plugin->utils_env->is_options_updated())
 				{
-					$notices .= '<div class="pmp-notice">'."\n";
+					$notices .= '<div class="pmp-notif-notice">'."\n";
 					$notices .= '  <i class="fa fa-thumbs-up"></i> '.__('Options updated successfully.', $this->plugin->text_domain)."\n";
 					$notices .= '</div>'."\n";
 				}
 				if($this->plugin->utils_env->is_options_restored())
 				{
-					$notices .= '<div class="pmp-notice">'."\n";
+					$notices .= '<div class="pmp-notif-notice">'."\n";
 					$notices .= '  <i class="fa fa-thumbs-up"></i> '.__('Default options successfully restored.', $this->plugin->text_domain)."\n";
 					$notices .= '</div>'."\n";
 				}
 				if($this->plugin->utils_env->is_pro_preview())
 				{
-					$notices .= '<div class="pmp-info">'."\n";
+					$notices .= '<div class="pmp-notif-info">'."\n";
 					$notices .= '  <a href="'.esc_attr($this->plugin->utils_url->page_only()).'" style="float:right; margin:0 0 15px 25px; font-variant:small-caps; text-decoration:none;">'.__('close', $this->plugin->text_domain).' <i class="fa fa-eye-slash"></i></a>'."\n";
 					$notices .= '  <i class="fa fa-eye"></i> '.sprintf(__('<strong>Pro Features (Preview)</strong> ~ New option panels below. Please explore before <a href="%1$s" target="_blank">upgrading <i class="fa fa-heart-o"></i></a>.', $this->plugin->text_domain), esc_attr($this->plugin->utils_url->product_page())).'<br />'."\n";
 					$notices .= '  '.sprintf(__('<small>NOTE: the free version of %1$s (i.e. this lite version); is more-than-adequate for most sites. Please upgrade only if you desire advanced features or would like to support the developer.</small>', $this->plugin->text_domain), esc_html($this->plugin->name))."\n";
@@ -287,7 +288,7 @@ namespace comment_mail // Root namespace.
 				}
 				if(!$this->plugin->options['enable'] && $this->plugin->utils_env->is_menu_page(__NAMESPACE__))
 				{
-					$notices .= '<div class="pmp-warning">'."\n";
+					$notices .= '<div class="pmp-notif-warning">'."\n";
 					$notices .= '  <i class="fa fa-warning"></i> '.sprintf(__('%1$s is currently disabled; please review options below.', $this->plugin->text_domain), esc_html($this->plugin->name))."\n";
 					$notices .= '</div>'."\n";
 				}

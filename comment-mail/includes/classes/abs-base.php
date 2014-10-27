@@ -146,7 +146,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/*
-			 * Core Utilities
+			 * Protected Core Utilities
 			 */
 
 			/**
@@ -158,7 +158,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return mixed `$var` if `isset()`; else `$or`.
 			 */
-			public function isset_or(&$var, $or = NULL, $type = '')
+			protected function isset_or(&$var, $or = NULL, $type = '')
 			{
 				if(isset($var))
 				{
@@ -178,7 +178,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return mixed `$var` if `!empty()`; else `$or`.
 			 */
-			public function not_empty_or(&$var, $or = NULL, $type = '')
+			protected function not_empty_or(&$var, $or = NULL, $type = '')
 			{
 				if(!empty($var))
 				{
@@ -187,6 +187,92 @@ namespace comment_mail // Root namespace.
 					return $var;
 				}
 				return $or; // Do not cast `$or`.
+			}
+
+			/*
+			 * Cache key generation helpers.
+			 */
+
+			/**
+			 * Construct and acquire a cache key.
+			 *
+			 * @param string      $function `__FUNCTION__` is suggested here.
+			 *    i.e. the calling function name in the calling class.
+			 *
+			 * @param mixed|array $args The arguments to the calling function.
+			 *    Using `func_get_args()` to the caller might suffice in some cases.
+			 *    That said, it's generally a good idea to customize this a bit.
+			 *    This should include the cachable arguments only.
+			 *
+			 * @param string      $___prop For internal use only. This defaults to `cache`.
+			 *    See also: {@link static_key()} where a value of `static` is used instead.
+			 *
+			 * @return mixed|null Returns the current value for the cache key.
+			 *    Or, this returns `NULL` if the key is not set yet.
+			 *
+			 * @note This function returns by reference. The use of `&` is highly recommended when calling this utility.
+			 *    See also: <http://php.net/manual/en/language.references.return.php>
+			 */
+			protected function &cache_key($function, $args = array(), $___prop = 'cache')
+			{
+				$function = (string)$function;
+				$args     = (array)$args;
+
+				if(!isset($this->{$___prop}[$function]))
+					$this->{$___prop}[$function] = NULL;
+				$cache_key = &$this->{$___prop}[$function];
+
+				foreach($args as $_arg) // Use each arg as a key.
+				{
+					switch(gettype($_arg))
+					{
+						case 'integer':
+							$_key = (integer)$_arg;
+							break; // Break switch handler.
+
+						case 'double':
+						case 'float':
+							$_key = (string)$_arg;
+							break; // Break switch handler.
+
+						case 'boolean':
+							$_key = (integer)$_arg;
+							break; // Break switch handler.
+
+						case 'array':
+						case 'object':
+							$_key = sha1(serialize($_arg));
+							break; // Break switch handler.
+
+						case 'NULL':
+						case 'resource':
+						case 'unknown type':
+						default: // Default case handler.
+							$_key = (string)$_arg;
+					}
+					if(!isset($cache_key[$_key]))
+						$cache_key[$_key] = NULL;
+					$cache_key = &$cache_key[$_key];
+				}
+				return $cache_key;
+			}
+
+			/**
+			 * Construct and acquire a static key.
+			 *
+			 * @param string      $function See {@link cache_key()}.
+			 * @param mixed|array $args See {@link cache_key()}.
+			 *
+			 * @return mixed|null See {@link cache_key()}.
+			 *
+			 * @note This function returns by reference. The use of `&` is highly recommended when calling this utility.
+			 *    See also: <http://php.net/manual/en/language.references.return.php>
+			 */
+			protected function &static_key($function, $args = array())
+			{
+				$key = &$this->cache_key($function, $args, 'static');
+
+				return $key; // By reference.
 			}
 		}
 	}
