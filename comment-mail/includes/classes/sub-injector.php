@@ -176,6 +176,21 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Array of any errors w/ HTML markup.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of any/all errors.
+			 */
+			public function errors_html()
+			{
+				if(!$this->sub_inserter)
+					return array();
+
+				return $this->sub_inserter->errors_html();
+			}
+
+			/**
 			 * Injects a new subscription.
 			 *
 			 * @since 14xxxx First documented version.

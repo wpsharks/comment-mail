@@ -59,7 +59,6 @@ namespace comment_mail // Root namespace.
 				$this->maybe_inject_sub();
 				$this->maybe_inject_queue();
 				$this->maybe_immediately_process_queue();
-				$this->maybe_set_sub_current_email();
 			}
 
 			/**
@@ -129,24 +128,6 @@ namespace comment_mail // Root namespace.
 					return; // Immediate queue processing is not enabled right now.
 
 				new queue_processor(FALSE, $immediate_max_time, 0, $immediate_max_limit); // No delay.
-			}
-
-			/**
-			 * Set current sub. email address.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected function maybe_set_sub_current_email()
-			{
-				if(empty($_REQUEST['email']))
-					return; // Nothing to do.
-
-				if(headers_sent()) return; // Not possible.
-
-				if(!($email = trim(stripslashes((string)$_REQUEST['email']))))
-					return; // Nothing to do.
-
-				$this->plugin->utils_sub->set_current_email($email);
 			}
 		}
 	}

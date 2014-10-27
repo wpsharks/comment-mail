@@ -435,7 +435,7 @@ namespace comment_mail // Root namespace.
 					return $id_only; // All we can do.
 
 				$name     = $item->sub_fname.' '.$item->sub_lname; // Concatenate.
-				$sub_info = '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
+				$sub_info = '<i class="fa fa-child"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
 				            ' <span style="font-weight:bold;" title="'.esc_attr($item->sub_key).'">ID #'.esc_html($item->sub_id).'</span>'.
 				            ' '.$this->plugin->utils_markup->name_email($name, $item->sub_email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
 
@@ -471,7 +471,7 @@ namespace comment_mail // Root namespace.
 					return $id_only; // All we can do.
 
 				$name         = $item->oby_sub_fname.' '.$item->oby_sub_lname; // Concatenate.
-				$oby_sub_info = '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
+				$oby_sub_info = '<i class="fa fa-child"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
 				                ' <span style="font-weight:bold;" title="'.esc_attr($item->oby_sub_key).'">ID #'.esc_html($item->oby_sub_id).'</span>'.
 				                ' '.$this->plugin->utils_markup->name_email($name, $item->oby_sub_email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
 
@@ -670,6 +670,9 @@ namespace comment_mail // Root namespace.
 				if(!isset($item->deliver))
 					return '—'; // Not possible.
 
+				if(!$item->deliver)
+					return '—'; // Not possible.
+
 				return esc_html($this->plugin->utils_i18n->deliver_label($item->deliver));
 			}
 
@@ -687,6 +690,9 @@ namespace comment_mail // Root namespace.
 				if(!isset($item->status_before))
 					return '—'; // Not possible.
 
+				if(!$item->status_before)
+					return '—'; // Not possible.
+
 				return esc_html($this->plugin->utils_i18n->status_label($item->status_before));
 			}
 
@@ -702,6 +708,9 @@ namespace comment_mail // Root namespace.
 			protected function column_status(\stdClass $item)
 			{
 				if(!isset($item->status))
+					return '—'; // Not possible.
+
+				if(!$item->status)
 					return '—'; // Not possible.
 
 				return esc_html($this->plugin->utils_i18n->status_label($item->status));
@@ -725,7 +734,7 @@ namespace comment_mail // Root namespace.
 					return '—'; // Not applicable.
 
 				$note = $this->plugin->utils_event->queue_note_code($item->note_code);
-				$note = $this->plugin->utils_string->s_md_to_html($note);
+				$note = $this->plugin->utils_string->markdown($note); // Convert to HTML markup.
 
 				return $note; // HTML markup via simple MD parsing.
 			}
@@ -784,7 +793,7 @@ namespace comment_mail // Root namespace.
 				if(!($property = trim((string)$property)))
 					return '—'; // Not applicable.
 
-				$value = $this->plugin->isset_or($item->{$property}, '');
+				$value = isset($item->{$property}) ? $item->{$property} : '';
 
 				if(($property === 'time' || substr($property, -5) === '_time') && is_integer($value))
 					$value = $value <= 0 ? '—' // Use a default value of `—` in this case.
@@ -1557,16 +1566,12 @@ namespace comment_mail // Root namespace.
 
 						array('transient' => TRUE, 'for_page' => $this->plugin->utils_env->current_menu_page())
 					);
-				$_r          = stripslashes_deep($_REQUEST);
-				$redirect_to = remove_query_arg(array('_wpnonce', 'action', $this->plural_name, $this->singular_name));
-				if(!empty($_r['orderby'])) $redirect_to = add_query_arg('orderby', urlencode($_r['orderby']), $redirect_to);
-				if(!empty($_r['order'])) $redirect_to = add_query_arg('order', urlencode($_r['order']), $redirect_to);
-				if(!empty($_r['s'])) $redirect_to = add_query_arg('s', urlencode($_r['s']), $redirect_to);
+				$redirect_to = $this->plugin->utils_url->page_table_nav_vars_only();
 
 				if(headers_sent()) // Output started already?
 					exit('      <script type="text/javascript">'.
 					     "         document.getElementsByTagName('body')[0].style.display = 'none';".
-					     "         location.href = '".$this->plugin->utils_string->esc_sq_deep($redirect_to)."';".
+					     "         location.href = '".$this->plugin->utils_string->esc_js_sq($redirect_to)."';".
 					     '      </script>'.
 					     '   </body>'.
 					     '</html>');
@@ -1792,13 +1797,13 @@ namespace comment_mail // Root namespace.
 				{
 					if(!$navigable_filter_lis) // `all` first; i.e. a way to remove all navigable filters.
 						$navigable_filter_lis[] = '<li>'. // List item for special navigable filter `all`.
-						                          '   <a href="'.esc_attr($this->plugin->utils_url->search_filter('::')).'"'.
+						                          '   <a href="'.esc_attr($this->plugin->utils_url->table_search_filter('::')).'"'.
 						                          (!$query_contains_navigable_filters ? ' class="pmp-active"' : '').'>'.
 						                          '      '.__('all', $this->plugin->text_domain).
 						                          '   </a>'.
 						                          '</li>';
 					$navigable_filter_lis[] = '<li>'. // List item for a navigable filter in this table.
-					                          '   <a href="'.esc_attr($this->plugin->utils_url->search_filter($_navigable_filter_s)).'"'.
+					                          '   <a href="'.esc_attr($this->plugin->utils_url->table_search_filter($_navigable_filter_s)).'"'.
 					                          (stripos($raw_search_query, $_navigable_filter_s) !== FALSE ? ' class="pmp-active"' : '').'>'.
 					                          '      <span style="'.esc_attr($_navigable_filter_s === 'status::trashed' ? 'font-style:italic;' : '').'">'.
 					                          '         '.esc_html($_navigable_filter_label).'</span>'.

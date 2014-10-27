@@ -20,6 +20,17 @@ namespace comment_mail // Root namespace.
 		 */
 		class menu_page_sub_form_base extends abs_base
 		{
+			/*
+			 * Instance-based properties.
+			 */
+
+			/**
+			 * @var boolean Editing?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $is_edit;
+
 			/**
 			 * @var \stdClass|null Subscription.
 			 *
@@ -28,11 +39,30 @@ namespace comment_mail // Root namespace.
 			protected $sub;
 
 			/**
-			 * @var boolean Editing?
+			 * @var form_fields Class instance.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $is_edit;
+			protected $form_fields;
+
+			/*
+			 * Static properties.
+			 */
+
+			/**
+			 * @var array Form field config. args.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $form_field_args = array(
+				'ns_id_suffix'   => '-sub-form',
+				'ns_name_suffix' => '[sub_form]',
+				'class_prefix'   => 'pmp-sub-form-',
+			);
+
+			/*
+			 * Instance-based constructor.
+			 */
 
 			/**
 			 * Class constructor.
@@ -47,15 +77,24 @@ namespace comment_mail // Root namespace.
 
 				if(isset($sub_id)) // Editing?
 				{
+					$this->is_edit = TRUE; // Flag as `TRUE`.
 					$sub_id        = (integer)$sub_id; // Force integer.
 					$this->sub     = $this->plugin->utils_sub->get($sub_id);
-					$this->is_edit = TRUE; // Flag as `TRUE`.
+
+					if(!$this->sub) // Unexpected scenario; fail w/ message.
+						wp_die(__('Subscription ID not found.', $this->plugin->text_domain));
 				}
+				$this->form_fields = new form_fields(static::$form_field_args);
+
 				$this->maybe_display();
 			}
 
+			/*
+			 * Instance-based form generation.
+			 */
+
 			/**
-			 * Displays edit form.
+			 * Displays form.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
@@ -64,53 +103,102 @@ namespace comment_mail // Root namespace.
 				echo '<table class="form-table">';
 				echo '   <tbody>';
 
-				echo static::select_field_row( // Select menu if possible; else input field row.
-					__('Post ID', $this->plugin->text_domain), 'post_id', TRUE, '%%posts%%', $this->current_value_for('post_id'),
-					__('Required; the Post ID they are subscribed to.', $this->plugin->text_domain));
-
-				echo static::select_field_row( // Select menu if possible; else input field row.
-					__('Comment ID', $this->plugin->text_domain), 'comment_id', FALSE, '%%comments%%', $this->current_value_for('comment_id'),
-					__('If empty, they\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $this->plugin->text_domain),
-					array('post_id' => $this->current_value_for('post_id'))); // With behavioral args.
-
-				// echo static::select_field_row( // Select menu if possible; else input field row.
-				//	__('WP User ID', $this->plugin->text_domain), 'user_id', FALSE, '%%users%%', $this->current_value_for('user_id'),
-				//	__('Associates subscription w/ a WP User ID (if applicable) to improve statistical reporting.', $this->plugin->text_domain));
-
+				echo $this->form_fields->select_row(
+					array(
+						'placeholder'         => __('Select a Post ID...', $this->plugin->text_domain),
+						'label'               => __('<i class="fa fa-fw fa-thumb-tack"></i> Post ID#', $this->plugin->text_domain),
+						'name'                => 'post_id', 'required' => TRUE, 'options' => '%%posts%%', 'current_value' => $this->current_value_for('post_id'),
+						'notes'               => __('Required; the Post ID they are subscribed to.', $this->plugin->text_domain),
+						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'placeholder' => ''),
+					));
+				echo $this->form_fields->select_row(
+					array(
+						'placeholder'         => __('— All Comments/Replies —', $this->plugin->text_domain),
+						'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID#', $this->plugin->text_domain),
+						'name'                => 'comment_id', 'required' => FALSE, 'options' => '%%comments%%', 'post_id' => $this->current_value_for('post_id'), 'current_value' => $this->current_value_for('comment_id'),
+						'notes'               => __('If empty, they\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $this->plugin->text_domain),
+						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"'),
+					));
+				echo $this->form_fields->select_row(
+				// @TODO auto-populate email and names when a user ID is selected and the fields are currently empty.
+					array(
+						'placeholder'         => __('— N/A; no WP User ID —', $this->plugin->text_domain),
+						'label'               => __('<i class="fa fa-fw fa-user"></i> WP User ID#', $this->plugin->text_domain),
+						'name'                => 'user_id', 'required' => FALSE, 'options' => '%%users%%', 'current_value' => $this->current_value_for('user_id'),
+						'notes'               => __('Associates subscription w/ a WP User ID (if applicable) to improve statistical reporting.', $this->plugin->text_domain).
+						                         ' '.__('If empty, the system will automatically try to find a matching user ID for the email address.', $this->plugin->text_domain),
+						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"'),
+					));
 				/* -------------------------------------------------------------------- */
-				echo $this->horizontal_line_row(/* -------------------------------------------------------------------- */);
+				echo $this->form_fields->horizontal_line_row(/* -------------------------------------------------------------------- */);
 				/* -------------------------------------------------------------------- */
 
-				echo static::input_field_row(__('Email', $this->plugin->text_domain), 'email', TRUE, $this->current_value_for('email'));
-				echo static::input_field_row(__('First Name', $this->plugin->text_domain), 'fname', FALSE, $this->current_value_for('fname'));
-				echo static::input_field_row(__('Last Name', $this->plugin->text_domain), 'lname', FALSE, $this->current_value_for('lname'));
-				echo static::input_field_row(__('IP Address', $this->plugin->text_domain), 'insertion_ip', FALSE, $this->current_value_for('insertion_ip'));
-
+				echo $this->form_fields->input_row(
+					array(
+						'type'  => 'email', // For `<input>` type.
+						'label' => __('<i class="fa fa-fw fa-envelope-o"></i> Email', $this->plugin->text_domain),
+						'name'  => 'email', 'required' => TRUE, 'maxlength' => 100, 'current_value' => $this->current_value_for('email'),
+					));
+				echo $this->form_fields->input_row(
+					array(
+						'label' => __('<i class="fa fa-fw fa-pencil-square-o"></i> First Name', $this->plugin->text_domain),
+						'name'  => 'fname', 'required' => TRUE, 'maxlength' => 50, 'current_value' => $this->current_value_for('fname'),
+					));
+				echo $this->form_fields->input_row(
+					array(
+						'label' => __('<i class="fa fa-fw fa-level-up fa-rotate-90" style="margin-left:1px;"></i> Last Name', $this->plugin->text_domain),
+						'name'  => 'lname', 'required' => FALSE, 'maxlength' => 100, 'current_value' => $this->current_value_for('lname'),
+					));
+				echo $this->form_fields->input_row(
+					array(
+						'label' => __('<i class="fa fa-fw fa-bullseye"></i> IP Address', $this->plugin->text_domain),
+						'name'  => 'insertion_ip', 'required' => FALSE, 'maxlength' => 39, 'current_value' => $this->current_value_for('insertion_ip'),
+						'notes' => __('If empty, this is filled automatically when a subscriber confirms or updates their subscription.', $this->plugin->text_domain),
+					));
 				/* -------------------------------------------------------------------- */
-				echo static::horizontal_line_row(/* -------------------------------------------------------------------- */);
+				echo $this->form_fields->horizontal_line_row(/* -------------------------------------------------------------------- */);
 				/* -------------------------------------------------------------------- */
 
-				echo static::select_field_row( // Select menu if possible; else input field row.
-					__('Status', $this->plugin->text_domain), 'status', TRUE, '%%status%%', $this->current_value_for('status'),
-					'', array('include_checkbox' => 'process_confirmation')); // + checkbox.
+				echo $this->form_fields->select_row(
+					array(
+						'placeholder'          => __('Select a Status...', $this->plugin->text_domain),
+						'label'                => __('<i class="fa fa-fw fa-flag-o"></i> Status', $this->plugin->text_domain),
+						'name'                 => 'status', 'required' => TRUE, 'options' => '%%status%%', 'current_value' => $this->current_value_for('status'),
 
-				echo static::select_field_row( // Select menu if possible; else input field row.
-					__('Deliver', $this->plugin->text_domain), 'deliver', TRUE, '%%deliver%%', $this->current_value_for('deliver'),
-					__('Any value that is not <code>asap</code> results in a digest instead of instant notifications.', $this->plugin->text_domain));
+						'nested_checkbox_args' => array('name'          => 'process_confirmation', // With additional checkbox option too.
+						                                'label'         => __('Request confirmation via email', $this->plugin->text_domain).' <i class="fa fa-envelope-o"></i>',
+						                                'current_value' => $this->current_value_for('process_confirmation')),
+					));
+				echo $this->form_fields->select_row(
+					array(
+						'placeholder' => __('Select a Delivery Option...', $this->plugin->text_domain),
+						'label'       => __('<i class="fa fa-fw fa-paper-plane-o"></i> Deliver', $this->plugin->text_domain),
+						'name'        => 'deliver', 'required' => TRUE, 'options' => '%%deliver%%', 'current_value' => $this->current_value_for('deliver'),
+						'notes'       => __('Any value that is not <code>asap</code> results in a digest instead of instant notifications.', $this->plugin->text_domain),
+					));
 
 				echo '   </tbody>';
 				echo '</table>';
 
 				echo '<hr />';
 
-				echo '<p class="submit">'.
-				     '   <input type="submit"'.
+				echo '<p class="submit">';
+
+				if($this->is_edit) // Include the ID and `subscription` we're updating.
+					echo $this->form_fields->hidden_input(array('name' => 'ID', 'current_value' => $this->sub->ID));
+
+				echo '   <input type="submit"'.
 				     ($this->is_edit  // Are we editing?
 					     ? ' value="'.esc_attr(__('Update Subscription', $this->plugin->text_domain)).'"'
 					     : ' value="'.esc_attr(__('Create Subscription', $this->plugin->text_domain)).'"').
-				     '    class="button button-primary" />'.
-				     '</p>';
+				     '    class="button button-primary" />';
+
+				echo '</p>';
 			}
+
+			/*
+			 * Instance-based helpers.
+			 */
 
 			/**
 			 * Collects current value for a particular property.
@@ -126,207 +214,18 @@ namespace comment_mail // Root namespace.
 				if(!($property = (string)$property))
 					return NULL; // Not possible.
 
-				if(isset($_REQUEST[__NAMESPACE__.'_sub_form'][$property]))
-					return trim(stripslashes((string)$_REQUEST[__NAMESPACE__.'_sub_form'][$property]));
+				if(isset($_REQUEST[__NAMESPACE__]['sub_form'][$property]))
+					return trim(stripslashes((string)$_REQUEST[__NAMESPACE__]['sub_form'][$property]));
 
-				if($this->is_edit && $this->sub && isset($this->sub->{$property}))
+				if($this->is_edit && isset($this->sub->{$property}))
 					return trim((string)$this->sub->{$property});
 
 				return NULL; // Default value.
 			}
 
-			/**
-			 * Constructs an input field row.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string      $label Field label.
-			 * @param string      $name Field name; formulates `id=""` also.
-			 * @param boolean     $required Is this field required?
-			 * @param string|null $current_value Current value.
-			 * @param string      $notes Any additional notes w/ HTML markup.
-			 *
-			 * @param array       $args Any additional behavior args.
-			 *
-			 * @return string HTML markup for this input field row.
-			 *
-			 * @see process_confirmation_checkbox()
+			/*
+			 * Public static processors.
 			 */
-			protected static function input_field_row($label, $name, $required = FALSE, $current_value = NULL, $notes = '', array $args = array())
-			{
-				$plugin = plugin(); // Needed below.
-
-				$label         = (string)$label; // Force string.
-				$name          = (string)$name; // Force string name.
-				$slug          = str_replace('_', '-', $name); // Slugified name.
-				$current_value = $plugin->isset_or($current_value, NULL, 'string');
-				$notes         = trim((string)$notes); // Force string value.
-
-				$default_args = array(
-					'post_id'          => NULL,
-					'include_checkbox' => '',
-				);
-				$args         = array_merge($default_args, $args);
-				$args         = array_intersect_key($args, $default_args);
-
-				$post_id          = $plugin->isset_or($args['post_id'], NULL, 'integer');
-				$include_checkbox = (string)$args['include_checkbox']; // The type of checkbox.
-
-				$field = '<tr class="'.esc_attr('form-field'.($required ? ' form-required' : '').' pmp-sub-form-'.$slug).'">';
-
-				$field .= ' <th scope="row">';
-				$field .= '    <label for="'.esc_attr(__NAMESPACE__.'-sub-form-'.$slug).'">'.
-				          '       '.$label.($required ?// Change the short description based on this boolean.
-						'           <span class="description">'.__('(required) *', $plugin->text_domain).'</span>' : '').
-				          '    </label>';
-				$field .= ' </th>';
-
-				$field .= ' <td>';
-				$field .= '    <input type="text" id="'.esc_attr(__NAMESPACE__.'-sub-form-'.$slug).'"'.
-				          '     name="'.esc_attr(__NAMESPACE__.'_sub_form['.$name.']').'"'.
-				          '     '.($required ? ' aria-required="true"' : '').
-				          '     value="'.esc_attr((string)$current_value).'" />'.
-
-				          '    '.($notes ? '<p class="description">'.$notes.'</p>' : '').
-
-				          ($include_checkbox === 'process_confirmation' // Include checkbox?
-					          ? '<p class="checkbox">'.static::process_confirmation_checkbox().'</p>' : '');
-				$field .= ' </td>';
-
-				$field .= '</tr>';
-
-				return $field; // HTML markup.
-			}
-
-			/**
-			 * Constructs a select field row.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string       $label Field label.
-			 * @param string       $name Field name; formulates `id=""` also.
-			 * @param boolean      $required Is this field required?
-			 *
-			 * @param string|array $options HTML markup for options; or an associative array of options.
-			 *    If this is an array, each key is an option value; each value is an option label.
-			 *    There are a few `%%replacement codes%%` supported here also.
-			 *
-			 * @param string|null  $current_value Current value.
-			 * @param string       $notes Any additional notes w/ HTML markup.
-			 *
-			 * @param array        $args Any additional behavior args.
-			 *
-			 * @return string HTML markup for this select field row.
-			 *    If no options (or too many options; this returns an input field instead.
-			 *
-			 * @see process_confirmation_checkbox()
-			 */
-			protected static function select_field_row($label, $name, $required, $options, $current_value = NULL, $notes = '', array $args = array())
-			{
-				$plugin = plugin(); // Needed below.
-
-				$label         = (string)$label; // Force string.
-				$name          = (string)$name; // Force string name.
-				$slug          = str_replace('_', '-', $name); // Slugified name.
-				$current_value = $plugin->isset_or($current_value, NULL, 'string');
-				$notes         = trim((string)$notes); // Force string value.
-
-				$default_args = array(
-					'post_id'          => NULL,
-					'include_checkbox' => '',
-				);
-				$args         = array_merge($default_args, $args);
-				$args         = array_intersect_key($args, $default_args);
-
-				$post_id          = $plugin->isset_or($args['post_id'], NULL, 'integer');
-				$include_checkbox = (string)$args['include_checkbox']; // The type of checkbox.
-
-				if($options === '%%users%%') $options = $plugin->utils_markup->user_select_options($current_value);
-				else if($options === '%%posts%%') $options = $plugin->utils_markup->post_select_options($current_value, array('for_comments_only'));
-				else if($options === '%%comments%%') $options = $plugin->utils_markup->comment_select_options($post_id, $current_value);
-				else if($options === '%%deliver%%') $options = $plugin->utils_markup->deliver_select_options($current_value);
-				else if($options === '%%status%%') $options = $plugin->utils_markup->status_select_options($current_value);
-				else if(is_array($options)) $options = $plugin->utils_markup->select_options($options, $current_value);
-
-				if(!($options = (string)$options)) // Use an input field instead?
-					return static::input_field_row($label, $name, $required, $current_value, $notes, $args);
-
-				$field = '<tr class="'.esc_attr('form-field'.($required ? ' form-required' : '').' pmp-sub-form-'.$slug).'">';
-
-				$field .= ' <th scope="row">';
-				$field .= '    <label for="'.esc_attr(__NAMESPACE__.'-sub-form-'.$slug).'">'.
-				          '       '.$label.($required ?// Change the short description based on this boolean.
-						'           <span class="description">'.__('(required) *', $plugin->text_domain).'</span>' : '').
-				          '    </label>';
-				$field .= ' </th>';
-
-				$field .= ' <td>';
-				$field .= '    <select id="'.esc_attr(__NAMESPACE__.'-sub-form-'.$slug).'"'.
-				          '     name="'.esc_attr(__NAMESPACE__.'_sub_form['.$name.']').'"'.
-				          '     '.($required ? ' aria-required="true"' : '').'>'.
-				          '       '.$options.
-				          '    </select>'.
-
-				          '    '.($notes ? '<p class="description">'.$notes.'</p>' : '').
-
-				          ($include_checkbox === 'process_confirmation' // Include checkbox?
-					          ? '<p class="checkbox">'.static::process_confirmation_checkbox().'</p>' : '');
-				$field .= ' </td>';
-
-				$field .= '</tr>';
-
-				return $field; // HTML markup.
-			}
-
-			/**
-			 * Checkbox for processing confirmation.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return string HTML markup for this checkbox.
-			 *
-			 * @see input_field_row()
-			 * @see select_field_row()
-			 */
-			protected static function process_confirmation_checkbox()
-			{
-				$plugin = plugin(); // Needed below.
-
-				$id   = __NAMESPACE__.'-sub-form-process-confirmation';
-				$name = __NAMESPACE__.'_sub_form[process_confirmation]';
-
-				$checked = ''; // Initialize; unchecked by default.
-				if(!empty($_REQUEST[__NAMESPACE__.'_sub_form']['process_confirmation']))
-					$checked = ' checked="checked"';
-
-				return '<label for="'.esc_attr($id).'" style="margin-left:10px;">'.
-
-				       ' <i class="fa fa-level-up fa-rotate-90"></i>'.
-				       ' &nbsp;<input type="checkbox" id="'.esc_attr($id).'" name="'.esc_attr($name).'" value="1"'.$checked.' />'.
-				       ' '.__('Request confirmation via email', $plugin->text_domain).' <i class="fa fa-envelope-o"></i>'.
-
-				       '</label>';
-			}
-
-			/**
-			 * Constructs an HR field row.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return string HTML markup for this field row.
-			 */
-			protected static function horizontal_line_row()
-			{
-				$field = '<tr>';
-
-				$field .= ' <td colspan="2">';
-				$field .= '    <hr />';
-				$field .= ' </td>';
-
-				$field .= '</tr>';
-
-				return $field; // HTML markup.
-			}
 
 			/**
 			 * Constructs a comment ID row via AJAX.
@@ -342,14 +241,97 @@ namespace comment_mail // Root namespace.
 			 */
 			public static function comment_id_row_via_ajax($post_id)
 			{
+				$plugin = plugin();
+
+				if(!current_user_can($plugin->manage_cap))
+					if(!current_user_can($plugin->cap))
+						return ''; // Unauthenticated; ignore.
+
+				$post_id     = (integer)$post_id;
+				$form_fields = new form_fields(static::$form_field_args);
+
+				return $form_fields->select_row(
+					array(
+						'placeholder'         => __('— All Comments/Replies —', $plugin->text_domain),
+						'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID#', $plugin->text_domain),
+						'name'                => 'comment_id', 'required' => FALSE, 'options' => '%%comments%%', 'post_id' => $post_id, 'current_value' => NULL,
+						'notes'               => __('If empty, they\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $plugin->text_domain),
+						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"'),
+					));
+			}
+
+			/**
+			 * Form processor.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $request_args Incoming action request args.
+			 *
+			 * @see menu_page_actions::sub_form()
+			 */
+			public static function process(array $request_args)
+			{
 				$plugin = plugin(); // Needed below.
 
-				$post_id = (integer)$post_id;
+				if(!current_user_can($plugin->manage_cap))
+					if(!current_user_can($plugin->cap))
+						return; // Unauthenticated; ignore.
 
-				return static::select_field_row(// Select menu if possible; else input field row.
-					__('Comment ID', $plugin->text_domain), 'comment_id', FALSE, '%%comments%%', NULL,
-					__('If empty they\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $plugin->text_domain),
-					array('post_id' => $post_id)); // With behavioral args.
+				$reporting_errors     = FALSE; // Initialize.
+				$process_confirmation = !empty($request_args['process_confirmation']);
+				$args                 = compact('process_confirmation');
+
+				if(isset($request_args['ID'])) // Updating an existing subscription via ID?
+				{
+					$sub_updater = new sub_updater($request_args, $args); // Run updater.
+
+					if($sub_updater->did_update()) // Updated successfully?
+					{
+						$plugin->enqueue_user_notice( // Queue notice.
+							sprintf(__('Subscription ID# <code>%1$s</code> updated successfully.', $plugin->text_domain), esc_html($request_args['ID'])),
+							array('transient' => TRUE, 'for_page' => $plugin->utils_env->current_menu_page()));
+
+						$redirect_to = $plugin->utils_url->page_table_nav_vars_only();
+					}
+					else // There were errors; display those errors to the current user.
+					{
+						$plugin->enqueue_user_error( // Queue error notice.
+							sprintf(__('Failed to update subscription ID# <code>%1$s</code>. Please review the following error(s):', $plugin->text_domain), esc_html($request_args['ID'])).
+							'<ul class="pmp-list-items"><li>'.implode('</li><li>', $sub_updater->errors_html()).'</li></ul>',
+							array('transient' => TRUE, 'for_page' => $plugin->utils_env->current_menu_page()));
+					}
+				}
+				else // We are doing a new insertion; i.e. a new subscription is being added here.
+				{
+					$sub_inserter = new sub_inserter($request_args, $args); // Run inserter.
+
+					if($sub_inserter->did_insert()) // Inserted successfully?
+					{
+						$plugin->enqueue_user_notice( // Queue notice.
+							sprintf(__('Subscription ID# <code>%1$s</code> created successfully.', $plugin->text_domain), esc_html($sub_inserter->insert_id())),
+							array('transient' => TRUE, 'for_page' => $plugin->utils_env->current_menu_page()));
+
+						$redirect_to = $plugin->utils_url->page_table_nav_vars_only();
+					}
+					else // There were errors; display those errors to the current user.
+					{
+						$plugin->enqueue_user_error( // Queue error notice.
+							__('Failed to create new subscription. Please review the following error(s):', $plugin->text_domain).
+							'<ul class="pmp-list-items"><li>'.implode('</li><li>', $sub_inserter->errors_html()).'</li></ul>',
+							array('transient' => TRUE, 'for_page' => $plugin->utils_env->current_menu_page()));
+					}
+				}
+				if(!empty($redirect_to)) // If applicable.
+				{
+					if(headers_sent()) // Output started already?
+						exit('      <script type="text/javascript">'.
+						     "         document.getElementsByTagName('body')[0].style.display = 'none';".
+						     "         location.href = '".$plugin->utils_string->esc_js_sq($redirect_to)."';".
+						     '      </script>'.
+						     '   </body>'.
+						     '</html>');
+					wp_redirect($redirect_to).exit();
+				}
 			}
 		}
 	}

@@ -64,15 +64,18 @@ namespace comment_mail // Root namespace.
 				$sub        = NULL; // Initialize.
 				$error_code = ''; // Initialize.
 
-				if(!$error_code && !($key = trim((string)$request_args)))
+				if(!($key = trim((string)$request_args)))
 					$error_code = 'missing_key';
 
-				if(!$error_code && !($sub = $this->plugin->utils_sub->get($key)))
+				else if(!($sub = $this->plugin->utils_sub->get($key)))
 					$error_code = 'invalid_key';
 
 				$confirm_args = array('user_initiated' => TRUE); // Confirmation args.
 				if(!$error_code && !($confirm = $this->plugin->utils_sub->confirm($sub->ID, $confirm_args)))
 					$error_code = $confirm === NULL ? 'invalid_key' : 'already_confirmed';
+
+				if(!$error_code) // If not errors; set current email.
+					$this->plugin->utils_sub->set_current_email($sub->email);
 
 				$template_vars = compact('key', 'sub', 'error_code');
 				$template      = new template('site/sub-actions/confirmed.php');
@@ -97,15 +100,18 @@ namespace comment_mail // Root namespace.
 				$sub        = NULL; // Initialize.
 				$error_code = ''; // Initialize.
 
-				if(!$error_code && !($key = trim((string)$request_args)))
+				if(!($key = trim((string)$request_args)))
 					$error_code = 'missing_key';
 
-				if(!$error_code && !($sub = $this->plugin->utils_sub->get($key)))
+				else if(!($sub = $this->plugin->utils_sub->get($key)))
 					$error_code = 'invalid_key';
 
 				$delete_args = array('user_initiated' => TRUE); // Deletion args.
 				if(!$error_code && !($delete = $this->plugin->utils_sub->delete($sub->ID, $delete_args)))
 					$error_code = $delete === NULL ? 'invalid_key' : 'already_unsubscribed';
+
+				if(!$error_code) // If not errors; set current email.
+					$this->plugin->utils_sub->set_current_email($sub->email);
 
 				$template_vars = compact('key', 'sub', 'error_code');
 				$template      = new template('site/sub-actions/unsubscribed.php');
@@ -126,12 +132,16 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function manage($request_args)
 			{
-				if(is_string($request_args)) // String indicates an email address.
-					if(($email = $this->plugin->utils_sub->decrypt_email($request_args)))
-						$this->plugin->utils_sub->set_current_email($email);
+				$key = ''; // Initialize.
+
+				if(is_string($request_args)) // A string indicates a key.
+					$key = trim($request_args); // Use as current key.
+
+				if($key && ($sub = $this->plugin->utils_sub->get($key)))
+					$this->plugin->utils_sub->set_current_email($sub->email);
 
 				if(!is_array($request_args)) // If NOT a sub action, redirect to one.
-					wp_redirect($this->plugin->utils_sub->manage_summary_url($this->plugin->utils_sub->current_email())).exit();
+					wp_redirect($this->plugin->utils_url->sub_manage_summary_url($key)).exit();
 
 				new sub_manage_actions(); // Handle sub. manage actions.
 			}

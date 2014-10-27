@@ -50,6 +50,9 @@ namespace comment_mail // Root namespace.
 					case 'trash':
 						return __('trashed', $this->plugin->text_domain);
 
+					case 'update':
+						return __('updated', $this->plugin->text_domain);
+
 					case 'delete':
 						return __('deleted', $this->plugin->text_domain);
 				}
@@ -265,6 +268,20 @@ namespace comment_mail // Root namespace.
 				$counter = (integer)$counter; // Force integer.
 
 				return sprintf(_n('%1$s queue event log entry', '%1$s queue event log entries', $counter, $this->plugin->text_domain), $counter);
+			}
+
+			/**
+			 * A confirmation/warning regarding log entry deletions.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string Confirmation/warning regarding log entry deletions.
+			 */
+			public function log_entry_js_deletion_confirmation_warning()
+			{
+				return __('Delete permanently? Are you sure?', $this->plugin->text_domain)."\n\n".
+				       __('WARNING: Deleting log entries is not recommended, as this will have an impact on statistical reporting.', $this->plugin->text_domain)."\n\n".
+				       __('If you want statistical reports to remain accurate, please leave ALL log entries intact.', $this->plugin->text_domain);
 			}
 		}
 	}

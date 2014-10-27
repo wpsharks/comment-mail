@@ -52,6 +52,27 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Subscription key to email address.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $key Input key to convert to an email address.
+			 *
+			 * @return string The subscription email address matching the input `$key`.
+			 *    If the `$key` is not found, this returns an empty string.
+			 */
+			public function key_to_email($key)
+			{
+				if(!($key = trim((string)$key)))
+					return ''; // Not possible.
+
+				if(!($sub = $this->get($key)))
+					return ''; // Not found.
+
+				return $sub->email;
+			}
+
+			/**
 			 * Unique IDs only, from IDs/keys.
 			 *
 			 * @since 14xxxx First documented version.
@@ -118,9 +139,8 @@ namespace comment_mail // Root namespace.
 				if(!$sub_id_or_key)
 					return NULL; // Not possible.
 
-				if(!isset($this->cache[__FUNCTION__]))
-					$this->cache[__FUNCTION__] = array();
-				$cache = &$this->cache[__FUNCTION__]; // Reference.
+				if(is_null($cache = &$this->cache_key(__FUNCTION__)))
+					$cache = array(); // Initialize array.
 
 				if(!$no_cache && $cache && array_key_exists($sub_id_or_key, $cache))
 					return $cache[$sub_id_or_key]; // From built-in object cache.
@@ -504,18 +524,9 @@ namespace comment_mail // Root namespace.
 				$group_by_email      = (boolean)$args['group_by_email'];
 				$no_cache            = (boolean)$args['no_cache'];
 
-				$post_id_key             = $this->isset_or($post_id, -1, 'integer');
-				$status_key              = strtolower((string)$status); // Lowercase.
-				$comment_id_key          = $this->isset_or($comment_id, -1, 'integer');
-				$auto_discount_trash_key = (integer)$auto_discount_trash;
-				$group_by_email_key      = (integer)$group_by_email;
-
-				if(!$no_cache && isset($this->cache[__FUNCTION__][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key]))
-					return $this->cache[__FUNCTION__][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key];
-
-				$this->cache[__FUNCTION__][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key]
-					    = 0; // Initialize this cache entry for the routines below; i.e. a shorter reference will be necesseary.
-				$total = &$this->cache[__FUNCTION__][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key];
+				$cache_keys = compact('post_id', 'status', 'comment_id', 'auto_discount_trash', 'group_by_email');
+				if(!is_null($total = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
+					return $total; // Already cached this.
 
 				$sql = "SELECT SQL_CALC_FOUND_ROWS `ID`".
 				       " FROM `".esc_html($this->plugin->utils_db->prefix().'subs')."`".
@@ -577,18 +588,9 @@ namespace comment_mail // Root namespace.
 				$group_by_email      = (boolean)$args['group_by_email'];
 				$no_cache            = (boolean)$args['no_cache'];
 
-				$post_id_key             = $this->isset_or($post_id, -1, 'integer');
-				$status_key              = strtolower((string)$status); // Force lowercase.
-				$comment_id_key          = $this->isset_or($comment_id, -1, 'integer');
-				$auto_discount_trash_key = (integer)$auto_discount_trash;
-				$group_by_email_key      = (integer)$group_by_email;
-
-				if(!$no_cache && isset($this->cache[__FUNCTION__][$x][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key]))
-					return $this->cache[__FUNCTION__][$x][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key];
-
-				$this->cache[__FUNCTION__][$x][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key]
-					     = array(); // Initialize this cache entry for the routines below; i.e. a shorter reference will be necesseary.
-				$last_x = &$this->cache[__FUNCTION__][$x][$post_id_key][$status_key][$comment_id_key][$auto_discount_trash_key][$group_by_email_key];
+				$cache_keys = compact('x', 'post_id', 'status', 'comment_id', 'auto_discount_trash', 'group_by_email');
+				if(!is_null($last_x = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
+					return $last_x; // Already cached this.
 
 				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
@@ -614,26 +616,6 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Email address decrypted automagically.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string $email Subscriber email address.
-			 *
-			 * @return string Subscriber email address; else an emtpy string.
-			 */
-			public function decrypt_email($email)
-			{
-				if(!($email = trim((string)$email))) // Force string.
-					return ''; // Not possible in this case.
-
-				if(!is_email($email) && is_email($decrypted_email = $this->plugin->utils_enc->decrypt($email)))
-					$email = $decrypted_email; // Decrypted automatically.
-
-				return $email; // Decrypted; i.e. plain text.
-			}
-
-			/**
 			 * Check existing email address.
 			 *
 			 * @since 14xxxx First documented version.
@@ -644,7 +626,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function email_exists($email)
 			{
-				if(!($email = $this->decrypt_email((string)$email)))
+				if(!($email = trim((string)$email)))
 					return FALSE; // Not possible.
 
 				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
@@ -657,13 +639,42 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Set current sub's email address.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $email Subscriber's current email address.
+			 *
+			 * @warning It's VERY IMPORTANT that we only call upon this function to set the email address
+			 *    during a subscriber action; i.e. in real-time. This cookie is used as a trusted source by {@link current_email()}.
+			 *    In short, do NOT set the current email address unless an action is being performed against a key.
+			 *
+			 * @throws \exception If attempting to set the current email when it's not a sub. action being processed in real time.
+			 *    Note that it's still possible to set the email address to an empty string; from anywhere at any time.
+			 */
+			public function set_current_email($email)
+			{
+				$email = trim((string)$email); // Force clean string.
+
+				if($email) // Check security if we are attempting to set a non-empty cookie value.
+					if(is_admin() || !isset($_REQUEST[__NAMESPACE__]['confirm'], $_REQUEST[__NAMESPACE__]['unsubscribe'], $_REQUEST[__NAMESPACE__]['manage']))
+						throw new \exception(__('Trying to set current email w/o a sub. action.', $this->plugin->text_domain));
+
+				$this->plugin->utils_enc->set_cookie(__NAMESPACE__.'_sub_email', $email);
+			}
+
+			/**
 			 * Current sub's email address.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
+			 * @param boolean $search_untrusted_sources Also search untrusted sources?
+			 *    This defaults to a `FALSE` value. By default, we only return a "confirmed" email address.
+			 *    i.e. an email address from a source that can be trusted to absolutely identify the current user.
+			 *
 			 * @return string Current subscriber's email address.
 			 */
-			public function current_email()
+			public function current_email($search_untrusted_sources = FALSE)
 			{
 				if(($user = wp_get_current_user()) && $user->exists() && $user->user_email)
 					return (string)$user->user_email; // Force string.
@@ -671,112 +682,11 @@ namespace comment_mail // Root namespace.
 				if(($email = $this->plugin->utils_enc->get_cookie(__NAMESPACE__.'_sub_email')))
 					return (string)$email; // Force string.
 
-				if(($commenter = wp_get_current_commenter()) && !empty($commenter['comment_author_email']))
-					return (string)$commenter['comment_author_email']; // Force string.
+				if($search_untrusted_sources) // Try current commenter?
+					if(($commenter = wp_get_current_commenter()) && !empty($commenter['comment_author_email']))
+						return (string)$commenter['comment_author_email']; // Force string.
 
 				return ''; // Not possible.
-			}
-
-			/**
-			 * Set current sub's email address.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string $email Subscriber's current email address.
-			 */
-			public function set_current_email($email)
-			{
-				$email = $this->decrypt_email((string)$email);
-
-				$this->plugin->utils_enc->set_cookie(__NAMESPACE__.'_sub_email', $email);
-			}
-
-			/**
-			 * Confirmation URL for a specific sub. key.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string      $key Unique subscription key.
-			 * @param string|null $scheme Optiona. Defaults to a `NULL` value.
-			 *    See `home_url()` in WordPress for further details on this.
-			 *
-			 * @return string URL w/ the given `$scheme`.
-			 */
-			public function confirm_url($key, $scheme = NULL)
-			{
-				$key  = trim((string)$key); // Force string.
-				$args = array(__NAMESPACE__ => array('confirm' => $key));
-
-				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
-			}
-
-			/**
-			 * Unsubscribe URL for a specific sub. key.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string      $key Unique subscription key.
-			 * @param string|null $scheme Optiona. Defaults to a `NULL` value.
-			 *    See `home_url()` in WordPress for further details on this.
-			 *
-			 * @return string URL w/ the given `$scheme`.
-			 */
-			public function unsubscribe_url($key, $scheme = NULL)
-			{
-				$key  = trim((string)$key); // Force string.
-				$args = array(__NAMESPACE__ => array('unsubscribe' => $key));
-
-				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
-			}
-
-			/**
-			 * Manage URL for a specific email address.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param null|string $email Subscriber's email address.
-			 *    This is optional. If `NULL` we use `current_email()`.
-			 *
-			 * @param string|null $scheme Optiona. Defaults to a `NULL` value.
-			 *    See `home_url()` in WordPress for further details on this.
-			 *
-			 * @return string URL w/ the given `$scheme`.
-			 */
-			public function manage_url($email = NULL, $scheme = NULL)
-			{
-				if(!isset($email))
-					$email = $this->current_email();
-				$email = $this->decrypt_email((string)$email);
-
-				$encrypted_email = $this->plugin->utils_enc->encrypt($email);
-				$args            = array(__NAMESPACE__ => array('manage' => $encrypted_email));
-
-				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
-			}
-
-			/**
-			 * Manage URL for a specific email address.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param null|string $email Subscriber's email address.
-			 *    This is optional. If `NULL` we use `current_email()`.
-			 *
-			 * @param string|null $scheme Optiona. Defaults to a `NULL` value.
-			 *    See `home_url()` in WordPress for further details on this.
-			 *
-			 * @return string URL w/ the given `$scheme`.
-			 */
-			public function manage_summary_url($email = NULL, $scheme = NULL)
-			{
-				if(!isset($email))
-					$email = $this->current_email();
-				$email = $this->decrypt_email((string)$email);
-
-				$encrypted_email = $this->plugin->utils_enc->encrypt($email);
-				$args            = array(__NAMESPACE__ => array('manage' => array('summary' => $encrypted_email)));
-
-				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
 			}
 		}
 	}

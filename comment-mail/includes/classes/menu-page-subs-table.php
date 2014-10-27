@@ -191,12 +191,12 @@ namespace comment_mail // Root namespace.
 				              ' '.$this->plugin->utils_markup->name_email($name, $item->email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
 
 				$edit_url      = $this->plugin->utils_url->edit_sub_short($item->ID);
-				$reconfirm_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'reconfirm');
-				$confirm_url   = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'confirm');
-				$unconfirm_url = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'unconfirm');
-				$suspend_url   = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'suspend');
-				$trash_url     = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'trash');
-				$delete_url    = $this->plugin->utils_url->bulk_action($this->plural_name, array($item->ID), 'delete');
+				$reconfirm_url = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'reconfirm');
+				$confirm_url   = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'confirm');
+				$unconfirm_url = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'unconfirm');
+				$suspend_url   = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'suspend');
+				$trash_url     = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'trash');
+				$delete_url    = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'delete');
 
 				$row_actions = array(
 					'edit'      => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscr.', $this->plugin->text_domain).'</a>',
@@ -222,7 +222,7 @@ namespace comment_mail // Root namespace.
 				if($item->status === 'unconfirmed') unset($row_actions['unconfirm'], $row_actions['suspend']);
 				if($item->status === 'subscribed') unset($row_actions['reconfirm'], $row_actions['confirm']);
 				if($item->status === 'suspended') unset($row_actions['suspend'], $row_actions['unconfirm']);
-				if($item->status === 'trashed') unset($row_actions['trashed']);
+				if($item->status === 'trashed') unset($row_actions['trash']);
 
 				if($this->plugin->options['auto_confirm_enable'])
 					unset($row_actions['reconfirm']); // N/A.

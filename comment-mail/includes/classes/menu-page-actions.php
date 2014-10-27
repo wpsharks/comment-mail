@@ -106,8 +106,8 @@ namespace comment_mail // Root namespace.
 			{
 				$request_args = (array)$request_args;
 
-				if(empty($request_args['key'])) // Missing key?
-					return; // Nothing to dismiss.
+				if(empty($request_args['key']))
+					return; // Not possible.
 
 				if(!current_user_can($this->plugin->manage_cap))
 					if(!current_user_can($this->plugin->cap))
@@ -116,7 +116,7 @@ namespace comment_mail // Root namespace.
 				$notices = get_option(__NAMESPACE__.'_notices');
 				if(!is_array($notices)) $notices = array();
 
-				unset($notices[$request_args['key']]); // Dismiss.
+				unset($notices[$request_args['key']]);
 				update_option(__NAMESPACE__.'_notices', $notices);
 
 				wp_redirect($this->plugin->utils_url->notice_dismissed()).exit();
@@ -179,7 +179,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @see menu_page_sub_form_base::comment_id_row_via_ajax()
 			 */
-			protected function comment_id_row_via_ajax($request_args)
+			protected function sub_form_comment_id_row_via_ajax($request_args)
 			{
 				$request_args = (array)$request_args;
 
@@ -194,6 +194,27 @@ namespace comment_mail // Root namespace.
 						return; // Unauthenticated; ignore.
 
 				exit(menu_page_sub_form_base::comment_id_row_via_ajax($post_id));
+			}
+
+			/**
+			 * Processes sub. form inserts/updates.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $request_args Input argument(s).
+			 *
+			 * @see menu_page_sub_form_base::process()
+			 */
+			protected function sub_form($request_args)
+			{
+				if(!($request_args = (array)$request_args))
+					return; // Empty request args.
+
+				if(!current_user_can($this->plugin->manage_cap))
+					if(!current_user_can($this->plugin->cap))
+						return; // Unauthenticated; ignore.
+
+				menu_page_sub_form_base::process($request_args);
 			}
 		}
 	}

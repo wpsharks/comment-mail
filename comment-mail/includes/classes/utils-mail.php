@@ -57,11 +57,10 @@ namespace comment_mail // Root namespace.
 				   && $this->plugin->options['smtp_host'] && $this->plugin->options['smtp_port']
 				) // If the SMTP mailer is enabled & configured; i.e. ready for use.
 				{
-					if(!isset($this->cache[__FUNCTION__]['mail_smtp']))
-						$mail_smtp = $this->cache[__FUNCTION__]['mail_smtp'] = new mail_smtp();
-					else $mail_smtp = $this->cache[__FUNCTION__]['mail_smtp'];
+					if(is_null($mail_smtp = &$this->cache_key(__FUNCTION__, 'mail_smtp')))
+						/** @var $mail_smtp mail_smtp Reference for IDEs. */
+						$mail_smtp = new mail_smtp(); // Single instance.
 
-					/** @var $mail_smtp mail_smtp Reference for IDEs. */
 					return $mail_smtp->send($to, $subject, $message, $headers, $attachments, $throw);
 				}
 				if(is_array($headers)) // Append `Content-Type`.

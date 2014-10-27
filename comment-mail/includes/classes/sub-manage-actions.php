@@ -60,25 +60,52 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function summary($request_args)
 			{
-				$error_code = ''; // Initialize.
+				$key = ''; // Initialize.
 
-				if(is_string($request_args)) // String indicates an email address.
-					if(($email = $this->plugin->utils_sub->decrypt_email($request_args)))
-						$this->plugin->utils_sub->set_current_email($email);
+				if(is_string($request_args)) // A string indicates a key.
+					$key = trim($request_args); // Use as current key.
 
-				$email = $this->plugin->utils_sub->current_email();
+				if($key && ($sub = $this->plugin->utils_sub->get($key)))
+					$this->plugin->utils_sub->set_current_email($sub->email);
 
-				if(!$error_code && !$email)
-					$error_code = 'missing_email';
+				new sub_manage_summary($key); // If no key, for current email address.
+			}
 
-				$template_vars = compact('email', 'error_code');
-				$template      = new template('site/sub-actions/manage-summary.php');
+			/**
+			 * Acquires comment ID row via AJAX.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $request_args Input argument(s).
+			 *
+			 * @see sub_manage_form_base::comment_id_row_via_ajax()
+			 */
+			protected function sub_form_comment_id_row_via_ajax($request_args)
+			{
+				$request_args = (array)$request_args;
 
-				status_header(200); // Status header.
-				nocache_headers(); // Disallow caching.
-				header('Content-Type: text/html; charset=UTF-8');
+				if(!isset($request_args['post_id']))
+					return; // Missing post ID.
 
-				exit($template->parse($template_vars));
+				if(($post_id = (integer)$request_args['post_id']) < 0)
+					return; // Invalid post ID.
+
+				exit(sub_manage_sub_form_base::comment_id_row_via_ajax($post_id));
+			}
+
+			/**
+			 * Form handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $request_args Input argument(s).
+			 */
+			protected function sub_form($request_args)
+			{
+				if(!($request_args = (array)$request_args))
+					return; // Empty request args.
+
+				sub_manage_sub_form_base::process($request_args);
 			}
 		}
 	}

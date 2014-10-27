@@ -21,6 +21,38 @@ namespace comment_mail // Root namespace.
 		class utils_markup extends abs_base
 		{
 			/**
+			 * @var array Regex block tags.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			public $regex_block_tags = array(
+				'p',
+				'h[1-9]',
+				'div',
+				'pre',
+				'blockquote',
+				'audio',
+				'video',
+				'ul',
+				'ol',
+				'table',
+				'form',
+				'fieldset',
+				'hr',
+			);
+
+			/**
+			 * @var array Regex block container tags.
+			 *    i.e. block tags that serve as inline containers.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			public $regex_block_container_tags = array(
+				'p',
+				'div',
+			);
+
+			/**
 			 * Class constructor.
 			 *
 			 * @since 14xxxx First documented version.
@@ -215,15 +247,18 @@ namespace comment_mail // Root namespace.
 					? (integer)$current_user_id : NULL;
 
 				$default_args = array(
-					'max'         => 1000,
+					'max'         => 2000,
 					'fail_on_max' => TRUE,
 					'no_cache'    => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
+				if(!$this->plugin->options['user_select_options_enable'])
+					return ''; // Use input field instead of options.
+
 				if(!($users = $this->plugin->utils_db->all_users($args)))
-					return '';  // No options; use input field instead of select menu.
+					return ''; // Use input field instead of options.
 
 				$options = '<option value="0"></option>'; // Initialize.
 
@@ -274,16 +309,25 @@ namespace comment_mail // Root namespace.
 					? (integer)$current_post_id : NULL;
 
 				$default_args = array(
-					'max'               => 1000,
-					'fail_on_max'       => TRUE,
-					'for_comments_only' => FALSE,
-					'no_cache'          => FALSE,
+					'max'                   => 2000,
+					'fail_on_max'           => TRUE,
+					'for_comments_only'     => FALSE,
+					'exclude_post_types'    => array(),
+					'exclude_post_statuses' => array(),
+					'no_cache'              => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
+				$args['exclude_post_types'] = (array)$args['exclude_post_types'];
+				if(!$this->plugin->options['post_select_options_media_enable'])
+					$args['exclude_post_types'][] = 'attachment';
+
+				if(!$this->plugin->options['post_select_options_enable'])
+					return ''; // Use input field instead of options.
+
 				if(!($posts = $this->plugin->utils_db->all_posts($args)))
-					return ''; // No options; use input field instead of select menu.
+					return ''; // Use input field instead of options.
 
 				$options                 = '<option value="0"></option>'; // Initialize.
 				$default_post_type_label = __('Post', $this->plugin->text_domain);
@@ -342,7 +386,7 @@ namespace comment_mail // Root namespace.
 					? (integer)$current_comment_id : NULL;
 
 				$default_args = array(
-					'max'          => 1000,
+					'max'          => 2000,
 					'fail_on_max'  => TRUE,
 					'parents_only' => FALSE,
 					'no_cache'     => FALSE,
@@ -350,8 +394,11 @@ namespace comment_mail // Root namespace.
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
+				if(!$this->plugin->options['comment_select_options_enable'])
+					return ''; // Use input field instead of options.
+
 				if(!($comments = $this->plugin->utils_db->all_comments($post_id, $args)))
-					return ''; // No options; use input field instead of select menu.
+					return ''; // Use input field instead of options.
 
 				$options = '<option value="0"></option>'; // Initialize.
 
@@ -532,6 +579,58 @@ namespace comment_mail // Root namespace.
 				unset($_options, $_selected_value); // Housekeeping.
 
 				return $options; // HTML markup.
+			}
+
+			/**
+			 * Wraps inline markup (and optional leader) inside `<p></p>` tags.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $markup Input markup to wrap.
+			 *
+			 * @param string $leader_markup `<[block]>$leader_markup`.
+			 *    If `$markup` is NOT already wrapped, this comes after first opening `<p>` tag; the most common occurrence here.
+			 *    If `$markup` IS already wrapped, this is placed after the first block-level open tag (IF it's an inline container; e.g. `<p>`, `<div>`).
+			 *
+			 *    In short, `$leader_markup` goes inside the first block-level open tag, even if that's not a `<p>` tag; so long as it's a block container.
+			 *       See: {@link $regex_block_container_tags}; e.g. `<p>`, `<div>` are containers; whereas `<ul>` may not contain arbitrary inline tags.
+			 *       If the first block-level open tag is NOT an inline container; a new `<p></p>` is prepended to hold the leader properly.
+			 *
+			 * @return string Inline markup (and optional leader) inside `<p></p>` (or existing block-level) tags.
+			 *    If markup is already wrapped inside a block-level tag, we simply inject `$leader_markup` and leave everything else as-is.
+			 *    If markup contains any block-level elements, they'll be moved after `<p></p>` tags to prevent HTML nesting issues.
+			 *    If markup is empty, this simply returns an empty string; indicating failure.
+			 */
+			public function p_wrap($markup, $leader_markup = '')
+			{
+				if(!($markup = trim((string)$markup)))
+					return ''; // Not possible.
+
+				$leader_markup  = trim((string)$leader_markup);
+				$markup_is_html = $this->plugin->utils_string->is_html($markup);
+
+				$block_tag_open_regex                   = '/(\<(?:'.implode('|', $this->regex_block_tags).')(?:\s[^>]*?)?\>)/i';
+				$leading_block_tag_open_regex           = '/^'.substr($block_tag_open_regex, 1); // Ditto; but beginning of the string.
+				$leading_block_container_tag_open_regex = '/^(\<(?:'.implode('|', $this->regex_block_container_tags).')(?:\s[^>]*?)?\>)/i';
+
+				if($markup_is_html) // Contains HTML markup?
+					if(preg_match($leading_block_tag_open_regex, $markup)) // Wrapped already?
+					{
+						if(preg_match($leading_block_container_tag_open_regex, $markup))
+							return preg_replace($leading_block_container_tag_open_regex, '${1}'.$leader_markup, $markup);
+						return '<p>'.$leader_markup.'</p>'.$markup; // Best we can do; given the circumstance.
+					}
+				$inline_markup           = $markup; // Initialize.
+				$markup_blocks_remaining = ''; // Initialize.
+
+				if($markup_is_html) // Quick check; contains HTML markup?
+					if(($notice_markup_parts = preg_split($block_tag_open_regex, $markup, 2, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)))
+					{
+						// We know the first part is NOT a block-level tag since the "leading" check above did not fire.
+						$inline_markup           = array_shift($notice_markup_parts); // First part; inline.
+						$markup_blocks_remaining = implode('', $notice_markup_parts); // Remaining parts.
+					}
+				return '<p>'.$leader_markup.$inline_markup.'</p>'.$markup_blocks_remaining;
 			}
 		}
 	}

@@ -39,7 +39,10 @@ namespace comment_mail // Root namespace.
 			 */
 			public function current_scheme()
 			{
-				return is_ssl() ? 'https' : 'http';
+				if(!is_null($scheme = &$this->static_key(__FUNCTION__)))
+					return $scheme; // Cached this already.
+
+				return ($scheme = is_ssl() ? 'https' : 'http');
 			}
 
 			/**
@@ -51,7 +54,10 @@ namespace comment_mail // Root namespace.
 			 */
 			public function current_host()
 			{
-				return strtolower((string)$_SERVER['HTTP_HOST']);
+				if(!is_null($host = &$this->static_key(__FUNCTION__)))
+					return $host; // Cached this already.
+
+				return ($host = strtolower((string)$_SERVER['HTTP_HOST']));
 			}
 
 			/**
@@ -63,7 +69,10 @@ namespace comment_mail // Root namespace.
 			 */
 			public function current_uri()
 			{
-				return '/'.ltrim((string)$_SERVER['REQUEST_URI'], '/');
+				if(!is_null($uri = &$this->static_key(__FUNCTION__)))
+					return $uri; // Cached this already.
+
+				return ($uri = '/'.ltrim((string)$_SERVER['REQUEST_URI'], '/'));
 			}
 
 			/**
@@ -75,7 +84,10 @@ namespace comment_mail // Root namespace.
 			 */
 			public function current_path()
 			{
-				return '/'.ltrim((string)parse_url($this->current_uri(), PHP_URL_PATH), '/');
+				if(!is_null($path = &$this->static_key(__FUNCTION__)))
+					return $path; // Cached this already.
+
+				return ($path = '/'.ltrim((string)parse_url($this->current_uri(), PHP_URL_PATH), '/'));
 			}
 
 			/**
@@ -87,71 +99,107 @@ namespace comment_mail // Root namespace.
 			 */
 			public function current()
 			{
-				return $this->current_scheme().'://'.$this->current_host().$this->current_uri();
+				if(!is_null($url = &$this->static_key(__FUNCTION__)))
+					return $url; // Cached this already.
+
+				return ($url = $this->current_scheme().'://'.$this->current_host().$this->current_uri());
 			}
 
 			/**
-			 * Current URL; without a query string.
+			 * URL without a query string.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @return string Current URL; without a query string.
+			 * @param string $url The input URL to work from (optional).
+			 *    If empty, defaults to the current URL.
+			 *
+			 * @return string URL without a query string.
 			 */
-			public function current_no_query()
+			public function no_query($url = '')
 			{
-				$current = $this->current(); // Current URL w/ possible query string.
+				if(!($url = trim((string)$url)))
+					$url = $this->current();
 
-				return strpos($current, '?') !== FALSE ? (string)strstr($current, '?', TRUE) : $current;
+				return strpos($url, '?') !== FALSE ? (string)strstr($url, '?', TRUE) : $url;
 			}
 
 			/**
-			 * Current URL; with `_wpnonce`.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string $nonce_action A specific nonce action.
-			 *    Defaults to `__NAMESPACE__`.
-			 *
-			 * @return string Current URL; with `_wpnonce`.
-			 */
-			public function current_nonce($nonce_action = __NAMESPACE__)
-			{
-				$args = array('_wpnonce' => wp_create_nonce($nonce_action));
-
-				return add_query_arg(urlencode_deep($args), $this->current());
-			}
-
-			/**
-			 * Current URL; with only a `page` var (if applicable).
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return string Current URL; with only a `page` var (if applicable).
-			 */
-			public function current_page_only()
-			{
-				$page = !empty($_REQUEST['page'])
-					? stripslashes((string)$_REQUEST['page']) : '';
-				$args = $page ? array('page' => $page) : array(); // If applicable.
-
-				return add_query_arg(urlencode_deep($args), $this->current_no_query());
-			}
-
-			/**
-			 * Current URL; with only a `page` var (if applicable) and `_wpnonce`.
+			 * URL with `_wpnonce`.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string $nonce_action A specific nonce action.
 			 *    Defaults to `__NAMESPACE__`.
 			 *
-			 * @return string Current URL; with only a `page` var (if applicable) and `_wpnonce`.
+			 * @param string $url The input URL to work from (optional).
+			 *    If empty, defaults to the current URL.
+			 *
+			 * @return string URL with `_wpnonce`.
 			 */
-			public function current_page_nonce_only($nonce_action = __NAMESPACE__)
+			public function nonce($nonce_action = __NAMESPACE__, $url = '')
 			{
+				if(!($url = trim((string)$url)))
+					$url = $this->current();
+
 				$args = array('_wpnonce' => wp_create_nonce($nonce_action));
 
-				return add_query_arg(urlencode_deep($args), $this->current_page_only());
+				return add_query_arg(urlencode_deep($args), $url);
+			}
+
+			/**
+			 * URL with only a `page` var (if applicable).
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $page A specific page value (optional).
+			 *    If empty, we use `page` from the URL; else current `page`.
+			 *
+			 * @param string $url The input URL to work from (optional).
+			 *    If empty, defaults to the current URL.
+			 *
+			 * @return string URL with only a `page` var (if applicable).
+			 */
+			public function page_only($page = '', $url = '')
+			{
+				$page = trim((string)$page);
+
+				if(!($url = trim((string)$url)))
+					$url = $this->current();
+
+				$query = (string)parse_url($url, PHP_URL_QUERY);
+				wp_parse_str($query, $query_vars);
+				$url = $this->no_query($url);
+
+				if(!$page && !empty($query_vars['page']))
+					$page = trim((string)$query_vars['page']);
+
+				if(!$page && !empty($_REQUEST['page']))
+					$page = trim(stripslashes((string)$_REQUEST['page']));
+
+				$args = $page ? array('page' => $page) : array();
+
+				return add_query_arg(urlencode_deep($args), $url);
+			}
+
+			/**
+			 * URL with only a `page` var (if applicable) and `_wpnonce`.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $page A specific page value (optional).
+			 *    If empty, we use `page` from the URL; else current `page`.
+			 *
+			 * @param string $nonce_action A specific nonce action.
+			 *    Defaults to `__NAMESPACE__`.
+			 *
+			 * @param string $url The input URL to work from (optional).
+			 *    If empty, defaults to the current URL.
+			 *
+			 * @return string URL with only a `page` var (if applicable) and `_wpnonce`.
+			 */
+			public function page_nonce_only($page = '', $nonce_action = __NAMESPACE__, $url = '')
+			{
+				return $this->nonce($nonce_action, $this->page_only($page, $url));
 			}
 
 			/**
@@ -163,9 +211,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function main_menu_page_only()
 			{
-				$args = array('page' => __NAMESPACE__);
-
-				return add_query_arg(urlencode_deep($args), admin_url('/edit-comments.php'));
+				return $this->page_only(__NAMESPACE__, admin_url('/edit-comments.php'));
 			}
 
 			/**
@@ -180,9 +226,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function main_menu_page_nonce_only($nonce_action = __NAMESPACE__)
 			{
-				$args = array('_wpnonce' => wp_create_nonce($nonce_action));
-
-				return add_query_arg(urlencode_deep($args), $this->main_menu_page_only());
+				return $this->nonce($nonce_action, $this->main_menu_page_only());
 			}
 
 			/**
@@ -194,9 +238,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function subs_menu_page_only()
 			{
-				$args = array('page' => __NAMESPACE__.'_subs');
-
-				return add_query_arg(urlencode_deep($args), admin_url('/edit-comments.php'));
+				return $this->page_only(__NAMESPACE__.'_subs', admin_url('/edit-comments.php'));
 			}
 
 			/**
@@ -208,9 +250,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function sub_event_log_menu_page_only()
 			{
-				$args = array('page' => __NAMESPACE__.'_sub_event_log');
-
-				return add_query_arg(urlencode_deep($args), admin_url('/edit-comments.php'));
+				return $this->page_only(__NAMESPACE__.'_sub_event_log', admin_url('/edit-comments.php'));
 			}
 
 			/**
@@ -222,9 +262,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function queue_menu_page_only()
 			{
-				$args = array('page' => __NAMESPACE__.'_queue');
-
-				return add_query_arg(urlencode_deep($args), admin_url('/edit-comments.php'));
+				return $this->page_only(__NAMESPACE__.'_queue', admin_url('/edit-comments.php'));
 			}
 
 			/**
@@ -236,81 +274,79 @@ namespace comment_mail // Root namespace.
 			 */
 			public function queue_event_log_menu_page_only()
 			{
-				$args = array('page' => __NAMESPACE__.'_queue_event_log');
-
-				return add_query_arg(urlencode_deep($args), admin_url('/edit-comments.php'));
+				return $this->page_only(__NAMESPACE__.'_queue_event_log', admin_url('/edit-comments.php'));
 			}
 
 			/**
-			 * Restore default options URL; for main menu page w/ `_wpnonce`.
+			 * Restore default options URL.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $nonce_action A specific nonce action.
-			 *    Defaults to `__NAMESPACE__`.
-			 *
-			 * @return string Restore default options URL; for main menu page w/ `_wpnonce`.
+			 * @return string Restore default options URL.
 			 */
-			public function restore_default_options($nonce_action = __NAMESPACE__)
+			public function restore_default_options()
 			{
 				$args = array(__NAMESPACE__ => array('restore_default_options' => '1'));
 
-				return add_query_arg(urlencode_deep($args), $this->main_menu_page_nonce_only($nonce_action));
+				return add_query_arg(urlencode_deep($args), $this->main_menu_page_nonce_only());
 			}
 
 			/**
-			 * Add options restored flag to a given URL.
+			 * Options restored URL.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $url The input URL to flag (optional).
-			 *    If empty, defaults to the current menu page.
-			 *
-			 * @return string The input `$url` with an options restored flag.
+			 * @return string Options restored URL.
 			 */
-			public function options_restored($url = '')
+			public function options_restored()
 			{
 				$args = array(__NAMESPACE__.'_options_restored' => '1');
 
-				return add_query_arg(urlencode_deep($args), $url ? (string)$url : $this->current_page_only());
+				return add_query_arg(urlencode_deep($args), $this->main_menu_page_only());
 			}
 
 			/**
-			 * Add options updated flag to a given URL.
+			 * Options updated URL.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $url The input URL to flag (optional).
+			 * @param string $url The input URL to work from (optional).
 			 *    If empty, defaults to the current menu page.
 			 *
-			 * @return string The input `$url` with an options updated flag.
+			 * @return string Options updated URL.
 			 */
 			public function options_updated($url = '')
 			{
+				if(!($url = trim((string)$url)))
+					$url = $this->page_only();
+
 				$args = array(__NAMESPACE__.'_options_updated' => '1');
 
-				return add_query_arg(urlencode_deep($args), $url ? (string)$url : $this->current_page_only());
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
-			 * Add pro preview action to a given URL.
+			 * Pro preview URL.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $url The input URL to preview (optional).
-			 *    If empty, defaults to the current menu page.
+			 * @param string $url The input URL to work from (optional).
+			 *    If empty, defaults to the main menu page.
 			 *
-			 * @return string The input `$url` with a pro preview action.
+			 * @return string Pro preview URL.
 			 */
 			public function pro_preview($url = '')
 			{
+				if(!($url = trim((string)$url)))
+					$url = $this->main_menu_page_only();
+
 				$args = array(__NAMESPACE__.'_pro_preview' => '1');
 
-				return add_query_arg(urlencode_deep($args), $url ? (string)$url : $this->current_page_only());
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
-			 * Adds search filter(s) to a given URL.
+			 * Adds search filter(s) to the `s` key for tables.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -324,12 +360,12 @@ namespace comment_mail // Root namespace.
 			 *    You can pass `type:` or `type::` to remove existing filters of that specific <type><group>;
 			 *       i.e. without adding new filters; it just removes all filters of <type><group>.
 			 *
-			 * @param string       $url The input URL to search (optional).
+			 * @param string       $url The input URL to work from (optional).
 			 *    If empty, defaults to the current URL.
 			 *
 			 * @return string URL w/ search filters added to the `s` key.
 			 */
-			public function search_filter($filters, $url = '')
+			public function table_search_filter($filters, $url = '')
 			{
 				if(is_array($filters)) // Force string.
 					$filters = implode(' ', $filters);
@@ -339,7 +375,7 @@ namespace comment_mail // Root namespace.
 					$url = $this->current();
 
 				$query = (string)parse_url($url, PHP_URL_QUERY);
-				wp_parse_str($query, $query_vars); // Parse query.
+				wp_parse_str($query, $query_vars);
 
 				$s            = !empty($query_vars['s']) ? (string)$query_vars['s'] : '';
 				$filters      = preg_split('/\s+/', $filters, NULL, PREG_SPLIT_NO_EMPTY);
@@ -370,64 +406,128 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Bulk action URL generator.
+			 * Bulk action URL generator for tables.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $plural Plural name/key.
+			 * @param string $plural Plural table name/key.
 			 * @param array  $ids An array of IDs to act upon.
 			 * @param string $action The bulk action to perform.
 			 *
-			 * @param string $url The input URL to act on (optional).
+			 * @param string $url The input URL to work from (optional).
 			 *    If empty, defaults to the current URL.
 			 *
 			 * @return string URL leading to the bulk action necessary.
 			 */
-			public function bulk_action($plural, array $ids, $action, $url = '')
+			public function table_bulk_action($plural, array $ids, $action, $url = '')
 			{
-				$plural = (string)$plural; // Force string.
-				$action = (string)$action; // Force string.
+				$plural = trim((string)$plural);
+				$action = trim((string)$action);
 
 				if(!($url = trim((string)$url)))
 					$url = $this->current();
 
-				$args = array($plural => $ids, 'action' => $action, '_wpnonce' => wp_create_nonce('bulk-'.$plural));
+				$args = array($plural => $ids, 'action' => $action);
 
-				return add_query_arg(urlencode_deep($args), $url);
+				return $this->nonce('bulk-'.$plural, add_query_arg(urlencode_deep($args), $url));
 			}
 
 			/**
-			 * Notice dimissal URL, for current URL w/ `_wpnonce`.
+			 * URL w/ page & table nav vars only.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array  $also_keep Any additional names/keys to keep.
+			 *
+			 *    Built-in names/keys to keep already includes the following:
+			 *       `page`, `orderby`, `order`, and `s` for searches.
+			 *
+			 *    If `_wponce` is passed in this array, we not only keep that variable,
+			 *    but we also generate a new `_wpnonce` key too. In short, `_wpnonce` is
+			 *    forced into the URL w/ a fresh value when keeping `_wp_nonce`.
+			 *    ~ See also: {@link page_nonce_table_nav_vars_only()}.
+			 *
+			 * @param string $url The input URL to work from (optional).
+			 *    If empty, defaults to the current URL.
+			 *
+			 * @param string $nonce_action A specific nonce action.
+			 *    ~ See also: {@link page_nonce_table_nav_vars_only()}.
+			 *
+			 * @return string URL w/ page & table nav vars only.
+			 */
+			public function page_table_nav_vars_only(array $also_keep = array(), $url = '', $nonce_action = __NAMESPACE__)
+			{
+				if(!($url = trim((string)$url)))
+					$url = $this->current();
+
+				$_r    = $this->plugin->utils_string->trim_strip_deep($_REQUEST);
+				$query = (string)parse_url($url, PHP_URL_QUERY);
+				wp_parse_str($query, $query_vars);
+				$url = $this->no_query($url);
+
+				$also_keep = array_map('strval', $also_keep);
+				$keepers   = array('page', 'orderby', 'order', 's');
+				$keepers   = array_unique(array_merge($keepers, $also_keep));
+
+				foreach($keepers as $_keeper) // Add keepers back onto the clean URL.
+				{
+					if(!empty($query_vars[$_keeper])) // In query vars?
+						$url = add_query_arg(urlencode($_keeper), urlencode($query_vars[$_keeper]), $url);
+
+					else if(!empty($_r[$_keeper])) // In the current request array?
+						$url = add_query_arg(urlencode($_keeper), urlencode($_r[$_keeper]), $url);
+				}
+				unset($_keeper); // Housekeeping.
+
+				if(in_array('_wpnonce', $also_keep, TRUE)) // Generate a fresh value.
+					$url = add_query_arg('_wpnonce', urlencode(wp_create_nonce($nonce_action)), $url);
+
+				return $url; // With page & table nav vars only.
+			}
+
+			/**
+			 * URL w/ page, nonce & table nav vars only.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array  $also_keep See {@link page_table_nav_vars_only()}.
+			 * @param string $url See {@link page_table_nav_vars_only()}.
+			 * @param string $nonce_action See {@link page_table_nav_vars_only()}.
+			 *
+			 * @return string See {@link page_table_nav_vars_only()}.
+			 */
+			public function page_nonce_table_nav_vars_only(array $also_keep = array(), $url = '', $nonce_action = __NAMESPACE__)
+			{
+				return $this->page_table_nav_vars_only(array_merge($also_keep, array('_wpnonce')), $url, $nonce_action);
+			}
+
+			/**
+			 * Notice dimissal URL.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string $key The notice key to dismiss.
 			 *
-			 * @param string $nonce_action A specific nonce action.
-			 *    Defaults to `__NAMESPACE__`.
-			 *
-			 * @return string Notice dimissal URL, for current URL w/ `_wpnonce`.
+			 * @return string Notice dimissal URL.
 			 */
-			public function dismiss_notice($key, $nonce_action = __NAMESPACE__)
+			public function dismiss_notice($key)
 			{
-				$args = array(__NAMESPACE__ => array('dismiss_notice' => array('key' => (string)$key)));
+				$key  = trim((string)$key); // Key to dismiss.
+				$args = array(__NAMESPACE__ => array('dismiss_notice' => compact('key')));
 
-				return add_query_arg(urlencode_deep($args), $this->current_nonce($nonce_action));
+				return add_query_arg(urlencode_deep($args), $this->nonce());
 			}
 
 			/**
-			 * Removes notice dismissal flag from a given URL.
+			 * Notice dimissed URL.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $url The input URL to unflag (optional).
-			 *    If empty, defaults to the current menu page.
-			 *
-			 * @return string The input `$url` with a notice dismissal flag removed.
+			 * @return string Notice dimissed URL.
 			 */
-			public function notice_dismissed($url = '')
+			public function notice_dismissed()
 			{
-				return remove_query_arg(__NAMESPACE__, $url ? (string)$url : $this->current());
+				return remove_query_arg(__NAMESPACE__, $this->current());
 			}
 
 			/**
@@ -466,10 +566,10 @@ namespace comment_mail // Root namespace.
 			 */
 			public function to($file = '', $scheme = NULL)
 			{
-				if(!isset($this->static[__FUNCTION__]['plugin_dir_url']))
-					$this->static[__FUNCTION__]['plugin_dir_url'] = rtrim(plugin_dir_url($this->plugin->file), '/');
+				if(is_null($plugin_dir_url = &$this->static_key(__FUNCTION__, 'plugin_dir_url')))
+					$plugin_dir_url = rtrim(plugin_dir_url($this->plugin->file), '/');
 
-				return set_url_scheme($this->static[__FUNCTION__]['plugin_dir_url'].(string)$file, $scheme);
+				return set_url_scheme($plugin_dir_url.(string)$file, $scheme);
 			}
 
 			/**
@@ -483,18 +583,18 @@ namespace comment_mail // Root namespace.
 			 * @param string $url A specific URL to check?
 			 *    Defaults to the current URL; i.e. current `$_REQUEST`.
 			 *
-			 * @return boolean TRUE if it has a valid `_wpnonce` `$action` value.
+			 * @return boolean TRUE if it has a valid `_wpnonce`.
 			 */
 			public function has_valid_nonce($nonce_action = __NAMESPACE__, $url = '')
 			{
 				if(($url = trim((string)$url)))
 					wp_parse_str((string)@parse_url($url, PHP_URL_QUERY), $_r);
-				else $_r = stripslashes_deep($_REQUEST); // Current `$_REQUEST`.
+				else $_r = stripslashes_deep($_REQUEST);
 
-				if(empty($_r['_wpnonce']) || !wp_verify_nonce($_r['_wpnonce'], $nonce_action))
-					return FALSE; // Unauthenticated; failure.
+				if(!empty($_r['_wpnonce']) && wp_verify_nonce($_r['_wpnonce'], $nonce_action))
+					return TRUE; // Valid `_wpnonce` value.
 
-				return TRUE; // Valid `_wpnonce` value.
+				return FALSE; // Unauthenticated; failure.
 			}
 
 			/**
@@ -502,17 +602,14 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|object $post_id A WP post ID; or a post object.
+			 * @param integer $post_id A WP post ID.
 			 *
 			 * @return string Post shortlink.
 			 */
 			public function post_short($post_id)
 			{
-				if(is_object($post_id) && !empty($post_id->ID))
-					$post_id = $post_id->ID;
-
-				$post_id = (integer)$post_id; // Force integer.
-				$args    = array('p' => $post_id); // Post ID.
+				$post_id = (integer)$post_id;
+				$args    = array('p' => $post_id);
 
 				return add_query_arg(urlencode_deep($args), home_url('/'));
 			}
@@ -522,16 +619,13 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|object $post_id A WP post ID; or a post object.
+			 * @param integer $post_id A WP post ID.
 			 *
 			 * @return string Post edit shortlink.
 			 */
 			public function post_edit_short($post_id)
 			{
-				if(is_object($post_id) && !empty($post_id->ID))
-					$post_id = $post_id->ID;
-
-				$post_id = (integer)$post_id; // Force integer.
+				$post_id = (integer)$post_id;
 				$args    = array('post' => $post_id, 'action' => 'edit');
 
 				return add_query_arg(urlencode_deep($args), admin_url('/post.php'));
@@ -542,17 +636,14 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|object $post_id A WP post ID; or a post object.
+			 * @param integer $post_id A WP post ID.
 			 *
 			 * @return string Post edit comments shortlink.
 			 */
 			public function post_edit_comments_short($post_id)
 			{
-				if(is_object($post_id) && !empty($post_id->ID))
-					$post_id = $post_id->ID;
-
-				$post_id = (integer)$post_id; // Force integer.
-				$args    = array('p' => $post_id); // Post ID.
+				$post_id = (integer)$post_id;
+				$args    = array('p' => $post_id);
 
 				return add_query_arg(urlencode_deep($args), admin_url('/edit-comments.php'));
 			}
@@ -562,18 +653,15 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|object $post_id A WP post ID; or a post object.
-			 * @param string         $s Any additional search words/filters.
+			 * @param integer $post_id A WP post ID.
+			 * @param string  $s Any additional search words/filters.
 			 *
 			 * @return string Post edit subscriptions shortlink.
 			 */
 			public function post_edit_subs_short($post_id, $s = '')
 			{
-				if(is_object($post_id) && !empty($post_id->ID))
-					$post_id = $post_id->ID;
-
-				$post_id = (integer)$post_id; // Force integer.
-				$s       = trim((string)$s); // Force trimmed string.
+				$post_id = (integer)$post_id;
+				$s       = trim((string)$s);
 				$args    = array('s' => 'post_id:'.$post_id.($s ? ' '.$s : ''));
 
 				return add_query_arg(urlencode_deep($args), $this->subs_menu_page_only());
@@ -589,8 +677,9 @@ namespace comment_mail // Root namespace.
 			public function new_sub_short()
 			{
 				$args = array('action' => 'new');
+				$url  = $this->page_table_nav_vars_only(array(), $this->subs_menu_page_only());
 
-				return add_query_arg(urlencode_deep($args), $this->subs_menu_page_only());
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
@@ -604,10 +693,11 @@ namespace comment_mail // Root namespace.
 			 */
 			public function edit_sub_short($sub_id)
 			{
-				$sub_id = (integer)$sub_id; // Force integer.
+				$sub_id = (integer)$sub_id;
 				$args   = array('action' => 'edit', 'subscription' => $sub_id);
+				$url    = $this->page_table_nav_vars_only(array(), $this->subs_menu_page_only());
 
-				return add_query_arg(urlencode_deep($args), $this->subs_menu_page_only());
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
@@ -615,13 +705,13 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer $user_id User ID.
+			 * @param integer $user_id A WP User ID.
 			 *
 			 * @return string Edit user shortlink.
 			 */
 			public function edit_user_short($user_id)
 			{
-				$user_id = (integer)$user_id; // Force integer.
+				$user_id = (integer)$user_id;
 				$args    = array('user_id' => $user_id);
 
 				return add_query_arg(urlencode_deep($args), admin_url('/user-edit.php'));
@@ -632,17 +722,14 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|object $comment_id A WP comment ID; or a post object.
+			 * @param integer $comment_id A WP comment ID.
 			 *
 			 * @return string Comment shortlink.
 			 */
 			public function comment_short($comment_id)
 			{
-				if(is_object($comment_id) && !empty($comment_id->commennt_ID))
-					$comment_id = $comment_id->commennt_ID;
-
-				$comment_id = (integer)$comment_id; // Force integer.
-				$args       = array('c' => $comment_id); // Comment ID.
+				$comment_id = (integer)$comment_id;
+				$args       = array('c' => $comment_id);
 
 				return add_query_arg(urlencode_deep($args), home_url('/'));
 			}
@@ -652,19 +739,102 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|object $comment_id A WP comment ID; or a post object.
+			 * @param integer $comment_id A WP comment ID.
 			 *
 			 * @return string Comment edit shortlink.
 			 */
 			public function comment_edit_short($comment_id)
 			{
-				if(is_object($comment_id) && !empty($comment_id->commennt_ID))
-					$comment_id = $comment_id->commennt_ID;
-
-				$comment_id = (integer)$comment_id; // Force integer.
+				$comment_id = (integer)$comment_id;
 				$args       = array('action' => 'editcomment', 'c' => $comment_id);
 
 				return add_query_arg(urlencode_deep($args), admin_url('/comment.php'));
+			}
+
+			/**
+			 * Confirmation URL for a specific sub. key.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string      $key Unique subscription key.
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See `home_url()` in WordPress for further details on this.
+			 *
+			 * @return string URL w/ the given `$scheme`.
+			 */
+			public function sub_confirm_url($key, $scheme = NULL)
+			{
+				$key  = trim((string)$key); // Force string.
+				$key  = !isset($key[0]) ? '0' : $key; // `0` default.
+				$args = array(__NAMESPACE__ => array('confirm' => $key));
+
+				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
+			}
+
+			/**
+			 * Unsubscribe URL for a specific sub. key.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string      $key Unique subscription key.
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See `home_url()` in WordPress for further details on this.
+			 *
+			 * @return string URL w/ the given `$scheme`.
+			 */
+			public function sub_unsubscribe_url($key, $scheme = NULL)
+			{
+				$key  = trim((string)$key); // Force string.
+				$key  = !isset($key[0]) ? '0' : $key; // `0` default.
+				$args = array(__NAMESPACE__ => array('unsubscribe' => $key));
+
+				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
+			}
+
+			/**
+			 * Manage URL for a specific sub. key.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string      $key Unique subscription key.
+			 *    If empty, the subscription management system will use
+			 *    the current user's email address; if available/possible.
+			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See `home_url()` in WordPress for further details on this.
+			 *
+			 * @return string URL w/ the given `$scheme`.
+			 */
+			public function sub_manage_url($key = '', $scheme = NULL)
+			{
+				$key  = trim((string)$key); // Force string.
+				$key  = !isset($key[0]) ? '0' : $key; // `0` default.
+				$args = array(__NAMESPACE__ => array('manage' => $key));
+
+				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
+			}
+
+			/**
+			 * Manage URL for a specific sub. key.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string      $key Unique subscription key.
+			 *    If empty, the subscription management system will use
+			 *    the current user's email address; if available/possible.
+			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See `home_url()` in WordPress for further details on this.
+			 *
+			 * @return string URL w/ the given `$scheme`.
+			 */
+			public function sub_manage_summary_url($key = '', $scheme = NULL)
+			{
+				$key  = trim((string)$key); // Force string.
+				$key  = !isset($key[0]) ? '0' : $key; // `0` default.
+				$args = array(__NAMESPACE__ => array('manage' => array('summary' => $key)));
+
+				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
 			}
 		}
 	}

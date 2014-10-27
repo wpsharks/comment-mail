@@ -233,9 +233,9 @@ namespace comment_mail
 				/*
 				 * Setup already?
 				 */
-				if(isset($this->cache[__FUNCTION__]))
+				if(!is_null($setup = &$this->cache_key(__FUNCTION__)))
 					return; // Already setup. Once only!
-				$this->cache[__FUNCTION__] = -1;
+				$setup = TRUE; // Once only please.
 
 				/*
 				 * Fire pre-setup hooks.
@@ -292,6 +292,7 @@ namespace comment_mail
 					'template_site_sub_actions_confirmed'         => '', // HTML/PHP code.
 					'template_site_sub_actions_unsubscribed'      => '', // HTML/PHP code.
 					'template_site_sub_actions_manage_summary'    => '', // HTML/PHP code.
+					'template_site_sub_actions_manage_sub_form'   => '', // HTML/PHP code.
 
 					'template_email_email_header'                 => '', // HTML/PHP code.
 					'template_email_email_footer'                 => '', // HTML/PHP code.
@@ -318,6 +319,11 @@ namespace comment_mail
 					// Or, this can be left empty to disable automatic deletions altogether.
 
 					'excluded_meta_box_post_types'                => 'link,comment,revision,attachment,nav_menu_item,snippet,redirect',
+
+					'user_select_options_enable'                  => '1', // `0|1`; enable?
+					'post_select_options_enable'                  => '1', // `0|1`; enable?
+					'post_select_options_media_enable'            => '0', // `0|1`; enable?
+					'comment_select_options_enable'               => '1', // `0|1`; enable?
 
 				); // Default options are merged with those defined by the site owner.
 				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options); // Allow filters.
@@ -573,8 +579,9 @@ namespace comment_mail
 				   && !$this->utils_env->is_menu_page('post.php')
 				) return; // Nothing to do; not applicable.
 
-				$deps = array(); // Plugin dependencies.
+				$deps = array('chosen'); // Plugin dependencies.
 
+				wp_enqueue_style('chosen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.min.css'), array(), $this->version, 'all');
 				wp_enqueue_style(__NAMESPACE__, $this->utils_url->to('/client-s/css/menu-pages.min.css'), $deps, $this->version, 'all');
 			}
 
@@ -590,16 +597,19 @@ namespace comment_mail
 				if(!$this->utils_env->is_menu_page(__NAMESPACE__.'*'))
 					return; // Nothing to do; NOT a plugin menu page.
 
-				$deps = array('jquery'); // Plugin dependencies.
+				$deps = array('jquery', 'chosen'); // Plugin dependencies.
 
+				wp_enqueue_script('chosen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.min.js'), array('jquery'), $this->version, TRUE);
 				wp_enqueue_script(__NAMESPACE__, $this->utils_url->to('/client-s/js/menu-pages.min.js'), $deps, $this->version, TRUE);
 				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_vars', array(
 					'plugin_url'    => rtrim($this->utils_url->to('/'), '/'),
-					'ajax_endpoint' => rtrim($this->utils_url->current_page_nonce_only(), '/')
+					'ajax_endpoint' => rtrim($this->utils_url->page_nonce_only(), '/')
 				));
 				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_i18n', array(
 					'bulk_reconfirm_confirmation' => __('Resend email confirmation link? Are you sure?', $this->text_domain),
-					'bulk_delete_confirmation'    => __('Delete permanently? Are you sure?', $this->text_domain),
+					'bulk_delete_confirmation'    => $this->utils_env->is_menu_page('*_event_log')
+						? $this->utils_i18n->log_entry_js_deletion_confirmation_warning()
+						: __('Delete permanently? Are you sure?', $this->text_domain),
 				));
 			}
 
@@ -899,7 +909,7 @@ namespace comment_mail
 			public function add_settings_link(array $links)
 			{
 				$links[] = '<a href="'.esc_attr($this->utils_url->main_menu_page_only()).'">'.__('Settings', $this->text_domain).'</a><br/>';
-				$links[] = '<a href="'.esc_attr($this->utils_url->pro_preview($this->utils_url->main_menu_page_only())).'">'.__('Preview Pro Features', $this->text_domain).'</a>';
+				$links[] = '<a href="'.esc_attr($this->utils_url->pro_preview()).'">'.__('Preview Pro Features', $this->text_domain).'</a>';
 				$links[] = '<a href="'.esc_attr($this->utils_url->product_page()).'" target="_blank">'.__('Upgrade', $this->text_domain).'</a>';
 
 				return apply_filters(__METHOD__, $links, get_defined_vars());
@@ -1077,32 +1087,31 @@ namespace comment_mail
 					{
 						if($_args['persistent']) // Need [dismiss] link?
 						{
-							$_dismiss_style  = 'float: right;'.
-							                   'margin: 0 0 0 15px;'.
-							                   'display: inline-block;'.
-							                   'text-decoration: none;'.
-							                   'font-weight: bold;';
-							$_dismiss_url    = $this->utils_url->dismiss_notice($_key);
-							$_dismiss_anchor = '<a href="'.esc_attr($_dismiss_url).'"'.
-							                   '  style="'.esc_attr($_dismiss_style).'">'.
-							                   '  '.__('dismiss &times;', $this->text_domain).
-							                   '</a>';
+							$_dismiss_style = 'float: right;'.
+							                  'margin: 0 0 0 15px;'.
+							                  'display: inline-block;'.
+							                  'text-decoration: none;'.
+							                  'font-weight: bold;';
+							$_dismiss_url   = $this->utils_url->dismiss_notice($_key);
+							$_dismiss       = '<a href="'.esc_attr($_dismiss_url).'"'.
+							                  '  style="'.esc_attr($_dismiss_style).'">'.
+							                  '  '.__('dismiss &times;', $this->text_domain).
+							                  '</a>';
 						}
-						else $_dismiss_anchor = ''; // Define a default value.
+						else $_dismiss = ''; // Default value; n/a.
 
 						$_classes = $this->slug.'-menu-page-area'; // Always.
-						$_classes .= ' pmp-'.($_args['type'] === 'error' ? 'error' : 'notice');
 						$_classes .= ' '.($_args['type'] === 'error' ? 'error' : 'updated');
 
 						$_full_markup = // Put together the full markup; including other pieces.
 							'<div class="'.esc_attr($_classes).'">'.
-							'  <p>'.$_args['markup'].$_dismiss_anchor.'</p>'.
+							'  '.$this->utils_markup->p_wrap($_args['markup'], $_dismiss).
 							'</div>';
 						echo apply_filters(__METHOD__.'_notice', $_full_markup, get_defined_vars());
 					}
 					if(!$_args['persistent']) unset($notices[$_key]); // Once only; i.e. don't show again.
 				}
-				unset($_key, $_args, $_dismiss_style, $_dismiss_url, $_dismiss_anchor, $_classes, $_full_markup); // Housekeeping.
+				unset($_key, $_args, $_dismiss_style, $_dismiss_url, $_dismiss, $_classes, $_full_markup); // Housekeeping.
 
 				if($original_notices !== $notices) update_option(__NAMESPACE__.'_notices', $notices);
 			}

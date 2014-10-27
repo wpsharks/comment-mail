@@ -18,7 +18,8 @@
 			$menuPageArea = $('.' + namespaceSlug + '-menu-page-area'),
 			$menuPageTable = $('.' + namespaceSlug + '-menu-page-table'),
 			$menuPageForm = $('.' + namespaceSlug + '-menu-page-form'),
-			vars = window[namespace + '_vars'], i18n = window[namespace + '_i18n'];
+			vars = window[namespace + '_vars'], i18n = window[namespace + '_i18n'],
+			chosenOps = {search_contains: true, disable_search_threshold: 10, allow_single_deselect: true};
 
 		/* ------------------------------------------------------------------------------------------------------------
 		 Plugin-specific JS for any menu page area of the dashboard.
@@ -90,39 +91,61 @@
 		 Plugin-specific JS for menu page forms that follow a WP standard, but need a few tweaks.
 		 ------------------------------------------------------------------------------------------------------------ */
 
-		var subFormPostIdChangeHandler = function()
+		var subFormPostIdProps = { // Initialize.
+			$select: $menuPageForm.find('> form tr.pmp-sub-form-post-id select'),
+			$input : $menuPageForm.find('> form tr.pmp-sub-form-post-id input')
+		};
+		if(subFormPostIdProps.$select.length) // Have select options?
+			subFormPostIdProps.lastId = $.trim(subFormPostIdProps.$select.val());
+		else subFormPostIdProps.lastId = $.trim(subFormPostIdProps.$input.val());
+
+		subFormPostIdProps.handler = function()
 		{
-			var $this = $(this), postId = $this.val(), requestVars = {},
-				$progressIcon = $('<img src="' + vars.plugin_url + '/client-s/images/tiny-progress-bar.gif" />'),
-				$commentIdRow = $menuPageForm.find('> form tr.pmp-sub-form-comment-id'),
-				$commentIdInput = $commentIdRow.find(':input');
+			var $this = $(this), // Initialize.
+				commentIdProps = {}, requestVars = {};
+			subFormPostIdProps.newId = $.trim($this.val());
 
-			if(!$commentIdRow.length || !$commentIdInput.length)
-				return; // Nothing we can do here.
+			if(subFormPostIdProps.newId === subFormPostIdProps.lastId)
+				return; // Nothing to do; i.e. no change, new post ID is the same.
+			subFormPostIdProps.lastId = subFormPostIdProps.newId; // Update last ID.
 
-			$commentIdInput.replaceWith($progressIcon),
-				requestVars[namespace] = {comment_id_row_via_ajax: {post_id: postId}},
-				$.get(vars.ajax_endpoint, requestVars, function(newCommentIdRow)
+			commentIdProps.$lastRow = $menuPageForm.find('> form tr.pmp-sub-form-comment-id'),
+				commentIdProps.$lastChosenContainer = commentIdProps.$lastRow.find('.chosen-container'),
+				commentIdProps.$lastInput = commentIdProps.$lastRow.find(':input');
+
+			if(!commentIdProps.$lastRow.length || !commentIdProps.$lastInput.length)
+				return; // Nothing we can do here; expecting a comment ID row.
+
+			commentIdProps.$lastChosenContainer.remove(), // Loading; i.e. prepare for new comment ID row.
+				commentIdProps.$lastInput.replaceWith('<img src="' + vars.plugin_url + '/client-s/images/tiny-progress-bar.gif" />');
+
+			requestVars[namespace] = {sub_form_comment_id_row_via_ajax: {post_id: subFormPostIdProps.newId}},
+				$.get(vars.ajax_endpoint, requestVars, function(newCommentIdRowMarkup)
 				{
-					$commentIdRow.replaceWith(newCommentIdRow);
+					commentIdProps.$newRow = $(newCommentIdRowMarkup),
+						commentIdProps.$lastRow.replaceWith(commentIdProps.$newRow),
+						commentIdProps.$newRow.find('select').chosen(chosenOps);
 				});
-		}; // This function is needed by two different events.
-		$menuPageForm.find('> form tr.pmp-sub-form-post-id select').on('change', subFormPostIdChangeHandler),
-			$menuPageForm.find('> form tr.pmp-sub-form-post-id input').on('blur', subFormPostIdChangeHandler);
+		};
+		subFormPostIdProps.$select.on('change', subFormPostIdProps.handler).chosen(chosenOps),
+			subFormPostIdProps.$input.on('blur', subFormPostIdProps.handler);
+
+		$menuPageForm.find('> form tr.pmp-sub-form-comment-id select').chosen(chosenOps);
+		$menuPageForm.find('> form tr.pmp-sub-form-user-id select').chosen(chosenOps);
 
 		$menuPageForm.find('> form tr.pmp-sub-form-status select').on('change', function()
 		{
-			var $this = $(this), val = $this.val(),
-				$checkbox = $this.siblings('.checkbox').first();
+			var $this = $(this), status = $.trim($this.val()),
+				$checkboxContainer = $this.siblings('.checkbox'),
+				$checkbox = $checkboxContainer.find('input');
 
-			if(!$checkbox.length)
-				return; // Not possible.
+			if(status === 'unconfirmed')
+				$checkboxContainer.show(); // Display checkbox option.
+			else $checkbox.prop('checked', false), $checkboxContainer.hide();
 
-			if($checkbox[0].checked || val === 'unconfirmed')
-				$checkbox.show(); // Display checkbox option.
-			else $checkbox.hide(), $checkbox[0].checked = false;
+		}).trigger('change').chosen(chosenOps); // Fire immediately.
 
-		}).trigger('change'); // Fire immediately.
+		$menuPageForm.find('> form tr.pmp-sub-form-deliver select').chosen(chosenOps);
 
 		$menuPageForm.find('> form').on('submit', function(e)
 		{
@@ -130,13 +153,13 @@
 				errors = '', // Initialize.
 				missingRequiredFields = [];
 
-			$this.find('.form-required :input[aria-required]')
+			$this.find('.form-required :input[required]')
 				.each(function(/* Missing required fields? */)
 				      {
 					      var $this = $(this),
 						      val = $.trim($this.val());
 
-					      if(val === '0' || val === '')
+					      if(typeof val === 'undefined' || val === '0' || val === '')
 						      missingRequiredFields.push(this);
 				      });
 			$.each(missingRequiredFields, function()
