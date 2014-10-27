@@ -4,3 +4,6 @@
 [submodule "comment-mail/submodules/wp-php-rv"]
 	path = comment-mail/submodules/wp-php-rv
 	url = https://github.com/websharks/wp-php-rv
+[submodule "comment-mail/submodules/parsedown"]
+	path = comment-mail/submodules/parsedown
+	url = https://github.com/erusev/parsedown

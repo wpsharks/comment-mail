@@ -611,15 +611,16 @@ namespace comment_mail // Root namespace.
 				if(!($string = trim((string)$string)))
 					return $string; // Not possible.
 
-				if($this->is_html($string))
-					return $string; // Not applicable.
+				if(!class_exists('\\Parsedown')) // Need Parsedown class here.
+					require_once dirname(dirname(dirname(__FILE__))).'/submodules/parsedown/Parsedown.php';
 
-				$html = $this->to_html($string);
+				if(!isset($this->cache[__FUNCTION__]['parsedown']))
+					$this->cache[__FUNCTION__]['parsedown'] = new \Parsedown();
 
-				$html = preg_replace('/`{3,}([^`]+?)`+/', '<pre><code>'.'${1}'.'</code></pre>', $html);
-				$html = preg_replace('/`+([^`]+?)`+/', '<code>'.'${1}'.'</code>', $html);
+				$parsedown =& $this->cache[__FUNCTION__]['parsedown'];
+				/** @var $parsedown \Parsedown Reference for IDEs. */
 
-				return $html;
+				return $parsedown->text($string);
 			}
 		}
 	}
