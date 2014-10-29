@@ -263,85 +263,126 @@ namespace comment_mail
 				$this->cap = apply_filters(__METHOD__.'_cap', 'activate_plugins');
 
 				$this->default_options = array(
-					'version'                                            => $this->version,
-					'enable'                                             => '0', // `0|1`; enable?
-					'crons_setup'                                        => '0', // `0` or timestamp.
-					'uninstall_on_deletion'                              => '0', // `0|1`; run uninstaller?
+					/* Core/systematic option keys. */
 
-					'manage_cap'                                         => $this->cap, // Capability.
-					'uninstall_cap'                                      => 'delete_plugins', // Capability.
+					'version'                                                           => $this->version,
+					'crons_setup'                                                       => '0', // `0` or timestamp.
 
-					'auto_confirm_enable'                                => '0', // `0|1`; auto-confirm enable?
+					/* Primary switch to enable/disable.
+					@TODO this should simply enable subscription ops in the comment submission form. */
 
-					'auto_subscribe_enable'                              => '1', // `0|1`; auto-subscribe enable?
-					'auto_subscribe_deliver'                             => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
-					'auto_subscribe_post_types'                          => 'post,page', // Comma-delimited post types.
-					'auto_subscribe_post_author'                         => '1', // `0|1`; auto-subscribe post authors?
-					'auto_subscribe_recipients'                          => '', // Others `;|,` delimited emails.
+					'enable'                                                            => '0', // `0|1`; enable?
 
-					'reply_to_email'                                     => '', // Reply-To header.
+					/* Related to user authentication. */
 
-					'smtp_enable'                                        => '0', // `0|1`; enable?
-					'smtp_host'                                          => '', // SMTP host name.
-					'smtp_port'                                          => '', // SMTP port number.
-					'smtp_secure'                                        => '', // ``, `ssl` or `tls`.
+					'manage_cap'                                                        => $this->cap, // Capability.
+					'uninstall_cap'                                                     => 'delete_plugins', // Capability.
 
-					'smtp_username'                                      => '', // SMTP username.
-					'smtp_password'                                      => '', // SMTP password.
+					/* Related to auto-subscribe functionality. */
 
-					'smtp_from_name'                                     => '', // SMTP from name.
-					'smtp_from_email'                                    => '', // SMTP from email.
-					'smtp_force_from'                                    => '1', // `0|1`; force?
+					'auto_subscribe_enable'                                             => '1', // `0|1`; auto-subscribe enable?
+					'auto_subscribe_deliver'                                            => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
+					'auto_subscribe_post_types'                                         => 'post,page', // Comma-delimited post types.
+					'auto_subscribe_post_author'                                        => '1', // `0|1`; auto-subscribe post authors?
+					'auto_subscribe_recipients'                                         => '', // Others `;|,` delimited emails.
 
-					'template_site_site_header'                          => '', // HTML/PHP code.
-					'template_site_site_footer'                          => '', // HTML/PHP code.
+					/* Related to auto-confirm functionality. */
 
-					'template_site_comment_form_sub_ops'                 => '', // HTML/PHP code.
+					'auto_confirm_enable'                                               => '0', // `0|1`; auto-confirm enable?
 
-					'template_site_sub_actions_confirmed'                => '', // HTML/PHP code.
-					'template_site_sub_actions_unsubscribed'             => '', // HTML/PHP code.
-					'template_site_sub_actions_manage_summary'           => '', // HTML/PHP code.
-					'template_site_sub_actions_manage_sub_form'          => '', // HTML/PHP code.
+					/* Related to SMPT configuration. */
 
-					'template_email_email_header'                        => '', // HTML/PHP code.
-					'template_email_email_footer'                        => '', // HTML/PHP code.
+					'smtp_enable'                                                       => '0', // `0|1`; enable?
+					'smtp_host'                                                         => '', // SMTP host name.
+					'smtp_port'                                                         => '', // SMTP port number.
+					'smtp_secure'                                                       => '', // ``, `ssl` or `tls`.
 
-					'email_footer_powered_by_enable'                     => '1', // `0|1`; enable?
-					'can_spam_postmaster'                                => get_bloginfo('admin_email'),
-					'can_spam_mailing_address'                           => '', // CAN-SPAM contact info.
+					'smtp_username'                                                     => '', // SMTP username.
+					'smtp_password'                                                     => '', // SMTP password.
 
-					'template_email_confirmation_request_subject'        => '', // HTML/PHP code.
-					'template_email_confirmation_request_message'        => '', // HTML/PHP code.
+					'smtp_from_name'                                                    => '', // SMTP from name.
+					'smtp_from_email'                                                   => '', // SMTP from email.
+					'smtp_force_from'                                                   => '1', // `0|1`; force?
 
-					'template_email_comment_notification_subject'        => '', // HTML/PHP code.
-					'template_email_comment_notification_message'        => '', // HTML/PHP code.
+					/* Related to queue processing. */
 
-					'queue_processor_max_time'                           => '30', // In seconds.
-					'queue_processor_delay'                              => '250', // In milliseconds.
-					'queue_processor_max_limit'                          => '100', // Total queue entries.
+					'queue_processor_max_time'                                          => '30', // In seconds.
+					'queue_processor_delay'                                             => '250', // In milliseconds.
+					'queue_processor_max_limit'                                         => '100', // Total queue entries.
 
-					'queue_processor_immediate_max_time'                 => '10', // In seconds.
-					'queue_processor_immediate_max_limit'                => '5', // Total queue entries.
+					'queue_processor_immediate_max_time'                                => '10', // In seconds.
+					'queue_processor_immediate_max_limit'                               => '5', // Total queue entries.
 
-					'sub_cleaner_max_time'                               => '60', // In seconds.
+					/* Related to CRON jobs. */
 
-					'unconfirmed_expiration_time'                        => '60 days', // `strtotime()` compatible.
+					'sub_cleaner_max_time'                                              => '60', // In seconds.
+
+					'unconfirmed_expiration_time'                                       => '60 days', // `strtotime()` compatible.
 					// Or, this can be left empty to disable automatic expirations altogether.
 
-					'trashed_expiration_time'                            => '60 days', // `strtotime()` compatible.
+					'trashed_expiration_time'                                           => '60 days', // `strtotime()` compatible.
 					// Or, this can be left empty to disable automatic deletions altogether.
 
-					'excluded_meta_box_post_types'                       => 'link,comment,revision,attachment,nav_menu_item,snippet,redirect',
+					/* Related to CAN-SPAM compliance. */
 
-					'user_select_options_enable'                         => '1', // `0|1`; enable?
-					'post_select_options_enable'                         => '1', // `0|1`; enable?
-					'post_select_options_media_enable'                   => '0', // `0|1`; enable?
-					'comment_select_options_enable'                      => '1', // `0|1`; enable?
+					'can_spam_postmaster'                                               => get_bloginfo('admin_email'),
+					'can_spam_mailing_address'                                          => '', // CAN-SPAM contact info.
 
-					'comment_notification_parent_content_clip_max_chars' => '100', // Max chars to include in notifications.
-					'comment_notification_content_clip_max_chars'        => '200', // Max chars to include in notifications.
+					/* Related to blacklisting. */
 
-					'email_blacklist_patterns'                           => '', // A line-delimited list of blacklisted emails/domains.
+					'email_blacklist_patterns'                                          => '', // A line-delimited list of blacklisted emails/domains.
+
+					/* Related to replies-via-email. */
+
+					'reply_to_email'                                                    => '', // Reply-To header.
+
+					/* Related to comment notifications. */
+
+					'comment_notification_parent_content_clip_max_chars'                => '100', // Max chars to include in notifications.
+					'comment_notification_content_clip_max_chars'                       => '200', // Max chars to include in notifications.
+
+					/* Related to select menu options. */
+
+					'user_select_options_enable'                                        => '1', // `0|1`; enable?
+					'post_select_options_enable'                                        => '1', // `0|1`; enable?
+					'post_select_options_media_enable'                                  => '0', // `0|1`; enable?
+					'comment_select_options_enable'                                     => '1', // `0|1`; enable?
+
+					/* Related to email footer branding. */
+
+					'email_footer_powered_by_enable'                                    => '1', // `0|1`; enable?
+
+					/* Template-related site templates. */
+
+					'template_site_site_header'                                         => '', // HTML/PHP code.
+					'template_site_site_footer'                                         => '', // HTML/PHP code.
+
+					'template_site_comment_form_sub_ops'                                => '', // HTML/PHP code.
+
+					'template_site_sub_actions_confirmed'                               => '', // HTML/PHP code.
+					'template_site_sub_actions_unsubscribed'                            => '', // HTML/PHP code.
+					'template_site_sub_actions_manage_summary'                          => '', // HTML/PHP code.
+					'template_site_sub_actions_manage_sub_form'                         => '', // HTML/PHP code.
+					'template_site_sub_actions_manage_sub_form_comment_id_row_via_ajax' => '', // HTML/PHP code.
+
+					/* Template-related email templates. */
+
+					'template_email_email_header'                                       => '', // HTML/PHP code.
+					'template_email_email_footer'                                       => '', // HTML/PHP code.
+
+					'template_email_confirmation_request_subject'                       => '', // HTML/PHP code.
+					'template_email_confirmation_request_message'                       => '', // HTML/PHP code.
+
+					'template_email_comment_notification_subject'                       => '', // HTML/PHP code.
+					'template_email_comment_notification_message'                       => '', // HTML/PHP code.
+
+					/* Related to meta boxes. */
+
+					'excluded_meta_box_post_types'                                      => 'link,comment,revision,attachment,nav_menu_item,snippet,redirect',
+
+					/* Related to data safeguards. */
+
+					'uninstall_on_deletion'                                             => '0', // `0|1`; run uninstaller?
 
 				); // Default options are merged with those defined by the site owner.
 				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options); // Allow filters.

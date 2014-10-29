@@ -273,24 +273,17 @@ namespace comment_mail // Root namespace.
 			 * @return string HTML markup for this select field row.
 			 *    If no options (or too many options; this returns an input field instead.
 			 *
-			 * @see sub_manage_actions::comment_id_row_via_ajax()
+			 * @see sub_manage_actions::sub_form_comment_id_row_via_ajax()
 			 */
 			public static function comment_id_row_via_ajax($post_id)
 			{
-				// @TODO move this into a template file.
-
-				$plugin      = plugin();
 				$post_id     = (integer)$post_id;
 				$form_fields = new form_fields(static::$form_field_args);
 
-				return $form_fields->select_row(
-					array(
-						'placeholder'         => __('— All Comments/Replies —', $plugin->text_domain),
-						'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID#', $plugin->text_domain),
-						'name'                => 'comment_id', 'required' => FALSE, 'options' => '%%comments%%', 'post_id' => $post_id, 'current_value' => NULL,
-						'notes'               => __('If empty, you\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $plugin->text_domain),
-						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"'),
-					));
+				$template_vars = get_defined_vars(); // Everything above.
+				$template      = new template('site/sub-actions/manage-sub-form-comment-id-row-via-ajax.php');
+
+				return $template->parse($template_vars);
 			}
 
 			/**
