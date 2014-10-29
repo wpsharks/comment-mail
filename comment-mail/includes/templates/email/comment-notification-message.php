@@ -60,8 +60,7 @@ namespace comment_mail;
 				<?php if($_comment->comment_parent && ($_comment_parent = get_comment($_comment->comment_parent))): ?>
 
 					<p style="margin-bottom:0;">
-						<?php echo sprintf(__('In response to comment ID# <a href="%1$s">%2$s</a>;', $plugin->text_domain),
-						                   esc_attr(get_comment_link($_comment_parent->comment_ID)), esc_html($_comment_parent->comment_ID)); ?>
+						<?php echo sprintf(__('In response to <a href="%1$s">comment ID# %2$s</a>;', $plugin->text_domain), esc_attr(get_comment_link($_comment_parent->comment_ID)), esc_html($_comment_parent->comment_ID)); ?>
 						<?php if($_comment_parent->comment_author): ?>
 							<?php echo sprintf(__('by %1$s', $plugin->text_domain), esc_html($_comment_parent->comment_author)); ?>
 						<?php endif; ?>
@@ -73,12 +72,12 @@ namespace comment_mail;
 						<li>
 							<p style="font-weight:bold;">
 								<?php if($_comment->comment_author): ?>
-									<?php echo sprintf(__('%1$s writes from new', $plugin->text_domain), esc_html($_comment->comment_author)); ?>
+									<?php echo sprintf(__('%1$s replies from new', $plugin->text_domain), esc_html($_comment->comment_author)); ?>
 								<?php else: // The site is not collecting comment author names. ?>
 									<?php echo __('New', $plugin->text_domain); ?>
 								<?php endif; ?>
 
-								<?php echo sprintf(__('comment ID# <a href="%1$s">%2$s</a> posted %3$s;', $plugin->text_domain), esc_attr(get_comment_link($_comment->comment_ID)), esc_html($_comment->comment_ID), esc_html($plugin->utils_date->approx_time_difference($_comment->comment_date_gmt))); ?>
+								<?php echo sprintf(__('<a href="%1$s">comment ID# %2$s</a> posted %3$s;', $plugin->text_domain), esc_attr(get_comment_link($_comment->comment_ID)), esc_html($_comment->comment_ID), esc_html($plugin->utils_date->approx_time_difference($_comment->comment_date_gmt))); ?>
 							</p>
 							<p>
 								<?php echo esc_html($plugin->utils_markup->comment_content_clip($_comment, 'notification')); ?>
@@ -104,7 +103,7 @@ namespace comment_mail;
 							<?php echo __('New', $plugin->text_domain); ?>
 						<?php endif; ?>
 
-						<?php echo sprintf(__('comment ID# <a href="%1$s">%2$s</a> posted %3$s;', $plugin->text_domain), esc_attr(get_comment_link($_comment->comment_ID)), esc_html($_comment->comment_ID), esc_html($plugin->utils_date->approx_time_difference($_comment->comment_date_gmt))); ?>
+						<?php echo sprintf(__('<a href="%1$s">comment ID# %2$s</a> posted %3$s;', $plugin->text_domain), esc_attr(get_comment_link($_comment->comment_ID)), esc_html($_comment->comment_ID), esc_html($plugin->utils_date->approx_time_difference($_comment->comment_date_gmt))); ?>
 					</p>
 					<p>
 						<?php echo esc_html($plugin->utils_markup->comment_content_clip($_comment, 'notification')); ?>

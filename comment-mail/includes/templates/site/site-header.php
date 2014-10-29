@@ -4,6 +4,12 @@ namespace comment_mail;
 /**
  * @var plugin $plugin Plugin class.
  *
+ * Other variables made available in this template file:
+ *
+ * @var string $site_easy_header Parsed easy header template file contents.
+ *    This is a partial header template, incorporated into this full template file;
+ *    i.e. a simpler fragment that fits into this larger picture here.
+ *
  * @note The `%%title%%` replacement code should remain as-is.
  *    It is replaced by other templates using this header.
  */
@@ -23,7 +29,28 @@ namespace comment_mail;
 
 	<style type="text/css">
 		/*
-		Font styles.
+		Main html/body.
+		*/
+		html, body
+		{
+			background : #EEEEEE;
+		}
+		/*
+		Main wrapper/container/inner-wrapper.
+		*/
+		.wrapper
+		{
+		}
+		.wrapper > .container
+		{
+			margin-top    : 20px;
+			margin-bottom : 20px;
+		}
+		.wrapper > .container > .panel.inner-wrapper
+		{
+		}
+		/*
+		Fonts.
 		*/
 		body, .font-body
 		{
@@ -34,18 +61,14 @@ namespace comment_mail;
 			font-weight : 700;
 			font-family : 'Bitter', serif;
 		}
-		h5, .h5, h6, .h6
-		{
-			font-weight : 400;
-			font-family : 'Bitter', serif;
-		}
 		h3.panel-title
 		{
 			font-weight : 400;
 		}
-		#content > * > .data
+		h5, .h5, h6, .h6
 		{
-			font-family : 'Noto Sans', sans-serif;
+			font-weight : 400;
+			font-family : 'Bitter', serif;
 		}
 		.font-serify
 		{
@@ -60,35 +83,11 @@ namespace comment_mail;
 			font-family : 'Noto Sans', sans-serif;
 		}
 		/*
-		Other global styles.
+		Misc. global styles.
 		*/
 		form label
 		{
 			cursor : pointer;
-		}
-		/*
-		Main html/body.
-		*/
-		html, body
-		{
-			background : #EEEEEE;
-		}
-		/*
-		Main wrapper/container.
-		*/
-		.wrapper
-		{
-		}
-		.wrapper > .container
-		{
-			margin-top    : 20px;
-			margin-bottom : 20px;
-		}
-		/*
-		Main panel; i.e. inner wrapper.
-		*/
-		.wrapper > .container > .panel.inner-wrapper
-		{
 		}
 		/*
 		Subscription add/edit form.
@@ -133,5 +132,8 @@ namespace comment_mail;
 <body>
 <div id="wrapper" class="wrapper" role="main">
 	<div id="container" class="container">
+
+		<?php echo $site_easy_header; ?>
+
 		<div id="inner-wrapper" class="inner-wrapper panel panel-default">
 			<div class="panel-body">

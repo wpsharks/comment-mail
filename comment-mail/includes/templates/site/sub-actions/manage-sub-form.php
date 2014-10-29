@@ -47,7 +47,7 @@ namespace comment_mail;
 ?>
 <?php echo str_replace('%%title%%', // Editing or creating?
                        $is_edit ? __('Edit Subscription', $plugin->text_domain)
-	                       : __('New Subscription', $plugin->text_domain), $site_header); ?>
+	                       : __('Add New Subscription', $plugin->text_domain), $site_header); ?>
 
 	<div class="manage-sub-form">
 
@@ -116,7 +116,7 @@ namespace comment_mail;
 		<?php endif; ?>
 
 			<h2 style="margin-top:0;">
-				<i class="fa fa-envelope-square pull-right"></i>
+				<i class="fa fa-envelope pull-right"></i>
 				<?php if($is_edit): ?>
 					<?php echo __('Edit Subscription', $plugin->text_domain); ?>
 				<?php else: // Creating a new subscription. ?>
@@ -139,6 +139,7 @@ namespace comment_mail;
 							'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'placeholder' => ''),
 						)); ?>
 					<?php echo $form_fields->select_row(
+					// Note: if you change this row; also change the AJAX template variation.
 						array(
 							'placeholder'         => __('— All Comments/Replies —', $plugin->text_domain),
 							'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID#', $plugin->text_domain),
@@ -204,13 +205,11 @@ namespace comment_mail;
 			</form>
 
 			<script type="text/javascript">
-				(function($)
+				(function($) // Primary closure w/ jQuery; strict standards.
 				{
-					'use strict';
+					'use strict'; // Strict standards enable.
 
-					var plugin = {},
-						$window = $(window),
-						$document = $(document),
+					var plugin = {}, $window = $(window), $document = $(document),
 
 						namespace = '<?php echo $plugin->utils_string->esc_js_sq(__NAMESPACE__); ?>',
 						namespaceSlug = '<?php echo $plugin->utils_string->esc_js_sq(str_replace('_', '-', __NAMESPACE__)); ?>',
@@ -222,13 +221,13 @@ namespace comment_mail;
 
 					/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-					plugin.onReady = function()
+					plugin.onReady = function() // On DOM ready handler.
 					{
 						/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 						var subFormPostIdProps = { // Initialize.
-							$select : $('form tr.manage-sub-form-post-id select'),
-							$input  : $('form tr.manage-sub-form-post-id input'),
+							$select : $('.manage-sub-form form tr.manage-sub-form-post-id select'),
+							$input  : $('.manage-sub-form form tr.manage-sub-form-post-id input'),
 							progress: '<img src="' + pluginUrl + '/client-s/images/tiny-progress-bar.gif" />'
 						};
 						if(subFormPostIdProps.$select.length) // Have select options?
@@ -245,7 +244,7 @@ namespace comment_mail;
 								return; // Nothing to do; i.e. no change, new post ID is the same.
 							subFormPostIdProps.lastId = subFormPostIdProps.newId; // Update last ID.
 
-							commentIdProps.$lastRow = $('form tr.manage-sub-form-comment-id'),
+							commentIdProps.$lastRow = $('.manage-sub-form form tr.manage-sub-form-comment-id'),
 								commentIdProps.$lastChosenContainer = commentIdProps.$lastRow.find('.chosen-container'),
 								commentIdProps.$lastInput = commentIdProps.$lastRow.find(':input');
 
@@ -268,9 +267,9 @@ namespace comment_mail;
 						subFormPostIdProps.$select.on('change', subFormPostIdProps.handler).chosen(chosenOps),
 							subFormPostIdProps.$input.on('blur', subFormPostIdProps.handler);
 
-						$('form tr.manage-sub-form-comment-id select').chosen(chosenOps);
-						$('form tr.manage-sub-form-status select').chosen(chosenOps);
-						$('form tr.manage-sub-form-deliver select').chosen(chosenOps);
+						$('.manage-sub-form form tr.manage-sub-form-comment-id select').chosen(chosenOps);
+						$('.manage-sub-form form tr.manage-sub-form-status select').chosen(chosenOps);
+						$('.manage-sub-form form tr.manage-sub-form-deliver select').chosen(chosenOps);
 
 						/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
@@ -303,8 +302,9 @@ namespace comment_mail;
 						});
 						/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 					};
-					$document.ready(plugin.onReady);
-				})(jQuery);
+					$document.ready(plugin.onReady); // On DOM ready handler.
+
+				})(jQuery); // Fire primary closure; with jQuery.
 			</script>
 
 		<?php endif; ?>

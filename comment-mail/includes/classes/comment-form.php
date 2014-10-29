@@ -53,6 +53,12 @@ namespace comment_mail // Root namespace.
 				if(!$this->post_id)
 					return; // Nothing to do.
 
+				if(!$this->plugins->options['enable'])
+					return; // Disabled currently.
+
+				if(!$this->plugins->options['commemt_form_enable'])
+					return; // Disabled currently.
+
 				// @TODO
 				// $_POST[__NAMESPACE__.'_sub_type']
 				// $_POST[__NAMESPACE__.'_sub_deliver']

@@ -268,10 +268,22 @@ namespace comment_mail
 					'version'                                                           => $this->version,
 					'crons_setup'                                                       => '0', // `0` or timestamp.
 
-					/* Primary switch to enable/disable.
-					@TODO this should simply enable subscription ops in the comment submission form. */
+					/* Primary switch to enable/disable; i.e. `enable`.
 
-					'enable'                                                            => '0', // `0|1`; enable?
+						- If disabled; subscription options no longer appear on comment forms.
+						- If disabled; the queue processor will stop processing, until such time as
+						the plugin is renabled. Queue injections continue, but the queue is not processed.
+
+						~ All other functionality remains enabled as always.
+
+					The `comment_form_enable` and `queue_enable` options allow for more control over
+					which of these two functionalities should be enabled/disabled. In some cases it might be desirable
+					to disable queue processing temporarily; allowing everything else to remain as-is.
+					*/
+
+					'enable'                                                            => '1', // `0|1`; enable?
+					'commemt_form_enable'                                               => '1', // `0|1`; enable?
+					'queue_enable'                                                      => '1', // `0|1`; enable?
 
 					/* Related to user authentication. */
 
@@ -293,6 +305,7 @@ namespace comment_mail
 					/* Related to SMPT configuration. */
 
 					'smtp_enable'                                                       => '0', // `0|1`; enable?
+
 					'smtp_host'                                                         => '', // SMTP host name.
 					'smtp_port'                                                         => '', // SMTP port number.
 					'smtp_secure'                                                       => '', // ``, `ssl` or `tls`.
@@ -354,7 +367,10 @@ namespace comment_mail
 
 					/* Template-related site templates. */
 
+					'template_site_site_easy_header'                                    => '', // HTML/PHP code.
 					'template_site_site_header'                                         => '', // HTML/PHP code.
+
+					'template_site_site_easy_footer'                                    => '', // HTML/PHP code.
 					'template_site_site_footer'                                         => '', // HTML/PHP code.
 
 					'template_site_comment_form_sub_ops'                                => '', // HTML/PHP code.
@@ -367,7 +383,10 @@ namespace comment_mail
 
 					/* Template-related email templates. */
 
+					'template_email_email_easy_header'                                  => '', // HTML/PHP code.
 					'template_email_email_header'                                       => '', // HTML/PHP code.
+
+					'template_email_email_easy_footer'                                  => '', // HTML/PHP code.
 					'template_email_email_footer'                                       => '', // HTML/PHP code.
 
 					'template_email_confirmation_request_subject'                       => '', // HTML/PHP code.

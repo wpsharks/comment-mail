@@ -104,23 +104,45 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function site_vars(array $vars = array())
 			{
+				if($this->file === 'site/site-easy-header.php')
+					return array(); // Prevent infinite loop.
+
 				if($this->file === 'site/site-header.php')
+					return array(); // Prevent infinite loop.
+
+				if($this->file === 'site/site-easy-footer.php')
 					return array(); // Prevent infinite loop.
 
 				if($this->file === 'site/site-footer.php')
 					return array(); // Prevent infinite loop.
 
+				// Header templates. Both the easy and full templates.
+
+				if(is_null($site_easy_header_template = &$this->cache_key(__FUNCTION__, 'site_easy_header_template')))
+					$site_easy_header_template = new template('site/site-easy-header.php');
+
 				if(is_null($site_header_template = &$this->cache_key(__FUNCTION__, 'site_header_template')))
 					$site_header_template = new template('site/site-header.php');
+				/**
+				 * @var $site_easy_header_template template For IDEs.
+				 * @var $site_header_template template For IDEs.
+				 */
+				$site_easy_header = $site_easy_header_template->parse($vars);
+				$site_header      = $site_header_template->parse(array_merge($vars, compact('site_easy_header')));
+
+				// Footer templates. Both the easy and full templates.
+
+				if(is_null($site_easy_footer_template = &$this->cache_key(__FUNCTION__, 'site_easy_footer_template')))
+					$site_easy_footer_template = new template('site/site-easy-footer.php');
 
 				if(is_null($site_footer_template = &$this->cache_key(__FUNCTION__, 'site_footer_template')))
 					$site_footer_template = new template('site/site-footer.php');
 				/**
-				 * @var $site_header_template template For IDEs.
+				 * @var $site_easy_footer_template template For IDEs.
 				 * @var $site_footer_template template For IDEs.
 				 */
-				$site_header = $site_header_template->parse($vars);
-				$site_footer = $site_footer_template->parse($vars);
+				$site_easy_footer = $site_easy_footer_template->parse($vars);
+				$site_footer      = $site_footer_template->parse(array_merge($vars, compact('site_easy_footer')));
 
 				return compact('site_header', 'site_footer'); // Header/footer.
 			}
@@ -136,23 +158,47 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function email_vars(array $vars = array())
 			{
+				if($this->file === 'email/email-easy-header.php')
+					return array(); // Prevent infinite loop.
+
 				if($this->file === 'email/email-header.php')
+					return array(); // Prevent infinite loop.
+
+				if($this->file === 'email/email-easy-footer.php')
 					return array(); // Prevent infinite loop.
 
 				if($this->file === 'email/email-footer.php')
 					return array(); // Prevent infinite loop.
 
+				// Header templates. Both the easy and full templates.
+
+				if(is_null($email_easy_header_template = &$this->cache_key(__FUNCTION__, 'email_easy_header_template')))
+					$email_easy_header_template = new template('email/email-easy-header.php');
+
 				if(is_null($email_header_template = &$this->cache_key(__FUNCTION__, 'email_header_template')))
 					$email_header_template = new template('email/email-header.php');
+				/**
+				 * @var $email_easy_header_template template For IDEs.
+				 * @var $email_header_template template For IDEs.
+				 */
+				$email_easy_header = $email_easy_header_template->parse($vars);
+				$email_header      = $email_header_template->parse(array_merge($vars, compact('email_easy_header')));
+
+				// Footer templates. Both the easy and full templates.
+
+				if(is_null($email_easy_footer_template = &$this->cache_key(__FUNCTION__, 'email_easy_footer_template')))
+					$email_easy_footer_template = new template('email/email-easy-footer.php');
 
 				if(is_null($email_footer_template = &$this->cache_key(__FUNCTION__, 'email_footer_template')))
 					$email_footer_template = new template('email/email-footer.php');
 				/**
-				 * @var $email_header_template template For IDEs.
+				 * @var $email_easy_footer_template template For IDEs.
 				 * @var $email_footer_template template For IDEs.
 				 */
-				$email_header = $email_header_template->parse($vars);
-				$email_footer = $email_footer_template->parse($vars);
+				$email_easy_footer = $email_easy_footer_template->parse($vars);
+				$email_footer      = $email_footer_template->parse(array_merge($vars, compact('email_easy_footer')));
+
+				// Add "powered by" note at the bottom of all email templates?
 
 				if(!$this->plugin->is_pro || $this->plugin->options['email_footer_powered_by_enable'])
 				{
