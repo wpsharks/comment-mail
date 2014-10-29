@@ -145,7 +145,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return array An array of all disabled functions, else an empty array.
 			 */
-			protected function disabled_functions()
+			public function disabled_functions()
 			{
 				if(!is_null($disabled = &$this->static_key(__FUNCTION__)))
 					return $disabled; // Cached this already.

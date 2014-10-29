@@ -1,0 +1,17 @@
+.chosen-container-single .chosen-single
+{
+	height      : 34px;
+	line-height : 33px;
+}
+.chosen-container-single .chosen-single div b
+{
+	background-position : 0 7px;
+}
+.chosen-container-active.chosen-with-drop .chosen-single div b
+{
+	background-position : -18px 7px;
+}
+.chosen-container-single .chosen-single abbr
+{
+	top : 10px;
+}

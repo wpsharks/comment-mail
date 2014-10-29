@@ -270,7 +270,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function errors_html()
 			{
-				return array_map(array($this->plugin->utils_string, 'markdown'), $this->errors);
+				return array_map(array($this->plugin->utils_string, 'markdown_no_p'), $this->errors);
 			}
 		}
 	}

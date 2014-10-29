@@ -105,7 +105,7 @@ namespace comment_mail // Root namespace.
 				$name      = trim((string)$args['name']);
 				$root_name = (boolean)$args['root_name'];
 
-				$slug = str_replace('_', '-', $name);
+				$slug = trim(preg_replace('/[^a-z0-9]/i', '-', $name), '-');
 				$slug = $root_name ? 'root-'.$slug : $slug;
 
 				$id   = __NAMESPACE__.$this->ns_id_suffix.'-'.$slug;
@@ -135,6 +135,8 @@ namespace comment_mail // Root namespace.
 					$row .= $this->hidden_input($args);
 
 				else $row .= '    <input type="'.esc_attr($type).'"'.
+
+				             '     class="form-control"'. // Bootstrap compat.
 
 				             '     id="'.esc_attr($id).'" name="'.esc_attr($name).'"'.
 
@@ -206,7 +208,7 @@ namespace comment_mail // Root namespace.
 				$name      = trim((string)$args['name']);
 				$root_name = (boolean)$args['root_name'];
 
-				$slug = str_replace('_', '-', $name);
+				$slug = trim(preg_replace('/[^a-z0-9]/i', '-', $name), '-');
 				$slug = $root_name ? 'root-'.$slug : $slug;
 
 				$id   = __NAMESPACE__.$this->ns_id_suffix.'-'.$slug;
@@ -246,6 +248,8 @@ namespace comment_mail // Root namespace.
 
 				$row .= ' <td>';
 				$row .= '    <select'. // Select menu options.
+
+				        '     class="form-control"'. // Bootstrap compat.
 
 				        '     id="'.esc_attr($id).'" name="'.esc_attr($name).'"'.
 
@@ -324,7 +328,7 @@ namespace comment_mail // Root namespace.
 				$name      = trim((string)$args['name']);
 				$root_name = (boolean)$args['root_name'];
 
-				$slug = str_replace('_', '-', $name);
+				$slug = trim(preg_replace('/[^a-z0-9]/i', '-', $name), '-');
 				$slug = $root_name ? 'root-'.$slug : $slug;
 
 				$id   = __NAMESPACE__.$this->ns_id_suffix.'-'.$slug;
@@ -379,7 +383,7 @@ namespace comment_mail // Root namespace.
 				$name      = trim((string)$args['name']);
 				$root_name = (boolean)$args['root_name'];
 
-				$slug = str_replace('_', '-', $name);
+				$slug = trim(preg_replace('/[^a-z0-9]/i', '-', $name), '-');
 				$slug = $root_name ? 'root-'.$slug : $slug;
 
 				$id   = __NAMESPACE__.$this->ns_id_suffix.'-'.$slug;

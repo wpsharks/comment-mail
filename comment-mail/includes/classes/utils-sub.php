@@ -35,17 +35,17 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $key Input key to convert to an ID.
+			 * @param string $sub_key Input key to convert to an ID.
 			 *
-			 * @return integer The subscription ID matching the input `$key`.
-			 *    If the `$key` is not found, this returns `0`.
+			 * @return integer The subscription ID matching the input `$sub_key`.
+			 *    If the `$sub_key` is not found, this returns `0`.
 			 */
-			public function key_to_id($key)
+			public function key_to_id($sub_key)
 			{
-				if(!($key = trim((string)$key)))
+				if(!($sub_key = trim((string)$sub_key)))
 					return 0; // Not possible.
 
-				if(!($sub = $this->get($key)))
+				if(!($sub = $this->get($sub_key)))
 					return 0; // Not found.
 
 				return $sub->ID;
@@ -56,17 +56,17 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $key Input key to convert to an email address.
+			 * @param string $sub_key Input key to convert to an email address.
 			 *
-			 * @return string The subscription email address matching the input `$key`.
-			 *    If the `$key` is not found, this returns an empty string.
+			 * @return string The subscription email address matching the input `$sub_key`.
+			 *    If the `$sub_key` is not found, this returns an empty string.
 			 */
-			public function key_to_email($key)
+			public function key_to_email($sub_key)
 			{
-				if(!($key = trim((string)$key)))
+				if(!($sub_key = trim((string)$sub_key)))
 					return ''; // Not possible.
 
-				if(!($sub = $this->get($key)))
+				if(!($sub = $this->get($sub_key)))
 					return ''; // Not found.
 
 				return $sub->email;
@@ -620,18 +620,18 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $email Email address to check.
+			 * @param string $sub_email Email address to check.
 			 *
 			 * @return boolean TRUE if email exists already.
 			 */
-			public function email_exists($email)
+			public function email_exists($sub_email)
 			{
-				if(!($email = trim((string)$email)))
+				if(!($sub_email = trim((string)$sub_email)))
 					return FALSE; // Not possible.
 
 				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
-				       " WHERE `email` = '".esc_sql($email)."'".
+				       " WHERE `email` = '".esc_sql($sub_email)."'".
 
 				       " LIMIT 1"; // One to check.
 
@@ -639,11 +639,64 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Last IP associated w/ email address.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $sub_email Email address to check.
+			 *
+			 * @return string Last IP associated w/ email address; else empty string.
+			 */
+			public function email_last_ip($sub_email)
+			{
+				if(!($sub_email = trim((string)$sub_email)))
+					return ''; // Not possible.
+
+				$sql = "SELECT `last_ip` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " WHERE `email` = '".esc_sql($sub_email)."'".
+				       " AND `last_ip` != ''". // Has an IP.
+
+				       " ORDER BY `last_update_time` DESC".
+
+				       " LIMIT 1"; // One to check.
+
+				return trim((string)$this->plugin->utils_db->wp->get_var($sql));
+			}
+
+			/**
+			 * Is an email address blacklisted?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $sub_email Email address to check.
+			 *
+			 * @return boolean `TRUE` if the email is blacklisted.
+			 */
+			public function email_is_blacklisted($sub_email)
+			{
+				if(!($sub_email = trim((string)$sub_email)))
+					return FALSE; // Not possible.
+
+				if(!($blacklist = trim($this->plugin->options['email_blacklist_patterns'])))
+					return FALSE; // There is no blacklist.
+
+				if(is_null($blacklist_patterns = &$this->cache_key(__FUNCTION__, 'blacklist_patterns')))
+					$blacklist_patterns = '(?:'.implode('|', array_map(function ($pattern)
+						{
+							return preg_replace('/\\\\\*/', '.*?', preg_quote($pattern, '/')); #
+
+						}, preg_split('/['."\r\n".']+/', $blacklist, NULL, PREG_SPLIT_NO_EMPTY))).')';
+
+				return (boolean)preg_match('/^'.$blacklist_patterns.'$/i', $sub_email);
+			}
+
+			/**
 			 * Set current sub's email address.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $email Subscriber's current email address.
+			 * @param string $sub_email Subscriber's current email address.
 			 *
 			 * @warning It's VERY IMPORTANT that we only call upon this function to set the email address
 			 *    during a subscriber action; i.e. in real-time. This cookie is used as a trusted source by {@link current_email()}.
@@ -652,15 +705,15 @@ namespace comment_mail // Root namespace.
 			 * @throws \exception If attempting to set the current email when it's not a sub. action being processed in real time.
 			 *    Note that it's still possible to set the email address to an empty string; from anywhere at any time.
 			 */
-			public function set_current_email($email)
+			public function set_current_email($sub_email)
 			{
-				$email = trim((string)$email); // Force clean string.
+				$sub_email = trim((string)$sub_email); // Force clean string.
 
-				if($email) // Check security if we are attempting to set a non-empty cookie value.
-					if(is_admin() || !isset($_REQUEST[__NAMESPACE__]['confirm'], $_REQUEST[__NAMESPACE__]['unsubscribe'], $_REQUEST[__NAMESPACE__]['manage']))
+				if($sub_email) // Check security if we are attempting to set a non-empty cookie value.
+					if(is_admin() || (!isset($_REQUEST[__NAMESPACE__]['confirm']) && !isset($_REQUEST[__NAMESPACE__]['unsubscribe']) && !isset($_REQUEST[__NAMESPACE__]['manage'])))
 						throw new \exception(__('Trying to set current email w/o a sub. action.', $this->plugin->text_domain));
 
-				$this->plugin->utils_enc->set_cookie(__NAMESPACE__.'_sub_email', $email);
+				$this->plugin->utils_enc->set_cookie(__NAMESPACE__.'_sub_email', $sub_email);
 			}
 
 			/**
@@ -676,11 +729,11 @@ namespace comment_mail // Root namespace.
 			 */
 			public function current_email($search_untrusted_sources = FALSE)
 			{
-				if(($user = wp_get_current_user()) && $user->exists() && $user->user_email)
+				if(($user = wp_get_current_user()) && $user->ID && $user->user_email)
 					return (string)$user->user_email; // Force string.
 
-				if(($email = $this->plugin->utils_enc->get_cookie(__NAMESPACE__.'_sub_email')))
-					return (string)$email; // Force string.
+				if(($sub_email = $this->plugin->utils_enc->get_cookie(__NAMESPACE__.'_sub_email')))
+					return (string)$sub_email; // Force string.
 
 				if($search_untrusted_sources) // Try current commenter?
 					if(($commenter = wp_get_current_commenter()) && !empty($commenter['comment_author_email']))

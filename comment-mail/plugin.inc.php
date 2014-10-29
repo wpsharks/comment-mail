@@ -18,24 +18,24 @@ namespace comment_mail
 		/**
 		 * Plugin Class
 		 *
-		 * @property utils_array           $utils_array
-		 * @property utils_date            $utils_date
-		 * @property utils_db              $utils_db
-		 * @property utils_enc             $utils_enc
-		 * @property utils_env             $utils_env
-		 * @property utils_event           $utils_event
-		 * @property utils_fs              $utils_fs
-		 * @property utils_i18n            $utils_i18n
-		 * @property utils_mail            $utils_mail
-		 * @property utils_markup          $utils_markup
-		 * @property utils_php             $utils_php
-		 * @property utils_queue           $utils_queue
-		 * @property utils_queue_event_log $utils_queue_event_log
-		 * @property utils_string          $utils_string
-		 * @property utils_sub             $utils_sub
-		 * @property utils_sub_event_log   $utils_sub_event_log
-		 * @property utils_url             $utils_url
-		 * @property utils_user            $utils_user
+		 * @property-read utils_array           $utils_array
+		 * @property-read utils_date            $utils_date
+		 * @property-read utils_db              $utils_db
+		 * @property-read utils_enc             $utils_enc
+		 * @property-read utils_env             $utils_env
+		 * @property-read utils_event           $utils_event
+		 * @property-read utils_fs              $utils_fs
+		 * @property-read utils_i18n            $utils_i18n
+		 * @property-read utils_mail            $utils_mail
+		 * @property-read utils_markup          $utils_markup
+		 * @property-read utils_php             $utils_php
+		 * @property-read utils_queue           $utils_queue
+		 * @property-read utils_queue_event_log $utils_queue_event_log
+		 * @property-read utils_string          $utils_string
+		 * @property-read utils_sub             $utils_sub
+		 * @property-read utils_sub_event_log   $utils_sub_event_log
+		 * @property-read utils_url             $utils_url
+		 * @property-read utils_user            $utils_user
 		 *
 		 * @since 14xxxx First documented version.
 		 */
@@ -71,6 +71,15 @@ namespace comment_mail
 			 * @var string Plugin name (abbreviated).
 			 */
 			public $short_name = 'CM';
+
+			/**
+			 * Plugin product page URL.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @var string Plugin product page URL.
+			 */
+			public $product_page = 'http://comment-mail.com';
 
 			/**
 			 * Used by the plugin's uninstall handler.
@@ -254,76 +263,85 @@ namespace comment_mail
 				$this->cap = apply_filters(__METHOD__.'_cap', 'activate_plugins');
 
 				$this->default_options = array(
-					'version'                                     => $this->version,
-					'enable'                                      => '0', // `0|1`; enable?
-					'crons_setup'                                 => '0', // `0` or timestamp.
-					'uninstall_on_deletion'                       => '0', // `0|1`; run uninstaller?
+					'version'                                            => $this->version,
+					'enable'                                             => '0', // `0|1`; enable?
+					'crons_setup'                                        => '0', // `0` or timestamp.
+					'uninstall_on_deletion'                              => '0', // `0|1`; run uninstaller?
 
-					'manage_cap'                                  => $this->cap, // Capability.
-					'uninstall_cap'                               => 'delete_plugins', // Capability.
+					'manage_cap'                                         => $this->cap, // Capability.
+					'uninstall_cap'                                      => 'delete_plugins', // Capability.
 
-					'auto_confirm_enable'                         => '0', // `0|1`; auto-confirm enable?
+					'auto_confirm_enable'                                => '0', // `0|1`; auto-confirm enable?
 
-					'auto_subscribe_enable'                       => '1', // `0|1`; auto-subscribe enable?
-					'auto_subscribe_deliver'                      => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
-					'auto_subscribe_post_types'                   => 'post,page', // Comma-delimited post types.
-					'auto_subscribe_post_author'                  => '1', // `0|1`; auto-subscribe post authors?
-					'auto_subscribe_recipients'                   => '', // Others `;|,` delimited emails.
+					'auto_subscribe_enable'                              => '1', // `0|1`; auto-subscribe enable?
+					'auto_subscribe_deliver'                             => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
+					'auto_subscribe_post_types'                          => 'post,page', // Comma-delimited post types.
+					'auto_subscribe_post_author'                         => '1', // `0|1`; auto-subscribe post authors?
+					'auto_subscribe_recipients'                          => '', // Others `;|,` delimited emails.
 
-					'reply_to_email'                              => '', // Reply-To header.
+					'reply_to_email'                                     => '', // Reply-To header.
 
-					'smtp_enable'                                 => '0', // `0|1`; enable?
-					'smtp_host'                                   => '', // SMTP host name.
-					'smtp_port'                                   => '', // SMTP port number.
-					'smtp_secure'                                 => '', // ``, `ssl` or `tls`.
+					'smtp_enable'                                        => '0', // `0|1`; enable?
+					'smtp_host'                                          => '', // SMTP host name.
+					'smtp_port'                                          => '', // SMTP port number.
+					'smtp_secure'                                        => '', // ``, `ssl` or `tls`.
 
-					'smtp_username'                               => '', // SMTP username.
-					'smtp_password'                               => '', // SMTP password.
+					'smtp_username'                                      => '', // SMTP username.
+					'smtp_password'                                      => '', // SMTP password.
 
-					'smtp_from_name'                              => '', // SMTP from name.
-					'smtp_from_email'                             => '', // SMTP from email.
-					'smtp_force_from'                             => '1', // `0|1`; force?
+					'smtp_from_name'                                     => '', // SMTP from name.
+					'smtp_from_email'                                    => '', // SMTP from email.
+					'smtp_force_from'                                    => '1', // `0|1`; force?
 
-					'template_site_site_header'                   => '', // HTML/PHP code.
-					'template_site_site_footer'                   => '', // HTML/PHP code.
+					'template_site_site_header'                          => '', // HTML/PHP code.
+					'template_site_site_footer'                          => '', // HTML/PHP code.
 
-					'template_site_comment_form_sub_ops'          => '', // HTML/PHP code.
+					'template_site_comment_form_sub_ops'                 => '', // HTML/PHP code.
 
-					'template_site_sub_actions_confirmed'         => '', // HTML/PHP code.
-					'template_site_sub_actions_unsubscribed'      => '', // HTML/PHP code.
-					'template_site_sub_actions_manage_summary'    => '', // HTML/PHP code.
-					'template_site_sub_actions_manage_sub_form'   => '', // HTML/PHP code.
+					'template_site_sub_actions_confirmed'                => '', // HTML/PHP code.
+					'template_site_sub_actions_unsubscribed'             => '', // HTML/PHP code.
+					'template_site_sub_actions_manage_summary'           => '', // HTML/PHP code.
+					'template_site_sub_actions_manage_sub_form'          => '', // HTML/PHP code.
 
-					'template_email_email_header'                 => '', // HTML/PHP code.
-					'template_email_email_footer'                 => '', // HTML/PHP code.
+					'template_email_email_header'                        => '', // HTML/PHP code.
+					'template_email_email_footer'                        => '', // HTML/PHP code.
 
-					'template_email_confirmation_request_subject' => '', // HTML/PHP code.
-					'template_email_confirmation_request_message' => '', // HTML/PHP code.
+					'email_footer_powered_by_enable'                     => '1', // `0|1`; enable?
+					'can_spam_postmaster'                                => get_bloginfo('admin_email'),
+					'can_spam_mailing_address'                           => '', // CAN-SPAM contact info.
 
-					'template_email_comment_notification_subject' => '', // HTML/PHP code.
-					'template_email_comment_notification_message' => '', // HTML/PHP code.
+					'template_email_confirmation_request_subject'        => '', // HTML/PHP code.
+					'template_email_confirmation_request_message'        => '', // HTML/PHP code.
 
-					'queue_processor_max_time'                    => '30', // In seconds.
-					'queue_processor_delay'                       => '250', // In milliseconds.
-					'queue_processor_max_limit'                   => '100', // Total queue entries.
+					'template_email_comment_notification_subject'        => '', // HTML/PHP code.
+					'template_email_comment_notification_message'        => '', // HTML/PHP code.
 
-					'queue_processor_immediate_max_time'          => '10', // In seconds.
-					'queue_processor_immediate_max_limit'         => '5', // Total queue entries.
+					'queue_processor_max_time'                           => '30', // In seconds.
+					'queue_processor_delay'                              => '250', // In milliseconds.
+					'queue_processor_max_limit'                          => '100', // Total queue entries.
 
-					'sub_cleaner_max_time'                        => '60', // In seconds.
+					'queue_processor_immediate_max_time'                 => '10', // In seconds.
+					'queue_processor_immediate_max_limit'                => '5', // Total queue entries.
 
-					'unconfirmed_expiration_time'                 => '60 days', // `strtotime()` compatible.
+					'sub_cleaner_max_time'                               => '60', // In seconds.
+
+					'unconfirmed_expiration_time'                        => '60 days', // `strtotime()` compatible.
 					// Or, this can be left empty to disable automatic expirations altogether.
 
-					'trashed_expiration_time'                     => '60 days', // `strtotime()` compatible.
+					'trashed_expiration_time'                            => '60 days', // `strtotime()` compatible.
 					// Or, this can be left empty to disable automatic deletions altogether.
 
-					'excluded_meta_box_post_types'                => 'link,comment,revision,attachment,nav_menu_item,snippet,redirect',
+					'excluded_meta_box_post_types'                       => 'link,comment,revision,attachment,nav_menu_item,snippet,redirect',
 
-					'user_select_options_enable'                  => '1', // `0|1`; enable?
-					'post_select_options_enable'                  => '1', // `0|1`; enable?
-					'post_select_options_media_enable'            => '0', // `0|1`; enable?
-					'comment_select_options_enable'               => '1', // `0|1`; enable?
+					'user_select_options_enable'                         => '1', // `0|1`; enable?
+					'post_select_options_enable'                         => '1', // `0|1`; enable?
+					'post_select_options_media_enable'                   => '0', // `0|1`; enable?
+					'comment_select_options_enable'                      => '1', // `0|1`; enable?
+
+					'comment_notification_parent_content_clip_max_chars' => '100', // Max chars to include in notifications.
+					'comment_notification_content_clip_max_chars'        => '200', // Max chars to include in notifications.
+
+					'email_blacklist_patterns'                           => '', // A line-delimited list of blacklisted emails/domains.
 
 				); // Default options are merged with those defined by the site owner.
 				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options); // Allow filters.
@@ -344,7 +362,7 @@ namespace comment_mail
 				/*
 				 * Setup all secondary plugin hooks.
 				 */
-				add_action('wp_loaded', array($this, 'actions'));
+				add_action('init', array($this, 'actions'), -10);
 
 				add_action('admin_init', array($this, 'check_version'));
 				add_action('all_admin_notices', array($this, 'all_admin_notices'));
@@ -356,7 +374,7 @@ namespace comment_mail
 				add_filter('set-screen-option', array($this, 'set_screen_option'), 10, 3);
 				add_filter('plugin_action_links_'.plugin_basename($this->file), array($this, 'add_settings_link'));
 
-				add_action('init', array($this, 'comment_shortlink_redirect'), -(PHP_INT_MAX - 10));
+				add_action('init', array($this, 'comment_shortlink_redirect'), -11);
 
 				add_action('transition_post_status', array($this, 'post_status'), 10, 3);
 				add_action('before_delete_post', array($this, 'post_delete'), 10, 1);
@@ -493,7 +511,7 @@ namespace comment_mail
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @attaches-to `wp_loaded` action.
+			 * @attaches-to `init` action.
 			 */
 			public function actions()
 			{

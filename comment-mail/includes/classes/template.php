@@ -82,16 +82,15 @@ namespace comment_mail // Root namespace.
 			 */
 			public function parse(array $vars = array())
 			{
+				$vars['plugin'] = plugin(); // Plugin class.
+
 				if(strpos($this->file, 'site/') === 0)
 					$vars = array_merge($vars, $this->site_vars($vars));
 
 				if(strpos($this->file, 'email/') === 0)
 					$vars = array_merge($vars, $this->email_vars($vars));
 
-				if(!empty($vars['sub']) && $vars['sub'] instanceof \stdClass)
-					$vars = array_merge($vars, $this->sub_vars($vars['sub']));
-
-				return $this->plugin->utils_php->evaluate($this->file_contents, $vars);
+				return trim($this->plugin->utils_php->evaluate($this->file_contents, $vars));
 			}
 
 			/**
@@ -155,25 +154,15 @@ namespace comment_mail // Root namespace.
 				$email_header = $email_header_template->parse($vars);
 				$email_footer = $email_footer_template->parse($vars);
 
+				if(!$this->plugin->is_pro || $this->plugin->options['email_footer_powered_by_enable'])
+				{
+					$powered_by   = '<hr /><p style="color:#888888;">'. // Powered by note at the bottom of all email templates.
+					                ' '.sprintf(__('~ powered by %1$s™ for WordPress', $this->plugin->text_domain), esc_html($this->plugin->name)).
+					                '  &lt;<a href="'.esc_attr($this->plugin->utils_url->product_page()).'">'.esc_html($this->plugin->utils_url->product_page()).'</a>&gt;'.
+					                '</p>';
+					$email_footer = str_ireplace('</body>', $powered_by.'</body>', $email_footer); // Before closing body tag.
+				}
 				return compact('email_header', 'email_footer'); // Header/footer.
-			}
-
-			/**
-			 * Sub. template vars.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param \stdClass $sub Subscription object.
-			 *
-			 * @return array An array of all sub. template vars.
-			 */
-			protected function sub_vars(\stdClass $sub)
-			{
-				$confirm_url     = $this->plugin->utils_url->sub_confirm_url($sub->key);
-				$unsubscribe_url = $this->plugin->utils_url->sub_unsubscribe_url($sub->key);
-				$manage_url      = $this->plugin->utils_url->sub_manage_url($sub->key);
-
-				return compact('confirm_url', 'unsubscribe_url', 'manage_url');
 			}
 
 			/**

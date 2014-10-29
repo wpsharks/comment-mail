@@ -116,78 +116,15 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Inserted successfully?
+			 * Sub inserter.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @return boolean Did we insert?
+			 * @return sub_inserter|null Sub inserter.
 			 */
-			public function did_insert()
+			public function sub_inserter()
 			{
-				if(!$this->sub_inserter)
-					return FALSE;
-
-				return $this->sub_inserter->did_insert();
-			}
-
-			/**
-			 * Insertion ID.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return integer Insertion ID; if applicable.
-			 */
-			public function insert_id()
-			{
-				if(!$this->sub_inserter)
-					return 0;
-
-				return $this->sub_inserter->insert_id();
-			}
-
-			/**
-			 * Do we have errors?
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return boolean `TRUE` if has errors.
-			 */
-			public function has_errors()
-			{
-				if(!$this->sub_inserter)
-					return FALSE;
-
-				return $this->sub_inserter->has_errors();
-			}
-
-			/**
-			 * Array of any errors.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return array An array of any/all errors.
-			 */
-			public function errors()
-			{
-				if(!$this->sub_inserter)
-					return array();
-
-				return $this->sub_inserter->errors();
-			}
-
-			/**
-			 * Array of any errors w/ HTML markup.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return array An array of any/all errors.
-			 */
-			public function errors_html()
-			{
-				if(!$this->sub_inserter)
-					return array();
-
-				return $this->sub_inserter->errors_html();
+				return $this->sub_inserter;
 			}
 
 			/**
@@ -209,9 +146,9 @@ namespace comment_mail // Root namespace.
 				if(!$this->comment->comment_author_email)
 					return; // Not possible.
 
-				if($this->comment->comment_type)
-					if($this->comment->comment_type !== 'comment')
-						return; // Not applicable.
+				if($this->comment->comment_type
+				   && $this->comment->comment_type !== 'comment'
+				) return; // Not applicable.
 
 				$data               = array(
 					'post_id'    => $this->comment->comment_post_ID,
@@ -219,8 +156,8 @@ namespace comment_mail // Root namespace.
 					'comment_id' => $this->type === 'comments' ? 0 : $this->comment->comment_ID,
 					'deliver'    => $this->deliver, // Delivery option.
 
-					'fname'      => $this->first_name(),
-					'lname'      => $this->last_name(),
+					'fname'      => $this->plugin->utils_string->first_name($this->comment->comment_author, $this->comment->comment_author_email),
+					'lname'      => $this->plugin->utils_string->last_name($this->comment->comment_author),
 					'email'      => $this->comment->comment_author_email,
 				);
 				$this->sub_inserter = new sub_inserter($data, array(
@@ -229,47 +166,6 @@ namespace comment_mail // Root namespace.
 					'process_events'       => $this->process_events,
 					'user_initiated'       => $this->user_initiated,
 				));
-			}
-
-			/**
-			 * Commenters first name.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return string Commenters first name; else `name` in email address.
-			 */
-			protected function first_name()
-			{
-				$fname = $name =  // Start with a clean full name.
-					$this->plugin->utils_string->clean_name($this->comment->comment_author);
-
-				if(strpos($name, ' ', 1) !== FALSE)
-					list($fname,) = explode(' ', $name, 2);
-
-				$fname = trim($fname); // Cleanup first name.
-
-				return $fname; // First name.
-			}
-
-			/**
-			 * Commenters last name.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return string Commenters last name; else empty string.
-			 */
-			protected function last_name()
-			{
-				$lname = ''; // Empty string; initialize.
-				$name  // Last part of full name might be useable.
-				       = $this->plugin->utils_string->clean_name($this->comment->comment_author);
-
-				if(strpos($name, ' ', 1) !== FALSE)
-					list(, $lname) = explode(' ', $name, 2);
-
-				$lname = trim($lname); // Cleanup last name.
-
-				return $lname; // Last name.
 			}
 		}
 	}

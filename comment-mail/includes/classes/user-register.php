@@ -62,6 +62,8 @@ namespace comment_mail // Root namespace.
 				if(!$this->user->user_email)
 					return; // Not possible.
 
+				# Update the subs table; i.e. associate w/ this user where applicable.
+
 				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `email` = '".esc_sql($this->user->user_email)."'".
@@ -72,7 +74,25 @@ namespace comment_mail // Root namespace.
 						new sub_updater(array('ID' => $_sub_id, 'user_id' => $this->user->ID));
 				unset($_sub_id); // Housekeeping.
 
-				// @TODO should this update event logs too?
+				# Update event logs too; i.e. associate w/ this user where applicable.
+
+				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
+				       " SET `user_id` = '".esc_sql($this->user->ID)."'". // Update.
+
+				       " WHERE `email` = '".esc_sql($this->user->user_email)."'".
+				       " AND `user_id` = '0'"; // Not yet associated w/ a user ID.
+
+				if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
+
+				$sql = "UPDATE `".esc_sql($this->plugin->utils_db->prefix().'queue_event_log')."`".
+				       " SET `user_id` = '".esc_sql($this->user->ID)."'". // Update.
+
+				       " WHERE `email` = '".esc_sql($this->user->user_email)."'".
+				       " AND `user_id` = '0'"; // Not yet associated w/ a user ID.
+
+				if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
 			}
 		}
 	}

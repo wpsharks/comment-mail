@@ -120,7 +120,6 @@ namespace comment_mail // Root namespace.
 						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"'),
 					));
 				echo $this->form_fields->select_row(
-				// @TODO auto-populate email and names when a user ID is selected and the fields are currently empty.
 					array(
 						'placeholder'         => __('— N/A; no WP User ID —', $this->plugin->text_domain),
 						'label'               => __('<i class="fa fa-fw fa-user"></i> WP User ID#', $this->plugin->text_domain),
@@ -205,20 +204,20 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $property The property to acquire.
+			 * @param string $key_prop The key/property to acquire.
 			 *
 			 * @return string|null The property value; else `NULL`.
 			 */
-			protected function current_value_for($property)
+			protected function current_value_for($key_prop)
 			{
-				if(!($property = (string)$property))
+				if(!($key_prop = (string)$key_prop))
 					return NULL; // Not possible.
 
-				if(isset($_REQUEST[__NAMESPACE__]['sub_form'][$property]))
-					return trim(stripslashes((string)$_REQUEST[__NAMESPACE__]['sub_form'][$property]));
+				if(isset($_REQUEST[__NAMESPACE__]['sub_form'][$key_prop]))
+					return trim(stripslashes((string)$_REQUEST[__NAMESPACE__]['sub_form'][$key_prop]));
 
-				if($this->is_edit && isset($this->sub->{$property}))
-					return trim((string)$this->sub->{$property});
+				if($this->is_edit && isset($this->sub->{$key_prop}))
+					return trim((string)$this->sub->{$key_prop});
 
 				return NULL; // Default value.
 			}
@@ -237,7 +236,7 @@ namespace comment_mail // Root namespace.
 			 * @return string HTML markup for this select field row.
 			 *    If no options (or too many options; this returns an input field instead.
 			 *
-			 * @see menu_page_actions::comment_id_row_via_ajax()
+			 * @see menu_page_actions::sub_form_comment_id_row_via_ajax()
 			 */
 			public static function comment_id_row_via_ajax($post_id)
 			{
@@ -258,6 +257,56 @@ namespace comment_mail // Root namespace.
 						'notes'               => __('If empty, they\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $plugin->text_domain),
 						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"'),
 					));
+			}
+
+			/**
+			 * Get user ID info via AJAX.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $user_id A WP user ID.
+			 *
+			 * @return string JSON data object w/ user info.
+			 *
+			 * @see menu_page_actions::sub_form_user_id_info_via_ajax()
+			 */
+			public static function user_id_info_via_ajax($user_id)
+			{
+				$plugin = plugin();
+
+				$default_info      = array(
+					'email' => '',
+					'fname' => '',
+					'lname' => '',
+					'ip'    => '',
+				);
+				$default_info_json = json_encode($default_info);
+
+				if(!current_user_can($plugin->manage_cap))
+					if(!current_user_can($plugin->cap))
+						return $default_info_json;
+
+				if(!current_user_can('list_users'))
+					return $default_info_json;
+
+				$user_id = (integer)$user_id;
+				$user    = new \WP_User($user_id);
+
+				if(!$user->ID) // Has no ID?
+					return $default_info_json;
+
+				$info = array(
+					'email' => $user->user_email,
+					'fname' => $plugin->utils_string->first_name('', $user),
+					'lname' => $plugin->utils_string->last_name('', $user),
+					'ip'    => $plugin->utils_user->is_current($user)
+						? $plugin->utils_env->user_ip() // For current user.
+						: $plugin->utils_sub->email_last_ip($user->user_email),
+				);
+				$info = array_merge($default_info, $info);
+				$info = array_intersect_key($info, $default_info);
+
+				return ($info_json = json_encode($info));
 			}
 
 			/**

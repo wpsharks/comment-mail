@@ -250,11 +250,11 @@ namespace comment_mail // Root namespace.
 					$_email = preg_replace('/^.*?_stcr@_/i', '', $_result->meta_key);
 					$_email = trim(strtolower($_email));
 
-					if(strpos($_email, '@', 1) === FALSE || !is_email($_email))
+					if(!$_email || strpos($_email, '@', 1) === FALSE || !is_email($_email))
 						continue; // Invalid email address.
 
 					// Original format: `2013-03-11 01:31:01|R`.
-					if(strpos($_result->meta_value, '|', 1) === FALSE)
+					if(!$_result->meta_value || strpos($_result->meta_value, '|', 1) === FALSE)
 						continue; // Invalid meta data.
 
 					list($_local_datetime, $_status) = explode('|', $_result->meta_value);

@@ -42,7 +42,11 @@ namespace comment_mail // Root namespace.
 				if(!is_null($ip = &$this->static_key(__FUNCTION__)))
 					return $ip; // Cached this already.
 
-				return ($ip = !empty($_SERVER['REMOTE_ADDR']) ? (string)$_SERVER['REMOTE_ADDR'] : '');
+				$ip = ''; // Initialize.
+				if(!empty($_SERVER['REMOTE_ADDR']))
+					$ip = $_SERVER['REMOTE_ADDR'];
+
+				return ($ip = (string)substr($ip, 0, 39));
 			}
 
 			/**
