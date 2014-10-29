@@ -743,7 +743,8 @@ Menu page table filter styles.
 */
 .comment-mail-menu-page-form .form-field input:not([type='radio']):not([type='checkbox']),
 .comment-mail-menu-page-form .form-field select,
-.comment-mail-menu-page-form .form-field textarea
+.comment-mail-menu-page-form .form-field textarea,
+.comment-mail-menu-page-form .form-field p.description
 {
 	width     : 100%;
 	max-width : 600px;

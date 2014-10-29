@@ -114,30 +114,21 @@ namespace comment_mail // Root namespace.
 					if(strpos($_recipient, '@') === FALSE) continue; // NOT an email address.
 
 					if(strpos($_recipient, '<') !== FALSE && preg_match('/(?:"(?P<name>[^"]+?)"\s*)?\<(?P<email>.+?)\>/', $_recipient, $_m))
-						if(strpos($_m['email'], '@', 1) !== FALSE && (!$strict || is_email($_m['email'])))
+						if($_m['email'] && strpos($_m['email'], '@', 1) !== FALSE && (!$strict || is_email($_m['email'])))
 						{
 							$_email = strtolower($_m['email']);
-
-							$_name = !empty($_m['name']) ? $_m['name'] : '';
-							$_name = $_name ? $this->plugin->utils_string->clean_name($_name) : '';
-
-							$_fname = $_name; // Default value; full name.
-							$_lname = ''; // Default value; empty string for now.
-
-							if($_name && strpos($_name, ' ', 1) !== FALSE) // Last name?
-								list($_fname, $_lname) = explode($_name, ' ', 2);
-
-							if(!$_fname) $_fname = (string)strstr($_email, '@', TRUE);
+							$_name  = !empty($_m['name']) ? $_m['name'] : '';
+							$_fname = $this->plugin->utils_string->first_name($_name, $_email);
+							$_lname = $this->plugin->utils_string->last_name($_name);
 
 							$recipients[$_email] = (object)array('fname' => $_fname, 'lname' => $_lname, 'email' => $_email);
 
 							continue; // Inside brackets; all done here.
 						}
-					if(strpos($_recipient, '@', 1) !== FALSE && (!$strict || is_email($_recipient)))
+					if($_recipient && strpos($_recipient, '@', 1) !== FALSE && (!$strict || is_email($_recipient)))
 					{
 						$_email = strtolower($_recipient);
-
-						$_fname = (string)strstr($_email, '@', TRUE);
+						$_fname = $this->plugin->utils_string->first_name('', $_email);
 						$_lname = ''; // Not possible in this case.
 
 						$recipients[$_email] = (object)array('fname' => $_fname, 'lname' => $_lname, 'email' => $_email);

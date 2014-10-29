@@ -25,13 +25,6 @@ namespace comment_mail // Root namespace.
 			 */
 
 			/**
-			 * @var string|null Unique subscription ID.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $sub_id;
-
-			/**
 			 * @var string|null Unique subscription key.
 			 *
 			 * @since 14xxxx First documented version.
@@ -74,6 +67,55 @@ namespace comment_mail // Root namespace.
 				'class_prefix'   => 'manage-sub-form-',
 			);
 
+			/**
+			 * @var boolean Processing form?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing = FALSE;
+
+			/**
+			 * @var array Any processing successes.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing_successes = array();
+
+			/**
+			 * @var array Any processing success codes.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing_success_codes = array();
+
+			/**
+			 * @var array Any processing successes w/ HTML markup.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing_successes_html = array();
+
+			/**
+			 * @var array Any processing errors.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing_errors = array();
+
+			/**
+			 * @var array Any processing error codes.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing_error_codes = array();
+
+			/**
+			 * @var array Any processing errors w/ HTML markup.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing_errors_html = array();
+
 			/*
 			 * Instance-based constructor.
 			 */
@@ -83,22 +125,17 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer $sub_id Subscription ID.
-			 *
 			 * @param integer $sub_key Unique subscription key.
-			 *    This MUST match the key for the subscription ID.
-			 *    This is validated as an added security measure.
 			 */
-			public function __construct($sub_id = NULL, $sub_key = NULL)
+			public function __construct($sub_key = NULL)
 			{
 				parent::__construct();
 
-				if(isset($sub_id) || isset($sub_key))
+				if(isset($sub_key)) // Editing?
 				{
 					$this->is_edit = TRUE;
-					$this->sub_id  = (integer)$sub_id;
 					$this->sub_key = trim((string)$sub_key);
-					$this->sub     = $this->plugin->utils_sub->get($this->sub_id);
+					$this->sub     = $this->plugin->utils_sub->get($this->sub_key);
 				}
 				$this->form_fields = new form_fields(static::$form_field_args);
 
@@ -116,26 +153,36 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_display()
 			{
-				$sub_id      = $this->sub_id;
-				$sub_key     = $this->sub_key;
-				$is_edit     = $this->is_edit;
-				$sub         = $this->sub;
-				$form_fields = $this->form_fields;
-				$error_code  = ''; // Initialize.
+				$sub_key = $this->sub_key;
+				$is_edit = $this->is_edit;
+				$sub     = $this->sub;
 
-				if($this->is_edit && !$this->sub_id)
-					$error_code = 'missing_sub_id';
+				$form_fields       = $this->form_fields;
+				$current_value_for = array($this, 'current_value_for');
+				$hidden_inputs     = array($this, 'hidden_inputs');
 
-				else if($this->is_edit && !$this->sub_key)
-					$error_code = 'missing_sub_key';
+				$processing = static::$processing; // & related vars.
+
+				$processing_successes      = static::$processing_successes;
+				$processing_success_codes  = static::$processing_success_codes;
+				$processing_successes_html = static::$processing_successes_html;
+
+				$processing_errors      = static::$processing_errors;
+				$processing_error_codes = static::$processing_error_codes;
+				$processing_errors_html = static::$processing_errors_html;
+
+				$error_codes = array(); // Initialize.
+
+				if($this->is_edit && !$this->sub_key)
+					$error_codes[] = 'missing_sub_key';
 
 				else if($this->is_edit && !$this->sub)
-					$error_code = 'invalid_sub_id';
+					$error_codes[] = 'invalid_sub_key';
 
 				else if($this->is_edit && $this->sub_key !== $this->sub->key)
-					$error_code = 'invalid_sub_key';
+					$error_codes[] = 'invalid_sub_key';
 
-				$template_vars = compact('sub_id', 'sub_key', 'is_edit', 'sub', 'form_fields', 'error_code');
+				$template_vars = get_defined_vars(); // Everything above.
 				$template      = new template('site/sub-actions/manage-sub-form.php');
 
 				status_header(200); // Status header.
@@ -154,22 +201,62 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $property The property to acquire.
+			 * @param string $key_prop The key/property to acquire.
 			 *
 			 * @return string|null The property value; else `NULL`.
 			 */
-			public function current_value_for($property)
+			public function current_value_for($key_prop)
 			{
-				if(!($property = (string)$property))
+				if(!($key_prop = (string)$key_prop))
 					return NULL; // Not possible.
 
-				if(isset($_REQUEST[__NAMESPACE__]['manage']['sub_form'][$property]))
-					return trim(stripslashes((string)$_REQUEST[__NAMESPACE__]['manage']['sub_form'][$property]));
+				if(!static::$processing || static::$processing_error_codes)
+					if(isset($_REQUEST[__NAMESPACE__]['manage']['sub_form'][$key_prop]))
+						return trim(stripslashes((string)$_REQUEST[__NAMESPACE__]['manage']['sub_form'][$key_prop]));
 
-				if($this->is_edit && isset($this->sub->{$property}))
-					return trim((string)$this->sub->{$property});
+				if($this->is_edit && isset($this->sub->{$key_prop}))
+					return trim((string)$this->sub->{$key_prop});
 
 				return NULL; // Default value.
+			}
+
+			/**
+			 * Hidden inputs needed for form processing.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string Hidden inputs needed for form processing.
+			 */
+			public function hidden_inputs()
+			{
+				$hidden_inputs = ''; // Initialize.
+
+				if($this->is_edit && $this->sub) // Editing?
+				{
+					$hidden_inputs .= $this->form_fields->hidden_input(
+							array(
+								'name'          => 'ID',
+								'current_value' => $this->sub->ID,
+							))."\n";
+					$hidden_inputs .= $this->form_fields->hidden_input(
+							array(
+								'name'          => 'key',
+								'current_value' => $this->sub->key,
+							))."\n";
+					$hidden_inputs .= $this->form_fields->hidden_input(
+							array(
+								'root_name'     => TRUE,
+								'name'          => __NAMESPACE__.'[manage][sub_edit]',
+								'current_value' => $this->sub->key,
+							))."\n";
+				}
+				else $hidden_inputs .= $this->form_fields->hidden_input(
+						array(
+							'root_name'     => TRUE,
+							'name'          => __NAMESPACE__.'[manage][sub_new]',
+							'current_value' => 0,
+						))."\n";
+				return $hidden_inputs; // Used by templats.
 			}
 
 			/*
@@ -190,6 +277,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public static function comment_id_row_via_ajax($post_id)
 			{
+				// @TODO move this into a template file.
+
 				$plugin      = plugin();
 				$post_id     = (integer)$post_id;
 				$form_fields = new form_fields(static::$form_field_args);
@@ -202,10 +291,7 @@ namespace comment_mail // Root namespace.
 						'notes'               => __('If empty, you\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $plugin->text_domain),
 						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"'),
 					));
-				// @ TODO this should conceal the email addresses associated w/ each comment for privacy reasons.
 			}
-
-			// @TODO everything below.
 
 			/**
 			 * Form processor.
@@ -214,20 +300,20 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param array $request_args Incoming action request args.
 			 *
-			 * @see menu_page_actions::sub_form()
+			 * @see sub_manage_actions::sub_form()
 			 */
 			public static function process(array $request_args)
 			{
 				$plugin = plugin(); // Needed below.
 
-				$reporting_errors = FALSE; // Initialize.
-
-				$request_args['user_id'] = get_current_user_id();
-				$args                    = array(
+				$args = array(
 					'process_confirmation'          => TRUE,
 					'user_initiated'                => TRUE,
 					'ui_protected_data_keys_enable' => TRUE,
+					'ui_protected_data_user'        => wp_get_current_user(),
 				); // Behavioral args.
+
+				static::$processing = TRUE; // Flag as `TRUE`; along w/ other statics below.
 
 				if(isset($request_args['ID'])) // Updating an existing subscription via ID?
 				{
@@ -235,21 +321,15 @@ namespace comment_mail // Root namespace.
 
 					if($sub_updater->did_update()) // Updated successfully?
 					{
-						// @TODO this needs to change for sub. management.
-						// Errors/successes should be reported for use in the template file.
-
-						$plugin->enqueue_user_notice( // Queue notice.
-							sprintf(__('Subscription ID# <code>%1$s</code> updated successfully.', $plugin->text_domain), esc_html($request_args['ID'])),
-							array('transient' => TRUE, 'for_page' => $plugin->utils_env->current_menu_page()));
-
-						$redirect_to = $plugin->utils_url->page_table_nav_vars_only();
+						static::$processing_successes      = $sub_updater->successes();
+						static::$processing_success_codes  = $sub_updater->success_codes();
+						static::$processing_successes_html = $sub_updater->successes_html();
 					}
-					else // There were errors; display those errors to the current user.
+					else // Include several properties when errors occur.
 					{
-						$plugin->enqueue_user_error( // Queue error notice.
-							sprintf(__('Failed to update subscription ID# <code>%1$s</code>. Please review the following error(s):', $plugin->text_domain), esc_html($request_args['ID'])).
-							'<ul class="pmp-list-items"><li>'.implode('</li><li>', $sub_updater->errors_html()).'</li></ul>',
-							array('transient' => TRUE, 'for_page' => $plugin->utils_env->current_menu_page()));
+						static::$processing_errors      = $sub_updater->errors();
+						static::$processing_error_codes = $sub_updater->error_codes();
+						static::$processing_errors_html = $sub_updater->errors_html();
 					}
 				}
 				else // We are doing a new insertion; i.e. a new subscription is being added here.
@@ -258,33 +338,16 @@ namespace comment_mail // Root namespace.
 
 					if($sub_inserter->did_insert()) // Inserted successfully?
 					{
-						// @TODO this needs to change for sub. management.
-						// Errors/successes should be reported for use in the template file.
-
-						$plugin->enqueue_user_notice( // Queue notice.
-							sprintf(__('Subscription ID# <code>%1$s</code> created successfully.', $plugin->text_domain), esc_html($sub_inserter->insert_id())),
-							array('transient' => TRUE, 'for_page' => $plugin->utils_env->current_menu_page()));
-
-						$redirect_to = $plugin->utils_url->page_table_nav_vars_only();
+						static::$processing_successes      = $sub_inserter->successes();
+						static::$processing_success_codes  = $sub_inserter->success_codes();
+						static::$processing_successes_html = $sub_inserter->successes_html();
 					}
-					else // There were errors; display those errors to the current user.
+					else // Include several properties when errors occur.
 					{
-						$plugin->enqueue_user_error( // Queue error notice.
-							__('Failed to create new subscription. Please review the following error(s):', $plugin->text_domain).
-							'<ul class="pmp-list-items"><li>'.implode('</li><li>', $sub_inserter->errors_html()).'</li></ul>',
-							array('transient' => TRUE, 'for_page' => $plugin->utils_env->current_menu_page()));
+						static::$processing_errors      = $sub_inserter->errors();
+						static::$processing_error_codes = $sub_inserter->error_codes();
+						static::$processing_errors_html = $sub_inserter->errors_html();
 					}
-				}
-				if(!empty($redirect_to)) // If applicable.
-				{
-					if(headers_sent()) // Output started already?
-						exit('      <script type="text/javascript">'.
-						     "         document.getElementsByTagName('body')[0].style.display = 'none';".
-						     "         location.href = '".$plugin->utils_string->esc_js_sq($redirect_to)."';".
-						     '      </script>'.
-						     '   </body>'.
-						     '</html>');
-					wp_redirect($redirect_to).exit();
 				}
 			}
 		}

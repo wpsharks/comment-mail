@@ -1,6 +1,6 @@
 (function($)
 {
-	'use strict'; // Standards.
+	'use strict';
 
 	var plugin = {},
 		$window = $(window),
@@ -43,11 +43,17 @@
 			$menuPage.find('.pmp-panel-heading').addClass('open')
 				.next('.pmp-panel-body').addClass('open');
 		});
+
+		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
 		$menuPage.find('.pmp-panels-close').on('click', function()
 		{
 			$menuPage.find('.pmp-panel-heading').removeClass('open')
 				.next('.pmp-panel-body').removeClass('open');
 		});
+
+		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
 		$menuPage.find('.pmp-panel-heading').on('click', function(e)
 		{
 			e.preventDefault(), e.stopImmediatePropagation();
@@ -55,6 +61,9 @@
 			$(this).toggleClass('open') // Toggle this panel now.
 				.next('.pmp-panel-body').toggleClass('open');
 		});
+
+		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
 		$menuPage.find('select[name$="_enable\\]"], select[name$="_enable_flavor\\]"]').not('.no-if-enabled').on('change', function()
 		{
 			var $this = $(this), thisName = $this[0].name, thisValue = $this.val(),
@@ -92,8 +101,9 @@
 		 ------------------------------------------------------------------------------------------------------------ */
 
 		var subFormPostIdProps = { // Initialize.
-			$select: $menuPageForm.find('> form tr.pmp-sub-form-post-id select'),
-			$input : $menuPageForm.find('> form tr.pmp-sub-form-post-id input')
+			$select : $menuPageForm.find('> form tr.pmp-sub-form-post-id select'),
+			$input  : $menuPageForm.find('> form tr.pmp-sub-form-post-id input'),
+			progress: '<img src="' + vars.plugin_url + '/client-s/images/tiny-progress-bar.gif" />'
 		};
 		if(subFormPostIdProps.$select.length) // Have select options?
 			subFormPostIdProps.lastId = $.trim(subFormPostIdProps.$select.val());
@@ -101,10 +111,10 @@
 
 		subFormPostIdProps.handler = function()
 		{
-			var $this = $(this), // Initialize.
-				commentIdProps = {}, requestVars = {};
-			subFormPostIdProps.newId = $.trim($this.val());
+			var $this = $(this), commentIdProps = {},
+				requestVars = {}; // Initialize these vars.
 
+			subFormPostIdProps.newId = $.trim($this.val());
 			if(subFormPostIdProps.newId === subFormPostIdProps.lastId)
 				return; // Nothing to do; i.e. no change, new post ID is the same.
 			subFormPostIdProps.lastId = subFormPostIdProps.newId; // Update last ID.
@@ -116,8 +126,8 @@
 			if(!commentIdProps.$lastRow.length || !commentIdProps.$lastInput.length)
 				return; // Nothing we can do here; expecting a comment ID row.
 
-			commentIdProps.$lastChosenContainer.remove(), // Loading; i.e. prepare for new comment ID row.
-				commentIdProps.$lastInput.replaceWith('<img src="' + vars.plugin_url + '/client-s/images/tiny-progress-bar.gif" />');
+			commentIdProps.$lastChosenContainer.remove(), // Loading indicator.
+				commentIdProps.$lastInput.replaceWith($(subFormPostIdProps.progress));
 
 			requestVars[namespace] = {sub_form_comment_id_row_via_ajax: {post_id: subFormPostIdProps.newId}},
 				$.get(vars.ajax_endpoint, requestVars, function(newCommentIdRowMarkup)
@@ -127,11 +137,59 @@
 						commentIdProps.$newRow.find('select').chosen(chosenOps);
 				});
 		};
+
+		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+		var subFormUserIdProps = { // Initialize.
+			$select  : $menuPageForm.find('> form tr.pmp-sub-form-user-id select'),
+			$input   : $menuPageForm.find('> form tr.pmp-sub-form-user-id input'),
+			$progress: $('<img src="' + vars.plugin_url + '/client-s/images/tiny-progress-bar.gif" />')
+		};
+		if(subFormUserIdProps.$select.length) // Have select options?
+			subFormUserIdProps.lastId = $.trim(subFormUserIdProps.$select.val());
+		else subFormUserIdProps.lastId = $.trim(subFormUserIdProps.$input.val());
+
+		subFormUserIdProps.handler = function()
+		{
+			var $this = $(this), $emailTh, $email, $fname, $lname, $ip,
+				requestVars = {}; // Initialize these vars.
+
+			subFormUserIdProps.newId = $.trim($this.val());
+			if(subFormUserIdProps.newId === subFormUserIdProps.lastId)
+				return; // Nothing to do; i.e. no change, new user ID is the same.
+			subFormUserIdProps.lastId = subFormUserIdProps.newId; // Update last ID.
+
+			$emailTh = $menuPageForm.find('> form tr.pmp-sub-form-email th'),
+				$email = $menuPageForm.find('> form tr.pmp-sub-form-email input'),
+				$fname = $menuPageForm.find('> form tr.pmp-sub-form-fname input'),
+				$lname = $menuPageForm.find('> form tr.pmp-sub-form-lname input'),
+				$ip = $menuPageForm.find('> form tr.pmp-sub-form-insertion-ip input');
+
+			if(!$emailTh.length || ($email.length + $fname.length + $lname.length) < 1)
+				return; // Not possible; expecting a table header; and at least one of these.
+
+			subFormUserIdProps.$progress.remove(), $emailTh.append(subFormUserIdProps.$progress);
+
+			requestVars[namespace] = {sub_form_user_id_info_via_ajax: {user_id: subFormUserIdProps.newId}},
+				$.get(vars.ajax_endpoint, requestVars, function(newUserInfo)
+				{
+					$email.val(newUserInfo.email), // Prefill these fields.
+						$fname.val(newUserInfo.fname), $lname.val(newUserInfo.lname),
+						$ip.val(newUserInfo.ip); // Normally this will be empty.
+
+					subFormUserIdProps.$progress.remove();
+				});
+		};
+
+		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
 		subFormPostIdProps.$select.on('change', subFormPostIdProps.handler).chosen(chosenOps),
 			subFormPostIdProps.$input.on('blur', subFormPostIdProps.handler);
 
 		$menuPageForm.find('> form tr.pmp-sub-form-comment-id select').chosen(chosenOps);
-		$menuPageForm.find('> form tr.pmp-sub-form-user-id select').chosen(chosenOps);
+
+		subFormUserIdProps.$select.on('change', subFormUserIdProps.handler).chosen(chosenOps),
+			subFormUserIdProps.$input.on('blur', subFormUserIdProps.handler);
 
 		$menuPageForm.find('> form tr.pmp-sub-form-status select').on('change', function()
 		{
@@ -139,13 +197,15 @@
 				$checkboxContainer = $this.siblings('.checkbox'),
 				$checkbox = $checkboxContainer.find('input');
 
-			if(status === 'unconfirmed')
+			if(status === 'unconfirmed') // Needs confirmation?
 				$checkboxContainer.show(); // Display checkbox option.
 			else $checkbox.prop('checked', false), $checkboxContainer.hide();
 
 		}).trigger('change').chosen(chosenOps); // Fire immediately.
 
 		$menuPageForm.find('> form tr.pmp-sub-form-deliver select').chosen(chosenOps);
+
+		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 		$menuPageForm.find('> form').on('submit', function(e)
 		{
@@ -174,6 +234,7 @@
 				return false;
 			}
 		});
+		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 	};
-	$document.ready(plugin.onReady); // On DOM ready.
+	$document.ready(plugin.onReady);
 })(jQuery);

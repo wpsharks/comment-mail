@@ -400,6 +400,26 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string HTML markup for this table column.
 			 */
+			protected function column_key(\stdClass $item)
+			{
+				if(!isset($item->key))
+					return '—'; // Not possible.
+
+				if(!$item->key)
+					return '—'; // Not possible.
+
+				return '<code>'.esc_html((string)$item->key).'</code>';
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
 			protected function column_subscr_type(\stdClass $item)
 			{
 				if(!isset($item->subscr_type))
@@ -428,14 +448,14 @@ namespace comment_mail // Root namespace.
 				if(!$item->sub_id)
 					return '—'; // Not possible.
 
-				$id_only = '<i class="fa fa-child"></i>'. // If it's all we can do.
+				$id_only = '<i class="fa fa-envelope"></i>'. // If it's all we can do.
 				           ' <span style="font-weight:bold;">ID #'.esc_html($item->sub_id).'</span>';
 
 				if(empty($this->merged_result_sets['subs'][$item->sub_id]))
 					return $id_only; // All we can do.
 
 				$name     = $item->sub_fname.' '.$item->sub_lname; // Concatenate.
-				$sub_info = '<i class="fa fa-child"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
+				$sub_info = '<i class="fa fa-envelope"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
 				            ' <span style="font-weight:bold;" title="'.esc_attr($item->sub_key).'">ID #'.esc_html($item->sub_id).'</span>'.
 				            ' '.$this->plugin->utils_markup->name_email($name, $item->sub_email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
 
@@ -464,14 +484,14 @@ namespace comment_mail // Root namespace.
 				if(!$item->oby_sub_id)
 					return '—'; // Not possible.
 
-				$id_only = '<i class="fa fa-child"></i>'. // If it's all we can do.
+				$id_only = '<i class="fa fa-envelope"></i>'. // If it's all we can do.
 				           ' <span style="font-weight:bold;">ID #'.esc_html($item->oby_sub_id).'</span>';
 
 				if(empty($this->merged_result_sets['subs'][$item->oby_sub_id]))
 					return $id_only; // All we can do.
 
 				$name         = $item->oby_sub_fname.' '.$item->oby_sub_lname; // Concatenate.
-				$oby_sub_info = '<i class="fa fa-child"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
+				$oby_sub_info = '<i class="fa fa-envelope"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
 				                ' <span style="font-weight:bold;" title="'.esc_attr($item->oby_sub_key).'">ID #'.esc_html($item->oby_sub_id).'</span>'.
 				                ' '.$this->plugin->utils_markup->name_email($name, $item->oby_sub_email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
 
@@ -734,7 +754,7 @@ namespace comment_mail // Root namespace.
 					return '—'; // Not applicable.
 
 				$note = $this->plugin->utils_event->queue_note_code($item->note_code);
-				$note = $this->plugin->utils_string->markdown($note); // Convert to HTML markup.
+				$note = $this->plugin->utils_string->markdown_no_p($note); // HTML markup.
 
 				return $note; // HTML markup via simple MD parsing.
 			}

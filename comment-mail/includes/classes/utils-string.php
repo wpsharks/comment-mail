@@ -404,17 +404,104 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Get first name from a full name, user, or email address.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string                       $name The full name; or display name.
+			 *
+			 * @param \WP_User|integer|string|null $user_id_email A WP User object, WP user ID, or email address.
+			 *    If provided, we make every attempt to pull a name from this source.
+			 *
+			 * @param integer                      $max_length The maximum length of the name.
+			 *
+			 * @return string First name, else full name; else whatever we can get from `$user_id_email`.
+			 */
+			public function first_name($name = '', $user_id_email = NULL, $max_length = 50)
+			{
+				$name       = $this->clean_name($name);
+				$max_length = abs((integer)$max_length);
+
+				if($name && strpos($name, ' ', 1) !== FALSE)
+					list($fname,) = explode(' ', $name, 2);
+				else $fname = $name; // One part in this case.
+
+				if($fname && ($fname = (string)substr(trim($fname), 0, $max_length)))
+					return $fname; // All set; nothing more to do here.
+
+				if(($user = $user_id_email) instanceof \WP_User
+				   || (is_integer($user_id_email) && ($user = new \WP_User($user_id_email)))
+				) // Find first non-empty data values (in order of precedence).
+				{
+					$name  = $this->coalesce($user->first_name, $user->display_name, $user->user_login);
+					$email = $this->coalesce($user->user_email);
+
+					if($name || $email) // Only if we got something.
+						return $this->first_name($name, $email, $max_length);
+				}
+				else if(is_string($user_id_email) && ($email = $user_id_email))
+					return $this->email_name($email, $max_length);
+
+				return ''; // Default value; i.e. failure.
+			}
+
+			/**
 			 * Name from email address.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $string Input email address.
+			 * @param string  $string Input email address.
+			 * @param integer $max_length The maximum length of the name.
 			 *
 			 * @return string Name from email address; else an empty string.
 			 */
-			public function email_name($string)
+			public function email_name($string, $max_length = 50)
 			{
-				return (string)ucfirst(substr(strstr(trim((string)$string), '@', TRUE), 0, 50));
+				if(!($string = trim((string)$string)))
+					return ''; // Not possible.
+
+				$max_length = abs((integer)$max_length);
+
+				return (string)ucfirst(substr(strstr($string, '@', TRUE), 0, $max_length));
+			}
+
+			/**
+			 * Get last name from a full name or user.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string                $name The full name; or display name.
+			 *
+			 * @param \WP_User|integer|null $user_id A WP User object, or WP user ID.
+			 *    If provided, we make every attempt to pull a name from this source.
+			 *
+			 * @param integer               $max_length The maximum length of the name.
+			 *
+			 * @return string First name, else full name; else whatever we can get from `$user_id_email`.
+			 */
+			public function last_name($name = '', $user_id = NULL, $max_length = 100)
+			{
+				$name       = $this->clean_name($name);
+				$max_length = abs((integer)$max_length);
+
+				if($name && strpos($name, ' ', 1) !== FALSE)
+					list(, $lname) = explode(' ', $name, 2);
+				else $lname = ''; // One part in this case.
+
+				if($lname && ($lname = (string)substr(trim($lname), 0, $max_length)))
+					return $lname; // All set; nothing more to do here.
+
+				if(($user = $user_id) instanceof \WP_User
+				   || (is_integer($user_id) && ($user = new \WP_User($user_id)))
+				) // Find first non-empty data values (in order of precedence).
+				{
+					if(($lname = $user->last_name))
+						return ($lname = (string)substr(trim($lname), 0, $max_length));
+
+					if(($name = $this->coalesce($user->display_name)))
+						return $this->last_name($name, NULL, $max_length);
+				}
+				return ''; // Default value; i.e. failure.
 			}
 
 			/**
@@ -503,7 +590,7 @@ namespace comment_mail // Root namespace.
 				$max_length = (integer)$max_length;
 				$max_length = $max_length < 4 ? 4 : $max_length;
 
-				$string = trim(preg_replace('/\s+/', ' ', strip_tags($string)));
+				$string = $this->to_text($string, array('br2nl' => FALSE));
 
 				if(strlen($string) > $max_length)
 					$string = (string)substr($string, 0, $max_length - 3).'...';
@@ -557,7 +644,7 @@ namespace comment_mail // Root namespace.
 				$max_length = (integer)$max_length;
 				$max_length = $max_length < 4 ? 4 : $max_length;
 
-				$string = trim(preg_replace('/\s+/', ' ', strip_tags($string)));
+				$string = $this->to_text($string, array('br2nl' => FALSE));
 
 				if(strlen($string) <= $max_length)
 					return $string; // Nothing to do.
@@ -608,7 +695,40 @@ namespace comment_mail // Root namespace.
 				if(!($string = trim((string)$string)))
 					return $string; // Not possible.
 
-				return nl2br(make_clickable(esc_html($string)));
+				return make_clickable(nl2br(esc_html($string)));
+			}
+
+			/**
+			 * Convert HTML markup converted to plain text.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $string Input string to convert.
+			 * @param array  $args Any additional behavioral args.
+			 *
+			 * @return string HTML markup converted to plain text.
+			 */
+			public function to_text($string, array $args = array())
+			{
+				if(!($string = trim((string)$string)))
+					return $string; // Not possible.
+
+				$default_args = array(
+					'br2nl' => TRUE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$br2nl = (boolean)$args['br2nl'];
+
+				$text = strip_tags($string, $br2nl ? '<br>' : '');
+				$text = wp_specialchars_decode($text); // Decode entities.
+				$text = trim(preg_replace('/\s+/', ' ', $text));
+
+				if($br2nl) // Convert <br> to line break?
+					$text = preg_replace('/\<br[\s\/]*\>/', "\n", $text);
+
+				return $text; // Plain text now.
 			}
 
 			/**
@@ -617,13 +737,22 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string $string Input string to convert.
+			 * @param array  $args Any additional behavioral args.
 			 *
 			 * @return string Markdown converted to HTML markup.
 			 */
-			public function markdown($string)
+			public function markdown($string, array $args = array())
 			{
 				if(!($string = trim((string)$string)))
 					return $string; // Not possible.
+
+				$default_args = array(
+					'no_p' => FALSE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$no_p = (boolean)$args['no_p'];
 
 				if(!class_exists('\\Parsedown')) // Need Parsedown class here.
 					require_once dirname(dirname(dirname(__FILE__))).'/submodules/parsedown/Parsedown.php';
@@ -632,7 +761,29 @@ namespace comment_mail // Root namespace.
 					/** @var $parsedown \Parsedown Reference for IDEs. */
 					$parsedown = new \Parsedown(); // Single instance.
 
-				return $parsedown->text($string);
+				$html = $parsedown->text($string);
+
+				if($no_p) // Remove `<p></p>` wrap?
+				{
+					$html = preg_replace('/^\<p\>/i', '', $html);
+					$html = preg_replace('/\<\/p\>$/i', '', $html);
+				}
+				return $html; // Gotta love Parsedown :-)
+			}
+
+			/**
+			 * A very simple markdown parser.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $string See {@link markdown()}.
+			 * @param array  $args See {@link markdown()}.
+			 *
+			 * @return string See {@link markdown()}.
+			 */
+			public function markdown_no_p($string, array $args = array())
+			{
+				return $this->markdown($string, array_merge($args, array('no_p' => TRUE)));
 			}
 		}
 	}

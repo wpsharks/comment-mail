@@ -184,16 +184,43 @@ namespace comment_mail // Root namespace.
 				$request_args = (array)$request_args;
 
 				if(!isset($request_args['post_id']))
-					return; // Missing post ID.
+					exit; // Missing post ID.
 
 				if(($post_id = (integer)$request_args['post_id']) < 0)
-					return; // Invalid post ID.
+					exit; // Invalid post ID.
 
 				if(!current_user_can($this->plugin->manage_cap))
 					if(!current_user_can($this->plugin->cap))
-						return; // Unauthenticated; ignore.
+						exit; // Unauthenticated; ignore.
 
 				exit(menu_page_sub_form_base::comment_id_row_via_ajax($post_id));
+			}
+
+			/**
+			 * Acquires user ID info via AJAX.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $request_args Input argument(s).
+			 *
+			 * @see menu_page_sub_form_base::user_id_info_via_ajax()
+			 */
+			protected function sub_form_user_id_info_via_ajax($request_args)
+			{
+				$request_args = (array)$request_args;
+
+				if(!isset($request_args['user_id']))
+					exit; // Missing user ID.
+
+				if(($user_id = (integer)$request_args['user_id']) < 0)
+					exit; // Invalid user ID.
+
+				if(!current_user_can($this->plugin->manage_cap))
+					if(!current_user_can($this->plugin->cap))
+						exit; // Unauthenticated; ignore.
+
+				header('Content-Type: application/json; charset=UTF-8');
+				exit(menu_page_sub_form_base::user_id_info_via_ajax($user_id));
 			}
 
 			/**

@@ -92,7 +92,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function subscribed_subs()
 			{
-				$emails = $subs = array(); // Initialize.
+				$sub_emails = $subs = array(); // Initialize.
 
 				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
@@ -109,18 +109,18 @@ namespace comment_mail // Root namespace.
 					if(!$_sub->email) // Email empty?
 						continue; // Missing email address.
 
-					$_email_lowercase = strtolower($_sub->email);
+					$_sub_email_lowercase = strtolower($_sub->email);
 
-					if(isset($emails[$_email_lowercase]))
+					if(isset($sub_emails[$_sub_email_lowercase]))
 						continue; // Email duplicate.
 
-					if(strcasecmp($_email_lowercase, $this->comment->comment_author_email) === 0)
+					if(strcasecmp($_sub_email_lowercase, $this->comment->comment_author_email) === 0)
 						continue; // Don't send an email to the comment author.
 
-					$emails[$_email_lowercase] = -1;
-					$subs[$_sub->ID]           = $_sub;
+					$sub_emails[$_sub_email_lowercase] = -1;
+					$subs[$_sub->ID]                   = $_sub;
 				}
-				unset($_sub_id_key, $_sub, $_email_lowercase); // Housekeeping.
+				unset($_sub_id_key, $_sub, $_sub_email_lowercase); // Housekeeping.
 
 				return $subs; // All valid/unique subscriptions.
 			}

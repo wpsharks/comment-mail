@@ -132,8 +132,8 @@ namespace comment_mail // Root namespace.
 					'comment_id' => 0, // Subscribe to all comments.
 					'deliver'    => $this->plugin->options['auto_subscribe_deliver'],
 
-					'fname'      => $this->first_name_post_author(),
-					'lname'      => $this->last_name_post_author(),
+					'fname'      => $this->plugin->utils_string->first_name('', $this->post_author),
+					'lname'      => $this->plugin->utils_string->last_name('', $this->post_author),
 					'email'      => $this->post_author->user_email,
 
 					'status'     => 'subscribed',
@@ -177,49 +177,6 @@ namespace comment_mail // Root namespace.
 					));
 				}
 				unset($_recipient, $_data); // Housekeeping.
-			}
-
-			/**
-			 * Post author's first name.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return string Post author's first name; else `name` in email address.
-			 */
-			protected function first_name_post_author()
-			{
-				$fname = $this->post_author->first_name;
-				$name  = // First part of display name might be useable.
-					$this->plugin->utils_string->clean_name($this->post_author->display_name);
-
-				if(!$fname && strpos($name, ' ', 1) !== FALSE)
-					list($fname,) = explode(' ', $name, 2);
-				else if(!$fname) $fname = $name; // Display name.
-
-				$fname = trim($fname); // Cleanup first name.
-
-				return $fname; // First name.
-			}
-
-			/**
-			 * Post author's last name.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return string Post author's last name; else empty string.
-			 */
-			protected function last_name_post_author()
-			{
-				$lname = $this->post_author->last_name;
-				$name  = // Last part of display name might be useable.
-					$this->plugin->utils_string->clean_name($this->post_author->display_name);
-
-				if(!$lname && strpos($name, ' ', 1) !== FALSE)
-					list(, $lname) = explode(' ', $name, 2);
-
-				$lname = trim($lname); // Cleanup last name.
-
-				return $lname; // Last name.
 			}
 		}
 	}

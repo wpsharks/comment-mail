@@ -42,6 +42,27 @@ namespace comment_mail // Root namespace.
 			protected $process_events;
 
 			/**
+			 * @var boolean Auto confirmed?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $auto_confirmed;
+
+			/**
+			 * @var boolean Confirming via email?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $confirming_via_email;
+
+			/**
+			 * @var boolean Sent an email?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $sent_email_successfully;
+
+			/**
 			 * Class constructor.
 			 *
 			 * @since 14xxxx First documented version.
@@ -54,7 +75,8 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
-				$sub_id = (integer)$sub_id;
+				if(($sub_id = (integer)$sub_id))
+					$this->sub = $this->plugin->utils_sub->get($sub_id);
 
 				$defaults_args = array(
 					'auto_confirm'   => NULL,
@@ -65,14 +87,53 @@ namespace comment_mail // Root namespace.
 
 				if(isset($args['auto_confirm']))
 					$this->auto_confirm = (boolean)$args['auto_confirm'];
-				$this->sub            = $this->plugin->utils_sub->get($sub_id);
 				$this->process_events = (boolean)$args['process_events'];
 
 				if(!isset($this->auto_confirm)) // If not set explicitly, use option value.
 					if((boolean)$this->plugin->options['auto_confirm_enable'])
 						$this->auto_confirm = TRUE; // Yes.
 
+				$this->auto_confirmed          = FALSE; // Initialize.
+				$this->confirming_via_email    = FALSE; // Initialize.
+				$this->sent_email_successfully = FALSE; // Initialize.
+
 				$this->maybe_send_confirmation_request();
+			}
+
+			/**
+			 * Auto-confirmed?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean `TRUE` if auto-confirmed.
+			 */
+			public function auto_confirmed()
+			{
+				return $this->auto_confirmed;
+			}
+
+			/**
+			 * Confirming via email?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean `TRUE` if confirming via email.
+			 */
+			public function confirming_via_email()
+			{
+				return $this->confirming_via_email;
+			}
+
+			/**
+			 * Sent email successfully?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean `TRUE` if sent email successfully.
+			 */
+			public function sent_email_successfully()
+			{
+				return $this->sent_email_successfully;
 			}
 
 			/**
@@ -91,17 +152,30 @@ namespace comment_mail // Root namespace.
 				if($this->sub->status === 'subscribed')
 					return; // Nothing to do.
 
-				if($this->maybe_auto_confirm())
+				if(($this->auto_confirmed = $this->maybe_auto_confirm()))
 					return; // Nothing more to do.
 
-				$template_vars    = array('sub' => $this->sub);
+				if(!get_post($this->sub->post_id))
+					return; // Post no longer exists.
+
+				if($this->sub->comment_id && !get_comment($this->sub->comment_id))
+					return; // Comment no longer exists.
+
+				$sub           = $this->sub; // For template.
+				$template_vars = get_defined_vars(); // Everything above.
+
 				$subject_template = new template('email/confirmation-request-subject.php');
 				$message_template = new template('email/confirmation-request-message.php');
 
-				$this->plugin->utils_mail->send(
-					$this->sub->email, // To subscriber.
-					$subject_template->parse($template_vars),
-					$message_template->parse($template_vars)
+				$subject = trim(preg_replace('/\s+/', ' ', $subject_template->parse($template_vars)));
+				$message = $message_template->parse($template_vars); // With confirmation link.
+
+				if(!$subject || !$message) // Missing one of these?
+					return; // One or more corrupted/empty template files.
+
+				$this->confirming_via_email    = TRUE; // Flag this scenario.
+				$this->sent_email_successfully = $this->plugin->utils_mail->send(
+					$this->sub->email, $subject, $message
 				);
 			}
 
@@ -115,15 +189,15 @@ namespace comment_mail // Root namespace.
 			protected function maybe_auto_confirm()
 			{
 				if($this->auto_confirm === FALSE)
-					return FALSE; // Nope.
+					return ($this->auto_confirmed = FALSE);
 
 				if($this->auto_confirm) // Auto-confirm?
 				{
 					$this->plugin->utils_sub->confirm($this->sub->ID, array(
-						'process_events' => $this->process_events
+						'process_events' => $this->process_events,
 					)); // With behavioral args.
 
-					return TRUE; // Confirmed automatically.
+					return ($this->auto_confirmed = TRUE);
 				}
 				// Else use default `NULL` behavior; i.e. check if they've already confirmed another.
 
@@ -143,12 +217,12 @@ namespace comment_mail // Root namespace.
 				if((integer)$this->plugin->utils_db->wp->get_var($sql))
 				{
 					$this->plugin->utils_sub->confirm($this->sub->ID, array(
-						'process_events' => $this->process_events
+						'process_events' => $this->process_events,
 					)); // With behavioral args.
 
-					return TRUE; // Confirmed automatically.
+					return ($this->auto_confirmed = TRUE);
 				}
-				return FALSE; // Not subscribed already.
+				return ($this->auto_confirmed = FALSE);
 			}
 		}
 	}

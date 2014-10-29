@@ -31,7 +31,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Class constructor.
+			 * Screen option value.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -54,6 +54,31 @@ namespace comment_mail // Root namespace.
 					$value = $default_value;
 
 				return $value;
+			}
+
+			/**
+			 * Class constructor.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \WP_User|integer A user to check; object or ID.
+			 * @param boolean          $allow_0 Allow `0`-based checks also?
+			 *
+			 * @return boolean `TRUE` if `$user` is the current user.
+			 */
+			public function is_current($user, $allow_0 = FALSE)
+			{
+				if(is_integer($user))
+					$user_id = (integer)$user;
+
+				else if($user instanceof \WP_User)
+					$user_id = (integer)$user->ID;
+
+				if(!isset($user_id))
+					return FALSE; // Not possible.
+
+				return ($user_id || ($user_id === 0 && $allow_0))
+				       && get_current_user_id() === $user_id;
 			}
 		}
 	}

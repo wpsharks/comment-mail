@@ -247,12 +247,20 @@ namespace comment_mail // Root namespace.
 					? (integer)$current_user_id : NULL;
 
 				$default_args = array(
-					'max'         => 2000,
-					'fail_on_max' => TRUE,
-					'no_cache'    => FALSE,
+					'max'            => 2000,
+					'fail_on_max'    => TRUE,
+					'no_cache'       => FALSE,
+
+					'display_emails' => // Show emails?
+						is_admin() && current_user_can('list_users'),
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
+
+				$display_emails = (boolean)$args['display_emails'];
+
+				if(!is_admin() || !current_user_can('list_users'))
+					return ''; // Not permitted to do so.
 
 				if(!$this->plugin->options['user_select_options_enable'])
 					return ''; // Use input field instead of options.
@@ -272,8 +280,8 @@ namespace comment_mail // Root namespace.
 
 					$options .= '<option value="'.esc_attr($_user->ID).'"'.$_selected.'>'.
 					            '  '.esc_html(__('User', $this->plugin->text_domain).' ID #'.$_user->ID.
-					                          ' :: '.$_user->user_login. // The user's username.
-					                          ' :: "'.$_user->display_name.'" <'.$_user->user_email.'>').
+					                          ' :: '.$_user->user_login. // The user's username; i.e. what they log in with.
+					                          ' :: "'.$_user->display_name.'"'.($display_emails ? ' <'.$_user->user_email.'>' : '')).
 					            '</option>';
 				}
 				unset($_user, $_selected); // Housekeeping.
@@ -386,13 +394,18 @@ namespace comment_mail // Root namespace.
 					? (integer)$current_comment_id : NULL;
 
 				$default_args = array(
-					'max'          => 2000,
-					'fail_on_max'  => TRUE,
-					'parents_only' => FALSE,
-					'no_cache'     => FALSE,
+					'max'            => 2000,
+					'fail_on_max'    => TRUE,
+					'parents_only'   => FALSE,
+					'no_cache'       => FALSE,
+
+					'display_emails' => // Show emails?
+						is_admin() && current_user_can('moderate_comments'),
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
+
+				$display_emails = (boolean)$args['display_emails'];
 
 				if(!$this->plugin->options['comment_select_options_enable'])
 					return ''; // Use input field instead of options.
@@ -412,7 +425,7 @@ namespace comment_mail // Root namespace.
 
 					$options .= '<option value="'.esc_attr($_comment->comment_ID).'"'.$_selected.'>'.
 					            '  '.esc_html(__('Comment', $this->plugin->text_domain).' ID #'.$_comment->comment_ID.
-					                          ' :: "'.$_comment->comment_author.'" <'.$_comment->comment_author_email.'>'.
+					                          ($_comment->comment_author ? ' :: '.__('by', $this->plugin->text_domain).' "'.$_comment->comment_author.'"'.($display_emails ? ' <'.$_comment->comment_author_email.'>' : '') : '').
 					                          ' :: '.$this->plugin->utils_date->i18n('M j, Y, g:i a', strtotime($_comment->comment_date_gmt))).
 					            '</option>';
 				}
@@ -448,14 +461,16 @@ namespace comment_mail // Root namespace.
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
+				$deliver_options_available = array(
+					'asap'   => $this->plugin->utils_i18n->deliver_label('asap'),
+					'hourly' => $this->plugin->utils_i18n->deliver_label('hourly'),
+					'daily'  => $this->plugin->utils_i18n->deliver_label('daily'),
+					'weekly' => $this->plugin->utils_i18n->deliver_label('weekly'),
+				); // These are hard-coded; i.e. not expected to change.
+
 				$options = '<option value=""></option>'; // Initialize.
 
-				foreach(array(
-					        'asap'   => $this->plugin->utils_i18n->deliver_label('asap'),
-					        'hourly' => $this->plugin->utils_i18n->deliver_label('hourly'),
-					        'daily'  => $this->plugin->utils_i18n->deliver_label('daily'),
-					        'weekly' => $this->plugin->utils_i18n->deliver_label('weekly'),
-				        ) as $_deliver_option => $_deliver_label)
+				foreach($deliver_options_available as $_deliver_option => $_deliver_label)
 				{
 					$_selected = ''; // Initialize.
 
@@ -495,18 +510,27 @@ namespace comment_mail // Root namespace.
 				$current_status  = isset($current_status)
 					? (string)$current_status : NULL;
 
-				$default_args = array();
+				$default_args = array(
+					'ui_protected_data_keys_enable' => !is_admin(),
+				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
+				$ui_protected_data_keys_enable = (boolean)$args['ui_protected_data_keys_enable'];
+
+				$status_options_available = array(
+					'unconfirmed' => $this->plugin->utils_i18n->status_label('unconfirmed'),
+					'subscribed'  => $this->plugin->utils_i18n->status_label('subscribed'),
+					'suspended'   => $this->plugin->utils_i18n->status_label('suspended'),
+					'trashed'     => $this->plugin->utils_i18n->status_label('trashed'),
+				); // These are hard-coded; i.e. not expected to change.
+
+				if($ui_protected_data_keys_enable) // Front-end UI should limit choices.
+					unset($status_options_available['unconfirmed'], $status_options_available['trashed']);
+
 				$options = '<option value=""></option>'; // Initialize.
 
-				foreach(array(
-					        'unconfirmed' => $this->plugin->utils_i18n->status_label('unconfirmed'),
-					        'subscribed'  => $this->plugin->utils_i18n->status_label('subscribed'),
-					        'suspended'   => $this->plugin->utils_i18n->status_label('suspended'),
-					        'trashed'     => $this->plugin->utils_i18n->status_label('trashed'),
-				        ) as $_status_option => $_status_label)
+				foreach($status_options_available as $_status_option => $_status_label)
 				{
 					$_selected = ''; // Initialize.
 
@@ -631,6 +655,82 @@ namespace comment_mail // Root namespace.
 						$markup_blocks_remaining = implode('', $notice_markup_parts); // Remaining parts.
 					}
 				return '<p>'.$leader_markup.$inline_markup.'</p>'.$markup_blocks_remaining;
+			}
+
+			/**
+			 * Parses comment content by applying necessary filters.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass $comment Comment object.
+			 *
+			 * @return string Comment content markup.
+			 */
+			public function comment_content(\stdClass $comment)
+			{
+				$markup = $comment->comment_content; // Initialize.
+				$markup = apply_filters('get_comment_text', $markup, $comment, array());
+				$markup = apply_filters('comment_text', $markup, $comment, array());
+
+				return trim((string)$markup); // Comment content markup.
+			}
+
+			/**
+			 * Parses comment content by applying necessary filters.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass      $comment Comment object.
+			 *
+			 * @param integer|string $max_length Defaults to a value of `100`.
+			 *    To use the default plugin option for notifications, pass the string `notification`.
+			 *    To use the default plugin option for parent notifications, pass `notification_parent`.
+			 *
+			 * @param boolean        $force_ellipsis Defaults to a value of `FALSE`.
+			 *
+			 * @return string Comment content text; after markup/filters and then clipping.
+			 */
+			public function comment_content_clip(\stdClass $comment, $max_length = 100, $force_ellipsis = FALSE)
+			{
+				if($max_length === 'notification') // An empty string indicates plugin option value.
+					$max_length = $this->plugin->options['comment_notification_content_clip_max_chars'];
+
+				else if($max_length === 'notification_parent') // Option for parent comment clips.
+					$max_length = $this->plugin->options['comment_notification_parent_content_clip_max_chars'];
+
+				$max_length = (integer)$max_length;
+				$markup     = $this->comment_content($comment);
+				$clip       = $this->plugin->utils_string->clip($markup, $max_length, $force_ellipsis);
+
+				return trim($clip); // After markup/filters and then clipping.
+			}
+
+			/**
+			 * Parses comment content by applying necessary filters.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param \stdClass      $comment Comment object.
+			 *
+			 * @param integer|string $max_length Defaults to a value of `100`.
+			 *    To use the default plugin option for notifications, pass the string `notification`.
+			 *    To use the default plugin option for parent notifications, pass `notification_parent`.
+			 *
+			 * @return string Comment content text; after markup/filters and then mid-clipping.
+			 */
+			public function comment_content_mid_clip(\stdClass $comment, $max_length = 100)
+			{
+				if($max_length === 'notification') // An empty string indicates plugin option value.
+					$max_length = $this->plugin->options['comment_notification_content_clip_max_chars'];
+
+				else if($max_length === 'notification_parent') // Option for parent comment clips.
+					$max_length = $this->plugin->options['comment_notification_parent_content_clip_max_chars'];
+
+				$max_length = (integer)$max_length;
+				$markup     = $this->comment_content($comment);
+				$mid_clip   = $this->plugin->utils_string->mid_clip($markup, $max_length);
+
+				return trim($mid_clip); // After markup/filters and then mid-clipping.
 			}
 		}
 	}

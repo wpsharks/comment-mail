@@ -506,14 +506,14 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $key The notice key to dismiss.
+			 * @param string $notice_key The notice key to dismiss.
 			 *
 			 * @return string Notice dimissal URL.
 			 */
-			public function dismiss_notice($key)
+			public function dismiss_notice($notice_key)
 			{
-				$key  = trim((string)$key); // Key to dismiss.
-				$args = array(__NAMESPACE__ => array('dismiss_notice' => compact('key')));
+				$notice_key = trim((string)$notice_key); // Key to dismiss.
+				$args       = array(__NAMESPACE__ => array('dismiss_notice' => compact('notice_key')));
 
 				return add_query_arg(urlencode_deep($args), $this->nonce());
 			}
@@ -539,6 +539,9 @@ namespace comment_mail // Root namespace.
 			 */
 			public function product_page()
 			{
+				if(!empty($this->plugin->product_page))
+					return $this->plugin->product_page;
+
 				return 'http://www.websharks-inc.com/product/'.urlencode($this->plugin->slug).'/';
 			}
 
@@ -551,6 +554,9 @@ namespace comment_mail // Root namespace.
 			 */
 			public function subscribe_page()
 			{
+				if(!empty($this->plugin->subscribe_page))
+					return $this->plugin->subscribe_page;
+
 				return 'http://www.websharks-inc.com/r/'.urlencode($this->plugin->slug).'-subscribe/';
 			}
 
@@ -756,17 +762,17 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string      $key Unique subscription key.
+			 * @param string      $sub_key Unique subscription key.
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
 			 *    See `home_url()` in WordPress for further details on this.
 			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
-			public function sub_confirm_url($key, $scheme = NULL)
+			public function sub_confirm_url($sub_key, $scheme = NULL)
 			{
-				$key  = trim((string)$key); // Force string.
-				$key  = !isset($key[0]) ? '0' : $key; // `0` default.
-				$args = array(__NAMESPACE__ => array('confirm' => $key));
+				$sub_key = trim((string)$sub_key); // Force string.
+				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key; // `0` default.
+				$args    = array(__NAMESPACE__ => array('confirm' => $sub_key));
 
 				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
 			}
@@ -776,17 +782,17 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string      $key Unique subscription key.
+			 * @param string      $sub_key Unique subscription key.
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
 			 *    See `home_url()` in WordPress for further details on this.
 			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
-			public function sub_unsubscribe_url($key, $scheme = NULL)
+			public function sub_unsubscribe_url($sub_key, $scheme = NULL)
 			{
-				$key  = trim((string)$key); // Force string.
-				$key  = !isset($key[0]) ? '0' : $key; // `0` default.
-				$args = array(__NAMESPACE__ => array('unsubscribe' => $key));
+				$sub_key = trim((string)$sub_key); // Force string.
+				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key; // `0` default.
+				$args    = array(__NAMESPACE__ => array('unsubscribe' => $sub_key));
 
 				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
 			}
@@ -796,7 +802,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string      $key Unique subscription key.
+			 * @param string      $sub_key Unique subscription key.
 			 *    If empty, the subscription management system will use
 			 *    the current user's email address; if available/possible.
 			 *
@@ -805,11 +811,11 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
-			public function sub_manage_url($key = '', $scheme = NULL)
+			public function sub_manage_url($sub_key = '', $scheme = NULL)
 			{
-				$key  = trim((string)$key); // Force string.
-				$key  = !isset($key[0]) ? '0' : $key; // `0` default.
-				$args = array(__NAMESPACE__ => array('manage' => $key));
+				$sub_key = trim((string)$sub_key); // Force string.
+				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key; // `0` default.
+				$args    = array(__NAMESPACE__ => array('manage' => $sub_key));
 
 				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
 			}
@@ -819,7 +825,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string      $key Unique subscription key.
+			 * @param string      $sub_key Unique subscription key.
 			 *    If empty, the subscription management system will use
 			 *    the current user's email address; if available/possible.
 			 *
@@ -828,11 +834,51 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
-			public function sub_manage_summary_url($key = '', $scheme = NULL)
+			public function sub_manage_summary_url($sub_key = '', $scheme = NULL)
 			{
-				$key  = trim((string)$key); // Force string.
-				$key  = !isset($key[0]) ? '0' : $key; // `0` default.
-				$args = array(__NAMESPACE__ => array('manage' => array('summary' => $key)));
+				$sub_key = trim((string)$sub_key); // Force string.
+				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key; // `0` default.
+				$args    = array(__NAMESPACE__ => array('manage' => array('summary' => $sub_key)));
+
+				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
+			}
+
+			/**
+			 * Manage URL for adding a new subscription.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See `home_url()` in WordPress for further details on this.
+			 *
+			 * @return string URL w/ the given `$scheme`.
+			 */
+			public function sub_manage_sub_new_url($scheme = NULL)
+			{
+				$args = array(__NAMESPACE__ => array('manage' => array('sub_new' => 0)));
+
+				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
+			}
+
+			/**
+			 * Manage URL to edit a specific sub. key.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string      $sub_key Unique subscription key.
+			 *    If empty, the subscription management system will use
+			 *    the current user's email address; if available/possible.
+			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See `home_url()` in WordPress for further details on this.
+			 *
+			 * @return string URL w/ the given `$scheme`.
+			 */
+			public function sub_manage_sub_edit_url($sub_key = '', $scheme = NULL)
+			{
+				$sub_key = trim((string)$sub_key); // Force string.
+				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key; // `0` default.
+				$args    = array(__NAMESPACE__ => array('manage' => array('sub_edit' => $sub_key)));
 
 				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
 			}

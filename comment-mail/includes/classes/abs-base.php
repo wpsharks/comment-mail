@@ -157,6 +157,13 @@ namespace comment_mail // Root namespace.
 			 * @param string $type Force a particular type if `isset()`?
 			 *
 			 * @return mixed `$var` if `isset()`; else `$or`.
+			 *
+			 * @warning Overloaded properties may NOT be passed by reference under most circumstanes.
+			 *
+			 * @warning Passing a variable by reference forces it be initialied should it not exist at all.
+			 *    Ordinarly this is NOT an issue; since the variable is initialized w/ a `NULL` value. That's PHP's behavior.
+			 *    However, in the case of objects/arrays this can add keys/properties with a `NULL` value inadvertently.
+			 *    Thus, please exercise caution when using this against objects/arrays where it might matter!
 			 */
 			protected function isset_or(&$var, $or = NULL, $type = '')
 			{
@@ -170,6 +177,40 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Utility Method; `isset()` coalesce.
+			 *
+			 * @param mixed $a A variable; by reference.
+			 * @param mixed $b A variable; by reference.
+			 * @param mixed $c A variable; by reference.
+			 * @param mixed $d A variable; by reference.
+			 * @param mixed $e A variable; by reference.
+			 * @param mixed $f A variable; by reference.
+			 * @param mixed $g A variable; by reference.
+			 * @param mixed $h A variable; by reference.
+			 * @param mixed $i A variable; by reference.
+			 * @param mixed $j A variable; by reference.
+			 *
+			 * @return mixed First `$var` that is `isset()`; else `NULL`.
+			 *
+			 * @warning Only the first 10 arguments can be passed by reference.
+			 *
+			 * @warning Overloaded properties may NOT be passed by reference under most circumstanes.
+			 *
+			 * @warning Passing a variable by reference forces it be initialied should it not exist at all.
+			 *    Ordinarly this is NOT an issue; since the variable is initialized w/ a `NULL` value. That's PHP's behavior.
+			 *    However, in the case of objects/arrays this can add keys/properties with a `NULL` value inadvertently.
+			 *    Thus, please exercise caution when using this against objects/arrays where it might matter!
+			 */
+			protected function isset_coalesce(&$a, &$b = NULL, &$c = NULL, &$d = NULL, &$e = NULL, &$f = NULL, &$g = NULL, &$h = NULL, &$i = NULL, &$j = NULL)
+			{
+				foreach(func_get_args() as $var)
+				{
+					if(isset($var)) return $var;
+				}
+				return NULL; // Default value.
+			}
+
+			/**
 			 * Utility Method; `!empty()` or what?
 			 *
 			 * @param mixed  $var A variable; by reference.
@@ -177,6 +218,13 @@ namespace comment_mail // Root namespace.
 			 * @param string $type Force a particular type if `!empty()`?
 			 *
 			 * @return mixed `$var` if `!empty()`; else `$or`.
+			 *
+			 * @warning Overloaded properties may NOT be passed by reference under most circumstanes.
+			 *
+			 * @warning Passing a variable by reference forces it be initialied should it not exist at all.
+			 *    Ordinarly this is NOT an issue; since the variable is initialized w/ a `NULL` value. That's PHP's behavior.
+			 *    However, in the case of objects/arrays this can add keys/properties with a `NULL` value inadvertently.
+			 *    Thus, please exercise caution when using this against objects/arrays where it might matter!
 			 */
 			protected function not_empty_or(&$var, $or = NULL, $type = '')
 			{
@@ -187,6 +235,61 @@ namespace comment_mail // Root namespace.
 					return $var;
 				}
 				return $or; // Do not cast `$or`.
+			}
+
+			/**
+			 * Utility Method; `!empty()` coalesce.
+			 *
+			 * @param mixed $a A variable; by reference.
+			 * @param mixed $b A variable; by reference.
+			 * @param mixed $c A variable; by reference.
+			 * @param mixed $d A variable; by reference.
+			 * @param mixed $e A variable; by reference.
+			 * @param mixed $f A variable; by reference.
+			 * @param mixed $g A variable; by reference.
+			 * @param mixed $h A variable; by reference.
+			 * @param mixed $i A variable; by reference.
+			 * @param mixed $j A variable; by reference.
+			 *
+			 * @return mixed First argument that is `!empty()`; else `NULL`.
+			 *
+			 * @warning Only the first 10 arguments can be passed by reference.
+			 *
+			 * @warning Overloaded properties may NOT be passed by reference under most circumstanes.
+			 *    See {@link coalesce()} for a variation that allows for overloaded properties.
+			 *
+			 * @warning Passing a variable by reference forces it be initialied should it not exist at all.
+			 *    Ordinarly this is NOT an issue; since the variable is initialized w/ a `NULL` value. That's PHP's behavior.
+			 *    However, in the case of objects/arrays this can add keys/properties with a `NULL` value inadvertently.
+			 *    Thus, please exercise caution when using this against objects/arrays where it might matter!
+			 */
+			protected function not_empty_coalesce(&$a, &$b = NULL, &$c = NULL, &$d = NULL, &$e = NULL, &$f = NULL, &$g = NULL, &$h = NULL, &$i = NULL, &$j = NULL)
+			{
+				foreach(func_get_args() as $var)
+				{
+					if(!empty($var)) return $var;
+				}
+				return NULL; // Default value.
+			}
+
+			/**
+			 * Utility Method; `!empty()` coalesce.
+			 *
+			 * @return mixed First argument that is `!empty()`; else `NULL`.
+			 *
+			 * @note This works only on existing variables; i.e. those that have been initialized already.
+			 *    If you need to check uninitialized variables, see {@link not_empty_coalesce()}.
+			 *
+			 * @note If you need to check properties in a class that implements overloading, this method is suggested.
+			 *    i.e. this will work on overloaded properties too; since they are NOT passed by reference here.
+			 */
+			protected function coalesce()
+			{
+				foreach(func_get_args() as $var)
+				{
+					if(!empty($var)) return $var;
+				}
+				return NULL; // Default value.
 			}
 
 			/*

@@ -25,30 +25,30 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $key;
+			protected $sub_key;
 
 			/**
 			 * @var string Email address.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $email;
+			protected $sub_email;
 
 			/**
 			 * Class constructor.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $key Unique subscription key (optional).
+			 * @param string $sub_key Unique subscription key (optional).
 			 *    If this is empty, we use the sub's current email address.
 			 */
-			public function __construct($key = '')
+			public function __construct($sub_key = '')
 			{
 				parent::__construct();
 
-				if(($this->key = trim((string)$key)))
-					$this->email = $this->plugin->utils_sub->key_to_email($this->key);
-				else $this->email = $this->plugin->utils_sub->current_email();
+				if(($this->sub_key = trim((string)$sub_key)))
+					$this->sub_email = $this->plugin->utils_sub->key_to_email($this->sub_key);
+				else $this->sub_email = $this->plugin->utils_sub->current_email();
 
 				$this->maybe_display();
 			}
@@ -60,17 +60,17 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_display()
 			{
-				$key        = $this->key;
-				$email      = $this->email;
-				$error_code = ''; // Initialize.
+				$sub_key     = $this->sub_key;
+				$sub_email   = $this->sub_email;
+				$error_codes = array(); // Initialize.
 
-				if(!$this->email && $this->key)
-					$error_code = 'invalid_key';
+				if(!$this->sub_email && $this->sub_key)
+					$error_codes[] = 'invalid_sub_key';
 
-				else if(!$this->email)
-					$error_code = 'unknown_user';
+				else if(!$this->sub_email)
+					$error_codes[] = 'unknown_sub';
 
-				$template_vars = compact('key', 'email', 'error_code');
+				$template_vars = get_defined_vars(); // Everything above.
 				$template      = new template('site/sub-actions/manage-summary.php');
 
 				status_header(200); // Status header.

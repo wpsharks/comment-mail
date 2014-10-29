@@ -46,67 +46,75 @@ namespace comment_mail // Root namespace.
 				switch(strtolower(trim((string)$note_code)))
 				{
 					case 'entry_sub_id_empty':
-						$note = __('Not possible; `$entry->sub_id` was empty.', $this->plugin->text_domain);
+						$note = __('Not possible; `$entry->sub_id` empty.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'entry_comment_id_empty':
-						$note = __('Not possible; `$entry->comment_id` was empty.', $this->plugin->text_domain);
+						$note = __('Not possible; `$entry->comment_id` empty.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'entry_post_id_empty':
-						$note = __('Not possible; `$entry->post_id` was empty.', $this->plugin->text_domain);
+						$note = __('Not possible; `$entry->post_id` empty.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'entry_sub_id_missing':
-						$note = __('Not possible; `$entry->sub_id` was missing. The subscription was deleted (or unsubscribed) before processing began.', $this->plugin->text_domain);
+						$note = __('Not possible; `$entry->sub_id` missing. The subscription may have been deleted before processing began.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'sub_email_empty':
-						$note = __('Not possible; `$sub->email` was empty. Could not notify the subscription due to the lack of an email address.', $this->plugin->text_domain);
+						$note = __('Not possible; `$sub->email` empty. Could not notify (obviously) due to the lack of an email address.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'sub_status_not_subscribed':
-						$note = __('Not applicable; `$sub->status` was no longer `subscribed`. The user may have been unsubscribed (or suspended) before processing began.', $this->plugin->text_domain);
+						$note = __('Not applicable; `$sub->status` not `subscribed`. The subscription status may have changed before processing began.', $this->plugin->text_domain);
+						break; // Break switch handler.
+
+					case 'sub_post_id_mismtach':
+						$note = __('Not applicable; `$sub->post_id` mismatch against `$entry->post_id`. This subscription may have been altered before processing began.', $this->plugin->text_domain);
+						break; // Break switch handler.
+
+					case 'sub_comment_id_mismatch':
+						$note = __('Not applicable; `$sub->comment_id` mismatch against `$entry->comment_parent_id`. This subscription may have been altered before processing began.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'entry_comment_id_missing':
-						$note = __('Not possible; `$entry->comment_id` was missing. The comment may have been deleted before processing began.', $this->plugin->text_domain);
+						$note = __('Not possible; `$entry->comment_id` missing. The comment may have been deleted before processing began.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'comment_type_not_comment':
-						$note = __('Not applicable; `$comment->comment_type` was not `` or `comment`. Perhaps it was a pingback/trackback.', $this->plugin->text_domain);
+						$note = __('Not applicable; `$comment->comment_type` not empty, and not `comment`. Perhaps a pingback/trackback.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'comment_content_empty':
-						$note = __('Not applicable; `$comment->comment_content` was empty. There was nothing to say or do.', $this->plugin->text_domain);
+						$note = __('Not applicable; `$comment->comment_content` empty. Nothing to say or do because the comment message is empty.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'comment_status_not_approve':
-						$note = __('Not applicable; `$comment->comment_approved` was not `approve`. The comment may have been marked as spam, or held for moderation before processing began.', $this->plugin->text_domain);
+						$note = __('Not applicable; `$comment->comment_approved` not `approve`. The comment may have been marked as spam, or held for moderation before processing began.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'comment_post_id_missing':
-						$note = __('Not possible; `$comment->comment_post_ID` was missing. The post may have been deleted before processing began.', $this->plugin->text_domain);
+						$note = __('Not possible; `$comment->comment_post_ID` missing. The post may have been deleted before processing began.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'post_title_empty':
-						$note = __('Not possible; `$post->post_title` was empty. There was nothing to use in a notification subject line.', $this->plugin->text_domain);
+						$note = __('Not possible; `$post->post_title` empty. Nothing to use in a notification subject line; or elsewhere, because the post has no title.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'post_status_not_publish':
-						$note = __('Not applicable; `$post->post_status` was not `publish`. The post may have been set to a `draft` (or another unpublished status) before processing began.', $this->plugin->text_domain);
+						$note = __('Not applicable; `$post->post_status` not `publish`. The post may have been set to a `draft` (or another unpublished status) before processing began.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'post_type_auto_excluded':
-						$note = __('Not applicable; `$post->post_type` was automatically excluded as unnotifiable. Note that revisions, nav menu items, etc; these are automatically bypassed.', $this->plugin->text_domain);
+						$note = __('Not applicable; `$post->post_type` automatically excluded as unnotifiable. Note that revisions, nav menu items, etc; these are automatically bypassed.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'comment_notification_subject_empty':
-						$note = __('Not possible; the comment notification subject was empty. Perhaps a missing template file/option. Please check your configuration.', $this->plugin->text_domain);
+						$note = __('Not possible; comment notification subject empty. Perhaps a missing template file/option. Please check your configuration.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'comment_notification_message_empty':
-						$note = __('Not possible; the comment notification message was empty. Perhaps a missing template file/option. Please check your configuration.', $this->plugin->text_domain);
+						$note = __('Not possible; comment notification message empty. Perhaps a missing template file/option. Please check your configuration.', $this->plugin->text_domain);
 						break; // Break switch handler.
 
 					case 'comment_notification_sent_successfully':

@@ -409,6 +409,12 @@ namespace comment_mail // Root namespace.
 				else if($sub->status !== 'subscribed') // Subscription is no longer `subscribed`?
 					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_status_not_subscribed', $entry, $sub);
 
+				else if($sub->post_id !== $entry->post_id) // Subscription's post ID changed?
+					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_post_id_mismtach', $entry, $sub);
+
+				else if($sub->comment_id && $sub->comment_id !== $entry->comment_parent_id) // Comment ID changed?
+					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_comment_id_mismatch', $entry, $sub);
+
 				else if(!($comment = get_comment($entry->comment_id))) // Comment is missing?
 					$invalidated_entry_props = $this->entry_props('invalidated', 'entry_comment_id_missing', $entry, $sub);
 
@@ -733,7 +739,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function entry_subject(\stdclass $entry_props)
 			{
-				return $this->subject_template->parse((array)$entry_props);
+				return trim(preg_replace('/\s+/', ' ', $this->subject_template->parse((array)$entry_props)));
 			}
 
 			/**

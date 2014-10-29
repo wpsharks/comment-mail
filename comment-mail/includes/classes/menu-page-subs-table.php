@@ -186,7 +186,7 @@ namespace comment_mail // Root namespace.
 			protected function column_email(\stdClass $item)
 			{
 				$name       = $item->fname.' '.$item->lname; // Concatenate.
-				$email_info = '<i class="fa fa-child"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
+				$email_info = '<i class="fa fa-envelope"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
 				              ' <span style="font-weight:bold;" title="'.esc_attr($item->key).'">ID #'.esc_html($item->ID).'</span>'.
 				              ' '.$this->plugin->utils_markup->name_email($name, $item->email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
 
