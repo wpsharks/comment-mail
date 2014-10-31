@@ -69,6 +69,7 @@ namespace comment_mail // Root namespace.
 					$this->plugin->utils_sub->set_current_email($sub->email);
 
 				new sub_manage_summary($sub_key);
+
 				exit(); // Stop after display; always.
 			}
 
@@ -84,13 +85,13 @@ namespace comment_mail // Root namespace.
 			protected function sub_form_comment_id_row_via_ajax($request_args)
 			{
 				if(!($request_args = (array)$request_args))
-					return; // Empty request args.
+					exit; // Empty request args.
 
 				if(!isset($request_args['post_id']))
-					return; // Missing post ID.
+					exit; // Missing post ID.
 
 				if(($post_id = (integer)$request_args['post_id']) < 0)
-					return; // Invalid post ID.
+					exit; // Invalid post ID.
 
 				exit(sub_manage_sub_form_base::comment_id_row_via_ajax($post_id));
 			}
@@ -123,6 +124,7 @@ namespace comment_mail // Root namespace.
 				$request_args = NULL; // N/A.
 
 				new sub_manage_sub_new_form();
+
 				exit(); // Stop after display; always.
 			}
 
@@ -135,13 +137,26 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function sub_edit($request_args)
 			{
-				$sub_key = ''; // Initialize.
-
-				if(is_string($request_args)) // A string indicates a sub key.
-					$sub_key = trim($request_args); // Use as current.
+				$sub_key = trim((string)$request_args);
 
 				new sub_manage_sub_edit_form($sub_key);
+
 				exit(); // Stop after display; always.
+			}
+
+			/**
+			 * Subscription deletion handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $request_args Input argument(s).
+			 */
+			protected function sub_delete($request_args)
+			{
+				$sub_key = trim((string)$request_args);
+
+				sub_manage_summary::delete($sub_key);
+				// Do NOT stop; allow `summary` action to run also.
 			}
 		}
 	}

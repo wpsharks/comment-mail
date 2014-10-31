@@ -659,7 +659,7 @@ namespace comment_mail
 
 				$deps = array('chosen'); // Plugin dependencies.
 
-				wp_enqueue_style('chosen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.min.css'), array(), $this->version, 'all');
+				wp_enqueue_style('chosen', $this->utils_url->set_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.min.css'), array(), $this->version, 'all');
 				wp_enqueue_style(__NAMESPACE__, $this->utils_url->to('/client-s/css/menu-pages.min.css'), $deps, $this->version, 'all');
 			}
 
@@ -677,7 +677,7 @@ namespace comment_mail
 
 				$deps = array('jquery', 'chosen'); // Plugin dependencies.
 
-				wp_enqueue_script('chosen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.min.js'), array('jquery'), $this->version, TRUE);
+				wp_enqueue_script('chosen', $this->utils_url->set_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.min.js'), array('jquery'), $this->version, TRUE);
 				wp_enqueue_script(__NAMESPACE__, $this->utils_url->to('/client-s/js/menu-pages.min.js'), $deps, $this->version, TRUE);
 				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_vars', array(
 					'plugin_url'    => rtrim($this->utils_url->to('/'), '/'),

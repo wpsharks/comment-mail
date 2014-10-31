@@ -79,6 +79,13 @@ namespace comment_mail // Root namespace.
 
 				exit($template->parse($template_vars));
 			}
+
+			public static function delete($sub_key)
+			{
+				$delete_args = array('user_initiated' => TRUE); // Deletion args.
+				if(!$error_codes && !($deleted = $this->plugin->utils_sub->delete($sub->ID, $delete_args)))
+					$error_codes[] = $deleted === NULL ? 'invalid_sub_key' : 'sub_already_unsubscribed';
+			}
 		}
 	}
 }

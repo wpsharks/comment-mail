@@ -71,8 +71,8 @@ namespace comment_mail // Root namespace.
 					$error_codes[] = 'missing_sub_key';
 
 				$confirm_args = array('user_initiated' => TRUE); // Confirmation args.
-				if(!$error_codes && !($confirm = $this->plugin->utils_sub->confirm($sub->ID, $confirm_args)))
-					$error_codes[] = $confirm === NULL ? 'invalid_sub_key' : 'sub_already_confirmed';
+				if(!$error_codes && !($confirmed = $this->plugin->utils_sub->confirm($sub->ID, $confirm_args)))
+					$error_codes[] = $confirmed === NULL ? 'invalid_sub_key' : 'sub_already_confirmed';
 
 				if(!$error_codes) // If not errors; set current email.
 					$this->plugin->utils_sub->set_current_email($sub->email);
@@ -107,8 +107,8 @@ namespace comment_mail // Root namespace.
 					$error_codes[] = 'missing_sub_key';
 
 				$delete_args = array('user_initiated' => TRUE); // Deletion args.
-				if(!$error_codes && !($delete = $this->plugin->utils_sub->delete($sub->ID, $delete_args)))
-					$error_codes[] = $delete === NULL ? 'invalid_sub_key' : 'sub_already_unsubscribed';
+				if(!$error_codes && !($deleted = $this->plugin->utils_sub->delete($sub->ID, $delete_args)))
+					$error_codes[] = $deleted === NULL ? 'invalid_sub_key' : 'sub_already_unsubscribed';
 
 				if(!$error_codes) // If not errors; set current email.
 					$this->plugin->utils_sub->set_current_email($sub->email);

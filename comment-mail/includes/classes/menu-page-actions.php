@@ -220,6 +220,7 @@ namespace comment_mail // Root namespace.
 						exit; // Unauthenticated; ignore.
 
 				header('Content-Type: application/json; charset=UTF-8');
+
 				exit(menu_page_sub_form_base::user_id_info_via_ajax($user_id));
 			}
 

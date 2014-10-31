@@ -229,9 +229,12 @@ namespace comment_mail // Root namespace.
 			 */
 			public function hidden_inputs()
 			{
-				$hidden_inputs = ''; // Initialize.
+				/* Important for this to come first!
+				 * We want form processing to take place first.
+				 * i.e. Array keys need to be submitted in a specific order. */
+				$hidden_inputs = $this->form_fields->hidden_input(array('name' => '_'))."\n";
 
-				if($this->is_edit && $this->sub) // Editing?
+				if($this->is_edit && $this->sub)
 				{
 					$hidden_inputs .= $this->form_fields->hidden_input(
 							array(
@@ -250,12 +253,15 @@ namespace comment_mail // Root namespace.
 								'current_value' => $this->sub->key,
 							))."\n";
 				}
-				else $hidden_inputs .= $this->form_fields->hidden_input(
-						array(
-							'root_name'     => TRUE,
-							'name'          => __NAMESPACE__.'[manage][sub_new]',
-							'current_value' => 0,
-						))."\n";
+				else // Adding a new subscription in this default case.
+				{
+					$hidden_inputs .= $this->form_fields->hidden_input(
+							array(
+								'root_name'     => TRUE,
+								'name'          => __NAMESPACE__.'[manage][sub_new]',
+								'current_value' => 0,
+							))."\n";
+				}
 				return $hidden_inputs; // Used by templats.
 			}
 
