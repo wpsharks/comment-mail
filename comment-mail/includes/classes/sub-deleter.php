@@ -124,15 +124,13 @@ namespace comment_mail // Root namespace.
 				$this->process_events = (boolean)$args['process_events'];
 				$this->user_initiated = (boolean)$args['user_initiated'];
 
-				if($this->oby_sub_id)
+				if($this->user_initiated && !$this->last_ip)
+					$this->last_ip = $this->plugin->utils_env->user_ip();
+
+				if($this->oby_sub_id) // Resolve conflicts.
 					$this->purging = $this->cleaning = FALSE;
-
-				if($this->purging)
-					$this->cleaning = FALSE;
-
-				if($this->cleaning)
-					$this->purging = FALSE;
-
+				if($this->purging) $this->cleaning = FALSE;
+				if($this->cleaning) $this->purging = FALSE;
 				if($this->purging || $this->cleaning)
 					$this->oby_sub_id = 0;
 

@@ -19,17 +19,6 @@ namespace comment_mail;
  *
  * @var boolean     $processing Are we (i.e. did we) process a form submission?
  *
- * @var array       $processing_successes An array of any/all processing successes.
- *    Array keys are success codes; array values are predefined success messages.
- *    Note that predefined messages in this array are in plain text format.
- *
- * @var array       $processing_success_codes An array of any/all processing success codes.
- *    This includes the codes only; i.e. w/o the full array of predefined messages.
- *
- * @var array       $processing_successes_html An array of any/all processing successes.
- *    Array keys are success codes; array values are predefined success messages.
- *    Note that predefined messages in this array are in HTML format.
- *
  * @var array       $processing_errors An array of any/all processing errors.
  *    Array keys are error codes; array values are predefined error messages.
  *    Note that predefined messages in this array are in plain text format.
@@ -39,6 +28,17 @@ namespace comment_mail;
  *
  * @var array       $processing_errors_html An array of any/all processing errors.
  *    Array keys are error codes; array values are predefined error messages.
+ *    Note that predefined messages in this array are in HTML format.
+ *
+ * @var array       $processing_successes An array of any/all processing successes.
+ *    Array keys are success codes; array values are predefined success messages.
+ *    Note that predefined messages in this array are in plain text format.
+ *
+ * @var array       $processing_success_codes An array of any/all processing success codes.
+ *    This includes the codes only; i.e. w/o the full array of predefined messages.
+ *
+ * @var array       $processing_successes_html An array of any/all processing successes.
+ *    Array keys are success codes; array values are predefined success messages.
  *    Note that predefined messages in this array are in HTML format.
  *
  * @var array       $error_codes An array of any/all major error codes; excluding processing error codes.
@@ -81,23 +81,6 @@ namespace comment_mail;
 
 		<?php else: // Display form; there are no major errors. ?>
 
-		<?php if ($processing && $processing_successes): // Any processing successes? ?>
-
-			<div class="alert alert-success" role="alert">
-				<p style="margin-top:0; font-weight:bold; font-size:120%;">
-					<?php echo __('Submission accepted; nice work!', $plugin->text_domain); ?>
-				</p>
-				<ul class="list-unstyled" style="margin-bottom:0;">
-					<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
-						<li style="margin-top:0; margin-bottom:0;">
-							<i class="fa fa-check fa-fw"></i>
-							<?php echo $_success_html; ?>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-			</div>
-		<?php endif; ?>
-
 		<?php if ($processing && $processing_errors): // Any processing errors? ?>
 
 			<div class="alert alert-danger" role="alert">
@@ -109,6 +92,23 @@ namespace comment_mail;
 						<li style="margin-top:0; margin-bottom:0;">
 							<i class="fa fa-warning fa-fw"></i>
 							<?php echo $_error_html; ?>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			</div>
+		<?php endif; ?>
+
+		<?php if ($processing && $processing_successes): // Any processing successes? ?>
+
+			<div class="alert alert-success" role="alert">
+				<p style="margin-top:0; font-weight:bold; font-size:120%;">
+					<?php echo __('Submission accepted; nice work!', $plugin->text_domain); ?>
+				</p>
+				<ul class="list-unstyled" style="margin-bottom:0;">
+					<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
+						<li style="margin-top:0; margin-bottom:0;">
+							<i class="fa fa-check fa-fw"></i>
+							<?php echo $_success_html; ?>
 						</li>
 					<?php endforeach; ?>
 				</ul>

@@ -75,27 +75,6 @@ namespace comment_mail // Root namespace.
 			protected static $processing = FALSE;
 
 			/**
-			 * @var array Any processing successes.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected static $processing_successes = array();
-
-			/**
-			 * @var array Any processing success codes.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected static $processing_success_codes = array();
-
-			/**
-			 * @var array Any processing successes w/ HTML markup.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected static $processing_successes_html = array();
-
-			/**
 			 * @var array Any processing errors.
 			 *
 			 * @since 14xxxx First documented version.
@@ -115,6 +94,27 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 */
 			protected static $processing_errors_html = array();
+
+			/**
+			 * @var array Any processing successes.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing_successes = array();
+
+			/**
+			 * @var array Any processing success codes.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing_success_codes = array();
+
+			/**
+			 * @var array Any processing successes w/ HTML markup.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing_successes_html = array();
 
 			/*
 			 * Instance-based constructor.
@@ -318,34 +318,34 @@ namespace comment_mail // Root namespace.
 				{
 					$sub_updater = new sub_updater($request_args, $args); // Run updater.
 
-					if($sub_updater->did_update()) // Updated successfully?
-					{
-						static::$processing_successes      = $sub_updater->successes();
-						static::$processing_success_codes  = $sub_updater->success_codes();
-						static::$processing_successes_html = $sub_updater->successes_html();
-					}
-					else // Include several properties when errors occur.
+					if($sub_updater->has_errors()) // Updater has errors?
 					{
 						static::$processing_errors      = $sub_updater->errors();
 						static::$processing_error_codes = $sub_updater->error_codes();
 						static::$processing_errors_html = $sub_updater->errors_html();
+					}
+					else if($sub_updater->did_update()) // Updated?
+					{
+						static::$processing_successes      = $sub_updater->successes();
+						static::$processing_success_codes  = $sub_updater->success_codes();
+						static::$processing_successes_html = $sub_updater->successes_html();
 					}
 				}
 				else // We are doing a new insertion; i.e. a new subscription is being added here.
 				{
 					$sub_inserter = new sub_inserter($request_args, $args); // Run inserter.
 
-					if($sub_inserter->did_insert()) // Inserted successfully?
-					{
-						static::$processing_successes      = $sub_inserter->successes();
-						static::$processing_success_codes  = $sub_inserter->success_codes();
-						static::$processing_successes_html = $sub_inserter->successes_html();
-					}
-					else // Include several properties when errors occur.
+					if($sub_inserter->has_errors()) // Inserter has errors?
 					{
 						static::$processing_errors      = $sub_inserter->errors();
 						static::$processing_error_codes = $sub_inserter->error_codes();
 						static::$processing_errors_html = $sub_inserter->errors_html();
+					}
+					else if($sub_inserter->did_insert()) // Inserted?
+					{
+						static::$processing_successes      = $sub_inserter->successes();
+						static::$processing_success_codes  = $sub_inserter->success_codes();
+						static::$processing_successes_html = $sub_inserter->successes_html();
 					}
 				}
 			}
