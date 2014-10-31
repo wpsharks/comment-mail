@@ -550,10 +550,11 @@ namespace comment_mail // Root namespace.
 				}
 				unset($_status_option, $_status_label, $_selected); // Housekeeping.
 
-				if(!isset($selected_status) && isset($current_status) && $current_status)
-					$options .= '<option value="'.esc_attr($current_status).'" selected="selected">'.
-					            '  '.esc_html($current_status).
-					            '</option>';
+				if(!$ui_protected_data_keys_enable) // Front-end UI limits choices.
+					if(!isset($selected_status) && isset($current_status) && $current_status)
+						$options .= '<option value="'.esc_attr($current_status).'" selected="selected">'.
+						            '  '.esc_html($current_status).
+						            '</option>';
 
 				return $options; // HTML markup.
 			}
