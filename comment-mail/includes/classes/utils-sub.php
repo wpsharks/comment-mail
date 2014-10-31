@@ -573,22 +573,26 @@ namespace comment_mail // Root namespace.
 					$post_id = (integer)$post_id;
 
 				$default_args = array(
+					'offset'              => 0,
 					'status'              => '',
+					'sub_email'           => '',
 					'comment_id'          => NULL,
 					'auto_discount_trash' => TRUE,
-					'group_by_email'      => TRUE,
+					'group_by_email'      => FALSE,
 					'no_cache'            => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
+				$offset              = abs((integer)$args['offset']);
 				$status              = trim((string)$args['status']);
+				$sub_email           = trim((string)$args['sub_email']);
 				$comment_id          = $this->isset_or($args['comment_id'], NULL, 'integer');
 				$auto_discount_trash = (boolean)$args['auto_discount_trash'];
 				$group_by_email      = (boolean)$args['group_by_email'];
 				$no_cache            = (boolean)$args['no_cache'];
 
-				$cache_keys = compact('x', 'post_id', 'status', 'comment_id', 'auto_discount_trash', 'group_by_email');
+				$cache_keys = compact('x', 'post_id', 'offset', 'status', 'sub_email', 'comment_id', 'auto_discount_trash', 'group_by_email');
 				if(!is_null($last_x = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
 					return $last_x; // Already cached this.
 
@@ -600,14 +604,15 @@ namespace comment_mail // Root namespace.
 					       ? " AND `status` = '".esc_sql((string)$status)."'"
 					       : ($auto_discount_trash ? " AND `status` != '".esc_sql('trashed')."'" : '')).
 
-				       (isset($post_id) ? " AND `post_id` = '".esc_sql((integer)$post_id)."'" : '').
-				       (isset($comment_id) ? " AND `comment_id` = '".esc_sql((integer)$comment_id)."'" : '').
+				       (isset($post_id) ? " AND `post_id` = '".esc_sql($post_id)."'" : '').
+				       ($sub_email ? " AND `email` = '".esc_sql($sub_email)."'" : '').
+				       (isset($comment_id) ? " AND `comment_id` = '".esc_sql($comment_id)."'" : '').
 
 				       ($group_by_email ? " GROUP BY `email`" : '').
 
 				       " ORDER BY `insertion_time` DESC".
 
-				       " LIMIT ".esc_sql($x); // X rows only please.
+				       " LIMIT ".esc_sql($offset).", ".esc_sql($x);
 
 				if(($results = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
 					return ($last_x = $results = $this->plugin->utils_db->typify_deep($results));

@@ -195,10 +195,12 @@ namespace comment_mail // Root namespace.
 					'list_style'          => 'margin:0;',
 					'anchor_style'        => 'text-decoration:none;',
 
+					'offset'              => 0,
 					'status'              => '',
+					'sub_email'           => '',
 					'comment_id'          => NULL,
 					'auto_discount_trash' => TRUE,
-					'group_by_email'      => TRUE,
+					'group_by_email'      => FALSE,
 					'no_cache'            => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
