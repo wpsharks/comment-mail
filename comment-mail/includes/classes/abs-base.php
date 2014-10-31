@@ -351,7 +351,7 @@ namespace comment_mail // Root namespace.
 						case 'resource':
 						case 'unknown type':
 						default: // Default case handler.
-							$_key = (string)$_arg;
+							$_key = "\0".(string)$_arg;
 					}
 					if(!isset($cache_key[$_key]))
 						$cache_key[$_key] = NULL;
@@ -376,6 +376,36 @@ namespace comment_mail // Root namespace.
 				$key = &$this->cache_key($function, $args, 'static');
 
 				return $key; // By reference.
+			}
+
+			/**
+			 * Unset cache keys.
+			 *
+			 * @since 14xxxx first documented version.
+			 *
+			 * @param array $preserve Preserve certain keys?
+			 */
+			protected function unset_cache_keys(array $preserve = array())
+			{
+				foreach($this->cache as $_key => $_value)
+					if(!$preserve || !in_array($_key, $preserve, TRUE))
+						unset($this->cache[$_key]);
+				unset($_key, $_value); // Housekeeping.
+			}
+
+			/**
+			 * Unset static keys.
+			 *
+			 * @since 14xxxx first documented version.
+			 *
+			 * @param array $preserve Preserve certain keys?
+			 */
+			protected function unset_static_keys(array $preserve = array())
+			{
+				foreach($this->static as $_key => $_value)
+					if(!$preserve || !in_array($_key, $preserve, TRUE))
+						unset($this->static[$_key]);
+				unset($_key, $_value); // Housekeeping.
 			}
 		}
 	}

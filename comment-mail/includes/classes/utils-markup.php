@@ -192,16 +192,20 @@ namespace comment_mail // Root namespace.
 				$last_x_email_lis = array(); // Initialize.
 
 				$default_args = array(
-					'list_style'          => 'margin:0;',
-					'anchor_style'        => 'text-decoration:none;',
+					'list_style'            => 'margin:0;',
+					'anchor_style'          => 'text-decoration:none;',
 
-					'offset'              => 0,
-					'status'              => '',
-					'sub_email'           => '',
-					'comment_id'          => NULL,
-					'auto_discount_trash' => TRUE,
-					'group_by_email'      => FALSE,
-					'no_cache'            => FALSE,
+					'offset'                => 0,
+
+					'status'                => '',
+					'sub_email'             => '',
+					'user_id'               => NULL,
+					'comment_id'            => NULL,
+
+					'auto_discount_trash'   => TRUE,
+					'sub_email_or_user_ids' => FALSE,
+					'group_by_email'        => FALSE,
+					'no_cache'              => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);

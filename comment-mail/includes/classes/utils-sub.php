@@ -69,7 +69,7 @@ namespace comment_mail // Root namespace.
 				if(!($sub = $this->get($sub_key)))
 					return ''; // Not found.
 
-				return $sub->email;
+				return strtolower($sub->email);
 			}
 
 			/**
@@ -107,7 +107,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Nullify the object cache for IDs/keys.
+			 * Nullify the object cache.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -115,11 +115,13 @@ namespace comment_mail // Root namespace.
 			 */
 			public function nullify_cache(array $sub_ids_or_keys = array())
 			{
+				$preserve = array(); // Initialize.
+				if($sub_ids_or_keys) $preserve[] = 'get';
+				$this->unset_cache_keys($preserve);
+
 				foreach($sub_ids_or_keys as $_sub_id_or_key)
 					unset($this->cache['get'][$_sub_id_or_key]);
 				unset($_sub_id_or_key); // Housekeeping.
-
-				unset($this->cache['query_total'], $this->cache['last_x']);
 			}
 
 			/**
@@ -509,22 +511,33 @@ namespace comment_mail // Root namespace.
 					$post_id = (integer)$post_id;
 
 				$default_args = array(
-					'status'              => '',
-					'comment_id'          => NULL,
-					'auto_discount_trash' => TRUE,
-					'group_by_email'      => FALSE,
-					'no_cache'            => FALSE,
+					'status'                => '',
+					'sub_email'             => '',
+					'user_id'               => NULL,
+					'comment_id'            => NULL,
+
+					'auto_discount_trash'   => TRUE,
+					'sub_email_or_user_ids' => FALSE,
+					'group_by_email'        => FALSE,
+					'no_cache'              => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$status              = trim((string)$args['status']);
-				$comment_id          = $this->isset_or($args['comment_id'], NULL, 'integer');
-				$auto_discount_trash = (boolean)$args['auto_discount_trash'];
-				$group_by_email      = (boolean)$args['group_by_email'];
-				$no_cache            = (boolean)$args['no_cache'];
+				$status     = trim((string)$args['status']);
+				$sub_email  = trim(strtolower((string)$args['sub_email']));
+				$user_id    = $this->isset_or($args['user_id'], NULL, 'integer');
+				$comment_id = $this->isset_or($args['comment_id'], NULL, 'integer');
 
-				$cache_keys = compact('post_id', 'status', 'comment_id', 'auto_discount_trash', 'group_by_email');
+				$auto_discount_trash   = (boolean)$args['auto_discount_trash'];
+				$sub_email_or_user_ids = (boolean)$args['sub_email_or_user_ids'];
+				$group_by_email        = (boolean)$args['group_by_email'];
+				$no_cache              = (boolean)$args['no_cache'];
+
+				$cache_keys = compact('post_id', // Cacheable keys.
+				                      'status', 'sub_email', 'user_id', 'comment_id',
+				                      'auto_discount_trash', 'sub_email_or_user_ids', 'group_by_email');
+
 				if(!is_null($total = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
 					return $total; // Already cached this.
 
@@ -537,8 +550,19 @@ namespace comment_mail // Root namespace.
 					       ? " AND `status` = '".esc_sql((string)$status)."'"
 					       : ($auto_discount_trash ? " AND `status` != '".esc_sql('trashed')."'" : '')).
 
-				       (isset($post_id) ? " AND `post_id` = '".esc_sql((integer)$post_id)."'" : '').
-				       (isset($comment_id) ? " AND `comment_id` = '".esc_sql((integer)$comment_id)."'" : '').
+				       ($sub_email // Match a specific email address?
+					       ? ($sub_email_or_user_ids // Email or user IDs?
+						       ? " AND (`email` = '".esc_sql($sub_email)."'".
+						         (isset($user_id) ? " OR `user_id` = '".esc_sql($user_id)."'" : '').
+						         "    OR `user_id` IN('".implode("','", array_map('esc_sql', $this->email_user_ids($sub_email, $no_cache)))."'))"
+						       : " AND `email` = '".esc_sql($sub_email)."'")
+					       : ''). // End `sub_email` check.
+
+				       (isset($user_id) && (!$sub_email || !$sub_email_or_user_ids)
+					       ? " AND `user_id` = '".esc_sql($user_id)."'" : '').
+
+				       (isset($post_id) ? " AND `post_id` = '".esc_sql($post_id)."'" : '').
+				       (isset($comment_id) ? " AND `comment_id` = '".esc_sql($comment_id)."'" : '').
 
 				       ($group_by_email ? " GROUP BY `email`" : '').
 
@@ -573,26 +597,36 @@ namespace comment_mail // Root namespace.
 					$post_id = (integer)$post_id;
 
 				$default_args = array(
-					'offset'              => 0,
-					'status'              => '',
-					'sub_email'           => '',
-					'comment_id'          => NULL,
-					'auto_discount_trash' => TRUE,
-					'group_by_email'      => FALSE,
-					'no_cache'            => FALSE,
+					'offset'                => 0,
+
+					'status'                => '',
+					'sub_email'             => '',
+					'user_id'               => NULL,
+					'comment_id'            => NULL,
+
+					'auto_discount_trash'   => TRUE,
+					'sub_email_or_user_ids' => FALSE,
+					'group_by_email'        => FALSE,
+					'no_cache'              => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$offset              = abs((integer)$args['offset']);
-				$status              = trim((string)$args['status']);
-				$sub_email           = trim((string)$args['sub_email']);
-				$comment_id          = $this->isset_or($args['comment_id'], NULL, 'integer');
-				$auto_discount_trash = (boolean)$args['auto_discount_trash'];
-				$group_by_email      = (boolean)$args['group_by_email'];
-				$no_cache            = (boolean)$args['no_cache'];
+				$offset     = abs((integer)$args['offset']);
+				$status     = trim((string)$args['status']);
+				$sub_email  = trim(strtolower((string)$args['sub_email']));
+				$user_id    = $this->isset_or($args['user_id'], NULL, 'integer');
+				$comment_id = $this->isset_or($args['comment_id'], NULL, 'integer');
 
-				$cache_keys = compact('x', 'post_id', 'offset', 'status', 'sub_email', 'comment_id', 'auto_discount_trash', 'group_by_email');
+				$auto_discount_trash   = (boolean)$args['auto_discount_trash'];
+				$sub_email_or_user_ids = (boolean)$args['sub_email_or_user_ids'];
+				$group_by_email        = (boolean)$args['group_by_email'];
+				$no_cache              = (boolean)$args['no_cache'];
+
+				$cache_keys = compact('x', 'post_id', // Cacheable keys.
+				                      'offset', 'status', 'sub_email', 'user_id', 'comment_id',
+				                      'auto_discount_trash', 'sub_email_or_user_ids', 'group_by_email');
+
 				if(!is_null($last_x = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
 					return $last_x; // Already cached this.
 
@@ -604,8 +638,18 @@ namespace comment_mail // Root namespace.
 					       ? " AND `status` = '".esc_sql((string)$status)."'"
 					       : ($auto_discount_trash ? " AND `status` != '".esc_sql('trashed')."'" : '')).
 
+				       ($sub_email // Match a specific email address?
+					       ? ($sub_email_or_user_ids // Email or user IDs?
+						       ? " AND (`email` = '".esc_sql($sub_email)."'".
+						         (isset($user_id) ? " OR `user_id` = '".esc_sql($user_id)."'" : '').
+						         "    OR `user_id` IN('".implode("','", array_map('esc_sql', $this->email_user_ids($sub_email, $no_cache)))."'))"
+						       : " AND `email` = '".esc_sql($sub_email)."'")
+					       : ''). // End `sub_email` check.
+
+				       (isset($user_id) && (!$sub_email || !$sub_email_or_user_ids)
+					       ? " AND `user_id` = '".esc_sql($user_id)."'" : '').
+
 				       (isset($post_id) ? " AND `post_id` = '".esc_sql($post_id)."'" : '').
-				       ($sub_email ? " AND `email` = '".esc_sql($sub_email)."'" : '').
 				       (isset($comment_id) ? " AND `comment_id` = '".esc_sql($comment_id)."'" : '').
 
 				       ($group_by_email ? " GROUP BY `email`" : '').
@@ -621,18 +665,52 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * All user IDs associated w/ a particular email address.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string  $sub_email Email address to check.
+			 * @param boolean $no_cache Disallow a previously cached value?
+			 *
+			 * @return array An array of unique user IDs.
+			 */
+			public function email_user_ids($sub_email, $no_cache = FALSE)
+			{
+				if(!($sub_email = trim(strtolower((string)$sub_email))))
+					return array(); // Not possible.
+
+				if(!is_null($user_ids = &$this->cache_key(__FUNCTION__, $sub_email)) && !$no_cache)
+					return $user_ids; // Already cached this.
+
+				$sql1 = "SELECT DISTINCT `user_id` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				        " WHERE `email` = '".esc_sql($sub_email)."' AND `user_id` > '0'";
+
+				$sql2 = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->wp->users)."`".
+				        " WHERE `user_email` = '".esc_sql($sub_email)."' AND `ID` > '0'";
+
+				$user_ids = $this->plugin->utils_db->wp->get_col($sql1);
+				$user_ids = array_merge($user_ids, $this->plugin->utils_db->wp->get_col($sql2));
+
+				return ($user_ids = array_unique(array_map('intval', $user_ids)));
+			}
+
+			/**
 			 * Check existing email address.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $sub_email Email address to check.
+			 * @param string  $sub_email Email address to check.
+			 * @param boolean $no_cache Disallow a previously cached value?
 			 *
 			 * @return boolean TRUE if email exists already.
 			 */
-			public function email_exists($sub_email)
+			public function email_exists($sub_email, $no_cache = FALSE)
 			{
-				if(!($sub_email = trim((string)$sub_email)))
+				if(!($sub_email = trim(strtolower((string)$sub_email))))
 					return FALSE; // Not possible.
+
+				if(!is_null($exists = &$this->cache_key(__FUNCTION__, $sub_email)) && !$no_cache)
+					return $exists; // Already cached this.
 
 				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
@@ -640,7 +718,7 @@ namespace comment_mail // Root namespace.
 
 				       " LIMIT 1"; // One to check.
 
-				return (boolean)$this->plugin->utils_db->wp->get_var($sql);
+				return ($exists = (boolean)$this->plugin->utils_db->wp->get_var($sql));
 			}
 
 			/**
@@ -648,14 +726,18 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $sub_email Email address to check.
+			 * @param string  $sub_email Email address to check.
+			 * @param boolean $no_cache Disallow a previously cached value?
 			 *
 			 * @return string Last IP associated w/ email address; else empty string.
 			 */
-			public function email_last_ip($sub_email)
+			public function email_last_ip($sub_email, $no_cache = FALSE)
 			{
-				if(!($sub_email = trim((string)$sub_email)))
+				if(!($sub_email = trim(strtolower((string)$sub_email))))
 					return ''; // Not possible.
+
+				if(!is_null($last_ip = &$this->cache_key(__FUNCTION__, $sub_email)) && !$no_cache)
+					return $last_ip; // Already cached this.
 
 				$sql = "SELECT `last_ip` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
@@ -666,7 +748,7 @@ namespace comment_mail // Root namespace.
 
 				       " LIMIT 1"; // One to check.
 
-				return trim((string)$this->plugin->utils_db->wp->get_var($sql));
+				return ($last_ip = trim((string)$this->plugin->utils_db->wp->get_var($sql)));
 			}
 
 			/**
@@ -674,14 +756,18 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $sub_email Email address to check.
+			 * @param string  $sub_email Email address to check.
+			 * @param boolean $no_cache Disallow a previously cached value?
 			 *
 			 * @return boolean `TRUE` if the email is blacklisted.
 			 */
-			public function email_is_blacklisted($sub_email)
+			public function email_is_blacklisted($sub_email, $no_cache = FALSE)
 			{
-				if(!($sub_email = trim((string)$sub_email)))
+				if(!($sub_email = trim(strtolower((string)$sub_email))))
 					return FALSE; // Not possible.
+
+				if(!is_null($is = &$this->cache_key(__FUNCTION__, $sub_email)) && !$no_cache)
+					return $is; // Already cached this.
 
 				if(!($blacklist = trim($this->plugin->options['email_blacklist_patterns'])))
 					return FALSE; // There is no blacklist.
@@ -693,7 +779,7 @@ namespace comment_mail // Root namespace.
 
 						}, preg_split('/['."\r\n".']+/', $blacklist, NULL, PREG_SPLIT_NO_EMPTY))).')';
 
-				return (boolean)preg_match('/^'.$blacklist_patterns.'$/i', $sub_email);
+				return ($is = (boolean)preg_match('/^'.$blacklist_patterns.'$/i', $sub_email));
 			}
 
 			/**
@@ -712,7 +798,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function set_current_email($sub_email)
 			{
-				$sub_email = trim((string)$sub_email); // Force clean string.
+				$sub_email = trim(strtolower((string)$sub_email));
 
 				if($sub_email) // Check security if we are attempting to set a non-empty cookie value.
 					if(is_admin() || (!isset($_REQUEST[__NAMESPACE__]['confirm']) && !isset($_REQUEST[__NAMESPACE__]['unsubscribe']) && !isset($_REQUEST[__NAMESPACE__]['manage'])))
@@ -735,14 +821,14 @@ namespace comment_mail // Root namespace.
 			public function current_email($search_untrusted_sources = FALSE)
 			{
 				if(($user = wp_get_current_user()) && $user->ID && $user->user_email)
-					return (string)$user->user_email; // Force string.
+					return trim(strtolower((string)$user->user_email));
 
 				if(($sub_email = $this->plugin->utils_enc->get_cookie(__NAMESPACE__.'_sub_email')))
-					return (string)$sub_email; // Force string.
+					return trim(strtolower((string)$sub_email));
 
 				if($search_untrusted_sources) // Try current commenter?
 					if(($commenter = wp_get_current_commenter()) && !empty($commenter['comment_author_email']))
-						return (string)$commenter['comment_author_email']; // Force string.
+						return trim(strtolower((string)$commenter['comment_author_email']));
 
 				return ''; // Not possible.
 			}
