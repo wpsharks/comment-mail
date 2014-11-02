@@ -1226,10 +1226,11 @@ namespace comment_mail // Root namespace.
 				$sub_key = trim((string)$sub_key);
 				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key;
 
-				$summary                                     = $this->sub_manage_summary_url('0', $scheme, $include_nav_vars, 'array');
-				$url                                         = $summary['url'];
-				$args                                        = $summary['args'];
-				$args[__NAMESPACE__]['manage']['sub_delete'] = $sub_key;
+				$url  = home_url('/', $scheme);
+				$args = array(__NAMESPACE__ => array('manage' => array('sub_delete' => $sub_key, 'summary' => $sub_key)));
+
+				if($include_nav_vars && ($nav_vars = $this->sub_manage_summary_nav_vars($include_nav_vars)))
+					$args[__NAMESPACE__]['manage']['summary_nav'] = $nav_vars;
 
 				return add_query_arg(urlencode_deep($args), $url);
 			}

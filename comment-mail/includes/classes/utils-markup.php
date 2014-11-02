@@ -78,37 +78,63 @@ namespace comment_mail // Root namespace.
 				$name  = (string)$name;
 				$email = (string)$email;
 
-				$default_args        = array(
-					'separator'       => ' ',
-					'force_separator' => FALSE,
-					'span_title'      => TRUE,
-					'name_style'      => '',
-					'email_style'     => '',
-					'anchor'          => TRUE,
+				$default_args = array(
+					'separator'          => ' ',
+					'force_separator'    => FALSE,
+
+					'span_title'         => TRUE,
+
+					'name_style'         => '',
+					'email_style'        => '',
+
+					'anchor'             => TRUE,
+					'anchor_to'          => 'mailto',
+					// `mailto|summary|[custom URL]`.
+					'anchor_summary_key' => '',
 				);
-				$args                = array_merge($default_args, $args);
-				$args['separator']   = (string)$args['separator'];
-				$args['name_style']  = (string)$args['name_style'];
-				$args['email_style'] = (string)$args['email_style'];
+				$args         = array_merge($default_args, $args);
 
-				$name            = $name ? $this->plugin->utils_string->clean_name($name) : '';
-				$name_clip       = $name ? $this->plugin->utils_string->mid_clip($name) : '';
-				$email_clip      = $email ? $this->plugin->utils_string->mid_clip($email) : '';
-				$full_name_email = ($name ? '"'.$name.'"' : '').($name && $email ? ' ' : '').($email ? '<'.$email.'>' : '');
-				$name_span       = $name ? '<span style="'.esc_attr($args['name_style']).'">"'.esc_html($name_clip).'"</span>' : '';
-				$email_anchor    = $email ? '<a href="mailto:'.esc_attr(urlencode($email)).'" style="'.esc_attr($args['email_style']).'">'.esc_html($email_clip).'</a>' : '';
+				$separator       = (string)$args['separator'];
+				$force_separator = (boolean)$args['force_separator'];
 
-				return ($args['span_title']
-					? '<span title="'.esc_attr($full_name_email).'">' : '').
+				$span_title = (boolean)$args['span_title'];
 
-				       ($name ? $name_span : '').
-				       ($name && $email ? $args['separator'] : '').
-				       ($email ? '&lt;'.($args['anchor'] ? $email_anchor : esc_html($email_clip)).'&gt;' : '').
-				       ($args['force_separator'] && (!$name || !$email) ? $args['separator'] : '').
+				$name_style  = (string)$args['name_style'];
+				$email_style = (string)$args['email_style'];
 
-				       ($args['span_title']
-					       ? '</span>'
-					       : '');
+				$anchor             = (boolean)$args['anchor'];
+				$anchor_to          = (string)$args['anchor_to'];
+				$anchor_summary_key = (string)$args['anchor_summary_key'];
+
+				$name       = $name ? $this->plugin->utils_string->clean_name($name) : '';
+				$name_clip  = $name ? $this->plugin->utils_string->mid_clip($name) : '';
+				$email_clip = $email ? $this->plugin->utils_string->mid_clip($email) : '';
+
+				$name_email_attr_value = ($name ? '"'.$name.'"' : '').($name && $email ? ' ' : '').($email ? '<'.$email.'>' : '');
+				$name_span_tag         = $name ? '<span style="'.esc_attr($name_style).'">"'.esc_html($name_clip).'"</span>' : '';
+
+				if($anchor_to === 'summary' && $email && !$anchor_summary_key)
+					$anchor_summary_key = $this->plugin->utils_sub->email_latest_key($email);
+
+				if($anchor_to === 'summary' && $anchor_summary_key) // Construct summary URL; if possible.
+					$summary_anchor_url = $this->plugin->utils_url->sub_manage_summary_url($anchor_summary_key);
+
+				$mailto_anchor_tag  = $email ? '<a href="mailto:'.esc_attr(urlencode($email)).'" style="'.esc_attr($email_style).'">'.esc_html($email_clip).'</a>' : '';
+				$summary_anchor_tag = !empty($summary_anchor_url) ? '<a href="'.esc_attr($summary_anchor_url).'" style="'.esc_attr($email_style).'">'.esc_html($email_clip).'</a>' : '';
+				$custom_anchor_tag  = $anchor_to ? '<a href="'.esc_attr($anchor_to).'" style="'.esc_attr($email_style).'">'.esc_html($email_clip).'</a>' : '';
+
+				if($anchor_to === 'mailto') $anchor_tag = $mailto_anchor_tag; // e.g. `mailto:email`.
+				else if($anchor_to === 'summary') $anchor_tag = $summary_anchor_tag; // i.e. front-end summary.
+				else $anchor_tag = $custom_anchor_tag; // Default behavior; assume a custom URL was given.
+
+				return ($span_title ? '<span title="'.esc_attr($name_email_attr_value).'">' : '').
+
+				       ($name ? $name_span_tag : '').
+				       ($name && $email ? $separator : '').
+				       ($email ? '&lt;'.($anchor ? $anchor_tag : esc_html($email_clip)).'&gt;' : '').
+				       ($force_separator && (!$name || !$email) ? $separator : '').
+
+				       ($span_title ? '</span>' : '');
 			}
 
 			/**
@@ -127,15 +153,17 @@ namespace comment_mail // Root namespace.
 				$post_id             = (integer)$post_id;
 				$post_total_comments = (integer)$post_total_comments;
 
-				$default_args  = array('style' => 'float:right; margin-left:5px;');
-				$args          = array_merge($default_args, $args);
-				$args['style'] = (string)$args['style'];
+				$default_args = array(
+					'style' => 'float:right; margin-left:5px;'
+				);
+				$args         = array_merge($default_args, $args);
 
-				$post_total_comments_desc = sprintf(_n('%1$s Comment', '%1$s Comments',
-				                                       $post_total_comments, $this->plugin->text_domain), esc_html($post_total_comments));
+				$style = (string)$args['style'];
+
+				$post_total_comments_desc = sprintf(_n('%1$s Comment', '%1$s Comments', $post_total_comments, $this->plugin->text_domain), esc_html($post_total_comments));
 				$post_edit_comments_url   = $this->plugin->utils_url->post_edit_comments_short($post_id);
 
-				return '<a href="'.esc_attr($post_edit_comments_url).'" class="pmp-post-com-count post-com-count" style="'.esc_attr($args['style']).'" title="'.esc_attr($post_total_comments_desc).'">'.
+				return '<a href="'.esc_attr($post_edit_comments_url).'" class="pmp-post-com-count post-com-count" style="'.esc_attr($style).'" title="'.esc_attr($post_total_comments_desc).'">'.
 				       '  <span class="pmp-com-count comment-count">'.esc_html($post_total_comments).'</span>'.
 				       '</a>';
 			}
@@ -156,15 +184,17 @@ namespace comment_mail // Root namespace.
 				$post_id         = (integer)$post_id;
 				$post_total_subs = (integer)$post_total_subs;
 
-				$default_args  = array('style' => 'float:right; margin-left:5px;');
-				$args          = array_merge($default_args, $args);
-				$args['style'] = (string)$args['style'];
+				$default_args = array(
+					'style' => 'float:right; margin-left:5px;'
+				);
+				$args         = array_merge($default_args, $args);
 
-				$post_total_subs_desc = sprintf(_n('%1$s Subscription', '%1$s Subscriptions',
-				                                   $post_total_subs, $this->plugin->text_domain), esc_html($post_total_subs));
+				$style = (string)$args['style'];
+
+				$post_total_subs_desc = sprintf(_n('%1$s Subscription', '%1$s Subscriptions', $post_total_subs, $this->plugin->text_domain), esc_html($post_total_subs));
 				$post_edit_subs_url   = $this->plugin->utils_url->post_edit_subs_short($post_id);
 
-				return '<a href="'.esc_attr($post_edit_subs_url).'" class="pmp-post-sub-count" style="'.esc_attr($args['style']).'" title="'.esc_attr($post_total_subs_desc).'">'.
+				return '<a href="'.esc_attr($post_edit_subs_url).'" class="pmp-post-sub-count" style="'.esc_attr($style).'" title="'.esc_attr($post_total_subs_desc).'">'.
 				       '  <span class="pmp-sub-count">'.esc_html($post_total_subs).'</span>'.
 				       '</a>';
 			}
@@ -192,9 +222,6 @@ namespace comment_mail // Root namespace.
 				$last_x_email_lis = array(); // Initialize.
 
 				$default_args = array(
-					'list_style'            => 'margin:0;',
-					'anchor_style'          => 'text-decoration:none;',
-
 					'offset'                => 0,
 
 					'status'                => '',
@@ -206,19 +233,35 @@ namespace comment_mail // Root namespace.
 					'sub_email_or_user_ids' => FALSE,
 					'group_by_email'        => FALSE,
 					'no_cache'              => FALSE,
+
+					'list_style'            => 'margin:0;',
+					'email_style'           => 'font-weight:bold;',
+					'anchor_style'          => 'text-decoration:none;',
+					'anchor_to'             => 'summary', // `edit|summary`.
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
 				$list_style   = (string)$args['list_style'];
+				$email_style  = (string)$args['email_style'];
 				$anchor_style = (string)$args['anchor_style'];
+				$anchor_to    = (string)$args['anchor_to'];
 
 				foreach($this->plugin->utils_sub->last_x($x, $post_id, $args) as $_sub)
-					$last_x_email_lis[] = '<li>'. // This is linked up to an edit URL; so the site owner can see more.
-					                      ' <a href="'.esc_attr($this->plugin->utils_url->edit_sub_short($_sub->ID)).'" style="'.esc_attr($anchor_style).'">'.
-					                      ' <i class="fa fa-user"></i> '.$this->name_email('', $_sub->email, array('anchor' => FALSE)).'</a>'.
+				{
+					$_name_email_args = array(
+						'anchor'      => FALSE,
+						'email_style' => $email_style,
+					);
+					$_anchor_url      = $anchor_to === 'edit' ? $this->plugin->utils_url->edit_sub_short($_sub->ID)
+						: $this->plugin->utils_url->sub_manage_summary_url($_sub->key); // Default behavior.
+
+					$last_x_email_lis[] = '<li>'. // Based on `anchor_to` specification above.
+					                      ' <a href="'.esc_attr($_anchor_url).'" style="'.esc_attr($anchor_style).'">'.
+					                      ' <i class="fa fa-user"></i> '.$this->name_email('', $_sub->email, $_name_email_args).'</a>'.
 					                      '</li>';
-				unset($_sub); // Just a little housekeeping.
+				}
+				unset($_sub, $_name_email_args, $_anchor_url); // Housekeeping.
 
 				if(!$last_x_email_lis) // If no results, add a no subscriptions message.
 					$last_x_email_lis[] = '<li style="font-style:italic;">'.

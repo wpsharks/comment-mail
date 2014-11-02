@@ -62,8 +62,8 @@ namespace comment_mail // Root namespace.
 			{
 				$sub_key = ''; // Initialize.
 
-				if(is_string($request_args))
-					$sub_key = trim($request_args);
+				if(is_string($request_args)) // Key sanitizer.
+					$sub_key = $this->plugin->utils_sub->sanitize_key($request_args);
 
 				if($sub_key && ($sub = $this->plugin->utils_sub->get($sub_key)))
 					$this->plugin->utils_sub->set_current_email($sub_key, $sub->email);
@@ -99,6 +99,9 @@ namespace comment_mail // Root namespace.
 			{
 				if(!($request_args = (array)$request_args))
 					return; // Empty request args.
+
+				if(isset($request_args['key'])) // Key sanitizer.
+					$request_args['key'] = $this->plugin->utils_sub->sanitize_key($request_args['key']);
 
 				sub_manage_sub_form_base::process($request_args);
 				// Do NOT stop; allow `edit|new` action to run also.
@@ -152,7 +155,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function sub_edit($request_args)
 			{
-				$sub_key = trim((string)$request_args);
+				$sub_key = $this->plugin->utils_sub->sanitize_key($request_args);
 
 				if($sub_key && ($sub = $this->plugin->utils_sub->get($sub_key)))
 					$this->plugin->utils_sub->set_current_email($sub_key, $sub->email);
@@ -171,7 +174,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function sub_delete($request_args)
 			{
-				$sub_key = trim((string)$request_args);
+				$sub_key = $this->plugin->utils_sub->sanitize_key($request_args);
 
 				if($sub_key && ($sub = $this->plugin->utils_sub->get($sub_key)))
 					$this->plugin->utils_sub->set_current_email($sub_key, $sub->email);

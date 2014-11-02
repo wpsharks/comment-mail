@@ -52,7 +52,8 @@ namespace comment_mail;
  *    Note that you should NOT display the form at all, if any major error exist here.
  */
 ?>
-<?php echo str_replace('%%title%%', // Editing or creating?
+<?php // Sets document <title> tag via `%%title%%` replacement code in header.
+echo str_replace('%%title%%', // Editing subscription; or creating a new one?
                        $is_edit ? __('Edit Subscription', $plugin->text_domain)
 	                       : __('Add New Subscription', $plugin->text_domain), $site_header); ?>
 
@@ -304,7 +305,7 @@ namespace comment_mail;
 
 						/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-						$('form').on('submit', function(e)
+						$('.manage-sub-form form').on('submit', function(e)
 						{
 							var $this = $(this),
 								errors = '', // Initialize.

@@ -688,6 +688,31 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Latest key associated w/ a particular email address.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string  $sub_email Email address to check.
+			 * @param boolean $no_cache Disallow a previously cached value?
+			 *
+			 * @return string Latest key associated w/ the email; else an empty string.
+			 */
+			public function email_latest_key($sub_email, $no_cache = FALSE)
+			{
+				if(!($sub_email = trim(strtolower((string)$sub_email))))
+					return array(); // Not possible.
+
+				if(!is_null($sub_key = &$this->cache_key(__FUNCTION__, $sub_email)) && !$no_cache)
+					return $sub_key; // Already cached this.
+
+				$sql = "SELECT `key` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				       " WHERE `email` = '".esc_sql($sub_email)."' AND `key` != ''".
+				       " ORDER BY `last_update_time` DESC LIMIT 1";
+
+				return ($sub_key = (string)$this->plugin->utils_db->wp->get_var($sql));
+			}
+
+			/**
 			 * All keys associated w/ a particular email address.
 			 *
 			 * @since 14xxxx First documented version.
@@ -937,7 +962,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function set_current_email($sub_key, $sub_email)
 			{
-				$sub_key   = trim((string)$sub_email);
+				$sub_key   = trim((string)$sub_key);
 				$sub_email = trim(strtolower((string)$sub_email));
 
 				if(isset($sub_email[0])) // Double-check security issues here.
@@ -990,6 +1015,31 @@ namespace comment_mail // Root namespace.
 						return trim(strtolower((string)$commenter['comment_author_email']));
 
 				return ''; // Not possible.
+			}
+
+			/**
+			 * Sanitizes a subscription key.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $key Input subscription key.
+			 *
+			 * @return string Sanitized subscription key; else an empty string.
+			 *
+			 * @note Numeric keys represent a security issue, since one of our utility functions
+			 *    may be able to accept either a key or an ID. Thus, all user-facing action handlers MUST always
+			 *    sanitize keys they're working with; in order to be sure keys are NOT numeric.
+			 *
+			 * @see utils_enc::uunnci_key_20_max()
+			 */
+			public function sanitize_key($key)
+			{
+				$key = trim((string)$key);
+
+				if(is_numeric($key))
+					$key = $key === '0' ? '' : 'k'.$key;
+
+				return $key;
 			}
 		}
 	}

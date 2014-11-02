@@ -185,10 +185,15 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function column_email(\stdClass $item)
 			{
-				$name       = $item->fname.' '.$item->lname; // Concatenate.
-				$email_info = '<i class="fa fa-envelope"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
-				              ' <span style="font-weight:bold;" title="'.esc_attr($item->key).'">ID #'.esc_html($item->ID).'</span>'.
-				              ' '.$this->plugin->utils_markup->name_email($name, $item->email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
+				$name_email_args = array(
+					'separator'   => '<br />',
+					'email_style' => 'font-weight:bold;',
+					'anchor_to'   => 'summary', 'summary_anchor_key' => $item->key,
+				);
+				$name            = $item->fname.' '.$item->lname; // Concatenate.
+				$email_info      = '<i class="fa fa-envelope"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
+				                   ' <span style="font-weight:bold;" title="'.esc_attr($item->key).'">ID #'.esc_html($item->ID).'</span>'.
+				                   ' '.$this->plugin->utils_markup->name_email($name, $item->email, $name_email_args);
 
 				$edit_url      = $this->plugin->utils_url->edit_sub_short($item->ID);
 				$reconfirm_url = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'reconfirm');

@@ -90,6 +90,26 @@ namespace comment_mail;
 			cursor : pointer;
 		}
 		/*
+		Subscription summary.
+		*/
+		.manage-summary .subs-table a
+		{
+			text-decoration : none;
+		}
+		.manage-summary .subs-table tr .hover-links
+		{
+			visibility : hidden;
+			margin     : 0 0 0 20px;
+		}
+		.manage-summary .subs-table tr:hover .hover-links
+		{
+			visibility : visible;
+		}
+		.manage-summary .subs-table tr .hover-links .text-muted
+		{
+			opacity : 0.5;
+		}
+		/*
 		Subscription add/edit form.
 		*/
 		.manage-sub-form form table

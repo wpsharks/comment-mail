@@ -235,11 +235,12 @@ namespace comment_mail // Root namespace.
 				$dirs[] = dirname(dirname(__FILE__)).'/templates';
 
 				foreach($dirs as $_dir /* In order of precedence. */)
-					if(is_file($_dir.'/'.$this->file) && is_readable($_dir.'/'.$this->file) && filesize($_dir.'/'.$this->file))
+					// Note: don't check `filesize()` here; templates CAN be empty.
+					if(is_file($_dir.'/'.$this->file) && is_readable($_dir.'/'.$this->file))
 						return file_get_contents($_dir.'/'.$this->file);
 				unset($_dir); // Housekeeping.
 
-				throw new \exception(sprintf('Missing template for: `%1$s`.', $this->plugin->text_domain), $this->file);
+				throw new \exception(sprintf(__('Missing template for: `%1$s`.', $this->plugin->text_domain), $this->file));
 			}
 		}
 	}

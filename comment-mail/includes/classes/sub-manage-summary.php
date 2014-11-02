@@ -119,12 +119,16 @@ namespace comment_mail // Root namespace.
 			 */
 			protected static $processing_successes_html = array();
 
+			/*
+			 * Public static properties.
+			 */
+
 			/**
 			 * @var array Default nav vars.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected static $default_nav_vars = array(
+			public static $default_nav_vars = array(
 				'page'    => 1,
 				'post_id' => NULL,
 				'status'  => '',
@@ -210,7 +214,7 @@ namespace comment_mail // Root namespace.
 					$error_codes[] = 'invalid_sub_key';
 
 				else if(!$this->sub_email)
-					$error_codes[] = 'unknown_sub';
+					$error_codes[] = 'missing_sub_key';
 
 				if(!$error_codes) // i.e. have email?
 				{
@@ -315,13 +319,13 @@ namespace comment_mail // Root namespace.
 			 */
 			public static function delete($sub_key)
 			{
-				$sub_key = (string)$sub_key;
-
 				$plugin = plugin(); // Needed below.
 
 				static::$processing = TRUE; // Flag as `TRUE`.
 
 				$errors = $successes = array(); // Initialize.
+
+				$sub_key = $plugin->utils_sub->sanitize_key($sub_key);
 
 				$delete_args = array('user_initiated' => TRUE);
 				$deleted     = $plugin->utils_sub->delete($sub_key, $delete_args);

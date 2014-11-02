@@ -346,6 +346,9 @@ namespace comment_mail // Root namespace.
 
 				static::$processing = TRUE; // Flag as `TRUE`; along w/ other statics below.
 
+				if(isset($request_args['key'])) // Key sanitizer; for added security.
+					$request_args['key'] = $sub_key = $plugin->utils_sub->sanitize_key($request_args['key']);
+
 				if(isset($request_args['ID'])) // Updating an existing subscription via ID?
 				{
 					$sub_updater = new sub_updater($request_args, $args); // Run updater.
