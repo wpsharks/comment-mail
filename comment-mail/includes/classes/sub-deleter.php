@@ -123,7 +123,9 @@ namespace comment_mail // Root namespace.
 				$this->cleaning       = (boolean)$args['cleaning'];
 				$this->process_events = (boolean)$args['process_events'];
 				$this->user_initiated = (boolean)$args['user_initiated'];
-
+				$this->user_initiated = $this->plugin->utils_sub->check_user_initiated_by_admin(
+					$this->sub ? $this->sub->email : '', $this->user_initiated
+				);
 				if($this->user_initiated && !$this->last_ip)
 					$this->last_ip = $this->plugin->utils_env->user_ip();
 

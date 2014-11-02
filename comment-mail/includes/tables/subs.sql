@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `%%prefix%%subs` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key.',
-  `key` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT 'A unique, unguessable, non-numeric, caSe-insensitive key (20 chars max).',
+  `key` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT 'A unique, secret, unguessable, non-numeric, caSe-insensitive key (20 chars max).',
   `user_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'User ID from the `wp_users` table. Leave this empty (zero) for commenters that are not stored as users.',
   `post_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Post ID from the `wp_posts` table. A comment subscription is always associated with a specific post ID.',
   `comment_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Comment ID from the `wp_comments` table. Applicable only when a subscription is to a specific comment. Otherwise, leave empty (zero) to indicate the subscription is for all comments/replies associated w/ the`post_id`.',

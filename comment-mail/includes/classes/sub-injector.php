@@ -111,7 +111,9 @@ namespace comment_mail // Root namespace.
 					$this->auto_confirm = (boolean)$args['auto_confirm'];
 				$this->process_events = (boolean)$args['process_events'];
 				$this->user_initiated = (boolean)$args['user_initiated'];
-
+				$this->user_initiated = $this->plugin->utils_sub->check_user_initiated_by_admin(
+					$this->comment ? $this->comment->comment_author_email : '', $this->user_initiated
+				);
 				$this->maybe_inject();
 			}
 

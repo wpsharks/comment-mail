@@ -72,7 +72,7 @@ namespace comment_mail // Root namespace.
 			 *    If empty, defaults to the current URL.
 			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See {@link \set_url_scheme()} in WordPress for further details on this.
+			 *    See {@link \set_url_scheme()} in WordPress for further details.
 			 *
 			 * @return string URL w/ the proper scheme.
 			 *
@@ -162,7 +162,7 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See {@link \set_url_scheme()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Current URL; i.e. scheme.host.URI put together.
 			 */
@@ -185,7 +185,7 @@ namespace comment_mail // Root namespace.
 			 *    If empty, defaults to the current URL.
 			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See {@link \set_url_scheme()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL without a query string.
 			 */
@@ -211,7 +211,7 @@ namespace comment_mail // Root namespace.
 			 *    If empty, defaults to the current URL.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL with `_wpnonce`.
 			 */
@@ -238,7 +238,7 @@ namespace comment_mail // Root namespace.
 			 *    If empty, defaults to the current URL.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL with only a `page` var (if applicable).
 			 */
@@ -280,7 +280,7 @@ namespace comment_mail // Root namespace.
 			 *    If empty, defaults to the current URL.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL with only a `page` var (if applicable) and `_wpnonce`.
 			 */
@@ -297,7 +297,7 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Main menu page URL.
 			 */
@@ -317,7 +317,7 @@ namespace comment_mail // Root namespace.
 			 *    Defaults to `__NAMESPACE__`.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Main menu page URL; w/ `_wpnonce`.
 			 */
@@ -334,7 +334,7 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Subscriptions menu page URL.
 			 */
@@ -351,7 +351,7 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Sub. event log menu page URL.
 			 */
@@ -368,7 +368,7 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Queue menu page URL.
 			 */
@@ -385,7 +385,7 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Queue event log menu page URL.
 			 */
@@ -402,7 +402,7 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Restore default options URL.
 			 */
@@ -420,7 +420,7 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Options restored URL.
 			 */
@@ -441,7 +441,7 @@ namespace comment_mail // Root namespace.
 			 *    If empty, defaults to the current menu page.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Options updated URL.
 			 */
@@ -465,7 +465,7 @@ namespace comment_mail // Root namespace.
 			 *    If empty, defaults to the main menu page.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Pro preview URL.
 			 */
@@ -499,7 +499,7 @@ namespace comment_mail // Root namespace.
 			 *    If empty, defaults to the current URL.
 			 *
 			 * @param string|null  $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL w/ search filters added to the `s` key.
 			 */
@@ -558,7 +558,7 @@ namespace comment_mail // Root namespace.
 			 *    If empty, defaults to the current URL.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL leading to the bulk action necessary.
 			 */
@@ -577,12 +577,11 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * URL w/ page & table nav vars only.
+			 * URL w/ page & table nav vars only — from a given URL and/or `$_REQUEST` vars.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param array       $also_keep Any additional names/keys to keep.
-			 *
 			 *    Built-in names/keys to keep already includes the following:
 			 *       `page`, `orderby`, `order`, and `s` for searches.
 			 *
@@ -592,25 +591,30 @@ namespace comment_mail // Root namespace.
 			 *    ~ See also: {@link page_nonce_table_nav_vars_only()}.
 			 *
 			 * @param string      $url The input URL to work from (optional).
-			 *    If empty, defaults to the current URL.
+			 *    Defaults to current URL. Existing vars will be taken from this URL.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @param string      $nonce_action A specific nonce action.
 			 *    ~ See also: {@link page_nonce_table_nav_vars_only()}.
 			 *
-			 * @return string URL w/ page & table nav vars only.
+			 * @return string URL w/ page & table nav vars only — from given URL and/or `$_REQUEST` vars.
+			 *
+			 * @note Vars found in the given URL are given priority over any found in the current `$_REQUEST` vars.
+			 *    i.e. If the given (and/or default) URL contains a particular table nav var, it's given precedence.
+			 *    Otherwise, if the URL does not have a particular table nav var, we look at `$_REQUEST` vars.
 			 */
 			public function page_table_nav_vars_only(array $also_keep = array(), $url = '', $scheme = 'admin', $nonce_action = __NAMESPACE__)
 			{
 				if(!($url = trim((string)$url)))
 					$url = $this->current();
 
-				$_r    = $this->plugin->utils_string->trim_strip_deep($_REQUEST);
 				$query = (string)parse_url($url, PHP_URL_QUERY);
 				wp_parse_str($query, $query_vars);
 				$url = $this->no_query($url);
+
+				$_r = $this->plugin->utils_string->trim_strip_deep($_REQUEST);
 
 				$also_keep = array_map('strval', $also_keep);
 				$keepers   = array('page', 'orderby', 'order', 's');
@@ -618,10 +622,10 @@ namespace comment_mail // Root namespace.
 
 				foreach($keepers as $_keeper) // Add keepers back onto the clean URL.
 				{
-					if(!empty($query_vars[$_keeper])) // In query vars?
+					if(isset($query_vars[$_keeper])) // In query vars?
 						$url = add_query_arg(urlencode($_keeper), urlencode($query_vars[$_keeper]), $url);
 
-					else if(!empty($_r[$_keeper])) // In the current request array?
+					else if(isset($_r[$_keeper])) // In the current request array?
 						$url = add_query_arg(urlencode($_keeper), urlencode($_r[$_keeper]), $url);
 				}
 				unset($_keeper); // Housekeeping.
@@ -633,7 +637,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * URL w/ page, nonce & table nav vars only.
+			 * URL w/ page, nonce & table nav vars only — from a given URL and/or `$_REQUEST` vars.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -657,7 +661,7 @@ namespace comment_mail // Root namespace.
 			 * @param string      $notice_key The notice key to dismiss.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Notice dimissal URL.
 			 */
@@ -677,7 +681,7 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Notice dimissed URL.
 			 */
@@ -694,7 +698,7 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See {@link \set_url_scheme()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Product page URL; normally at WebSharks™.
 			 */
@@ -713,7 +717,7 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See {@link \set_url_scheme()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Subscribe page URL; normally at WebSharks™.
 			 */
@@ -734,7 +738,7 @@ namespace comment_mail // Root namespace.
 			 * @param string      $file Optional file path; relative to plugin directory.
 			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See {@link \set_url_scheme()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL to plugin directory; or to the specified `$file` if applicable.
 			 */
@@ -779,7 +783,7 @@ namespace comment_mail // Root namespace.
 			 * @param integer     $post_id A WP post ID.
 			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See {@link \set_url_scheme()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Post shortlink.
 			 */
@@ -801,7 +805,7 @@ namespace comment_mail // Root namespace.
 			 * @param integer     $post_id A WP post ID.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Post edit shortlink.
 			 */
@@ -823,7 +827,7 @@ namespace comment_mail // Root namespace.
 			 * @param integer     $post_id A WP post ID.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Post edit comments shortlink.
 			 */
@@ -846,7 +850,7 @@ namespace comment_mail // Root namespace.
 			 * @param string      $s Any additional search words/filters.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Post edit subscriptions shortlink.
 			 */
@@ -867,7 +871,7 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string New subscription shortlink.
 			 */
@@ -888,7 +892,7 @@ namespace comment_mail // Root namespace.
 			 * @param integer     $sub_id Subscription ID.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Edit subscription shortlink.
 			 */
@@ -911,7 +915,7 @@ namespace comment_mail // Root namespace.
 			 * @param integer     $user_id A WP User ID.
 			 *
 			 * @param string|null Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Edit user shortlink.
 			 */
@@ -933,7 +937,7 @@ namespace comment_mail // Root namespace.
 			 * @param integer     $comment_id A WP comment ID.
 			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See {@link \home_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Comment shortlink.
 			 */
@@ -955,7 +959,7 @@ namespace comment_mail // Root namespace.
 			 * @param integer     $comment_id A WP comment ID.
 			 *
 			 * @param string|null Optional . Defaults to `admin`.
-			 *    See {@link \admin_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Comment edit shortlink.
 			 */
@@ -977,7 +981,7 @@ namespace comment_mail // Root namespace.
 			 * @param string      $sub_key Unique subscription key.
 			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See {@link \home_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
@@ -1000,7 +1004,7 @@ namespace comment_mail // Root namespace.
 			 * @param string      $sub_key Unique subscription key.
 			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See {@link \home_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
@@ -1025,7 +1029,7 @@ namespace comment_mail // Root namespace.
 			 *    the current user's email address; if available/possible.
 			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See {@link \home_url()} in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
@@ -1045,16 +1049,25 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string      $sub_key Unique subscription key.
+			 * @param string        $sub_key Unique subscription key.
 			 *    If empty, the subscription management system will use
 			 *    the current user's email address; if available/possible.
 			 *
-			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See {@link \home_url()} in WordPress for further details on this.
+			 * @param string|null   $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
 			 *
-			 * @return string URL w/ the given `$scheme`.
+			 * @param boolean|array $include_nav_vars Defaults to a `NULL` value.
+			 *    Use a non-empty array to add new nav vars; `TRUE` to simply include existing nav vars.
+			 *    See also {@link sub_manage_summary_nav_vars()} for additional details.
+			 *
+			 * @param string        $return_type Type of return value; i.e. `(string)$url` or `(array)$args`?
+			 *    Set this to a value of `array` to indicate that you want `(array)$args`.
+			 *    ~ Defaults to a value of `string`, indicating `(string)$url`.
+			 *
+			 * @return string URL w/ all args + nav vars. Or, `(array)$args`; i.e. array of all args + nav vars.
+			 *    In short, return value is dependent upon the `$return_type` parameter.
 			 */
-			public function sub_manage_summary_url($sub_key = '', $scheme = NULL)
+			public function sub_manage_summary_url($sub_key = '', $scheme = NULL, $include_nav_vars = NULL, $return_type = 'string')
 			{
 				$sub_key = trim((string)$sub_key);
 				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key;
@@ -1062,7 +1075,79 @@ namespace comment_mail // Root namespace.
 				$url  = home_url('/', $scheme);
 				$args = array(__NAMESPACE__ => array('manage' => array('summary' => $sub_key)));
 
-				return add_query_arg(urlencode_deep($args), $url);
+				if($include_nav_vars && ($nav_vars = $this->sub_manage_summary_nav_vars($include_nav_vars)))
+					$args[__NAMESPACE__]['manage']['summary_nav'] = $nav_vars;
+
+				return $return_type === 'array' ? compact('url', 'args') : add_query_arg(urlencode_deep($args), $url);
+			}
+
+			/**
+			 * Summary nav vars in a given URL and/or current `$_REQUEST` vars.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param boolean|array $include_nav_vars Defaults to a `TRUE` value.
+			 *    Use a non-empty array to add new nav vars; `TRUE` to simply include existing nav vars.
+			 *    ~ Any other value results in no nav vars; i.e. this function returns an empty array.
+			 *
+			 *    • Regarding `(array)$include_nav_vars`; i.e. adding new nav vars:
+			 *
+			 *       Any new nav vars are ADDED to those which may already exist in the URL and/or `$_REQUEST` vars.
+			 *       If you want to override any that may already exist in these sources, define key `0` in your array.
+			 *       i.e. `if(array_key_exists(0, $include_nav_vars))`; yours will override any that exist already.
+			 *       ~ Noting that the `0` key is excluded automatically after interpretation for this purpose.
+			 *
+			 * @param string        $url The input URL to work from (optional).
+			 *    Defaults to current URL. Existing nav vars will be taken from this URL.
+			 *
+			 * @return array An array of any summary nav vars; when/if applicable.
+			 *
+			 * @note Nav vars found in the given URL are given priority over any found in the current `$_REQUEST` vars.
+			 *    i.e. If the given (and/or default) URL contains a particular summary nav var, it's given precedence.
+			 *    Otherwise, if the URL does not have a particular summary nav var, we look at `$_REQUEST` vars.
+			 */
+			public function sub_manage_summary_nav_vars($include_nav_vars = TRUE, $url = '')
+			{
+				if($include_nav_vars !== TRUE // Exclude nav vars?
+				   && (!is_array($include_nav_vars) || empty($include_nav_vars))
+				) return array(); // Must be `TRUE`, or a non-empty array.
+
+				if(!is_array($nav_vars = $include_nav_vars))
+					$nav_vars = array(); // Force array.
+
+				if(!($url = trim((string)$url)))
+					$url = $this->current();
+
+				$existing_nav_vars = array(); // Initialize.
+				$new_nav_vars_only = FALSE; // Default behavior.
+
+				if(array_key_exists(0, $nav_vars)) // Only use new nav vars?
+				{
+					$new_nav_vars_only = TRUE; // Flag as `TRUE`; only use new nav vars.
+					unset($nav_vars[0]); // Unset automatically after interpretation.
+				}
+				if(!$new_nav_vars_only) // Only if we NEED existing nav vars.
+				{
+					$query = (string)parse_url($url, PHP_URL_QUERY);
+					wp_parse_str($query, $query_vars); // By reference.
+
+					if(!empty($query_vars[__NAMESPACE__]['manage']['summary_nav']))
+						$query_nav_vars = (array)$query_vars[__NAMESPACE__]['manage']['summary_nav'];
+
+					if($_REQUEST && !empty($_REQUEST[__NAMESPACE__]['manage']['summary_nav']))
+						$_r_nav_vars = $this->plugin->utils_string->trim_strip_deep((array)$_REQUEST[__NAMESPACE__]['manage']['summary_nav']);
+
+					foreach(array_keys(sub_manage_summary::$default_nav_vars) as $_nav_var_key)
+					{
+						if(isset($query_nav_vars[$_nav_var_key]))
+							$existing_nav_vars[$_nav_var_key] = (string)$query_nav_vars[$_nav_var_key];
+
+						else if(isset($_r_nav_vars[$_nav_var_key]))
+							$existing_nav_vars[$_nav_var_key] = (string)$_r_nav_vars[$_nav_var_key];
+					}
+					unset($_nav_var_key); // Housekeeping.
+				}
+				return $new_nav_vars_only ? $nav_vars : array_merge($existing_nav_vars, $nav_vars);
 			}
 
 			/**
@@ -1070,15 +1155,22 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See {@link \home_url()} in WordPress for further details on this.
+			 * @param string|null   $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @param boolean|array $include_nav_vars Defaults to a `NULL` value.
+			 *    Use a non-empty array to add new nav vars; `TRUE` to simply include existing nav vars.
+			 *    See also {@link sub_manage_summary_nav_vars()} for additional details.
 			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
-			public function sub_manage_sub_new_url($scheme = NULL)
+			public function sub_manage_sub_new_url($scheme = NULL, $include_nav_vars = NULL)
 			{
 				$url  = home_url('/', $scheme);
-				$args = array(__NAMESPACE__ => array('manage' => array('sub_new' => 0)));
+				$args = array(__NAMESPACE__ => array('manage' => array('sub_new' => '0')));
+
+				if($include_nav_vars && ($nav_vars = $this->sub_manage_summary_nav_vars($include_nav_vars)))
+					$args[__NAMESPACE__]['manage']['summary_nav'] = $nav_vars;
 
 				return add_query_arg(urlencode_deep($args), $url);
 			}
@@ -1088,20 +1180,27 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string      $sub_key Unique subscription key.
+			 * @param string        $sub_key Unique subscription key.
 			 *
-			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See {@link \home_url()} in WordPress for further details on this.
+			 * @param string|null   $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @param boolean|array $include_nav_vars Defaults to a `NULL` value.
+			 *    Use a non-empty array to add new nav vars; `TRUE` to simply include existing nav vars.
+			 *    See also {@link sub_manage_summary_nav_vars()} for additional details.
 			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
-			public function sub_manage_sub_edit_url($sub_key = '', $scheme = NULL)
+			public function sub_manage_sub_edit_url($sub_key = '', $scheme = NULL, $include_nav_vars = NULL)
 			{
 				$sub_key = trim((string)$sub_key);
 				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key;
 
 				$url  = home_url('/', $scheme);
 				$args = array(__NAMESPACE__ => array('manage' => array('sub_edit' => $sub_key)));
+
+				if($include_nav_vars && ($nav_vars = $this->sub_manage_summary_nav_vars($include_nav_vars)))
+					$args[__NAMESPACE__]['manage']['summary_nav'] = $nav_vars;
 
 				return add_query_arg(urlencode_deep($args), $url);
 			}
@@ -1111,20 +1210,26 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string      $sub_key Unique subscription key.
+			 * @param string        $sub_key Unique subscription key.
 			 *
-			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See {@link \home_url()} in WordPress for further details on this.
+			 * @param string|null   $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @param boolean|array $include_nav_vars Defaults to a `NULL` value.
+			 *    Use a non-empty array to add new nav vars; `TRUE` to simply include existing nav vars.
+			 *    See also {@link sub_manage_summary_nav_vars()} for additional details.
 			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
-			public function sub_manage_sub_delete_url($sub_key = '', $scheme = NULL)
+			public function sub_manage_sub_delete_url($sub_key = '', $scheme = NULL, $include_nav_vars = NULL)
 			{
 				$sub_key = trim((string)$sub_key);
 				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key;
 
-				$url  = $this->sub_manage_summary_url($sub_key, $scheme);
-				$args = array(__NAMESPACE__ => array('manage' => array('sub_delete' => $sub_key)));
+				$summary                                     = $this->sub_manage_summary_url('0', $scheme, $include_nav_vars, 'array');
+				$url                                         = $summary['url'];
+				$args                                        = $summary['args'];
+				$args[__NAMESPACE__]['manage']['sub_delete'] = $sub_key;
 
 				return add_query_arg(urlencode_deep($args), $url);
 			}

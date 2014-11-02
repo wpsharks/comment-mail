@@ -203,7 +203,7 @@ namespace comment_mail // Root namespace.
 				if(!$this->plugins->options['enable'])
 					return; // Disabled currently.
 
-				if(!$this->plugins->options['queue_enable'])
+				if(!$this->plugins->options['queue_processing_enable'])
 					return; // Disabled currently.
 
 				if(!($this->entries = $this->entries()))
@@ -290,7 +290,7 @@ namespace comment_mail // Root namespace.
 					'queue_id'          => $entry_props->entry->ID,
 					'dby_queue_id'      => $entry_props->dby_queue_id, // Digested?
 					'sub_id'            => $entry_props->sub ? $entry_props->sub->ID : $entry_props->entry->sub_id,
-					'user_id'           => $entry_props->sub ? $entry_props->sub->user_id : 0, // Default; no user.
+					'user_id'           => $entry_props->sub ? $entry_props->sub->user_id : 0, // Default; no user; not possible.
 					'post_id'           => $entry_props->post ? $entry_props->post->ID : ($entry_props->comment ? $entry_props->comment->comment_post_ID : ($entry_props->sub ? $entry_props->sub->post_id : 0)),
 					'comment_id'        => $entry_props->comment ? $entry_props->comment->comment_ID : $entry_props->entry->comment_id,
 					'comment_parent_id' => $entry_props->comment ? $entry_props->comment->comment_parent : $entry_props->entry->comment_parent_id,

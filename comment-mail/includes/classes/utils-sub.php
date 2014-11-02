@@ -656,12 +656,59 @@ namespace comment_mail // Root namespace.
 
 				       " ORDER BY `insertion_time` DESC".
 
-				       " LIMIT ".esc_sql($offset).", ".esc_sql($x);
+				       " LIMIT ".esc_sql($offset).",".esc_sql($x);
 
 				if(($results = $this->plugin->utils_db->wp->get_results($sql, OBJECT_K)))
 					return ($last_x = $results = $this->plugin->utils_db->typify_deep($results));
 
 				return ($last_x = array()); // Default value.
+			}
+
+			/**
+			 * User initiated, but by an admin on behalf of another?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string  $sub_email Email address to check.
+			 * @param boolean $user_initiated Current value for this flag.
+			 *
+			 * @return boolean `TRUE` if user initiated, but by an admin on behalf of another?
+			 */
+			public function check_user_initiated_by_admin($sub_email, $user_initiated = FALSE)
+			{
+				$sub_email = trim(strtolower((string)$sub_email));
+				// Even if the email is empty; we still run the check below.
+
+				if($user_initiated) // We only need this check if it IS user-initiated obviously.
+					if(current_user_can($this->plugin->manage_cap) || current_user_can($this->plugin->cap) || current_user_can('edit_posts'))
+						if(strcasecmp($sub_email, wp_get_current_user()->user_email) !== 0) // Email not a match?
+							$user_initiated = FALSE; // Possible update on behalf of another.
+
+				return $user_initiated;
+			}
+
+			/**
+			 * All keys associated w/ a particular email address.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string  $sub_email Email address to check.
+			 * @param boolean $no_cache Disallow a previously cached value?
+			 *
+			 * @return array An array of unique subscription keys.
+			 */
+			public function email_keys($sub_email, $no_cache = FALSE)
+			{
+				if(!($sub_email = trim(strtolower((string)$sub_email))))
+					return array(); // Not possible.
+
+				if(!is_null($sub_keys = &$this->cache_key(__FUNCTION__, $sub_email)) && !$no_cache)
+					return $sub_keys; // Already cached this.
+
+				$sql = "SELECT DISTINCT `key` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				       " WHERE `email` = '".esc_sql($sub_email)."' AND `key` != ''";
+
+				return ($sub_keys = $this->plugin->utils_db->wp->get_col($sql));
 			}
 
 			/**
@@ -695,33 +742,6 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Check existing email address.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string  $sub_email Email address to check.
-			 * @param boolean $no_cache Disallow a previously cached value?
-			 *
-			 * @return boolean TRUE if email exists already.
-			 */
-			public function email_exists($sub_email, $no_cache = FALSE)
-			{
-				if(!($sub_email = trim(strtolower((string)$sub_email))))
-					return FALSE; // Not possible.
-
-				if(!is_null($exists = &$this->cache_key(__FUNCTION__, $sub_email)) && !$no_cache)
-					return $exists; // Already cached this.
-
-				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-
-				       " WHERE `email` = '".esc_sql($sub_email)."'".
-
-				       " LIMIT 1"; // One to check.
-
-				return ($exists = (boolean)$this->plugin->utils_db->wp->get_var($sql));
-			}
-
-			/**
 			 * Last IP associated w/ email address.
 			 *
 			 * @since 14xxxx First documented version.
@@ -740,9 +760,7 @@ namespace comment_mail // Root namespace.
 					return $last_ip; // Already cached this.
 
 				$sql = "SELECT `last_ip` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-
-				       " WHERE `email` = '".esc_sql($sub_email)."'".
-				       " AND `last_ip` != ''". // Has an IP.
+				       " WHERE `email` = '".esc_sql($sub_email)."' AND `last_ip` != ''".
 
 				       " ORDER BY `last_update_time` DESC".
 
@@ -783,27 +801,156 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Can a subscription be auto-confirmed?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer      $post_id A WP post ID.
+			 * @param integer      $sub_user_id Subscriber's WP user ID.
+			 * @param string       $sub_email Subscriber email address.
+			 * @param string       $sub_last_ip Subscriber's last IP address.
+			 * @param boolean      $user_initiated Request is user-initiated?
+			 * @param boolean|null $auto_confirm Flag to force specific behavior.
+			 *
+			 * @return boolean|null `TRUE` if the subscription can be auto-confirmed.
+			 *    Or, `FALSE` if the subscription CANNOT be autoconfirmed (explicitly).
+			 *
+			 *    Otherwise, we will simply allow an already-`NULL` value to pass through as-is.
+			 *    This preserves our ability to recognize that it was left to the default behavior,
+			 *    and that we could not determine definitely if it should be auto-confirmed or not.
+			 *
+			 * @note Regarding the default auto-confirm-if-already-subscribed behavior:
+			 *
+			 *    We MUST check both the user ID and also the email address here.
+			 *    Otherwise, the following scenario would be allowed to occur.
+			 *
+			 *    `1@example.com` subscribes w/ sub ID `1`; as user ID `1`, and confirms their email address.
+			 *    `2@example.com` subscribes w/ sub ID `2`; as user ID `2`, and confirms their email address.
+			 *    `1@example.com` subscribes w/ sub ID `3`; as user ID `2` ~ using a forged email address!
+			 *
+			 *    If we didn't check both the user ID and also the email address here;
+			 *    then sub ID `3` would be auto-confirmed; associated w/ user ID `2`.
+			 *
+			 *    Since user ID `2` will be unable to receive email for sub ID `3`, they wouldn't
+			 *    get a key for this particular subscription, so there's not a security issue there.
+			 *
+			 *    However, this WOULD create two problems that we should avoid if at all possible.
+			 *
+			 *       1. The subscription would have been auto-confirmed, even though the owner of the email
+			 *          address did not confirm the subscription themselves; i.e. it was a forged email address.
+			 *
+			 *       2. It creates an invalid association between the email address and user ID.
+			 *          This could still occur anyway, but the subscr. should NOT be auto-confirmed when it does.
+			 *          i.e. it should be left as `unconfirmed` so it will be cleaned from the DB eventually.
+			 *
+			 *    Hmm, but what if both users were to have the same ID (e.g. `0` when not logged-in)?
+			 *    In that case, anyone who is NOT logged-in might submit a comment as someone else (w/ a subscr. request).
+			 *    If the email address they entered (i.e. forged) was already confirmed by the real owner some time before,
+			 *    it would be auto-confirmed by a fake; even though the real owner did not actually request the subscription.
+			 *    That could occur quite often on a site that doesn't require a user to be logged-in when commenting.
+			 *
+			 *    It's important to note however, that since this type of auto-confirmation occurs on a post-specific basis anyway,
+			 *    the aforementioned problem doesn't pose a serious security threat. However, we should prevent it by default,
+			 *    by disabling auto-confirmations whenever there's a NOT a reliable non-empty user ID that we can use;
+			 *    and/or when `all_wp_users_confirm_email` has not been turned on by the site owner.
+			 *
+			 *    Instead, we can let a site owner turn on `auto_confirm_if_already_subscribed_u0ip_enable`
+			 *    after being warned about the potential for abuse that such a thing could expose. In this case,
+			 *    instead of checking only the user ID, we can also check the user's IP address to be sure it matches up.
+			 *    Still, IP addresses can be spoofed too, so this should NOT be enabled w/o a strong warning.
+			 *
+			 *    All of that said, if `$sub_user_id` > `0` (and `all_wp_users_confirm_email=1`), we can safely continue
+			 *    w/o the additional check against the current plugin options; since the user ID can be matched up properly in that case.
+			 */
+			public function can_auto_confirm($post_id, $sub_user_id, $sub_email, $sub_last_ip, $user_initiated = FALSE, $auto_confirm = NULL)
+			{
+				$post_id     = (integer)$post_id;
+				$sub_user_id = (integer)$sub_user_id;
+				$sub_email   = trim(strtolower((string)$sub_email));
+				$sub_last_ip = trim((string)$sub_last_ip);
+
+				$user_initiated = (boolean)$user_initiated;
+				$user_initiated = $this->check_user_initiated_by_admin($sub_email, $user_initiated);
+
+				if(!$post_id || !$sub_email)
+					return FALSE; // Not possible.
+
+				if(!in_array($auto_confirm, array(NULL, TRUE, FALSE), TRUE))
+					$auto_confirm = NULL; // Force one of these values.
+
+				if(!isset($auto_confirm)) // If not set explicitly, check option value.
+					if((boolean)$this->plugin->options['auto_confirm_force_enable'])
+						$auto_confirm = TRUE; // Site owner says `TRUE` explicitly.
+
+				// ↑ Note that we're preserving `FALSE` (explicitly) here.
+				// The default behavior is to check for an already-confirmed subscription.
+
+				if($auto_confirm === TRUE) // `TRUE` (explicitly)?
+					return $auto_confirm; // Report back to the caller.
+
+				// Now, unless `$auto_confirm` was passed as `FALSE` (explicitly),
+				// we continue with the additional/default behavior down below.
+
+				if($auto_confirm === FALSE) // `FALSE` (explicitly)?
+					return $auto_confirm; // Report back to the caller.
+
+				// Else use default `NULL` behavior; i.e. check if they've already confirmed another.
+
+				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " WHERE `post_id` = '".esc_sql($post_id)."'". // On a post-specific basis (always).
+
+				       " AND `user_id` = '".esc_sql($sub_user_id)."'". // Must match user ID.
+				       " AND `email` = '".esc_sql($sub_email)."'". // Must match email address.
+
+				       ($sub_user_id <= 0 || !$this->plugin->options['all_wp_users_confirm_email']
+					       ? " AND (`insertion_ip` = '".esc_sql($sub_last_ip)."' OR `last_ip` = '".esc_sql($sub_last_ip)."')".
+					         " AND '".esc_sql($sub_last_ip)."' != ''" // The IP that we're checking cannot be empty.
+					       : ''). // Exclude otherwise; we have a good user ID we can check in this case.
+
+				       " AND `status` = 'subscribed' LIMIT 1"; // One to check.
+
+				if(($sub_user_id > 0 && $this->plugin->options['all_wp_users_confirm_email'])
+				   || ($sub_last_ip && $this->plugin->options['auto_confirm_if_already_subscribed_u0ip_enable'])
+				)
+					if((boolean)$this->plugin->utils_db->wp->get_var($sql))
+						$auto_confirm = TRUE; // Confirmed once already on this post ID.
+
+				return $auto_confirm; // Report back to the caller; possibly still `NULL` here.
+			}
+
+			/**
 			 * Set current sub's email address.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
+			 * @param string $sub_key Subscription key; MUST match the email address.
 			 * @param string $sub_email Subscriber's current email address.
 			 *
 			 * @warning It's VERY IMPORTANT that we only call upon this function to set the email address
-			 *    during a subscriber action; i.e. in real-time. This cookie is used as a trusted source by {@link current_email()}.
-			 *    In short, do NOT set the current email address unless an action is being performed against a key.
+			 *    during a user-initiated sub. action; i.e. in real-time. This cookie is used as a trusted source by {@link current_email()}.
+			 *    In short, do NOT set the current email address cookie unless an action is being performed against a key.
 			 *
+			 * @throws \exception If `$sub_key` does NOT match any existing keys for the `$sub_email`.
 			 * @throws \exception If attempting to set the current email when it's not a sub. action being processed in real time.
 			 *    Note that it's still possible to set the email address to an empty string; from anywhere at any time.
 			 */
-			public function set_current_email($sub_email)
+			public function set_current_email($sub_key, $sub_email)
 			{
+				$sub_key   = trim((string)$sub_email);
 				$sub_email = trim(strtolower((string)$sub_email));
 
-				if($sub_email) // Check security if we are attempting to set a non-empty cookie value.
-					if(is_admin() || (!isset($_REQUEST[__NAMESPACE__]['confirm']) && !isset($_REQUEST[__NAMESPACE__]['unsubscribe']) && !isset($_REQUEST[__NAMESPACE__]['manage'])))
-						throw new \exception(__('Trying to set current email w/o a sub. action.', $this->plugin->text_domain));
+				if(isset($sub_email[0])) // Double-check security issues here.
+				{
+					if(!$sub_key || !in_array($sub_key, $this->email_keys($sub_email), TRUE))
+						throw new \exception(__('Key-to-email mismatch; possible security issue.', $this->plugin->text_domain));
 
+					if(is_admin() || (!isset($_REQUEST[__NAMESPACE__]['confirm']) && !isset($_REQUEST[__NAMESPACE__]['unsubscribe']) && !isset($_REQUEST[__NAMESPACE__]['manage'])))
+						throw new \exception(__('Trying to set current email w/o a user-initiated sub. action.', $this->plugin->text_domain));
+				}
+				// Cookie is ONLY set for subscribers that received a secret `key` in one way or another.
+				// A subscriber only receives a secret key if we can confirm they own the email associated w/ it.
+				// ~ Note also that this cookie is encrypted via `MCRYPT_RIJNDAEL_256` w/ a unique salt.
 				$this->plugin->utils_enc->set_cookie(__NAMESPACE__.'_sub_email', $sub_email);
 			}
 
@@ -820,11 +967,23 @@ namespace comment_mail // Root namespace.
 			 */
 			public function current_email($search_untrusted_sources = FALSE)
 			{
-				if(($user = wp_get_current_user()) && $user->ID && $user->user_email)
-					return trim(strtolower((string)$user->user_email));
+				$all_wp_users_confirm_email = // Disabled by default (security).
+					(boolean)$this->plugin->options['all_wp_users_confirm_email'];
 
+				if($all_wp_users_confirm_email || current_user_can('edit_posts'))
+					if(($user = wp_get_current_user()) && $user->ID && $user->user_email)
+						return trim(strtolower((string)$user->user_email));
+
+				// Cookie is ONLY set for subscribers that received a secret `key` in one way or another.
+				// A subscriber only receives a secret key if we can confirm they own the email associated w/ it.
+				// ~ Note also that this cookie is encrypted via `MCRYPT_RIJNDAEL_256` w/ a unique salt.
 				if(($sub_email = $this->plugin->utils_enc->get_cookie(__NAMESPACE__.'_sub_email')))
 					return trim(strtolower((string)$sub_email));
+
+				if($search_untrusted_sources) // Try current user?
+					if(!$this->plugin->options['all_wp_users_confirm_email'])
+						if(($user = wp_get_current_user()) && $user->ID && $user->user_email)
+							return trim(strtolower((string)$user->user_email));
 
 				if($search_untrusted_sources) // Try current commenter?
 					if(($commenter = wp_get_current_commenter()) && !empty($commenter['comment_author_email']))

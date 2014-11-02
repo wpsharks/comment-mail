@@ -268,22 +268,31 @@ namespace comment_mail
 					'version'                                                           => $this->version,
 					'crons_setup'                                                       => '0', // `0` or timestamp.
 
-					/* Primary switch to enable/disable; i.e. `enable`.
-
-						- If disabled; subscription options no longer appear on comment forms.
-						- If disabled; the queue processor will stop processing, until such time as
-						the plugin is renabled. Queue injections continue, but the queue is not processed.
-
-						~ All other functionality remains enabled as always.
-
-					The `comment_form_enable` and `queue_enable` options allow for more control over
-					which of these two functionalities should be enabled/disabled. In some cases it might be desirable
-					to disable queue processing temporarily; allowing everything else to remain as-is.
-					*/
-
+					/* Low-level switches to enable/disable certain functionalities.
+					 *
+					 * With the `enable=0` option, here is an overview of what happens:
+					 *
+					 * • Subscription options no longer appear on comment forms; i.e. no new subscriptions.
+					 *    In addition, the ability to add a new subscription through any/all front-end forms
+					 *    is disabled too. All back-end functionality remains available however.
+					 *
+					 * • The queue processor will stop processing, until such time as the plugin is renabled.
+					 *    i.e. No more email notifications. Queue injections continue, but no queue processing.
+					 *    If it is desirable that any queued notifications NOT be processed at all upon re-enabling,
+					 *    a site owner can choose to delete queued notifications in the dashboard before doing so.
+					 *
+					 * • Even w/ `enable=0`, all other functionality remains while the plugin is enabled in WP.
+					 *
+					 * The `new_subs_enable` and `queue_processing_enable` options allow for more control over
+					 * which of these two functionalities should be enabled/disabled. In some cases it might
+					 * be nice to disable queue processing temporarily; allowing everything else to remain as-is.
+					 *
+					 * Or, a site owner can allow other functionality to remain available, but stop
+					 * accepting new subscriptions if they so desire; i.e. by setting `new_subs_enable=0`.
+					 */
 					'enable'                                                            => '1', // `0|1`; enable?
-					'commemt_form_enable'                                               => '1', // `0|1`; enable?
-					'queue_enable'                                                      => '1', // `0|1`; enable?
+					'new_subs_enable'                                                   => '1', // `0|1`; enable?
+					'queue_processing_enable'                                           => '1', // `0|1`; enable?
 
 					/* Related to user authentication. */
 
@@ -298,9 +307,39 @@ namespace comment_mail
 					'auto_subscribe_post_author'                                        => '1', // `0|1`; auto-subscribe post authors?
 					'auto_subscribe_recipients'                                         => '', // Others `;|,` delimited emails.
 
-					/* Related to auto-confirm functionality. */
+					/* Auto-confirm functionality and security issues related to this.
 
-					'auto_confirm_enable'                                               => '0', // `0|1`; auto-confirm enable?
+					 * Note that turning `auto_confirm_force_enable` on, has the negative side-effect of making it
+					 * much more difficult for users to view a summary of their existing subscriptions;
+					 * i.e. they won't get a `sub_email` cookie right away via email confirmation.
+					 *
+					 * The only way they can view a summary of their subscriptions is:
+					 *    1. If they're a logged-in user, and the site owner says that `all_wp_users_confirm_email`.
+					 *    2. Or, if they click a link to manage their subscription after having received a notification.
+					 *       It is at this point that an auto-confirmed subscriber will finally get their cookie.
+					 *
+					 * For this reason (and for security), it is suggested that `auto_confirm_force_enable=0`,
+					 * unless there happens to be a very good reason for doing so. Can't really think of one;
+					 * but this option remains nonetheless — just in case it becomes handy for some.
+					 *
+					 * The second option here: `auto_confirm_if_already_subscribed_u0ip_enable`, is a bit different.
+					 * This option does not explicitly enable auto-confirm functionality, it simply states that we will
+					 * allow auto-confirmations to occur even whenever there is no reliable user ID to help verify.
+					 *
+					 * In this case, we can try to match the IP address and auto-confirm that way.
+					 * However, since IP addresses can be spoofed, it remains disabled by default as a security measure.
+					 * A site owner must turn this on themselves. Note: this option is not necessary (or recommended)
+					 * if you require folks to login before leaving a comment. A user ID can be used in this case.
+					 *
+					 * The final option here is related to our ability to trust the `wp_users` table, or not!
+					 * Some sites run plugins that allow users to register and gain immediate access w/o confirmation
+					 * being necessary. We assume (by default) that this is the case on every site. A site owner must tell us
+					 * explicitly that they force every user to confirm via email before being allowed to log into the site.
+					 * Otherwise, we will not trust the email addresses associated with registered users.
+					 */
+					'auto_confirm_force_enable'                                         => '0', // `0|1`; auto-confirm enable?
+					'auto_confirm_if_already_subscribed_u0ip_enable'                    => '0', // `0|1`; auto-confirm enable?
+					'all_wp_users_confirm_email'                                        => '0', // WP users confirm their email?
 
 					/* Related to SMPT configuration. */
 
@@ -394,6 +433,10 @@ namespace comment_mail
 
 					'template_email_comment_notification_subject'                       => '', // HTML/PHP code.
 					'template_email_comment_notification_message'                       => '', // HTML/PHP code.
+
+					/* Related to summary display for subscribers. */
+
+					'sub_manage_summary_max_limit'                                      => '50', // Subscriptions per page.
 
 					/* Related to meta boxes. */
 
@@ -680,12 +723,12 @@ namespace comment_mail
 				wp_enqueue_script('chosen', $this->utils_url->set_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.min.js'), array('jquery'), $this->version, TRUE);
 				wp_enqueue_script(__NAMESPACE__, $this->utils_url->to('/client-s/js/menu-pages.min.js'), $deps, $this->version, TRUE);
 				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_vars', array(
-					'plugin_url'    => rtrim($this->utils_url->to('/'), '/'),
-					'ajax_endpoint' => rtrim($this->utils_url->page_nonce_only(), '/')
+					'pluginUrl'    => rtrim($this->utils_url->to('/'), '/'),
+					'ajaxEndpoint' => rtrim($this->utils_url->page_nonce_only(), '/')
 				));
 				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_i18n', array(
-					'bulk_reconfirm_confirmation' => __('Resend email confirmation link? Are you sure?', $this->text_domain),
-					'bulk_delete_confirmation'    => $this->utils_env->is_menu_page('*_event_log')
+					'bulkReconfirmConfirmation' => __('Resend email confirmation link? Are you sure?', $this->text_domain),
+					'bulkDeleteConfirmation'    => $this->utils_env->is_menu_page('*_event_log')
 						? $this->utils_i18n->log_entry_js_deletion_confirmation_warning()
 						: __('Delete permanently? Are you sure?', $this->text_domain),
 				));

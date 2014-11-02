@@ -41,8 +41,15 @@ namespace comment_mail;
  *    Array keys are success codes; array values are predefined success messages.
  *    Note that predefined messages in this array are in HTML format.
  *
+ * @var boolean     $processing_email_key_change Success; but w/ an email & key change?
+ *    This particular case should be handled differently. It's a successful update; but also results
+ *    in an error message. An error, because a change of address always results in a key change too.
+ *    Since both the email & key have changed, their existing key is now useless; i.e. no longer valid.
+ *    When this occurs, we display successes; but nothing else. Messages in the list of successess
+ *    will instruct the user to check their email to complete the confirmation process.
+ *
  * @var array       $error_codes An array of any/all major error codes; excluding processing error codes.
- *    Note that you should NOT display the form at all; if any major error exist.
+ *    Note that you should NOT display the form at all, if any major error exist here.
  */
 ?>
 <?php echo str_replace('%%title%%', // Editing or creating?
@@ -51,7 +58,25 @@ namespace comment_mail;
 
 	<div class="manage-sub-form">
 
-		<?php if($error_codes): // Any major errors? ?>
+		<?php if($error_codes // Changed email, nullifying their existing key?
+		         && $error_codes[0] === 'invalid_sub_key_after_email_key_change'
+					&& $processing && $processing_successes && $processing_email_key_change): ?>
+
+			<div class="alert alert-success" role="alert">
+				<p style="margin-top:0; font-weight:bold; font-size:120%;">
+					<?php echo __('Submission accepted; nice work!', $plugin->text_domain); ?>
+				</p>
+				<ul class="list-unstyled" style="margin-bottom:0;">
+					<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
+						<li style="margin-top:0; margin-bottom:0;">
+							<i class="fa fa-check fa-fw"></i>
+							<?php echo $_success_html; ?>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			</div>
+
+		<?php elseif ($error_codes): // Any major errors? ?>
 
 			<div class="alert alert-danger" role="alert">
 				<p style="margin-top:0; font-weight:bold; font-size:120%;">
@@ -71,6 +96,10 @@ namespace comment_mail;
 									echo __('Invalid subscription key; unable to edit.', $plugin->text_domain);
 									break; // Break switch handler.
 
+								case 'new_subs_disabled':
+									echo __('Sorry; not accepting new subscriptions at this time.', $plugin->text_domain);
+									break; // Break switch handler.
+
 								default: // Anything else that is unexpected/unknown at this time.
 									echo __('Unknown error; unable to add/edit.', $plugin->text_domain);
 							} ?>
@@ -81,39 +110,41 @@ namespace comment_mail;
 
 		<?php else: // Display form; there are no major errors. ?>
 
-		<?php if ($processing && $processing_errors): // Any processing errors? ?>
+			<?php if ($processing && $processing_errors): // Any processing errors? ?>
 
-			<div class="alert alert-danger" role="alert">
-				<p style="margin-top:0; font-weight:bold; font-size:120%;">
-					<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
-				</p>
-				<ul class="list-unstyled" style="margin-bottom:0;">
-					<?php foreach($processing_errors_html as $_error_code => $_error_html): ?>
-						<li style="margin-top:0; margin-bottom:0;">
-							<i class="fa fa-warning fa-fw"></i>
-							<?php echo $_error_html; ?>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-			</div>
-		<?php endif; ?>
+				<div class="alert alert-danger" role="alert">
+					<p style="margin-top:0; font-weight:bold; font-size:120%;">
+						<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
+					</p>
+					<ul class="list-unstyled" style="margin-bottom:0;">
+						<?php foreach($processing_errors_html as $_error_code => $_error_html): ?>
+							<li style="margin-top:0; margin-bottom:0;">
+								<i class="fa fa-warning fa-fw"></i>
+								<?php echo $_error_html; ?>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</div>
 
-		<?php if ($processing && $processing_successes): // Any processing successes? ?>
+			<?php endif; ?>
 
-			<div class="alert alert-success" role="alert">
-				<p style="margin-top:0; font-weight:bold; font-size:120%;">
-					<?php echo __('Submission accepted; nice work!', $plugin->text_domain); ?>
-				</p>
-				<ul class="list-unstyled" style="margin-bottom:0;">
-					<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
-						<li style="margin-top:0; margin-bottom:0;">
-							<i class="fa fa-check fa-fw"></i>
-							<?php echo $_success_html; ?>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-			</div>
-		<?php endif; ?>
+			<?php if ($processing && $processing_successes): // Any processing successes? ?>
+
+				<div class="alert alert-success" role="alert">
+					<p style="margin-top:0; font-weight:bold; font-size:120%;">
+						<?php echo __('Submission accepted; nice work!', $plugin->text_domain); ?>
+					</p>
+					<ul class="list-unstyled" style="margin-bottom:0;">
+						<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
+							<li style="margin-top:0; margin-bottom:0;">
+								<i class="fa fa-check fa-fw"></i>
+								<?php echo $_success_html; ?>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</div>
+
+			<?php endif; ?>
 
 			<h2 style="margin-top:0;">
 				<i class="fa fa-envelope pull-right"></i>
@@ -124,9 +155,9 @@ namespace comment_mail;
 				<?php endif; ?>
 			</h2>
 
-		<hr />
+			<hr />
 
-			<form method="post" action="" enctype="multipart/form-data" novalidate="novalidate">
+			<form method="post" enctype="multipart/form-data" novalidate="novalidate">
 				<table>
 					<tbody>
 
@@ -307,7 +338,7 @@ namespace comment_mail;
 				})(jQuery); // Fire primary closure; with jQuery.
 			</script>
 
-		<?php endif; ?>
+		<?php endif; // end: display when no major errors. ?>
 	</div>
 
 <?php echo $site_footer; ?>

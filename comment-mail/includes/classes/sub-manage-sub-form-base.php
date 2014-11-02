@@ -116,6 +116,13 @@ namespace comment_mail // Root namespace.
 			 */
 			protected static $processing_successes_html = array();
 
+			/**
+			 * @var boolean Processing email change?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing_email_key_change = FALSE;
+
 			/*
 			 * Instance-based constructor.
 			 */
@@ -161,26 +168,36 @@ namespace comment_mail // Root namespace.
 				$current_value_for = array($this, 'current_value_for');
 				$hidden_inputs     = array($this, 'hidden_inputs');
 
-				$processing = static::$processing; // & related vars.
-
-				$processing_successes      = static::$processing_successes;
-				$processing_success_codes  = static::$processing_success_codes;
-				$processing_successes_html = static::$processing_successes_html;
+				$processing = static::$processing;
 
 				$processing_errors      = static::$processing_errors;
 				$processing_error_codes = static::$processing_error_codes;
 				$processing_errors_html = static::$processing_errors_html;
+
+				$processing_successes        = static::$processing_successes;
+				$processing_success_codes    = static::$processing_success_codes;
+				$processing_successes_html   = static::$processing_successes_html;
+				$processing_email_key_change = static::$processing_email_key_change;
 
 				$error_codes = array(); // Initialize.
 
 				if($this->is_edit && !$this->sub_key)
 					$error_codes[] = 'missing_sub_key';
 
+				else if($this->is_edit && !$this->sub
+				        && static::$processing
+				        && static::$processing_successes
+				        && static::$processing_email_key_change
+				) $error_codes[] = 'invalid_sub_key_after_email_key_change';
+
 				else if($this->is_edit && !$this->sub)
 					$error_codes[] = 'invalid_sub_key';
 
 				else if($this->is_edit && $this->sub_key !== $this->sub->key)
 					$error_codes[] = 'invalid_sub_key';
+
+				else if(!$this->is_edit && !$this->plugin->options['new_subs_enable'])
+					$error_codes[] = 'new_subs_disabled';
 
 				$template_vars = get_defined_vars(); // Everything above.
 				$template      = new template('site/sub-actions/manage-sub-form.php');
@@ -262,7 +279,22 @@ namespace comment_mail // Root namespace.
 								'current_value' => 0,
 							))."\n";
 				}
-				return $hidden_inputs; // Used by templats.
+				$current_summary_nav_vars // Include these too.
+					= $this->plugin->utils_url->sub_manage_summary_nav_vars();
+
+				foreach(array_keys(sub_manage_summary::$default_nav_vars) as $_summary_nav_var_key)
+					if(isset($current_summary_nav_vars[$_summary_nav_var_key]))
+					{
+						$hidden_inputs .= $this->form_fields->hidden_input(
+								array(
+									'root_name'     => TRUE,
+									'name'          => __NAMESPACE__.'[manage][summary_nav]['.$_summary_nav_var_key.']',
+									'current_value' => (string)$current_summary_nav_vars[$_summary_nav_var_key],
+								))."\n";
+					}
+				unset($_summary_nav_var_key); // Housekeeping.
+
+				return $hidden_inputs;
 			}
 
 			/*
@@ -326,12 +358,14 @@ namespace comment_mail // Root namespace.
 					}
 					else if($sub_updater->did_update()) // Updated?
 					{
-						static::$processing_successes      = $sub_updater->successes();
-						static::$processing_success_codes  = $sub_updater->success_codes();
-						static::$processing_successes_html = $sub_updater->successes_html();
+						static::$processing_successes        = $sub_updater->successes();
+						static::$processing_success_codes    = $sub_updater->success_codes();
+						static::$processing_successes_html   = $sub_updater->successes_html();
+						static::$processing_email_key_change = $sub_updater->email_key_changed();
 					}
 				}
-				else // We are doing a new insertion; i.e. a new subscription is being added here.
+				else if($plugin->options['new_subs_enable']) // Only if `new_subs_enable=1`.
+					// This check is for added security only. The form should not be available.
 				{
 					$sub_inserter = new sub_inserter($request_args, $args); // Run inserter.
 

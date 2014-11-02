@@ -62,15 +62,46 @@ namespace comment_mail // Root namespace.
 			{
 				$sub_key = ''; // Initialize.
 
-				if(is_string($request_args)) // A string indicates a sub key.
-					$sub_key = trim($request_args); // Use as current key.
+				if(is_string($request_args))
+					$sub_key = trim($request_args);
 
 				if($sub_key && ($sub = $this->plugin->utils_sub->get($sub_key)))
-					$this->plugin->utils_sub->set_current_email($sub->email);
+					$this->plugin->utils_sub->set_current_email($sub_key, $sub->email);
 
-				new sub_manage_summary($sub_key);
+				$nav_vars = $this->plugin->utils_url->sub_manage_summary_nav_vars();
+
+				new sub_manage_summary($sub_key, $nav_vars);
 
 				exit(); // Stop after display; always.
+			}
+
+			/**
+			 * Summary nav vars handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $request_args Input argument(s).
+			 */
+			protected function summary_nav($request_args)
+			{
+				return; // Simply a placeholder.
+				// Summary navigation vars are used by other actions.
+			}
+
+			/**
+			 * Form handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $request_args Input argument(s).
+			 */
+			protected function sub_form($request_args)
+			{
+				if(!($request_args = (array)$request_args))
+					return; // Empty request args.
+
+				sub_manage_sub_form_base::process($request_args);
+				// Do NOT stop; allow `edit|new` action to run also.
 			}
 
 			/**
@@ -94,22 +125,6 @@ namespace comment_mail // Root namespace.
 					exit; // Invalid post ID.
 
 				exit(sub_manage_sub_form_base::comment_id_row_via_ajax($post_id));
-			}
-
-			/**
-			 * Form handler.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param mixed $request_args Input argument(s).
-			 */
-			protected function sub_form($request_args)
-			{
-				if(!($request_args = (array)$request_args))
-					return; // Empty request args.
-
-				sub_manage_sub_form_base::process($request_args);
-				// Do NOT stop; allow `edit|new` action to run also.
 			}
 
 			/**
@@ -139,6 +154,9 @@ namespace comment_mail // Root namespace.
 			{
 				$sub_key = trim((string)$request_args);
 
+				if($sub_key && ($sub = $this->plugin->utils_sub->get($sub_key)))
+					$this->plugin->utils_sub->set_current_email($sub_key, $sub->email);
+
 				new sub_manage_sub_edit_form($sub_key);
 
 				exit(); // Stop after display; always.
@@ -154,6 +172,9 @@ namespace comment_mail // Root namespace.
 			protected function sub_delete($request_args)
 			{
 				$sub_key = trim((string)$request_args);
+
+				if($sub_key && ($sub = $this->plugin->utils_sub->get($sub_key)))
+					$this->plugin->utils_sub->set_current_email($sub_key, $sub->email);
 
 				sub_manage_summary::delete($sub_key);
 				// Do NOT stop; allow `summary` action to run also.

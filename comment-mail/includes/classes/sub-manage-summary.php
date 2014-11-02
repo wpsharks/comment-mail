@@ -38,6 +38,34 @@ namespace comment_mail // Root namespace.
 			 */
 			protected $sub_email;
 
+			/**
+			 * @var array WP user IDs associated w/ email address.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $sub_user_ids;
+
+			/**
+			 * @var \stdClass Query vars.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $query_vars;
+
+			/**
+			 * @var \stdClass[] Subscriptions.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $subs; // Array of subs.
+
+			/**
+			 * @var \stdClass|null Pagination vars.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $pagination_vars;
+
 			/*
 			 * Static properties.
 			 */
@@ -48,6 +76,27 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 */
 			protected static $processing = FALSE;
+
+			/**
+			 * @var array Any processing errors.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing_errors = array();
+
+			/**
+			 * @var array Any processing error codes.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing_error_codes = array();
+
+			/**
+			 * @var array Any processing errors w/ HTML markup.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing_errors_html = array();
 
 			/**
 			 * @var array Any processing successes.
@@ -71,25 +120,15 @@ namespace comment_mail // Root namespace.
 			protected static $processing_successes_html = array();
 
 			/**
-			 * @var array Any processing errors.
+			 * @var array Default nav vars.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected static $processing_errors = array();
-
-			/**
-			 * @var array Any processing error codes.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected static $processing_error_codes = array();
-
-			/**
-			 * @var array Any processing errors w/ HTML markup.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected static $processing_errors_html = array();
+			protected static $default_nav_vars = array(
+				'page'    => 1,
+				'post_id' => NULL,
+				'status'  => '',
+			);
 
 			/*
 			 * Instance-based constructor.
@@ -102,14 +141,35 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param string $sub_key Unique subscription key (optional).
 			 *    If this is empty, we use the sub's current email address.
+			 *
+			 * @param array  $request_args An array of any nav request args.
 			 */
-			public function __construct($sub_key = '')
+			public function __construct($sub_key = '', array $request_args = array())
 			{
 				parent::__construct();
 
 				if(($this->sub_key = trim((string)$sub_key)))
 					$this->sub_email = $this->plugin->utils_sub->key_to_email($this->sub_key);
 				else $this->sub_email = $this->plugin->utils_sub->current_email();
+
+				$this->sub_user_ids = array(); // Initialize.
+				if($this->sub_email) // Do we have an email address?
+					$this->sub_user_ids = $this->plugin->utils_sub->email_user_ids($this->sub_email);
+
+				$default_request_args = static::$default_nav_vars;
+				$request_args         = array_merge($default_request_args, $request_args);
+				$request_args         = array_intersect_key($request_args, $default_request_args);
+
+				$this->query_vars = new \stdClass; // Initialize.
+
+				$this->query_vars->page     = max(1, (integer)$request_args['page']);
+				$this->query_vars->per_page = (integer)$this->plugin->options['sub_manage_summary_max_limit'];
+
+				$this->query_vars->post_id = $this->isset_or($request_args['post_id'], NULL, 'integer');
+				$this->query_vars->status  = trim(strtolower((string)$request_args['status']));
+
+				$this->subs            = array(); // Initialize.
+				$this->pagination_vars = NULL; // Initialize.
 
 				$this->maybe_display();
 			}
@@ -125,22 +185,24 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_display()
 			{
-				$sub_key   = $this->sub_key;
-				$sub_email = $this->sub_email;
+				$sub_key      = $this->sub_key;
+				$sub_email    = $this->sub_email;
+				$sub_user_ids = $this->sub_user_ids;
 
-				$user_ids = array(); // Initialize.
-				if($this->sub_email) // Do we have an email address?
-					$user_ids = $this->plugin->utils_sub->email_user_ids($this->sub_email);
+				$query_vars = $this->query_vars;
 
-				$processing = static::$processing; // & related vars.
+				$subs            = $this->subs;
+				$pagination_vars = $this->pagination_vars;
 
-				$processing_successes      = static::$processing_successes;
-				$processing_success_codes  = static::$processing_success_codes;
-				$processing_successes_html = static::$processing_successes_html;
+				$processing = static::$processing;
 
 				$processing_errors      = static::$processing_errors;
 				$processing_error_codes = static::$processing_error_codes;
 				$processing_errors_html = static::$processing_errors_html;
+
+				$processing_successes      = static::$processing_successes;
+				$processing_success_codes  = static::$processing_success_codes;
+				$processing_successes_html = static::$processing_successes_html;
 
 				$error_codes = array(); // Initialize.
 
@@ -150,8 +212,12 @@ namespace comment_mail // Root namespace.
 				else if(!$this->sub_email)
 					$error_codes[] = 'unknown_sub';
 
-				// @TODO collect data for summary generation here.
-
+				if(!$error_codes) // i.e. have email?
+				{
+					$this->prepare_subs();
+					$subs            = $this->subs;
+					$pagination_vars = $this->pagination_vars;
+				}
 				$template_vars = get_defined_vars(); // Everything above.
 				$template      = new template('site/sub-actions/manage-summary.php');
 
@@ -165,6 +231,76 @@ namespace comment_mail // Root namespace.
 			/*
 			 * Instance-based helpers.
 			 */
+
+			protected function prepare_subs()
+			{
+				$post_id = $this->query_vars->post_id;
+				$status  = $this->query_vars->status;
+
+				$current_offset = $this->current_offset();
+				$max_limit      = $this->query_vars->per_page;
+
+				$calc_found_rows = 0; // Initialize.
+				$this->subs      = array(); // Initialize.
+
+				$sql = "SELECT SQL_CALC_FOUND_ROWS *". // w/ calc enabled.
+				       " FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " WHERE (`email` = '".esc_sql($this->sub_email)."'". // + WP user IDs.
+				       "    OR `user_id` IN('".implode("','", array_map('esc_sql', $this->sub_user_ids))."'))".
+
+				       (isset($post_id) // Specific post ID?
+					       ? " AND `post_id` = '".esc_sql($post_id)."'" : '').
+
+				       ($status // Specific status in the request?
+					       ? " AND `status` = '".esc_sql($status)."'" : '').
+				       " AND `status` NOT IN('unconfirmed', 'trashed')".
+
+				       " ORDER BY".
+				       " `post_id` ASC,".
+				       " `comment_id` ASC,".
+				       " `email` ASC,".
+				       " `status` ASC".
+
+				       " LIMIT ".esc_sql($current_offset).",".esc_sql($max_limit);
+
+				if(($results = $this->plugin->utils_db->wp->get_results($sql)))
+				{
+					$this->subs      = $results = $this->plugin->utils_db->typify_deep($results);
+					$calc_found_rows = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
+				}
+				$this->set_pagination_vars($calc_found_rows);
+			}
+
+			/**
+			 * Gets current SQL offset.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return integer Current SQL offset value.
+			 */
+			protected function current_offset()
+			{
+				return ($this->query_vars->page - 1) * $this->query_vars->per_page;
+			}
+
+			/**
+			 * Set pagination vars.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $calc_found_rows `SQL_CALC_FOUND_ROWS`.
+			 */
+			protected function set_pagination_vars($calc_found_rows)
+			{
+				$page     = $this->query_vars->page;
+				$per_page = $this->query_vars->per_page;
+
+				$total_subs  = (integer)$calc_found_rows;
+				$total_pages = ceil($total_subs / $per_page);
+
+				$this->pagination_vars = (object)get_defined_vars();
+			}
 
 			/*
 			 * Public static processors.

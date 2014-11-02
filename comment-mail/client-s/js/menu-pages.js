@@ -103,7 +103,7 @@
 		var subFormPostIdProps = { // Initialize.
 			$select : $menuPageForm.find('> form tr.pmp-sub-form-post-id select'),
 			$input  : $menuPageForm.find('> form tr.pmp-sub-form-post-id input'),
-			progress: '<img src="' + vars.plugin_url + '/client-s/images/tiny-progress-bar.gif" />'
+			progress: '<img src="' + vars.pluginUrl + '/client-s/images/tiny-progress-bar.gif" />'
 		};
 		if(subFormPostIdProps.$select.length) // Have select options?
 			subFormPostIdProps.lastId = $.trim(subFormPostIdProps.$select.val());
@@ -130,7 +130,7 @@
 				commentIdProps.$lastInput.replaceWith($(subFormPostIdProps.progress));
 
 			requestVars[namespace] = {sub_form_comment_id_row_via_ajax: {post_id: subFormPostIdProps.newId}},
-				$.get(vars.ajax_endpoint, requestVars, function(newCommentIdRowMarkup)
+				$.get(vars.ajaxEndpoint, requestVars, function(newCommentIdRowMarkup)
 				{
 					commentIdProps.$newRow = $(newCommentIdRowMarkup),
 						commentIdProps.$lastRow.replaceWith(commentIdProps.$newRow),
@@ -143,7 +143,7 @@
 		var subFormUserIdProps = { // Initialize.
 			$select  : $menuPageForm.find('> form tr.pmp-sub-form-user-id select'),
 			$input   : $menuPageForm.find('> form tr.pmp-sub-form-user-id input'),
-			$progress: $('<img src="' + vars.plugin_url + '/client-s/images/tiny-progress-bar.gif" />')
+			$progress: $('<img src="' + vars.pluginUrl + '/client-s/images/tiny-progress-bar.gif" />')
 		};
 		if(subFormUserIdProps.$select.length) // Have select options?
 			subFormUserIdProps.lastId = $.trim(subFormUserIdProps.$select.val());
@@ -171,7 +171,7 @@
 			subFormUserIdProps.$progress.remove(), $emailTh.append(subFormUserIdProps.$progress);
 
 			requestVars[namespace] = {sub_form_user_id_info_via_ajax: {user_id: subFormUserIdProps.newId}},
-				$.get(vars.ajax_endpoint, requestVars, function(newUserInfo)
+				$.get(vars.ajaxEndpoint, requestVars, function(newUserInfo)
 				{
 					$email.val(newUserInfo.email), // Prefill these fields.
 						$fname.val(newUserInfo.fname), $lname.val(newUserInfo.lname),

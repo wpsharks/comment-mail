@@ -75,7 +75,7 @@ namespace comment_mail // Root namespace.
 					$error_codes[] = $confirmed === NULL ? 'invalid_sub_key' : 'sub_already_confirmed';
 
 				if(!$error_codes) // If not errors; set current email.
-					$this->plugin->utils_sub->set_current_email($sub->email);
+					$this->plugin->utils_sub->set_current_email($sub_key, $sub->email);
 
 				$template_vars = get_defined_vars(); // Everything above.
 				$template      = new template('site/sub-actions/confirmed.php');
@@ -111,7 +111,7 @@ namespace comment_mail // Root namespace.
 					$error_codes[] = $deleted === NULL ? 'invalid_sub_key' : 'sub_already_unsubscribed';
 
 				if(!$error_codes) // If not errors; set current email.
-					$this->plugin->utils_sub->set_current_email($sub->email);
+					$this->plugin->utils_sub->set_current_email($sub_key,$sub->email);
 
 				$template_vars = get_defined_vars(); // Everything above.
 				$template      = new template('site/sub-actions/unsubscribed.php');
@@ -134,11 +134,11 @@ namespace comment_mail // Root namespace.
 			{
 				$sub_key = ''; // Initialize.
 
-				if(is_string($request_args)) // A string indicates a sub key.
-					$sub_key = trim($request_args); // Use as current.
+				if(is_string($request_args))
+					$sub_key = trim($request_args);
 
 				if($sub_key && ($sub = $this->plugin->utils_sub->get($sub_key)))
-					$this->plugin->utils_sub->set_current_email($sub->email);
+					$this->plugin->utils_sub->set_current_email($sub_key,$sub->email);
 
 				if(!is_array($request_args)) // If NOT a sub action, redirect to one.
 					wp_redirect($this->plugin->utils_url->sub_manage_summary_url($sub_key)).exit();

@@ -56,7 +56,7 @@ namespace comment_mail // Root namespace.
 				if(!$this->plugins->options['enable'])
 					return; // Disabled currently.
 
-				if(!$this->plugins->options['commemt_form_enable'])
+				if(!$this->plugins->options['new_subs_enable'])
 					return; // Disabled currently.
 
 				// @TODO
