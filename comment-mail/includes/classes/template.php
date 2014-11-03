@@ -84,6 +84,9 @@ namespace comment_mail // Root namespace.
 			{
 				$vars['plugin'] = plugin(); // Plugin class.
 
+				if(!isset($vars['template_file'])) // Don't override in site/email children.
+					$vars['template_file'] = $this->file; // Template file name.
+
 				if(strpos($this->file, 'site/') === 0)
 					$vars = array_merge($vars, $this->site_vars($vars));
 

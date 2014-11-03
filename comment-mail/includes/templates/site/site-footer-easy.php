@@ -6,6 +6,8 @@ namespace comment_mail;
  *
  * Other variables made available in this template file:
  *
+ * @var string $template_file Relative path to the current template file.
+ *
  * @note This file is automatically included as a child of other templates.
  *    Therefore, this template will ALSO receive any variable(s) passed to the parent template file,
  *    where the parent automatically calls upon this template. In short, if you see a variable documented in
@@ -37,17 +39,18 @@ $current_host_path = $plugin->utils_url->current_host_path();
 $privacy_policy_url = $plugin->options['can_spam_privacy_policy_url'];
 ?>
 
-<footer style="margin-bottom:20px;">
+<footer class="center-block clearfix">
 	<div class="row">
 
 		<div class="col-md-6 text-left">
 
-			<a href="<?php echo esc_attr($sub_summary_return_url); ?>">
-				<i class="<?php echo esc_attr('wsi-'.$plugin->slug); ?>"></i>
-				<?php echo __('My Subscriptions', $plugin->text_domain); ?>
-			</a>
-
-			<span class="text-muted">|</span>
+			<?php if($template_file !== 'site/sub-actions/manage-summary.php'): ?>
+				<a href="<?php echo esc_attr($sub_summary_return_url); ?>">
+					<i class="fa fa-arrow-circle-left"></i>
+					<?php echo __('Back to My Subscriptions', $plugin->text_domain); ?>
+				</a>
+				<span class="text-muted">|</span>
+			<?php endif; ?>
 
 			<a href="<?php echo esc_attr($home_url); ?>">
 				<i class="fa fa-home"></i> <?php echo sprintf(__('Return to "%1$s"', $plugin->text_domain), esc_html($blog_name_clip)); ?>

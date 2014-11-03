@@ -6,6 +6,8 @@ namespace comment_mail;
  *
  * Other variables made available in this template file:
  *
+ * @var string $template_file Relative path to the current template file.
+ *
  * @note This file is automatically included as a child of other templates.
  *    Therefore, this template will ALSO receive any variable(s) passed to the parent template file,
  *    where the parent automatically calls upon this template. In short, if you see a variable documented in
@@ -33,19 +35,16 @@ $sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url(!empty($sub
 // Current `host[/path]` with support for multisite network and child blogs.
 $current_host_path = $plugin->utils_url->current_host_path();
 
-// Logo URL; defaults to the plugin's logo image.
-$logo_url         = $plugin->utils_url->to('/client-s/images/logo.png');
-$logo_image_width = 936; // Width; in pixels.
-
-// @TODO Default the logo to being off; use an icon instead to save space.
+// Icon URL; defaults to the plugin's icon image.
+$icon_url = $plugin->utils_url->to('/client-s/images/icon-bubbles.png');
 ?>
 
-<header class="text-center" style="margin-bottom:30px;">
+<header class="center-block clearfix">
 	<h1>
 		<?php echo esc_html($blog_name_clip); ?><br />
-		<span class="text-muted">
-			<small><?php echo esc_html($current_host_path); ?></small>
-		</span>
+		<a href="<?php echo esc_attr($home_url); ?>">
+			<small><i class="fa fa-link"></i> <?php echo esc_html($current_host_path); ?></small>
+		</a>
 	</h1>
-	<img src="<?php echo esc_attr($logo_url); ?>" class="center-block img-responsive" style="width:<?php echo esc_attr($logo_image_width.'px'); ?>;" />
+	<img src="<?php echo esc_attr($icon_url); ?>" class="icon-bubbles" />
 </header>

@@ -21,6 +21,8 @@ namespace comment_mail;
  * @note The `%%title%%` replacement code should remain as-is.
  *    It is replaced by other templates using this header.
  *
+ * @var string $template_file Relative path to the current template file.
+ *
  * @note This file is automatically included as a child of other templates.
  *    Therefore, this template will ALSO receive any variable(s) passed to the parent template file,
  *    where the parent automatically calls upon this template. In short, if you see a variable documented in
