@@ -69,7 +69,7 @@ namespace comment_mail // Root namespace.
 				       " WHERE `email` = '".esc_sql($this->user->user_email)."'".
 				       " AND `user_id` = '0'"; // Not yet associated w/ a user ID.
 
-				if(($sub_ids = $this->plugin->utils_db->wp->get_col($sql)))
+				if(($sub_ids = array_map('intval', $this->plugin->utils_db->wp->get_col($sql))))
 					foreach($sub_ids as $_sub_id) // Update the `user_id` on each of these.
 						new sub_updater(array('ID' => $_sub_id, 'user_id' => $this->user->ID));
 				unset($_sub_id); // Housekeeping.

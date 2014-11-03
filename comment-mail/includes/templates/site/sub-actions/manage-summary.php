@@ -28,11 +28,11 @@ namespace comment_mail;
  * @var integer[]      $sub_user_ids An array of any WP user IDs associated w/ the email address.
  *    See also `$sub_user_id_emails` for access to the array of all emails derived from this list of WP user IDs.
  *
- * @var string[] $sub_user_id_emails An array of all emails that belong to this user; based on `$sub_email`
+ * @var string[]       $sub_user_id_emails An array of all emails that belong to this user; based on `$sub_email`
  *    and also on the array of `$sub_user_ids`. This is a complete list of all emails displayed by the summary.
  *    See also: `$sub_emails`; which is a simpler/cleaner alias for this variable (same thing).
  *
- * @var string[] $sub_emails A simpler/cleaner alias for `$sub_user_id_emails`; same exact thing.
+ * @var string[]       $sub_emails A simpler/cleaner alias for `$sub_user_id_emails`; same exact thing.
  *    See also: <https://github.com/websharks/comment-mail/blob/000000-dev/assets/sma-diagram.png> for a diagram
  *    that helps to clarify how this works; i.e. how a single key can be associated w/ multiple emails.
  *
@@ -42,9 +42,11 @@ namespace comment_mail;
  *
  * @var \stdClass[]    $subs An array of all subscriptions to display as part of the summary on this `$query_vars->page`.
  *    Note that all query vars/filters/etc. will have already been applied; a template simply needs to iterate and display a table row for each of these.
+ *    Subscriptions are ordered by `post_id` ASC, `comment_id` ASC, `email` ASC, and finally by `status` ASC.
  *
  * @var \stdClass|null $pagination_vars Pagination vars; consisting of: `page`, `per_page`, `total_subs`, `total_pages`.
  *    Note that `page` and `per_page` are simply duplicated here for convenience; same as you'll find in `$query_vars`.
+ *    Max `$subs` `per_page`, is configured by plugin options from the dashboard; it cannot be modified here; these are read-only.
  *
  * @var boolean        $processing Are we (i.e. did we) process an action? e.g. a deletion from the list perhaps.
  *
@@ -163,7 +165,7 @@ $home_url = home_url('/');
 				<i class="<?php echo esc_attr('wsi-'.$plugin->slug); ?>"></i>
 				<?php echo __('My Comment Subscriptions', $plugin->text_domain); ?><br />
 				<em style="margin-left:10px;">
-					<small>&lt;<?php echo esc_html(implode('&gt;, &lt;', $sub_emails)); ?>&gt;</small>
+					<small>&lt;<?php echo esc_html(implode('&gt;, &lt;', array_slice($sub_emails, 0, 100))); ?>&gt;</small>
 				</em>
 			</h2>
 
@@ -290,6 +292,14 @@ $home_url = home_url('/');
 					</tbody>
 				</table>
 			</div>
+			<!-- @TODO: add pagination links here. -->
+			<nav>
+				<ul class="pagination">
+					<li class="disabled"><a href="#">&laquo;</a></li>
+					<li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+					...
+				</ul>
+			</nav>
 		<?php
 		/* Javascript needed by this template.
 		 ------------------------------------------------------------------------------------------------------------------------ */

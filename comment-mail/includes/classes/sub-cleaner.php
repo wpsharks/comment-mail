@@ -114,7 +114,7 @@ namespace comment_mail // Root namespace.
 				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 				       " WHERE `user_id` != '0' AND `user_id` NOT IN(".$user_ids.")";
 
-				if(($ids = $this->plugin->utils_db->wp->get_col($sql)))
+				if(($ids = array_map('intval', $this->plugin->utils_db->wp->get_col($sql))))
 					$this->cleaned += $this->plugin->utils_sub->bulk_delete($ids, array('cleaning' => TRUE));
 			}
 
@@ -139,7 +139,7 @@ namespace comment_mail // Root namespace.
 				       " WHERE `status` = 'unconfirmed'".
 				       " AND `last_update_time` < '".esc_sql($exp_time)."'";
 
-				if(($ids = $this->plugin->utils_db->wp->get_col($sql)))
+				if(($ids = array_map('intval', $this->plugin->utils_db->wp->get_col($sql))))
 					$this->cleaned += $this->plugin->utils_sub->bulk_delete($ids, array('cleaning' => TRUE));
 			}
 
@@ -164,7 +164,7 @@ namespace comment_mail // Root namespace.
 				       " WHERE `status` = 'trashed'".
 				       " AND `last_update_time` < '".esc_sql($exp_time)."'";
 
-				if(($ids = $this->plugin->utils_db->wp->get_col($sql)))
+				if(($ids = array_map('intval', $this->plugin->utils_db->wp->get_col($sql))))
 					$this->cleaned += $this->plugin->utils_sub->bulk_delete($ids, array('cleaning' => TRUE));
 			}
 
