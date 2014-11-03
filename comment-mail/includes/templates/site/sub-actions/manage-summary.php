@@ -166,7 +166,6 @@ $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 				<a href="<?php echo esc_attr($sub_new_url); ?>" title="<?php echo __('Create New Subscription', $plugin->text_domain); ?>">
 					<i class="fa fa-plus-square pull-right"></i>
 				</a>
-				<i class="<?php echo esc_attr('wsi-'.$plugin->slug); ?>"></i>
 				<?php echo __('My Comment Subscriptions', $plugin->text_domain); ?><br />
 				<em style="margin-left:10px;">
 					<small>&lt;<?php echo esc_html(implode('&gt;, &lt;', array_slice($sub_emails, 0, 100))); ?>&gt;</small>

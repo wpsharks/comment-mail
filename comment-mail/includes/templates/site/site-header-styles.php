@@ -4,6 +4,10 @@ namespace comment_mail;
 /**
  * @var plugin $plugin Plugin class.
  *
+ * Other variables made available in this template file:
+ *
+ * @var string $template_file Relative path to the current template file.
+ *
  * @note This file is automatically included as a child of other templates.
  *    Therefore, this template will ALSO receive any variable(s) passed to the parent template file,
  *    where the parent automatically calls upon this template. In short, if you see a variable documented in
@@ -19,23 +23,23 @@ namespace comment_mail;
 	@import url('//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css');
 	@import url('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.min.css');
 	@import url('<?php echo $plugin->utils_url->to('/client-s/css/bootstrap-chosen.min.css'); ?>');
-
+	/* --------------------------------------------------------------------------------- */
 	@import url('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css');
 	@import url('<?php echo $plugin->utils_url->to('/submodules/sharkicons/styles.min.css'); ?>');
-
+	/* --------------------------------------------------------------------------------- */
 	@import url('//fonts.googleapis.com/css?family=Bitter:400,400italic,700|Noto+Serif:400,400italic,700,700italic|Noto+Sans:400,400italic,700,700italic&amp;subset=latin');
 </style>
 
 <style type="text/css">
 	/*
-	Main html/body.
+	HTML/body styles.
 	*/
 	html, body
 	{
 		background : #EEEEEE;
 	}
 	/*
-	Fonts.
+	Font styles.
 	*/
 	body, .font-body
 	{
@@ -75,7 +79,48 @@ namespace comment_mail;
 		cursor : pointer;
 	}
 	/*
-	Subscription summary.
+	Header styles.
+	*/
+	header
+	{
+		z-index       : 3;
+		margin-bottom : 10px;
+		position      : relative;
+	}
+	header h1
+	{
+		line-height : 0.8;
+	}
+	header img.icon-bubbles
+	{
+		top      : 5px;
+		right    : 75px;
+		position : absolute;
+
+		width    : 175px;
+		height   : auto;
+	}
+	@media (max-width : 991px)
+	{
+		header img.icon-bubbles
+		{
+			display : none;
+		}
+	}
+	header a
+	{
+		text-decoration : none !important;
+	}
+	/*
+	Inner wrapper styles.
+	*/
+	.wrapper .inner-wrapper
+	{
+		z-index  : 2;
+		position : relative;
+	}
+	/*
+	Subscription summary styles.
 	*/
 	.manage-summary .subs-table a
 	{
@@ -95,7 +140,7 @@ namespace comment_mail;
 		opacity : 0.5;
 	}
 	/*
-	Subscription add/edit form.
+	Subscription add/edit form styles.
 	*/
 	.manage-sub-form form table
 	{
@@ -103,11 +148,12 @@ namespace comment_mail;
 	}
 	.manage-sub-form form th
 	{
-		width : 250px;
+		vertical-align : top;
+		width          : 250px;
 	}
 	.manage-sub-form form table td
 	{
-		padding : 10px 0 10px 10px;
+		padding : 0 0 10px 10px;
 	}
 	.manage-sub-form form table .description
 	{
@@ -127,5 +173,16 @@ namespace comment_mail;
 			width       : 100%;
 			display     : block;
 		}
+	}
+	/*
+	Footer styles.
+	*/
+	footer
+	{
+		margin-bottom : 30px;
+	}
+	footer a
+	{
+		text-decoration : none !important;
 	}
 </style>

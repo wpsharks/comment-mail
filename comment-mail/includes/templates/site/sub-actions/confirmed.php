@@ -94,7 +94,7 @@ echo str_replace('%%title%%', __('Confirmation', $plugin->text_domain), $site_he
 				</p>
 			</div>
 
-			<!-- @TODO: add more information here. -->
+			<!-- @TODO: add more information here; i.e. the post title, comment, etc. -->
 
 		<?php endif; ?>
 

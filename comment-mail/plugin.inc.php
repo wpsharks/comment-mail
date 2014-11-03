@@ -442,7 +442,7 @@ namespace comment_mail
 
 					/* Related to summary display for subscribers. */
 
-					'sub_manage_summary_max_limit'                                      => '2', // Subscriptions per page.
+					'sub_manage_summary_max_limit'                                      => '25', // Subscriptions per page.
 
 					/* Related to meta boxes. */
 

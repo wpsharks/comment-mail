@@ -173,8 +173,7 @@ $sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, N
 
 			<h2 style="margin-top:0;">
 				<a href="<?php echo esc_attr($sub_summary_return_url); ?>" title="<?php echo __('Back to My Subscriptions', $plugin->text_domain); ?>">
-					<i class="fa fa-arrow-circle-left pull-right" style="font-size:50%; position:relative; z-index:1; top:5px; right:50px;"></i>
-					<i class="<?php echo esc_attr('wsi-'.$plugin->slug); ?> pull-right"></i>
+					<i class="fa fa-arrow-circle-left pull-right"></i>
 				</a>
 				<?php if($is_edit): ?>
 					<?php echo __('Edit Subscription', $plugin->text_domain); ?>
