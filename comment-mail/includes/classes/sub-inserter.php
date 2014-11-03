@@ -20,12 +20,83 @@ namespace comment_mail // Root namespace.
 		 */
 		class sub_inserter extends abs_base
 		{
+			/* Related to the data. */
+
 			/**
 			 * @var array Based on request args.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
 			protected $data;
+
+			/**
+			 * @var boolean Did we validate?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $validated;
+
+			/* Related to inserts. */
+
+			/**
+			 * @var boolean An insert?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $is_insert;
+
+			/**
+			 * @var boolean Did we insert?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $inserted;
+
+			/**
+			 * @var integer Insertion ID.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $insert_id;
+
+			/* Related to updates. */
+
+			/**
+			 * @var boolean An update?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $is_update;
+
+			/**
+			 * @var \stdClass|null Subscription.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $sub; // On update only.
+
+			/**
+			 * @var string Status before update.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $status_before;
+
+			/**
+			 * @var boolean Did we update?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $updated;
+
+			/**
+			 * @var boolean Email & key changed?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $email_key_changed;
+
+			/* Related to args/flags. */
 
 			/**
 			 * @var boolean Auto-confirm?
@@ -76,61 +147,23 @@ namespace comment_mail // Root namespace.
 			 */
 			protected $user_allow_0;
 
-			/**
-			 * @var boolean Did we validate?
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $validated;
+			/* Related to user. */
 
 			/**
-			 * @var boolean An insert?
+			 * @var \WP_User|null Subscriber.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $is_insert;
+			protected $user; // Subscriber.
 
 			/**
-			 * @var boolean Did we insert?
+			 * @var boolean Subscriber is current user?
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $inserted;
+			protected $is_current_user;
 
-			/**
-			 * @var integer Insertion ID.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $insert_id;
-
-			/**
-			 * @var boolean An update?
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $is_update;
-
-			/**
-			 * @var \stdClass|null Subscription.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $sub; // On update only.
-
-			/**
-			 * @var string Status before update.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $status_before;
-
-			/**
-			 * @var boolean Did we update?
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $updated;
+			/* Related to duplicates. */
 
 			/**
 			 * @var array An array of any duplicate key IDs.
@@ -146,19 +179,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected $other_duplicate_ids;
 
-			/**
-			 * @var \WP_User|null Subscription.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $user; // Subscriber.
-
-			/**
-			 * @var boolean Subscriber is current user?
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $is_current_user;
+			/* Other misc. properties. */
 
 			/**
 			 * @var sub_confirmer|null Sub confirmer.
@@ -167,12 +188,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected $sub_confirmer;
 
-			/**
-			 * @var array An array of any successes.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $successes;
+			/* Related to error/success reporting. */
 
 			/**
 			 * @var array An array of any errors.
@@ -180,6 +196,17 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 */
 			protected $errors;
+
+			/**
+			 * @var array An array of any successes.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $successes;
+
+			/*
+			 * A lengthy class constructor.
+			 */
 
 			/**
 			 * Class constructor.
@@ -193,22 +220,22 @@ namespace comment_mail // Root namespace.
 			 *
 			 *    Regarding user-initiated actions. The following arguments may apply.
 			 *
-			 *       • `user_initiated` This is a low-level argument by itself; mostly for event processing.
-			 *             This is intended to identify user-initiated inserts/updates; but mostly for the sake of event processing.
-			 *             However, this argument MUST be defined if you intend to use any other user-initiated arguments.
+			 *       • `user_initiated` This is intended to identify user-initiated inserts/updates.
+			 *             This argument MUST be defined if you intend to use any other user-initiated arguments.
 			 *
 			 *       • `ui_protected_data_keys_enable` is a secondary argument to indicate that it's both a user-initiated event
 			 *             and that we also WANT data key protections enabled. For instance, when a user is inserting/updating on their own.
 			 *
 			 *             • This flag exists so that it's still possible for us to systematically update something on behalf of a user,
 			 *                without triggering the additional protected data key validations, should those be unwanted at times.
+			 *                Use of `user_initiated` w/o data key protections should be careful to sanitize all input data.
 			 *
 			 *       • `ui_protected_data_user` This is the only way to insert/update a specific user ID
 			 *             whenever the `ui_protected_data_keys_enable` flag is `TRUE`; i.e. the `user_id` is a protected/nullified key.
 			 *             Thus, the only way to push a user ID through is by passing it through args; using a trusted data source.
 			 *
 			 * @warning Generally speaking, user-initiated actions (i.e. `user_initiated`) should NOT be allowed to push request arguments
-			 *    into this method that may update protected data keys such as: `user_id`, `insertion_ip`, `last_update_time`, and others.
+			 *    into this method that may update protected data keys such as: `key`, `user_id`, `insertion_ip`, `last_update_time`, and others.
 			 *
 			 *    To enable validation of protected data keys please pass `user_initiated` + `ui_protected_data_keys_enable` as `TRUE`.
 			 *       This automatically removes/sanitizes/validates protected data keys before an insertion or update occurs.
@@ -216,33 +243,38 @@ namespace comment_mail // Root namespace.
 			 *    Note: on insert/update with `user_initiated` + `ui_protected_data_keys_enable`, the only way to set the `user_id` is by
 			 *       passing the `ui_protected_data_user` argument also — the initiating user; i.e. the user doing an insert/update.
 			 *
-			 *    Note: updates w/ `user_initiated` + `ui_protected_data_keys_enable` require a `key` to successfully complete the update.
+			 *    Note: updates w/ `user_initiated` + `ui_protected_data_keys_enable` require a read-only `key` to successfully complete the update.
 			 *       i.e. An input `key` is validated against the `ID` in the input request args during update. It must match up!
 			 *
 			 *    The following keys can never be inserted/updated with `user_initiated` + `ui_protected_data_keys_enable`:
 			 *
-			 *       • `user_id` (requires `ui_protected_data_user` instead)
+			 *       • `key`; never; only inserted/updated systematically (no exceptions).
+			 *          ~ This is only updated systematically when an email changes.
 			 *
-			 *       • `insertion_ip` (inserted/updated systematically)
-			 *       • `last_ip` (inserted/updated systematically)
+			 *       • `user_id`; requires `ui_protected_data_user`.
 			 *
-			 *       • `insertion_time` (inserted/updated systematically)
-			 *       • `last_update_time` (inserted/updated systematically)
+			 *       • `insertion_ip`; inserted/updated systematically.
+			 *       • `last_ip`; inserted/updated systematically.
 			 *
-			 *    ~ On insert, `status` is always `unconfirmed` (by force).
+			 *       • `insertion_time`; inserted/updated systematically.
+			 *       • `last_update_time`; inserted/updated systematically.
+			 *
+			 *    ~ On insert, `status` is always `unconfirmed` by force.
 			 *
 			 *    ~ On update, `status` can by anything except `trashed`.
-			 *       A user cannot trash themselves.
+			 *       A user cannot trash themselves under any circumstance.
 			 */
 			public function __construct(array $request_args, array $args = array())
 			{
 				parent::__construct();
 
+				/* Related to the data. */
+
 				$default_request_args = array(
 					'ID'               => NULL,
 					// A key is always auto-generated on insert.
-					// A key can NEVER be updated by anyone — ever!
-					// A key is required to update w/ `ui_protected_data_keys_enable`.
+					// A key can NEVER be updated by anyone — only systematically!
+					// A read-only key is required to update w/ `ui_protected_data_keys_enable`.
 					'key'              => NULL,
 
 					'user_id'          => NULL,
@@ -265,7 +297,31 @@ namespace comment_mail // Root namespace.
 				);
 				$request_args         = array_merge($default_request_args, $request_args);
 				$request_args         = array_intersect_key($request_args, $default_request_args);
-				$this->data           = $request_args; // A copy of the request args.
+
+				$this->data      = $request_args; // A copy of the request args.
+				$this->validated = FALSE; // Initialize; not validated yet, obviously.
+				if(isset($this->data['ID'])) $this->data['ID'] = (integer)$this->data['ID'];
+
+				/* Related to inserts. */
+
+				$this->is_insert = !isset($this->data['ID']);
+				$this->inserted  = FALSE; // Initialize.
+				$this->insert_id = 0; // Initialize.
+
+				/* Related to updates. */
+
+				$this->is_update = isset($this->data['ID']);
+				if($this->is_update && $this->data['ID'])
+				{
+					$this->sub           = $this->plugin->utils_sub->get($this->data['ID']);
+					$this->status_before = $this->sub->status; // For updates only.
+				}
+				if(!isset($this->status_before))
+					$this->status_before = ''; // Initialize.
+				$this->updated           = FALSE; // Initialize.
+				$this->email_key_changed = FALSE; // Initialize.
+
+				/* Related to args/flags. */
 
 				$defaults_args = array(
 					'auto_confirm'                  => NULL,
@@ -289,61 +345,44 @@ namespace comment_mail // Root namespace.
 				$this->process_confirmation = (boolean)$args['process_confirmation'];
 
 				$this->user_initiated                = (boolean)$args['user_initiated'];
-				$this->ui_protected_data_keys_enable = // Applicable only w/ `user_initiated`.
-					$this->user_initiated && (boolean)$args['ui_protected_data_keys_enable'];
+				$this->user_initiated                = $this->plugin->utils_sub->check_user_initiated_by_admin(
+					$this->data['email'] ? $this->data['email'] // « On insert or update.
+						: ($this->is_update && $this->sub ? $this->sub->email : ''), $this->user_initiated
+				);
+				$this->ui_protected_data_keys_enable = $this->user_initiated && $args['ui_protected_data_keys_enable'];
+				$this->ui_protected_data_user        = NULL; // Recording here; but can't be filled until later below.
 
-				if($this->user_initiated && $this->ui_protected_data_keys_enable)
-				{
-					$this->data['user_id']          = NULL; // Nullify.
-					$this->data['insertion_ip']     = NULL; // Nullify.
-					$this->data['insertion_time']   = NULL; // Nullify.
-					$this->data['last_update_time'] = NULL; // Nullify.
-					// Additional sanitizing/validation occurs elsewhere.
-				}
-				if($this->user_initiated && $this->ui_protected_data_keys_enable)
-					if($args['ui_protected_data_user'] instanceof \WP_User)
+				if($this->user_initiated) // Protected data keys?
+					if($this->ui_protected_data_keys_enable)
 					{
-						$this->user                   = $args['ui_protected_data_user'];
-						$this->ui_protected_data_user = $args['ui_protected_data_user'];
+						$this->data['user_id']          = NULL;
+						$this->data['insertion_ip']     = NULL;
+						$this->data['insertion_time']   = NULL;
+						$this->data['last_update_time'] = NULL;
 					}
-				if(isset($args['user_allow_0']))
-					$this->user_allow_0 = (boolean)$args['user_allow_0'];
-				else $this->user_allow_0 = $this->user_initiated;
+				if(isset($args['user_allow_0'])) // Iff `$this->user_initiated` also.
+					$this->user_allow_0 = $this->user_initiated && $args['user_allow_0'];
+				else $this->user_allow_0 = $this->user_initiated; // Defaults to this value.
 
-				if(!$this->user_initiated) // Only if a user initiated this action.
-					$this->user_allow_0 = FALSE; // Force `FALSE` in this case.
-
-				$this->validated = FALSE; // Initialize.
-
-				$this->is_insert = !isset($this->data['ID']);
-				$this->inserted  = FALSE; // Initialize.
-				$this->insert_id = 0; // Initialize.
-
-				$this->status_before = ''; // Initialize; see below.
-				$this->is_update     = isset($this->data['ID']);
-				$this->updated       = FALSE; // Initialize.
-				if($this->is_update && $this->data['ID'])
-				{
-					$this->sub           = $this->plugin->utils_sub->get($this->data['ID']);
-					$this->status_before = $this->sub->status; // For updates only.
-				}
-				$this->duplicate_key_ids   = array(); // Initialize.
-				$this->other_duplicate_ids = array(); // Initialize.
+				/* Related to user. */
 
 				if(!isset($this->user) || !$this->user->ID)
-					if($this->user_allow_0 && $this->data['user_id'] === 0)
-						$this->user = new \WP_User(0);
-
-				if(!isset($this->user) || !$this->user->ID)
-					if((integer)$this->data['user_id'] > 0) // Have a user ID?
+					if((integer)$this->data['user_id'] > 0) // A potentially new user ID?
 						$this->user = new \WP_User((integer)$this->data['user_id']);
+
+				if($this->user_initiated && $this->ui_protected_data_keys_enable
+				   && !isset($this->data['user_id']) && $args['ui_protected_data_user'] instanceof \WP_User
+				) $this->user = $this->ui_protected_data_user = $args['ui_protected_data_user'];
+
+				if(!isset($this->user) || !$this->user->ID)
+					if($this->user_initiated) $this->user = wp_get_current_user();
 
 				if(!isset($this->user) || !$this->user->ID)
 					if($this->is_update && $this->sub && $this->sub->user_id)
 						$this->user = new \WP_User($this->sub->user_id);
 
 				if(!isset($this->user) || !$this->user->ID)
-					if((string)$this->data['email']) // A potentially new email?
+					if((string)$this->data['email']) // A potentially new email address?
 						if(($_user = \WP_User::get_data_by('email', (string)$this->data['email'])))
 							$this->user = new \WP_User($_user->ID);
 				unset($_user); // Housekeeping.
@@ -354,18 +393,37 @@ namespace comment_mail // Root namespace.
 							$this->user = new \WP_User($_user->ID);
 				unset($_user); // Housekeeping.
 
+				if(!isset($this->user) || !$this->user->ID)
+					if($this->user_allow_0 && $this->data['user_id'] === 0)
+						$this->user = new \WP_User(0);
+
 				if(!$this->user_allow_0 && $this->user && !$this->user->ID)
-					$this->user = NULL; // Do NOT allow `0` in this case.
+					$this->user = NULL; // Do not allow `0` in this case.
 
-				$this->is_current_user = // `$this->user` is current user?
-					$this->user && // The user associated w/ the subscription.
-					$this->plugin->utils_user->is_current($this->user, $this->user_allow_0);
+				/* Related to current user. */
 
-				$this->successes = array(); // Initialize.
+				if($this->user_initiated) $this->is_current_user = TRUE;
+				else $this->is_current_user = // `$this->user` is current user?
+					$this->user && $this->plugin->utils_user->is_current($this->user, $this->user_allow_0);
+
+				/* Related to duplicates. */
+
+				$this->duplicate_key_ids   = array(); // Initialize.
+				$this->other_duplicate_ids = array(); // Initialize.
+
+				/* Related to success/error reporting. */
+
 				$this->errors    = array(); // Initialize.
+				$this->successes = array(); // Initialize.
+
+				/* OK, let's do this. */
 
 				$this->maybe_insert_update();
 			}
+
+			/*
+			 * Public API methods.
+			 */
 
 			/**
 			 * Subscription object reference.
@@ -428,6 +486,18 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Email & key changed?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean Email & key changed?
+			 */
+			public function email_key_changed()
+			{
+				return $this->email_key_changed;
+			}
+
+			/**
 			 * Instance of sub confirmer.
 			 *
 			 * @since 14xxxx First documented version.
@@ -437,54 +507,6 @@ namespace comment_mail // Root namespace.
 			public function sub_confirmer()
 			{
 				return $this->sub_confirmer;
-			}
-
-			/**
-			 * Do we have errors?
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return boolean `TRUE` if has errors.
-			 */
-			public function has_successes()
-			{
-				return !empty($this->successes);
-			}
-
-			/**
-			 * Array of any successes.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return array An array of any/all successes.
-			 */
-			public function successes()
-			{
-				return $this->successes;
-			}
-
-			/**
-			 * Array of any success codes.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return array An array of any/all success codes.
-			 */
-			public function success_codes()
-			{
-				return array_keys($this->successes);
-			}
-
-			/**
-			 * Array of any successes w/ HTML markup.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return array An array of any/all errors.
-			 */
-			public function successes_html()
-			{
-				return array_map(array($this->plugin->utils_string, 'markdown_no_p'), $this->successes);
 			}
 
 			/**
@@ -536,6 +558,58 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Do we have errors?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean `TRUE` if has errors.
+			 */
+			public function has_successes()
+			{
+				return !empty($this->successes);
+			}
+
+			/**
+			 * Array of any successes.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of any/all successes.
+			 */
+			public function successes()
+			{
+				return $this->successes;
+			}
+
+			/**
+			 * Array of any success codes.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of any/all success codes.
+			 */
+			public function success_codes()
+			{
+				return array_keys($this->successes);
+			}
+
+			/**
+			 * Array of any successes w/ HTML markup.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return array An array of any/all errors.
+			 */
+			public function successes_html()
+			{
+				return array_map(array($this->plugin->utils_string, 'markdown_no_p'), $this->successes);
+			}
+
+			/*
+			 * Insert/update related methods.
+			 */
+
+			/**
 			 * Updates a subscription; or inserts a new one.
 			 *
 			 * @since 14xxxx First documented version.
@@ -566,10 +640,8 @@ namespace comment_mail // Root namespace.
 				$this->check_auto_confirm_before_insert_update();
 				$this->collect_duplicate_key_ids_before_insert();
 
-				$this->data['insertion_time']   = time(); // Force this.
-				$this->data['last_update_time'] = time(); // Force this too.
-				$table                          = $this->plugin->utils_db->prefix().'subs';
-				$data_to_insert                 = $this->plugin->utils_array->remove_nulls($this->data);
+				$table          = $this->plugin->utils_db->prefix().'subs';
+				$data_to_insert = $this->plugin->utils_array->remove_nulls($this->data);
 
 				if($this->plugin->utils_db->wp->replace($table, $data_to_insert) === FALSE)
 					throw new \exception(__('Insertion failure.', $this->plugin->text_domain));
@@ -602,6 +674,7 @@ namespace comment_mail // Root namespace.
 					$this->sub_confirmer = new sub_confirmer($this->sub->ID, array(
 						'auto_confirm'   => $this->auto_confirm,
 						'process_events' => $this->process_events,
+						'user_initiated' => $this->user_initiated,
 					)); // With behavioral args.
 
 					if($this->sub_confirmer->sent_email_successfully())
@@ -623,9 +696,8 @@ namespace comment_mail // Root namespace.
 				$this->check_auto_confirm_before_insert_update();
 				$this->overwrite_duplicate_key_ids_before_update();
 
-				$this->data['last_update_time'] = time(); // Force this.
-				$table                          = $this->plugin->utils_db->prefix().'subs';
-				$data_to_update                 = $this->plugin->utils_array->remove_nulls($this->data);
+				$table          = $this->plugin->utils_db->prefix().'subs';
+				$data_to_update = $this->plugin->utils_array->remove_nulls($this->data);
 
 				if($this->plugin->utils_db->wp->update($table, $data_to_update, array('ID' => $this->sub->ID)) === FALSE)
 					throw new \exception(__('Update failure.', $this->plugin->text_domain));
@@ -658,6 +730,7 @@ namespace comment_mail // Root namespace.
 					$this->sub_confirmer = new sub_confirmer($this->sub->ID, array(
 						'auto_confirm'   => $this->auto_confirm,
 						'process_events' => $this->process_events,
+						'user_initiated' => $this->user_initiated,
 					)); // With behavioral args.
 
 					if($this->sub_confirmer->sent_email_successfully())
@@ -666,6 +739,10 @@ namespace comment_mail // Root namespace.
 				}
 				$this->overwrite_any_others_after_insert_update(); // Overwrites any others.
 			}
+
+			/*
+			 * Insert/update helpers.
+			 */
 
 			/**
 			 * Check if we can/should auto-confirm in this instance.
@@ -688,23 +765,17 @@ namespace comment_mail // Root namespace.
 				$new_post_id = $this->new_value_for('post_id');
 				$new_user_id = $this->new_value_for('user_id');
 				$new_email   = $this->new_value_for('email');
+				$new_last_ip = $this->new_value_for('last_ip');
 
-				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-
-				       " WHERE `post_id` = '".esc_sql($new_post_id)."'".
-
-				       ($new_user_id // Has a user ID?
-					       ? " AND (`user_id` = '".esc_sql($new_user_id)."'".
-					         "       OR `email` = '".esc_sql($new_email)."')"
-					       : " AND `email` = '".esc_sql($new_email)."'").
-
-				       " AND `status` = 'subscribed'".
-
-				       " LIMIT 1"; // One to check.
-
-				if((integer)$this->plugin->utils_db->wp->get_var($sql))
-					$this->auto_confirm = TRUE; // Auto-confirm.
+				$this->auto_confirm = $this->plugin->utils_sub->can_auto_confirm(
+					$new_post_id, $new_user_id, $new_email, $new_last_ip,
+					$this->user_initiated, $this->auto_confirm
+				);
 			}
+
+			/*
+			 * For insert; duplicate key ID handlers.
+			 */
 
 			/**
 			 * Collects duplicate key IDs before an insert occurs.
@@ -731,7 +802,7 @@ namespace comment_mail // Root namespace.
 
 				if(($this->duplicate_key_ids = $this->plugin->utils_db->wp->get_col($sql)))
 					foreach($this->duplicate_key_ids as $_duplicate_key_id)
-						$this->plugin->utils_sub->get($_duplicate_key_id); // Cache.
+						$this->plugin->utils_sub->get((integer)$_duplicate_key_id); // Cache.
 				unset($_duplicate_key_id); // Housekeeping.
 			}
 
@@ -751,6 +822,10 @@ namespace comment_mail // Root namespace.
 						'process_events' => $this->process_events,
 					));
 			}
+
+			/*
+			 * For update; duplicate key ID handlers.
+			 */
 
 			/**
 			 * Overwrites duplicate key IDs before an update occurs.
@@ -787,6 +862,10 @@ namespace comment_mail // Root namespace.
 						));
 			}
 
+			/*
+			 * For insert/update; overwrite helpers.
+			 */
+
 			/**
 			 * Overwrites any other subscriptions after an insert|update occurs.
 			 *
@@ -814,6 +893,10 @@ namespace comment_mail // Root namespace.
 						));
 			}
 
+			/*
+			 * Other internal utilities.
+			 */
+
 			/**
 			 * New value for a key/property.
 			 *
@@ -840,6 +923,10 @@ namespace comment_mail // Root namespace.
 				}
 				throw new \exception(sprintf(__('Missing key/prop: `%1$s`.', $this->plugin->text_domain), $key_prop));
 			}
+
+			/*
+			 * Lengthy validation handler.
+			 */
 
 			/**
 			 * Sanitizes/validates request args; i.e. {@link $data}.
@@ -873,7 +960,7 @@ namespace comment_mail // Root namespace.
 
 							break; // Break switch handler.
 
-						case 'key': // Unique key.
+						case 'key': // Unique/secret key.
 
 							if(isset($_value))
 								$_value = (string)$_value;
@@ -891,7 +978,20 @@ namespace comment_mail // Root namespace.
 							        && (!isset($_value) || !$_value || strlen($_value) > 20 || !$this->sub || !$this->sub->key || $_value !== $this->sub->key)
 							) $this->errors['invalid_sub_key'] = sprintf(__('Invalid key: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
-							if($this->is_update) $_value = NULL; // Nullify now; a key can never be changed by anyone!
+							if($this->is_update) // If updating, always nullify the key now.
+								// Key changes may ONLY occur systematically; as seen in the section below.
+								$_value = NULL; // Nullify now; a key can never be changed by anyone!
+
+							if($this->is_update && $this->data['email'] && $this->sub) // Possible email change?
+								if(strcasecmp((string)$this->data['email'], $this->sub->email) !== 0) // Email changing?
+									// Actions that change email should also change/nullify the existing key.
+								{
+									$this->email_key_changed = TRUE; // Flag for API calls.
+									$_value                  = $this->plugin->utils_enc->uunnci_key_20_max();
+								}
+							if(empty($this->errors['invalid_sub_key']))
+								if(isset($_value) && (!$_value || strlen($_value) > 20))
+									$this->errors['invalid_sub_key'] = sprintf(__('Invalid key: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -1033,8 +1133,11 @@ namespace comment_mail // Root namespace.
 							if($this->is_insert && !$_value)
 								$_value = ''; // Use a default value.
 
-							if($this->is_insert && !$_value && $this->user && $this->user->user_email)
-								$_value = $this->user->user_email;
+							// Disabling this; not necessary.
+							// Also, we don't want the email changing w/o us knowing about it in the `status` check.
+							//    i.e. changing the email here could occur after the status validation later.
+							// if($this->is_insert && !$_value && $this->user && $this->user->user_email)
+							//	$_value = $this->user->user_email;
 
 							if(isset($_value) && (!$_value || !is_email($_value) || strlen($_value) > 100))
 								$this->errors['invalid_sub_email'] = sprintf(__('Invalid email address: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
@@ -1124,9 +1227,9 @@ namespace comment_mail // Root namespace.
 
 							if($this->is_update && $this->user_initiated && $this->data['email'] && $this->sub)
 								if(strcasecmp((string)$this->data['email'], $this->sub->email) !== 0) // Email changing?
-									// NOTE: if `process_confirmation` is not `TRUE`, this silently unconfirms a user.
-									// User-initiated actions that change the email should set `process_confirmation = TRUE`.
-									$_value = 'unconfirmed'; // User must reconfirm when they change email addresses.
+									// NOTE: if `process_confirmation` is not `TRUE`, this silently unconfirms the subscriber.
+									// User-initiated actions that change email should set `process_confirmation = TRUE`.
+									$_value = 'unconfirmed'; // User MUST reconfirm when they change email addresses.
 
 							if(isset($_value) && !in_array($_value, array('unconfirmed', 'subscribed', 'suspended', 'trashed'), TRUE))
 								$this->errors['invalid_sub_status'] = sprintf(__('Invalid status: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
@@ -1153,6 +1256,7 @@ namespace comment_mail // Root namespace.
 							//    It is safe to assume here that a user would NOT have a key if they had not already been confirmed in some way.
 							//    See also: the `key` check up above for `user_initiated` + `ui_protected_data_keys_enable` actions.
 							//    See also: the `email` change of address check above w/ `user_initiated`.
+							//    See also: the `email` change of address check above w/ `key`.
 
 							break; // Break switch handler.
 
@@ -1165,7 +1269,7 @@ namespace comment_mail // Root namespace.
 							if(isset($_value))
 								$_value = (integer)$_value;
 
-							if($this->is_insert && !$_value)
+							if($this->is_insert && $_value < 1)
 								$_value = time(); // Use a default value.
 
 							if(isset($_value) && strlen((string)$_value) !== 10)
@@ -1185,10 +1289,10 @@ namespace comment_mail // Root namespace.
 							if(isset($_value))
 								$_value = (integer)$_value;
 
-							if($this->is_insert && !$_value)
+							if($this->is_insert && $_value < 1)
 								$_value = time(); // Use a default value.
 
-							if(!$_value) $_value = time(); // Update time.
+							if($_value < 1) $_value = time(); // Update time.
 
 							if(isset($_value) && strlen((string)$_value) !== 10)
 								$this->errors['invalid_sub_last_update_time'] = sprintf(__('Invalid last update time: `%1$s`.', $this->plugin->text_domain), esc_html($_value));

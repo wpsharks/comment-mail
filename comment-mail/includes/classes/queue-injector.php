@@ -109,18 +109,18 @@ namespace comment_mail // Root namespace.
 					if(!$_sub->email) // Email empty?
 						continue; // Missing email address.
 
-					$_sub_email_lowercase = strtolower($_sub->email);
+					$_sub->email = strtolower($_sub->email);
 
-					if(isset($sub_emails[$_sub_email_lowercase]))
+					if(isset($sub_emails[$_sub->email]))
 						continue; // Email duplicate.
 
-					if(strcasecmp($_sub_email_lowercase, $this->comment->comment_author_email) === 0)
+					if(strcasecmp($_sub->email, $this->comment->comment_author_email) === 0)
 						continue; // Don't send an email to the comment author.
 
-					$sub_emails[$_sub_email_lowercase] = -1;
-					$subs[$_sub->ID]                   = $_sub;
+					$sub_emails[$_sub->email] = -1;
+					$subs[$_sub->ID]          = $_sub;
 				}
-				unset($_sub_id_key, $_sub, $_sub_email_lowercase); // Housekeeping.
+				unset($_sub_id_key, $_sub); // Housekeeping.
 
 				return $subs; // All valid/unique subscriptions.
 			}

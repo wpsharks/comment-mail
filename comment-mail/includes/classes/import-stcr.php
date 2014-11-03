@@ -110,6 +110,9 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_import()
 			{
+				if(!current_user_can($this->plugin->cap))
+					return; // Unauthenticated; ignore.
+
 				if(!$this->unimported_post_ids)
 					return; // Nothing to do.
 

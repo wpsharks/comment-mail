@@ -7,3 +7,6 @@
 [submodule "comment-mail/submodules/parsedown"]
 	path = comment-mail/submodules/parsedown
 	url = https://github.com/erusev/parsedown
+[submodule "comment-mail/submodules/sharkicons"]
+	path = comment-mail/submodules/sharkicons
+	url = https://github.com/websharks/sharkicons

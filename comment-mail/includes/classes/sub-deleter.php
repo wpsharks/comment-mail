@@ -102,8 +102,8 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
-				$this->sub           = // Subscription.
-					$this->plugin->utils_sub->get((integer)$sub_id);
+				$sub_id              = (integer)$sub_id;
+				$this->sub           = $this->plugin->utils_sub->get($sub_id);
 				$this->status_before = $this->sub ? $this->sub->status : '';
 
 				$defaults_args = array(
@@ -123,16 +123,16 @@ namespace comment_mail // Root namespace.
 				$this->cleaning       = (boolean)$args['cleaning'];
 				$this->process_events = (boolean)$args['process_events'];
 				$this->user_initiated = (boolean)$args['user_initiated'];
+				$this->user_initiated = $this->plugin->utils_sub->check_user_initiated_by_admin(
+					$this->sub ? $this->sub->email : '', $this->user_initiated
+				);
+				if($this->user_initiated && !$this->last_ip)
+					$this->last_ip = $this->plugin->utils_env->user_ip();
 
-				if($this->oby_sub_id)
+				if($this->oby_sub_id) // Resolve conflicts.
 					$this->purging = $this->cleaning = FALSE;
-
-				if($this->purging)
-					$this->cleaning = FALSE;
-
-				if($this->cleaning)
-					$this->purging = FALSE;
-
+				if($this->purging) $this->cleaning = FALSE;
+				if($this->cleaning) $this->purging = FALSE;
 				if($this->purging || $this->cleaning)
 					$this->oby_sub_id = 0;
 

@@ -58,7 +58,7 @@ namespace comment_mail // Root namespace.
 
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-area').'">'.
 				     '   <h4 style="margin-bottom:5px;">'.$total_subs_bubble.__('Most Recent Subscriptions:', $this->plugin->text_domain).'</h4>'.
-				     '   '.$this->plugin->utils_markup->last_x_subs(5, $this->post->ID).
+				     '   '.$this->plugin->utils_markup->last_x_subs(5, $this->post->ID, array('group_by_email' => TRUE)).
 				     '</div>';
 
 				if($post_comment_status !== 'open' && !$this->post->comment_count)

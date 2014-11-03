@@ -42,6 +42,13 @@ namespace comment_mail // Root namespace.
 			protected $process_events;
 
 			/**
+			 * @var boolean User initiated?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $user_initiated;
+
+			/**
 			 * @var boolean Auto confirmed?
 			 *
 			 * @since 14xxxx First documented version.
@@ -67,32 +74,32 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|string $sub_id Comment ID.
+			 * @param integer $sub_id Subscriber ID.
 			 *
-			 * @param array          $args Any additional behavioral args.
+			 * @param array   $args Any additional behavioral args.
 			 */
 			public function __construct($sub_id, array $args = array())
 			{
 				parent::__construct();
 
-				if(($sub_id = (integer)$sub_id))
-					$this->sub = $this->plugin->utils_sub->get($sub_id);
+				$sub_id    = (integer)$sub_id;
+				$this->sub = $this->plugin->utils_sub->get($sub_id);
 
 				$defaults_args = array(
 					'auto_confirm'   => NULL,
 					'process_events' => TRUE,
+					'user_initiated' => FALSE,
 				);
 				$args          = array_merge($defaults_args, $args);
 				$args          = array_intersect_key($args, $defaults_args);
 
 				if(isset($args['auto_confirm']))
 					$this->auto_confirm = (boolean)$args['auto_confirm'];
-				$this->process_events = (boolean)$args['process_events'];
-
-				if(!isset($this->auto_confirm)) // If not set explicitly, use option value.
-					if((boolean)$this->plugin->options['auto_confirm_enable'])
-						$this->auto_confirm = TRUE; // Yes.
-
+				$this->process_events          = (boolean)$args['process_events'];
+				$this->user_initiated          = (boolean)$args['user_initiated'];
+				$this->user_initiated          = $this->plugin->utils_sub->check_user_initiated_by_admin(
+					$this->sub ? $this->sub->email : '', $this->user_initiated
+				);
 				$this->auto_confirmed          = FALSE; // Initialize.
 				$this->confirming_via_email    = FALSE; // Initialize.
 				$this->sent_email_successfully = FALSE; // Initialize.
@@ -152,7 +159,7 @@ namespace comment_mail // Root namespace.
 				if($this->sub->status === 'subscribed')
 					return; // Nothing to do.
 
-				if(($this->auto_confirmed = $this->maybe_auto_confirm()))
+				if($this->maybe_auto_confirm())
 					return; // Nothing more to do.
 
 				if(!get_post($this->sub->post_id))
@@ -188,33 +195,12 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_auto_confirm()
 			{
-				if($this->auto_confirm === FALSE)
-					return ($this->auto_confirmed = FALSE);
-
-				if($this->auto_confirm) // Auto-confirm?
-				{
-					$this->plugin->utils_sub->confirm($this->sub->ID, array(
-						'process_events' => $this->process_events,
-					)); // With behavioral args.
-
-					return ($this->auto_confirmed = TRUE);
-				}
-				// Else use default `NULL` behavior; i.e. check if they've already confirmed another.
-
-				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-
-				       " WHERE `post_id` = '".esc_sql($this->sub->post_id)."'".
-
-				       ($this->sub->user_id // Has a user ID?
-					       ? " AND (`user_id` = '".esc_sql($this->sub->user_id)."'".
-					         "       OR `email` = '".esc_sql($this->sub->email)."')"
-					       : " AND `email` = '".esc_sql($this->sub->email)."'").
-
-				       " AND `status` = 'subscribed'".
-
-				       " LIMIT 1"; // One to check.
-
-				if((integer)$this->plugin->utils_db->wp->get_var($sql))
+				$can_auto_confirm = // Call upon our utility for this.
+					$this->plugin->utils_sub->can_auto_confirm(
+						$this->sub->post_id, $this->sub->user_id, $this->sub->email, $this->sub->last_ip,
+						$this->user_initiated, $this->auto_confirm
+					);
+				if($can_auto_confirm) // Possible to auto-confirm?
 				{
 					$this->plugin->utils_sub->confirm($this->sub->ID, array(
 						'process_events' => $this->process_events,

@@ -46,18 +46,84 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Current front scheme; lowercase.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string Current front scheme; lowercase.
+			 *
+			 * @note This will return `https://` only if we are NOT in the admin area.
+			 *    Also, see {@link \home_url()} for some other considerations.
+			 */
+			public function current_front_scheme()
+			{
+				if(!is_null($scheme = &$this->static_key(__FUNCTION__)))
+					return $scheme; // Cached this already.
+
+				return ($scheme = (string)parse_url(home_url(), PHP_URL_SCHEME));
+			}
+
+			/**
+			 * Sets URL scheme.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string      $url The input URL to work from (optional).
+			 *    If empty, defaults to the current URL.
+			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link \set_url_scheme()} in WordPress for further details.
+			 *
+			 * @return string URL w/ the proper scheme.
+			 *
+			 * @note Regarding the special `front` scheme:
+			 *    {@link home_url()} establishes the standards we use.
+			 *
+			 *    It is NOT necessary to use `front` in most scenarios,
+			 *       but there are some edge cases where it has a purpose.
+			 *
+			 *    e.g. building a URL that leads {@to()} a plugin file (while {@link is_admin()});
+			 *       but where the URL is intended for display on the front-end of the site.
+			 *
+			 * @uses set_url_scheme()
+			 * @uses current_front_scheme()
+			 */
+			public function set_scheme($url = '', $scheme = NULL)
+			{
+				if(!($url = trim((string)$url)))
+					$url = $this->current();
+
+				if($scheme === 'front') // Front-side?
+					$scheme = $this->current_front_scheme();
+
+				return set_url_scheme($url, $scheme);
+			}
+
+			/**
 			 * Current host name; lowercase.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
+			 * @param boolean $no_port No port number? Defaults to `FALSE`.
+			 *
+			 * @note Some hosts include a port number in `$_SERVER['HTTP_HOST']`.
+			 *    That SHOULD be left intact for URL generation in almost every scenario.
+			 *    However, in a few other edge cases it may be desirable to exclude the port number.
+			 *    e.g. if the purpose of obtaining the host is to use it for email generation, or in a slug, etc.
+			 *
 			 * @return string Current host name; lowercase.
 			 */
-			public function current_host()
+			public function current_host($no_port = FALSE)
 			{
-				if(!is_null($host = &$this->static_key(__FUNCTION__)))
+				if(!is_null($host = &$this->static_key(__FUNCTION__, $no_port)))
 					return $host; // Cached this already.
 
-				return ($host = strtolower((string)$_SERVER['HTTP_HOST']));
+				$host = strtolower((string)$_SERVER['HTTP_HOST']);
+
+				if($no_port) // Remove possible port number?
+					$host = preg_replace('/\:[0-9]+$/', '', $host);
+
+				return $host; // Current host (cached).
 			}
 
 			/**
@@ -95,14 +161,19 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
+			 *
 			 * @return string Current URL; i.e. scheme.host.URI put together.
 			 */
-			public function current()
+			public function current($scheme = NULL)
 			{
-				if(!is_null($url = &$this->static_key(__FUNCTION__)))
+				if(!is_null($url = &$this->static_key(__FUNCTION__, $scheme)))
 					return $url; // Cached this already.
 
-				return ($url = $this->current_scheme().'://'.$this->current_host().$this->current_uri());
+				$url = '//'.$this->current_host().$this->current_uri();
+
+				return ($url = $this->set_scheme($url, $scheme));
 			}
 
 			/**
@@ -110,17 +181,22 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $url The input URL to work from (optional).
+			 * @param string      $url The input URL to work from (optional).
 			 *    If empty, defaults to the current URL.
+			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL without a query string.
 			 */
-			public function no_query($url = '')
+			public function no_query($url = '', $scheme = NULL)
 			{
 				if(!($url = trim((string)$url)))
 					$url = $this->current();
 
-				return strpos($url, '?') !== FALSE ? (string)strstr($url, '?', TRUE) : $url;
+				$url = strpos($url, '?') !== FALSE ? (string)strstr($url, '?', TRUE) : $url;
+
+				return $this->set_scheme($url, $scheme);
 			}
 
 			/**
@@ -128,22 +204,26 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $nonce_action A specific nonce action.
+			 * @param string      $nonce_action A specific nonce action.
 			 *    Defaults to `__NAMESPACE__`.
 			 *
-			 * @param string $url The input URL to work from (optional).
+			 * @param string      $url The input URL to work from (optional).
 			 *    If empty, defaults to the current URL.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL with `_wpnonce`.
 			 */
-			public function nonce($nonce_action = __NAMESPACE__, $url = '')
+			public function nonce($nonce_action = __NAMESPACE__, $url = '', $scheme = 'admin')
 			{
 				if(!($url = trim((string)$url)))
 					$url = $this->current();
 
 				$args = array('_wpnonce' => wp_create_nonce($nonce_action));
+				$url  = add_query_arg(urlencode_deep($args), $url);
 
-				return add_query_arg(urlencode_deep($args), $url);
+				return $this->set_scheme($url, $scheme);
 			}
 
 			/**
@@ -151,15 +231,18 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $page A specific page value (optional).
+			 * @param string      $page A specific page value (optional).
 			 *    If empty, we use `page` from the URL; else current `page`.
 			 *
-			 * @param string $url The input URL to work from (optional).
+			 * @param string      $url The input URL to work from (optional).
 			 *    If empty, defaults to the current URL.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL with only a `page` var (if applicable).
 			 */
-			public function page_only($page = '', $url = '')
+			public function page_only($page = '', $url = '', $scheme = 'admin')
 			{
 				$page = trim((string)$page);
 
@@ -177,8 +260,9 @@ namespace comment_mail // Root namespace.
 					$page = trim(stripslashes((string)$_REQUEST['page']));
 
 				$args = $page ? array('page' => $page) : array();
+				$url  = add_query_arg(urlencode_deep($args), $url);
 
-				return add_query_arg(urlencode_deep($args), $url);
+				return $this->set_scheme($url, $scheme);
 			}
 
 			/**
@@ -186,20 +270,25 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $page A specific page value (optional).
+			 * @param string      $page A specific page value (optional).
 			 *    If empty, we use `page` from the URL; else current `page`.
 			 *
-			 * @param string $nonce_action A specific nonce action.
+			 * @param string      $nonce_action A specific nonce action.
 			 *    Defaults to `__NAMESPACE__`.
 			 *
-			 * @param string $url The input URL to work from (optional).
+			 * @param string      $url The input URL to work from (optional).
 			 *    If empty, defaults to the current URL.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL with only a `page` var (if applicable) and `_wpnonce`.
 			 */
-			public function page_nonce_only($page = '', $nonce_action = __NAMESPACE__, $url = '')
+			public function page_nonce_only($page = '', $nonce_action = __NAMESPACE__, $url = '', $scheme = 'admin')
 			{
-				return $this->nonce($nonce_action, $this->page_only($page, $url));
+				$url = $this->page_only($page, $url);
+
+				return $this->nonce($nonce_action, $url, $scheme);
 			}
 
 			/**
@@ -207,11 +296,16 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
 			 * @return string Main menu page URL.
 			 */
-			public function main_menu_page_only()
+			public function main_menu_page_only($scheme = 'admin')
 			{
-				return $this->page_only(__NAMESPACE__, admin_url('/edit-comments.php'));
+				$url = admin_url('/edit-comments.php');
+
+				return $this->page_only(__NAMESPACE__, $url, $scheme);
 			}
 
 			/**
@@ -219,14 +313,19 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $nonce_action A specific nonce action.
+			 * @param string      $nonce_action A specific nonce action.
 			 *    Defaults to `__NAMESPACE__`.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Main menu page URL; w/ `_wpnonce`.
 			 */
-			public function main_menu_page_nonce_only($nonce_action = __NAMESPACE__)
+			public function main_menu_page_nonce_only($nonce_action = __NAMESPACE__, $scheme = 'admin')
 			{
-				return $this->nonce($nonce_action, $this->main_menu_page_only());
+				$url = $this->main_menu_page_only();
+
+				return $this->nonce($nonce_action, $url, $scheme);
 			}
 
 			/**
@@ -234,11 +333,16 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
 			 * @return string Subscriptions menu page URL.
 			 */
-			public function subs_menu_page_only()
+			public function subs_menu_page_only($scheme = 'admin')
 			{
-				return $this->page_only(__NAMESPACE__.'_subs', admin_url('/edit-comments.php'));
+				$url = admin_url('/edit-comments.php');
+
+				return $this->page_only(__NAMESPACE__.'_subs', $url, $scheme);
 			}
 
 			/**
@@ -246,11 +350,16 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
 			 * @return string Sub. event log menu page URL.
 			 */
-			public function sub_event_log_menu_page_only()
+			public function sub_event_log_menu_page_only($scheme = 'admin')
 			{
-				return $this->page_only(__NAMESPACE__.'_sub_event_log', admin_url('/edit-comments.php'));
+				$url = admin_url('/edit-comments.php');
+
+				return $this->page_only(__NAMESPACE__.'_sub_event_log', $url, $scheme);
 			}
 
 			/**
@@ -258,11 +367,16 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
 			 * @return string Queue menu page URL.
 			 */
-			public function queue_menu_page_only()
+			public function queue_menu_page_only($scheme = 'admin')
 			{
-				return $this->page_only(__NAMESPACE__.'_queue', admin_url('/edit-comments.php'));
+				$url = admin_url('/edit-comments.php');
+
+				return $this->page_only(__NAMESPACE__.'_queue', $url, $scheme);
 			}
 
 			/**
@@ -270,11 +384,16 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
 			 * @return string Queue event log menu page URL.
 			 */
-			public function queue_event_log_menu_page_only()
+			public function queue_event_log_menu_page_only($scheme = 'admin')
 			{
-				return $this->page_only(__NAMESPACE__.'_queue_event_log', admin_url('/edit-comments.php'));
+				$url = admin_url('/edit-comments.php');
+
+				return $this->page_only(__NAMESPACE__.'_queue_event_log', $url, $scheme);
 			}
 
 			/**
@@ -282,13 +401,17 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
 			 * @return string Restore default options URL.
 			 */
-			public function restore_default_options()
+			public function restore_default_options($scheme = 'admin')
 			{
+				$url  = $this->main_menu_page_nonce_only(__NAMESPACE__, $scheme);
 				$args = array(__NAMESPACE__ => array('restore_default_options' => '1'));
 
-				return add_query_arg(urlencode_deep($args), $this->main_menu_page_nonce_only());
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
@@ -296,13 +419,17 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
 			 * @return string Options restored URL.
 			 */
-			public function options_restored()
+			public function options_restored($scheme = 'admin')
 			{
+				$url  = $this->main_menu_page_only($scheme);
 				$args = array(__NAMESPACE__.'_options_restored' => '1');
 
-				return add_query_arg(urlencode_deep($args), $this->main_menu_page_only());
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
@@ -310,19 +437,23 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $url The input URL to work from (optional).
+			 * @param string      $url The input URL to work from (optional).
 			 *    If empty, defaults to the current menu page.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Options updated URL.
 			 */
-			public function options_updated($url = '')
+			public function options_updated($url = '', $scheme = 'admin')
 			{
 				if(!($url = trim((string)$url)))
 					$url = $this->page_only();
 
 				$args = array(__NAMESPACE__.'_options_updated' => '1');
+				$url  = add_query_arg(urlencode_deep($args), $url);
 
-				return add_query_arg(urlencode_deep($args), $url);
+				return $this->set_scheme($url, $scheme);
 			}
 
 			/**
@@ -330,19 +461,23 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $url The input URL to work from (optional).
+			 * @param string      $url The input URL to work from (optional).
 			 *    If empty, defaults to the main menu page.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Pro preview URL.
 			 */
-			public function pro_preview($url = '')
+			public function pro_preview($url = '', $scheme = 'admin')
 			{
 				if(!($url = trim((string)$url)))
 					$url = $this->main_menu_page_only();
 
 				$args = array(__NAMESPACE__.'_pro_preview' => '1');
+				$url  = add_query_arg(urlencode_deep($args), $url);
 
-				return add_query_arg(urlencode_deep($args), $url);
+				return $this->set_scheme($url, $scheme);
 			}
 
 			/**
@@ -350,7 +485,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string|array A string or an array of filters.
+			 * @param string|array $filters A string or an array of filters.
 			 *    e.g. `array('post_ids:1,2,3', 'comment_ids:4,5,6')`.
 			 *    e.g. `post_ids:1,2,3 comment_ids:4,5,6`.
 			 *
@@ -363,9 +498,12 @@ namespace comment_mail // Root namespace.
 			 * @param string       $url The input URL to work from (optional).
 			 *    If empty, defaults to the current URL.
 			 *
+			 * @param string|null  $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
 			 * @return string URL w/ search filters added to the `s` key.
 			 */
-			public function table_search_filter($filters, $url = '')
+			public function table_search_filter($filters, $url = '', $scheme = 'admin')
 			{
 				if(is_array($filters)) // Force string.
 					$filters = implode(' ', $filters);
@@ -400,9 +538,11 @@ namespace comment_mail // Root namespace.
 				}
 				unset($_filter, $_filter_m); // Just housekeeping.
 
-				$s = trim(preg_replace('/\s+/', ' ', $s));
+				$s   = trim(preg_replace('/\s+/', ' ', $s));
+				$url = add_query_arg('s', $s ? urlencode($s) : FALSE, $url);
 				// Note: `FALSE` tells `add_query_arg()` to remove `s`.
-				return add_query_arg('s', $s ? urlencode($s) : FALSE, $url);
+
+				return $this->set_scheme($url, $scheme);
 			}
 
 			/**
@@ -410,16 +550,19 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $plural Plural table name/key.
-			 * @param array  $ids An array of IDs to act upon.
-			 * @param string $action The bulk action to perform.
+			 * @param string      $plural Plural table name/key.
+			 * @param array       $ids An array of IDs to act upon.
+			 * @param string      $action The bulk action to perform.
 			 *
-			 * @param string $url The input URL to work from (optional).
+			 * @param string      $url The input URL to work from (optional).
 			 *    If empty, defaults to the current URL.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL leading to the bulk action necessary.
 			 */
-			public function table_bulk_action($plural, array $ids, $action, $url = '')
+			public function table_bulk_action($plural, array $ids, $action, $url = '', $scheme = 'admin')
 			{
 				$plural = trim((string)$plural);
 				$action = trim((string)$action);
@@ -428,17 +571,17 @@ namespace comment_mail // Root namespace.
 					$url = $this->current();
 
 				$args = array($plural => $ids, 'action' => $action);
+				$url  = add_query_arg(urlencode_deep($args), $url);
 
-				return $this->nonce('bulk-'.$plural, add_query_arg(urlencode_deep($args), $url));
+				return $this->nonce('bulk-'.$plural, $url, $scheme);
 			}
 
 			/**
-			 * URL w/ page & table nav vars only.
+			 * URL w/ page & table nav vars only — from a given URL and/or `$_REQUEST` vars.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param array  $also_keep Any additional names/keys to keep.
-			 *
+			 * @param array       $also_keep Any additional names/keys to keep.
 			 *    Built-in names/keys to keep already includes the following:
 			 *       `page`, `orderby`, `order`, and `s` for searches.
 			 *
@@ -447,23 +590,31 @@ namespace comment_mail // Root namespace.
 			 *    forced into the URL w/ a fresh value when keeping `_wp_nonce`.
 			 *    ~ See also: {@link page_nonce_table_nav_vars_only()}.
 			 *
-			 * @param string $url The input URL to work from (optional).
-			 *    If empty, defaults to the current URL.
+			 * @param string      $url The input URL to work from (optional).
+			 *    Defaults to current URL. Existing vars will be taken from this URL.
 			 *
-			 * @param string $nonce_action A specific nonce action.
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @param string      $nonce_action A specific nonce action.
 			 *    ~ See also: {@link page_nonce_table_nav_vars_only()}.
 			 *
-			 * @return string URL w/ page & table nav vars only.
+			 * @return string URL w/ page & table nav vars only — from given URL and/or `$_REQUEST` vars.
+			 *
+			 * @note Vars found in the given URL are given priority over any found in the current `$_REQUEST` vars.
+			 *    i.e. If the given (and/or default) URL contains a particular table nav var, it's given precedence.
+			 *    Otherwise, if the URL does not have a particular table nav var, we look at `$_REQUEST` vars.
 			 */
-			public function page_table_nav_vars_only(array $also_keep = array(), $url = '', $nonce_action = __NAMESPACE__)
+			public function page_table_nav_vars_only(array $also_keep = array(), $url = '', $scheme = 'admin', $nonce_action = __NAMESPACE__)
 			{
 				if(!($url = trim((string)$url)))
 					$url = $this->current();
 
-				$_r    = $this->plugin->utils_string->trim_strip_deep($_REQUEST);
 				$query = (string)parse_url($url, PHP_URL_QUERY);
 				wp_parse_str($query, $query_vars);
 				$url = $this->no_query($url);
+
+				$_r = $this->plugin->utils_string->trim_strip_deep($_REQUEST);
 
 				$also_keep = array_map('strval', $also_keep);
 				$keepers   = array('page', 'orderby', 'order', 's');
@@ -471,10 +622,10 @@ namespace comment_mail // Root namespace.
 
 				foreach($keepers as $_keeper) // Add keepers back onto the clean URL.
 				{
-					if(!empty($query_vars[$_keeper])) // In query vars?
+					if(isset($query_vars[$_keeper])) // In query vars?
 						$url = add_query_arg(urlencode($_keeper), urlencode($query_vars[$_keeper]), $url);
 
-					else if(!empty($_r[$_keeper])) // In the current request array?
+					else if(isset($_r[$_keeper])) // In the current request array?
 						$url = add_query_arg(urlencode($_keeper), urlencode($_r[$_keeper]), $url);
 				}
 				unset($_keeper); // Housekeeping.
@@ -482,23 +633,24 @@ namespace comment_mail // Root namespace.
 				if(in_array('_wpnonce', $also_keep, TRUE)) // Generate a fresh value.
 					$url = add_query_arg('_wpnonce', urlencode(wp_create_nonce($nonce_action)), $url);
 
-				return $url; // With page & table nav vars only.
+				return $this->set_scheme($url, $scheme); // With page & table nav vars only.
 			}
 
 			/**
-			 * URL w/ page, nonce & table nav vars only.
+			 * URL w/ page, nonce & table nav vars only — from a given URL and/or `$_REQUEST` vars.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param array  $also_keep See {@link page_table_nav_vars_only()}.
-			 * @param string $url See {@link page_table_nav_vars_only()}.
-			 * @param string $nonce_action See {@link page_table_nav_vars_only()}.
+			 * @param array       $also_keep See {@link page_table_nav_vars_only()}.
+			 * @param string      $url See {@link page_table_nav_vars_only()}.
+			 * @param string      $nonce_action See {@link page_table_nav_vars_only()}.
+			 * @param string|null $scheme See {@link page_table_nav_vars_only()}.
 			 *
 			 * @return string See {@link page_table_nav_vars_only()}.
 			 */
-			public function page_nonce_table_nav_vars_only(array $also_keep = array(), $url = '', $nonce_action = __NAMESPACE__)
+			public function page_nonce_table_nav_vars_only(array $also_keep = array(), $url = '', $scheme = 'admin', $nonce_action = __NAMESPACE__)
 			{
-				return $this->page_table_nav_vars_only(array_merge($also_keep, array('_wpnonce')), $url, $nonce_action);
+				return $this->page_table_nav_vars_only(array_merge($also_keep, array('_wpnonce')), $url, $scheme, $nonce_action);
 			}
 
 			/**
@@ -506,16 +658,21 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $notice_key The notice key to dismiss.
+			 * @param string      $notice_key The notice key to dismiss.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Notice dimissal URL.
 			 */
-			public function dismiss_notice($notice_key)
+			public function dismiss_notice($notice_key, $scheme = 'admin')
 			{
-				$notice_key = trim((string)$notice_key); // Key to dismiss.
-				$args       = array(__NAMESPACE__ => array('dismiss_notice' => compact('notice_key')));
+				$notice_key = trim((string)$notice_key);
 
-				return add_query_arg(urlencode_deep($args), $this->nonce());
+				$url  = $this->nonce(__NAMESPACE__, '', $scheme);
+				$args = array(__NAMESPACE__ => array('dismiss_notice' => compact('notice_key')));
+
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
@@ -523,11 +680,16 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
 			 * @return string Notice dimissed URL.
 			 */
-			public function notice_dismissed()
+			public function notice_dismissed($scheme = 'admin')
 			{
-				return remove_query_arg(__NAMESPACE__, $this->current());
+				$url = $this->current($scheme);
+
+				return remove_query_arg(__NAMESPACE__, $url);
 			}
 
 			/**
@@ -535,14 +697,18 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
+			 *
 			 * @return string Product page URL; normally at WebSharks™.
 			 */
-			public function product_page()
+			public function product_page($scheme = NULL)
 			{
 				if(!empty($this->plugin->product_page))
-					return $this->plugin->product_page;
+					$url = $this->plugin->product_page; // Provided by plugin class?
+				else $url = 'http://www.websharks-inc.com/product/'.urlencode($this->plugin->slug).'/';
 
-				return 'http://www.websharks-inc.com/product/'.urlencode($this->plugin->slug).'/';
+				return isset($scheme) ? $this->set_scheme($url, $scheme) : $url;
 			}
 
 			/**
@@ -550,14 +716,18 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
+			 *
 			 * @return string Subscribe page URL; normally at WebSharks™.
 			 */
-			public function subscribe_page()
+			public function subscribe_page($scheme = NULL)
 			{
 				if(!empty($this->plugin->subscribe_page))
-					return $this->plugin->subscribe_page;
+					$url = $this->plugin->subscribe_page; // Provided by plugin class?
+				else $url = 'http://www.websharks-inc.com/r/'.urlencode($this->plugin->slug).'-subscribe/';
 
-				return 'http://www.websharks-inc.com/r/'.urlencode($this->plugin->slug).'-subscribe/';
+				return isset($scheme) ? $this->set_scheme($url, $scheme) : $url;
 			}
 
 			/**
@@ -566,7 +736,9 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string      $file Optional file path; relative to plugin directory.
-			 * @param string|null $scheme Optional URL scheme. Defaults to the current scheme.
+			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL to plugin directory; or to the specified `$file` if applicable.
 			 */
@@ -575,7 +747,7 @@ namespace comment_mail // Root namespace.
 				if(is_null($plugin_dir_url = &$this->static_key(__FUNCTION__, 'plugin_dir_url')))
 					$plugin_dir_url = rtrim(plugin_dir_url($this->plugin->file), '/');
 
-				return set_url_scheme($plugin_dir_url.(string)$file, $scheme);
+				return $this->set_scheme($plugin_dir_url.(string)$file, $scheme);
 			}
 
 			/**
@@ -608,16 +780,21 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer $post_id A WP post ID.
+			 * @param integer     $post_id A WP post ID.
+			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Post shortlink.
 			 */
-			public function post_short($post_id)
+			public function post_short($post_id, $scheme = NULL)
 			{
 				$post_id = (integer)$post_id;
-				$args    = array('p' => $post_id);
 
-				return add_query_arg(urlencode_deep($args), home_url('/'));
+				$url  = home_url('/', $scheme);
+				$args = array('p' => $post_id);
+
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
@@ -625,16 +802,21 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer $post_id A WP post ID.
+			 * @param integer     $post_id A WP post ID.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Post edit shortlink.
 			 */
-			public function post_edit_short($post_id)
+			public function post_edit_short($post_id, $scheme = 'admin')
 			{
 				$post_id = (integer)$post_id;
-				$args    = array('post' => $post_id, 'action' => 'edit');
 
-				return add_query_arg(urlencode_deep($args), admin_url('/post.php'));
+				$url  = admin_url('/post.php', $scheme);
+				$args = array('post' => $post_id, 'action' => 'edit');
+
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
@@ -642,16 +824,21 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer $post_id A WP post ID.
+			 * @param integer     $post_id A WP post ID.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Post edit comments shortlink.
 			 */
-			public function post_edit_comments_short($post_id)
+			public function post_edit_comments_short($post_id, $scheme = 'admin')
 			{
 				$post_id = (integer)$post_id;
-				$args    = array('p' => $post_id);
 
-				return add_query_arg(urlencode_deep($args), admin_url('/edit-comments.php'));
+				$url  = admin_url('/edit-comments.php', $scheme);
+				$args = array('p' => $post_id);
+
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
@@ -659,18 +846,23 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer $post_id A WP post ID.
-			 * @param string  $s Any additional search words/filters.
+			 * @param integer     $post_id A WP post ID.
+			 * @param string      $s Any additional search words/filters.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Post edit subscriptions shortlink.
 			 */
-			public function post_edit_subs_short($post_id, $s = '')
+			public function post_edit_subs_short($post_id, $s = '', $scheme = 'admin')
 			{
 				$post_id = (integer)$post_id;
 				$s       = trim((string)$s);
-				$args    = array('s' => 'post_id:'.$post_id.($s ? ' '.$s : ''));
 
-				return add_query_arg(urlencode_deep($args), $this->subs_menu_page_only());
+				$url  = $this->subs_menu_page_only($scheme);
+				$args = array('s' => 'post_id:'.$post_id.($s ? ' '.$s : ''));
+
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
@@ -678,12 +870,16 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
 			 * @return string New subscription shortlink.
 			 */
-			public function new_sub_short()
+			public function new_sub_short($scheme = 'admin')
 			{
+				$url  = $this->subs_menu_page_only();
+				$url  = $this->page_table_nav_vars_only(array(), $url, $scheme);
 				$args = array('action' => 'new');
-				$url  = $this->page_table_nav_vars_only(array(), $this->subs_menu_page_only());
 
 				return add_query_arg(urlencode_deep($args), $url);
 			}
@@ -693,15 +889,20 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer $sub_id Subscription ID.
+			 * @param integer     $sub_id Subscription ID.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Edit subscription shortlink.
 			 */
-			public function edit_sub_short($sub_id)
+			public function edit_sub_short($sub_id, $scheme = 'admin')
 			{
 				$sub_id = (integer)$sub_id;
-				$args   = array('action' => 'edit', 'subscription' => $sub_id);
-				$url    = $this->page_table_nav_vars_only(array(), $this->subs_menu_page_only());
+
+				$url  = $this->subs_menu_page_only();
+				$url  = $this->page_table_nav_vars_only(array(), $url, $scheme);
+				$args = array('action' => 'edit', 'subscription' => $sub_id);
 
 				return add_query_arg(urlencode_deep($args), $url);
 			}
@@ -711,16 +912,21 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer $user_id A WP User ID.
+			 * @param integer     $user_id A WP User ID.
+			 *
+			 * @param string|null Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Edit user shortlink.
 			 */
-			public function edit_user_short($user_id)
+			public function edit_user_short($user_id, $scheme = 'admin')
 			{
 				$user_id = (integer)$user_id;
-				$args    = array('user_id' => $user_id);
 
-				return add_query_arg(urlencode_deep($args), admin_url('/user-edit.php'));
+				$url  = admin_url('/user-edit.php', $scheme);
+				$args = array('user_id' => $user_id);
+
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
@@ -728,16 +934,21 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer $comment_id A WP comment ID.
+			 * @param integer     $comment_id A WP comment ID.
+			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Comment shortlink.
 			 */
-			public function comment_short($comment_id)
+			public function comment_short($comment_id, $scheme = NULL)
 			{
 				$comment_id = (integer)$comment_id;
-				$args       = array('c' => $comment_id);
 
-				return add_query_arg(urlencode_deep($args), home_url('/'));
+				$url  = home_url('/', $scheme);
+				$args = array('c' => $comment_id);
+
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
@@ -745,16 +956,21 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer $comment_id A WP comment ID.
+			 * @param integer     $comment_id A WP comment ID.
+			 *
+			 * @param string|null Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string Comment edit shortlink.
 			 */
-			public function comment_edit_short($comment_id)
+			public function comment_edit_short($comment_id, $scheme = 'admin')
 			{
 				$comment_id = (integer)$comment_id;
-				$args       = array('action' => 'editcomment', 'c' => $comment_id);
 
-				return add_query_arg(urlencode_deep($args), admin_url('/comment.php'));
+				$url  = admin_url('/comment.php', $scheme);
+				$args = array('action' => 'editcomment', 'c' => $comment_id);
+
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
@@ -763,18 +979,21 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string      $sub_key Unique subscription key.
+			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See `home_url()` in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
 			public function sub_confirm_url($sub_key, $scheme = NULL)
 			{
-				$sub_key = trim((string)$sub_key); // Force string.
-				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key; // `0` default.
-				$args    = array(__NAMESPACE__ => array('confirm' => $sub_key));
+				$sub_key = trim((string)$sub_key);
+				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key;
 
-				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
+				$url  = home_url('/', $scheme);
+				$args = array(__NAMESPACE__ => array('confirm' => $sub_key));
+
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
@@ -783,18 +1002,21 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string      $sub_key Unique subscription key.
+			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See `home_url()` in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
 			public function sub_unsubscribe_url($sub_key, $scheme = NULL)
 			{
-				$sub_key = trim((string)$sub_key); // Force string.
-				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key; // `0` default.
-				$args    = array(__NAMESPACE__ => array('unsubscribe' => $sub_key));
+				$sub_key = trim((string)$sub_key);
+				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key;
 
-				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
+				$url  = home_url('/', $scheme);
+				$args = array(__NAMESPACE__ => array('unsubscribe' => $sub_key));
+
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
@@ -807,17 +1029,19 @@ namespace comment_mail // Root namespace.
 			 *    the current user's email address; if available/possible.
 			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See `home_url()` in WordPress for further details on this.
+			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
 			public function sub_manage_url($sub_key = '', $scheme = NULL)
 			{
-				$sub_key = trim((string)$sub_key); // Force string.
-				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key; // `0` default.
-				$args    = array(__NAMESPACE__ => array('manage' => $sub_key));
+				$sub_key = trim((string)$sub_key);
+				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key;
 
-				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
+				$url  = home_url('/', $scheme);
+				$args = array(__NAMESPACE__ => array('manage' => $sub_key));
+
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
@@ -825,22 +1049,105 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string      $sub_key Unique subscription key.
+			 * @param string        $sub_key Unique subscription key.
 			 *    If empty, the subscription management system will use
 			 *    the current user's email address; if available/possible.
 			 *
-			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See `home_url()` in WordPress for further details on this.
+			 * @param string|null   $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
 			 *
-			 * @return string URL w/ the given `$scheme`.
+			 * @param boolean|array $include_nav_vars Defaults to a `NULL` value.
+			 *    Use a non-empty array to add new nav vars; `TRUE` to simply include existing nav vars.
+			 *    See also {@link sub_manage_summary_nav_vars()} for additional details.
+			 *
+			 * @param string        $return_type Type of return value; i.e. `(string)$url` or `(array)$args`?
+			 *    Set this to a value of `array` to indicate that you want `(array)$args`.
+			 *    ~ Defaults to a value of `string`, indicating `(string)$url`.
+			 *
+			 * @return string URL w/ all args + nav vars. Or, `(array)$args`; i.e. array of all args + nav vars.
+			 *    In short, return value is dependent upon the `$return_type` parameter.
 			 */
-			public function sub_manage_summary_url($sub_key = '', $scheme = NULL)
+			public function sub_manage_summary_url($sub_key = '', $scheme = NULL, $include_nav_vars = NULL, $return_type = 'string')
 			{
-				$sub_key = trim((string)$sub_key); // Force string.
-				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key; // `0` default.
-				$args    = array(__NAMESPACE__ => array('manage' => array('summary' => $sub_key)));
+				$sub_key = trim((string)$sub_key);
+				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key;
 
-				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
+				$url  = home_url('/', $scheme);
+				$args = array(__NAMESPACE__ => array('manage' => array('summary' => $sub_key)));
+
+				if($include_nav_vars && ($nav_vars = $this->sub_manage_summary_nav_vars($include_nav_vars)))
+					$args[__NAMESPACE__]['manage']['summary_nav'] = $nav_vars;
+
+				return $return_type === 'array' ? compact('url', 'args') : add_query_arg(urlencode_deep($args), $url);
+			}
+
+			/**
+			 * Summary nav vars in a given URL and/or current `$_REQUEST` vars.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param boolean|array $include_nav_vars Defaults to a `TRUE` value.
+			 *    Use a non-empty array to add new nav vars; `TRUE` to simply include existing nav vars.
+			 *    ~ Any other value results in no nav vars; i.e. this function returns an empty array.
+			 *
+			 *    • Regarding `(array)$include_nav_vars`; i.e. adding new nav vars:
+			 *
+			 *       Any new nav vars are ADDED to those which may already exist in the URL and/or `$_REQUEST` vars.
+			 *       If you want to override any that may already exist in these sources, define key `0` in your array.
+			 *       i.e. `if(array_key_exists(0, $include_nav_vars))`; yours will override any that exist already.
+			 *       ~ Noting that the `0` key is excluded automatically after interpretation for this purpose.
+			 *
+			 * @param string        $url The input URL to work from (optional).
+			 *    Defaults to current URL. Existing nav vars will be taken from this URL.
+			 *
+			 * @return array An array of any summary nav vars; when/if applicable.
+			 *
+			 * @note Nav vars found in the given URL are given priority over any found in the current `$_REQUEST` vars.
+			 *    i.e. If the given (and/or default) URL contains a particular summary nav var, it's given precedence.
+			 *    Otherwise, if the URL does not have a particular summary nav var, we look at `$_REQUEST` vars.
+			 */
+			public function sub_manage_summary_nav_vars($include_nav_vars = TRUE, $url = '')
+			{
+				if($include_nav_vars !== TRUE // Exclude nav vars?
+				   && (!is_array($include_nav_vars) || empty($include_nav_vars))
+				) return array(); // Must be `TRUE`, or a non-empty array.
+
+				if(!is_array($nav_vars = $include_nav_vars))
+					$nav_vars = array(); // Force array.
+
+				if(!($url = trim((string)$url)))
+					$url = $this->current();
+
+				$existing_nav_vars = array(); // Initialize.
+				$new_nav_vars_only = FALSE; // Default behavior.
+
+				if(array_key_exists(0, $nav_vars)) // Only use new nav vars?
+				{
+					$new_nav_vars_only = TRUE; // Flag as `TRUE`; only use new nav vars.
+					unset($nav_vars[0]); // Unset automatically after interpretation.
+				}
+				if(!$new_nav_vars_only) // Only if we NEED existing nav vars.
+				{
+					$query = (string)parse_url($url, PHP_URL_QUERY);
+					wp_parse_str($query, $query_vars); // By reference.
+
+					if(!empty($query_vars[__NAMESPACE__]['manage']['summary_nav']))
+						$query_nav_vars = (array)$query_vars[__NAMESPACE__]['manage']['summary_nav'];
+
+					if($_REQUEST && !empty($_REQUEST[__NAMESPACE__]['manage']['summary_nav']))
+						$_r_nav_vars = $this->plugin->utils_string->trim_strip_deep((array)$_REQUEST[__NAMESPACE__]['manage']['summary_nav']);
+
+					foreach(array_keys(sub_manage_summary::$default_nav_vars) as $_nav_var_key)
+					{
+						if(isset($query_nav_vars[$_nav_var_key]))
+							$existing_nav_vars[$_nav_var_key] = (string)$query_nav_vars[$_nav_var_key];
+
+						else if(isset($_r_nav_vars[$_nav_var_key]))
+							$existing_nav_vars[$_nav_var_key] = (string)$_r_nav_vars[$_nav_var_key];
+					}
+					unset($_nav_var_key); // Housekeeping.
+				}
+				return $new_nav_vars_only ? $nav_vars : array_merge($existing_nav_vars, $nav_vars);
 			}
 
 			/**
@@ -848,16 +1155,24 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See `home_url()` in WordPress for further details on this.
+			 * @param string|null   $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @param boolean|array $include_nav_vars Defaults to a `NULL` value.
+			 *    Use a non-empty array to add new nav vars; `TRUE` to simply include existing nav vars.
+			 *    See also {@link sub_manage_summary_nav_vars()} for additional details.
 			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
-			public function sub_manage_sub_new_url($scheme = NULL)
+			public function sub_manage_sub_new_url($scheme = NULL, $include_nav_vars = NULL)
 			{
-				$args = array(__NAMESPACE__ => array('manage' => array('sub_new' => 0)));
+				$url  = home_url('/', $scheme);
+				$args = array(__NAMESPACE__ => array('manage' => array('sub_new' => '0')));
 
-				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
+				if($include_nav_vars && ($nav_vars = $this->sub_manage_summary_nav_vars($include_nav_vars)))
+					$args[__NAMESPACE__]['manage']['summary_nav'] = $nav_vars;
+
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 
 			/**
@@ -865,22 +1180,62 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string      $sub_key Unique subscription key.
-			 *    If empty, the subscription management system will use
-			 *    the current user's email address; if available/possible.
+			 * @param string        $sub_key Unique subscription key.
 			 *
-			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See `home_url()` in WordPress for further details on this.
+			 * @param string|null   $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @param boolean|array $include_nav_vars Defaults to a `NULL` value.
+			 *    Use a non-empty array to add new nav vars; `TRUE` to simply include existing nav vars.
+			 *    See also {@link sub_manage_summary_nav_vars()} for additional details.
 			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
-			public function sub_manage_sub_edit_url($sub_key = '', $scheme = NULL)
+			public function sub_manage_sub_edit_url($sub_key = '', $scheme = NULL, $include_nav_vars = NULL)
 			{
-				$sub_key = trim((string)$sub_key); // Force string.
-				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key; // `0` default.
-				$args    = array(__NAMESPACE__ => array('manage' => array('sub_edit' => $sub_key)));
+				$sub_key = trim((string)$sub_key);
+				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key;
 
-				return add_query_arg(urlencode_deep($args), home_url('/', $scheme));
+				$url  = home_url('/', $scheme);
+				$args = array(__NAMESPACE__ => array('manage' => array('sub_edit' => $sub_key)));
+
+				if($include_nav_vars && ($nav_vars = $this->sub_manage_summary_nav_vars($include_nav_vars)))
+					$args[__NAMESPACE__]['manage']['summary_nav'] = $nav_vars;
+
+				return add_query_arg(urlencode_deep($args), $url);
+			}
+
+			/**
+			 * Manage URL to delete a specific sub. key.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string        $sub_key Unique subscription key.
+			 *
+			 * @param string|null   $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @param boolean|array $include_nav_vars Defaults to a `NULL` value.
+			 *    Use a non-empty array to add new nav vars; `TRUE` to simply include existing nav vars.
+			 *    See also {@link sub_manage_summary_nav_vars()} for additional details.
+			 *
+			 * @return string URL w/ the given `$scheme`.
+			 *
+			 * @note It's IMPORTANT to set `summary=0` here, since the key in this URL
+			 *    will ultimately be deleted; i.e. it will not be valid once the action is complete.
+			 */
+			public function sub_manage_sub_delete_url($sub_key = '', $scheme = NULL, $include_nav_vars = NULL)
+			{
+				$sub_key = trim((string)$sub_key);
+				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key;
+
+				$url  = home_url('/', $scheme);
+				$args = array(__NAMESPACE__ => array('manage' => array('sub_delete' => $sub_key, 'summary' => '0')));
+
+				if($include_nav_vars && ($nav_vars = $this->sub_manage_summary_nav_vars($include_nav_vars)))
+					$args[__NAMESPACE__]['manage']['summary_nav'] = $nav_vars;
+
+				return add_query_arg(urlencode_deep($args), $url);
 			}
 		}
 	}

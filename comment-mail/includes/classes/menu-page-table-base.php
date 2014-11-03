@@ -448,16 +448,23 @@ namespace comment_mail // Root namespace.
 				if(!$item->sub_id)
 					return '—'; // Not possible.
 
-				$id_only = '<i class="fa fa-envelope"></i>'. // If it's all we can do.
+				$id_only = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
 				           ' <span style="font-weight:bold;">ID #'.esc_html($item->sub_id).'</span>';
 
 				if(empty($this->merged_result_sets['subs'][$item->sub_id]))
 					return $id_only; // All we can do.
 
-				$name     = $item->sub_fname.' '.$item->sub_lname; // Concatenate.
-				$sub_info = '<i class="fa fa-envelope"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
-				            ' <span style="font-weight:bold;" title="'.esc_attr($item->sub_key).'">ID #'.esc_html($item->sub_id).'</span>'.
-				            ' '.$this->plugin->utils_markup->name_email($name, $item->sub_email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
+				$name_email_args = array(
+					'separator'          => '<br />',
+					'email_style'        => 'font-weight:bold;',
+					'anchor_to'          => 'summary',
+					'anchor_target'      => '_blank',
+					'summary_anchor_key' => $item->sub_key,
+				);
+				$name            = $item->sub_fname.' '.$item->sub_lname; // Concatenate.
+				$sub_info        = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
+				                   ' <span style="font-weight:bold;" title="'.esc_attr($item->sub_key).'">ID #'.esc_html($item->sub_id).'</span>'.
+				                   ' '.$this->plugin->utils_markup->name_email($name, $item->sub_email, $name_email_args);
 
 				$edit_url = $this->plugin->utils_url->edit_sub_short($item->sub_id);
 
@@ -484,16 +491,23 @@ namespace comment_mail // Root namespace.
 				if(!$item->oby_sub_id)
 					return '—'; // Not possible.
 
-				$id_only = '<i class="fa fa-envelope"></i>'. // If it's all we can do.
+				$id_only = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
 				           ' <span style="font-weight:bold;">ID #'.esc_html($item->oby_sub_id).'</span>';
 
 				if(empty($this->merged_result_sets['subs'][$item->oby_sub_id]))
 					return $id_only; // All we can do.
 
-				$name         = $item->oby_sub_fname.' '.$item->oby_sub_lname; // Concatenate.
-				$oby_sub_info = '<i class="fa fa-envelope"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
-				                ' <span style="font-weight:bold;" title="'.esc_attr($item->oby_sub_key).'">ID #'.esc_html($item->oby_sub_id).'</span>'.
-				                ' '.$this->plugin->utils_markup->name_email($name, $item->oby_sub_email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
+				$name_email_args = array(
+					'separator'          => '<br />',
+					'email_style'        => 'font-weight:bold;',
+					'anchor_to'          => 'summary',
+					'anchor_target'      => '_blank',
+					'summary_anchor_key' => $item->oby_sub_key,
+				);
+				$name            = $item->oby_sub_fname.' '.$item->oby_sub_lname; // Concatenate.
+				$oby_sub_info    = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
+				                   ' <span style="font-weight:bold;" title="'.esc_attr($item->oby_sub_key).'">ID #'.esc_html($item->oby_sub_id).'</span>'.
+				                   ' '.$this->plugin->utils_markup->name_email($name, $item->oby_sub_email, $name_email_args);
 
 				$edit_url = $this->plugin->utils_url->edit_sub_short($item->oby_sub_id);
 
@@ -526,9 +540,13 @@ namespace comment_mail // Root namespace.
 				if(empty($this->merged_result_sets['users'][$item->user_id]))
 					return $id_only; // All we can do.
 
-				$user_info = '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ username in hover title.
-				             ' <span style="font-weight:bold;" title="'.esc_attr($item->user_login).'">ID #'.esc_html($item->user_id).'</span>'.
-				             ' '.$this->plugin->utils_markup->name_email($item->user_display_name, $item->user_email, array('separator' => '<br />', 'email_style' => 'font-weight:bold;'));
+				$name_email_args = array(
+					'separator'   => '<br />',
+					'email_style' => 'font-weight:normal;',
+				);
+				$user_info       = '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ username in hover title.
+				                   ' <span style="font-weight:bold;" title="'.esc_attr($item->user_login).'">ID #'.esc_html($item->user_id).'</span>'.
+				                   ' '.$this->plugin->utils_markup->name_email($item->user_display_name, $item->user_email, $name_email_args);
 
 				$edit_url = $this->plugin->utils_url->edit_user_short($item->user_id);
 
@@ -615,6 +633,9 @@ namespace comment_mail // Root namespace.
 				if(empty($this->merged_result_sets['comments'][$item->comment_parent_id]))
 					return $id_only; // All we can do.
 
+				$name_email_args          = array(
+					'email_style' => 'font-weight:normal;',
+				);
 				$comment_parent_date_time = $this->plugin->utils_date->i18n('M j, Y, g:i a', strtotime($item->comment_parent_date_gmt));
 				$comment_parent_time_ago  = $this->plugin->utils_date->approx_time_difference(strtotime($item->comment_parent_date_gmt));
 				$comment_parent_status    = $this->plugin->utils_i18n->status_label($this->plugin->utils_db->comment_status__($item->comment_parent_approved));
@@ -623,7 +644,7 @@ namespace comment_mail // Root namespace.
 				                       ' <span style="font-weight:bold;">'.esc_html(__('Comment', $this->plugin->text_domain)).' ID #'.esc_html($item->comment_parent_id).'</span>'.
 				                       ' <span style="font-style:italic;">('.esc_html($comment_parent_status).')</span><br />'.
 				                       '<span style="font-style:italic;">'.__('by:', $this->plugin->text_domain).'</span>'.
-				                       ' '.$this->plugin->utils_markup->name_email($item->comment_parent_author, $item->comment_parent_author_email);
+				                       ' '.$this->plugin->utils_markup->name_email($item->comment_parent_author, $item->comment_parent_author_email, $name_email_args);
 
 				$comment_parent_view_url    = $this->plugin->utils_url->comment_short($item->comment_parent_id);
 				$comment_parent_edit_url    = $this->plugin->utils_url->comment_edit_short($item->comment_parent_id);
@@ -657,6 +678,9 @@ namespace comment_mail // Root namespace.
 				if(empty($this->merged_result_sets['comments'][$item->comment_id]))
 					return esc_html($item->comment_id);
 
+				$name_email_args   = array(
+					'email_style' => 'font-weight:normal;',
+				);
 				$comment_date_time = $this->plugin->utils_date->i18n('M j, Y, g:i a', strtotime($item->comment_date_gmt));
 				$comment_time_ago  = $this->plugin->utils_date->approx_time_difference(strtotime($item->comment_date_gmt));
 				$comment_status    = $this->plugin->utils_i18n->status_label($this->plugin->utils_db->comment_status__($item->comment_approved));
@@ -665,7 +689,7 @@ namespace comment_mail // Root namespace.
 				                ' <span style="font-weight:bold;">'.esc_html(__('Comment', $this->plugin->text_domain)).' ID #'.esc_html($item->comment_id).'</span>'.
 				                ' <span style="font-style:italic;">('.esc_html($comment_status).')</span><br />'.
 				                '<span style="font-style:italic;">'.__('by:', $this->plugin->text_domain).'</span>'.
-				                ' '.$this->plugin->utils_markup->name_email($item->comment_author, $item->comment_author_email);
+				                ' '.$this->plugin->utils_markup->name_email($item->comment_author, $item->comment_author_email, $name_email_args);
 
 				$comment_view_url    = $this->plugin->utils_url->comment_short($item->comment_id);
 				$comment_edit_url    = $this->plugin->utils_url->comment_edit_short($item->comment_id);
@@ -902,7 +926,7 @@ namespace comment_mail // Root namespace.
 
 				if($s && preg_match_all($this->sub_ids_regex, $s, $_m))
 					foreach(preg_split('/[|;,]+/', implode(',', $_m['sub_ids']), NULL, PREG_SPLIT_NO_EMPTY) as $_sub_id)
-						if((integer)$_sub_id > 0) $sub_ids[$_sub_id] = (integer)$_sub_id;
+						if(($_sub_id = (integer)$_sub_id) > 0) $sub_ids[$_sub_id] = $_sub_id;
 				unset($_m, $_sub_id); // Housekeeping.
 
 				return $sub_ids;
@@ -922,7 +946,7 @@ namespace comment_mail // Root namespace.
 
 				if($s && preg_match_all($this->user_ids_regex, $s, $_m))
 					foreach(preg_split('/[|;,]+/', implode(',', $_m['user_ids']), NULL, PREG_SPLIT_NO_EMPTY) as $_user_id)
-						if((integer)$_user_id > 0) $user_ids[$_user_id] = (integer)$_user_id;
+						if(($_user_id = (integer)$_user_id) > 0) $user_ids[$_user_id] = $_user_id;
 				unset($_m, $_user_id); // Housekeeping.
 
 				return $user_ids;
@@ -942,7 +966,7 @@ namespace comment_mail // Root namespace.
 
 				if($s && preg_match_all($this->post_ids_regex, $s, $_m))
 					foreach(preg_split('/[|;,]+/', implode(',', $_m['post_ids']), NULL, PREG_SPLIT_NO_EMPTY) as $_post_id)
-						if((integer)$_post_id > 0) $post_ids[$_post_id] = (integer)$_post_id;
+						if(($_post_id = (integer)$_post_id) > 0) $post_ids[$_post_id] = $_post_id;
 				unset($_m, $_post_id); // Housekeeping.
 
 				return $post_ids;
@@ -962,7 +986,7 @@ namespace comment_mail // Root namespace.
 
 				if($s && preg_match_all($this->comment_ids_regex, $s, $_m))
 					foreach(preg_split('/[|;,]+/', implode(',', $_m['comment_ids']), NULL, PREG_SPLIT_NO_EMPTY) as $_comment_id)
-						if((integer)$_comment_id > 0) $comment_ids[$_comment_id] = (integer)$_comment_id;
+						if(($_comment_id = (integer)$_comment_id) > 0) $comment_ids[$_comment_id] = $_comment_id;
 				unset($_m, $_comment_id); // Housekeeping.
 
 				return $comment_ids;
@@ -1041,10 +1065,26 @@ namespace comment_mail // Root namespace.
 				if($this->is_clean_search_submit_post()) // Force `orderby`.
 					$orderby = $this->get_ft_searchable_columns() ? 'relevance' : '';
 
+				$orderby = !$orderby ? $this->get_default_orderby() : $orderby;
+
 				$_GET['orderby'] = $_REQUEST['orderby'] = addslashes($orderby);
 				if(isset($_POST['orderby'])) $_POST['orderby'] = addslashes($orderby);
 
 				return $orderby; // Current orderby.
+			}
+
+			/**
+			 * Get default orderby value.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string The default orderby value.
+			 *
+			 * @extenders Extenders should normally override this.
+			 */
+			protected function get_default_orderby()
+			{
+				return ''; // Default orderby.
 			}
 
 			/**
@@ -1066,10 +1106,26 @@ namespace comment_mail // Root namespace.
 				if($this->is_clean_search_submit_post())
 					$order = 'desc'; // Force by relevance.
 
+				$order = !$order ? $this->get_default_order() : $order;
+
 				$_GET['order'] = $_REQUEST['order'] = addslashes($order);
 				if(isset($_POST['order'])) $_POST['order'] = addslashes($order);
 
-				return $order; // Current orderby.
+				return $order; // Current order.
+			}
+
+			/**
+			 * Get default order value.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string The default order value.
+			 *
+			 * @extenders Extenders should normally override this.
+			 */
+			protected function get_default_order()
+			{
+				return ''; // Default order.
 			}
 
 			/*
@@ -1712,18 +1768,24 @@ namespace comment_mail // Root namespace.
 					if(isset($sub_lis[$_sub->ID]))
 						continue; // Duplicate.
 
-					$_sub_name      = $_sub->fname.' '.$_sub->lname; // Concatenate.
-					$_sub_edit_link = $this->plugin->utils_url->edit_sub_short($_sub->ID);
+					$_name_email_args = array(
+						'email_style'        => 'font-weight:bold;',
+						'anchor_to'          => 'summary',
+						'anchor_target'      => '_blank',
+						'summary_anchor_key' => $_sub->key,
+					);
+					$_sub_name        = $_sub->fname.' '.$_sub->lname; // Concatenate.
+					$_sub_edit_link   = $this->plugin->utils_url->edit_sub_short($_sub->ID);
 
 					$sub_lis[$_sub->ID] = '<li>'. // ♙ ID "Name" <email> [edit].
 					                      '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
 					                      ' <span style="font-weight:bold;" title="'.esc_attr($_sub->key).'">ID #'.esc_html($_sub->ID).'</span>'.
-					                      ' '.$this->plugin->utils_markup->name_email($_sub_name, $_sub->email, array('email_style' => 'font-weight:bold;')).
+					                      ' '.$this->plugin->utils_markup->name_email($_sub_name, $_sub->email, $_name_email_args).
 					                      ($_sub_edit_link // Only if they can edit the subscription ID; else this will be empty.
 						                      ? ' [<a href="'.esc_attr($_sub_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
 					                      '</li>';
 				}
-				unset($_sub, $_sub_name, $_sub_edit_link); // Housekeeping.
+				unset($_sub, $_name_email_args, $_sub_name, $_sub_edit_link); // Housekeeping.
 
 				foreach($users as $_user) // `\WP_User` objects.
 				{
@@ -1732,17 +1794,20 @@ namespace comment_mail // Root namespace.
 					if(isset($user_lis[$_user->ID]))
 						continue; // Duplicate.
 
-					$_user_edit_link = get_edit_user_link($_user->ID);
+					$_name_email_args = array(
+						'email_style' => 'font-weight:normal;',
+					);
+					$_user_edit_link  = get_edit_user_link($_user->ID);
 
 					$user_lis[$_user->ID] = '<li>'. // ♙ ID "Name" <email> [edit].
 					                        '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
 					                        ' <span style="font-weight:bold;" title="'.esc_attr($_user->user_login).'">ID #'.esc_html($_user->ID).'</span>'.
-					                        ' '.$this->plugin->utils_markup->name_email($_user->display_name, $_user->user_email, array('email_style' => 'font-weight:bold;')).
+					                        ' '.$this->plugin->utils_markup->name_email($_user->display_name, $_user->user_email, $_name_email_args).
 					                        ($_user_edit_link // Only if they can edit the user ID; else this will be empty.
 						                        ? ' [<a href="'.esc_attr($_user_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
 					                        '</li>';
 				}
-				unset($_user, $_user_edit_link); // Housekeeping.
+				unset($_user, $_name_email_args, $_user_edit_link); // Housekeeping.
 
 				foreach($posts as $_post) // `\WP_Post` objects.
 				{
@@ -1762,7 +1827,7 @@ namespace comment_mail // Root namespace.
 					$post_lis[$_post->ID] = '<li>'. // Type ID: <title> [edit].
 					                        '  <span style="font-weight:bold;">'.esc_html($_post_type_label).'</span>'.
 					                        '  <span style="font-weight:bold;">ID #'.esc_html($_post->ID).':</span>'.
-					                        '  “<a href="'.esc_attr($_post_permalink).'">'.esc_html($_post_title_clip).'</a>”'.
+					                        '  “<a href="'.esc_attr($_post_permalink).'" target="_blank">'.esc_html($_post_title_clip).'</a>”'.
 					                        ($_post_edit_link // Only if they can edit the post ID; else this will be empty.
 						                        ? ' [<a href="'.esc_attr($_post_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
 					                        '</li>';
@@ -1783,6 +1848,9 @@ namespace comment_mail // Root namespace.
 					if(!($_post_type = get_post_type_object($_post->post_type)))
 						continue; // Unable to determine type.
 
+					$_name_email_args = array(
+						'email_style' => 'font-weight:normal;',
+					);
 					$_post_permalink  = get_permalink($_post);
 					$_post_edit_link  = get_edit_post_link($_post->ID, '');
 					$_post_title_clip = $this->plugin->utils_string->mid_clip($_post->post_title);
@@ -1795,15 +1863,15 @@ namespace comment_mail // Root namespace.
 					$comment_lis[$_comment->comment_ID] = '<li>'. // Type ID: <title> [edit].
 					                                      '   <span style="font-weight:normal;">'.esc_html($_post_type_label).'</span>'.
 					                                      '   <span style="font-weight:normal;">ID #'.esc_html($_post->ID).':</span>'.
-					                                      '   “<a href="'.esc_attr($_post_permalink).'">'.esc_html($_post_title_clip).'</a>”'.
+					                                      '   “<a href="'.esc_attr($_post_permalink).'" target="_blank">'.esc_html($_post_title_clip).'</a>”'.
 					                                      ($_post_edit_link // Only if they can edit the post ID; else this will be empty.
 						                                      ? ' [<a href="'.esc_attr($_post_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
 
 					                                      '   <ul>'. // Nest comment under post.
 					                                      '      <li>'. // Comment ID: <author> [edit] ... followed by a content clip.
 					                                      '         <span style="font-weight:bold;">'.__('Comment', $this->plugin->text_domain).'</span>'.
-					                                      '         <span style="font-weight:bold;">ID <a href="'.esc_attr($_comment_permalink).'">#'.esc_html($_comment->comment_ID).'</a>:</span>'.
-					                                      '         '.$this->plugin->utils_markup->name_email($_comment->comment_author, $_comment->comment_author_email).
+					                                      '         <span style="font-weight:bold;">ID <a href="'.esc_attr($_comment_permalink).'" target="_blank">#'.esc_html($_comment->comment_ID).'</a>:</span>'.
+					                                      '         '.$this->plugin->utils_markup->name_email($_comment->comment_author, $_comment->comment_author_email, $_name_email_args).
 					                                      ($_comment_edit_link // Only if they can edit the comment ID; else this will be empty.
 						                                      ? '     [<a href="'.esc_attr($_comment_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
 					                                      '         <blockquote>'.esc_html($_comment_content_clip).'</blockquote>'.
@@ -1811,7 +1879,7 @@ namespace comment_mail // Root namespace.
 					                                      '   </ul>'.
 					                                      '</li>';
 				}
-				unset($_comment, $_post, $_post_type, $_post_permalink, $_post_edit_link, $_post_title_clip, $_post_type_label, $_comment_permalink, $_comment_edit_link, $_comment_content_clip); // Housekeeping.
+				unset($_comment, $_post, $_post_type, $_name_email_args, $_post_permalink, $_post_edit_link, $_post_title_clip, $_post_type_label, $_comment_permalink, $_comment_edit_link, $_comment_content_clip); // Housekeeping.
 
 				foreach($navigable_filters as $_navigable_filter_s => $_navigable_filter_label)
 				{

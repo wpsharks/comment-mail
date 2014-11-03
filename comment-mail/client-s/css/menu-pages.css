@@ -1,7 +1,10 @@
 /* ------------------------------------------------------------------------------------------------------------
-	Icon font(s) compatible w/ the WP core.
+	Other resources; compatible w/ the WP core.
 ------------------------------------------------------------------------------------------------------------ */
+@import url('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.min.css');
 @import url('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css');
+@import url('../../submodules/sharkicons/styles.min.css');
+
 /* ------------------------------------------------------------------------------------------------------------
 	Plugin-specific styles for any menu page area of the dashboard.
 ------------------------------------------------------------------------------------------------------------ */

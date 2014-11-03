@@ -104,6 +104,21 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Current `$GLOBALS['pagenow']`.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string Current `$GLOBALS['pagenow']`.
+			 */
+			public function current_pagenow()
+			{
+				if(!is_null($pagenow = &$this->static_key(__FUNCTION__)))
+					return $pagenow; // Cached this already.
+
+				return ($pagenow = !empty($GLOBALS['pagenow']) ? (string)$GLOBALS['pagenow'] : '');
+			}
+
+			/**
 			 * Current admin menu page.
 			 *
 			 * @since 14xxxx First documented version.
@@ -118,8 +133,8 @@ namespace comment_mail // Root namespace.
 				if(!is_admin()) return ($page = '');
 
 				$page = !empty($_REQUEST['page'])
-					? stripslashes((string)$_REQUEST['page'])
-					: (!empty($GLOBALS['pagenow']) ? (string)$GLOBALS['pagenow'] : '');
+					? trim(stripslashes((string)$_REQUEST['page']))
+					: $this->current_pagenow();
 
 				return $page; // Current menu page.
 			}

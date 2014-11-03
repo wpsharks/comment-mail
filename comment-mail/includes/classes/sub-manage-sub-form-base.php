@@ -75,6 +75,27 @@ namespace comment_mail // Root namespace.
 			protected static $processing = FALSE;
 
 			/**
+			 * @var array Any processing errors.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing_errors = array();
+
+			/**
+			 * @var array Any processing error codes.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing_error_codes = array();
+
+			/**
+			 * @var array Any processing errors w/ HTML markup.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected static $processing_errors_html = array();
+
+			/**
 			 * @var array Any processing successes.
 			 *
 			 * @since 14xxxx First documented version.
@@ -96,25 +117,11 @@ namespace comment_mail // Root namespace.
 			protected static $processing_successes_html = array();
 
 			/**
-			 * @var array Any processing errors.
+			 * @var boolean Processing email change?
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected static $processing_errors = array();
-
-			/**
-			 * @var array Any processing error codes.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected static $processing_error_codes = array();
-
-			/**
-			 * @var array Any processing errors w/ HTML markup.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected static $processing_errors_html = array();
+			protected static $processing_email_key_change = FALSE;
 
 			/*
 			 * Instance-based constructor.
@@ -161,26 +168,36 @@ namespace comment_mail // Root namespace.
 				$current_value_for = array($this, 'current_value_for');
 				$hidden_inputs     = array($this, 'hidden_inputs');
 
-				$processing = static::$processing; // & related vars.
-
-				$processing_successes      = static::$processing_successes;
-				$processing_success_codes  = static::$processing_success_codes;
-				$processing_successes_html = static::$processing_successes_html;
+				$processing = static::$processing;
 
 				$processing_errors      = static::$processing_errors;
 				$processing_error_codes = static::$processing_error_codes;
 				$processing_errors_html = static::$processing_errors_html;
+
+				$processing_successes        = static::$processing_successes;
+				$processing_success_codes    = static::$processing_success_codes;
+				$processing_successes_html   = static::$processing_successes_html;
+				$processing_email_key_change = static::$processing_email_key_change;
 
 				$error_codes = array(); // Initialize.
 
 				if($this->is_edit && !$this->sub_key)
 					$error_codes[] = 'missing_sub_key';
 
+				else if($this->is_edit && !$this->sub
+				        && static::$processing
+				        && static::$processing_successes
+				        && static::$processing_email_key_change
+				) $error_codes[] = 'invalid_sub_key_after_email_key_change';
+
 				else if($this->is_edit && !$this->sub)
 					$error_codes[] = 'invalid_sub_key';
 
 				else if($this->is_edit && $this->sub_key !== $this->sub->key)
 					$error_codes[] = 'invalid_sub_key';
+
+				else if(!$this->is_edit && !$this->plugin->options['new_subs_enable'])
+					$error_codes[] = 'new_subs_disabled';
 
 				$template_vars = get_defined_vars(); // Everything above.
 				$template      = new template('site/sub-actions/manage-sub-form.php');
@@ -229,9 +246,12 @@ namespace comment_mail // Root namespace.
 			 */
 			public function hidden_inputs()
 			{
-				$hidden_inputs = ''; // Initialize.
+				/* Important for this to come first!
+				 * We want form processing to take place first.
+				 * i.e. Array keys need to be submitted in a specific order. */
+				$hidden_inputs = $this->form_fields->hidden_input(array('name' => '_'))."\n";
 
-				if($this->is_edit && $this->sub) // Editing?
+				if($this->is_edit && $this->sub)
 				{
 					$hidden_inputs .= $this->form_fields->hidden_input(
 							array(
@@ -250,13 +270,31 @@ namespace comment_mail // Root namespace.
 								'current_value' => $this->sub->key,
 							))."\n";
 				}
-				else $hidden_inputs .= $this->form_fields->hidden_input(
-						array(
-							'root_name'     => TRUE,
-							'name'          => __NAMESPACE__.'[manage][sub_new]',
-							'current_value' => 0,
-						))."\n";
-				return $hidden_inputs; // Used by templats.
+				else // Adding a new subscription in this default case.
+				{
+					$hidden_inputs .= $this->form_fields->hidden_input(
+							array(
+								'root_name'     => TRUE,
+								'name'          => __NAMESPACE__.'[manage][sub_new]',
+								'current_value' => 0,
+							))."\n";
+				}
+				$current_summary_nav_vars // Include these too.
+					= $this->plugin->utils_url->sub_manage_summary_nav_vars();
+
+				foreach(array_keys(sub_manage_summary::$default_nav_vars) as $_summary_nav_var_key)
+					if(isset($current_summary_nav_vars[$_summary_nav_var_key]))
+					{
+						$hidden_inputs .= $this->form_fields->hidden_input(
+								array(
+									'root_name'     => TRUE,
+									'name'          => __NAMESPACE__.'[manage][summary_nav]['.$_summary_nav_var_key.']',
+									'current_value' => (string)$current_summary_nav_vars[$_summary_nav_var_key],
+								))."\n";
+					}
+				unset($_summary_nav_var_key); // Housekeeping.
+
+				return $hidden_inputs;
 			}
 
 			/*
@@ -273,24 +311,17 @@ namespace comment_mail // Root namespace.
 			 * @return string HTML markup for this select field row.
 			 *    If no options (or too many options; this returns an input field instead.
 			 *
-			 * @see sub_manage_actions::comment_id_row_via_ajax()
+			 * @see sub_manage_actions::sub_form_comment_id_row_via_ajax()
 			 */
 			public static function comment_id_row_via_ajax($post_id)
 			{
-				// @TODO move this into a template file.
-
-				$plugin      = plugin();
 				$post_id     = (integer)$post_id;
 				$form_fields = new form_fields(static::$form_field_args);
 
-				return $form_fields->select_row(
-					array(
-						'placeholder'         => __('— All Comments/Replies —', $plugin->text_domain),
-						'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID#', $plugin->text_domain),
-						'name'                => 'comment_id', 'required' => FALSE, 'options' => '%%comments%%', 'post_id' => $post_id, 'current_value' => NULL,
-						'notes'               => __('If empty, you\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $plugin->text_domain),
-						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"'),
-					));
+				$template_vars = get_defined_vars(); // Everything above.
+				$template      = new template('site/sub-actions/manage-sub-form-comment-id-row-via-ajax.php');
+
+				return $template->parse($template_vars);
 			}
 
 			/**
@@ -315,38 +346,43 @@ namespace comment_mail // Root namespace.
 
 				static::$processing = TRUE; // Flag as `TRUE`; along w/ other statics below.
 
+				if(isset($request_args['key'])) // Key sanitizer; for added security.
+					$request_args['key'] = $sub_key = $plugin->utils_sub->sanitize_key($request_args['key']);
+
 				if(isset($request_args['ID'])) // Updating an existing subscription via ID?
 				{
 					$sub_updater = new sub_updater($request_args, $args); // Run updater.
 
-					if($sub_updater->did_update()) // Updated successfully?
-					{
-						static::$processing_successes      = $sub_updater->successes();
-						static::$processing_success_codes  = $sub_updater->success_codes();
-						static::$processing_successes_html = $sub_updater->successes_html();
-					}
-					else // Include several properties when errors occur.
+					if($sub_updater->has_errors()) // Updater has errors?
 					{
 						static::$processing_errors      = $sub_updater->errors();
 						static::$processing_error_codes = $sub_updater->error_codes();
 						static::$processing_errors_html = $sub_updater->errors_html();
 					}
+					else if($sub_updater->did_update()) // Updated?
+					{
+						static::$processing_successes        = $sub_updater->successes();
+						static::$processing_success_codes    = $sub_updater->success_codes();
+						static::$processing_successes_html   = $sub_updater->successes_html();
+						static::$processing_email_key_change = $sub_updater->email_key_changed();
+					}
 				}
-				else // We are doing a new insertion; i.e. a new subscription is being added here.
+				else if($plugin->options['new_subs_enable']) // Only if `new_subs_enable=1`.
+					// This check is for added security only. The form should not be available.
 				{
 					$sub_inserter = new sub_inserter($request_args, $args); // Run inserter.
 
-					if($sub_inserter->did_insert()) // Inserted successfully?
-					{
-						static::$processing_successes      = $sub_inserter->successes();
-						static::$processing_success_codes  = $sub_inserter->success_codes();
-						static::$processing_successes_html = $sub_inserter->successes_html();
-					}
-					else // Include several properties when errors occur.
+					if($sub_inserter->has_errors()) // Inserter has errors?
 					{
 						static::$processing_errors      = $sub_inserter->errors();
 						static::$processing_error_codes = $sub_inserter->error_codes();
 						static::$processing_errors_html = $sub_inserter->errors_html();
+					}
+					else if($sub_inserter->did_insert()) // Inserted?
+					{
+						static::$processing_successes      = $sub_inserter->successes();
+						static::$processing_success_codes  = $sub_inserter->success_codes();
+						static::$processing_successes_html = $sub_inserter->successes_html();
 					}
 				}
 			}

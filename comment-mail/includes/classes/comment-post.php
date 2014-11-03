@@ -68,6 +68,12 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_inject_sub()
 			{
+				if(!$this->plugins->options['enable'])
+					return; // Disabled currently.
+
+				if(!$this->plugins->options['new_subs_enable'])
+					return; // Disabled currently.
+
 				if(!$this->comment_id)
 					return; // Not applicable.
 

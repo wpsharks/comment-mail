@@ -275,6 +275,7 @@ namespace comment_mail // Root namespace.
 				$no_cache = (boolean)$args['no_cache'];
 
 				$cache_keys = array(); // No cacheable keys at this time.
+
 				if(!is_null($total = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
 					return $total; // Already cached this.
 
@@ -315,6 +316,7 @@ namespace comment_mail // Root namespace.
 				$no_cache    = (boolean)$args['no_cache'];
 
 				$cache_keys = compact('max', 'fail_on_max');
+
 				if(!is_null($users = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
 					return $users; // Already cached this.
 
@@ -367,6 +369,7 @@ namespace comment_mail // Root namespace.
 				$no_cache          = (boolean)$args['no_cache'];
 
 				$cache_keys = compact('for_comments_only');
+
 				if(!is_null($total = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
 					return $total; // Already cached this.
 
@@ -424,6 +427,7 @@ namespace comment_mail // Root namespace.
 				$no_cache              = (boolean)$args['no_cache'];
 
 				$cache_keys = compact('max', 'fail_on_max', 'for_comments_only', 'exclude_post_types', 'exclude_post_statuses');
+
 				if(!is_null($posts = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
 					return $posts; // Already cached this.
 
@@ -521,6 +525,7 @@ namespace comment_mail // Root namespace.
 				$no_cache     = (boolean)$args['no_cache'];
 
 				$cache_keys = compact('post_id', 'parents_only');
+
 				if(!is_null($total = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
 					return $total; // Already cached this.
 
@@ -573,6 +578,7 @@ namespace comment_mail // Root namespace.
 				$no_cache     = (boolean)$args['no_cache'];
 
 				$cache_keys = compact('post_id', 'max', 'fail_on_max', 'parents_only');
+
 				if(!is_null($comments = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
 					return $comments; // Already cached this.
 

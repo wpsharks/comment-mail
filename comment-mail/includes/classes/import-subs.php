@@ -116,6 +116,9 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_import()
 			{
+				if(!current_user_can($this->plugin->cap))
+					return; // Unauthenticated; ignore.
+
 				$csv_headers             = array(); // Initialize.
 				$current_csv_line_number = $current_csv_line_index = 0;
 

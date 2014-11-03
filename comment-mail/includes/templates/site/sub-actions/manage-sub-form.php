@@ -19,17 +19,6 @@ namespace comment_mail;
  *
  * @var boolean     $processing Are we (i.e. did we) process a form submission?
  *
- * @var array       $processing_successes An array of any/all processing successes.
- *    Array keys are success codes; array values are predefined success messages.
- *    Note that predefined messages in this array are in plain text format.
- *
- * @var array       $processing_success_codes An array of any/all processing success codes.
- *    This includes the codes only; i.e. w/o the full array of predefined messages.
- *
- * @var array       $processing_successes_html An array of any/all processing successes.
- *    Array keys are success codes; array values are predefined success messages.
- *    Note that predefined messages in this array are in HTML format.
- *
  * @var array       $processing_errors An array of any/all processing errors.
  *    Array keys are error codes; array values are predefined error messages.
  *    Note that predefined messages in this array are in plain text format.
@@ -41,19 +30,71 @@ namespace comment_mail;
  *    Array keys are error codes; array values are predefined error messages.
  *    Note that predefined messages in this array are in HTML format.
  *
+ * @var array       $processing_successes An array of any/all processing successes.
+ *    Array keys are success codes; array values are predefined success messages.
+ *    Note that predefined messages in this array are in plain text format.
+ *
+ * @var array       $processing_success_codes An array of any/all processing success codes.
+ *    This includes the codes only; i.e. w/o the full array of predefined messages.
+ *
+ * @var array       $processing_successes_html An array of any/all processing successes.
+ *    Array keys are success codes; array values are predefined success messages.
+ *    Note that predefined messages in this array are in HTML format.
+ *
+ * @var boolean     $processing_email_key_change Success; but w/ an email & key change?
+ *    This particular case should be handled differently. It's a successful update; but also results
+ *    in an error message. An error, because a change of address always results in a key change too.
+ *    Since both the email & key have changed, their existing key is now useless; i.e. no longer valid.
+ *    When this occurs, we display successes; but nothing else. Messages in the list of successess
+ *    will instruct the user to check their email to complete the confirmation process.
+ *
  * @var array       $error_codes An array of any/all major error codes; excluding processing error codes.
- *    Note that you should NOT display the form at all; if any major error exist.
+ *    Note that you should NOT display the form at all, if any major error exist here.
  */
 ?>
-<?php echo str_replace('%%title%%', // Editing or creating?
-                       $is_edit ? __('Edit Subscription', $plugin->text_domain)
-	                       : __('New Subscription', $plugin->text_domain), $site_header); ?>
+<?php // Sets document <title> tag via `%%title%%` replacement code in header.
+echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_domain)
+	: __('Add New Subscription', $plugin->text_domain), $site_header); ?>
+<?php
+/*
+ * Here we define a few more variables of our own.
+ * All based on what the template makes available to us;
+ * ~ as documented at the top of this file.
+ */
+// Summary return URL; w/ all summary navigation vars preserved.
+$sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, NULL, TRUE);
 
+// Site home page URL; i.e. back to the main site.
+$home_url = home_url('/');
+?>
 	<div class="manage-sub-form">
 
-		<?php if($error_codes): // Any major errors? ?>
+		<?php if($error_codes // Changed email; i.e. nullified existing key?
+		         && $error_codes[0] === 'invalid_sub_key_after_email_key_change'
+					&& $processing && $processing_successes && $processing_email_key_change): ?>
 
-			<div class="alert alert-danger" role="alert">
+			<div class="alert alert-success" style="margin:0;">
+				<p style="margin-top:0; font-weight:bold; font-size:120%;">
+					<?php echo __('Submission accepted; nice work!', $plugin->text_domain); ?>
+				</p>
+				<ul class="list-unstyled" style="margin-bottom:0;">
+					<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
+						<li style="margin-top:0; margin-bottom:0;">
+							<i class="fa fa-check fa-fw"></i>
+							<?php echo $_success_html; ?>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+				<p style="margin:10px 0 0 0;">
+					<a href="<?php echo esc_attr($sub_summary_return_url); ?>">
+						<?php echo __('« Back to My Subscriptions', $plugin->text_domain); ?>
+					</a>
+				</p>
+			</div>
+
+		<?php elseif ($error_codes): // Any other major errors? ?>
+
+			<div class="alert alert-danger" style="margin:0;">
 				<p style="margin-top:0; font-weight:bold; font-size:120%;">
 					<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
 				</p>
@@ -71,6 +112,10 @@ namespace comment_mail;
 									echo __('Invalid subscription key; unable to edit.', $plugin->text_domain);
 									break; // Break switch handler.
 
+								case 'new_subs_disabled':
+									echo __('Sorry; not accepting new subscriptions at this time.', $plugin->text_domain);
+									break; // Break switch handler.
+
 								default: // Anything else that is unexpected/unknown at this time.
 									echo __('Unknown error; unable to add/edit.', $plugin->text_domain);
 							} ?>
@@ -81,42 +126,52 @@ namespace comment_mail;
 
 		<?php else: // Display form; there are no major errors. ?>
 
-		<?php if ($processing && $processing_successes): // Any processing successes? ?>
+			<?php if ($processing && $processing_errors): // Any processing errors? ?>
 
-			<div class="alert alert-success" role="alert">
-				<p style="margin-top:0; font-weight:bold; font-size:120%;">
-					<?php echo __('Submission accepted; nice work!', $plugin->text_domain); ?>
-				</p>
-				<ul class="list-unstyled" style="margin-bottom:0;">
-					<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
-						<li style="margin-top:0; margin-bottom:0;">
-							<i class="fa fa-check fa-fw"></i>
-							<?php echo $_success_html; ?>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-			</div>
-		<?php endif; ?>
+				<div class="alert alert-danger">
+					<p style="margin-top:0; font-weight:bold; font-size:120%;">
+						<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
+					</p>
+					<ul class="list-unstyled" style="margin-bottom:0;">
+						<?php foreach($processing_errors_html as $_error_code => $_error_html): ?>
+							<li style="margin-top:0; margin-bottom:0;">
+								<i class="fa fa-warning fa-fw"></i>
+								<?php echo $_error_html; ?>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</div>
 
-		<?php if ($processing && $processing_errors): // Any processing errors? ?>
+			<?php endif; ?>
 
-			<div class="alert alert-danger" role="alert">
-				<p style="margin-top:0; font-weight:bold; font-size:120%;">
-					<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
-				</p>
-				<ul class="list-unstyled" style="margin-bottom:0;">
-					<?php foreach($processing_errors_html as $_error_code => $_error_html): ?>
-						<li style="margin-top:0; margin-bottom:0;">
-							<i class="fa fa-warning fa-fw"></i>
-							<?php echo $_error_html; ?>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-			</div>
-		<?php endif; ?>
+			<?php if ($processing && $processing_successes): // Any processing successes? ?>
+
+				<div class="alert alert-success">
+					<p style="margin-top:0; font-weight:bold; font-size:120%;">
+						<?php echo __('Submission accepted; nice work!', $plugin->text_domain); ?>
+					</p>
+					<ul class="list-unstyled" style="margin-bottom:0;">
+						<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
+							<li style="margin-top:0; margin-bottom:0;">
+								<i class="fa fa-check fa-fw"></i>
+								<?php echo $_success_html; ?>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+					<p style="margin:10px 0 0 0;">
+						<a href="<?php echo esc_attr($sub_summary_return_url); ?>">
+							<?php echo __('« Back to My Subscriptions', $plugin->text_domain); ?>
+						</a>
+					</p>
+				</div>
+
+			<?php endif; ?>
 
 			<h2 style="margin-top:0;">
-				<i class="fa fa-envelope-square pull-right"></i>
+				<a href="<?php echo esc_attr($sub_summary_return_url); ?>" title="<?php echo __('Back to My Subscriptions', $plugin->text_domain); ?>">
+					<i class="fa fa-arrow-circle-left pull-right" style="font-size:50%; position:relative; z-index:1; top:5px; right:45px;"></i>
+					<i class="<?php echo esc_attr('wsi-'.$plugin->slug); ?> pull-right"></i>
+				</a>
 				<?php if($is_edit): ?>
 					<?php echo __('Edit Subscription', $plugin->text_domain); ?>
 				<?php else: // Creating a new subscription. ?>
@@ -124,9 +179,9 @@ namespace comment_mail;
 				<?php endif; ?>
 			</h2>
 
-		<hr />
+			<hr />
 
-			<form method="post" action="" enctype="multipart/form-data" novalidate="novalidate">
+			<form method="post" enctype="multipart/form-data" novalidate="novalidate">
 				<table>
 					<tbody>
 
@@ -139,6 +194,7 @@ namespace comment_mail;
 							'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'placeholder' => ''),
 						)); ?>
 					<?php echo $form_fields->select_row(
+					// Note: if you change this row; also change the AJAX template variation.
 						array(
 							'placeholder'         => __('— All Comments/Replies —', $plugin->text_domain),
 							'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID#', $plugin->text_domain),
@@ -202,15 +258,15 @@ namespace comment_mail;
 
 				</p>
 			</form>
-
+			<?php
+			/* Javascript needed by this template.
+			 --------------------------------------------------------------------------------------------------------------------- */ ?>
 			<script type="text/javascript">
-				(function($)
+				(function($) // Primary closure w/ jQuery; strict standards.
 				{
-					'use strict';
+					'use strict'; // Strict standards enable.
 
-					var plugin = {},
-						$window = $(window),
-						$document = $(document),
+					var plugin = {}, $window = $(window), $document = $(document),
 
 						namespace = '<?php echo $plugin->utils_string->esc_js_sq(__NAMESPACE__); ?>',
 						namespaceSlug = '<?php echo $plugin->utils_string->esc_js_sq(str_replace('_', '-', __NAMESPACE__)); ?>',
@@ -222,13 +278,13 @@ namespace comment_mail;
 
 					/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-					plugin.onReady = function()
+					plugin.onReady = function() // On DOM ready handler.
 					{
 						/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 						var subFormPostIdProps = { // Initialize.
-							$select : $('form tr.manage-sub-form-post-id select'),
-							$input  : $('form tr.manage-sub-form-post-id input'),
+							$select : $('.manage-sub-form form tr.manage-sub-form-post-id select'),
+							$input  : $('.manage-sub-form form tr.manage-sub-form-post-id input'),
 							progress: '<img src="' + pluginUrl + '/client-s/images/tiny-progress-bar.gif" />'
 						};
 						if(subFormPostIdProps.$select.length) // Have select options?
@@ -245,7 +301,7 @@ namespace comment_mail;
 								return; // Nothing to do; i.e. no change, new post ID is the same.
 							subFormPostIdProps.lastId = subFormPostIdProps.newId; // Update last ID.
 
-							commentIdProps.$lastRow = $('form tr.manage-sub-form-comment-id'),
+							commentIdProps.$lastRow = $('.manage-sub-form form tr.manage-sub-form-comment-id'),
 								commentIdProps.$lastChosenContainer = commentIdProps.$lastRow.find('.chosen-container'),
 								commentIdProps.$lastInput = commentIdProps.$lastRow.find(':input');
 
@@ -268,13 +324,13 @@ namespace comment_mail;
 						subFormPostIdProps.$select.on('change', subFormPostIdProps.handler).chosen(chosenOps),
 							subFormPostIdProps.$input.on('blur', subFormPostIdProps.handler);
 
-						$('form tr.manage-sub-form-comment-id select').chosen(chosenOps);
-						$('form tr.manage-sub-form-status select').chosen(chosenOps);
-						$('form tr.manage-sub-form-deliver select').chosen(chosenOps);
+						$('.manage-sub-form form tr.manage-sub-form-comment-id select').chosen(chosenOps);
+						$('.manage-sub-form form tr.manage-sub-form-status select').chosen(chosenOps);
+						$('.manage-sub-form form tr.manage-sub-form-deliver select').chosen(chosenOps);
 
 						/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-						$('form').on('submit', function(e)
+						$('.manage-sub-form form').on('submit', function(e)
 						{
 							var $this = $(this),
 								errors = '', // Initialize.
@@ -303,11 +359,13 @@ namespace comment_mail;
 						});
 						/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 					};
-					$document.ready(plugin.onReady);
-				})(jQuery);
-			</script>
+					$document.ready(plugin.onReady); // On DOM ready handler.
 
-		<?php endif; ?>
+				})(jQuery); // Fire primary closure; with jQuery.
+			</script>
+			<?php /* ---------------------------------------------------------------------------------------------------------- */ ?>
+
+		<?php endif; // END: display when no major errors. ?>
 	</div>
 
 <?php echo $site_footer; ?>

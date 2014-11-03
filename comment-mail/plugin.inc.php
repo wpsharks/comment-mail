@@ -263,85 +263,193 @@ namespace comment_mail
 				$this->cap = apply_filters(__METHOD__.'_cap', 'activate_plugins');
 
 				$this->default_options = array(
-					'version'                                            => $this->version,
-					'enable'                                             => '0', // `0|1`; enable?
-					'crons_setup'                                        => '0', // `0` or timestamp.
-					'uninstall_on_deletion'                              => '0', // `0|1`; run uninstaller?
+					/* Core/systematic option keys. */
 
-					'manage_cap'                                         => $this->cap, // Capability.
-					'uninstall_cap'                                      => 'delete_plugins', // Capability.
+					'version'                                                           => $this->version,
+					'crons_setup'                                                       => '0', // `0` or timestamp.
 
-					'auto_confirm_enable'                                => '0', // `0|1`; auto-confirm enable?
+					/* Low-level switches to enable/disable certain functionalities.
+					 *
+					 * With the `enable=0` option, here is an overview of what happens:
+					 *
+					 * • Subscription options no longer appear on comment forms; i.e. no new subscriptions.
+					 *    In addition, the ability to add a new subscription through any/all front-end forms
+					 *    is disabled too. All back-end functionality remains available however.
+					 *
+					 * • The queue processor will stop processing, until such time as the plugin is renabled.
+					 *    i.e. No more email notifications. Queue injections continue, but no queue processing.
+					 *    If it is desirable that any queued notifications NOT be processed at all upon re-enabling,
+					 *    a site owner can choose to delete queued notifications in the dashboard before doing so.
+					 *
+					 * • Even w/ `enable=0`, all other functionality remains while the plugin is enabled in WP.
+					 *
+					 * The `new_subs_enable` and `queue_processing_enable` options allow for more control over
+					 * which of these two functionalities should be enabled/disabled. In some cases it might
+					 * be nice to disable queue processing temporarily; allowing everything else to remain as-is.
+					 *
+					 * Or, a site owner can allow other functionality to remain available, but stop
+					 * accepting new subscriptions if they so desire; i.e. by setting `new_subs_enable=0`.
+					 */
+					'enable'                                                            => '1', // `0|1`; enable?
+					'new_subs_enable'                                                   => '1', // `0|1`; enable?
+					'queue_processing_enable'                                           => '1', // `0|1`; enable?
 
-					'auto_subscribe_enable'                              => '1', // `0|1`; auto-subscribe enable?
-					'auto_subscribe_deliver'                             => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
-					'auto_subscribe_post_types'                          => 'post,page', // Comma-delimited post types.
-					'auto_subscribe_post_author'                         => '1', // `0|1`; auto-subscribe post authors?
-					'auto_subscribe_recipients'                          => '', // Others `;|,` delimited emails.
+					/* Related to user authentication. */
 
-					'reply_to_email'                                     => '', // Reply-To header.
+					'manage_cap'                                                        => $this->cap, // Capability.
+					'uninstall_cap'                                                     => 'delete_plugins', // Capability.
 
-					'smtp_enable'                                        => '0', // `0|1`; enable?
-					'smtp_host'                                          => '', // SMTP host name.
-					'smtp_port'                                          => '', // SMTP port number.
-					'smtp_secure'                                        => '', // ``, `ssl` or `tls`.
+					/* Related to auto-subscribe functionality. */
 
-					'smtp_username'                                      => '', // SMTP username.
-					'smtp_password'                                      => '', // SMTP password.
+					'auto_subscribe_enable'                                             => '1', // `0|1`; auto-subscribe enable?
+					'auto_subscribe_deliver'                                            => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
+					'auto_subscribe_post_types'                                         => 'post,page', // Comma-delimited post types.
+					'auto_subscribe_post_author'                                        => '1', // `0|1`; auto-subscribe post authors?
+					'auto_subscribe_recipients'                                         => '', // Others `;|,` delimited emails.
 
-					'smtp_from_name'                                     => '', // SMTP from name.
-					'smtp_from_email'                                    => '', // SMTP from email.
-					'smtp_force_from'                                    => '1', // `0|1`; force?
+					/* Auto-confirm functionality and security issues related to this.
 
-					'template_site_site_header'                          => '', // HTML/PHP code.
-					'template_site_site_footer'                          => '', // HTML/PHP code.
+					 * Note that turning `auto_confirm_force_enable` on, has the negative side-effect of making it
+					 * much more difficult for users to view a summary of their existing subscriptions;
+					 * i.e. they won't get a `sub_email` cookie right away via email confirmation.
+					 *
+					 * The only way they can view a summary of their subscriptions is:
+					 *    1. If they're a logged-in user, and the site owner says that `all_wp_users_confirm_email`.
+					 *    2. Or, if they click a link to manage their subscription after having received a notification.
+					 *       It is at this point that an auto-confirmed subscriber will finally get their cookie.
+					 *
+					 * For this reason (and for security), it is suggested that `auto_confirm_force_enable=0`,
+					 * unless there happens to be a very good reason for doing so. Can't really think of one;
+					 * but this option remains nonetheless — just in case it becomes handy for some.
+					 *
+					 * The second option here: `auto_confirm_if_already_subscribed_u0ip_enable`, is a bit different.
+					 * This option does not explicitly enable auto-confirm functionality, it simply states that we will
+					 * allow auto-confirmations to occur even whenever there is no reliable user ID to help verify.
+					 *
+					 * In this case, we can try to match the IP address and auto-confirm that way.
+					 * However, since IP addresses can be spoofed, it remains disabled by default as a security measure.
+					 * A site owner must turn this on themselves. Note: this option is not necessary (or recommended)
+					 * if you require folks to login before leaving a comment. A user ID can be used in this case.
+					 *
+					 * The final option here is related to our ability to trust the `wp_users` table, or not!
+					 * Some sites run plugins that allow users to register and gain immediate access w/o confirmation
+					 * being necessary. We assume (by default) that this is the case on every site. A site owner must tell us
+					 * explicitly that they force every user to confirm via email before being allowed to log into the site.
+					 * Otherwise, we will not trust the email addresses associated with registered users.
+					 */
+					'auto_confirm_force_enable'                                         => '0', // `0|1`; auto-confirm enable?
+					'auto_confirm_if_already_subscribed_u0ip_enable'                    => '0', // `0|1`; auto-confirm enable?
+					'all_wp_users_confirm_email'                                        => '0', // WP users confirm their email?
 
-					'template_site_comment_form_sub_ops'                 => '', // HTML/PHP code.
+					/* Related to SMPT configuration. */
 
-					'template_site_sub_actions_confirmed'                => '', // HTML/PHP code.
-					'template_site_sub_actions_unsubscribed'             => '', // HTML/PHP code.
-					'template_site_sub_actions_manage_summary'           => '', // HTML/PHP code.
-					'template_site_sub_actions_manage_sub_form'          => '', // HTML/PHP code.
+					'smtp_enable'                                                       => '0', // `0|1`; enable?
 
-					'template_email_email_header'                        => '', // HTML/PHP code.
-					'template_email_email_footer'                        => '', // HTML/PHP code.
+					'smtp_host'                                                         => '', // SMTP host name.
+					'smtp_port'                                                         => '', // SMTP port number.
+					'smtp_secure'                                                       => '', // ``, `ssl` or `tls`.
 
-					'email_footer_powered_by_enable'                     => '1', // `0|1`; enable?
-					'can_spam_postmaster'                                => get_bloginfo('admin_email'),
-					'can_spam_mailing_address'                           => '', // CAN-SPAM contact info.
+					'smtp_username'                                                     => '', // SMTP username.
+					'smtp_password'                                                     => '', // SMTP password.
 
-					'template_email_confirmation_request_subject'        => '', // HTML/PHP code.
-					'template_email_confirmation_request_message'        => '', // HTML/PHP code.
+					'smtp_from_name'                                                    => '', // SMTP from name.
+					'smtp_from_email'                                                   => '', // SMTP from email.
+					'smtp_force_from'                                                   => '1', // `0|1`; force?
 
-					'template_email_comment_notification_subject'        => '', // HTML/PHP code.
-					'template_email_comment_notification_message'        => '', // HTML/PHP code.
+					/* Related to queue processing. */
 
-					'queue_processor_max_time'                           => '30', // In seconds.
-					'queue_processor_delay'                              => '250', // In milliseconds.
-					'queue_processor_max_limit'                          => '100', // Total queue entries.
+					'queue_processor_max_time'                                          => '30', // In seconds.
+					'queue_processor_delay'                                             => '250', // In milliseconds.
+					'queue_processor_max_limit'                                         => '100', // Total queue entries.
 
-					'queue_processor_immediate_max_time'                 => '10', // In seconds.
-					'queue_processor_immediate_max_limit'                => '5', // Total queue entries.
+					'queue_processor_immediate_max_time'                                => '10', // In seconds.
+					'queue_processor_immediate_max_limit'                               => '5', // Total queue entries.
 
-					'sub_cleaner_max_time'                               => '60', // In seconds.
+					/* Related to CRON jobs. */
 
-					'unconfirmed_expiration_time'                        => '60 days', // `strtotime()` compatible.
+					'sub_cleaner_max_time'                                              => '60', // In seconds.
+
+					'unconfirmed_expiration_time'                                       => '60 days', // `strtotime()` compatible.
 					// Or, this can be left empty to disable automatic expirations altogether.
 
-					'trashed_expiration_time'                            => '60 days', // `strtotime()` compatible.
+					'trashed_expiration_time'                                           => '60 days', // `strtotime()` compatible.
 					// Or, this can be left empty to disable automatic deletions altogether.
 
-					'excluded_meta_box_post_types'                       => 'link,comment,revision,attachment,nav_menu_item,snippet,redirect',
+					/* Related to CAN-SPAM compliance. */
 
-					'user_select_options_enable'                         => '1', // `0|1`; enable?
-					'post_select_options_enable'                         => '1', // `0|1`; enable?
-					'post_select_options_media_enable'                   => '0', // `0|1`; enable?
-					'comment_select_options_enable'                      => '1', // `0|1`; enable?
+					'can_spam_postmaster'                                               => get_bloginfo('admin_email'),
+					'can_spam_mailing_address'                                          => '', // CAN-SPAM contact info.
 
-					'comment_notification_parent_content_clip_max_chars' => '100', // Max chars to include in notifications.
-					'comment_notification_content_clip_max_chars'        => '200', // Max chars to include in notifications.
+					/* Related to blacklisting. */
 
-					'email_blacklist_patterns'                           => '', // A line-delimited list of blacklisted emails/domains.
+					'email_blacklist_patterns'                                          => '', // A line-delimited list of blacklisted emails/domains.
+
+					/* Related to replies-via-email. */
+
+					'reply_to_email'                                                    => '', // Reply-To header.
+
+					/* Related to comment notifications. */
+
+					'comment_notification_parent_content_clip_max_chars'                => '100', // Max chars to include in notifications.
+					'comment_notification_content_clip_max_chars'                       => '200', // Max chars to include in notifications.
+
+					/* Related to select menu options. */
+
+					'user_select_options_enable'                                        => '1', // `0|1`; enable?
+					'post_select_options_enable'                                        => '1', // `0|1`; enable?
+					'post_select_options_media_enable'                                  => '0', // `0|1`; enable?
+					'comment_select_options_enable'                                     => '1', // `0|1`; enable?
+					'max_select_options'                                                => '2000', // Max options.
+
+					/* Related to email footer branding. */
+
+					'email_footer_powered_by_enable'                                    => '1', // `0|1`; enable?
+
+					/* Template-related site templates. */
+
+					'template_site_site_header'                                         => '', // HTML/PHP code.
+					'template_site_site_header_styles'                                  => '', // HTML/PHP code.
+					'template_site_site_header_scripts'                                 => '', // HTML/PHP code.
+					'template_site_site_header_easy'                                    => '', // HTML/PHP code.
+
+					'template_site_site_footer_easy'                                    => '', // HTML/PHP code.
+					'template_site_site_footer'                                         => '', // HTML/PHP code.
+
+					'template_site_comment_form_sub_ops'                                => '', // HTML/PHP code.
+
+					'template_site_sub_actions_confirmed'                               => '', // HTML/PHP code.
+					'template_site_sub_actions_unsubscribed'                            => '', // HTML/PHP code.
+					'template_site_sub_actions_manage_summary'                          => '', // HTML/PHP code.
+					'template_site_sub_actions_manage_sub_form'                         => '', // HTML/PHP code.
+					'template_site_sub_actions_manage_sub_form_comment_id_row_via_ajax' => '', // HTML/PHP code.
+
+					/* Template-related email templates. */
+
+					'template_email_email_header'                                       => '', // HTML/PHP code.
+					'template_email_email_header_styles'                                => '', // HTML/PHP code.
+					'template_email_email_header_scripts'                               => '', // HTML/PHP code.
+					'template_email_email_header_easy'                                  => '', // HTML/PHP code.
+
+					'template_email_email_footer_easy'                                  => '', // HTML/PHP code.
+					'template_email_email_footer'                                       => '', // HTML/PHP code.
+
+					'template_email_confirmation_request_subject'                       => '', // HTML/PHP code.
+					'template_email_confirmation_request_message'                       => '', // HTML/PHP code.
+
+					'template_email_comment_notification_subject'                       => '', // HTML/PHP code.
+					'template_email_comment_notification_message'                       => '', // HTML/PHP code.
+
+					/* Related to summary display for subscribers. */
+
+					'sub_manage_summary_max_limit'                                      => '50', // Subscriptions per page.
+
+					/* Related to meta boxes. */
+
+					'excluded_meta_box_post_types'                                      => 'link,comment,revision,attachment,nav_menu_item,snippet,redirect',
+
+					/* Related to data safeguards. */
+
+					'uninstall_on_deletion'                                             => '0', // `0|1`; run uninstaller?
 
 				); // Default options are merged with those defined by the site owner.
 				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options); // Allow filters.
@@ -597,9 +705,8 @@ namespace comment_mail
 				   && !$this->utils_env->is_menu_page('post.php')
 				) return; // Nothing to do; not applicable.
 
-				$deps = array('chosen'); // Plugin dependencies.
+				$deps = array(); // Plugin dependencies.
 
-				wp_enqueue_style('chosen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.min.css'), array(), $this->version, 'all');
 				wp_enqueue_style(__NAMESPACE__, $this->utils_url->to('/client-s/css/menu-pages.min.css'), $deps, $this->version, 'all');
 			}
 
@@ -615,17 +722,17 @@ namespace comment_mail
 				if(!$this->utils_env->is_menu_page(__NAMESPACE__.'*'))
 					return; // Nothing to do; NOT a plugin menu page.
 
-				$deps = array('jquery', 'chosen'); // Plugin dependencies.
+				$deps = array('jquery'); // Plugin dependencies.
 
-				wp_enqueue_script('chosen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.min.js'), array('jquery'), $this->version, TRUE);
 				wp_enqueue_script(__NAMESPACE__, $this->utils_url->to('/client-s/js/menu-pages.min.js'), $deps, $this->version, TRUE);
+
 				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_vars', array(
-					'plugin_url'    => rtrim($this->utils_url->to('/'), '/'),
-					'ajax_endpoint' => rtrim($this->utils_url->page_nonce_only(), '/')
+					'pluginUrl'    => rtrim($this->utils_url->to('/'), '/'),
+					'ajaxEndpoint' => rtrim($this->utils_url->page_nonce_only(), '/')
 				));
 				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_i18n', array(
-					'bulk_reconfirm_confirmation' => __('Resend email confirmation link? Are you sure?', $this->text_domain),
-					'bulk_delete_confirmation'    => $this->utils_env->is_menu_page('*_event_log')
+					'bulkReconfirmConfirmation' => __('Resend email confirmation link? Are you sure?', $this->text_domain),
+					'bulkDeleteConfirmation'    => $this->utils_env->is_menu_page('*_event_log')
 						? $this->utils_i18n->log_entry_js_deletion_confirmation_warning()
 						: __('Delete permanently? Are you sure?', $this->text_domain),
 				));
@@ -644,25 +751,38 @@ namespace comment_mail
 					if(!current_user_can($this->cap))
 						return; // Do not add meta boxes.
 
-				$this->menu_page_hooks[__NAMESPACE__] = add_comments_page($this->name.'™', $this->name.'™', $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
+				// Menu page titles use UTF-8 char: `⥱`; <http://unicode-table.com/en/2971/>.
+
+				// Menu page icon uses an SVG graphic specifically designed for inline display.
+				$icon = file_get_contents(dirname(__FILE__).'/client-s/images/inline-icon.svg');
+
+				$_ = // Each branch uses the following UTF-8 char `꜖`; <http://unicode-table.com/en/A716/>.
+					'<span style="inline-block; margin-left:.5em; position:relative; top:-.2em; left:-.2em; font-weight:normal; opacity:0.2;">꜖</span> ';
+
+				$__ = // Each branch uses the following UTF-8 char `꜖`; <http://unicode-table.com/en/A716/>.
+					'<span style="inline-block; margin-left:1.5em; position:relative; top:-.2em; left:-.2em; font-weight:normal; opacity:0.2;">꜖</span> ';
+
+				$menu_title                           = $this->name.'™ '.$icon;
+				$page_title                           = $this->name.'™'; // w/o icon.
+				$this->menu_page_hooks[__NAMESPACE__] = add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__], array($this, 'menu_page_options_screen'));
 
-				$menu_title                                   = '⥱ '.__('Subscriptions', $this->text_domain);
+				$menu_title                                   = $_.__('Subscriptions', $this->text_domain);
 				$page_title                                   = $this->name.'™ ⥱ '.__('Subscriptions', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_subs'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_subs', array($this, 'menu_page_subs'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_subs'], array($this, 'menu_page_subs_screen'));
 
-				$menu_title                                            = '⥱ '.__('Sub. Event Log', $this->text_domain);
+				$menu_title                                            = $__.__('Event Log', $this->text_domain);
 				$page_title                                            = $this->name.'™ ⥱ '.__('Sub. Event Log', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_sub_event_log'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_sub_event_log', array($this, 'menu_page_sub_event_log'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_sub_event_log'], array($this, 'menu_page_sub_event_log_screen'));
 
-				$menu_title                                    = '⥱ '.__('Mail Queue', $this->text_domain);
+				$menu_title                                    = $_.__('Mail Queue', $this->text_domain);
 				$page_title                                    = $this->name.'™ ⥱ '.__('Mail Queue', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_queue'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue'], array($this, 'menu_page_queue_screen'));
 
-				$menu_title                                              = '⥱ '.__('Queue Event Log', $this->text_domain);
+				$menu_title                                              = $__.__('Event Log', $this->text_domain);
 				$page_title                                              = $this->name.'™ ⥱ '.__('Queue Event Log', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_queue_event_log', array($this, 'menu_page_queue_event_log'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'], array($this, 'menu_page_queue_event_log_screen'));
