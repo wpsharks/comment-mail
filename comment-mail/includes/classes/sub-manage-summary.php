@@ -46,6 +46,13 @@ namespace comment_mail // Root namespace.
 			protected $sub_user_ids;
 
 			/**
+			 * @var array WP user ID-based list of email addresses.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $sub_user_id_emails;
+
+			/**
 			 * @var \stdClass Query vars.
 			 *
 			 * @since 14xxxx First documented version.
@@ -156,9 +163,14 @@ namespace comment_mail // Root namespace.
 					$this->sub_email = $this->plugin->utils_sub->key_to_email($this->sub_key);
 				else $this->sub_email = $this->plugin->utils_sub->current_email();
 
-				$this->sub_user_ids = array(); // Initialize.
+				$this->sub_user_ids       = array(); // Initialize.
+				$this->sub_user_id_emails = array(); // Initialize.
+
 				if($this->sub_email) // Do we have an email address?
 					$this->sub_user_ids = $this->plugin->utils_sub->email_user_ids($this->sub_email);
+
+				if($this->sub_email) // Do we have an email address?
+					$this->sub_user_id_emails = $this->plugin->utils_sub->email_user_id_emails($this->sub_email);
 
 				$default_request_args = static::$default_nav_vars;
 				$request_args         = array_merge($default_request_args, $request_args);
@@ -189,9 +201,11 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_display()
 			{
-				$sub_key      = $this->sub_key;
-				$sub_email    = $this->sub_email;
-				$sub_user_ids = $this->sub_user_ids;
+				$sub_key            = $this->sub_key;
+				$sub_email          = $this->sub_email;
+				$sub_user_ids       = $this->sub_user_ids;
+				$sub_user_id_emails = $this->sub_user_id_emails;
+				$sub_emails         = $this->sub_user_id_emails;
 
 				$query_vars = $this->query_vars;
 
@@ -250,7 +264,8 @@ namespace comment_mail // Root namespace.
 				$sql = "SELECT SQL_CALC_FOUND_ROWS *". // w/ calc enabled.
 				       " FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
-				       " WHERE (`email` = '".esc_sql($this->sub_email)."'". // + WP user IDs.
+				       " WHERE (`email` = '".esc_sql($this->sub_email)."'".
+				       // See `assets/sma-diagram.png` for further details on this.
 				       "    OR `user_id` IN('".implode("','", array_map('esc_sql', $this->sub_user_ids))."'))".
 
 				       (isset($post_id) // Specific post ID?

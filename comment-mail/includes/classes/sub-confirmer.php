@@ -74,16 +74,16 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param integer|string $sub_id Comment ID.
+			 * @param integer $sub_id Subscriber ID.
 			 *
-			 * @param array          $args Any additional behavioral args.
+			 * @param array   $args Any additional behavioral args.
 			 */
 			public function __construct($sub_id, array $args = array())
 			{
 				parent::__construct();
 
-				if(($sub_id = (integer)$sub_id))
-					$this->sub = $this->plugin->utils_sub->get($sub_id);
+				$sub_id    = (integer)$sub_id;
+				$this->sub = $this->plugin->utils_sub->get($sub_id);
 
 				$defaults_args = array(
 					'auto_confirm'   => NULL,

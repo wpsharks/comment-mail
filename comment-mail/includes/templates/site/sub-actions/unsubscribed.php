@@ -22,7 +22,7 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 
 		<?php if($error_codes): // Any processing errors? ?>
 
-			<div class="alert alert-danger" role="alert">
+			<div class="alert alert-danger" style="margin:0;">
 				<p style="margin-top:0; font-weight:bold; font-size:120%;">
 					<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
 				</p>
@@ -71,12 +71,14 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 				$unsub_comment && strcasecmp($unsub_comment->comment_author_email, $sub->email) === 0;
 			?>
 
-			<div class="alert alert-success" role="alert">
+			<div class="alert alert-success" style="margin:0;">
 				<p style="margin-top:0; margin-bottom:0; font-weight:bold; font-size:120%;">
 					<i class="fa fa-check fa-fw"></i>
 					<?php echo __('Unsubscribed successfully. Sorry to see you go!', $plugin->text_domain); ?>
 				</p>
 			</div>
+
+			<!-- @TODO: add more information here. -->
 
 		<?php endif; ?>
 

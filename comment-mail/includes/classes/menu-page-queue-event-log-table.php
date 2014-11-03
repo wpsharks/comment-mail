@@ -276,6 +276,30 @@ namespace comment_mail // Root namespace.
 				}
 			}
 
+			/**
+			 * Get default orderby value.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string The default orderby value.
+			 */
+			protected function get_default_orderby()
+			{
+				return 'time'; // Default orderby.
+			}
+
+			/**
+			 * Get default order value.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string The default order value.
+			 */
+			protected function get_default_order()
+			{
+				return 'desc'; // Default order.
+			}
+
 			/*
 			 * Protected action-related methods.
 			 */

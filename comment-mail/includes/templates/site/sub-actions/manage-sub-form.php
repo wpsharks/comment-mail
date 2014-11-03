@@ -53,17 +53,27 @@ namespace comment_mail;
  */
 ?>
 <?php // Sets document <title> tag via `%%title%%` replacement code in header.
-echo str_replace('%%title%%', // Editing subscription; or creating a new one?
-                       $is_edit ? __('Edit Subscription', $plugin->text_domain)
-	                       : __('Add New Subscription', $plugin->text_domain), $site_header); ?>
+echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_domain)
+	: __('Add New Subscription', $plugin->text_domain), $site_header); ?>
+<?php
+/*
+ * Here we define a few more variables of our own.
+ * All based on what the template makes available to us;
+ * ~ as documented at the top of this file.
+ */
+// Summary return URL; w/ all summary navigation vars preserved.
+$sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, NULL, TRUE);
 
+// Site home page URL; i.e. back to the main site.
+$home_url = home_url('/');
+?>
 	<div class="manage-sub-form">
 
-		<?php if($error_codes // Changed email, nullifying their existing key?
+		<?php if($error_codes // Changed email; i.e. nullified existing key?
 		         && $error_codes[0] === 'invalid_sub_key_after_email_key_change'
 					&& $processing && $processing_successes && $processing_email_key_change): ?>
 
-			<div class="alert alert-success" role="alert">
+			<div class="alert alert-success" style="margin:0;">
 				<p style="margin-top:0; font-weight:bold; font-size:120%;">
 					<?php echo __('Submission accepted; nice work!', $plugin->text_domain); ?>
 				</p>
@@ -75,11 +85,16 @@ echo str_replace('%%title%%', // Editing subscription; or creating a new one?
 						</li>
 					<?php endforeach; ?>
 				</ul>
+				<p style="margin:10px 0 0 0;">
+					<a href="<?php echo esc_attr($sub_summary_return_url); ?>">
+						<?php echo __('« Back to My Subscriptions', $plugin->text_domain); ?>
+					</a>
+				</p>
 			</div>
 
-		<?php elseif ($error_codes): // Any major errors? ?>
+		<?php elseif ($error_codes): // Any other major errors? ?>
 
-			<div class="alert alert-danger" role="alert">
+			<div class="alert alert-danger" style="margin:0;">
 				<p style="margin-top:0; font-weight:bold; font-size:120%;">
 					<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
 				</p>
@@ -113,7 +128,7 @@ echo str_replace('%%title%%', // Editing subscription; or creating a new one?
 
 			<?php if ($processing && $processing_errors): // Any processing errors? ?>
 
-				<div class="alert alert-danger" role="alert">
+				<div class="alert alert-danger">
 					<p style="margin-top:0; font-weight:bold; font-size:120%;">
 						<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
 					</p>
@@ -131,7 +146,7 @@ echo str_replace('%%title%%', // Editing subscription; or creating a new one?
 
 			<?php if ($processing && $processing_successes): // Any processing successes? ?>
 
-				<div class="alert alert-success" role="alert">
+				<div class="alert alert-success">
 					<p style="margin-top:0; font-weight:bold; font-size:120%;">
 						<?php echo __('Submission accepted; nice work!', $plugin->text_domain); ?>
 					</p>
@@ -143,12 +158,20 @@ echo str_replace('%%title%%', // Editing subscription; or creating a new one?
 							</li>
 						<?php endforeach; ?>
 					</ul>
+					<p style="margin:10px 0 0 0;">
+						<a href="<?php echo esc_attr($sub_summary_return_url); ?>">
+							<?php echo __('« Back to My Subscriptions', $plugin->text_domain); ?>
+						</a>
+					</p>
 				</div>
 
 			<?php endif; ?>
 
 			<h2 style="margin-top:0;">
-				<i class="fa fa-envelope pull-right"></i>
+				<a href="<?php echo esc_attr($sub_summary_return_url); ?>" title="<?php echo __('Back to My Subscriptions', $plugin->text_domain); ?>">
+					<i class="fa fa-arrow-circle-left pull-right" style="font-size:50%; position:relative; z-index:1; top:5px; right:45px;"></i>
+					<i class="<?php echo esc_attr('wsi-'.$plugin->slug); ?> pull-right"></i>
+				</a>
 				<?php if($is_edit): ?>
 					<?php echo __('Edit Subscription', $plugin->text_domain); ?>
 				<?php else: // Creating a new subscription. ?>
@@ -235,7 +258,9 @@ echo str_replace('%%title%%', // Editing subscription; or creating a new one?
 
 				</p>
 			</form>
-
+			<?php
+			/* Javascript needed by this template.
+			 --------------------------------------------------------------------------------------------------------------------- */ ?>
 			<script type="text/javascript">
 				(function($) // Primary closure w/ jQuery; strict standards.
 				{
@@ -338,8 +363,9 @@ echo str_replace('%%title%%', // Editing subscription; or creating a new one?
 
 				})(jQuery); // Fire primary closure; with jQuery.
 			</script>
+			<?php /* ---------------------------------------------------------------------------------------------------------- */ ?>
 
-		<?php endif; // end: display when no major errors. ?>
+		<?php endif; // END: display when no major errors. ?>
 	</div>
 
 <?php echo $site_footer; ?>

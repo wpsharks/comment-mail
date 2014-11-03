@@ -31,6 +31,52 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Sanitizes a subscription key.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $sub_key Input subscription key.
+			 *
+			 * @return string Sanitized subscription key; else an empty string.
+			 *
+			 * @note Numeric keys represent a security issue, since one of our utility functions
+			 *    may be able to accept either a key or an ID. Thus, all user-facing action handlers MUST always
+			 *    sanitize keys they're working with; in order to be sure keys are NOT numeric.
+			 *
+			 * @see utils_enc::uunnci_key_20_max()
+			 */
+			public function sanitize_key($sub_key)
+			{
+				$sub_key = trim((string)$sub_key);
+
+				if(!$this->has_uunnci_key_20_max_format($sub_key))
+					$sub_key = $sub_key === '0' ? '' : 'k'.$sub_key;
+
+				return $sub_key;
+			}
+
+			/**
+			 * Checks a subscription key.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $sub_key Input value to check on.
+			 *
+			 * @return boolean `TRUE` if the input value is in key format.
+			 *
+			 * @see utils_enc::uunnci_key_20_max()
+			 */
+			public function has_uunnci_key_20_max_format($sub_key)
+			{
+				if(is_string($sub_key) && !is_numeric($sub_key))
+					if(isset($sub_key[0]) && strcasecmp($sub_key[0], 'k') === 0)
+						if(strlen($sub_key) <= 20)
+							return TRUE;
+
+				return FALSE;
+			}
+
+			/**
 			 * Subscription key to ID.
 			 *
 			 * @since 14xxxx First documented version.
@@ -81,17 +127,17 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return array An array of unique IDs only.
 			 */
-			public function unique_ids_only(array $sub_ids_or_keys)
+			public function unique_ids(array $sub_ids_or_keys)
 			{
 				$unique_ids = $sub_keys = array();
 
 				foreach($sub_ids_or_keys as $_sub_id_or_key)
 				{
-					if(is_numeric($_sub_id_or_key) && (integer)$_sub_id_or_key > 0)
-						$unique_ids[] = (integer)$_sub_id_or_key;
-
-					else if(is_string($_sub_id_or_key) && $_sub_id_or_key)
+					if(is_string($_sub_id_or_key) && $this->has_uunnci_key_20_max_format($_sub_id_or_key))
 						$sub_keys[] = $_sub_id_or_key; // String key.
+
+					else if(is_integer($_sub_id_or_key) && $_sub_id_or_key > 0)
+						$unique_ids[] = (integer)$_sub_id_or_key;
 				}
 				unset($_sub_id_or_key); // Housekeeping.
 
@@ -104,24 +150,6 @@ namespace comment_mail // Root namespace.
 					$unique_ids = array_unique($unique_ids);
 
 				return $unique_ids;
-			}
-
-			/**
-			 * Nullify the object cache.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param array $sub_ids_or_keys An array of IDs/keys.
-			 */
-			public function nullify_cache(array $sub_ids_or_keys = array())
-			{
-				$preserve = array(); // Initialize.
-				if($sub_ids_or_keys) $preserve[] = 'get';
-				$this->unset_cache_keys($preserve);
-
-				foreach($sub_ids_or_keys as $_sub_id_or_key)
-					unset($this->cache['get'][$_sub_id_or_key]);
-				unset($_sub_id_or_key); // Housekeeping.
 			}
 
 			/**
@@ -152,20 +180,18 @@ namespace comment_mail // Root namespace.
 					$this->plugin->utils_array->shuffle_assoc($cache);
 					$cache = array_slice($cache, 0, 2000, TRUE);
 				}
-				if(is_string($sub_id_or_key) && !is_numeric($sub_id_or_key))
+				if(is_string($sub_id_or_key) && $this->has_uunnci_key_20_max_format($sub_id_or_key))
 				{
 					$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-
 					       " WHERE `key` = '".esc_sql($sub_id_or_key)."' LIMIT 1";
 				}
-				else // Treat the value as an ID; i.e. the default behavior.
+				else if(is_integer($sub_id_or_key) && $sub_id_or_key > 0) // It's a subscription ID.
 				{
 					$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-
 					       " WHERE `ID` = '".esc_sql((integer)$sub_id_or_key)."' LIMIT 1";
 				}
-				if(($row = $this->plugin->utils_db->wp->get_row($sql)))
-					return ($cache[$row->ID] = $cache[$row->key] = $row = $this->plugin->utils_db->typify_deep($row));
+				if(!empty($sql) && ($row = $this->plugin->utils_db->wp->get_row($sql)))
+					return ($cache[(integer)$row->ID] = $cache[(string)$row->key] = $row = $this->plugin->utils_db->typify_deep($row));
 
 				return ($cache[$sub_id_or_key] = NULL);
 			}
@@ -221,7 +247,7 @@ namespace comment_mail // Root namespace.
 			{
 				$counter = 0; // Initialize.
 
-				foreach($this->unique_ids_only($sub_ids_or_keys) as $_sub_id)
+				foreach($this->unique_ids($sub_ids_or_keys) as $_sub_id)
 					if($this->reconfirm($_sub_id, $args))
 						$counter++; // Update counter.
 				unset($_sub_id); // Housekeeping.
@@ -274,7 +300,7 @@ namespace comment_mail // Root namespace.
 			{
 				$counter = 0; // Initialize.
 
-				foreach($this->unique_ids_only($sub_ids_or_keys) as $_sub_id)
+				foreach($this->unique_ids($sub_ids_or_keys) as $_sub_id)
 					if($this->confirm($_sub_id, $args))
 						$counter++; // Update counter.
 				unset($_sub_id); // Housekeeping.
@@ -327,7 +353,7 @@ namespace comment_mail // Root namespace.
 			{
 				$counter = 0; // Initialize.
 
-				foreach($this->unique_ids_only($sub_ids_or_keys) as $_sub_id)
+				foreach($this->unique_ids($sub_ids_or_keys) as $_sub_id)
 					if($this->unconfirm($_sub_id, $args))
 						$counter++; // Update counter.
 				unset($_sub_id); // Housekeeping.
@@ -380,7 +406,7 @@ namespace comment_mail // Root namespace.
 			{
 				$counter = 0; // Initialize.
 
-				foreach($this->unique_ids_only($sub_ids_or_keys) as $_sub_id)
+				foreach($this->unique_ids($sub_ids_or_keys) as $_sub_id)
 					if($this->suspend($_sub_id, $args))
 						$counter++; // Update counter.
 				unset($_sub_id); // Housekeeping.
@@ -433,7 +459,7 @@ namespace comment_mail // Root namespace.
 			{
 				$counter = 0; // Initialize.
 
-				foreach($this->unique_ids_only($sub_ids_or_keys) as $_sub_id)
+				foreach($this->unique_ids($sub_ids_or_keys) as $_sub_id)
 					if($this->trash($_sub_id, $args))
 						$counter++; // Update counter.
 				unset($_sub_id); // Housekeeping.
@@ -483,7 +509,7 @@ namespace comment_mail // Root namespace.
 			{
 				$counter = 0; // Initialize.
 
-				foreach($this->unique_ids_only($sub_ids_or_keys) as $_sub_id)
+				foreach($this->unique_ids($sub_ids_or_keys) as $_sub_id)
 					if($this->delete($_sub_id, $args))
 						$counter++; // Bump counter.
 				unset($_sub_id); // Housekeeping.
@@ -745,6 +771,8 @@ namespace comment_mail // Root namespace.
 			 * @param boolean $no_cache Disallow a previously cached value?
 			 *
 			 * @return array An array of unique user IDs.
+			 *
+			 * @see sub_manage_summary::prepare_subs()
 			 */
 			public function email_user_ids($sub_email, $no_cache = FALSE)
 			{
@@ -764,6 +792,39 @@ namespace comment_mail // Root namespace.
 				$user_ids = array_merge($user_ids, $this->plugin->utils_db->wp->get_col($sql2));
 
 				return ($user_ids = array_unique(array_map('intval', $user_ids)));
+			}
+
+			/**
+			 * All user ID-based emails associated w/ a particular email address.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string  $sub_email Email address to check.
+			 * @param boolean $no_cache Disallow a previously cached value?
+			 *
+			 * @return array An array of unique user ID-based emails (including `$sub_email`).
+			 *    Note that all of these emails will be in lowercase format.
+			 *
+			 * @see sub_manage_summary::prepare_subs()
+			 * @note See `assets/sma-diagram.png` for further details on this.
+			 */
+			public function email_user_id_emails($sub_email, $no_cache = FALSE)
+			{
+				if(!($sub_email = trim(strtolower((string)$sub_email))))
+					return array(); // Not possible.
+
+				if(!is_null($user_id_emails = &$this->cache_key(__FUNCTION__, $sub_email)) && !$no_cache)
+					return $user_id_emails; // Already cached this.
+
+				$user_ids = $this->email_user_ids($sub_email, $no_cache);
+
+				$sql = "SELECT DISTINCT `email` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				       " WHERE `user_id` IN('".implode("','", array_map('esc_sql', $user_ids))."')";
+
+				$user_id_emails = $this->plugin->utils_db->wp->get_col($sql);
+				$user_id_emails = array_map('strtolower', array_merge(array($sub_email), $user_id_emails));
+
+				return ($user_id_emails = array_unique($user_id_emails));
 			}
 
 			/**
@@ -1006,9 +1067,8 @@ namespace comment_mail // Root namespace.
 					return trim(strtolower((string)$sub_email));
 
 				if($search_untrusted_sources) // Try current user?
-					if(!$this->plugin->options['all_wp_users_confirm_email'])
-						if(($user = wp_get_current_user()) && $user->ID && $user->user_email)
-							return trim(strtolower((string)$user->user_email));
+					if(($user = wp_get_current_user()) && $user->ID && $user->user_email)
+						return trim(strtolower((string)$user->user_email));
 
 				if($search_untrusted_sources) // Try current commenter?
 					if(($commenter = wp_get_current_commenter()) && !empty($commenter['comment_author_email']))
@@ -1018,28 +1078,21 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Sanitizes a subscription key.
+			 * Nullify the object cache.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $key Input subscription key.
-			 *
-			 * @return string Sanitized subscription key; else an empty string.
-			 *
-			 * @note Numeric keys represent a security issue, since one of our utility functions
-			 *    may be able to accept either a key or an ID. Thus, all user-facing action handlers MUST always
-			 *    sanitize keys they're working with; in order to be sure keys are NOT numeric.
-			 *
-			 * @see utils_enc::uunnci_key_20_max()
+			 * @param array $sub_ids_or_keys An array of IDs/keys.
 			 */
-			public function sanitize_key($key)
+			public function nullify_cache(array $sub_ids_or_keys = array())
 			{
-				$key = trim((string)$key);
+				$preserve = array(); // Initialize.
+				if($sub_ids_or_keys) $preserve[] = 'get';
+				$this->unset_cache_keys($preserve);
 
-				if(is_numeric($key))
-					$key = $key === '0' ? '' : 'k'.$key;
-
-				return $key;
+				foreach($sub_ids_or_keys as $_sub_id_or_key)
+					unset($this->cache['get'][$_sub_id_or_key]);
+				unset($_sub_id_or_key); // Housekeeping.
 			}
 		}
 	}

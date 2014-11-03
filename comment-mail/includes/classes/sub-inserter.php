@@ -300,6 +300,7 @@ namespace comment_mail // Root namespace.
 
 				$this->data      = $request_args; // A copy of the request args.
 				$this->validated = FALSE; // Initialize; not validated yet, obviously.
+				if(isset($this->data['ID'])) $this->data['ID'] = (integer)$this->data['ID'];
 
 				/* Related to inserts. */
 
@@ -801,7 +802,7 @@ namespace comment_mail // Root namespace.
 
 				if(($this->duplicate_key_ids = $this->plugin->utils_db->wp->get_col($sql)))
 					foreach($this->duplicate_key_ids as $_duplicate_key_id)
-						$this->plugin->utils_sub->get($_duplicate_key_id); // Cache.
+						$this->plugin->utils_sub->get((integer)$_duplicate_key_id); // Cache.
 				unset($_duplicate_key_id); // Housekeeping.
 			}
 

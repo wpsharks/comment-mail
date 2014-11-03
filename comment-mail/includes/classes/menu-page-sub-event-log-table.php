@@ -96,6 +96,7 @@ namespace comment_mail // Root namespace.
 					'user_id',
 					'user_initiated',
 					'oby_sub_id',
+					'post_id',
 					'comment_id',
 					'deliver',
 					'fname',
@@ -281,6 +282,30 @@ namespace comment_mail // Root namespace.
 					$this->prepare_items_merge_post_properties(); // Merge additional properties.
 					$this->prepare_items_merge_comment_properties(); // Merge additional properties.
 				}
+			}
+
+			/**
+			 * Get default orderby value.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string The default orderby value.
+			 */
+			protected function get_default_orderby()
+			{
+				return 'time'; // Default orderby.
+			}
+
+			/**
+			 * Get default order value.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string The default order value.
+			 */
+			protected function get_default_order()
+			{
+				return 'desc'; // Default order.
 			}
 
 			/*

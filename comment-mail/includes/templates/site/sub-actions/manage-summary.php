@@ -26,6 +26,15 @@ namespace comment_mail;
  *    See `$sub_user_ids` for access to the array of associated WP user IDs.
  *
  * @var integer[]      $sub_user_ids An array of any WP user IDs associated w/ the email address.
+ *    See also `$sub_user_id_emails` for access to the array of all emails derived from this list of WP user IDs.
+ *
+ * @var string[] $sub_user_id_emails An array of all emails that belong to this user; based on `$sub_email`
+ *    and also on the array of `$sub_user_ids`. This is a complete list of all emails displayed by the summary.
+ *    See also: `$sub_emails`; which is a simpler/cleaner alias for this variable (same thing).
+ *
+ * @var string[] $sub_emails A simpler/cleaner alias for `$sub_user_id_emails`; same exact thing.
+ *    See also: <https://github.com/websharks/comment-mail/blob/000000-dev/assets/sma-diagram.png> for a diagram
+ *    that helps to clarify how this works; i.e. how a single key can be associated w/ multiple emails.
  *
  * @var \stdClass      $query_vars Nav/query vars; consisting of: `page`, `per_page`, `post_id`, `status`.
  *    Note that `post_id` will be `NULL` when there is no specific post ID filter applied to the list of `$subs`.
@@ -67,12 +76,23 @@ namespace comment_mail;
 ?>
 <?php echo // Sets document <title> tag via `%%title%%` replacement code in header.
 str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $site_header); ?>
+<?php
+/*
+ * Here we define a few more variables of our own.
+ * All based on what the template makes available to us;
+ * ~ as documented at the top of this file.
+ */
+// Subscription creation URL; user may create a new subscription.
+$sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 
+// Site home page URL; i.e. back to the main site.
+$home_url = home_url('/');
+?>
 	<div class="manage-summary">
 
 		<?php if($error_codes): // Any major errors? ?>
 
-			<div class="alert alert-danger" role="alert">
+			<div class="alert alert-danger" style="margin:0;">
 				<p style="margin-top:0; font-weight:bold; font-size:120%;">
 					<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
 				</p>
@@ -102,7 +122,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $
 
 		<?php if ($processing && $processing_errors): // Any processing errors? ?>
 
-			<div class="alert alert-danger" role="alert">
+			<div class="alert alert-danger">
 				<p style="margin-top:0; font-weight:bold; font-size:120%;">
 					<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
 				</p>
@@ -120,7 +140,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $
 
 		<?php if ($processing && $processing_successes): // Any processing successes? ?>
 
-			<div class="alert alert-success" role="alert">
+			<div class="alert alert-success">
 				<p style="margin-top:0; font-weight:bold; font-size:120%;">
 					<?php echo __('Submission accepted; thank you :-)', $plugin->text_domain); ?>
 				</p>
@@ -137,15 +157,21 @@ str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $
 		<?php endif; ?>
 
 			<h2 style="margin-top:0;">
-				<i class="fa fa-envelope pull-right"></i>
-				<?php echo __('My Comment Subscriptions', $plugin->text_domain); ?>
+				<a href="<?php echo esc_attr($sub_new_url); ?>" title="<?php echo __('Create New Subscription', $plugin->text_domain); ?>">
+					<i class="fa fa-plus-square pull-right"></i>
+				</a>
+				<i class="<?php echo esc_attr('wsi-'.$plugin->slug); ?>"></i>
+				<?php echo __('My Comment Subscriptions', $plugin->text_domain); ?><br />
+				<em style="margin-left:10px;">
+					<small>&lt;<?php echo esc_html(implode('&gt;, &lt;', $sub_emails)); ?>&gt;</small>
+				</em>
 			</h2>
 
 		<hr />
 
 		<?php if (empty($subs)): ?>
 			<p class="center-block" style="font-size:120%;">
-				<?php echo __('No subscriptions at this time.', $plugin->text_domain); ?>
+				<?php echo sprintf(__('No subscriptions at this time. You may <a href="%1$s">click here</a> to create one <i class="fa fa-smile-o"></i>', $plugin->text_domain), esc_attr($sub_new_url)); ?>
 			</p>
 		<?php endif; ?>
 
@@ -207,9 +233,9 @@ str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $
 								$_sub_name_email_markup = $plugin->utils_markup->name_email($_sub->fname.' '.$_sub->lname, $_sub->email, $_sub_name_email_args);
 
 								$_subscribed_to_own_comment = // Subscribed to their own comment?
-									$_sub_comment && strcasecmp($_sub_comment->comment_author_email, $_sub->email) === 0;
+									$_sub_comment && in_array(strtolower($_sub_comment->comment_author_email), $sub_emails, TRUE);
 								?>
-								<i class="fa fa-envelope"></i>
+								<i class="<?php echo esc_attr('wsi-'.$plugin->slug.'-one'); ?>"></i>
 								<?php echo $_sub_name_email_markup; ?><br />
 
 								<div class="hover-links">
@@ -264,9 +290,12 @@ str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $
 					</tbody>
 				</table>
 			</div>
-
+		<?php
+		/* Javascript needed by this template.
+		 ------------------------------------------------------------------------------------------------------------------------ */
+		?>
 			<script type="text/javascript">
-				(function($)
+				(function($) // Primary closure w/ jQuery; strict standards.
 				{
 					'use strict'; // Strict standards enable.
 
@@ -297,8 +326,9 @@ str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $
 					$document.ready(plugin.onReady); // On DOM ready handler.
 				})(jQuery);
 			</script>
+			<?php /* ---------------------------------------------------------------------------------------------------------- */ ?>
 
-		<?php endif; // end: display summary when no major errors. ?>
+		<?php endif; // END: display summary when no major errors. ?>
 
 	</div>
 

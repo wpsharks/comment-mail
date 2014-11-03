@@ -399,6 +399,7 @@ namespace comment_mail
 					'post_select_options_enable'                                        => '1', // `0|1`; enable?
 					'post_select_options_media_enable'                                  => '0', // `0|1`; enable?
 					'comment_select_options_enable'                                     => '1', // `0|1`; enable?
+					'max_select_options'                                                => '2000', // Max options.
 
 					/* Related to email footer branding. */
 
@@ -406,10 +407,12 @@ namespace comment_mail
 
 					/* Template-related site templates. */
 
-					'template_site_site_easy_header'                                    => '', // HTML/PHP code.
 					'template_site_site_header'                                         => '', // HTML/PHP code.
+					'template_site_site_header_styles'                                  => '', // HTML/PHP code.
+					'template_site_site_header_scripts'                                 => '', // HTML/PHP code.
+					'template_site_site_header_easy'                                    => '', // HTML/PHP code.
 
-					'template_site_site_easy_footer'                                    => '', // HTML/PHP code.
+					'template_site_site_footer_easy'                                    => '', // HTML/PHP code.
 					'template_site_site_footer'                                         => '', // HTML/PHP code.
 
 					'template_site_comment_form_sub_ops'                                => '', // HTML/PHP code.
@@ -422,10 +425,12 @@ namespace comment_mail
 
 					/* Template-related email templates. */
 
-					'template_email_email_easy_header'                                  => '', // HTML/PHP code.
 					'template_email_email_header'                                       => '', // HTML/PHP code.
+					'template_email_email_header_styles'                                => '', // HTML/PHP code.
+					'template_email_email_header_scripts'                               => '', // HTML/PHP code.
+					'template_email_email_header_easy'                                  => '', // HTML/PHP code.
 
-					'template_email_email_easy_footer'                                  => '', // HTML/PHP code.
+					'template_email_email_footer_easy'                                  => '', // HTML/PHP code.
 					'template_email_email_footer'                                       => '', // HTML/PHP code.
 
 					'template_email_confirmation_request_subject'                       => '', // HTML/PHP code.
@@ -700,9 +705,8 @@ namespace comment_mail
 				   && !$this->utils_env->is_menu_page('post.php')
 				) return; // Nothing to do; not applicable.
 
-				$deps = array('chosen'); // Plugin dependencies.
+				$deps = array(); // Plugin dependencies.
 
-				wp_enqueue_style('chosen', $this->utils_url->set_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.min.css'), array(), $this->version, 'all');
 				wp_enqueue_style(__NAMESPACE__, $this->utils_url->to('/client-s/css/menu-pages.min.css'), $deps, $this->version, 'all');
 			}
 
@@ -718,10 +722,10 @@ namespace comment_mail
 				if(!$this->utils_env->is_menu_page(__NAMESPACE__.'*'))
 					return; // Nothing to do; NOT a plugin menu page.
 
-				$deps = array('jquery', 'chosen'); // Plugin dependencies.
+				$deps = array('jquery'); // Plugin dependencies.
 
-				wp_enqueue_script('chosen', $this->utils_url->set_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.min.js'), array('jquery'), $this->version, TRUE);
 				wp_enqueue_script(__NAMESPACE__, $this->utils_url->to('/client-s/js/menu-pages.min.js'), $deps, $this->version, TRUE);
+
 				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_vars', array(
 					'pluginUrl'    => rtrim($this->utils_url->to('/'), '/'),
 					'ajaxEndpoint' => rtrim($this->utils_url->page_nonce_only(), '/')
@@ -747,25 +751,38 @@ namespace comment_mail
 					if(!current_user_can($this->cap))
 						return; // Do not add meta boxes.
 
-				$this->menu_page_hooks[__NAMESPACE__] = add_comments_page($this->name.'™', $this->name.'™', $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
+				// Menu page titles use UTF-8 char: `⥱`; <http://unicode-table.com/en/2971/>.
+
+				// Menu page icon uses an SVG graphic specifically designed for inline display.
+				$icon = file_get_contents(dirname(__FILE__).'/client-s/images/inline-icon.svg');
+
+				$_ = // Each branch uses the following UTF-8 char `꜖`; <http://unicode-table.com/en/A716/>.
+					'<span style="inline-block; margin-left:.5em; position:relative; top:-.2em; left:-.2em; font-weight:normal; opacity:0.2;">꜖</span> ';
+
+				$__ = // Each branch uses the following UTF-8 char `꜖`; <http://unicode-table.com/en/A716/>.
+					'<span style="inline-block; margin-left:1.5em; position:relative; top:-.2em; left:-.2em; font-weight:normal; opacity:0.2;">꜖</span> ';
+
+				$menu_title                           = $this->name.'™ '.$icon;
+				$page_title                           = $this->name.'™'; // w/o icon.
+				$this->menu_page_hooks[__NAMESPACE__] = add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__], array($this, 'menu_page_options_screen'));
 
-				$menu_title                                   = '⥱ '.__('Subscriptions', $this->text_domain);
+				$menu_title                                   = $_.__('Subscriptions', $this->text_domain);
 				$page_title                                   = $this->name.'™ ⥱ '.__('Subscriptions', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_subs'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_subs', array($this, 'menu_page_subs'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_subs'], array($this, 'menu_page_subs_screen'));
 
-				$menu_title                                            = '⥱ '.__('Sub. Event Log', $this->text_domain);
+				$menu_title                                            = $__.__('Event Log', $this->text_domain);
 				$page_title                                            = $this->name.'™ ⥱ '.__('Sub. Event Log', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_sub_event_log'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_sub_event_log', array($this, 'menu_page_sub_event_log'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_sub_event_log'], array($this, 'menu_page_sub_event_log_screen'));
 
-				$menu_title                                    = '⥱ '.__('Mail Queue', $this->text_domain);
+				$menu_title                                    = $_.__('Mail Queue', $this->text_domain);
 				$page_title                                    = $this->name.'™ ⥱ '.__('Mail Queue', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_queue'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue'], array($this, 'menu_page_queue_screen'));
 
-				$menu_title                                              = '⥱ '.__('Queue Event Log', $this->text_domain);
+				$menu_title                                              = $__.__('Event Log', $this->text_domain);
 				$page_title                                              = $this->name.'™ ⥱ '.__('Queue Event Log', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_queue_event_log', array($this, 'menu_page_queue_event_log'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'], array($this, 'menu_page_queue_event_log_screen'));

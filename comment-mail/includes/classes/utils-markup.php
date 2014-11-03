@@ -90,6 +90,7 @@ namespace comment_mail // Root namespace.
 					'anchor'             => TRUE,
 					'anchor_to'          => 'mailto',
 					// `mailto|summary|[custom URL]`.
+					'anchor_target'      => '',
 					'anchor_summary_key' => '',
 				);
 				$args         = array_merge($default_args, $args);
@@ -104,6 +105,7 @@ namespace comment_mail // Root namespace.
 
 				$anchor             = (boolean)$args['anchor'];
 				$anchor_to          = (string)$args['anchor_to'];
+				$anchor_target      = (string)$args['anchor_target'];
 				$anchor_summary_key = (string)$args['anchor_summary_key'];
 
 				$name       = $name ? $this->plugin->utils_string->clean_name($name) : '';
@@ -119,9 +121,9 @@ namespace comment_mail // Root namespace.
 				if($anchor_to === 'summary' && $anchor_summary_key) // Construct summary URL; if possible.
 					$summary_anchor_url = $this->plugin->utils_url->sub_manage_summary_url($anchor_summary_key);
 
-				$mailto_anchor_tag  = $email ? '<a href="mailto:'.esc_attr(urlencode($email)).'" style="'.esc_attr($email_style).'">'.esc_html($email_clip).'</a>' : '';
-				$summary_anchor_tag = !empty($summary_anchor_url) ? '<a href="'.esc_attr($summary_anchor_url).'" style="'.esc_attr($email_style).'">'.esc_html($email_clip).'</a>' : '';
-				$custom_anchor_tag  = $anchor_to ? '<a href="'.esc_attr($anchor_to).'" style="'.esc_attr($email_style).'">'.esc_html($email_clip).'</a>' : '';
+				$mailto_anchor_tag  = $email ? '<a href="mailto:'.esc_attr(urlencode($email)).'" target="'.esc_attr($anchor_target).'" style="'.esc_attr($email_style).'">'.esc_html($email_clip).'</a>' : '';
+				$summary_anchor_tag = !empty($summary_anchor_url) ? '<a href="'.esc_attr($summary_anchor_url).'" target="'.esc_attr($anchor_target).'" style="'.esc_attr($email_style).'">'.esc_html($email_clip).'</a>' : '';
+				$custom_anchor_tag  = $anchor_to ? '<a href="'.esc_attr($anchor_to).'" target="'.esc_attr($anchor_target).'" style="'.esc_attr($email_style).'">'.esc_html($email_clip).'</a>' : '';
 
 				if($anchor_to === 'mailto') $anchor_tag = $mailto_anchor_tag; // e.g. `mailto:email`.
 				else if($anchor_to === 'summary') $anchor_tag = $summary_anchor_tag; // i.e. front-end summary.
@@ -238,14 +240,17 @@ namespace comment_mail // Root namespace.
 					'email_style'           => 'font-weight:bold;',
 					'anchor_style'          => 'text-decoration:none;',
 					'anchor_to'             => 'summary', // `edit|summary`.
+					'anchor_target'         => !empty($args['anchor_to']) && $args['anchor_to'] !== 'summary'
+						? '' : '_blank', // We use a dynamic default value here.
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$list_style   = (string)$args['list_style'];
-				$email_style  = (string)$args['email_style'];
-				$anchor_style = (string)$args['anchor_style'];
-				$anchor_to    = (string)$args['anchor_to'];
+				$list_style    = (string)$args['list_style'];
+				$email_style   = (string)$args['email_style'];
+				$anchor_style  = (string)$args['anchor_style'];
+				$anchor_to     = (string)$args['anchor_to'];
+				$anchor_target = (string)$args['anchor_target'];
 
 				foreach($this->plugin->utils_sub->last_x($x, $post_id, $args) as $_sub)
 				{
@@ -257,7 +262,7 @@ namespace comment_mail // Root namespace.
 						: $this->plugin->utils_url->sub_manage_summary_url($_sub->key); // Default behavior.
 
 					$last_x_email_lis[] = '<li>'. // Based on `anchor_to` specification above.
-					                      ' <a href="'.esc_attr($_anchor_url).'" style="'.esc_attr($anchor_style).'">'.
+					                      ' <a href="'.esc_attr($_anchor_url).'" target="'.esc_attr($anchor_target).'" style="'.esc_attr($anchor_style).'">'.
 					                      ' <i class="fa fa-user"></i> '.$this->name_email('', $_sub->email, $_name_email_args).'</a>'.
 					                      '</li>';
 				}
@@ -296,7 +301,8 @@ namespace comment_mail // Root namespace.
 					? (integer)$current_user_id : NULL;
 
 				$default_args = array(
-					'max'            => 2000,
+					'max'            => // Plugin option value.
+						(integer)$this->plugin->options['max_select_options'],
 					'fail_on_max'    => TRUE,
 					'no_cache'       => FALSE,
 
@@ -366,7 +372,8 @@ namespace comment_mail // Root namespace.
 					? (integer)$current_post_id : NULL;
 
 				$default_args = array(
-					'max'                   => 2000,
+					'max'                   => // Plugin option value.
+						(integer)$this->plugin->options['max_select_options'],
 					'fail_on_max'           => TRUE,
 					'for_comments_only'     => FALSE,
 					'exclude_post_types'    => array(),
@@ -443,7 +450,8 @@ namespace comment_mail // Root namespace.
 					? (integer)$current_comment_id : NULL;
 
 				$default_args = array(
-					'max'            => 2000,
+					'max'            => // Plugin option value.
+						(integer)$this->plugin->options['max_select_options'],
 					'fail_on_max'    => TRUE,
 					'parents_only'   => FALSE,
 					'no_cache'       => FALSE,

@@ -102,8 +102,8 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
-				$this->sub           = // Subscription.
-					$this->plugin->utils_sub->get((integer)$sub_id);
+				$sub_id              = (integer)$sub_id;
+				$this->sub           = $this->plugin->utils_sub->get($sub_id);
 				$this->status_before = $this->sub ? $this->sub->status : '';
 
 				$defaults_args = array(

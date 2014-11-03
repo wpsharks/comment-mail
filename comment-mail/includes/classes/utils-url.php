@@ -1220,6 +1220,9 @@ namespace comment_mail // Root namespace.
 			 *    See also {@link sub_manage_summary_nav_vars()} for additional details.
 			 *
 			 * @return string URL w/ the given `$scheme`.
+			 *
+			 * @note It's IMPORTANT to set `summary=0` here, since the key in this URL
+			 *    will ultimately be deleted; i.e. it will not be valid once the action is complete.
 			 */
 			public function sub_manage_sub_delete_url($sub_key = '', $scheme = NULL, $include_nav_vars = NULL)
 			{
@@ -1227,7 +1230,7 @@ namespace comment_mail // Root namespace.
 				$sub_key = !isset($sub_key[0]) ? '0' : $sub_key;
 
 				$url  = home_url('/', $scheme);
-				$args = array(__NAMESPACE__ => array('manage' => array('sub_delete' => $sub_key, 'summary' => $sub_key)));
+				$args = array(__NAMESPACE__ => array('manage' => array('sub_delete' => $sub_key, 'summary' => '0')));
 
 				if($include_nav_vars && ($nav_vars = $this->sub_manage_summary_nav_vars($include_nav_vars)))
 					$args[__NAMESPACE__]['manage']['summary_nav'] = $nav_vars;

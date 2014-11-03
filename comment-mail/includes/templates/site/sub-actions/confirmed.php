@@ -22,7 +22,7 @@ echo str_replace('%%title%%', __('Confirmation', $plugin->text_domain), $site_he
 
 		<?php if($error_codes): // Any processing errors? ?>
 
-			<div class="alert alert-danger" role="alert">
+			<div class="alert alert-danger" style="margin:0;">
 				<p style="margin-top:0; font-weight:bold; font-size:120%;">
 					<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
 				</p>
@@ -83,12 +83,14 @@ echo str_replace('%%title%%', __('Confirmation', $plugin->text_domain), $site_he
 			$sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $sub->last_update_time);
 			?>
 
-			<div class="alert alert-success" role="alert">
+			<div class="alert alert-success" style="margin:0;">
 				<p style="margin-top:0; margin-bottom:0; font-weight:bold; font-size:120%;">
 					<i class="fa fa-check fa-fw"></i>
 					<?php echo __('Confirmed successfully. Thank you!', $plugin->text_domain); ?>
 				</p>
 			</div>
+
+			<!-- @TODO: add more information here. -->
 
 		<?php endif; ?>
 

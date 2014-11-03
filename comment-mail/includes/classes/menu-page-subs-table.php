@@ -186,12 +186,14 @@ namespace comment_mail // Root namespace.
 			protected function column_email(\stdClass $item)
 			{
 				$name_email_args = array(
-					'separator'   => '<br />',
-					'email_style' => 'font-weight:bold;',
-					'anchor_to'   => 'summary', 'summary_anchor_key' => $item->key,
+					'separator'          => '<br />',
+					'email_style'        => 'font-weight:bold;',
+					'anchor_to'          => 'summary',
+					'anchor_target'      => '_blank',
+					'summary_anchor_key' => $item->key,
 				);
 				$name            = $item->fname.' '.$item->lname; // Concatenate.
-				$email_info      = '<i class="fa fa-envelope"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
+				$email_info      = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
 				                   ' <span style="font-weight:bold;" title="'.esc_attr($item->key).'">ID #'.esc_html($item->ID).'</span>'.
 				                   ' '.$this->plugin->utils_markup->name_email($name, $item->email, $name_email_args);
 
@@ -308,6 +310,30 @@ namespace comment_mail // Root namespace.
 					$this->prepare_items_merge_post_properties(); // Merge additional properties.
 					$this->prepare_items_merge_comment_properties(); // Merge additional properties.
 				}
+			}
+
+			/**
+			 * Get default orderby value.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string The default orderby value.
+			 */
+			protected function get_default_orderby()
+			{
+				return 'email'; // Default orderby.
+			}
+
+			/**
+			 * Get default order value.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string The default order value.
+			 */
+			protected function get_default_order()
+			{
+				return 'asc'; // Default order.
 			}
 
 			/*
