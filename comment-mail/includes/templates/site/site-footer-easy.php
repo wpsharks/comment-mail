@@ -43,7 +43,8 @@ $privacy_policy_url = $plugin->options['can_spam_privacy_policy_url'];
 		<div class="col-md-6 text-left">
 
 			<a href="<?php echo esc_attr($sub_summary_return_url); ?>">
-				<?php echo __('&laquo; My Subscriptions', $plugin->text_domain); ?>
+				<i class="<?php echo esc_attr('wsi-'.$plugin->slug); ?>"></i>
+				<?php echo __('My Subscriptions', $plugin->text_domain); ?>
 			</a>
 
 			<span class="text-muted">|</span>

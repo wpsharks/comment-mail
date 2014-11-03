@@ -36,6 +36,8 @@ $current_host_path = $plugin->utils_url->current_host_path();
 // Logo URL; defaults to the plugin's logo image.
 $logo_url         = $plugin->utils_url->to('/client-s/images/logo.png');
 $logo_image_width = 936; // Width; in pixels.
+
+// @TODO Default the logo to being off; use an icon instead to save space.
 ?>
 
 <header class="text-center" style="margin-bottom:30px;">
