@@ -12,6 +12,10 @@ namespace comment_mail;
  * @note Extra whitespace in subject templates is stripped automatically.
  * That's why this template is able to break things down into multiple lines.
  * In the end, the email will contain a one-line subject of course.
+ *
+ * -------------------------------------------------------------------
+ * @note In addition to plugin-specific variables & functionality,
+ *    you may also use any WordPress functions that you like.
  */
 ?>
 <?php

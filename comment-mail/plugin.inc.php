@@ -379,6 +379,7 @@ namespace comment_mail
 
 					'can_spam_postmaster'                                               => get_bloginfo('admin_email'),
 					'can_spam_mailing_address'                                          => '', // CAN-SPAM contact info.
+					'can_spam_privacy_policy_url'                                       => '', // CAN-SPAM privacy policy.
 
 					/* Related to blacklisting. */
 
@@ -441,7 +442,7 @@ namespace comment_mail
 
 					/* Related to summary display for subscribers. */
 
-					'sub_manage_summary_max_limit'                                      => '50', // Subscriptions per page.
+					'sub_manage_summary_max_limit'                                      => '2', // Subscriptions per page.
 
 					/* Related to meta boxes. */
 

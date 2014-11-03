@@ -613,6 +613,33 @@ namespace comment_mail // Root namespace.
 
 				return ($comments = array()); // Default return value.
 			}
+
+			/**
+			 * Pagination links start page.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $current_page The current page number.
+			 * @param integer $total_pages The total pages available.
+			 * @param integer $max_links Max pagination links to display.
+			 *
+			 * @return integer The page number to begin pagination links from.
+			 *
+			 * @note This method has been tested; even against invalid figures.
+			 *    It handles every scenario gracefully; even if invalid figures are given.
+			 */
+			public function pagination_links_start_page($current_page, $total_pages, $max_links)
+			{
+				$current_page = (integer)$current_page;
+				$total_pages  = (integer)$total_pages;
+				$max_links    = (integer)$max_links;
+
+				$min_start_page = 1; // Obviously.
+				$max_start_page = max($total_pages - ($max_links - 1), $min_start_page);
+				$start_page     = max(min($current_page - floor($max_links / 2), $max_start_page), $min_start_page);
+
+				return $start_page;
+			}
 		}
 	}
 }

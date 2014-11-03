@@ -127,6 +127,29 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Current `host[/path]`; w/ multisite compat.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string Current `host/path`; w/ multisite compat.
+			 *
+			 * @note We don't cache this, since a blog can get changed at runtime.
+			 */
+			public function current_host_path()
+			{
+				if(is_multisite()) // Multisite network?
+				{
+					global $current_blog;
+
+					$host = rtrim($current_blog->domain, '/');
+					$path = trim($current_blog->path, '/');
+
+					return strtolower(trim($host.'/'.$path, '/'));
+				}
+				return strtolower($this->plugin->utils_url->current_host(TRUE));
+			}
+
+			/**
 			 * Current URI; with a leading `/`.
 			 *
 			 * @since 14xxxx First documented version.

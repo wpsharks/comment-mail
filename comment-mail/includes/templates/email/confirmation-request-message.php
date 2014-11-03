@@ -10,6 +10,10 @@ namespace comment_mail;
  * @var string    $email_footer Parsed email footer template.
  *
  * @var \stdClass $sub Subscription object data.
+ *
+ * -------------------------------------------------------------------
+ * @note In addition to plugin-specific variables & functionality,
+ *    you may also use any WordPress functions that you like.
  */
 ?>
 <?php // Sets document <title> tag via `%%title%%` replacement code in header.
