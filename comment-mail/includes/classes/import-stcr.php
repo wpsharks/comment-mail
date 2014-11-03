@@ -310,8 +310,7 @@ namespace comment_mail // Root namespace.
 
 				       " ORDER BY `comment_date` ASC"; // Oldest to newest.
 
-				if(($comment_ids = $this->plugin->utils_db->wp->get_col($sql)))
-					$comment_ids = array_map('intval', $comment_ids);
+				$comment_ids = array_map('intval', $this->plugin->utils_db->wp->get_col($sql));
 
 				return $comment_ids; // All of their comment IDs.
 			}
@@ -348,9 +347,7 @@ namespace comment_mail // Root namespace.
 
 				       " LIMIT ".$max_limit; // Limit results.
 
-				if(($post_ids = $this->plugin->utils_db->wp->get_col($sql)))
-					$post_ids = array_map('intval', $post_ids);
-				else $post_ids = array(); // Default; empty array.
+				$post_ids = array_map('intval', $this->plugin->utils_db->wp->get_col($sql));
 
 				return $post_ids; // Up to `$max_limit` unimported post IDs.
 			}

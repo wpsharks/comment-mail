@@ -790,6 +790,45 @@ namespace comment_mail // Root namespace.
 
 				return trim($mid_clip); // After markup/filters and then mid-clipping.
 			}
+
+			/**
+			 * Generates markup for powered-by link.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $args Any style-related arguments.
+			 *
+			 * @return string Markup for powered-by link.
+			 */
+			public function powered_by(array $args = array())
+			{
+				$default_args = array(
+					'anchor_to'            => '',
+					'anchor_target'        => '_blank',
+					'anchor_style'         => 'text-decoration:none;',
+
+					'icon_prefix'          => TRUE,
+					'for_wordpress_suffix' => TRUE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$anchor_to = trim((string)$args['anchor_to']);
+				$anchor_to = !$anchor_to ? $this->plugin->utils_url->product_page() : $anchor_to;
+
+				$anchor_target        = trim((string)$args['anchor_target']);
+				$anchor_style         = trim((string)$args['anchor_style']);
+				$icon_prefix          = (boolean)$args['icon_prefix'];
+				$for_wordpress_suffix = (boolean)$args['for_wordpress_suffix'];
+
+				$icon   = '<i class="'.esc_attr('wsi-'.$this->plugin->slug).'"></i>';
+				$anchor = '<a href="'.esc_attr($anchor_to).'" target="'.esc_attr($anchor_target).'" style="'.esc_attr($anchor_style).'">'.
+				          ($icon_prefix ? $icon.' ' : '').esc_html($this->plugin->name).'™'.
+				          '</a>';
+				$suffix = $for_wordpress_suffix ? ' '.__('for WordPress', $this->plugin->text_domain) : '';
+
+				return sprintf(__('Powered by %1$s', $this->plugin->text_domain), $anchor.$suffix);
+			}
 		}
 	}
 }

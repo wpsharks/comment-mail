@@ -822,9 +822,9 @@ namespace comment_mail // Root namespace.
 				       " WHERE `user_id` IN('".implode("','", array_map('esc_sql', $user_ids))."')";
 
 				$user_id_emails = $this->plugin->utils_db->wp->get_col($sql);
-				$user_id_emails = array_map('strtolower', array_merge(array($sub_email), $user_id_emails));
+				$user_id_emails = array_merge(array($sub_email), $user_id_emails);
 
-				return ($user_id_emails = array_unique($user_id_emails));
+				return ($user_id_emails = array_unique(array_map('strtolower', $user_id_emails)));
 			}
 
 			/**

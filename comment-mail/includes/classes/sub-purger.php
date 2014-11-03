@@ -108,7 +108,7 @@ namespace comment_mail // Root namespace.
 				       " WHERE `post_id` = '".esc_sql($this->post_id)."'".
 				       ($this->comment_id ? " AND `comment_id` = '".esc_sql($this->comment_id)."'" : '');
 
-				if(($ids = $this->plugin->utils_db->wp->get_col($sql)))
+				if(($ids = array_map('intval', $this->plugin->utils_db->wp->get_col($sql))))
 					$this->purged += $this->plugin->utils_sub->bulk_delete($ids, array('purging' => TRUE));
 			}
 
@@ -130,7 +130,7 @@ namespace comment_mail // Root namespace.
 				       " WHERE `user_id` = '".esc_sql($user->ID)."'".
 				       ($user->user_email ? " OR `email` = '".esc_sql($user->user_email)."'" : '');
 
-				if(($ids = $this->plugin->utils_db->wp->get_col($sql)))
+				if(($ids = array_map('intval', $this->plugin->utils_db->wp->get_col($sql))))
 					$this->purged += $this->plugin->utils_sub->bulk_delete($ids, array('purging' => TRUE));
 			}
 		}

@@ -13,6 +13,10 @@ namespace comment_mail;
  *    This could be `NULL` if there are any errors.
  *
  * @var array          $error_codes An array of any/all error codes.
+ *
+ * -------------------------------------------------------------------
+ * @note In addition to plugin-specific variables & functionality,
+ *    you may also use any WordPress functions that you like.
  */
 ?>
 <?php // Sets document <title> tag via `%%title%%` replacement code in header.

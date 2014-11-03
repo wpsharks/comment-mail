@@ -11,6 +11,10 @@ namespace comment_mail;
  *
  * @var \stdClass   $sub Subscription object data.
  * @var \stdClass[] $comments An array of all WP comment objects.
+ *
+ * -------------------------------------------------------------------
+ * @note In addition to plugin-specific variables & functionality,
+ *    you may also use any WordPress functions that you like.
  */
 ?>
 <?php // Sets document <title> tag via `%%title%%` replacement code in header.

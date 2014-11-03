@@ -8,6 +8,10 @@ namespace comment_mail;
  *
  * @var integer     $post_id The post ID for which to obtain comments.
  * @var form_fields $form_fields Form fields class.
+ *
+ * -------------------------------------------------------------------
+ * @note In addition to plugin-specific variables & functionality,
+ *    you may also use any WordPress functions that you like.
  */
 ?>
 <?php echo $form_fields->select_row(

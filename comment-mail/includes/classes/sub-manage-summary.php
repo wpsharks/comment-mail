@@ -178,7 +178,7 @@ namespace comment_mail // Root namespace.
 
 				$this->query_vars = new \stdClass; // Initialize.
 
-				$this->query_vars->page     = max(1, (integer)$request_args['page']);
+				$this->query_vars->current_page     = max(1, (integer)$request_args['page']);
 				$this->query_vars->per_page = (integer)$this->plugin->options['sub_manage_summary_max_limit'];
 
 				$this->query_vars->post_id = $this->isset_or($request_args['post_id'], NULL, 'integer');
@@ -300,7 +300,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function current_offset()
 			{
-				return ($this->query_vars->page - 1) * $this->query_vars->per_page;
+				return ($this->query_vars->current_page - 1) * $this->query_vars->per_page;
 			}
 
 			/**
@@ -312,8 +312,8 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function set_pagination_vars($calc_found_rows)
 			{
-				$page     = $this->query_vars->page;
-				$per_page = $this->query_vars->per_page;
+				$current_page = $this->query_vars->current_page;
+				$per_page     = $this->query_vars->per_page;
 
 				$total_subs  = (integer)$calc_found_rows;
 				$total_pages = ceil($total_subs / $per_page);

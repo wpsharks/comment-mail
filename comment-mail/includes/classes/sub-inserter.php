@@ -642,6 +642,7 @@ namespace comment_mail // Root namespace.
 
 				$table          = $this->plugin->utils_db->prefix().'subs';
 				$data_to_insert = $this->plugin->utils_array->remove_nulls($this->data);
+				unset($data_to_insert['ID']); // We never want to insert an ID.
 
 				if($this->plugin->utils_db->wp->replace($table, $data_to_insert) === FALSE)
 					throw new \exception(__('Insertion failure.', $this->plugin->text_domain));
@@ -698,6 +699,7 @@ namespace comment_mail // Root namespace.
 
 				$table          = $this->plugin->utils_db->prefix().'subs';
 				$data_to_update = $this->plugin->utils_array->remove_nulls($this->data);
+				unset($data_to_update['ID']); // We don't need to update the `ID`.
 
 				if($this->plugin->utils_db->wp->update($table, $data_to_update, array('ID' => $this->sub->ID)) === FALSE)
 					throw new \exception(__('Update failure.', $this->plugin->text_domain));
@@ -800,9 +802,9 @@ namespace comment_mail // Root namespace.
 				       " AND `comment_id` = '".esc_sql($new_comment_id)."'".
 				       " AND `email` = '".esc_sql($new_email)."'";
 
-				if(($this->duplicate_key_ids = $this->plugin->utils_db->wp->get_col($sql)))
+				if(($this->duplicate_key_ids = array_map('intval', $this->plugin->utils_db->wp->get_col($sql))))
 					foreach($this->duplicate_key_ids as $_duplicate_key_id)
-						$this->plugin->utils_sub->get((integer)$_duplicate_key_id); // Cache.
+						$this->plugin->utils_sub->get($_duplicate_key_id); // Cache.
 				unset($_duplicate_key_id); // Housekeeping.
 			}
 
@@ -854,7 +856,7 @@ namespace comment_mail // Root namespace.
 
 				       " AND `ID` != '".esc_sql($this->sub->ID)."'";
 
-				if(($this->duplicate_key_ids = $this->plugin->utils_db->wp->get_col($sql)))
+				if(($this->duplicate_key_ids = array_map('intval', $this->plugin->utils_db->wp->get_col($sql))))
 					$this->plugin->utils_sub->bulk_delete(
 						$this->duplicate_key_ids, array(
 							'oby_sub_id'     => $this->sub->ID,
@@ -885,7 +887,7 @@ namespace comment_mail // Root namespace.
 
 				       " AND `ID` != '".esc_sql($this->sub->ID)."'";
 
-				if(($this->other_duplicate_ids = $this->plugin->utils_db->wp->get_col($sql)))
+				if(($this->other_duplicate_ids = array_map('intval', $this->plugin->utils_db->wp->get_col($sql))))
 					$this->plugin->utils_sub->bulk_delete(
 						$this->other_duplicate_ids, array(
 							'oby_sub_id'     => $this->sub->ID,

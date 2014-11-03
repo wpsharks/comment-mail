@@ -28,23 +28,25 @@ namespace comment_mail;
  * @var integer[]      $sub_user_ids An array of any WP user IDs associated w/ the email address.
  *    See also `$sub_user_id_emails` for access to the array of all emails derived from this list of WP user IDs.
  *
- * @var string[] $sub_user_id_emails An array of all emails that belong to this user; based on `$sub_email`
+ * @var string[]       $sub_user_id_emails An array of all emails that belong to this user; based on `$sub_email`
  *    and also on the array of `$sub_user_ids`. This is a complete list of all emails displayed by the summary.
  *    See also: `$sub_emails`; which is a simpler/cleaner alias for this variable (same thing).
  *
- * @var string[] $sub_emails A simpler/cleaner alias for `$sub_user_id_emails`; same exact thing.
+ * @var string[]       $sub_emails A simpler/cleaner alias for `$sub_user_id_emails`; same exact thing.
  *    See also: <https://github.com/websharks/comment-mail/blob/000000-dev/assets/sma-diagram.png> for a diagram
  *    that helps to clarify how this works; i.e. how a single key can be associated w/ multiple emails.
  *
- * @var \stdClass      $query_vars Nav/query vars; consisting of: `page`, `per_page`, `post_id`, `status`.
+ * @var \stdClass      $query_vars Nav/query vars; consisting of: `current_page`, `per_page`, `post_id`, `status`.
  *    Note that `post_id` will be `NULL` when there is no specific post ID filter applied to the list of `$subs`.
  *    Note that `status` will be empty when there is no specific status filter applied to the list of `$subs`.
  *
- * @var \stdClass[]    $subs An array of all subscriptions to display as part of the summary on this `$query_vars->page`.
+ * @var \stdClass[]    $subs An array of all subscriptions to display as part of the summary on this `$query_vars->current_page`.
  *    Note that all query vars/filters/etc. will have already been applied; a template simply needs to iterate and display a table row for each of these.
+ *    Subscriptions are ordered by `post_id` ASC, `comment_id` ASC, `email` ASC, and finally by `status` ASC.
  *
- * @var \stdClass|null $pagination_vars Pagination vars; consisting of: `page`, `per_page`, `total_subs`, `total_pages`.
- *    Note that `page` and `per_page` are simply duplicated here for convenience; same as you'll find in `$query_vars`.
+ * @var \stdClass|null $pagination_vars Pagination vars; consisting of: `current_page`, `per_page`, `total_subs`, `total_pages`.
+ *    Note that `current_page` and `per_page` are simply duplicated here for convenience; same as you'll find in `$query_vars`.
+ *    The `per_page` value is configured by plugin options from the dashboard; it cannot be modified here; these are read-only.
  *
  * @var boolean        $processing Are we (i.e. did we) process an action? e.g. a deletion from the list perhaps.
  *
@@ -72,6 +74,10 @@ namespace comment_mail;
  *
  * @var array          $error_codes An array of any/all major error codes; excluding processing error codes.
  *    Note that you should NOT display the summary at all, if any major error exist here.
+ *
+ * -------------------------------------------------------------------
+ * @note In addition to plugin-specific variables & functionality,
+ *    you may also use any WordPress functions that you like.
  */
 ?>
 <?php echo // Sets document <title> tag via `%%title%%` replacement code in header.
@@ -82,11 +88,11 @@ str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $
  * All based on what the template makes available to us;
  * ~ as documented at the top of this file.
  */
+// Site home page URL; i.e. back to the main site.
+$home_url = home_url('/'); // Multisite compatible.
+
 // Subscription creation URL; user may create a new subscription.
 $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
-
-// Site home page URL; i.e. back to the main site.
-$home_url = home_url('/');
 ?>
 	<div class="manage-summary">
 
@@ -120,41 +126,41 @@ $home_url = home_url('/');
 
 		<?php else: // Display summary; there are no major errors. ?>
 
-		<?php if ($processing && $processing_errors): // Any processing errors? ?>
+			<?php if ($processing && $processing_errors): // Any processing errors? ?>
 
-			<div class="alert alert-danger">
-				<p style="margin-top:0; font-weight:bold; font-size:120%;">
-					<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
-				</p>
-				<ul class="list-unstyled" style="margin-bottom:0;">
-					<?php foreach($processing_errors_html as $_error_code => $_error_html): ?>
-						<li style="margin-top:0; margin-bottom:0;">
-							<i class="fa fa-warning fa-fw"></i>
-							<?php echo $_error_html; ?>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-			</div>
+				<div class="alert alert-danger">
+					<p style="margin-top:0; font-weight:bold; font-size:120%;">
+						<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
+					</p>
+					<ul class="list-unstyled" style="margin-bottom:0;">
+						<?php foreach($processing_errors_html as $_error_code => $_error_html): ?>
+							<li style="margin-top:0; margin-bottom:0;">
+								<i class="fa fa-warning fa-fw"></i>
+								<?php echo $_error_html; ?>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</div>
 
-		<?php endif; ?>
+			<?php endif; ?>
 
-		<?php if ($processing && $processing_successes): // Any processing successes? ?>
+			<?php if ($processing && $processing_successes): // Any processing successes? ?>
 
-			<div class="alert alert-success">
-				<p style="margin-top:0; font-weight:bold; font-size:120%;">
-					<?php echo __('Submission accepted; thank you :-)', $plugin->text_domain); ?>
-				</p>
-				<ul class="list-unstyled" style="margin-bottom:0;">
-					<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
-						<li style="margin-top:0; margin-bottom:0;">
-							<i class="fa fa-check fa-fw"></i>
-							<?php echo $_success_html; ?>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-			</div>
+				<div class="alert alert-success">
+					<p style="margin-top:0; font-weight:bold; font-size:120%;">
+						<?php echo __('Submission accepted; thank you :-)', $plugin->text_domain); ?>
+					</p>
+					<ul class="list-unstyled" style="margin-bottom:0;">
+						<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
+							<li style="margin-top:0; margin-bottom:0;">
+								<i class="fa fa-check fa-fw"></i>
+								<?php echo $_success_html; ?>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</div>
 
-		<?php endif; ?>
+			<?php endif; ?>
 
 			<h2 style="margin-top:0;">
 				<a href="<?php echo esc_attr($sub_new_url); ?>" title="<?php echo __('Create New Subscription', $plugin->text_domain); ?>">
@@ -163,17 +169,17 @@ $home_url = home_url('/');
 				<i class="<?php echo esc_attr('wsi-'.$plugin->slug); ?>"></i>
 				<?php echo __('My Comment Subscriptions', $plugin->text_domain); ?><br />
 				<em style="margin-left:10px;">
-					<small>&lt;<?php echo esc_html(implode('&gt;, &lt;', $sub_emails)); ?>&gt;</small>
+					<small>&lt;<?php echo esc_html(implode('&gt;, &lt;', array_slice($sub_emails, 0, 100))); ?>&gt;</small>
 				</em>
 			</h2>
 
-		<hr />
+			<hr />
 
-		<?php if (empty($subs)): ?>
-			<p class="center-block" style="font-size:120%;">
-				<?php echo sprintf(__('No subscriptions at this time. You may <a href="%1$s">click here</a> to create one <i class="fa fa-smile-o"></i>', $plugin->text_domain), esc_attr($sub_new_url)); ?>
-			</p>
-		<?php endif; ?>
+			<?php if (empty($subs)): ?>
+				<p class="center-block" style="font-size:120%;">
+					<?php echo sprintf(__('No subscriptions at this time. You may <a href="%1$s">click here</a> to create one <i class="fa fa-smile-o"></i>', $plugin->text_domain), esc_attr($sub_new_url)); ?>
+				</p>
+			<?php endif; ?>
 
 			<div class="subs-table table-responsive">
 				<table class="table table-striped table-hover">
@@ -290,10 +296,56 @@ $home_url = home_url('/');
 					</tbody>
 				</table>
 			</div>
-		<?php
-		/* Javascript needed by this template.
-		 ------------------------------------------------------------------------------------------------------------------------ */
-		?>
+
+			<?php if ($pagination_vars->total_pages > 1): ?><hr />
+				<div class="row subs-pagination">
+					<div class="col-md-3 text-left">
+						<span class="label label-default" style="font-size:110%; vertical-align:bottom;">
+							<?php echo sprintf(__('Page %1$s of %2$s', $plugin->text_domain), esc_html($pagination_vars->current_page), esc_html($pagination_vars->total_pages)); ?>
+						</span>
+					</div>
+					<div class="col-md-9 text-right">
+						<nav>
+							<ul class="pagination" style="margin:0;">
+
+								<?php if($pagination_vars->current_page > 1): // Create a previous page link? ?>
+									<?php $_prev_page_url = $plugin->utils_url->sub_manage_summary_url($sub_key, NULL, array('page' => $pagination_vars->current_page - 1)); ?>
+									<li><a href="<?php echo esc_attr($_prev_page_url); ?>">&laquo;</a></li>
+								<?php else: // Not possible; this is the first page. ?>
+									<li class="disabled"><a href="#">&laquo;</a></li>
+								<?php endif; ?>
+
+								<?php // Individual page links now.
+								$_max_page_links           = 5; // Max individual page links to show on each page.
+								$_page_links_start_at_page = // This is a mildly complex calculation that we can do w/ help from the plugin class.
+									$plugin->utils_db->pagination_links_start_page($pagination_vars->current_page, $pagination_vars->total_pages, $_max_page_links);
+
+								for($_i = 1, $_page = $_page_links_start_at_page;
+								    $_i <= $_max_page_links && $_page <= $pagination_vars->total_pages; $_i++ && $_page++):
+									$_page_url = $plugin->utils_url->sub_manage_summary_url($sub_key, NULL, array('page' => $_page)); ?>
+
+									<li<?php if($_page === $pagination_vars->current_page): ?> class="active"<?php endif; ?>>
+										<a href="<?php echo esc_attr($_page_url); ?>"><?php echo esc_html($_page); ?></a>
+									</li>
+								<?php endfor; ?>
+
+								<?php if($pagination_vars->current_page < $pagination_vars->total_pages): // Create a next page link? ?>
+									<?php $_next_page_url = $plugin->utils_url->sub_manage_summary_url($sub_key, NULL, array('page' => $pagination_vars->current_page + 1)); ?>
+									<li><a href="<?php echo esc_attr($_next_page_url); ?>">&raquo;</a></li>
+								<?php else: // Not possible; this is the last page. ?>
+									<li class="disabled"><a href="#">&raquo;</a></li>
+								<?php endif; ?>
+
+							</ul>
+						</nav>
+					</div>
+				</div>
+			<?php endif; // END: pagination links check. ?>
+
+			<?php
+			/* Javascript needed by this template.
+			 ------------------------------------------------------------------------------------------------------------------------ */
+			?>
 			<script type="text/javascript">
 				(function($) // Primary closure w/ jQuery; strict standards.
 				{

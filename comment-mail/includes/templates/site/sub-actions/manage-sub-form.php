@@ -50,6 +50,10 @@ namespace comment_mail;
  *
  * @var array       $error_codes An array of any/all major error codes; excluding processing error codes.
  *    Note that you should NOT display the form at all, if any major error exist here.
+ *
+ * -------------------------------------------------------------------
+ * @note In addition to plugin-specific variables & functionality,
+ *    you may also use any WordPress functions that you like.
  */
 ?>
 <?php // Sets document <title> tag via `%%title%%` replacement code in header.
@@ -61,11 +65,11 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
  * All based on what the template makes available to us;
  * ~ as documented at the top of this file.
  */
+// Site home page URL; i.e. back to the main site.
+$home_url = home_url('/'); // Multisite compatible.
+
 // Summary return URL; w/ all summary navigation vars preserved.
 $sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, NULL, TRUE);
-
-// Site home page URL; i.e. back to the main site.
-$home_url = home_url('/');
 ?>
 	<div class="manage-sub-form">
 
@@ -169,7 +173,7 @@ $home_url = home_url('/');
 
 			<h2 style="margin-top:0;">
 				<a href="<?php echo esc_attr($sub_summary_return_url); ?>" title="<?php echo __('Back to My Subscriptions', $plugin->text_domain); ?>">
-					<i class="fa fa-arrow-circle-left pull-right" style="font-size:50%; position:relative; z-index:1; top:5px; right:45px;"></i>
+					<i class="fa fa-arrow-circle-left pull-right" style="font-size:50%; position:relative; z-index:1; top:5px; right:50px;"></i>
 					<i class="<?php echo esc_attr('wsi-'.$plugin->slug); ?> pull-right"></i>
 				</a>
 				<?php if($is_edit): ?>
