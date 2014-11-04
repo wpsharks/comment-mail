@@ -60,8 +60,11 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function confirm($request_args)
 			{
-				$sub_key     = ''; // Initialize.
-				$sub         = NULL; // Initialize.
+				$sub_key = ''; // Initialize.
+
+				// Initialize others needed by template.
+				$sub = NULL = $sub_post = $sub_comment = NULL;
+
 				$error_codes = array(); // Initialize.
 
 				if(!($sub_key = $this->plugin->utils_sub->sanitize_key($request_args)))
@@ -69,6 +72,12 @@ namespace comment_mail // Root namespace.
 
 				else if(!($sub = $this->plugin->utils_sub->get($sub_key)))
 					$error_codes[] = 'invalid_sub_key';
+
+				else if(!($sub_post = get_post($sub->post_id)))
+					$error_codes[] = 'sub_post_id_missing';
+
+				else if($sub->comment_id && !($sub_comment = get_comment($sub->comment_id)))
+					$error_codes[] = 'sub_comment_id_missing';
 
 				$confirm_args = array('user_initiated' => TRUE); // Confirmation args.
 				if(!$error_codes && !($confirmed = $this->plugin->utils_sub->confirm($sub->ID, $confirm_args)))
@@ -96,8 +105,11 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function unsubscribe($request_args)
 			{
-				$sub_key     = ''; // Initialize.
-				$sub         = NULL; // Initialize.
+				$sub_key = ''; // Initialize.
+
+				// Initialize others needed by template.
+				$sub = NULL = $sub_post = $sub_comment = NULL;
+
 				$error_codes = array(); // Initialize.
 
 				if(!($sub_key = $this->plugin->utils_sub->sanitize_key($request_args)))
@@ -105,6 +117,12 @@ namespace comment_mail // Root namespace.
 
 				else if(!($sub = $this->plugin->utils_sub->get($sub_key)))
 					$error_codes[] = 'invalid_sub_key';
+
+				if($sub && !$error_codes)
+					$sub_post = get_post($sub->post_id);
+
+				if($sub && !$error_codes && $sub->comment_id)
+					$sub_comment = get_comment($sub->comment_id);
 
 				$delete_args = array('user_initiated' => TRUE); // Deletion args.
 				if(!$error_codes && !($deleted = $this->plugin->utils_sub->delete($sub->ID, $delete_args)))

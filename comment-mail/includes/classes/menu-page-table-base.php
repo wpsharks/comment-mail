@@ -599,7 +599,7 @@ namespace comment_mail // Root namespace.
 				             '<i class="fa fa-thumb-tack"></i>'. // Start w/ a thumb tack icon; works w/ any post type.
 				             ' <span style="font-weight:bold;">'.esc_html($post_type_label).' ID #'.esc_html($item->post_id).'</span>'.
 				             ' <span style="font-style:italic;">('.__('comments', $this->plugin->text_domain).' '.esc_html($post_comments_status).')</span><br />'.
-				             '<span title="'.esc_attr($post_date).'">“'.esc_html($post_title_clip).'”</span>';
+				             '<span title="'.esc_attr($post_date).'">&ldquo;'.esc_html($post_title_clip).'&rdquo;</span>';
 
 				$post_view_url    = $this->plugin->utils_url->post_short($item->post_id);
 				$post_edit_url    = $this->plugin->utils_url->post_edit_short($item->post_id);
@@ -1819,7 +1819,7 @@ namespace comment_mail // Root namespace.
 					if(!($_post_type = get_post_type_object($_post->post_type)))
 						continue; // Unable to determine type.
 
-					$_post_permalink  = get_permalink($_post);
+					$_post_permalink  = get_permalink($_post->ID);
 					$_post_edit_link  = get_edit_post_link($_post->ID, '');
 					$_post_title_clip = $this->plugin->utils_string->mid_clip($_post->post_title);
 					$_post_type_label = $_post_type->labels->singular_name;
@@ -1827,7 +1827,7 @@ namespace comment_mail // Root namespace.
 					$post_lis[$_post->ID] = '<li>'. // Type ID: <title> [edit].
 					                        '  <span style="font-weight:bold;">'.esc_html($_post_type_label).'</span>'.
 					                        '  <span style="font-weight:bold;">ID #'.esc_html($_post->ID).':</span>'.
-					                        '  “<a href="'.esc_attr($_post_permalink).'" target="_blank">'.esc_html($_post_title_clip).'</a>”'.
+					                        '  &ldquo;<a href="'.esc_attr($_post_permalink).'" target="_blank">'.esc_html($_post_title_clip).'</a>&rdquo;'.
 					                        ($_post_edit_link // Only if they can edit the post ID; else this will be empty.
 						                        ? ' [<a href="'.esc_attr($_post_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
 					                        '</li>';
@@ -1851,19 +1851,19 @@ namespace comment_mail // Root namespace.
 					$_name_email_args = array(
 						'email_style' => 'font-weight:normal;',
 					);
-					$_post_permalink  = get_permalink($_post);
+					$_post_permalink  = get_permalink($_post->ID);
 					$_post_edit_link  = get_edit_post_link($_post->ID, '');
 					$_post_title_clip = $this->plugin->utils_string->mid_clip($_post->post_title);
 					$_post_type_label = $_post_type->labels->singular_name;
 
-					$_comment_permalink    = get_comment_link($_comment);
+					$_comment_permalink    = get_comment_link($_comment->comment_ID);
 					$_comment_edit_link    = get_edit_comment_link($_comment->comment_ID);
 					$_comment_content_clip = $this->plugin->utils_string->clip($_comment->comment_content, 100);
 
 					$comment_lis[$_comment->comment_ID] = '<li>'. // Type ID: <title> [edit].
 					                                      '   <span style="font-weight:normal;">'.esc_html($_post_type_label).'</span>'.
 					                                      '   <span style="font-weight:normal;">ID #'.esc_html($_post->ID).':</span>'.
-					                                      '   “<a href="'.esc_attr($_post_permalink).'" target="_blank">'.esc_html($_post_title_clip).'</a>”'.
+					                                      '   &ldquo;<a href="'.esc_attr($_post_permalink).'" target="_blank">'.esc_html($_post_title_clip).'</a>&rdquo;'.
 					                                      ($_post_edit_link // Only if they can edit the post ID; else this will be empty.
 						                                      ? ' [<a href="'.esc_attr($_post_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
 

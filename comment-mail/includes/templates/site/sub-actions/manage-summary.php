@@ -17,7 +17,7 @@ namespace comment_mail;
  *    is display instead. Therefore, this value is mostly irrelevant
  *    for templates — only provided for the sake of being thorough.
  *
- * @var \stdClass      $sub_email Email address that we're displaying the summary for.
+ * @var string         $sub_email Email address that we're displaying the summary for.
  *
  *    Note that we may also display a summary of any comment subscriptions
  *    that are indirectly related to this email address, but still belong to the
@@ -43,10 +43,12 @@ namespace comment_mail;
  * @var \stdClass[]    $subs An array of all subscriptions to display as part of the summary on this `$query_vars->current_page`.
  *    Note that all query vars/filters/etc. will have already been applied; a template simply needs to iterate and display a table row for each of these.
  *    Subscriptions are ordered by `post_id` ASC, `comment_id` ASC, `email` ASC, and finally by `status` ASC.
+ *    Note: this array will be empty if there are any `$error_codes`.
  *
  * @var \stdClass|null $pagination_vars Pagination vars; consisting of: `current_page`, `per_page`, `total_subs`, `total_pages`.
  *    Note that `current_page` and `per_page` are simply duplicated here for convenience; same as you'll find in `$query_vars`.
  *    The `per_page` value is configured by plugin options from the dashboard; it cannot be modified here; these are read-only.
+ *    Note: this will be `NULL` if there are any `$error_codes`.
  *
  * @var boolean        $processing Are we (i.e. did we) process an action? e.g. a deletion from the list perhaps.
  *
@@ -88,7 +90,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $
  * All based on what the template makes available to us;
  * ~ as documented at the top of this file.
  */
-// Site home page URL; i.e. back to the main site.
+// Site home page URL; i.e. back to main site.
 $home_url = home_url('/'); // Multisite compatible.
 
 // Subscription creation URL; user may create a new subscription.
@@ -99,14 +101,13 @@ $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 		<?php if($error_codes): // Any major errors? ?>
 
 			<div class="alert alert-danger" style="margin:0;">
-				<p style="margin-top:0; font-weight:bold; font-size:120%;">
+				<h4>
 					<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
-				</p>
-				<ul class="list-unstyled" style="margin-bottom:0;">
+				</h4>
+				<ul class="list-unstyled">
 					<?php foreach($error_codes as $_error_code): ?>
-						<li style="margin-top:0; margin-bottom:0;">
-							<i class="fa fa-warning fa-fw"></i>
-							<?php switch($_error_code)
+						<li>
+							<i class="fa fa-warning fa-fw"></i> <?php switch($_error_code)
 							{
 								case 'missing_sub_key':
 									echo __('Missing subscription key; unable to display summary.', $plugin->text_domain);
@@ -117,7 +118,7 @@ $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 									break; // Break switch handler.
 
 								default: // Anything else that is unexpected/unknown at this time.
-									echo __('Unknown error; unable to display summary.', $plugin->text_domain);
+									echo __('Unknown error; unable to display summary. Sorry!', $plugin->text_domain);
 							} ?>
 						</li>
 					<?php endforeach; ?>
@@ -129,14 +130,13 @@ $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 			<?php if ($processing && $processing_errors): // Any processing errors? ?>
 
 				<div class="alert alert-danger">
-					<p style="margin-top:0; font-weight:bold; font-size:120%;">
+					<h4>
 						<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
-					</p>
-					<ul class="list-unstyled" style="margin-bottom:0;">
+					</h4>
+					<ul class="list-unstyled">
 						<?php foreach($processing_errors_html as $_error_code => $_error_html): ?>
-							<li style="margin-top:0; margin-bottom:0;">
-								<i class="fa fa-warning fa-fw"></i>
-								<?php echo $_error_html; ?>
+							<li>
+								<i class="fa fa-warning fa-fw"></i> <?php echo $_error_html; ?>
 							</li>
 						<?php endforeach; ?>
 					</ul>
@@ -147,14 +147,13 @@ $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 			<?php if ($processing && $processing_successes): // Any processing successes? ?>
 
 				<div class="alert alert-success">
-					<p style="margin-top:0; font-weight:bold; font-size:120%;">
+					<h4>
 						<?php echo __('Submission accepted; thank you :-)', $plugin->text_domain); ?>
-					</p>
-					<ul class="list-unstyled" style="margin-bottom:0;">
+					</h4>
+					<ul class="list-unstyled">
 						<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
-							<li style="margin-top:0; margin-bottom:0;">
-								<i class="fa fa-check fa-fw"></i>
-								<?php echo $_success_html; ?>
+							<li>
+								<i class="fa fa-check fa-fw"></i> <?php echo $_success_html; ?>
 							</li>
 						<?php endforeach; ?>
 					</ul>
@@ -162,22 +161,22 @@ $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 
 			<?php endif; ?>
 
-			<h2 style="margin-top:0;">
-				<a href="<?php echo esc_attr($sub_new_url); ?>" title="<?php echo __('Create New Subscription', $plugin->text_domain); ?>">
-					<i class="fa fa-plus-square pull-right"></i>
-				</a>
-				<?php echo __('My Comment Subscriptions', $plugin->text_domain); ?><br />
-				<em style="margin-left:10px;">
-					<small>&lt;<?php echo esc_html(implode('&gt;, &lt;', array_slice($sub_emails, 0, 100))); ?>&gt;</small>
-				</em>
-			</h2>
+				<h2 style="margin-top:0;">
+					<a href="<?php echo esc_attr($sub_new_url); ?>" title="<?php echo __('Create New Subscription', $plugin->text_domain); ?>">
+						<i class="fa fa-plus-square pull-right"></i>
+					</a>
+					<?php echo __('My Comment Subscriptions', $plugin->text_domain); ?><br />
+					<em style="margin-left:10px;">
+						<small>&lt;<?php echo esc_html(implode('&gt;, &lt;', array_slice($sub_emails, 0, 100))); ?>&gt;</small>
+					</em>
+				</h2>
 
 			<hr />
 
 			<?php if (empty($subs)): ?>
-				<p class="center-block" style="font-size:120%;">
+				<h4>
 					<?php echo sprintf(__('No subscriptions at this time. You may <a href="%1$s">click here</a> to create one <i class="fa fa-smile-o"></i>', $plugin->text_domain), esc_attr($sub_new_url)); ?>
-				</p>
+				</h4>
 			<?php endif; ?>
 
 			<div class="subs-table table-responsive">
@@ -212,16 +211,22 @@ $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 								 *    ~ as documented at the top of this file.
 								 */
 								// Post they are subscribed to.
+								//    Note: you CANNOT rely on the post still existing!
+								//    Always be sure to provide a fallback w/ just the `$_sub->post_id`
+								//    in case you deleted this post since they subscribed to it.
 								$_sub_post              = get_post($_sub->post_id);
-								$_sub_post_url          = get_permalink($_sub->post_id);
-								$_sub_post_comments_url = get_comments_link($_sub->post_id);
-								$_sub_post_title_clip   = $_sub_post ? $plugin->utils_string->clip($_sub_post->post_title) : '';
-								$_sub_post_type         = $_sub_post ? get_post_type_object($_sub_post->post_type) : '';
+								$_sub_post_url          = $_sub_post ? get_permalink($_sub_post->ID) : '';
+								$_sub_post_comments_url = $_sub_post ? get_comments_link($_sub_post->ID) : '';
+								$_sub_post_title_clip   = $_sub_post ? $plugin->utils_string->clip($_sub_post->post_title, 45) : '';
+								$_sub_post_type         = $_sub_post ? get_post_type_object($_sub_post->post_type) : NULL;
 								$_sub_post_type_label   = $_sub_post_type ? $_sub_post_type->labels->singular_name : '';
 
-								// A possible comment they are subscribed to; instead of just "all" comments.
+								// Comment they are subscribed to; if applicable.
+								//    Note: you CANNOT rely on the comment still existing!
+								//    Always be sure to provide a fallback w/ just the `$_sub->comment_id`
+								//    in case you deleted this comment since they subscribed to it.
 								$_sub_comment            = $_sub->comment_id ? get_comment($_sub->comment_id) : NULL;
-								$_sub_comment_url        = $_sub->comment_id ? get_comment_link($_sub->comment_id) : '';
+								$_sub_comment_url        = $_sub_comment ? get_comment_link($_sub_comment->comment_ID) : '';
 								$_sub_comment_date_utc   = $_sub_comment ? $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', strtotime($_sub_comment->comment_date_gmt)) : '';
 								$_sub_comment_date_local = $_sub_comment ? $plugin->utils_date->i18n('M jS, Y @ g:i a T', strtotime($_sub_comment->comment_date_gmt)) : '';
 								$_sub_comment_time_ago   = $_sub_comment ? $plugin->utils_date->approx_time_difference(strtotime($_sub_comment->comment_date_gmt)) : '';
@@ -237,11 +242,10 @@ $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 								// This is the subscriber's `"name" <email>` w/ HTML markup enhancements.
 								$_sub_name_email_markup = $plugin->utils_markup->name_email($_sub->fname.' '.$_sub->lname, $_sub->email, $_sub_name_email_args);
 
-								$_subscribed_to_own_comment = // Subscribed to their own comment?
-									$_sub_comment && in_array(strtolower($_sub_comment->comment_author_email), $sub_emails, TRUE);
+								// Subscribed to their own comment?
+								$_subscribed_to_own_comment = $_sub_comment && in_array(strtolower($_sub_comment->comment_author_email), $sub_emails, TRUE);
 								?>
-								<i class="<?php echo esc_attr('wsi-'.$plugin->slug.'-one'); ?>"></i>
-								<?php echo $_sub_name_email_markup; ?><br />
+								<i class="<?php echo esc_attr('wsi-'.$plugin->slug.'-one'); ?>"></i> <?php echo $_sub_name_email_markup; ?><br />
 
 								<div class="hover-links">
 									<a href="<?php echo esc_attr($_sub_edit_url); ?>"
@@ -258,7 +262,7 @@ $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 							</td>
 							<td>
 								<?php if($_sub_post && $_sub_post_type_label): ?>
-									<?php echo sprintf(__('%1$s ID# <a href="%2$s"><code>%3$s</code></a> <a href="%4$s">%5$s</a>', $plugin->text_domain), esc_html($_sub_post_type_label), esc_attr($_sub_post_url), esc_html($_sub->post_id), esc_attr($_sub_post_comments_url), esc_html($_sub_post_title_clip)); ?>
+									<?php echo sprintf(__('%1$s ID# <a href="%2$s"><code>%3$s</code></a> <a href="%4$s">%5$s</a>', $plugin->text_domain), esc_html($_sub_post_type_label), esc_attr($_sub_post_url), esc_html($_sub_post->ID), esc_attr($_sub_post_comments_url), esc_html($_sub_post_title_clip)); ?>
 								<?php else: // Post no longer exists for whatever reason; display post ID only in this case. ?>
 									<?php echo sprintf(__('Post ID# <code>%1$s</code>', $plugin->text_domain), esc_html($_sub->post_id)); ?>
 								<?php endif; ?>
@@ -268,9 +272,9 @@ $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 
 									<?php if($_sub_comment): ?>
 										<?php if($_subscribed_to_own_comment): ?>
-											<?php echo sprintf(__('Replies to <a href="%1$s">your comment</a>; ID# <a href="%1$s"><code>%2$s</code></a> posted %3$s', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub->comment_id), esc_html($_sub_comment_time_ago)); ?>
+											<?php echo sprintf(__('Replies to <a href="%1$s">your comment</a>; ID# <a href="%1$s"><code>%2$s</code></a> posted %3$s', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_ID), esc_html($_sub_comment_time_ago)); ?>
 										<?php else: // It's not their own comment; i.e. it's by someone else. ?>
-											<?php echo sprintf(__('Replies to <a href="%1$s">comment ID# <code>%2$s</code></a> posted %3$s', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub->comment_id), esc_html($_sub_comment_time_ago)); ?>
+											<?php echo sprintf(__('Replies to <a href="%1$s">comment ID# <code>%2$s</code></a> posted %3$s', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_ID), esc_html($_sub_comment_time_ago)); ?>
 										<?php endif; ?>
 										<?php if($_sub_comment->comment_author): ?>
 											<?php echo sprintf(__('by: <a href="%1$s">%2$s</a>', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_author)); ?>
@@ -296,12 +300,13 @@ $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 				</table>
 			</div>
 
-			<?php if ($pagination_vars->total_pages > 1): ?><hr />
+			<?php if($pagination_vars->total_pages > 1): ?>
+				<hr />
 				<div class="row subs-pagination">
 					<div class="col-md-3 text-left">
-						<span class="label label-default" style="font-size:110%; vertical-align:bottom;">
-							<?php echo sprintf(__('Page %1$s of %2$s', $plugin->text_domain), esc_html($pagination_vars->current_page), esc_html($pagination_vars->total_pages)); ?>
-						</span>
+							<span class="label label-default" style="font-size:110%; vertical-align:bottom;">
+								<?php echo sprintf(__('Page %1$s of %2$s', $plugin->text_domain), esc_html($pagination_vars->current_page), esc_html($pagination_vars->total_pages)); ?>
+							</span>
 					</div>
 					<div class="col-md-9 text-right">
 						<nav>
@@ -339,7 +344,7 @@ $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 						</nav>
 					</div>
 				</div>
-			<?php endif; // END: pagination links check. ?>
+			<?php endif; // END: pagination total pages check. ?>
 
 			<?php
 			/* Javascript needed by this template.

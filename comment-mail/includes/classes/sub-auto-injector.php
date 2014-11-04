@@ -60,7 +60,9 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
-				if(($post_id = (integer)$post_id))
+				$post_id = (integer)$post_id;
+
+				if($post_id) // Need to have this.
 					$this->post = get_post($post_id);
 
 				$defaults_args = array(

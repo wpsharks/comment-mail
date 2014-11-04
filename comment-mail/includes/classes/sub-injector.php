@@ -91,7 +91,9 @@ namespace comment_mail // Root namespace.
 
 				$this->user = $user; // \WP_user|null.
 
-				if(($comment_id = (integer)$comment_id) > 0)
+				$comment_id = (integer)$comment_id;
+
+				if($comment_id) // Need to have this.
 					$this->comment = get_comment($comment_id);
 
 				$defaults_args = array(

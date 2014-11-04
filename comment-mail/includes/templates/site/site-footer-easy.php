@@ -23,7 +23,7 @@ namespace comment_mail;
 /*
  * Here we define a few variables of our own.
  */
-// Site home page URL; i.e. back to the main site.
+// Site home page URL; i.e. back to main site.
 $home_url = home_url('/'); // Multisite compatible.
 
 // A clip of the blog's name; as configured in WordPress.
@@ -32,7 +32,7 @@ $blog_name_clip = $plugin->utils_string->clip(get_bloginfo('name'));
 // Summary return URL; w/ all summary navigation vars preserved.
 $sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url(!empty($sub_key) ? $sub_key : '', NULL, TRUE);
 
-// Current `host[/path]` with support for multisite network and child blogs.
+// Current `host[/path]` with support for multisite network child blogs.
 $current_host_path = $plugin->utils_url->current_host_path();
 
 // Privacy policy URL; as configured in plugin options via the dashboard.
@@ -45,9 +45,9 @@ $privacy_policy_url = $plugin->options['can_spam_privacy_policy_url'];
 		<div class="col-md-6 text-left">
 
 			<?php if($template_file !== 'site/sub-actions/manage-summary.php'): ?>
+				<?php // Displays a link leading them back to their subscriptions; if not already there. ?>
 				<a href="<?php echo esc_attr($sub_summary_return_url); ?>">
-					<i class="fa fa-arrow-circle-left"></i>
-					<?php echo __('Back to My Subscriptions', $plugin->text_domain); ?>
+					<i class="fa fa-arrow-circle-left"></i> <?php echo __('My Comment Subscriptions', $plugin->text_domain); ?>
 				</a>
 				<span class="text-muted">|</span>
 			<?php endif; ?>
