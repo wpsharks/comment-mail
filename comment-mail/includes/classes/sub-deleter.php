@@ -28,13 +28,6 @@ namespace comment_mail // Root namespace.
 			protected $sub; // Subscription.
 
 			/**
-			 * @var string Status before deletion.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $status_before;
-
-			/**
 			 * @var string Last IP.
 			 *
 			 * @since 14xxxx First documented version.
@@ -102,26 +95,33 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
-				$sub_id              = (integer)$sub_id;
-				$this->sub           = $this->plugin->utils_sub->get($sub_id);
-				$this->status_before = $this->sub ? $this->sub->status : '';
+				$sub_id    = (integer)$sub_id;
+				$this->sub = $this->plugin->utils_sub->get($sub_id);
 
 				$defaults_args = array(
 					'last_ip'        => '',
+
 					'oby_sub_id'     => 0,
+
 					'purging'        => FALSE,
 					'cleaning'       => FALSE,
+
 					'process_events' => TRUE,
+
 					'user_initiated' => FALSE,
 				);
 				$args          = array_merge($defaults_args, $args);
 				$args          = array_intersect_key($args, $defaults_args);
 
 				$this->last_ip        = (string)$args['last_ip'];
+
 				$this->oby_sub_id     = (integer)$args['oby_sub_id'];
+
 				$this->purging        = (boolean)$args['purging'];
 				$this->cleaning       = (boolean)$args['cleaning'];
+
 				$this->process_events = (boolean)$args['process_events'];
+
 				$this->user_initiated = (boolean)$args['user_initiated'];
 				$this->user_initiated = $this->plugin->utils_sub->check_user_initiated_by_admin(
 					$this->sub ? $this->sub->email : '', $this->user_initiated
@@ -175,8 +175,9 @@ namespace comment_mail // Root namespace.
 				if($this->sub->status === 'deleted')
 					return; // Deleted already.
 
-				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				$sub_before = (array)$this->sub; // For event logging.
 
+				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 				       " WHERE `ID` = '".esc_sql($this->sub->ID)."'";
 
 				if(($this->deleted = $this->plugin->utils_db->wp->query($sql)) === FALSE)
@@ -196,9 +197,8 @@ namespace comment_mail // Root namespace.
 					new sub_event_log_inserter(array_merge((array)$this->sub, array(
 						'event'          => $this->event_type,
 						'oby_sub_id'     => $this->oby_sub_id,
-						'status_before'  => $this->status_before,
 						'user_initiated' => $this->user_initiated,
-					))); // Log event data.
+					)), $sub_before); // Log event data.
 				}
 			}
 		}

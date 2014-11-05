@@ -112,11 +112,8 @@ namespace comment_mail // Root namespace.
 
 				}, $integer_keys);
 
-				if(in_array($key, $integer_keys, TRUE))
-					return TRUE;
-
-				if(preg_match('/_(?:'.implode('|', $preg_quoted_integer_keys).')$/i', $key))
-					return TRUE;
+				if(preg_match('/(?:^|_)(?:'.implode('|', $preg_quoted_integer_keys).')(?:_before)?$/i', $key))
+					return TRUE; // e.g. `id`, `x_id`, `x_x_id`, `x_id_before`, `time_before`, `x_time_before`.
 
 				return FALSE; // Default.
 			}

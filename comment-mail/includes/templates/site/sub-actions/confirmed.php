@@ -11,7 +11,8 @@ namespace comment_mail;
  *
  * @var \stdClass|null $sub Subscription object data.
  *
- * @var \WP_Post       $sub_post Post they're subscribed to.
+ * @var \WP_Post|null  $sub_post Post they're subscribed to.
+ *    This will be `NULL` if there were any `$error_codes` during processing.
  *
  * @var \stdClass|null $sub_comment Comment they're subcribed to; if applicable.
  *

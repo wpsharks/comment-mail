@@ -76,13 +76,6 @@ namespace comment_mail // Root namespace.
 			protected $sub; // On update only.
 
 			/**
-			 * @var string Status before update.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $status_before;
-
-			/**
 			 * @var boolean Did we update?
 			 *
 			 * @since 14xxxx First documented version.
@@ -319,12 +312,7 @@ namespace comment_mail // Root namespace.
 
 				$this->is_update = isset($this->data['ID']);
 				if($this->is_update && $this->data['ID'])
-				{
-					$this->sub           = $this->plugin->utils_sub->get($this->data['ID']);
-					$this->status_before = $this->sub->status; // For updates only.
-				}
-				if(!isset($this->status_before))
-					$this->status_before = ''; // Initialize.
+					$this->sub = $this->plugin->utils_sub->get($this->data['ID']);
 				$this->updated           = FALSE; // Initialize.
 				$this->email_key_changed = FALSE; // Initialize.
 
@@ -680,7 +668,6 @@ namespace comment_mail // Root namespace.
 				{
 					new sub_event_log_inserter(array_merge((array)$this->sub, array(
 						'event'          => 'inserted',
-						'status_before'  => '', // New insertion.
 						'user_initiated' => $this->user_initiated,
 					))); // Log event data.
 				}
@@ -711,6 +698,8 @@ namespace comment_mail // Root namespace.
 				$this->check_auto_confirm_before_insert_update();
 				$this->overwrite_duplicate_key_ids_before_update();
 
+				$sub_before = (array)$this->sub; // For event logging.
+
 				$table          = $this->plugin->utils_db->prefix().'subs';
 				$data_to_update = $this->plugin->utils_array->remove_nulls($this->data);
 				unset($data_to_update['ID']); // We don't need to update the `ID`.
@@ -737,9 +726,8 @@ namespace comment_mail // Root namespace.
 				{
 					new sub_event_log_inserter(array_merge((array)$this->sub, array(
 						'event'          => 'updated',
-						'status_before'  => $this->status_before,
 						'user_initiated' => $this->user_initiated,
-					))); // Log event data.
+					)), $sub_before); // Log event data.
 				}
 				if($this->process_confirmation && $this->sub->status === 'unconfirmed')
 				{

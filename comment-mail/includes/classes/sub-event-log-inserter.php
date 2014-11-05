@@ -32,38 +32,55 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param array $entry Log entry data.
+			 * @param array $entry Log entry data; w/ sub. now.
+			 *
+			 * @param array $before Log entry data; w/ sub. before.
+			 *    Not applicable w/ insertions.
 			 *
 			 * @throws \exception If `$entry` is missing required keys.
 			 */
-			public function __construct(array $entry)
+			public function __construct(array $entry, array $before = array())
 			{
 				parent::__construct();
 
 				$defaults = array(
-					'sub_id'         => 0,
-					'oby_sub_id'     => 0,
+					'sub_id'            => 0,
+					'key'               => '',
 
-					'user_id'        => 0,
-					'post_id'        => 0,
-					'comment_id'     => 0,
-					'deliver'        => '',
+					'oby_sub_id'        => 0,
 
-					'fname'          => '',
-					'lname'          => '',
-					'email'          => '',
-					'ip'             => '',
+					'user_id'           => 0,
+					'post_id'           => 0,
+					'comment_id'        => 0,
+					'deliver'           => '',
 
-					'status_before'  => '',
-					'status'         => '',
+					'fname'             => '',
+					'lname'             => '',
+					'email'             => '',
+					'ip'                => '',
 
-					'event'          => '',
-					'user_initiated' => 0,
+					'status'            => '',
 
-					'time'           => time(),
-				   /*
-				    * This needs to log keys too, so we can search the history for specific keys. @TODO
-				    */
+					'event'             => '',
+					'user_initiated'    => 0,
+
+					'time'              => time(),
+
+					/* ----------------- */
+
+					'key_before'        => '',
+
+					'user_id_before'    => 0,
+					'post_id_before'    => 0,
+					'comment_id_before' => 0,
+					'deliver_before'    => '',
+
+					'fname_before'      => '',
+					'lname_before'      => '',
+					'email_before'      => '',
+					'ip_before'         => '',
+
+					'status_before'     => '',
 				);
 				if(empty($entry['sub_id']) && !empty($entry['ID']))
 					$entry['sub_id'] = $entry['ID'];
@@ -74,7 +91,20 @@ namespace comment_mail // Root namespace.
 				if(empty($entry['ip']) && !empty($entry['insertion_ip']))
 					$entry['ip'] = $entry['insertion_ip'];
 
-				$this->entry = array_merge($defaults, $entry);
+				foreach($before as $_key => $_value)
+				{
+					$before[$_key.'_before'] = $_value;
+					unset($before[$_key]); // Unset.
+				}
+				unset($_key, $_value); // Housekeeping.
+
+				if(empty($before['ip_before']) && !empty($before['last_ip_before']))
+					$before['ip_before'] = $before['last_ip_before'];
+
+				if(empty($before['ip_before']) && !empty($before['insertion_ip_before']))
+					$before['ip_before'] = $before['insertion_ip_before'];
+
+				$this->entry = array_merge($defaults, $entry, $before);
 				$this->entry = array_intersect_key($this->entry, $defaults);
 				$this->entry = $this->plugin->utils_db->typify_deep($this->entry);
 

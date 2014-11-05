@@ -63,6 +63,8 @@ namespace comment_mail // Root namespace.
 					'ID'             => __('Entry', $plugin->text_domain),
 
 					'sub_id'         => __('Subscr. ID', $plugin->text_domain),
+					'key'            => __('Subscr. Key', $plugin->text_domain),
+
 					'user_id'        => __('WP User ID', $plugin->text_domain),
 
 					'event'          => __('Event', $plugin->text_domain),
@@ -93,6 +95,7 @@ namespace comment_mail // Root namespace.
 			public static function get_hidden_columns_()
 			{
 				return array(
+					'key',
 					'user_id',
 					'user_initiated',
 					'oby_sub_id',
@@ -116,10 +119,17 @@ namespace comment_mail // Root namespace.
 			public static function get_ft_searchable_columns_()
 			{
 				return array(
+					'key',
 					'fname',
 					'lname',
 					'email',
 					'ip',
+
+					'key_before',
+					'fname_before',
+					'lname_before',
+					'email_before',
+					'ip_before',
 				);
 			}
 
