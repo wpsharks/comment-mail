@@ -200,10 +200,10 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_process()
 			{
-				if(!$this->plugins->options['enable'])
+				if(!$this->plugin->options['enable'])
 					return; // Disabled currently.
 
-				if(!$this->plugins->options['queue_processing_enable'])
+				if(!$this->plugin->options['queue_processing_enable'])
 					return; // Disabled currently.
 
 				if(!($this->entries = $this->entries()))

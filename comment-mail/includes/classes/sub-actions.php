@@ -63,7 +63,7 @@ namespace comment_mail // Root namespace.
 				$sub_key = ''; // Initialize.
 
 				// Initialize others needed by template.
-				$sub = NULL = $sub_post = $sub_comment = NULL;
+				$sub = $sub_post = $sub_comment = NULL;
 
 				$error_codes = array(); // Initialize.
 
@@ -108,7 +108,7 @@ namespace comment_mail // Root namespace.
 				$sub_key = ''; // Initialize.
 
 				// Initialize others needed by template.
-				$sub = NULL = $sub_post = $sub_comment = NULL;
+				$sub = $sub_post = $sub_comment = NULL;
 
 				$error_codes = array(); // Initialize.
 
@@ -140,6 +140,8 @@ namespace comment_mail // Root namespace.
 
 				exit($template->parse($template_vars));
 			}
+
+			// @TODO Add an unsubscribe_all handler.
 
 			/**
 			 * Manage handler w/ sub. actions.

@@ -286,7 +286,7 @@ $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 								<?php endif; ?>
 							</td>
 							<td>
-								<?php echo esc_html($plugin->utils_i18n->subscr_type_label($_sub_type)); ?>
+								<?php echo esc_html($plugin->utils_i18n->sub_type_label($_sub_type)); ?>
 							</td>
 							<td>
 								<?php echo esc_html($plugin->utils_i18n->status_label($_sub->status)); ?>

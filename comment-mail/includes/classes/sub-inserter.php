@@ -878,7 +878,9 @@ namespace comment_mail // Root namespace.
 				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE `post_id` = '".esc_sql($this->sub->post_id)."'".
-				       " AND (`comment_id` = '0' OR `comment_id` = '".esc_sql($this->sub->comment_id)."')".
+
+				       (!$this->sub->comment_id ? '' // If all comments now; overwrite everything else.
+					       : " AND (`comment_id` = '0' OR `comment_id` = '".esc_sql($this->sub->comment_id)."')").
 
 				       ($this->sub->user_id // Has a user ID?
 					       ? " AND (`user_id` = '".esc_sql($this->sub->user_id)."'".

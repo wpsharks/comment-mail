@@ -99,19 +99,25 @@ namespace comment_mail // Root namespace.
 				$defaults_args = array(
 					'type'           => 'comment',
 					'deliver'        => 'asap',
+
 					'auto_confirm'   => NULL,
+
 					'process_events' => TRUE,
+
 					'user_initiated' => FALSE,
 				);
 				$args          = array_merge($defaults_args, $args);
 				$args          = array_intersect_key($args, $defaults_args);
 
-				$this->type    = strtolower((string)$args['type']);
-				$this->deliver = strtolower((string)$args['deliver']);
+				$this->type    = trim(strtolower((string)$args['type']));
+				$this->deliver = trim(strtolower((string)$args['deliver']));
+				$this->deliver = !$this->deliver ? 'asap' : $this->deliver;
 
 				if(isset($args['auto_confirm']))
 					$this->auto_confirm = (boolean)$args['auto_confirm'];
+
 				$this->process_events = (boolean)$args['process_events'];
+
 				$this->user_initiated = (boolean)$args['user_initiated'];
 				$this->user_initiated = $this->plugin->utils_sub->check_user_initiated_by_admin(
 					$this->comment ? $this->comment->comment_author_email : '', $this->user_initiated
@@ -135,6 +141,10 @@ namespace comment_mail // Root namespace.
 			 * Injects a new subscription.
 			 *
 			 * @since 14xxxx First documented version.
+			 *
+			 * @TODO there are going to be lots of overwritten subs
+			 *    since each time a comment is posted it may result in a new one.
+			 *    Is that what we want here?
 			 */
 			protected function maybe_inject()
 			{

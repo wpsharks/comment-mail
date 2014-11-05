@@ -420,15 +420,15 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string HTML markup for this table column.
 			 */
-			protected function column_subscr_type(\stdClass $item)
+			protected function column_sub_type(\stdClass $item)
 			{
-				if(!isset($item->subscr_type))
+				if(!isset($item->sub_type))
 					return '—'; // Not possible.
 
-				if(!$item->subscr_type)
+				if(!$item->sub_type)
 					return '—'; // Not possible.
 
-				return esc_html($this->plugin->utils_i18n->subscr_type_label($item->subscr_type));
+				return esc_html($this->plugin->utils_i18n->sub_type_label($item->sub_type));
 			}
 
 			/**
@@ -676,7 +676,7 @@ namespace comment_mail // Root namespace.
 				           ' <span style="font-weight:bold;">ID #'.esc_html($item->comment_id).'</span>';
 
 				if(empty($this->merged_result_sets['comments'][$item->comment_id]))
-					return esc_html($item->comment_id);
+					return $id_only; // All we can do.
 
 				$name_email_args   = array(
 					'email_style' => 'font-weight:normal;',
@@ -1161,7 +1161,7 @@ namespace comment_mail // Root namespace.
 				$this->set_items(array()); // `$this->items` = an array of \stdClass objects.
 				$this->set_total_items_available((integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()"));
 
-				$this->prepare_items_merge_subscr_type_property();
+				$this->prepare_items_merge_sub_type_property();
 				$this->prepare_items_merge_sub_properties();
 				$this->prepare_items_merge_user_properties();
 				$this->prepare_items_merge_post_properties();
@@ -1289,20 +1289,20 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function prepare_items_merge_subscr_type_property()
+			protected function prepare_items_merge_sub_type_property()
 			{
 				foreach($this->items as $_item)
 				{
-					$_item->subscr_type = NULL; // Initialize.
+					$_item->sub_type = NULL; // Initialize.
 
 					if(!isset($_item->post_id, $_item->comment_id))
 						continue; // Not possible.
 
 					if($_item->post_id && !$_item->comment_id)
-						$_item->subscr_type = 'comments';
+						$_item->sub_type = 'comments';
 
 					else if($_item->post_id && $_item->comment_id)
-						$_item->subscr_type = 'comment';
+						$_item->sub_type = 'comment';
 				}
 				unset($_item); // Housekeeping.
 

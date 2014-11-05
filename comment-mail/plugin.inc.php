@@ -289,10 +289,22 @@ namespace comment_mail
 					 *
 					 * Or, a site owner can allow other functionality to remain available, but stop
 					 * accepting new subscriptions if they so desire; i.e. by setting `new_subs_enable=0`.
+					 *
+					 * --------------------------------------------------------------------------------------
+					 * The `comment_form_template_enable` option can be turned off if the site owner would like to
+					 * implement their own HTML markup for comment subscription options; instead of the built-in template.
+					 *
+					 * The `comment_form_scripts_enable` option can be turned off if the site owner has decided not to use
+					 * the default HTML markup for comment subscription options; i.e. they might not need JavaScript in this case.
+					 *    Note that `comment_form_template_enable` must also be disabled for this option to actually work;
+					 *    i.e. the default comment form template relies on this; so IT must be off to turn this off.
 					 */
 					'enable'                                                            => '1', // `0|1`; enable?
 					'new_subs_enable'                                                   => '1', // `0|1`; enable?
 					'queue_processing_enable'                                           => '1', // `0|1`; enable?
+
+					'comment_form_template_enable'                                      => '1', // `0|1`; enable?
+					'comment_form_scripts_enable'                                       => '1', // `0|1`; enable?
 
 					/* Related to user authentication. */
 
@@ -394,6 +406,12 @@ namespace comment_mail
 					'comment_notification_parent_content_clip_max_chars'                => '100', // Max chars to include in notifications.
 					'comment_notification_content_clip_max_chars'                       => '200', // Max chars to include in notifications.
 
+					/* Related to front-end UI for subscribers. */
+
+					'comment_form_default_sub_type_option'                              => 'comment', // ``, `comment` or `comments`.
+					'comment_form_default_sub_deliver_option'                           => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
+					'sub_manage_summary_max_limit'                                      => '25', // Subscriptions per page.
+
 					/* Related to select menu options. */
 
 					'user_select_options_enable'                                        => '1', // `0|1`; enable?
@@ -417,6 +435,7 @@ namespace comment_mail
 					'template_site_site_footer'                                         => '', // HTML/PHP code.
 
 					'template_site_comment_form_sub_ops'                                => '', // HTML/PHP code.
+					'template_site_comment_form_sub_op_scripts'                         => '', // HTML/PHP code.
 
 					'template_site_sub_actions_confirmed'                               => '', // HTML/PHP code.
 					'template_site_sub_actions_unsubscribed'                            => '', // HTML/PHP code.
@@ -439,10 +458,6 @@ namespace comment_mail
 
 					'template_email_comment_notification_subject'                       => '', // HTML/PHP code.
 					'template_email_comment_notification_message'                       => '', // HTML/PHP code.
-
-					/* Related to summary display for subscribers. */
-
-					'sub_manage_summary_max_limit'                                      => '25', // Subscriptions per page.
 
 					/* Related to meta boxes. */
 
@@ -485,10 +500,14 @@ namespace comment_mail
 
 				add_action('init', array($this, 'comment_shortlink_redirect'), -11);
 
+				add_action('wp_print_scripts', array($this, 'enqueue_front_scripts'));
+
 				add_action('transition_post_status', array($this, 'post_status'), 10, 3);
 				add_action('before_delete_post', array($this, 'post_delete'), 10, 1);
 
-				add_action('comment_form', array($this, 'comment_form'), 5, 1);
+				add_filter('comment_form_field_comment', array($this, 'comment_form_filter_append'), 5, 1);
+				add_action('comment_form', array($this, 'comment_form'), 5, 0); // Secondary fallback.
+
 				add_action('comment_post', array($this, 'comment_post'), 10, 2);
 				add_action('transition_comment_status', array($this, 'comment_status'), 10, 3);
 
@@ -1256,6 +1275,15 @@ namespace comment_mail
 			}
 
 			/*
+			 * Front-Side Scripts
+			 */
+
+			public function enqueue_front_scripts()
+			{
+				new front_scripts();
+			}
+
+			/*
 			 * Post-Related Methods
 			 */
 
@@ -1342,17 +1370,49 @@ namespace comment_mail
 			}
 
 			/**
+			 * Comment form handler; via filter.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `comment_form_field_comment` filter.
+			 *
+			 * @param mixed $value Value passed in by a filter.
+			 *
+			 * @return mixed The `$value`; possibly filtered here.
+			 */
+			public function comment_form_filter_append($value)
+			{
+				if(!is_null($fired = &$this->static_key('comment_form')))
+					return $value; // We only handle this for a single hook.
+				// The first hook to fire this will win automatically.
+
+				if(is_string($value))
+				{
+					$fired = TRUE; // Flag as `TRUE` now.
+
+					ob_start(); // Output buffer.
+					new comment_form();
+					$value .= ob_get_clean();
+				}
+				return $value;
+			}
+
+			/**
 			 * Comment form handler.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
 			 * @attaches-to `comment_form` action.
-			 *
-			 * @param integer|string $post_id Post ID.
 			 */
-			public function comment_form($post_id)
+			public function comment_form()
 			{
-				new comment_form($post_id);
+				if(!is_null($fired = &$this->static_key(__FUNCTION__)))
+					return; // We only handle this for a single hook.
+				// The first hook to fire this will win automatically.
+
+				$fired = TRUE; // Flag as `TRUE` now.
+
+				new comment_form();
 			}
 
 			/**
