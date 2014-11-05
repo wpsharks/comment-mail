@@ -106,7 +106,7 @@ namespace comment_mail // Root namespace.
 				echo $this->form_fields->select_row(
 					array(
 						'placeholder'         => __('Select a Post ID...', $this->plugin->text_domain),
-						'label'               => __('<i class="fa fa-fw fa-thumb-tack"></i> Post ID#', $this->plugin->text_domain),
+						'label'               => __('<i class="fa fa-fw fa-thumb-tack"></i> Post ID #', $this->plugin->text_domain),
 						'name'                => 'post_id', 'required' => TRUE, 'options' => '%%posts%%', 'current_value' => $this->current_value_for('post_id'),
 						'notes'               => __('Required; the Post ID they are subscribed to.', $this->plugin->text_domain),
 						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'placeholder' => '', 'current_value_empty_on_0' => TRUE),
@@ -114,7 +114,7 @@ namespace comment_mail // Root namespace.
 				echo $this->form_fields->select_row(
 					array(
 						'placeholder'         => __('— All Comments/Replies —', $this->plugin->text_domain),
-						'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID#', $this->plugin->text_domain),
+						'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID #', $this->plugin->text_domain),
 						'name'                => 'comment_id', 'required' => FALSE, 'options' => '%%comments%%', 'post_id' => $this->current_value_for('post_id'), 'current_value' => $this->current_value_for('comment_id'),
 						'notes'               => __('If empty, they\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $this->plugin->text_domain),
 						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'current_value_empty_on_0' => TRUE),
@@ -122,7 +122,7 @@ namespace comment_mail // Root namespace.
 				echo $this->form_fields->select_row(
 					array(
 						'placeholder'         => __('— N/A; no WP User ID —', $this->plugin->text_domain),
-						'label'               => __('<i class="fa fa-fw fa-user"></i> WP User ID#', $this->plugin->text_domain),
+						'label'               => __('<i class="fa fa-fw fa-user"></i> WP User ID #', $this->plugin->text_domain),
 						'name'                => 'user_id', 'required' => FALSE, 'options' => '%%users%%', 'current_value' => $this->current_value_for('user_id'),
 						'notes'               => __('Associates subscription w/ a WP User ID (if applicable) to improve statistical reporting.', $this->plugin->text_domain).
 						                         ' '.__('If empty, the system will automatically try to find a matching user ID for the email address.', $this->plugin->text_domain),
@@ -252,7 +252,7 @@ namespace comment_mail // Root namespace.
 				return $form_fields->select_row(
 					array(
 						'placeholder'         => __('— All Comments/Replies —', $plugin->text_domain),
-						'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID#', $plugin->text_domain),
+						'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID #', $plugin->text_domain),
 						'name'                => 'comment_id', 'required' => FALSE, 'options' => '%%comments%%', 'post_id' => $post_id, 'current_value' => NULL,
 						'notes'               => __('If empty, they\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $plugin->text_domain),
 						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"'),
@@ -337,7 +337,7 @@ namespace comment_mail // Root namespace.
 					if($sub_updater->did_update()) // Updated successfully?
 					{
 						$plugin->enqueue_user_notice( // Queue notice.
-							sprintf(__('Subscription ID# <code>%1$s</code> updated successfully.', $plugin->text_domain), esc_html($request_args['ID'])),
+							sprintf(__('Subscription ID #<code>%1$s</code> updated successfully.', $plugin->text_domain), esc_html($request_args['ID'])),
 							array('transient' => TRUE, 'for_page' => $plugin->utils_env->current_menu_page()));
 
 						$redirect_to = $plugin->utils_url->page_table_nav_vars_only();
@@ -345,7 +345,7 @@ namespace comment_mail // Root namespace.
 					else // There were errors; display those errors to the current user.
 					{
 						$plugin->enqueue_user_error( // Queue error notice.
-							sprintf(__('Failed to update subscription ID# <code>%1$s</code>. Please review the following error(s):', $plugin->text_domain), esc_html($request_args['ID'])).
+							sprintf(__('Failed to update subscription ID #<code>%1$s</code>. Please review the following error(s):', $plugin->text_domain), esc_html($request_args['ID'])).
 							'<ul class="pmp-list-items"><li>'.implode('</li><li>', $sub_updater->errors_html()).'</li></ul>',
 							array('transient' => TRUE, 'for_page' => $plugin->utils_env->current_menu_page()));
 					}
@@ -357,7 +357,7 @@ namespace comment_mail // Root namespace.
 					if($sub_inserter->did_insert()) // Inserted successfully?
 					{
 						$plugin->enqueue_user_notice( // Queue notice.
-							sprintf(__('Subscription ID# <code>%1$s</code> created successfully.', $plugin->text_domain), esc_html($sub_inserter->insert_id())),
+							sprintf(__('Subscription ID #<code>%1$s</code> created successfully.', $plugin->text_domain), esc_html($sub_inserter->insert_id())),
 							array('transient' => TRUE, 'for_page' => $plugin->utils_env->current_menu_page()));
 
 						$redirect_to = $plugin->utils_url->page_table_nav_vars_only();

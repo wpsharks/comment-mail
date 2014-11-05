@@ -190,7 +190,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 					<?php echo $form_fields->select_row(
 						array(
 							'placeholder'         => __('Select a Post ID...', $plugin->text_domain),
-							'label'               => __('<i class="fa fa-fw fa-thumb-tack"></i> Post ID#', $plugin->text_domain),
+							'label'               => __('<i class="fa fa-fw fa-thumb-tack"></i> Post ID #', $plugin->text_domain),
 							'name'                => 'post_id', 'required' => TRUE, 'options' => '%%posts%%', 'current_value' => $current_value_for('post_id'),
 							'notes'               => __('Required; the Post ID you\'re subscribed to.', $plugin->text_domain),
 							'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'placeholder' => '', 'current_value_empty_on_0' => TRUE),
@@ -199,7 +199,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 					// Note: if you change this row; also change the AJAX template variation.
 						array(
 							'placeholder'         => __('— All Comments/Replies —', $plugin->text_domain),
-							'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID#', $plugin->text_domain),
+							'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID #', $plugin->text_domain),
 							'name'                => 'comment_id', 'required' => FALSE, 'options' => '%%comments%%', 'post_id' => $current_value_for('post_id'), 'current_value' => $current_value_for('comment_id'),
 							'notes'               => __('If empty, you\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $plugin->text_domain),
 							'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'current_value_empty_on_0' => TRUE),

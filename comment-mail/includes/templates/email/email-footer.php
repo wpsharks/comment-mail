@@ -25,7 +25,7 @@ namespace comment_mail;
 ?>
 <?php echo $email_footer_easy; ?>
 
-<hr />
+<hr style="margin-top:100px;" />
 
 <?php // Open table to hold important footer links. ?>
 
@@ -56,24 +56,19 @@ namespace comment_mail;
 		?>
 
 		<tr>
-			<td>
-				<p style="font-size:90%; color:#888888;">
-					<strong><?php echo __('Manage Subscription', $plugin->text_domain); ?></strong><br />
-					<?php echo sprintf(__('<a href="%1$s">My Comment Subscriptions (Summary)</a>', $plugin->text_domain), esc_attr($sub_summary_url)); ?><br />
-					<?php echo sprintf(__('<a href="%1$s">One-Click Unsubscribe</a>', $plugin->text_domain), esc_attr($sub_unsubscribe_url)); ?>
+			<td style="vertical-align:top;">
+				<p style="color:#888888;">
+					<strong><?php echo __('Manage Subscriptions', $plugin->text_domain); ?></strong><br />
+					<?php echo sprintf(__('<a href="%1$s">My Comment Subscriptions</a>', $plugin->text_domain), esc_attr($sub_summary_url)); ?><br />
+					&nbsp;&#42774;&nbsp; <?php echo sprintf(__('<a href="%1$s">One-Click Unsubscribe</a>', $plugin->text_domain), esc_attr($sub_unsubscribe_url)); ?>
 				</p>
 			</td>
-			<td style="padding-left:25px;">
-				<p style="font-size:90%; color:#888888;">
+			<td style="vertical-align:top; padding-left:100px;">
+				<p style="color:#888888;">
 					<strong><?php echo __('Create New Subscription?', $plugin->text_domain); ?></strong><br />
 					<?php echo sprintf(__('<a href="%1$s">Add New Comment Subscription</a>', $plugin->text_domain), esc_attr($sub_new_url)); ?>
 				</p>
 			</td>
-		</tr>
-
-		<tr style="height:10px;">
-			<td>&nbsp;</td>
-			<td>&nbsp;</td>
 		</tr>
 
 	<?php endif; ?>
@@ -97,16 +92,16 @@ namespace comment_mail;
 	?>
 
 	<tr>
-		<td>
-			<p style="font-size:90%; color:#888888;">
+		<td style="vertical-align:top;">
+			<p style="color:#888888;">
 				<strong><?php echo __('Contact Info', $plugin->text_domain); ?></strong><br />
 				<?php echo sprintf(__('Website URL: <a href="%1$s">%2$s</a>', $plugin->text_domain), esc_attr($home_url), esc_html($home_url)); ?><br />
 				<?php echo sprintf(__('Report Abuse to: <a href="mailto:%1$s">%2$s</a>', $plugin->text_domain), esc_attr(urlencode($can_spam_postmaster)), esc_html($can_spam_postmaster)); ?>
 			</p>
 		</td>
-		<td style="padding-left:25px;">
-			<p style="font-size:90%; color:#888888;">
-				<strong><?php echo __('Our Mailing Address is:', $plugin->text_domain); ?></strong><br />
+		<td style="vertical-align:top; padding-left:100px;">
+			<p style="color:#888888;">
+				<strong><?php echo __('Our Mailing Address', $plugin->text_domain); ?></strong><br />
 				<?php echo $can_spam_mailing_address; ?>
 			</p>
 		</td>

@@ -823,7 +823,7 @@ namespace comment_mail // Root namespace.
 
 				$icon   = '<i class="'.esc_attr('wsi-'.$this->plugin->slug).'"></i>';
 				$anchor = '<a href="'.esc_attr($anchor_to).'" target="'.esc_attr($anchor_target).'" style="'.esc_attr($anchor_style).'">'.
-				          ($icon_prefix ? $icon.' ' : '').esc_html($this->plugin->name).'™'.
+				          ($icon_prefix ? $icon.' ' : '').esc_html($this->plugin->name).'&trade;'.
 				          '</a>';
 				$suffix = $for_wordpress_suffix ? ' '.__('for WordPress', $this->plugin->text_domain) : '';
 

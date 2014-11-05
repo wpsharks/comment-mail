@@ -58,7 +58,7 @@ $sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $
 // A notification may contain one (or more) comments. Is this a digest?
 $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the notification.
 ?>
-	<h3>
+	<h2 style="margin-top:0; font-family:serif;">
 		<?php if($is_digest): // Multiple comments/replies in this notification? ?>
 
 			<?php if($sub_comment): // Subscribed to a specific comment? ?>
@@ -66,7 +66,7 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
 				<?php if($subscribed_to_own_comment): ?>
 					<?php echo sprintf(__('New Replies to <a href="%1$s">your Comment</a> on &ldquo;%2$s&rdquo;', $plugin->text_domain), esc_attr($sub_comment_url), esc_html($sub_post_title_clip)); ?>
 				<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
-					<?php echo sprintf(__('New Replies to <a href="%1$s">Comment ID# %2$s</a> on &ldquo;%3$s&rdquo;', $plugin->text_domain), esc_attr($sub_comment_url), esc_html($sub_comment->comment_ID), esc_html($sub_post_title_clip)); ?>
+					<?php echo sprintf(__('New Replies to <a href="%1$s">Comment ID #%2$s</a> on &ldquo;%3$s&rdquo;', $plugin->text_domain), esc_attr($sub_comment_url), esc_html($sub_comment->comment_ID), esc_html($sub_post_title_clip)); ?>
 				<?php endif; ?>
 
 			<?php else: // All comments/replies on this post. ?>
@@ -80,7 +80,7 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
 				<?php if($subscribed_to_own_comment): ?>
 					<?php echo sprintf(__('New Reply to <a href="%1$s">your Comment</a> on &ldquo;%2$s&rdquo;', $plugin->text_domain), esc_attr($sub_comment_url), esc_html($sub_post_title_clip)); ?>
 				<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
-					<?php echo sprintf(__('New Reply to <a href="%1$s">Comment ID# %2$s</a> on &ldquo;%3$s&rdquo;', $plugin->text_domain), esc_attr($sub_comment_url), esc_html($sub_comment->comment_ID), esc_html($sub_post_title_clip)); ?>
+					<?php echo sprintf(__('New Reply to <a href="%1$s">Comment ID #%2$s</a> on &ldquo;%3$s&rdquo;', $plugin->text_domain), esc_attr($sub_comment_url), esc_html($sub_comment->comment_ID), esc_html($sub_post_title_clip)); ?>
 				<?php endif; ?>
 
 			<?php else: // All comments/replies on this post ID. ?>
@@ -88,7 +88,7 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
 			<?php endif; ?>
 
 		<?php endif; ?>
-	</h3>
+	</h2>
 
 	<hr />
 
@@ -101,39 +101,39 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
 
 			$_comment_url      = get_comment_link($_comment->comment_ID);
 			$_comment_time_ago = $plugin->utils_date->approx_time_difference(strtotime($_comment->comment_date_gmt));
-			$_comment_clip     = $plugin->utils_markup->comment_content_clip($_comment, 'notification');
+			$_comment_clip     = $plugin->utils_markup->comment_content_clip($_comment, 'notification', TRUE);
 			?>
 			<li>
 				<?php if($_comment_parent): // This is a reply to someone? ?>
 
 					<p style="margin-bottom:0;">
-						<?php echo sprintf(__('In response to <a href="%1$s">comment ID# %2$s</a>;', $plugin->text_domain), esc_attr($_comment_parent_url), esc_html($_comment_parent->comment_ID)); ?>
+						<?php echo sprintf(__('In response to comment ID <a href="%1$s">#%2$s</a>', $plugin->text_domain), esc_attr($_comment_parent_url), esc_html($_comment_parent->comment_ID)); ?>
 						<?php if($_comment_parent->comment_author): ?>
-							<?php echo sprintf(__('by %1$s', $plugin->text_domain), esc_html($_comment_parent->comment_author)); ?>
+							<?php echo sprintf(__('— posted by %1$s', $plugin->text_domain), esc_html($_comment_parent->comment_author)); ?>
 						<?php endif; ?>
 					</p>
-					<p style="margin-top:0; font-style:italic; font-size:90%;">
+					<p style="font-style:italic; font-size:90%; margin-top:0;">
 						<?php echo esc_html($_comment_parent_clip); ?>
 					</p>
 					<ul>
 						<li>
-							<p style="font-weight:bold;">
+							<p style="font-size:110%; font-weight:bold;">
 								<?php if($_comment->comment_author): ?>
-									<?php echo sprintf(__('%1$s replies from new', $plugin->text_domain), esc_html($_comment->comment_author)); ?>
+									<?php echo sprintf(__('%1$s added this reply %2$s.', $plugin->text_domain), esc_html($_comment->comment_author), esc_html($_comment_time_ago)); ?>
 								<?php else: // The site is not collecting comment author names. ?>
-									<?php echo __('New', $plugin->text_domain); ?>
+									<?php echo sprintf(__('This reply was posted %1$s.', $plugin->text_domain), esc_html($_comment_time_ago)); ?>
 								<?php endif; ?>
-								<?php echo sprintf(__('<a href="%1$s">comment ID# %2$s</a> posted %3$s;', $plugin->text_domain), esc_attr($_comment_url), esc_html($_comment->comment_ID), esc_html($_comment_time_ago)); ?>
 							</p>
-							<p>
+							<p style="font-size:130%; font-family:serif; max-width:800px;">
 								<?php echo esc_html($_comment_clip); ?>
-
+							</p>
+							<p style="margin-bottom:0;">
 								<a href="<?php echo esc_attr($_comment_url); ?>">
 									<?php echo __('continue reading', $plugin->text_domain); ?>
 								</a>
 								<?php if($sub_post_comments_open): ?>
-									<a href="<?php echo esc_attr($_comment_url); ?>">
-										<?php echo '| '.__('add reply', $plugin->text_domain); ?>
+									| <a href="<?php echo esc_attr($_comment_url); ?>">
+										<?php echo __('add reply', $plugin->text_domain); ?>
 									</a>
 								<?php endif; ?>
 							</p>
@@ -142,23 +142,23 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
 
 				<?php else: // A new comment; i.e. not a reply to someone. ?>
 
-					<p style="font-weight:bold;">
+					<p style="font-size:110%; font-weight:bold;">
 						<?php if($_comment->comment_author): ?>
-							<?php echo sprintf(__('%1$s replies from new', $plugin->text_domain), esc_html($_comment->comment_author)); ?>
+							<?php echo sprintf(__('%1$s left this comment %2$s.', $plugin->text_domain), esc_html($_comment->comment_author), esc_html($_comment_time_ago)); ?>
 						<?php else: // The site is not collecting comment author names. ?>
-							<?php echo __('New', $plugin->text_domain); ?>
+							<?php echo sprintf(__('This comment was posted %1$s.', $plugin->text_domain), esc_html($_comment_time_ago)); ?>
 						<?php endif; ?>
-						<?php echo sprintf(__('<a href="%1$s">comment ID# %2$s</a> posted %3$s;', $plugin->text_domain), esc_attr($_comment_url), esc_html($_comment->comment_ID), esc_html($_comment_time_ago)); ?>
 					</p>
-					<p>
+					<p style="font-size:130%; font-family:serif; max-width:800px;">
 						<?php echo esc_html($_comment_clip); ?>
-
+					</p>
+					<p style="margin-bottom:0;">
 						<a href="<?php echo esc_attr($_comment_url); ?>">
 							<?php echo __('continue reading', $plugin->text_domain); ?>
 						</a>
 						<?php if($sub_post_comments_open): ?>
-							<a href="<?php echo esc_attr($_comment_url); ?>">
-								<?php echo '| '.__('add reply', $plugin->text_domain); ?>
+							| <a href="<?php echo esc_attr($_comment_url); ?>">
+								<?php echo __('add reply', $plugin->text_domain); ?>
 							</a>
 						<?php endif; ?>
 					</p>

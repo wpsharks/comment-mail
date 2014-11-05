@@ -112,10 +112,10 @@
 				bulkTopVal = $bulkTop.val(), bulkBottomVal = $bulkBottom.val();
 
 			if(bulkTopVal === 'reconfirm' || bulkBottomVal === 'reconfirm')
-				return confirm(i18n.bulk_reconfirm_confirmation);
+				return confirm(i18n.bulkReconfirmConfirmation);
 
 			else if(bulkTopVal === 'delete' || bulkBottomVal === 'delete')
-				return confirm(i18n.bulk_delete_confirmation);
+				return confirm(i18n.bulkDeleteConfirmation);
 
 			return true; // Default behavior.
 		});

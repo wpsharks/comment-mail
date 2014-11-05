@@ -56,17 +56,19 @@ $sub_last_ip = $sub->last_ip ? $sub->last_ip : __('unknown', $plugin->text_domai
 // Subscription last update time "ago"; e.g. `X [seconds/minutes/days/weeks/years] ago`.
 $sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $sub->last_update_time);
 ?>
-<?php if($sub->fname): ?>
-	<p style="margin-top:0; font-family:serif; font-size:140%;">
-		<?php echo esc_html(sprintf(__('Hi %1$s :-)', $plugin->text_domain), esc_html($sub->fname))); ?>
-	</p>
-<?php endif; ?>
 
-	<p style="font-size:120%;">
-		<?php echo __('Please', $plugin->text_domain); ?>
+	<p style="font-family:serif; font-size:140%;">
+
+		<?php if($sub->fname): // We can call them by name? ?>
+			<?php echo esc_html(sprintf(__('%1$s, please', $plugin->text_domain), esc_html($sub->fname))); ?>
+		<?php else: echo __('Please', $plugin->text_domain); endif; ?>
+
 		<a href="<?php echo esc_attr($sub_confirm_url); ?>">
-			<strong><?php echo __('click here to confirm', $plugin->text_domain); ?></strong></a>
+			<strong><?php echo __('click here to confirm', $plugin->text_domain); ?></strong>
+		</a>
+
 		<?php echo __('your subscription.', $plugin->text_domain); ?>
+
 	</p>
 
 	<p style="margin-left:10px;">
@@ -76,7 +78,7 @@ $sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $
 			<?php if($subscribed_to_own_comment): ?>
 				<?php echo sprintf(__('You\'ll be notified about replies to <a href="%1$s">your comment</a>; on:', $plugin->text_domain), esc_html($sub_comment_url)); ?>
 			<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
-				<?php echo sprintf(__('You\'ll be notified about replies to <a href="%1$s">comment ID# %2$s</a>; on:', $plugin->text_domain), esc_html($sub_comment_url), esc_html($sub_comment->comment_ID)); ?>
+				<?php echo sprintf(__('You\'ll be notified about replies to <a href="%1$s">comment ID #%2$s</a>; on:', $plugin->text_domain), esc_html($sub_comment_url), esc_html($sub_comment->comment_ID)); ?>
 			<?php endif; ?>
 
 		<?php else: // All comments/replies on this post. ?>
@@ -99,7 +101,7 @@ $sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $
 
 	</p>
 
-	<p style="margin-left:10px; font-style:italic;">
+	<p style="color:#888888; font-style:italic; margin-left:10px;">
 		<?php echo __('Note: if you did not make this request, please ignore this email. You will only be subscribed if you confirm.', $plugin->text_domain); ?>
 		<?php echo sprintf(__('This subscription was requested by %1$s; from IP address: <code>%2$s</code> on %3$s.', $plugin->text_domain), $sub_name_email_markup, esc_html($sub_last_ip), esc_html($sub_last_update_time_ago)); ?>
 		<?php echo __('If you need to report any continued abuse, please use the contact info at the bottom of this email.', $plugin->text_domain); ?>

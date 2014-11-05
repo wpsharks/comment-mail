@@ -273,9 +273,9 @@ str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $
 							</td>
 							<td>
 								<?php if($_sub_post && $_sub_post_type_label): ?>
-									<?php echo sprintf(__('%1$s ID# <a href="%2$s"><code>%3$s</code></a> <a href="%4$s">%5$s</a>', $plugin->text_domain), esc_html($_sub_post_type_label), esc_attr($_sub_post_url), esc_html($_sub_post->ID), esc_attr($_sub_post_comments_url), esc_html($_sub_post_title_clip)); ?>
+									<?php echo sprintf(__('%1$s ID <a href="%2$s">#<code>%3$s</code></a> <a href="%4$s">%5$s</a>', $plugin->text_domain), esc_html($_sub_post_type_label), esc_attr($_sub_post_url), esc_html($_sub_post->ID), esc_attr($_sub_post_comments_url), esc_html($_sub_post_title_clip)); ?>
 								<?php else: // Post no longer exists for whatever reason; display post ID only in this case. ?>
-									<?php echo sprintf(__('Post ID# <code>%1$s</code>', $plugin->text_domain), esc_html($_sub->post_id)); ?>
+									<?php echo sprintf(__('Post ID #<code>%1$s</code>', $plugin->text_domain), esc_html($_sub->post_id)); ?>
 								<?php endif; ?>
 
 								<?php if($_sub->comment_id): ?><br />
@@ -283,15 +283,15 @@ str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $
 
 									<?php if($_sub_comment): ?>
 										<?php if($_subscribed_to_own_comment): ?>
-											<?php echo sprintf(__('Replies to <a href="%1$s">your comment</a>; ID# <a href="%1$s"><code>%2$s</code></a> posted %3$s', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_ID), esc_html($_sub_comment_time_ago)); ?>
+											<?php echo sprintf(__('Replies to <a href="%1$s">your comment</a>; ID <a href="%1$s">#<code>%2$s</code></a> posted %3$s', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_ID), esc_html($_sub_comment_time_ago)); ?>
 										<?php else: // It's not their own comment; i.e. it's by someone else. ?>
-											<?php echo sprintf(__('Replies to <a href="%1$s">comment ID# <code>%2$s</code></a> posted %3$s', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_ID), esc_html($_sub_comment_time_ago)); ?>
+											<?php echo sprintf(__('Replies to <a href="%1$s">comment ID #<code>%2$s</code></a> posted %3$s', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_ID), esc_html($_sub_comment_time_ago)); ?>
 										<?php endif; ?>
 										<?php if($_sub_comment->comment_author): ?>
 											<?php echo sprintf(__('by: <a href="%1$s">%2$s</a>', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_author)); ?>
 										<?php endif; ?>
 									<?php else: // Comment no longer exists for whatever reason; display comment ID only in this case. ?>
-										<?php echo sprintf(__('Comment ID# <code>%1$s</code>', $plugin->text_domain), esc_html($_sub->comment_id)); ?>
+										<?php echo sprintf(__('Comment ID #<code>%1$s</code>', $plugin->text_domain), esc_html($_sub->comment_id)); ?>
 									<?php endif; ?>
 
 								<?php endif; ?>

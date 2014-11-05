@@ -19,3 +19,5 @@ namespace comment_mail;
  *    you may also use any WordPress functions that you like.
  */
 ?>
+
+<footer></footer>

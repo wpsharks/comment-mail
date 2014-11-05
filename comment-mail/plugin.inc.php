@@ -675,8 +675,8 @@ namespace comment_mail
 				if(in_array($post_type, $excluded_post_types, TRUE))
 					return; // Ignore; this post type excluded.
 
-				add_meta_box(__NAMESPACE__.'_small', $this->name.'™', array($this, 'post_small_meta_box'), $post_type, 'side', 'high');
-				add_meta_box(__NAMESPACE__.'_large', $this->name.'™ '.__('Subscriptions', $this->text_domain),
+				add_meta_box(__NAMESPACE__.'_small', $this->name.'&trade;', array($this, 'post_small_meta_box'), $post_type, 'side', 'high');
+				add_meta_box(__NAMESPACE__.'_large', $this->name.'&trade; '.__('Subscriptions', $this->text_domain),
 				             array($this, 'post_large_meta_box'), $post_type, 'normal', 'high');
 			}
 
@@ -777,33 +777,33 @@ namespace comment_mail
 				$icon = file_get_contents(dirname(__FILE__).'/client-s/images/inline-icon.svg');
 
 				$_ = // Each branch uses the following UTF-8 char `꜖`; <http://unicode-table.com/en/A716/>.
-					'<span style="inline-block; margin-left:.5em; position:relative; top:-.2em; left:-.2em; font-weight:normal; opacity:0.2;">꜖</span> ';
+					'<span style="inline-block; margin-left:.5em; position:relative; top:-.2em; left:-.2em; font-weight:normal; opacity:0.2;">&#42774;</span> ';
 
 				$__ = // Each branch uses the following UTF-8 char `꜖`; <http://unicode-table.com/en/A716/>.
-					'<span style="inline-block; margin-left:1.5em; position:relative; top:-.2em; left:-.2em; font-weight:normal; opacity:0.2;">꜖</span> ';
+					'<span style="inline-block; margin-left:1.5em; position:relative; top:-.2em; left:-.2em; font-weight:normal; opacity:0.2;">&#42774;</span> ';
 
-				$menu_title                           = $this->name.'™ '.$icon;
-				$page_title                           = $this->name.'™'; // w/o icon.
+				$menu_title                           = $this->name.'&trade; '.$icon;
+				$page_title                           = $this->name.'&trade;'; // w/o icon.
 				$this->menu_page_hooks[__NAMESPACE__] = add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__], array($this, 'menu_page_options_screen'));
 
 				$menu_title                                   = $_.__('Subscriptions', $this->text_domain);
-				$page_title                                   = $this->name.'™ ⥱ '.__('Subscriptions', $this->text_domain);
+				$page_title                                   = $this->name.'&trade; &#10609; '.__('Subscriptions', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_subs'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_subs', array($this, 'menu_page_subs'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_subs'], array($this, 'menu_page_subs_screen'));
 
 				$menu_title                                            = $__.__('Event Log', $this->text_domain);
-				$page_title                                            = $this->name.'™ ⥱ '.__('Sub. Event Log', $this->text_domain);
+				$page_title                                            = $this->name.'&trade; &#10609; '.__('Sub. Event Log', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_sub_event_log'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_sub_event_log', array($this, 'menu_page_sub_event_log'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_sub_event_log'], array($this, 'menu_page_sub_event_log_screen'));
 
 				$menu_title                                    = $_.__('Mail Queue', $this->text_domain);
-				$page_title                                    = $this->name.'™ ⥱ '.__('Mail Queue', $this->text_domain);
+				$page_title                                    = $this->name.'&trade; &#10609; '.__('Mail Queue', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_queue'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue'], array($this, 'menu_page_queue_screen'));
 
 				$menu_title                                              = $__.__('Event Log', $this->text_domain);
-				$page_title                                              = $this->name.'™ ⥱ '.__('Queue Event Log', $this->text_domain);
+				$page_title                                              = $this->name.'&trade; &#10609; '.__('Queue Event Log', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_queue_event_log', array($this, 'menu_page_queue_event_log'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'], array($this, 'menu_page_queue_event_log_screen'));
 			}

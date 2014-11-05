@@ -61,7 +61,7 @@ namespace comment_mail;
 
 	<?php if($current->sub_email): // TIP: this is optional. If you exclude this, subscribers can still view their summary via emails they receive. ?>
 		<div class="cso-links">
-			[<a href="<?php echo esc_attr($sub_summary_url); ?>" target="_blank" class="cso-link-summary"><?php echo __('Manage My Comment Subscriptions', $plugin->text_domain); ?></a>]
+			&nbsp;&#42774;&nbsp; <a href="<?php echo esc_attr($sub_summary_url); ?>" target="_blank" class="cso-link-summary"><?php echo __('Manage My Comment Subscriptions', $plugin->text_domain); ?></a>
 		</div>
 	<?php endif; ?>
 
