@@ -79,12 +79,11 @@ namespace comment_mail // Root namespace.
 				else if($sub->comment_id && !($sub_comment = get_comment($sub->comment_id)))
 					$error_codes[] = 'sub_comment_id_missing';
 
-				$confirm_args = array('user_initiated' => TRUE); // Confirmation args.
-				if(!$error_codes && !($confirmed = $this->plugin->utils_sub->confirm($sub->ID, $confirm_args)))
-					$error_codes[] = $confirmed === NULL ? 'invalid_sub_key' : 'sub_already_confirmed';
-
 				if(!$error_codes) // If no errors; set current email.
 					$this->plugin->utils_sub->set_current_email($sub_key, $sub->email);
+
+				if(!$error_codes && !($confirmed = $this->plugin->utils_sub->confirm($sub->ID, array('user_initiated' => TRUE))))
+					$error_codes[] = $confirmed === NULL ? 'invalid_sub_key' : 'sub_already_confirmed';
 
 				$template_vars = get_defined_vars(); // Everything above.
 				$template      = new template('site/sub-actions/confirmed.php');
@@ -118,19 +117,17 @@ namespace comment_mail // Root namespace.
 				else if(!($sub = $this->plugin->utils_sub->get($sub_key)))
 					$error_codes[] = 'invalid_sub_key';
 
-				if($sub && !$error_codes)
+				if(!$error_codes) // May not exist!
 					$sub_post = get_post($sub->post_id);
 
-				if($sub && !$error_codes && $sub->comment_id)
+				if(!$error_codes && $sub->comment_id) // May not exist!
 					$sub_comment = get_comment($sub->comment_id);
 
-				$delete_args = array('user_initiated' => TRUE); // Deletion args.
-				if(!$error_codes && !($deleted = $this->plugin->utils_sub->delete($sub->ID, $delete_args)))
-					$error_codes[] = $deleted === NULL ? 'invalid_sub_key' : 'sub_already_unsubscribed';
-
-				if(!$error_codes) // If no errors; set current email.
-					// @TODO After deletion this may fail; since the key will not exist any longer.
+				if(!$error_codes) // Note: this MUST come before deletion.
 					$this->plugin->utils_sub->set_current_email($sub_key, $sub->email);
+
+				if(!$error_codes && !($deleted = $this->plugin->utils_sub->delete($sub->ID, array('user_initiated' => TRUE))))
+					$error_codes[] = $deleted === NULL ? 'invalid_sub_key' : 'sub_already_unsubscribed';
 
 				$template_vars = get_defined_vars(); // Everything above.
 				$template      = new template('site/sub-actions/unsubscribed.php');

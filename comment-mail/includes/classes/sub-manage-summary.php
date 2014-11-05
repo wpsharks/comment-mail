@@ -153,6 +153,8 @@ namespace comment_mail // Root namespace.
 			 * @param string $sub_key Unique subscription key (optional).
 			 *    If this is empty, we use the sub's current email address.
 			 *
+			 * @TODO if this is invalid; should we revert to current sub's email address?
+			 *
 			 * @param array  $request_args An array of any nav request args.
 			 */
 			public function __construct($sub_key = '', array $request_args = array())
