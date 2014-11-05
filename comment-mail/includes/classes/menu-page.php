@@ -46,7 +46,7 @@ namespace comment_mail // Root namespace.
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-area').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_only()).'" novalidate="novalidate">'."\n";
 
-				echo '      '.$this->heading(__('Plugin Options', $this->plugin->text_domain), 'options.png').
+				echo '      '.$this->heading(__('Plugin Options', $this->plugin->text_domain), 'logo.png').
 				     '      '.$this->notifications(); // Heading/notifications.
 
 				echo '      <div class="pmp-body">'."\n";
@@ -219,15 +219,15 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string $title Title of this menu page.
-			 * @param string $icon Icon for this menu page; e.g. `options.png`.
+			 * @param string $logo_icon Logo/icon for this menu page.
 			 *
 			 * @return string The heading for this menu page.
 			 */
-			protected function heading($title, $icon)
+			protected function heading($title, $logo_icon)
 			{
-				$heading = ''; // Initialize heading.
-				$title   = (string)$title; // Force string.
-				$icon    = (string)$icon; // Force string.
+				$title     = (string)$title;
+				$logo_icon = (string)$logo_icon;
+				$heading   = ''; // Initialize.
 
 				$heading .= '<div class="pmp-heading">'."\n";
 
@@ -248,7 +248,7 @@ namespace comment_mail // Root namespace.
 				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->subscribe_page()).'" target="_blank"><i class="fa fa-envelope"></i> '.__('Newsletter (Subscribe)', $this->plugin->text_domain).'</a>'."\n";
 				$heading .= '  </div>'."\n";
 
-				$heading .= '  <img src="'.$this->plugin->utils_url->to('/client-s/images/'.$icon).'" alt="'.esc_attr($title).'" style="max-width:400px;" />'."\n";
+				$heading .= '  <img src="'.$this->plugin->utils_url->to('/client-s/images/'.$logo_icon).'" alt="'.esc_attr($title).'" />'."\n";
 
 				$heading .= '</div>'."\n";
 
