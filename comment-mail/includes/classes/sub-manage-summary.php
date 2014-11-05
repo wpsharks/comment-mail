@@ -151,9 +151,7 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 *
 			 * @param string $sub_key Unique subscription key (optional).
-			 *    If this is empty, we use the sub's current email address.
-			 *
-			 * @TODO if this is invalid; should we revert to current sub's email address?
+			 *    If this is empty (or invalid), we use the sub's current email address.
 			 *
 			 * @param array  $request_args An array of any nav request args.
 			 */
@@ -163,8 +161,12 @@ namespace comment_mail // Root namespace.
 
 				if(($this->sub_key = trim((string)$sub_key)))
 					$this->sub_email = $this->plugin->utils_sub->key_to_email($this->sub_key);
-				else $this->sub_email = $this->plugin->utils_sub->current_email();
 
+				if(!$this->sub_email) // Fallback on current email address.
+				{
+					$this->sub_key   = ''; // Key empty/invalid in this case.
+					$this->sub_email = $this->plugin->utils_sub->current_email();
+				}
 				$this->sub_user_ids       = array(); // Initialize.
 				$this->sub_user_id_emails = array(); // Initialize.
 
@@ -180,8 +182,8 @@ namespace comment_mail // Root namespace.
 
 				$this->query_vars = new \stdClass; // Initialize.
 
-				$this->query_vars->current_page     = max(1, (integer)$request_args['page']);
-				$this->query_vars->per_page = (integer)$this->plugin->options['sub_manage_summary_max_limit'];
+				$this->query_vars->current_page = max(1, (integer)$request_args['page']);
+				$this->query_vars->per_page     = (integer)$this->plugin->options['sub_manage_summary_max_limit'];
 
 				$this->query_vars->post_id = $this->isset_or($request_args['post_id'], NULL, 'integer');
 				$this->query_vars->status  = trim(strtolower((string)$request_args['status']));
