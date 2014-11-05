@@ -1,10 +1,4 @@
 /* ------------------------------------------------------------------------------------------------------------
-	Other resources; compatible w/ the WP core.
------------------------------------------------------------------------------------------------------------- */
-@import url('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.min.css');
-@import url('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css');
-@import url('../../submodules/sharkicons/styles.min.css');
-/* ------------------------------------------------------------------------------------------------------------
 	Plugin-specific styles for any menu page area of the dashboard.
 ------------------------------------------------------------------------------------------------------------ */
 /*
@@ -27,7 +21,7 @@ A menu page area ~ notifications.
 }
 .comment-mail-menu-page-area .pmp-notif-notice
 {
-	background : #FFFBCC;
+	background : #FFFDE8;
 	border     : 1px solid #E6DB55;
 }
 .comment-mail-menu-page-area .pmp-notif-warning
@@ -146,12 +140,12 @@ Menu page styles.
 }
 .comment-mail-menu-page a
 {
-	color : #003E75;
+	color : #346098;
 }
 .comment-mail-menu-page a:hover,
 .comment-mail-menu-page a:active
 {
-	color : #027E02;
+	color : #307D27;
 }
 .comment-mail-menu-page p,
 .comment-mail-menu-page code
@@ -172,7 +166,7 @@ Menu page styles.
 {
 	border-radius : 3px;
 	padding       : 1px 5px 1px 5px;
-	background    : rgba(255, 255, 255, 0.25);
+	background    : rgba(178, 178, 178, 0.25);
 	font-family   : 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
 }
 .comment-mail-menu-page pre.pmp-code
@@ -191,7 +185,7 @@ Menu page styles.
 	border-radius : 4px;
 	padding       : 10px;
 	display       : block;
-	box-shadow    : 0 0 2px 1px #000000 inset, 0 0 1px 1px rgba(223, 245, 165, 0.5);
+	box-shadow    : 0 0 2px 1px #000000 inset, 0 0 1px 1px rgba(0, 0, 0, 0.5);
 }
 .comment-mail-menu-page img
 {
@@ -203,12 +197,12 @@ Menu page styles.
 	padding       : 10px;
 	background    : #FFFFFF;
 	border        : 1px solid #AFAFAF;
-	box-shadow    : 0 0 2px 1px #D8D8D8 inset, 0 0 1px 1px rgba(223, 245, 165, 0.5);
+	box-shadow    : 0 0 2px 1px #D8D8D8 inset, 0 0 1px 1px rgba(0, 0, 0, 0.5);
 }
 .comment-mail-menu-page hr
 {
 	margin : 25px 0 25px 0;
-	border : 1px solid #91DD97;
+	border : 1px solid #CCCCCC;
 }
 .comment-mail-menu-page label
 {
@@ -253,21 +247,21 @@ Menu page styles.
 	border        : 0;
 	padding       : 5px;
 	border-radius : 4px;
-	box-shadow    : 0 0 1px 1px rgba(37, 47, 26, 0.75) inset, 0 0 1px 1px rgba(223, 245, 165, 0.5);
+	box-shadow    : 0 0 1px 1px rgba(161, 161, 161, 0.75) inset;
 }
 .comment-mail-menu-page select,
 .comment-mail-menu-page textarea,
 .comment-mail-menu-page input:not([type='radio']):not([type='checkbox'])
 {
-	color      : #F7F7F7;
-	background : #73834B;
+	color      : #000000;
+	background : #DADADA;
 }
 .comment-mail-menu-page select:focus,
 .comment-mail-menu-page textarea:focus,
 .comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus,
 .comment-mail-menu-page /* CodeMirror wrappers. */.cm
 {
-	background : #637041;
+	background : #FFFFFF;
 }
 .comment-mail-menu-page select.pmp-max-width,
 .comment-mail-menu-page textarea.pmp-max-width,
@@ -280,25 +274,25 @@ Menu page styles.
 {
 	padding-top : 3px;
 	font-style  : italic;
-	color       : rgba(255, 255, 255, 0.2);
+	color       : rgba(0, 0, 0, 0.2);
 }
 .comment-mail-menu-page input::-moz-placeholder
 {
 	padding-top : 3px;
 	font-style  : italic;
-	color       : rgba(255, 255, 255, 0.2);
+	color       : rgba(0, 0, 0, 0.2);
 }
 .comment-mail-menu-page input:-moz-placeholder
 {
 	padding-top : 3px;
 	font-style  : italic;
-	color       : rgba(255, 255, 255, 0.2);
+	color       : rgba(0, 0, 0, 0.2);
 }
 .comment-mail-menu-page input:-ms-input-placeholder
 {
 	padding-top : 3px;
 	font-style  : italic;
-	color       : rgba(255, 255, 255, 0.2);
+	color       : rgba(0, 0, 0, 0.2);
 }
 .comment-mail-menu-page input[disabled],
 .comment-mail-menu-page select[disabled],
@@ -316,7 +310,7 @@ Menu page styles.
 	font-size           : 150%;
 	font-weight         : bold;
 	color               : #FFFFFF;
-	background          : #0E4152;
+	background          : #3e76b8;
 
 	border-radius       : 4px;
 	border              : 1px solid rgba(0, 0, 0, 0.5);
@@ -337,16 +331,12 @@ Menu page styles.
 }
 .comment-mail-menu-page button:hover
 {
-	background : #0D1F2F;
+	background : #3BA633;
 }
 .comment-mail-menu-page button:active
 {
 	-webkit-transform : scale(0.98, 0.98);
 	transform         : scale(0.98, 0.98);
-}
-.comment-mail-menu-page button[type='submit']:hover
-{
-	background : #4C6324;
 }
 .comment-mail-menu-page .pmp-pro-preview
 {
@@ -375,11 +365,11 @@ Menu page heading styles.
 .comment-mail-menu-page .pmp-heading img.pmp-logo-icon
 {
 	margin-left : 10px;
-	width       : 400px;
+	width       : 500px;
 }
 .comment-mail-menu-page .pmp-heading .pmp-heading-links
 {
-	left       : 450px;
+	left       : 550px;
 	bottom     : 20px;
 	position   : absolute;
 	text-align : center;
@@ -420,7 +410,7 @@ Menu page panel styles.
 	padding             : 10px;
 	font-size           : 150%;
 	font-weight         : bold;
-	background          : #173B47;
+	background          : #346098;
 	color               : #EEEEEE !important;
 
 	border-radius       : 4px;
@@ -434,7 +424,7 @@ Menu page panel styles.
 .comment-mail-menu-page .pmp-panel-heading:hover,
 .comment-mail-menu-page .pmp-panel-heading.open
 {
-	background : #0D1F2F;
+	background : #307D27;
 	color      : #FFFFFF !important;
 }
 .comment-mail-menu-page .pmp-panel-heading:after
@@ -470,7 +460,7 @@ Menu page panel styles.
 
 	padding                    : 25px;
 	color                      : #333333;
-	background                 : #D0DDAD;
+	background                 : #FFFFFF;
 
 	border-bottom-left-radius  : 4px;
 	border-bottom-right-radius : 4px;

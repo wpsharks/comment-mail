@@ -6,32 +6,8 @@
 		$window = $(window),
 		$document = $(document);
 
-	plugin.scriptsLoading = {};
-
-	plugin.loadScript = function(url)
-	{
-		url = String(url);
-
-		var ajaxOptions = {
-			url     : url,
-			cache   : true,
-			dataType: 'script',
-			success : function()
-			{
-				delete plugin.scriptsLoading[url];
-			}
-		};
-		plugin.scriptsLoading[url] = -1,
-			$.ajax(ajaxOptions);
-	};
-	plugin.scriptsReady = function()
-	{
-		return $.isEmptyObject(plugin.scriptsLoading);
-	};
 	plugin.onReady = function() // jQuery DOM ready event handler.
 	{
-		if(!plugin.scriptsReady()) return setTimeout(plugin.onReady, 100);
-
 		/* ------------------------------------------------------------------------------------------------------------
 		 Plugin-specific selectors needed by routines below.
 		 ------------------------------------------------------------------------------------------------------------ */
@@ -260,7 +236,5 @@
 		});
 		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 	};
-	plugin.loadScript('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.min.js');
-
 	$document.ready(plugin.onReady); // DOM ready handler.
 })(jQuery);

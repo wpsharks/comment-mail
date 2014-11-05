@@ -74,6 +74,7 @@ namespace comment_mail // Root namespace.
 				echo '                     <option value="0"'.selected($this->plugin->options['uninstall_on_deletion'], '0', FALSE).'>'.__('Safeguard my options and subscriptions (recommended).', $this->plugin->text_domain).'</option>'."\n";
 				echo '                     <option value="1"'.selected($this->plugin->options['uninstall_on_deletion'], '1', FALSE).'>'.sprintf(__('Yes, uninstall (completely erase) %1$s on plugin deletion.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</option>'."\n";
 				echo '                  </select></p>'."\n";
+				echo '               <p><input type="text" placeholder="hello world" /></p>'."\n";
 				echo '            </div>'."\n";
 				echo '         </div>'."\n";
 
