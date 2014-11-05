@@ -829,6 +829,10 @@ namespace comment_mail
 				$page_title                                              = $this->name.'&trade; &#10609; '.__('Queue Event Log', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_queue_event_log', array($this, 'menu_page_queue_event_log'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'], array($this, 'menu_page_queue_event_log_screen'));
+
+				$menu_title = $_.__('Config. Options', $this->text_domain);
+				$page_title = $this->name.'&trade; &#10609; '.__('Config. Options', $this->text_domain);
+				add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__, array($this, 'menu_page_options'));
 			}
 
 			/**
