@@ -727,6 +727,13 @@ namespace comment_mail
 
 				$deps = array(); // Plugin dependencies.
 
+				if($this->utils_env->is_menu_page(__NAMESPACE__)) // Main options page only.
+				{
+					$deps[] = __NAMESPACE__.'-cm'; // CodeMirror dependency is added to the array now.
+
+					wp_enqueue_style(__NAMESPACE__.'-cm', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/codemirror.min.css'), array(), NULL, 'all');
+					wp_enqueue_style(__NAMESPACE__.'-cm-theme', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/theme/twilight.css'), array(__NAMESPACE__.'-cm'), NULL, 'all');
+				}
 				wp_enqueue_style(__NAMESPACE__, $this->utils_url->to('/client-s/css/menu-pages.min.css'), $deps, $this->version, 'all');
 			}
 
@@ -744,6 +751,19 @@ namespace comment_mail
 
 				$deps = array('jquery'); // Plugin dependencies.
 
+				if($this->utils_env->is_menu_page(__NAMESPACE__)) // Main options page only.
+				{
+					$deps[] = __NAMESPACE__.'-cm'; // CodeMirror dependency is added to the array now.
+
+					wp_enqueue_script(__NAMESPACE__.'-cm', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/codemirror.min.js'), array(), NULL, TRUE);
+					wp_enqueue_script(__NAMESPACE__.'-cm-matchbrackets', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/addon/edit/matchbrackets.js'), array(__NAMESPACE__.'-cm'), NULL, TRUE);
+					wp_enqueue_script(__NAMESPACE__.'-cm-htmlmixed', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/mode/htmlmixed/htmlmixed.js'), array(__NAMESPACE__.'-cm'), NULL, TRUE);
+					wp_enqueue_script(__NAMESPACE__.'-cm-xml', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/mode/xml/xml.js'), array(__NAMESPACE__.'-cm'), NULL, TRUE);
+					wp_enqueue_script(__NAMESPACE__.'-cm-javascript', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/mode/javascript/javascript.js'), array(__NAMESPACE__.'-cm'), NULL, TRUE);
+					wp_enqueue_script(__NAMESPACE__.'-cm-css', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/mode/css/css.js'), array(__NAMESPACE__.'-cm'), NULL, TRUE);
+					wp_enqueue_script(__NAMESPACE__.'-cm-clike', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/mode/clike/clike.js'), array(__NAMESPACE__.'-cm'), NULL, TRUE);
+					wp_enqueue_script(__NAMESPACE__.'-cm-php', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/mode/php/php.js'), array(__NAMESPACE__.'-cm'), NULL, TRUE);
+				}
 				wp_enqueue_script(__NAMESPACE__, $this->utils_url->to('/client-s/js/menu-pages.min.js'), $deps, $this->version, TRUE);
 
 				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_vars', array(
