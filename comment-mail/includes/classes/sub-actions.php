@@ -83,7 +83,7 @@ namespace comment_mail // Root namespace.
 				if(!$error_codes && !($confirmed = $this->plugin->utils_sub->confirm($sub->ID, $confirm_args)))
 					$error_codes[] = $confirmed === NULL ? 'invalid_sub_key' : 'sub_already_confirmed';
 
-				if(!$error_codes) // If not errors; set current email.
+				if(!$error_codes) // If no errors; set current email.
 					$this->plugin->utils_sub->set_current_email($sub_key, $sub->email);
 
 				$template_vars = get_defined_vars(); // Everything above.
@@ -128,7 +128,8 @@ namespace comment_mail // Root namespace.
 				if(!$error_codes && !($deleted = $this->plugin->utils_sub->delete($sub->ID, $delete_args)))
 					$error_codes[] = $deleted === NULL ? 'invalid_sub_key' : 'sub_already_unsubscribed';
 
-				if(!$error_codes) // If not errors; set current email.
+				if(!$error_codes) // If no errors; set current email.
+					// @TODO After deletion this may fail; since the key will not exist any longer.
 					$this->plugin->utils_sub->set_current_email($sub_key, $sub->email);
 
 				$template_vars = get_defined_vars(); // Everything above.

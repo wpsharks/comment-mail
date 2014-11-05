@@ -61,6 +61,9 @@ namespace comment_mail // Root namespace.
 					'user_initiated' => 0,
 
 					'time'           => time(),
+				   /*
+				    * This needs to log keys too, so we can search the history for specific keys. @TODO
+				    */
 				);
 				if(empty($entry['sub_id']) && !empty($entry['ID']))
 					$entry['sub_id'] = $entry['ID'];
