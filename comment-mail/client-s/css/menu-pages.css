@@ -4,7 +4,6 @@
 @import url('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.min.css');
 @import url('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css');
 @import url('../../submodules/sharkicons/styles.min.css');
-
 /* ------------------------------------------------------------------------------------------------------------
 	Plugin-specific styles for any menu page area of the dashboard.
 ------------------------------------------------------------------------------------------------------------ */
@@ -124,20 +123,13 @@ A menu page area ~ post com/sub bubbles.
 	WP core elements under plugin-specific conditions.
 ------------------------------------------------------------------------------------------------------------ */
 /*
-Alter wrap bg color.
-*/
-.comments_page_comment_mail #wpwrap
-{
-	background : #C7C7C7;
-}
-/*
 Align w/ menu page.
 */
 .comments_page_comment_mail div.updated,
 .comments_page_comment_mail div.error
 {
 	font-size : 120%;
-	margin    : 25px 25px 25px 5px;
+	margin    : 0 25px 25px 5px;
 }
 /* ------------------------------------------------------------------------------------------------------------
 	Plugin-specific styles for an actual/standard plugin menu page; e.g. options.
@@ -147,15 +139,10 @@ Menu page styles.
 */
 .comment-mail-menu-page
 {
-	font-size     : 14px;
-	padding       : 25px;
-	min-width     : 800px;
-	margin        : 25px 25px 25px 5px;
-
-	border-radius : 5px;
-	border        : 1px solid #333333;
-	box-shadow    : 0 0 8px 0 rgba(0, 0, 0, 0.2) !important;
-	background    : #FFFFFF url('../images/trans-bg.png') repeat left top;
+	font-size : 14px;
+	padding   : 25px;
+	min-width : 800px;
+	margin    : 0 25px 25px 5px;
 }
 .comment-mail-menu-page a
 {
