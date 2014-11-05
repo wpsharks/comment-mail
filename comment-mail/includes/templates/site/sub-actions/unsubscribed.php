@@ -12,7 +12,8 @@ namespace comment_mail;
  * @var \stdClass|null $sub Subscription object data.
  *
  * @var \WP_Post|null  $sub_post Post they were subscribed to.
- *    This will be `NULL` if there are any `$error_codes`.
+ *    This will be `NULL` if there were any `$error_codes` during processing.
+ *    This will also be `NULL` if you deleted the post before they unsubscribed.
  *
  * @var \stdClass|null $sub_comment Comment they were subcribed to; if applicable.
  *
@@ -68,15 +69,19 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 			 * Here we define a few more variables of our own.
 			 * All based on what the template makes available to us;
 			 * ~ as documented at the top of this file.
+			 *
+			 * Note: you CANNOT rely on the post still existing!
+			 * Always be sure to provide a fallback w/ just the `$sub->post_id`
+			 *    in case you deleted this post since they subscribed to it.
 			 */
 			// URL to comments on the post they were subscribed to.
-			$sub_post_comments_url = get_comments_link($sub_post->ID);
+			$sub_post_comments_url = $sub_post ? get_comments_link($sub_post->ID) : '';
 
 			// Are comments still open on this post?
-			$sub_post_comments_open = comments_open($sub_post->ID);
+			$sub_post_comments_open = $sub_post ? comments_open($sub_post->ID) : FALSE;
 
 			// A shorter clip of the full post title.
-			$sub_post_title_clip = $plugin->utils_string->clip($sub_post->post_title, 70);
+			$sub_post_title_clip = $sub_post ? $plugin->utils_string->clip($sub_post->post_title, 70) : '';
 
 			// URL to comment they were subscribed to; if applicable.
 			$sub_comment_url = $sub_comment ? get_comment_link($sub_comment->comment_ID) : '';
@@ -128,7 +133,7 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 					<?php endif; ?>
 
 				<?php else: // All comments/replies on this post. ?>
-					<?php echo __('You\'ll no longer be notified about all comments/replies to:', $plugin->text_domain); ?>
+					<?php echo __('You\'ll no longer be notified about comments/replies to:', $plugin->text_domain); ?>
 				<?php endif; ?>
 			</h4>
 
@@ -136,8 +141,10 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 				<i class="fa fa-thumb-tack"></i>
 				<?php if($sub_comment): // A specific comment? ?>
 					&ldquo;<a href="<?php echo esc_attr($sub_comment_url); ?>"><?php echo esc_html($sub_post_title_clip); ?></a>&rdquo;
-				<?php else: // Unsubscribing from all comments/replies to this post. ?>
+				<?php elseif($sub_post && $sub_post_comments_url && $sub_post_title_clip): // Unsubscribing from all comments/replies. ?>
 					&ldquo;<a href="<?php echo esc_attr($sub_post_comments_url); ?>"><?php echo esc_html($sub_post_title_clip); ?></a>&rdquo;
+				<?php else: // Unsubscribing from all comments/replies; this is a fallback w/ just the `$sub->post_id`. ?>
+					&ldquo;<?php echo sprintf(__('Post ID #<code>%1$s</code>', $plugin->text_domain), esc_html($sub->post_id)); ?>&rdquo;
 				<?php endif; ?>
 			</h4>
 
