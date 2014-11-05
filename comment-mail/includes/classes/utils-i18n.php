@@ -183,19 +183,19 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Subscr. type label translation.
+			 * Sub. type label translation.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $subscr_type A subscr. type; i.e. `comments`, `comment`.
+			 * @param string $sub_type A sub. type; i.e. `comments`, `comment`.
 			 *
-			 * @return string The string translation for the given `$subscr_type`.
+			 * @return string The string translation for the given `$sub_type`.
 			 */
-			public function subscr_type_label($subscr_type)
+			public function sub_type_label($sub_type)
 			{
-				$subscr_type = strtolower(trim((string)$subscr_type));
+				$sub_type = strtolower(trim((string)$sub_type));
 
-				switch($subscr_type) // Convert to label.
+				switch($sub_type) // Convert to label.
 				{
 					case 'comments':
 						return __('all comments', $this->plugin->text_domain);
@@ -203,7 +203,7 @@ namespace comment_mail // Root namespace.
 					case 'comment':
 						return __('replies only', $this->plugin->text_domain);
 				}
-				return !$subscr_type ? '' : __($subscr_type, $this->plugin->text_domain);
+				return !$sub_type ? '' : __($sub_type, $this->plugin->text_domain);
 			}
 
 			/**

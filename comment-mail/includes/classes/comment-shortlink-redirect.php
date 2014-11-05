@@ -45,6 +45,9 @@ namespace comment_mail // Root namespace.
 				if(!($comment_id = (integer)$_REQUEST['c']))
 					return; // Not applicable.
 
+				if(!($comment = get_comment($comment_id)))
+					return; // Not possible.
+
 				if(!($comment_link = get_comment_link($comment_id)))
 					return; // Not possible.
 

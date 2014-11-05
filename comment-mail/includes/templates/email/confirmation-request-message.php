@@ -2,14 +2,18 @@
 namespace comment_mail;
 
 /**
- * @var plugin    $plugin Plugin class.
+ * @var plugin         $plugin Plugin class.
  *
  * Other variables made available in this template file:
  *
- * @var string    $email_header Parsed email header template.
- * @var string    $email_footer Parsed email footer template.
+ * @var string         $email_header Parsed email header template.
+ * @var string         $email_footer Parsed email footer template.
  *
- * @var \stdClass $sub Subscription object data.
+ * @var \stdClass      $sub Subscription object data.
+ *
+ * @var \WP_Post       $sub_post Post they're subscribed to.
+ *
+ * @var \stdClass|null $sub_comment Comment they're subcribed to; if applicable.
  *
  * -------------------------------------------------------------------
  * @note In addition to plugin-specific variables & functionality,
@@ -25,18 +29,20 @@ echo str_replace('%%title%%', __('Confirmation Request', $plugin->text_domain), 
  * All based on what the template makes available to us;
  * ~ as documented at the top of this file.
  */
-// Post they're subscribed to.
-$sub_post               = get_post($sub->post_id);
-$sub_post_comments_url  = get_comments_link($sub->post_id);
-$sub_post_comments_open = comments_open($sub->post_id);
-$sub_post_title_clip    = $sub_post ? $plugin->utils_string->clip($sub_post->post_title) : '';
+// URL to comments on the post they're subscribed to.
+$sub_post_comments_url = get_comments_link($sub_post->ID);
 
-// Comment they're subscribed to; if applicable;
-$sub_comment     = $sub->comment_id ? get_comment($sub->comment_id) : NULL;
-$sub_comment_url = $sub->comment_id ? get_comment_link($sub->comment_id) : '';
+// Are comments still open on this post?
+$sub_post_comments_open = comments_open($sub_post->ID);
 
-$subscribed_to_own_comment = // Subscribed to their own comment?
-	$sub_comment && strcasecmp($sub_comment->comment_author_email, $sub->email) === 0;
+// A shorter clip of the full post title.
+$sub_post_title_clip = $plugin->utils_string->clip($sub_post->post_title, 70);
+
+// URL to comment they're subscribed to; if applicable.
+$sub_comment_url = $sub_comment ? get_comment_link($sub_comment->comment_ID) : '';
+
+// Subscribed to their own comment?
+$subscribed_to_own_comment = $sub_comment && strcasecmp($sub_comment->comment_author_email, $sub->email) === 0;
 
 // Confirmation URL; they need to click this.
 $sub_confirm_url = $plugin->utils_url->sub_confirm_url($sub->key);
@@ -65,27 +71,27 @@ $sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $
 
 	<p style="margin-left:10px;">
 
-		<?php if($sub->comment_id): // Subscribing to a specific comment? ?>
+		<?php if($sub_comment): // Subscribing to a specific comment? ?>
 
 			<?php if($subscribed_to_own_comment): ?>
-				<?php echo sprintf(__('You\'ll be notified about replies to <a href="%1$s">your comment</a> on:', $plugin->text_domain), esc_html($sub_comment_url)); ?>
+				<?php echo sprintf(__('You\'ll be notified about replies to <a href="%1$s">your comment</a>; on:', $plugin->text_domain), esc_html($sub_comment_url)); ?>
 			<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
-				<?php echo sprintf(__('You\'ll be notified about replies to <a href="%1$s">comment ID# %2$s</a> on:', $plugin->text_domain), esc_html($sub_comment_url), esc_html($sub->comment_id)); ?>
+				<?php echo sprintf(__('You\'ll be notified about replies to <a href="%1$s">comment ID# %2$s</a>; on:', $plugin->text_domain), esc_html($sub_comment_url), esc_html($sub_comment->comment_ID)); ?>
 			<?php endif; ?>
 
-		<?php else: // All comments/replies on this post ID. ?>
-			<?php echo __('You\'ll be notified about all comments/replies on:', $plugin->text_domain); ?>
+		<?php else: // All comments/replies on this post. ?>
+			<?php echo __('You\'ll be notified about all comments/replies to:', $plugin->text_domain); ?>
 		<?php endif; ?><br />
 
 		<span style="font-size:120%;">
-			"<?php echo esc_html($sub_post->post_title); ?>"
+			&ldquo;<?php echo esc_html($sub_post_title_clip); ?>&rdquo;
 		</span><br />
 
-		<?php if($sub->comment_id): // A specific comment ID? ?>
+		<?php if($sub_comment): // A specific comment? ?>
 			<a href="<?php echo esc_attr($sub_comment_url); ?>">
 				<?php echo esc_html($sub_comment_url); ?>
 			</a>
-		<?php else: // Subscribing to all comments/replies on this post ID. ?>
+		<?php else: // Subscribing to all comments/replies. ?>
 			<a href="<?php echo esc_attr($sub_post_comments_url); ?>">
 				<?php echo esc_html($sub_post_comments_url); ?>
 			</a>

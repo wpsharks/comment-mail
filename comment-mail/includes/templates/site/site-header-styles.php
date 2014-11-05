@@ -83,7 +83,7 @@ namespace comment_mail;
 	*/
 	header
 	{
-		z-index       : 3;
+		z-index       : 2;
 		margin-bottom : 10px;
 		position      : relative;
 	}
@@ -94,7 +94,7 @@ namespace comment_mail;
 	header img.icon-bubbles
 	{
 		top      : 5px;
-		right    : 75px;
+		right    : 110px;
 		position : absolute;
 
 		width    : 175px;
@@ -116,7 +116,7 @@ namespace comment_mail;
 	*/
 	.wrapper .inner-wrapper
 	{
-		z-index  : 2;
+		z-index  : 1;
 		position : relative;
 	}
 	/*

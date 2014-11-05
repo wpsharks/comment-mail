@@ -162,13 +162,15 @@ namespace comment_mail // Root namespace.
 				if($this->maybe_auto_confirm())
 					return; // Nothing more to do.
 
-				if(!get_post($this->sub->post_id))
+				$sub      = $this->sub; // For template.
+				$sub_post = $sub_comment = NULL; // Initialize.
+
+				if(!($sub_post = get_post($this->sub->post_id)))
 					return; // Post no longer exists.
 
-				if($this->sub->comment_id && !get_comment($this->sub->comment_id))
+				if($this->sub->comment_id && !($sub_comment = get_comment($this->sub->comment_id)))
 					return; // Comment no longer exists.
 
-				$sub           = $this->sub; // For template.
 				$template_vars = get_defined_vars(); // Everything above.
 
 				$subject_template = new template('email/confirmation-request-subject.php');

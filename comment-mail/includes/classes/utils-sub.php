@@ -241,7 +241,7 @@ namespace comment_mail // Root namespace.
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
-			 * @return integer Number of suscribers reconfirmed successfully.
+			 * @return integer Number of subscriptions reconfirmed successfully.
 			 */
 			public function bulk_reconfirm(array $sub_ids_or_keys, array $args = array())
 			{
@@ -294,7 +294,7 @@ namespace comment_mail // Root namespace.
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
-			 * @return integer Number of suscribers confirmed successfully.
+			 * @return integer Number of subscriptions confirmed successfully.
 			 */
 			public function bulk_confirm(array $sub_ids_or_keys, array $args = array())
 			{
@@ -347,7 +347,7 @@ namespace comment_mail // Root namespace.
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
-			 * @return integer Number of suscribers unconfirmed successfully.
+			 * @return integer Number of subscriptions unconfirmed successfully.
 			 */
 			public function bulk_unconfirm(array $sub_ids_or_keys, array $args = array())
 			{
@@ -400,7 +400,7 @@ namespace comment_mail // Root namespace.
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
-			 * @return integer Number of suscribers suspended successfully.
+			 * @return integer Number of subscriptions suspended successfully.
 			 */
 			public function bulk_suspend(array $sub_ids_or_keys, array $args = array())
 			{
@@ -453,7 +453,7 @@ namespace comment_mail // Root namespace.
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
-			 * @return integer Number of suscribers trashed successfully.
+			 * @return integer Number of subscriptions trashed successfully.
 			 */
 			public function bulk_trash(array $sub_ids_or_keys, array $args = array())
 			{
@@ -503,7 +503,7 @@ namespace comment_mail // Root namespace.
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
-			 * @return integer Number of suscribers deleted successfully.
+			 * @return integer Number of subscriptions deleted successfully.
 			 */
 			public function bulk_delete(array $sub_ids_or_keys, array $args = array())
 			{
@@ -515,6 +515,31 @@ namespace comment_mail // Root namespace.
 				unset($_sub_id); // Housekeeping.
 
 				return $counter;
+			}
+
+			/**
+			 * Delete email/user all; for unsubscribe all functionality.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $sub_email An input email address.
+			 * @param array  $args Any additional behavioral args.
+			 *
+			 * @return integer Number of subscriptions deleted successfully.
+			 */
+			public function delete_email_user_all($sub_email, array $args = array())
+			{
+				if(!($sub_email = trim(strtolower((string)$sub_email))))
+					return NULL; // Not possible.
+
+				$user_ids = $this->email_user_ids($sub_email);
+
+				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				       " WHERE `email` = '".esc_sql($sub_email)."' OR `user_id` IN('".implode("','", array_map('esc_sql', $user_ids))."')";
+
+				$sub_ids = array_map('intval', $this->plugin->utils_db->wp->get_col($sql));
+
+				return $this->bulk_delete($sub_ids, $args);
 			}
 
 			/**
@@ -1075,6 +1100,74 @@ namespace comment_mail // Root namespace.
 						return trim(strtolower((string)$commenter['comment_author_email']));
 
 				return ''; // Not possible.
+			}
+
+			/**
+			 * Current `sub_email`, `sub_type`, `sub_deliver` for a specific post ID.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param integer $post_id Post ID to check here.
+			 * @param boolean $use_comment_form_defaults Use comment form defaults?
+			 *    This defaults to a `FALSE` value. Comment forms should set this to `TRUE` please.
+			 *
+			 * @param boolean $no_cache Disallow a previously cached value?
+			 *
+			 * @return \stdClass Current `sub_email`, `sub_type`, `sub_deliver` for a specific post ID.
+			 *    If values cannot be filled, we return a set of default values.
+			 */
+			public function current_email_type_deliver_for($post_id, $use_comment_form_defaults = FALSE, $no_cache = FALSE)
+			{
+				$post_id                   = (integer)$post_id;
+				$sub_email                 = $this->current_email();
+				$use_comment_form_defaults = (boolean)$use_comment_form_defaults;
+
+				$default_sub_type    = 'comment';
+				$default_sub_deliver = 'asap';
+
+				if($use_comment_form_defaults) // Note: this CAN be empty.
+					$default_sub_type = $this->plugin->options['comment_form_default_sub_type_option'];
+
+				if($use_comment_form_defaults) // This can never be empty.
+					$default_sub_deliver = $this->plugin->options['comment_form_default_sub_deliver_option'];
+
+				$email_type_deliver_defaults = (object)array(
+					'sub_email'   => $sub_email,
+					'sub_type'    => $default_sub_type, // CAN be empty.
+					'sub_deliver' => $default_sub_deliver,
+				);
+				if(!$post_id || !$sub_email) // Not possible?
+					return $email_type_deliver_defaults;
+
+				$cache_keys = compact('post_id', 'sub_email', 'use_comment_form_defaults');
+
+				if(!is_null($email_type_deliver = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
+					return $email_type_deliver; // Already cached this.
+
+				$sql = "SELECT `comment_id`, `deliver` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " WHERE `post_id` = '".esc_sql($post_id)."'".
+				       " AND `email` = '".esc_sql($sub_email)."'".
+				       " AND `status` = 'subscribed'".
+
+				       " ORDER BY `comment_id` ASC, `last_update_time` DESC".
+
+				       " LIMIT 1"; // Only need last one; give precedence to `comment_id=0`.
+
+				if(($results = $this->plugin->utils_db->wp->get_results($sql)))
+					// Note: if we have results at all, we can make a decision here.
+				{
+					$results     = $this->plugin->utils_db->typify_deep($results);
+					$sub_type    = $results[0]->comment_id <= 0 ? 'comments' : 'comment';
+					$sub_deliver = $results[0]->deliver ? $results[0]->deliver : 'asap';
+
+					return ($email_type_deliver = (object)array(
+						'sub_email'   => $sub_email,
+						'sub_type'    => $sub_type,
+						'sub_deliver' => $sub_deliver,
+					));
+				}
+				return ($email_type_deliver = $email_type_deliver_defaults);
 			}
 
 			/**

@@ -23,7 +23,7 @@ namespace comment_mail;
 /*
  * Here we define a few variables of our own.
  */
-// Site home page URL; i.e. back to the main site.
+// Site home page URL; i.e. back to main site.
 $home_url = home_url('/'); // Multisite compatible.
 
 // A clip of the blog's name; as configured in WordPress.
@@ -32,11 +32,11 @@ $blog_name_clip = $plugin->utils_string->clip(get_bloginfo('name'));
 // Summary return URL; w/ all summary navigation vars preserved.
 $sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url(!empty($sub_key) ? $sub_key : '', NULL, TRUE);
 
-// Current `host[/path]` with support for multisite network and child blogs.
+// Current `host[/path]` with support for multisite network child blogs.
 $current_host_path = $plugin->utils_url->current_host_path();
 
 // Icon URL; defaults to the plugin's icon image.
-$icon_url = $plugin->utils_url->to('/client-s/images/icon-bubbles.png');
+$icon_bubbles_url = $plugin->utils_url->to('/client-s/images/icon-bubbles.png');
 ?>
 
 <header class="center-block clearfix">
@@ -46,5 +46,5 @@ $icon_url = $plugin->utils_url->to('/client-s/images/icon-bubbles.png');
 			<small><i class="fa fa-link"></i> <?php echo esc_html($current_host_path); ?></small>
 		</a>
 	</h1>
-	<img src="<?php echo esc_attr($icon_url); ?>" class="icon-bubbles" />
+	<img src="<?php echo esc_attr($icon_bubbles_url); ?>" class="icon-bubbles" />
 </header>

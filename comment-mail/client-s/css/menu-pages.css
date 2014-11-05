@@ -98,9 +98,9 @@ A menu page area ~ post com/sub bubbles.
 {
 	text-rendering         : auto;
 	font-weight            : normal;
-	content                : '\f0c0';
+	content                : '\e000';
 	color                  : #5A5A5A;
-	font-family            : FontAwesome;
+	font-family            : sharkicons;
 	-webkit-font-smoothing : antialiased;
 
 	float                  : left;

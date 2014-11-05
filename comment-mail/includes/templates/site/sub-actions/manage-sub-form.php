@@ -2,53 +2,53 @@
 namespace comment_mail;
 
 /**
- * @var plugin      $plugin Plugin class.
+ * @var plugin         $plugin Plugin class.
  *
  * Other variables made available in this template file:
  *
- * @var string      $site_header Parsed site header template.
- * @var string      $site_footer Parsed site footer template.
+ * @var string         $site_header Parsed site header template.
+ * @var string         $site_footer Parsed site footer template.
  *
- * @var boolean     $is_edit Editing an existing subscription?
- * @var string      $sub_key Current subscription key; if editing.
- * @var \stdClass   $sub Subscription object data; if editing.
+ * @var boolean        $is_edit Editing an existing subscription?
+ * @var string         $sub_key Current subscription key; if editing.
+ * @var \stdClass|null $sub Subscription object data; if editing.
  *
- * @var form_fields $form_fields Form fields class.
- * @var callable    $current_value_for Current value for a form field.
- * @var callable    $hidden_inputs Hidden input fields needed by form.
+ * @var form_fields    $form_fields Form fields class.
+ * @var callable       $current_value_for Current value for a form field.
+ * @var callable       $hidden_inputs Hidden input fields needed by form.
  *
- * @var boolean     $processing Are we (i.e. did we) process a form submission?
+ * @var boolean        $processing Are we (i.e. did we) process a form submission?
  *
- * @var array       $processing_errors An array of any/all processing errors.
+ * @var array          $processing_errors An array of any/all processing errors.
  *    Array keys are error codes; array values are predefined error messages.
  *    Note that predefined messages in this array are in plain text format.
  *
- * @var array       $processing_error_codes An array of any/all processing error codes.
+ * @var array          $processing_error_codes An array of any/all processing error codes.
  *    This includes the codes only; i.e. w/o the full array of predefined messages.
  *
- * @var array       $processing_errors_html An array of any/all processing errors.
+ * @var array          $processing_errors_html An array of any/all processing errors.
  *    Array keys are error codes; array values are predefined error messages.
  *    Note that predefined messages in this array are in HTML format.
  *
- * @var array       $processing_successes An array of any/all processing successes.
+ * @var array          $processing_successes An array of any/all processing successes.
  *    Array keys are success codes; array values are predefined success messages.
  *    Note that predefined messages in this array are in plain text format.
  *
- * @var array       $processing_success_codes An array of any/all processing success codes.
+ * @var array          $processing_success_codes An array of any/all processing success codes.
  *    This includes the codes only; i.e. w/o the full array of predefined messages.
  *
- * @var array       $processing_successes_html An array of any/all processing successes.
+ * @var array          $processing_successes_html An array of any/all processing successes.
  *    Array keys are success codes; array values are predefined success messages.
  *    Note that predefined messages in this array are in HTML format.
  *
- * @var boolean     $processing_email_key_change Success; but w/ an email & key change?
+ * @var boolean        $processing_email_key_change Success; but w/ an email & key change?
  *    This particular case should be handled differently. It's a successful update; but also results
  *    in an error message. An error, because a change of address always results in a key change too.
  *    Since both the email & key have changed, their existing key is now useless; i.e. no longer valid.
  *    When this occurs, we display successes; but nothing else. Messages in the list of successess
  *    will instruct the user to check their email to complete the confirmation process.
  *
- * @var array       $error_codes An array of any/all major error codes; excluding processing error codes.
+ * @var array          $error_codes An array of any/all major error codes; excluding processing error codes.
  *    Note that you should NOT display the form at all, if any major error exist here.
  *
  * -------------------------------------------------------------------
@@ -59,39 +59,28 @@ namespace comment_mail;
 <?php // Sets document <title> tag via `%%title%%` replacement code in header.
 echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_domain)
 	: __('Add New Subscription', $plugin->text_domain), $site_header); ?>
-<?php
-/*
- * Here we define a few more variables of our own.
- * All based on what the template makes available to us;
- * ~ as documented at the top of this file.
- */
-// Site home page URL; i.e. back to the main site.
-$home_url = home_url('/'); // Multisite compatible.
 
-// Summary return URL; w/ all summary navigation vars preserved.
-$sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, NULL, TRUE);
-?>
 	<div class="manage-sub-form">
 
 		<?php if($error_codes // Changed email; i.e. nullified existing key?
 		         && $error_codes[0] === 'invalid_sub_key_after_email_key_change'
-					&& $processing && $processing_successes && $processing_email_key_change): ?>
+		         && $processing && $processing_successes && $processing_email_key_change
+		): ?>
 
 			<div class="alert alert-success" style="margin:0;">
-				<p style="margin-top:0; font-weight:bold; font-size:120%;">
+				<h4>
 					<?php echo __('Submission accepted; nice work!', $plugin->text_domain); ?>
-				</p>
-				<ul class="list-unstyled" style="margin-bottom:0;">
+				</h4>
+				<ul class="list-unstyled">
 					<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
-						<li style="margin-top:0; margin-bottom:0;">
-							<i class="fa fa-check fa-fw"></i>
-							<?php echo $_success_html; ?>
+						<li>
+							<i class="fa fa-check fa-fw"></i> <?php echo $_success_html; ?>
 						</li>
 					<?php endforeach; ?>
 				</ul>
-				<p style="margin:10px 0 0 0;">
-					<a href="<?php echo esc_attr($sub_summary_return_url); ?>">
-						<?php echo __('« Back to My Subscriptions', $plugin->text_domain); ?>
+				<p style="margin-top:10px;">
+					<a href="<?php echo esc_attr($plugin->utils_url->sub_manage_summary_url($sub_key, NULL, TRUE)); ?>">
+						<i class="fa fa-arrow-circle-left"></i> <?php echo __('Back to My Subscriptions', $plugin->text_domain); ?>
 					</a>
 				</p>
 			</div>
@@ -99,14 +88,13 @@ $sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, N
 		<?php elseif ($error_codes): // Any other major errors? ?>
 
 			<div class="alert alert-danger" style="margin:0;">
-				<p style="margin-top:0; font-weight:bold; font-size:120%;">
+				<h4>
 					<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
-				</p>
-				<ul class="list-unstyled" style="margin-bottom:0;">
+				</h4>
+				<ul class="list-unstyled">
 					<?php foreach($error_codes as $_error_code): ?>
-						<li style="margin-top:0; margin-bottom:0;">
-							<i class="fa fa-warning fa-fw"></i>
-							<?php switch($_error_code)
+						<li>
+							<i class="fa fa-warning fa-fw"></i> <?php switch($_error_code)
 							{
 								case 'missing_sub_key':
 									echo __('Subscription key is missing; unable to edit.', $plugin->text_domain);
@@ -121,7 +109,7 @@ $sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, N
 									break; // Break switch handler.
 
 								default: // Anything else that is unexpected/unknown at this time.
-									echo __('Unknown error; unable to add/edit.', $plugin->text_domain);
+									echo __('Unknown error; unable to add/edit. Sorry!', $plugin->text_domain);
 							} ?>
 						</li>
 					<?php endforeach; ?>
@@ -130,17 +118,29 @@ $sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, N
 
 		<?php else: // Display form; there are no major errors. ?>
 
+			<?php
+			/*
+			 * Here we define a few more variables of our own.
+			 * All based on what the template makes available to us;
+			 * ~ as documented at the top of this file.
+			 */
+			// Site home page URL; i.e. back to main site.
+			$home_url = home_url('/'); // Multisite compatible.
+
+			// Summary return URL; w/ all summary navigation vars preserved.
+			$sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, NULL, TRUE);
+			?>
+
 			<?php if ($processing && $processing_errors): // Any processing errors? ?>
 
 				<div class="alert alert-danger">
-					<p style="margin-top:0; font-weight:bold; font-size:120%;">
+					<h4>
 						<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
-					</p>
-					<ul class="list-unstyled" style="margin-bottom:0;">
+					</h4>
+					<ul class="list-unstyled">
 						<?php foreach($processing_errors_html as $_error_code => $_error_html): ?>
-							<li style="margin-top:0; margin-bottom:0;">
-								<i class="fa fa-warning fa-fw"></i>
-								<?php echo $_error_html; ?>
+							<li>
+								<i class="fa fa-warning fa-fw"></i> <?php echo $_error_html; ?>
 							</li>
 						<?php endforeach; ?>
 					</ul>
@@ -151,36 +151,35 @@ $sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, N
 			<?php if ($processing && $processing_successes): // Any processing successes? ?>
 
 				<div class="alert alert-success">
-					<p style="margin-top:0; font-weight:bold; font-size:120%;">
+					<h4>
 						<?php echo __('Submission accepted; nice work!', $plugin->text_domain); ?>
-					</p>
-					<ul class="list-unstyled" style="margin-bottom:0;">
+					</h4>
+					<ul class="list-unstyled">
 						<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
-							<li style="margin-top:0; margin-bottom:0;">
-								<i class="fa fa-check fa-fw"></i>
-								<?php echo $_success_html; ?>
+							<li>
+								<i class="fa fa-check fa-fw"></i> <?php echo $_success_html; ?>
 							</li>
 						<?php endforeach; ?>
 					</ul>
-					<p style="margin:10px 0 0 0;">
+					<p style="margin-top:10px;">
 						<a href="<?php echo esc_attr($sub_summary_return_url); ?>">
-							<?php echo __('« Back to My Subscriptions', $plugin->text_domain); ?>
+							<i class="fa fa-arrow-circle-left"></i> <?php echo __('Back to My Subscriptions', $plugin->text_domain); ?>
 						</a>
 					</p>
 				</div>
 
 			<?php endif; ?>
 
-			<h2 style="margin-top:0;">
-				<a href="<?php echo esc_attr($sub_summary_return_url); ?>" title="<?php echo __('Back to My Subscriptions', $plugin->text_domain); ?>">
-					<i class="fa fa-arrow-circle-left pull-right"></i>
-				</a>
-				<?php if($is_edit): ?>
-					<?php echo __('Edit Subscription', $plugin->text_domain); ?>
-				<?php else: // Creating a new subscription. ?>
-					<?php echo __('Add New Subscription', $plugin->text_domain); ?>
-				<?php endif; ?>
-			</h2>
+				<h2 style="margin-top:0;">
+					<a href="<?php echo esc_attr($sub_summary_return_url); ?>" title="<?php echo __('Back to My Subscriptions', $plugin->text_domain); ?>">
+						<i class="fa fa-arrow-circle-left pull-right"></i>
+					</a>
+					<?php if($is_edit): ?>
+						<?php echo __('Edit Subscription', $plugin->text_domain); ?>
+					<?php else: // Creating a new subscription. ?>
+						<?php echo __('Add New Subscription', $plugin->text_domain); ?>
+					<?php endif; ?>
+				</h2>
 
 			<hr />
 
@@ -194,7 +193,7 @@ $sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, N
 							'label'               => __('<i class="fa fa-fw fa-thumb-tack"></i> Post ID#', $plugin->text_domain),
 							'name'                => 'post_id', 'required' => TRUE, 'options' => '%%posts%%', 'current_value' => $current_value_for('post_id'),
 							'notes'               => __('Required; the Post ID you\'re subscribed to.', $plugin->text_domain),
-							'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'placeholder' => ''),
+							'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'placeholder' => '', 'current_value_empty_on_0' => TRUE),
 						)); ?>
 					<?php echo $form_fields->select_row(
 					// Note: if you change this row; also change the AJAX template variation.
@@ -203,7 +202,7 @@ $sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, N
 							'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID#', $plugin->text_domain),
 							'name'                => 'comment_id', 'required' => FALSE, 'options' => '%%comments%%', 'post_id' => $current_value_for('post_id'), 'current_value' => $current_value_for('comment_id'),
 							'notes'               => __('If empty, you\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $plugin->text_domain),
-							'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"'),
+							'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'current_value_empty_on_0' => TRUE),
 						)); ?>
 					<?php /* -------------------------------------------------------------------- */ ?>
 					<?php echo $form_fields->horizontal_line_row(/* -------------------------------------------------------------------- */); ?>
@@ -263,7 +262,8 @@ $sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, N
 			</form>
 			<?php
 			/* Javascript needed by this template.
-			 --------------------------------------------------------------------------------------------------------------------- */ ?>
+			 --------------------------------------------------------------------------------------------------------------------- */
+			?>
 			<script type="text/javascript">
 				(function($) // Primary closure w/ jQuery; strict standards.
 				{

@@ -21,24 +21,13 @@ namespace comment_mail // Root namespace.
 		class comment_form extends abs_base
 		{
 			/**
-			 * @var integer Post ID.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $post_id;
-
-			/**
 			 * Class constructor.
 			 *
-			 * @param integer|string $post_id Post ID.
-			 *
 			 * @since 14xxxx First documented version.
 			 */
-			public function __construct($post_id)
+			public function __construct()
 			{
 				parent::__construct();
-
-				$this->post_id = (integer)$post_id;
 
 				$this->maybe_display_sub_ops();
 			}
@@ -50,19 +39,40 @@ namespace comment_mail // Root namespace.
 			 */
 			public function maybe_display_sub_ops()
 			{
-				if(!$this->post_id)
-					return; // Nothing to do.
-
-				if(!$this->plugins->options['enable'])
+				if(!$this->plugin->options['enable'])
 					return; // Disabled currently.
 
-				if(!$this->plugins->options['new_subs_enable'])
+				if(!$this->plugin->options['new_subs_enable'])
 					return; // Disabled currently.
 
-				// @TODO
-				// $_POST[__NAMESPACE__.'_sub_type']
-				// $_POST[__NAMESPACE__.'_sub_deliver']
-				// templates/site/sub-ops.php
+				if(!$this->plugin->options['comment_form_template_enable'])
+					return; // Disabled currently.
+
+				if(empty($GLOBALS['post']) || !($GLOBALS['post'] instanceof \WP_Post))
+					return; // Not possible here.
+
+				$post_id = $GLOBALS['post']->ID; // Current post ID.
+
+				$current // Object w/ `sub_email`, `sub_type`, `sub_deliver`; for this post ID.
+					= $this->plugin->utils_sub->current_email_type_deliver_for($post_id, TRUE);
+
+				$sub_email   = $current->sub_email;
+				$sub_type    = $current->sub_type; // Note: this can be empty.
+				$sub_deliver = $current->sub_deliver;
+
+				$sub_type_id   = str_replace('_', '-', __NAMESPACE__.'_sub_type');
+				$sub_type_name = __NAMESPACE__.'_sub_type';
+
+				$sub_deliver_id   = str_replace('_', '-', __NAMESPACE__.'_sub_deliver');
+				$sub_deliver_name = __NAMESPACE__.'_sub_deliver';
+
+				$sub_summary_url = $this->plugin->utils_url->sub_manage_summary_url();
+				$inline_icon_svg = file_get_contents(dirname(dirname(dirname(__FILE__))).'/client-s/images/inline-icon.svg');
+
+				$template_vars = get_defined_vars(); // Everything above.
+				$template      = new template('site/comment-form/sub-ops.php');
+
+				echo $template->parse($template_vars);
 			}
 		}
 	}

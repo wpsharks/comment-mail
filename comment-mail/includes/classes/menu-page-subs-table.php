@@ -68,7 +68,7 @@ namespace comment_mail // Root namespace.
 					'comment_id'       => __('Subscr. to Comment ID', $plugin->text_domain),
 					'insertion_time'   => __('Subscr. Time', $plugin->text_domain),
 					'insertion_ip'     => __('Subscr. IP', $plugin->text_domain),
-					'subscr_type'      => __('Subscr. Type', $plugin->text_domain),
+					'sub_type'      => __('Subscr. Type', $plugin->text_domain),
 					'deliver'          => __('Delivery', $plugin->text_domain),
 					'last_ip'          => __('Last IP', $plugin->text_domain),
 					'status'           => __('Status', $plugin->text_domain),
@@ -143,7 +143,7 @@ namespace comment_mail // Root namespace.
 			public static function get_unsortable_columns_()
 			{
 				return array(
-					'subscr_type',
+					'sub_type',
 				);
 			}
 
@@ -305,7 +305,7 @@ namespace comment_mail // Root namespace.
 					$this->set_items($results = $this->plugin->utils_db->typify_deep($results));
 					$this->set_total_items_available((integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()"));
 
-					$this->prepare_items_merge_subscr_type_property(); // Merge property.
+					$this->prepare_items_merge_sub_type_property(); // Merge property.
 					$this->prepare_items_merge_user_properties(); // Merge additional properties.
 					$this->prepare_items_merge_post_properties(); // Merge additional properties.
 					$this->prepare_items_merge_comment_properties(); // Merge additional properties.

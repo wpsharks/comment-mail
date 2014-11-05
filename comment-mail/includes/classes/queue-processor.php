@@ -146,7 +146,7 @@ namespace comment_mail // Root namespace.
 
 				if($this->delay < 0) $this->delay = 0;
 				if($this->delay && $this->delay / 1000 > $this->max_time - 5)
-					$this->delay = 250; // Cannot be greater than max time.
+					$this->delay = 250; // Cannot be greater than max time - 5 seconds.
 
 				if(isset($max_limit)) // Argument is set?
 					$this->max_limit = (integer)$max_limit; // This takes precedence.
@@ -200,10 +200,10 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_process()
 			{
-				if(!$this->plugins->options['enable'])
+				if(!$this->plugin->options['enable'])
 					return; // Disabled currently.
 
-				if(!$this->plugins->options['queue_processing_enable'])
+				if(!$this->plugin->options['queue_processing_enable'])
 					return; // Disabled currently.
 
 				if(!($this->entries = $this->entries()))
@@ -262,7 +262,7 @@ namespace comment_mail // Root namespace.
 				}
 				$entry_headers   = $this->message_headers; // Defaults.
 				$entry_headers[] = 'X-Comment-Id: '.$entry_props->comment->comment_ID;
-				$entry_headers[] = 'X-Comment-Parent-Id: '.$entry_props->comment->comment_parent_ID;
+				$entry_headers[] = 'X-Comment-Parent-Id: '.$entry_props->comment->comment_parent;
 
 				$entry_props->event     = 'notified'; // Notifying now.
 				$entry_props->note_code = 'comment_notification_sent_successfully';
@@ -308,7 +308,6 @@ namespace comment_mail // Root namespace.
 
 				$entry_props->logged        = TRUE; // Flag as `TRUE`.
 				$entry_props->entry->logged = TRUE; // Flag as `TRUE`.
-
 				if(isset($this->entries[$entry_props->entry->ID]))
 					$this->entries[$entry_props->entry->ID]->logged = TRUE;
 
@@ -373,7 +372,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param \stdClass $entry Queue entry.
 			 *
-			 * @return object|null Object with properties.
+			 * @return \stdClass|null Structured entry properties.
 			 *    If unable to validate, returns `NULL`.
 			 *
 			 *    Object properties will include:
@@ -382,9 +381,13 @@ namespace comment_mail // Root namespace.
 			 *    - `note_code` the note code.
 			 *
 			 *    - `entry` the entry.
+			 *
 			 *    - `sub` the subscription.
-			 *    - `post` the post.
-			 *    - `comment` the comment.
+			 *    - `sub_post` subscription post.
+			 *    - `sub_comment` subscription comment.
+			 *
+			 *    - `post` the post we are notifying about.
+			 *    - `comment` the comment we are notifying about.
 			 *
 			 *    - `props` digestable entry props.
 			 *    - `comments` digestable comments.
@@ -397,56 +400,105 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function validated_entry_props(\stdClass $entry)
 			{
-				if(!$entry->sub_id) // Not possible; data missing.
+				$sub_comment = NULL; // Initialize this.
+				/*
+				 * Check primary IDs for validity.
+				 */
+				if(!$entry->sub_id)
 					$invalidated_entry_props = $this->entry_props('invalidated', 'entry_sub_id_empty', $entry);
 
-				else if(!$entry->post_id) // Not possible; data missing.
+				else if(!$entry->post_id)
 					$invalidated_entry_props = $this->entry_props('invalidated', 'entry_post_id_empty', $entry);
 
-				else if(!$entry->comment_id) // Not possible; data missing.
+				else if(!$entry->comment_id)
 					$invalidated_entry_props = $this->entry_props('invalidated', 'entry_comment_id_empty', $entry);
-
-				else if(!($sub = $this->plugin->utils_sub->get($entry->sub_id))) // Sub. missing?
+				/*
+				 * Now we check some basics in the subscription itself.
+				 */
+				else if(!($sub = $this->plugin->utils_sub->get($entry->sub_id)))
 					$invalidated_entry_props = $this->entry_props('invalidated', 'entry_sub_id_missing', $entry);
 
-				else if(!$sub->email) // WP config. issue? i.e. missing subscription's email address?
+				else if(!$sub->email)
 					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_email_empty', $entry, $sub);
 
-				else if($sub->status !== 'subscribed') // Subscription is no longer `subscribed`?
+				else if($sub->status !== 'subscribed')
 					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_status_not_subscribed', $entry, $sub);
-
-				else if($sub->post_id !== $entry->post_id) // Subscription's post ID changed?
+				/*
+				 * Make sure the subscription still matches up with the same post/comment IDs.
+				 */
+				else if($sub->post_id !== $entry->post_id)
 					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_post_id_mismtach', $entry, $sub);
 
-				else if($sub->comment_id && $sub->comment_id !== $entry->comment_parent_id) // Comment ID changed?
+				else if($sub->comment_id && $sub->comment_id !== $entry->comment_parent_id)
 					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_comment_id_mismatch', $entry, $sub);
+				/*
+				 * Now we check the subscription's post ID.
+				 */
+				else if(!($sub_post = get_post($sub->post_id)))
+					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_post_id_missing', $entry, $sub);
 
-				else if(!($comment = get_comment($entry->comment_id))) // Comment is missing?
-					$invalidated_entry_props = $this->entry_props('invalidated', 'entry_comment_id_missing', $entry, $sub);
+				else if(!$sub_post->post_title)
+					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_post_title_empty', $entry, $sub, $sub_post);
 
-				else if($comment->comment_type && $comment->comment_type !== 'comment') // Not an actual comment?
-					$invalidated_entry_props = $this->entry_props('invalidated', 'comment_type_not_comment', $entry, $sub, NULL, $comment);
+				else if($sub_post->post_status !== 'publish')
+					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_post_status_not_publish', $entry, $sub, $sub_post);
 
-				else if(!$comment->comment_content) // An empty comment; i.e. no content for the comment?
-					$invalidated_entry_props = $this->entry_props('invalidated', 'comment_content_empty', $entry, $sub, NULL, $comment);
+				else if(in_array($sub_post->post_type, array('revision', 'nav_menu_item'), TRUE))
+					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_post_type_auto_excluded', $entry, $sub, $sub_post);
+				/*
+				 * Now we check the subscription's comment ID; if applicable.
+				 */
+				else if($sub->comment_id && !($sub_comment = get_comment($sub->comment_id)))
+					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_comment_id_missing', $entry, $sub, $sub_post);
 
-				else if($this->plugin->utils_db->comment_status__($comment->comment_approved) !== 'approve') // No longer approved?
-					$invalidated_entry_props = $this->entry_props('invalidated', 'comment_status_not_approve', $entry, $sub, NULL, $comment);
+				else if($sub_comment && $sub_comment->comment_type && $sub_comment->comment_type !== 'comment')
+					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_comment_type_not_comment', $entry, $sub, $sub_post, $sub_comment);
 
-				else if(!($post = get_post($comment->comment_post_ID))) // Post is missing? Perhaps deleted since the comment came in.
-					$invalidated_entry_props = $this->entry_props('invalidated', 'comment_post_id_missing', $entry, $sub, NULL, $comment);
+				else if($sub_comment && !$sub_comment->comment_content)
+					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_comment_content_empty', $entry, $sub, $sub_post, $sub_comment);
 
-				else if(!$post->post_title) // An empty post title; i.e. we have nothing for a subject line?
-					$invalidated_entry_props = $this->entry_props('invalidated', 'post_title_empty', $entry, $sub, $post, $comment);
+				else if($sub_comment && $this->plugin->utils_db->comment_status__($sub_comment->comment_approved) !== 'approve')
+					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_comment_status_not_approve', $entry, $sub, $sub_post, $sub_comment);
+				/*
+				 * Make sure the comment we are notifying about still exists; and check validity.
+				 */
+				else if(!($comment = get_comment($entry->comment_id)))
+					$invalidated_entry_props = $this->entry_props('invalidated', 'entry_comment_id_missing', $entry, $sub, $sub_post, $sub_comment);
 
-				else if($post->post_status !== 'publish') // Unavailable; i.e. the post is no longer published?
-					$invalidated_entry_props = $this->entry_props('invalidated', 'post_status_not_publish', $entry, $sub, $post, $comment);
+				else if($comment->comment_type && $comment->comment_type !== 'comment')
+					$invalidated_entry_props = $this->entry_props('invalidated', 'comment_type_not_comment', $entry, $sub, $sub_post, $sub_comment, NULL, $comment);
 
-				else if(in_array($post->post_type, array('revision', 'nav_menu_item'), TRUE)) // Excluded post type?
-					$invalidated_entry_props = $this->entry_props('invalidated', 'post_type_auto_excluded', $entry, $sub, $post, $comment);
+				else if(!$comment->comment_content)
+					$invalidated_entry_props = $this->entry_props('invalidated', 'comment_content_empty', $entry, $sub, $sub_post, $sub_comment, NULL, $comment);
 
-				else return $this->entry_props('', '', $entry, $sub, $post, $comment); // Validated entry props.
+				else if($this->plugin->utils_db->comment_status__($comment->comment_approved) !== 'approve')
+					$invalidated_entry_props = $this->entry_props('invalidated', 'comment_status_not_approve', $entry, $sub, $sub_post, $sub_comment, NULL, $comment);
+				/*
+				 * Make sure the post containing the comment we are notifying about still exists; and check validity.
+				 */
+				else if(!($post = get_post($comment->comment_post_ID)))
+					$invalidated_entry_props = $this->entry_props('invalidated', 'comment_post_id_missing', $entry, $sub, $sub_post, $sub_comment, NULL, $comment);
 
+				else if(!$post->post_title)
+					$invalidated_entry_props = $this->entry_props('invalidated', 'post_title_empty', $entry, $sub, $sub_post, $sub_comment, $post, $comment);
+
+				else if($post->post_status !== 'publish')
+					$invalidated_entry_props = $this->entry_props('invalidated', 'post_status_not_publish', $entry, $sub, $sub_post, $sub_comment, $post, $comment);
+
+				else if(in_array($post->post_type, array('revision', 'nav_menu_item'), TRUE))
+					$invalidated_entry_props = $this->entry_props('invalidated', 'post_type_auto_excluded', $entry, $sub, $sub_post, $sub_comment, $post, $comment);
+				/*
+				 * Again, make sure the subscription still matches up with the same post/comment IDs; and that both still exist.
+				 */
+				else if($sub->post_id !== (integer)$comment->comment_post_ID)
+					$invalidated_entry_props = $this->entry_props('invalidated', 'sub_post_id_comment_mismtach', $entry, $sub, $sub_post, $sub_comment, $post, $comment);
+				/*
+				 * Else, we can return the full set of entry properties for this queue entry.
+				 */
+				else return $this->entry_props('', '', $entry, $sub, $sub_post, $sub_comment, $post, $comment); // Validated entry props.
+				/*
+				 * Otherwise (i.e. if we get down here); we need to log the invalidation.
+				 */
 				if(isset($invalidated_entry_props)) // Unable to validate/initialize entry props?
 					$this->log_entry($invalidated_entry_props); // Log invalidation.
 
@@ -454,7 +506,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Structure entry props.
+			 * Structured entry props.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -462,9 +514,13 @@ namespace comment_mail // Root namespace.
 			 * @param string         $note_code See {@link utils_event::queue_note_code()}.
 			 *
 			 * @param \stdClass      $entry Queue entry.
+			 *
 			 * @param \stdClass|null $sub Subscription.
-			 * @param \WP_Post|null  $post Post.
-			 * @param \stdClass|null $comment Comment.
+			 * @param \WP_Post|null  $sub_post Subscription post.
+			 * @param \stdClass|null $sub_comment Subscription comment.
+			 *
+			 * @param \WP_Post|null  $post Post we are notifying about.
+			 * @param \stdClass|null $comment Comment we are notifying about.
 			 *
 			 * @param \stdClass[]    $props Digestable entry props.
 			 * @param \stdClass[]    $comments Digestable comments.
@@ -473,7 +529,7 @@ namespace comment_mail // Root namespace.
 			 * @param integer        $dby_queue_id Digested by queue ID.
 			 * @param boolean        $logged Logged? Defaults to `FALSE`.
 			 *
-			 * @return object Object with properties.
+			 * @return \stdClass Structured entry properties.
 			 *
 			 *    Object properties will include:
 			 *
@@ -481,9 +537,13 @@ namespace comment_mail // Root namespace.
 			 *    - `note_code` the note code.
 			 *
 			 *    - `entry` the entry.
+			 *
 			 *    - `sub` the subscription.
-			 *    - `post` the post.
-			 *    - `comment` the comment.
+			 *    - `sub_post` subscription post.
+			 *    - `sub_comment` subscription comment.
+			 *
+			 *    - `post` the post we are notifying about.
+			 *    - `comment` the comment we are notifying about.
 			 *
 			 *    - `props` digestable entry props.
 			 *    - `comments` digestable comments.
@@ -494,10 +554,24 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @see utils_event::queue_note_code()
 			 */
-			protected function entry_props($event = '', $note_code = '',
-			                               \stdClass $entry, \stdClass $sub = NULL, \WP_Post $post = NULL, \stdClass $comment = NULL,
-			                               array $props = array(), array $comments = array(), // Digestables.
-			                               $held = FALSE, $dby_queue_id = 0, $logged = FALSE)
+			protected function entry_props($event = '',
+			                               $note_code = '',
+
+			                               \stdClass $entry,
+
+			                               \stdClass $sub = NULL,
+			                               \WP_Post $sub_post = NULL,
+			                               \stdClass $sub_comment = NULL,
+
+			                               \WP_Post $post = NULL,
+			                               \stdClass $comment = NULL,
+
+			                               array $props = array(),
+			                               array $comments = array(),
+
+			                               $held = FALSE,
+			                               $dby_queue_id = 0,
+			                               $logged = FALSE)
 			{
 				$event     = (string)$event;
 				$note_code = (string)$note_code;
@@ -510,10 +584,24 @@ namespace comment_mail // Root namespace.
 				$logged       = (boolean)$logged;
 
 				$entry_props = (object)compact(
-					'event', 'note_code',
-					'entry', 'sub', 'post', 'comment',
-					'props', 'comments', // Digestables.
-					'held', 'dby_queue_id', 'logged'
+					'event',
+					'note_code',
+
+					'entry',
+
+					'sub',
+					'sub_post',
+					'sub_comment',
+
+					'post',
+					'comment',
+
+					'props',
+					'comments',
+
+					'held',
+					'dby_queue_id',
+					'logged'
 				);
 				if(!$props && !$entry_props->props)
 					$entry_props->props = array($entry ? $entry->ID : 0 => $entry_props);
@@ -568,7 +656,7 @@ namespace comment_mail // Root namespace.
 						if(($entry_last_notified_time = $this->entry_last_notified_time($entry_props)))
 							return $entry_last_notified_time + 604800;
 				}
-				return $entry_props->entry->hold_until_time ? $entry_props->entry->hold_until_time : $entry_props->entry->time;
+				return $entry_props->entry->hold_until_time ? $entry_props->entry->hold_until_time : $entry_props->entry->insertion_time;
 			}
 
 			/**
@@ -616,7 +704,10 @@ namespace comment_mail // Root namespace.
 				$sql = "SELECT `time` FROM `".esc_sql($this->plugin->utils_db->prefix().'queue_event_log')."`".
 
 				       " WHERE `post_id` = '".esc_sql($entry_props->post->ID)."'".
-				       " AND `comment_parent_id` = '".esc_sql($entry_props->comment->comment_parent)."'".
+
+				       (!$entry_props->sub->comment_id ? '' // If all comments; include everything.
+					       : " AND `comment_parent_id` = '".esc_sql($entry_props->comment->comment_parent)."'").
+
 				       " AND `sub_id` = '".esc_sql($entry_props->sub->ID)."'".
 				       " AND `event` = 'notified'".
 
@@ -678,7 +769,10 @@ namespace comment_mail // Root namespace.
 				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
 
 				       " WHERE `post_id` = '".esc_sql($entry_props->post->ID)."'".
-				       " AND `comment_parent_id` = '".esc_sql($entry_props->comment->comment_parent)."'".
+
+				       (!$entry_props->sub->comment_id ? '' // If all comments; include everything.
+					       : " AND `comment_parent_id` = '".esc_sql($entry_props->comment->comment_parent)."'").
+
 				       " AND `sub_id` = '".esc_sql($entry_props->sub->ID)."'".
 
 				       " ORDER BY `insertion_time` ASC"; // In chronological order.

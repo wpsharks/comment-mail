@@ -79,21 +79,22 @@ namespace comment_mail // Root namespace.
 			public function input_row(array $args = array())
 			{
 				$default_args = array(
-					'type'                 => 'text',
-					'label'                => '',
-					'placeholder'          => '',
+					'type'                     => 'text',
+					'label'                    => '',
+					'placeholder'              => '',
 
-					'name'                 => '',
-					'root_name'            => FALSE,
+					'name'                     => '',
+					'root_name'                => FALSE,
 
-					'required'             => FALSE,
-					'maxlength'            => 0,
-					'current_value'        => NULL,
+					'required'                 => FALSE,
+					'maxlength'                => 0,
+					'current_value'            => NULL,
+					'current_value_empty_on_0' => FALSE,
 
-					'notes'                => '',
-					'post_id'              => NULL,
-					'nested_checkbox_args' => array(),
-					'other_attrs'          => '',
+					'notes'                    => '',
+					'post_id'                  => NULL,
+					'nested_checkbox_args'     => array(),
+					'other_attrs'              => '',
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
@@ -111,9 +112,13 @@ namespace comment_mail // Root namespace.
 				$id   = __NAMESPACE__.$this->ns_id_suffix.'-'.$slug;
 				$name = $root_name ? $name : __NAMESPACE__.$this->ns_name_suffix.'['.$name.']';
 
-				$required      = (boolean)$args['required'];
-				$maxlength     = (integer)$args['maxlength'];
-				$current_value = $this->isset_or($args['current_value'], NULL, 'string');
+				$required                 = (boolean)$args['required'];
+				$maxlength                = (integer)$args['maxlength'];
+				$current_value            = $this->isset_or($args['current_value'], NULL, 'string');
+				$current_value_empty_on_0 = (boolean)$args['current_value_empty_on_0'];
+
+				if($current_value_empty_on_0 && in_array($current_value, array(0, '0'), TRUE))
+					$current_value = ''; // Empty value.
 
 				$notes                = trim((string)$args['notes']);
 				$post_id              = $this->isset_or($args['post_id'], NULL, 'integer');
@@ -179,24 +184,25 @@ namespace comment_mail // Root namespace.
 			public function select_row(array $args = array())
 			{
 				$default_args = array(
-					'type'                 => 'text',
-					'label'                => '',
-					'placeholder'          => '',
+					'type'                     => 'text',
+					'label'                    => '',
+					'placeholder'              => '',
 
-					'name'                 => '',
-					'root_name'            => FALSE,
+					'name'                     => '',
+					'root_name'                => FALSE,
 
-					'required'             => FALSE,
-					'maxlength'            => 0,
-					'options'              => '',
-					'current_value'        => NULL,
+					'required'                 => FALSE,
+					'maxlength'                => 0,
+					'options'                  => '',
+					'current_value'            => NULL,
+					'current_value_empty_on_0' => FALSE,
 
-					'notes'                => '',
-					'post_id'              => NULL,
-					'nested_checkbox_args' => array(),
-					'other_attrs'          => '',
+					'notes'                    => '',
+					'post_id'                  => NULL,
+					'nested_checkbox_args'     => array(),
+					'other_attrs'              => '',
 
-					'input_fallback_args'  => array(),
+					'input_fallback_args'      => array(),
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
@@ -214,10 +220,14 @@ namespace comment_mail // Root namespace.
 				$id   = __NAMESPACE__.$this->ns_id_suffix.'-'.$slug;
 				$name = $root_name ? $name : __NAMESPACE__.$this->ns_name_suffix.'['.$name.']';
 
-				$required      = (boolean)$args['required'];
-				$maxlength     = (integer)$args['maxlength'];
-				$options       = !is_array($args['options']) ? trim((string)$args['options']) : $args['options'];
-				$current_value = $this->isset_or($args['current_value'], NULL, 'string');
+				$required                 = (boolean)$args['required'];
+				$maxlength                = (integer)$args['maxlength'];
+				$options                  = !is_array($args['options']) ? trim((string)$args['options']) : $args['options'];
+				$current_value            = $this->isset_or($args['current_value'], NULL, 'string');
+				$current_value_empty_on_0 = (boolean)$args['current_value_empty_on_0'];
+
+				if($current_value_empty_on_0 && in_array($current_value, array(0, '0'), TRUE))
+					$current_value = ''; // Empty value.
 
 				$notes                = trim((string)$args['notes']);
 				$post_id              = $this->isset_or($args['post_id'], NULL, 'integer');

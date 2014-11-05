@@ -109,7 +109,7 @@ namespace comment_mail // Root namespace.
 						'label'               => __('<i class="fa fa-fw fa-thumb-tack"></i> Post ID#', $this->plugin->text_domain),
 						'name'                => 'post_id', 'required' => TRUE, 'options' => '%%posts%%', 'current_value' => $this->current_value_for('post_id'),
 						'notes'               => __('Required; the Post ID they are subscribed to.', $this->plugin->text_domain),
-						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'placeholder' => ''),
+						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'placeholder' => '', 'current_value_empty_on_0' => TRUE),
 					));
 				echo $this->form_fields->select_row(
 					array(
@@ -117,7 +117,7 @@ namespace comment_mail // Root namespace.
 						'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID#', $this->plugin->text_domain),
 						'name'                => 'comment_id', 'required' => FALSE, 'options' => '%%comments%%', 'post_id' => $this->current_value_for('post_id'), 'current_value' => $this->current_value_for('comment_id'),
 						'notes'               => __('If empty, they\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $this->plugin->text_domain),
-						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"'),
+						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'current_value_empty_on_0' => TRUE),
 					));
 				echo $this->form_fields->select_row(
 					array(
@@ -126,7 +126,7 @@ namespace comment_mail // Root namespace.
 						'name'                => 'user_id', 'required' => FALSE, 'options' => '%%users%%', 'current_value' => $this->current_value_for('user_id'),
 						'notes'               => __('Associates subscription w/ a WP User ID (if applicable) to improve statistical reporting.', $this->plugin->text_domain).
 						                         ' '.__('If empty, the system will automatically try to find a matching user ID for the email address.', $this->plugin->text_domain),
-						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"'),
+						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'current_value_empty_on_0' => TRUE),
 					));
 				/* -------------------------------------------------------------------- */
 				echo $this->form_fields->horizontal_line_row(/* -------------------------------------------------------------------- */);

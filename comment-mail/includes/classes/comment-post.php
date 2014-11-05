@@ -68,10 +68,10 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_inject_sub()
 			{
-				if(!$this->plugins->options['enable'])
+				if(!$this->plugin->options['enable'])
 					return; // Disabled currently.
 
-				if(!$this->plugins->options['new_subs_enable'])
+				if(!$this->plugin->options['new_subs_enable'])
 					return; // Disabled currently.
 
 				if(!$this->comment_id)
@@ -80,21 +80,18 @@ namespace comment_mail // Root namespace.
 				if(empty($_POST[__NAMESPACE__.'_sub_type']))
 					return; // Not applicable.
 
-				if(empty($_POST[__NAMESPACE__.'_sub_deliver']))
-					return; // Not applicable.
-
 				$sub_type = (string)$_POST[__NAMESPACE__.'_sub_type'];
 				if(!($sub_type = $this->plugin->utils_string->trim_strip($sub_type)))
 					return; // Not applicable.
 
-				$sub_deliver = (string)$_POST[__NAMESPACE__.'_sub_deliver'];
-				if(!($sub_deliver = $this->plugin->utils_string->trim_strip($sub_deliver)))
-					return; // Not applicable.
+				$sub_deliver = !empty($_POST[__NAMESPACE__.'_sub_deliver'])
+					? (string)$_POST[__NAMESPACE__.'_sub_deliver'] : '';
 
 				new sub_injector(wp_get_current_user(), $this->comment_id, array(
 					'type'           => $sub_type,
 					'deliver'        => $sub_deliver,
 					'user_initiated' => TRUE,
+					'keep_existing'  => TRUE,
 				));
 			}
 

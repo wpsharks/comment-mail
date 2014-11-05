@@ -1043,6 +1043,29 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Unsubscribe ALL URL for a specific sub. email.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string      $sub_email Subscriber's email address.
+			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @return string URL w/ the given `$scheme`.
+			 */
+			public function sub_unsubscribe_all_url($sub_email, $scheme = NULL)
+			{
+				$sub_email = trim((string)$sub_email);
+				$sub_email = $this->plugin->utils_enc->encrypt($sub_email);
+
+				$url  = home_url('/', $scheme);
+				$args = array(__NAMESPACE__ => array('unsubscribe_all' => $sub_email));
+
+				return add_query_arg(urlencode_deep($args), $url);
+			}
+
+			/**
 			 * Manage URL for a specific sub. key.
 			 *
 			 * @since 14xxxx First documented version.
