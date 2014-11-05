@@ -129,7 +129,7 @@ Align w/ menu page.
 .comments_page_comment_mail div.error
 {
 	font-size : 120%;
-	margin    : 0 25px 25px 5px;
+	margin    : 25px 25px 25px 5px;
 }
 /* ------------------------------------------------------------------------------------------------------------
 	Plugin-specific styles for an actual/standard plugin menu page; e.g. options.
@@ -140,9 +140,8 @@ Menu page styles.
 .comment-mail-menu-page
 {
 	font-size : 14px;
-	padding   : 25px;
 	min-width : 800px;
-	margin    : 0 25px 25px 5px;
+	margin    : 25px 25px 25px 5px;
 }
 .comment-mail-menu-page a
 {
