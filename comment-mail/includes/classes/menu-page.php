@@ -231,24 +231,14 @@ namespace comment_mail // Root namespace.
 
 				$heading .= '<div class="pmp-heading">'."\n";
 
-				$heading .= '  <button type="button" class="pmp-restore-defaults"'. // Restores default options.
-				            '     data-pmp-confirmation="'.esc_attr(__('Restore default plugin options? You will lose all of your current settings! Are you absolutely sure?', $this->plugin->text_domain)).'"'.
-				            '     data-pmp-action="'.esc_attr($this->plugin->utils_url->restore_default_options()).'">'.
-				            '     '.__('Restore', $this->plugin->text_domain).' <i class="fa fa-ambulance"></i>'.
-				            '  </button>'."\n";
+				$heading .= '  <img class="pmp-logo-icon" src="'.$this->plugin->utils_url->to('/client-s/images/'.$logo_icon).'" alt="'.esc_attr($title).'" />'."\n";
 
-				$heading .= '  <div class="pmp-panel-togglers" title="'.esc_attr(__('All Panels', $this->plugin->text_domain)).'">'."\n";
-				$heading .= '     <button type="button" class="pmp-panels-open"><i class="fa fa-chevron-down"></i></button>'."\n";
-				$heading .= '     <button type="button" class="pmp-panels-close"><i class="fa fa-chevron-up"></i></button>'."\n";
-				$heading .= '  </div>'."\n";
-
-				$heading .= '  <div class="pmp-upsells">'."\n";
+				$heading .= '  <div class="pmp-heading-links">'."\n";
 				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->pro_preview()).'"><i class="fa fa-eye"></i> Preview Pro Features</a>'."\n";
 				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->product_page()).'" target="_blank"><i class="fa fa-heart-o"></i> '.__('Pro Upgrade', $this->plugin->text_domain).'</a>'."\n";
 				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->subscribe_page()).'" target="_blank"><i class="fa fa-envelope"></i> '.__('Newsletter (Subscribe)', $this->plugin->text_domain).'</a>'."\n";
+				$heading .= '     <a href="#" data-pmp-action="'.esc_attr($this->plugin->utils_url->restore_default_options()).'" data-pmp-confirmation="'.esc_attr(__('Restore default plugin options? You will lose all of your current settings! Are you absolutely sure?', $this->plugin->text_domain)).'"><i class="fa fa-ambulance"></i> '.__('Restore Default Options', $this->plugin->text_domain).'</a>'."\n";
 				$heading .= '  </div>'."\n";
-
-				$heading .= '  <img src="'.$this->plugin->utils_url->to('/client-s/images/'.$logo_icon).'" alt="'.esc_attr($title).'" />'."\n";
 
 				$heading .= '</div>'."\n";
 

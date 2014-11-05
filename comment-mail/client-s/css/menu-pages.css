@@ -370,34 +370,33 @@ Menu page heading styles.
 	padding-bottom : 15px;
 	margin-bottom  : 25px;
 	border-bottom  : 1px solid #CCCCCC;
+	position       : relative;
 }
-.comment-mail-menu-page .pmp-heading button[type='submit'],
-.comment-mail-menu-page .pmp-heading .pmp-restore-defaults,
-.comment-mail-menu-page .pmp-heading .pmp-panel-togglers
+.comment-mail-menu-page .pmp-heading img.pmp-logo-icon
 {
-	float : right;
+	margin-left : 10px;
+	width       : 400px;
 }
-.comment-mail-menu-page .pmp-heading .pmp-restore-defaults,
-.comment-mail-menu-page .pmp-heading .pmp-panel-togglers
+.comment-mail-menu-page .pmp-heading .pmp-heading-links
 {
-	margin : 0 25px 0 0;
-}
-.comment-mail-menu-page .pmp-heading .pmp-upsells
-{
-	float      : right;
-	clear      : right;
-
-	max-width  : 375px;
-	margin     : 10px 0 0 0;
-
+	left       : 450px;
+	bottom     : 20px;
+	position   : absolute;
 	text-align : center;
 }
-.comment-mail-menu-page .pmp-heading .pmp-upsells a
+.comment-mail-menu-page .pmp-heading .pmp-heading-links a
 {
-	line-height     : 1.5em;
 	text-decoration : none;
-	margin          : 0 5px 0 5px;
+	margin          : 10px 15px 0 15px;
 	display         : inline-block;
+}
+.comment-mail-menu-page .pmp-heading .pmp-heading-links a:first-child
+{
+	margin-left : 0;
+}
+.comment-mail-menu-page .pmp-heading .pmp-heading-links a:last-child
+{
+	margin-right : 0;
 }
 /*
 Menu page panel styles.
