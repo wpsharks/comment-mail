@@ -48,7 +48,7 @@ namespace comment_mail;
 	<select id="<?php echo esc_attr($sub_type_id); ?>" name="<?php echo esc_attr($sub_type_name); ?>" class="cso-sub-type form-control" title="<?php echo __('Receive Notifications?', $plugin->text_domain); ?>">
 		<option value=""<?php selected('', $current->sub_type); ?>><?php echo __('no, do not subscribe', $plugin->text_domain); ?></option>
 		<option value="comment"<?php selected('comment', $current->sub_type); ?>><?php echo __('yes, replies to my comment', $plugin->text_domain); ?></option>
-		<option value="comments"<?php selected('comments', $current->sub_type); ?>><?php echo __('yes, for all comments/replies', $plugin->text_domain); ?></option>
+		<option value="comments"<?php selected('comments', $current->sub_type); ?>><?php echo __('yes, all comments/replies', $plugin->text_domain); ?></option>
 	</select>
 
 	<?php // TIP: this is optional. If you exclude this select menu, the value will automatically default to `asap`. ?>

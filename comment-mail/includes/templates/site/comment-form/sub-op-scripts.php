@@ -11,24 +11,25 @@ namespace comment_mail;
 ?>
 
 <script type="text/javascript">
-	(function($) // Enhance Comment Mail™ subscr. options.
+	(function($) // Comment Mail™ subscr. options.
 	{
 		$(document).ready(
 			function() // On DOM ready handler.
 			{
-				var $_subOps = $('.comment-sub-ops');
-				if($_subOps.data('auto') === 'position') $_subOps.prevUntil('form')
+				var $subOps = $('.comment-sub-ops'),
+					$subType, $subDeliver; // Initialize vars.
+
+				if($subOps.data('auto') === 'position') $subOps.prevUntil('form')
 					.each(function(/* Auto-position subscription options. */)
 					      {
 						      var $this = $(this); // Cache this.
 						      if($this.find(':input[type="submit"]').length)
 						      {
-							      $_subOps.remove(), $this.before($_subOps);
+							      $subOps.remove(), $this.before($subOps);
 							      return false; // Break the each() loop.
 						      }
 					      });
-
-				var $subOps = $('.comment-sub-ops'),
+				$subOps = $('.comment-sub-ops'),
 					$subType = $subOps.find('select.cso-sub-type'),
 					$subDeliver = $subOps.find('select.cso-sub-deliver');
 

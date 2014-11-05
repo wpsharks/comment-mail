@@ -70,6 +70,13 @@ namespace comment_mail // Root namespace.
 			protected $user_initiated;
 
 			/**
+			 * @var boolean Keep existing?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $keep_existing;
+
+			/**
 			 * @var sub_inserter|null Sub inserter.
 			 *
 			 * @since 14xxxx First documented version.
@@ -105,6 +112,8 @@ namespace comment_mail // Root namespace.
 					'process_events' => TRUE,
 
 					'user_initiated' => FALSE,
+
+					'keep_existing'  => FALSE,
 				);
 				$args          = array_merge($defaults_args, $args);
 				$args          = array_intersect_key($args, $defaults_args);
@@ -122,6 +131,8 @@ namespace comment_mail // Root namespace.
 				$this->user_initiated = $this->plugin->utils_sub->check_user_initiated_by_admin(
 					$this->comment ? $this->comment->comment_author_email : '', $this->user_initiated
 				);
+				$this->keep_existing  = (boolean)$args['keep_existing'];
+
 				$this->maybe_inject();
 			}
 
@@ -141,10 +152,6 @@ namespace comment_mail // Root namespace.
 			 * Injects a new subscription.
 			 *
 			 * @since 14xxxx First documented version.
-			 *
-			 * @TODO there are going to be lots of overwritten subs
-			 *    since each time a comment is posted it may result in a new one.
-			 *    Is that what we want here?
 			 */
 			protected function maybe_inject()
 			{
@@ -179,6 +186,7 @@ namespace comment_mail // Root namespace.
 					'auto_confirm'         => $this->auto_confirm,
 					'process_events'       => $this->process_events,
 					'user_initiated'       => $this->user_initiated,
+					'keep_existing'        => $this->keep_existing,
 				));
 			}
 		}

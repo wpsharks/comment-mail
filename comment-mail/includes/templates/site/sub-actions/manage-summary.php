@@ -17,7 +17,7 @@ namespace comment_mail;
  *    is display instead. Therefore, this value is mostly irrelevant
  *    for templates — only provided for the sake of being thorough.
  *
- * @var string         $sub_email Email address that we're displaying the summary for.
+ * @var string         $sub_email Primary email address in this summary.
  *
  *    Note that we may also display a summary of any comment subscriptions
  *    that are indirectly related to this email address, but still belong to the
@@ -84,18 +84,7 @@ namespace comment_mail;
 ?>
 <?php echo // Sets document <title> tag via `%%title%%` replacement code in header.
 str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $site_header); ?>
-<?php
-/*
- * Here we define a few more variables of our own.
- * All based on what the template makes available to us;
- * ~ as documented at the top of this file.
- */
-// Site home page URL; i.e. back to main site.
-$home_url = home_url('/'); // Multisite compatible.
 
-// Subscription creation URL; user may create a new subscription.
-$sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
-?>
 	<div class="manage-summary">
 
 		<?php if($error_codes): // Any major errors? ?>
@@ -126,6 +115,22 @@ $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 			</div>
 
 		<?php else: // Display summary; there are no major errors. ?>
+
+			<?php
+			/*
+			 * Here we define a few more variables of our own.
+			 * All based on what the template makes available to us;
+			 * ~ as documented at the top of this file.
+			 */
+			// Site home page URL; i.e. back to main site.
+			$home_url = home_url('/'); // Multisite compatible.
+
+			// Subscription creation URL; user may create a new subscription.
+			$sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
+
+			// Unsubscribes (deletes) ALL subscriptions in the summary, at the same time.
+			$sub_unsubscribe_all_url = $plugin->utils_url->sub_unsubscribe_all_url($sub_email);
+			?>
 
 			<?php if ($processing && $processing_errors): // Any processing errors? ?>
 
@@ -161,15 +166,21 @@ $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 
 			<?php endif; ?>
 
-				<h2 style="margin-top:0;">
-					<a href="<?php echo esc_attr($sub_new_url); ?>" title="<?php echo __('Create New Subscription', $plugin->text_domain); ?>">
-						<i class="fa fa-plus-square pull-right"></i>
-					</a>
-					<?php echo __('My Comment Subscriptions', $plugin->text_domain); ?><br />
-					<em style="margin-left:10px;">
-						<small>&lt;<?php echo esc_html(implode('&gt;, &lt;', array_slice($sub_emails, 0, 100))); ?>&gt;</small>
-					</em>
-				</h2>
+			<h2 style="margin-top:0;">
+				<a href="<?php echo esc_attr($sub_new_url); ?>" title="<?php echo __('Add New Subscription', $plugin->text_domain); ?>">
+					<i class="fa fa-plus-square text-success pull-right" style="margin-left:15px;"></i>
+				</a>
+				<a href="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
+					data-action="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
+					data-confirmation="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address? Are you absolutely sure?', $plugin->text_domain); ?>"
+					title="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address?', $plugin->text_domain); ?>">
+					<i class="fa fa-times-circle text-danger pull-right"></i>
+				</a>
+				<?php echo __('My Comment Subscriptions', $plugin->text_domain); ?><br />
+				<em style="margin-left:10px;">
+					<small>&lt;<?php echo esc_html(implode('&gt;, &lt;', array_slice($sub_emails, 0, 100))); ?>&gt;</small>
+				</em>
+			</h2>
 
 			<hr />
 
@@ -347,7 +358,7 @@ $sub_new_url = $plugin->utils_url->sub_manage_sub_new_url(NULL, TRUE);
 			<?php endif; // END: pagination total pages check. ?>
 
 			<?php
-			/* Javascript needed by this template.
+			/* Javascript used in this template.
 			 ------------------------------------------------------------------------------------------------------------------------ */
 			?>
 			<script type="text/javascript">

@@ -91,6 +91,7 @@ namespace comment_mail // Root namespace.
 					'type'           => $sub_type,
 					'deliver'        => $sub_deliver,
 					'user_initiated' => TRUE,
+					'keep_existing'  => TRUE,
 				));
 			}
 

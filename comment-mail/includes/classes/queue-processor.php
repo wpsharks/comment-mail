@@ -146,7 +146,7 @@ namespace comment_mail // Root namespace.
 
 				if($this->delay < 0) $this->delay = 0;
 				if($this->delay && $this->delay / 1000 > $this->max_time - 5)
-					$this->delay = 250; // Cannot be greater than max time.
+					$this->delay = 250; // Cannot be greater than max time - 5 seconds.
 
 				if(isset($max_limit)) // Argument is set?
 					$this->max_limit = (integer)$max_limit; // This takes precedence.
@@ -656,7 +656,7 @@ namespace comment_mail // Root namespace.
 						if(($entry_last_notified_time = $this->entry_last_notified_time($entry_props)))
 							return $entry_last_notified_time + 604800;
 				}
-				return $entry_props->entry->hold_until_time ? $entry_props->entry->hold_until_time : $entry_props->entry->time;
+				return $entry_props->entry->hold_until_time ? $entry_props->entry->hold_until_time : $entry_props->entry->insertion_time;
 			}
 
 			/**
@@ -704,7 +704,10 @@ namespace comment_mail // Root namespace.
 				$sql = "SELECT `time` FROM `".esc_sql($this->plugin->utils_db->prefix().'queue_event_log')."`".
 
 				       " WHERE `post_id` = '".esc_sql($entry_props->post->ID)."'".
-				       " AND `comment_parent_id` = '".esc_sql($entry_props->comment->comment_parent)."'".
+
+				       (!$entry_props->sub->comment_id ? '' // If all comments; include everything.
+					       : " AND `comment_parent_id` = '".esc_sql($entry_props->comment->comment_parent)."'").
+
 				       " AND `sub_id` = '".esc_sql($entry_props->sub->ID)."'".
 				       " AND `event` = 'notified'".
 
@@ -766,7 +769,10 @@ namespace comment_mail // Root namespace.
 				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
 
 				       " WHERE `post_id` = '".esc_sql($entry_props->post->ID)."'".
-				       " AND `comment_parent_id` = '".esc_sql($entry_props->comment->comment_parent)."'".
+
+				       (!$entry_props->sub->comment_id ? '' // If all comments; include everything.
+					       : " AND `comment_parent_id` = '".esc_sql($entry_props->comment->comment_parent)."'").
+
 				       " AND `sub_id` = '".esc_sql($entry_props->sub->ID)."'".
 
 				       " ORDER BY `insertion_time` ASC"; // In chronological order.

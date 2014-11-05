@@ -59,18 +59,7 @@ namespace comment_mail;
 <?php // Sets document <title> tag via `%%title%%` replacement code in header.
 echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_domain)
 	: __('Add New Subscription', $plugin->text_domain), $site_header); ?>
-<?php
-/*
- * Here we define a few more variables of our own.
- * All based on what the template makes available to us;
- * ~ as documented at the top of this file.
- */
-// Site home page URL; i.e. back to main site.
-$home_url = home_url('/'); // Multisite compatible.
 
-// Summary return URL; w/ all summary navigation vars preserved.
-$sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, NULL, TRUE);
-?>
 	<div class="manage-sub-form">
 
 		<?php if($error_codes // Changed email; i.e. nullified existing key?
@@ -90,7 +79,7 @@ $sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, N
 					<?php endforeach; ?>
 				</ul>
 				<p style="margin-top:10px;">
-					<a href="<?php echo esc_attr($sub_summary_return_url); ?>">
+					<a href="<?php echo esc_attr($plugin->utils_url->sub_manage_summary_url($sub_key, NULL, TRUE)); ?>">
 						<i class="fa fa-arrow-circle-left"></i> <?php echo __('Back to My Subscriptions', $plugin->text_domain); ?>
 					</a>
 				</p>
@@ -128,6 +117,19 @@ $sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, N
 			</div>
 
 		<?php else: // Display form; there are no major errors. ?>
+
+			<?php
+			/*
+			 * Here we define a few more variables of our own.
+			 * All based on what the template makes available to us;
+			 * ~ as documented at the top of this file.
+			 */
+			// Site home page URL; i.e. back to main site.
+			$home_url = home_url('/'); // Multisite compatible.
+
+			// Summary return URL; w/ all summary navigation vars preserved.
+			$sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url($sub_key, NULL, TRUE);
+			?>
 
 			<?php if ($processing && $processing_errors): // Any processing errors? ?>
 

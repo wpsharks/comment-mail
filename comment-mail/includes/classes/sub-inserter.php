@@ -147,6 +147,13 @@ namespace comment_mail // Root namespace.
 			 */
 			protected $user_allow_0;
 
+			/**
+			 * @var boolean Keep existing?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $keep_existing;
+
 			/* Related to user. */
 
 			/**
@@ -334,6 +341,8 @@ namespace comment_mail // Root namespace.
 					'ui_protected_data_user'        => NULL,
 
 					'user_allow_0'                  => NULL,
+
+					'keep_existing'                 => FALSE,
 				);
 				$args          = array_merge($defaults_args, $args);
 				$args          = array_intersect_key($args, $defaults_args);
@@ -363,6 +372,8 @@ namespace comment_mail // Root namespace.
 				if(isset($args['user_allow_0'])) // Iff `$this->user_initiated` also.
 					$this->user_allow_0 = $this->user_initiated && $args['user_allow_0'];
 				else $this->user_allow_0 = $this->user_initiated; // Defaults to this value.
+
+				$this->keep_existing = (boolean)$args['keep_existing'];
 
 				/* Related to user. */
 
@@ -637,6 +648,9 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function insert()
 			{
+				if($this->check_existing_before_insert())
+					return; // Already exists.
+
 				$this->check_auto_confirm_before_insert_update();
 				$this->collect_duplicate_key_ids_before_insert();
 
@@ -650,7 +664,7 @@ namespace comment_mail // Root namespace.
 				if(!($this->insert_id = (integer)$this->plugin->utils_db->wp->insert_id))
 					throw new \exception(__('Insertion failure.', $this->plugin->text_domain));
 
-				$this->inserted = TRUE; // Flag a `TRUE` now; i.e. the insertion was a success.
+				$this->inserted = TRUE; // Flag as `TRUE` now; i.e. the insertion was a success.
 
 				$this->overwrite_duplicate_key_ids_after_insert(); // Before nullifying cache.
 
@@ -740,6 +754,39 @@ namespace comment_mail // Root namespace.
 							= __('Request for email confirmation sent successfully.', $this->plugin->text_domain);
 				}
 				$this->overwrite_any_others_after_insert_update(); // Overwrites any others.
+			}
+
+			/*
+			 * For insert; check existing subscription(s).
+			 */
+
+			/**
+			 * Is there an existing subscription that will suffice?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean `TRUE` if there's an existing subscription that will suffice.
+			 */
+			protected function check_existing_before_insert()
+			{
+				if(!$this->keep_existing)
+					return FALSE; // Not applicable.
+
+				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+
+				       " WHERE `post_id` = '".esc_sql($this->data['post_id'])."'".
+				       " AND `comment_id` = '".esc_sql($this->data['comment_id'])."'".
+
+				       " AND `user_id` = '".esc_sql($this->data['user_id'])."'".
+				       " AND `email` = '".esc_sql($this->data['email'])."'".
+
+				       " AND `fname` = '".esc_sql($this->data['fname'])."'".
+				       " AND `lname` = '".esc_sql($this->data['lname'])."'".
+
+				       " AND `status` = 'subscribed'". // Only if `subscribed`.
+				       " AND `deliver` = '".esc_sql($this->data['deliver'])."'";
+
+				return (boolean)$this->plugin->utils_db->wp->get_var($sql);
 			}
 
 			/*

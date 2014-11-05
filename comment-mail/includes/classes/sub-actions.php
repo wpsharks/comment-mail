@@ -141,7 +141,35 @@ namespace comment_mail // Root namespace.
 				exit($template->parse($template_vars));
 			}
 
-			// @TODO Add an unsubscribe_all handler.
+			/**
+			 * Unsubscribe ALL handler.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $request_args Input argument(s).
+			 */
+			protected function unsubscribe_all($request_args)
+			{
+				$sub_email = ''; // Initialize.
+
+				$error_codes = array(); // Initialize.
+
+				if(!($sub_email = $this->plugin->utils_enc->decrypt($request_args)))
+					$error_codes[] = 'missing_sub_email';
+
+				$delete_args = array('user_initiated' => TRUE); // Deletion args.
+				if(!$error_codes && !($deleted = $this->plugin->utils_sub->delete_email_user_all($sub_email, $delete_args)))
+					$error_codes[] = 'sub_already_unsubscribed_all';
+
+				$template_vars = get_defined_vars(); // Everything above.
+				$template      = new template('site/sub-actions/unsubscribed-all.php');
+
+				status_header(200); // Status header.
+				nocache_headers(); // Disallow caching.
+				header('Content-Type: text/html; charset=UTF-8');
+
+				exit($template->parse($template_vars));
+			}
 
 			/**
 			 * Manage handler w/ sub. actions.

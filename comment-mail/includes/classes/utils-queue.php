@@ -39,7 +39,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return array An array of unique IDs only.
 			 */
-			public function unique_ids_only(array $queue_ids)
+			public function unique_ids(array $queue_ids)
 			{
 				$unique_ids = array(); // Initialize.
 
@@ -76,7 +76,6 @@ namespace comment_mail // Root namespace.
 					return NULL; // Not possible.
 
 				$sql = "DELETE FROM `".esc_sql($this->plugin->utils_db->prefix().'queue')."`".
-
 				       " WHERE `ID` = '".esc_sql($queue_id)."'";
 
 				if(($deleted = $this->plugin->utils_db->wp->query($sql)) === FALSE)
@@ -99,7 +98,7 @@ namespace comment_mail // Root namespace.
 			{
 				$counter = 0; // Initialize.
 
-				foreach($this->unique_ids_only($queue_ids) as $_queue_id)
+				foreach($this->unique_ids($queue_ids) as $_queue_id)
 					if($this->delete($_queue_id, $args))
 						$counter++; // Bump counter.
 				unset($_queue_id); // Housekeeping.

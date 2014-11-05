@@ -241,7 +241,7 @@ namespace comment_mail // Root namespace.
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
-			 * @return integer Number of suscribers reconfirmed successfully.
+			 * @return integer Number of subscriptions reconfirmed successfully.
 			 */
 			public function bulk_reconfirm(array $sub_ids_or_keys, array $args = array())
 			{
@@ -294,7 +294,7 @@ namespace comment_mail // Root namespace.
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
-			 * @return integer Number of suscribers confirmed successfully.
+			 * @return integer Number of subscriptions confirmed successfully.
 			 */
 			public function bulk_confirm(array $sub_ids_or_keys, array $args = array())
 			{
@@ -347,7 +347,7 @@ namespace comment_mail // Root namespace.
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
-			 * @return integer Number of suscribers unconfirmed successfully.
+			 * @return integer Number of subscriptions unconfirmed successfully.
 			 */
 			public function bulk_unconfirm(array $sub_ids_or_keys, array $args = array())
 			{
@@ -400,7 +400,7 @@ namespace comment_mail // Root namespace.
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
-			 * @return integer Number of suscribers suspended successfully.
+			 * @return integer Number of subscriptions suspended successfully.
 			 */
 			public function bulk_suspend(array $sub_ids_or_keys, array $args = array())
 			{
@@ -453,7 +453,7 @@ namespace comment_mail // Root namespace.
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
-			 * @return integer Number of suscribers trashed successfully.
+			 * @return integer Number of subscriptions trashed successfully.
 			 */
 			public function bulk_trash(array $sub_ids_or_keys, array $args = array())
 			{
@@ -503,7 +503,7 @@ namespace comment_mail // Root namespace.
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
 			 *
-			 * @return integer Number of suscribers deleted successfully.
+			 * @return integer Number of subscriptions deleted successfully.
 			 */
 			public function bulk_delete(array $sub_ids_or_keys, array $args = array())
 			{
@@ -515,6 +515,31 @@ namespace comment_mail // Root namespace.
 				unset($_sub_id); // Housekeeping.
 
 				return $counter;
+			}
+
+			/**
+			 * Delete email/user all; for unsubscribe all functionality.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $sub_email An input email address.
+			 * @param array  $args Any additional behavioral args.
+			 *
+			 * @return integer Number of subscriptions deleted successfully.
+			 */
+			public function delete_email_user_all($sub_email, array $args = array())
+			{
+				if(!($sub_email = trim(strtolower((string)$sub_email))))
+					return NULL; // Not possible.
+
+				$user_ids = $this->email_user_ids($sub_email);
+
+				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				       " WHERE `email` = '".esc_sql($sub_email)."' OR `user_id` IN('".implode("','", array_map('esc_sql', $user_ids))."')";
+
+				$sub_ids = array_map('intval', $this->plugin->utils_db->wp->get_col($sql));
+
+				return $this->bulk_delete($sub_ids, $args);
 			}
 
 			/**

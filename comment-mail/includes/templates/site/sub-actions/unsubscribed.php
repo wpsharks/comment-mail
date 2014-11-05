@@ -96,6 +96,9 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 			// Subscription last update time "ago"; e.g. `X [seconds/minutes/days/weeks/years] ago`.
 			$sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $sub->last_update_time);
 
+			// Unsubscribes (deletes) ALL subscriptions associated w/ their email address.
+			$sub_unsubscribe_all_url = $plugin->utils_url->sub_unsubscribe_all_url($sub->email);
+
 			// Subscription creation URL; i.e. so they can add a new subscription if they like.
 			$sub_new_url = $plugin->utils_url->sub_manage_sub_new_url();
 			?>
@@ -104,6 +107,15 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 				<h4 style="margin:0;">
 					<i class="fa fa-check fa-fw"></i> <?php echo __('Unsubscribed successfully. Sorry to see you go!', $plugin->text_domain); ?>
 				</h4>
+			</div>
+
+			<div class="alert alert-warning text-center pull-right" style="margin:10px 0 20px 20px;">
+				<a href="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
+					data-action="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
+					data-confirmation="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address? Are you absolutely sure?', $plugin->text_domain); ?>"
+					title="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address?', $plugin->text_domain); ?>">
+					<?php echo __('Unsubscribe All', $plugin->text_domain); ?> <i class="fa fa-times-circle pull-right"></i>
+				</a>
 			</div>
 
 			<h4>
@@ -134,6 +146,44 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 			<h5 style="font-style:italic; margin:0;">
 				<i class="fa fa-frown-o"></i> <?php echo sprintf(__('Too many emails? ~ Please feel free to <a href="%1$s">add a new/different subscription</a> if you like!', $plugin->text_domain), esc_attr($sub_new_url)); ?>
 			</h5>
+
+			<?php
+			/* Javascript used in this template.
+			 ------------------------------------------------------------------------------------------------------------------------ */
+			?>
+			<script type="text/javascript">
+				(function($) // Primary closure w/ jQuery; strict standards.
+				{
+					'use strict'; // Strict standards enable.
+
+					var plugin = {}, $window = $(window), $document = $(document),
+
+						namespace = '<?php echo $plugin->utils_string->esc_js_sq(__NAMESPACE__); ?>',
+						namespaceSlug = '<?php echo $plugin->utils_string->esc_js_sq(str_replace('_', '-', __NAMESPACE__)); ?>',
+
+						ajaxEndpoint = '<?php echo $plugin->utils_string->esc_js_sq(home_url('/')); ?>',
+						pluginUrl = '<?php echo $plugin->utils_string->esc_js_sq(rtrim($plugin->utils_url->to('/'), '/')); ?>';
+
+					/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+					plugin.onReady = function() // On DOM ready handler.
+					{
+						/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+						$('.unsubscribe').find('[data-action]').on('click', function(e)
+						{
+							e.preventDefault(), e.stopImmediatePropagation();
+
+							var $this = $(this), data = $this.data();
+							if(typeof data.confirmation !== 'string' || confirm(data.confirmation))
+								location.href = data.action;
+						});
+						/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+					};
+					$document.ready(plugin.onReady); // On DOM ready handler.
+				})(jQuery);
+			</script>
+			<?php /* ---------------------------------------------------------------------------------------------------------- */ ?>
 
 		<?php endif; // END: if unsubscribed successfully w/ no major errors. ?>
 
