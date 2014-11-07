@@ -1070,18 +1070,11 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param boolean $search_untrusted_sources Also search untrusted sources?
-			 *    This defaults to a `FALSE` value. By default, we only return a "confirmed" email address.
-			 *    i.e. an email address from a source that can be trusted to absolutely identify the current user.
-			 *
 			 * @return string Current subscriber's email address.
 			 */
-			public function current_email($search_untrusted_sources = FALSE)
+			public function current_email()
 			{
-				$all_wp_users_confirm_email = // Disabled by default (security).
-					(boolean)$this->plugin->options['all_wp_users_confirm_email'];
-
-				if($all_wp_users_confirm_email || current_user_can('edit_posts'))
+				if($this->plugin->options['all_wp_users_confirm_email'] || current_user_can('edit_posts'))
 					if(($user = wp_get_current_user()) && $user->ID && $user->user_email)
 						return trim(strtolower((string)$user->user_email));
 
@@ -1090,14 +1083,6 @@ namespace comment_mail // Root namespace.
 				// ~ Note also that this cookie is encrypted via `MCRYPT_RIJNDAEL_256` w/ a unique salt.
 				if(($sub_email = $this->plugin->utils_enc->get_cookie(__NAMESPACE__.'_sub_email')))
 					return trim(strtolower((string)$sub_email));
-
-				if($search_untrusted_sources) // Try current user?
-					if(($user = wp_get_current_user()) && $user->ID && $user->user_email)
-						return trim(strtolower((string)$user->user_email));
-
-				if($search_untrusted_sources) // Try current commenter?
-					if(($commenter = wp_get_current_commenter()) && !empty($commenter['comment_author_email']))
-						return trim(strtolower((string)$commenter['comment_author_email']));
 
 				return ''; // Not possible.
 			}

@@ -4,32 +4,29 @@
 /*
 A menu page area ~ notifications.
 */
-.comment-mail-menu-page-area .pmp-notif-info,
-.comment-mail-menu-page-area .pmp-notif-notice,
-.comment-mail-menu-page-area .pmp-notif-warning,
-.comment-mail-menu-page-area .pmp-notif-error
+.comment-mail-menu-page-area .pmp-note
 {
 	border-radius : 5px;
 	padding       : .5em;
 	margin        : 0 0 1em 0;
 	box-shadow    : 0 1px 1px 0 rgba(0, 0, 0, .1);
 }
-.comment-mail-menu-page-area .pmp-notif-info
+.comment-mail-menu-page-area .pmp-note.pmp-info
 {
 	background : #CEE5FF;
 	border     : 1px solid #35558A;
 }
-.comment-mail-menu-page-area .pmp-notif-notice
+.comment-mail-menu-page-area .pmp-note.pmp-notice
 {
 	background : #FFFDE8;
 	border     : 1px solid #E6DB55;
 }
-.comment-mail-menu-page-area .pmp-notif-warning
+.comment-mail-menu-page-area .pmp-note.pmp-warning
 {
 	background : #FFEFD3;
 	border     : 1px solid #D29A04;
 }
-.comment-mail-menu-page-area .pmp-notif-error
+.comment-mail-menu-page-area .pmp-note.pmp-error
 {
 	background : #FFC0CB;
 	border     : 1px solid #711E1E;
@@ -114,6 +111,26 @@ A menu page area ~ post com/sub bubbles.
 {
 	color : #FFFFFF;
 }
+/*
+A menu page area ~ utilities.
+*/
+.comment-mail-menu-page-area img.pmp-left
+{
+	margin-right : 1em;
+	float        : left !important;
+}
+.comment-mail-menu-page-area img.pmp-right
+{
+	margin-left : 1em;
+	float       : right !important;
+}
+.comment-mail-menu-page-area img.pmp-borders-padding
+{
+	border-radius : 4px !important;
+	padding       : .5em !important;
+	background    : #FFFFFF !important;
+	border        : 1px solid rgba(0, 0, 0, .3) !important;
+}
 /* ------------------------------------------------------------------------------------------------------------
 	WP core elements under plugin-specific conditions.
 ------------------------------------------------------------------------------------------------------------ */
@@ -153,13 +170,6 @@ Menu page styles.
 	font-size : 14px;
 	min-width : 800px;
 	margin    : 1.25em 1.25em 1.25em .25em;
-
-	z-index   : 10;
-	/*
-		Make it possible for children to rise above
-			most other elements; e.g. CodeMirror fullscreen.
-	*/
-	position  : relative;
 }
 .comment-mail-menu-page a
 {
@@ -170,9 +180,30 @@ Menu page styles.
 {
 	color : #307D27;
 }
-.comment-mail-menu-page p
+.comment-mail-menu-page p,
+.comment-mail-menu-page pre,
+.comment-mail-menu-page output,
+.comment-mail-menu-page table,
+.comment-mail-menu-page blockquote,
+.comment-mail-menu-page audio,
+.comment-mail-menu-page video,
+.comment-mail-menu-page ul,
+.comment-mail-menu-page ol,
+.comment-mail-menu-page dl
 {
 	margin : 1em 0 1em 0;
+}
+.comment-mail-menu-page .cm pre
+{
+	margin : 0;
+}
+.comment-mail-menu-page *:not(hr):first-child
+{
+	margin-top : 0 !important;
+}
+.comment-mail-menu-page *:not(hr):last-child
+{
+	margin-bottom : 0 !important;
 }
 .comment-mail-menu-page p,
 .comment-mail-menu-page code
@@ -183,21 +214,6 @@ Menu page styles.
 {
 	width        : 100%;
 	table-layout : fixed;
-	margin       : 1em 0 1em 0;
-}
-.comment-mail-menu-page p:first-child,
-.comment-mail-menu-page pre:first-child,
-.comment-mail-menu-page table:first-child,
-.comment-mail-menu-page ul:first-child
-{
-	margin-top : 0 !important;
-}
-.comment-mail-menu-page p:last-child,
-.comment-mail-menu-page pre:last-child,
-.comment-mail-menu-page table:last-child,
-.comment-mail-menu-page ul:last-child
-{
-	margin-bottom : 0 !important;
 }
 .comment-mail-menu-page table .form-field th,
 .comment-mail-menu-page table .form-field td
@@ -251,14 +267,6 @@ Menu page styles.
 .comment-mail-menu-page img
 {
 	border : 0;
-}
-.comment-mail-menu-page img.pmp-bordered
-{
-	border-radius : 4px;
-	padding       : .5em;
-	background    : #FFFFFF;
-	border        : 1px solid #AFAFAF;
-	box-shadow    : 0 0 2px 1px #D8D8D8 inset, 0 0 1px 1px rgba(0, 0, 0, 0.5);
 }
 .comment-mail-menu-page hr
 {
@@ -357,25 +365,25 @@ Menu page styles.
 }
 .comment-mail-menu-page input::-webkit-input-placeholder
 {
-	padding-top : .25em;
+	padding-top : .1em;
 	font-style  : italic;
 	color       : rgba(0, 0, 0, 0.2);
 }
 .comment-mail-menu-page input::-moz-placeholder
 {
-	padding-top : .25em;
+	padding-top : .1em;
 	font-style  : italic;
 	color       : rgba(0, 0, 0, 0.2);
 }
 .comment-mail-menu-page input:-moz-placeholder
 {
-	padding-top : .25em;
+	padding-top : .1em;
 	font-style  : italic;
 	color       : rgba(0, 0, 0, 0.2);
 }
 .comment-mail-menu-page input:-ms-input-placeholder
 {
-	padding-top : .25em;
+	padding-top : .1em;
 	font-style  : italic;
 	color       : rgba(0, 0, 0, 0.2);
 }
@@ -485,9 +493,7 @@ Menu page panel styles.
 */
 .comment-mail-menu-page .pmp-panel
 {
-	z-index  : 1;
-	position : relative;
-	margin   : 1em 0 1em 0;
+	margin : 1em 0 1em 0;
 }
 .comment-mail-menu-page .pmp-panel:first-child
 {
@@ -497,9 +503,6 @@ Menu page panel styles.
 {
 	display             : block;
 	text-decoration     : none;
-
-	z-index             : 1;
-	position            : relative;
 
 	padding             : .5em;
 	font-size           : 150%;
@@ -548,8 +551,6 @@ Menu page panel styles.
 	margin                     : 0 auto 0 auto;
 	box-sizing                 : border-box;
 
-	z-index                    : 1;
-	position                   : relative;
 	display                    : none;
 
 	padding                    : 1em;
@@ -577,14 +578,15 @@ Menu page panel styles.
 {
 	margin-top : 0;
 }
-.comment-mail-menu-page .pmp-panel-body .pmp-notif-notice,
-.comment-mail-menu-page .pmp-panel-body .pmp-notif-info,
-.comment-mail-menu-page .pmp-panel-body .pmp-notif-warning,
-.comment-mail-menu-page .pmp-panel-body .pmp-notif-error
+.comment-mail-menu-page .pmp-panel-body .pmp-note
 {
 	padding   : 5px;
 	font-size : inherit;
 	margin    : 1em 0 1em 0;
+}
+.comment-mail-menu-page .pmp-panel-body .pmp-note.pmp-max-width
+{
+	display : table;
 }
 /*
 Menu page save button styles.

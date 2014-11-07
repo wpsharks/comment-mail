@@ -301,18 +301,22 @@ namespace comment_mail // Root namespace.
 					? (integer)$current_user_id : NULL;
 
 				$default_args = array(
-					'max'            => // Plugin option value.
+					'max'             => // Plugin option value.
 						(integer)$this->plugin->options['max_select_options'],
-					'fail_on_max'    => TRUE,
-					'no_cache'       => FALSE,
+					'fail_on_max'     => TRUE,
+					'no_cache'        => FALSE,
 
-					'display_emails' => // Show emails?
+					'display_emails'  => // Show emails?
 						is_admin() && current_user_can('list_users'),
+					'allow_empty'     => TRUE,
+					'allow_arbitrary' => TRUE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$display_emails = (boolean)$args['display_emails'];
+				$display_emails  = (boolean)$args['display_emails'];
+				$allow_empty     = (boolean)$args['allow_empty'];
+				$allow_arbitrary = (boolean)$args['allow_arbitrary'];
 
 				if(!is_admin() || !current_user_can('list_users'))
 					return ''; // Not permitted to do so.
@@ -323,7 +327,9 @@ namespace comment_mail // Root namespace.
 				if(!($users = $this->plugin->utils_db->all_users($args)))
 					return ''; // Use input field instead of options.
 
-				$options = '<option value="0"></option>'; // Initialize.
+				$options = ''; // Initialize.
+				if($allow_empty) // Allow empty selection?
+					$options = '<option value="0"></option>';
 
 				foreach($users as $_user) // Iterate users.
 				{
@@ -341,10 +347,11 @@ namespace comment_mail // Root namespace.
 				}
 				unset($_user, $_selected); // Housekeeping.
 
-				if(!isset($selected_user_id) && isset($current_user_id) && $current_user_id > 0)
-					$options .= '<option value="'.esc_attr($current_user_id).'" selected="selected">'.
-					            '  '.esc_html(__('User', $this->plugin->text_domain).' ID #'.$current_user_id).
-					            '</option>';
+				if($allow_arbitrary) // Allow arbitrary select option?
+					if(!isset($selected_user_id) && isset($current_user_id) && $current_user_id > 0)
+						$options .= '<option value="'.esc_attr($current_user_id).'" selected="selected">'.
+						            '  '.esc_html(__('User', $this->plugin->text_domain).' ID #'.$current_user_id).
+						            '</option>';
 
 				return $options; // HTML markup.
 			}
@@ -379,6 +386,9 @@ namespace comment_mail // Root namespace.
 					'exclude_post_types'    => array(),
 					'exclude_post_statuses' => array(),
 					'no_cache'              => FALSE,
+
+					'allow_empty'           => TRUE,
+					'allow_arbitrary'       => TRUE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
@@ -387,13 +397,19 @@ namespace comment_mail // Root namespace.
 				if(!$this->plugin->options['post_select_options_media_enable'])
 					$args['exclude_post_types'][] = 'attachment';
 
+				$allow_empty     = (boolean)$args['allow_empty'];
+				$allow_arbitrary = (boolean)$args['allow_arbitrary'];
+
 				if(!$this->plugin->options['post_select_options_enable'])
 					return ''; // Use input field instead of options.
 
 				if(!($posts = $this->plugin->utils_db->all_posts($args)))
 					return ''; // Use input field instead of options.
 
-				$options                 = '<option value="0"></option>'; // Initialize.
+				$options = ''; // Initialize.
+				if($allow_empty) // Allow empty selection?
+					$options = '<option value="0"></option>';
+
 				$default_post_type_label = __('Post', $this->plugin->text_domain);
 
 				foreach($posts as $_post) // Iterate posts.
@@ -415,10 +431,11 @@ namespace comment_mail // Root namespace.
 				}
 				unset($_post, $_selected, $_post_type, $_post_type_label); // Housekeeping.
 
-				if(!isset($selected_post_id) && isset($current_post_id) && $current_post_id > 0)
-					$options .= '<option value="'.esc_attr($current_post_id).'" selected="selected">'.
-					            '  '.esc_html(__('Post', $this->plugin->text_domain).' ID #'.$current_post_id).
-					            '</option>';
+				if($allow_arbitrary) // Allow arbitrary select option?
+					if(!isset($selected_post_id) && isset($current_post_id) && $current_post_id > 0)
+						$options .= '<option value="'.esc_attr($current_post_id).'" selected="selected">'.
+						            '  '.esc_html(__('Post', $this->plugin->text_domain).' ID #'.$current_post_id).
+						            '</option>';
 
 				return $options; // HTML markup.
 			}
@@ -450,19 +467,23 @@ namespace comment_mail // Root namespace.
 					? (integer)$current_comment_id : NULL;
 
 				$default_args = array(
-					'max'            => // Plugin option value.
+					'max'             => // Plugin option value.
 						(integer)$this->plugin->options['max_select_options'],
-					'fail_on_max'    => TRUE,
-					'parents_only'   => FALSE,
-					'no_cache'       => FALSE,
+					'fail_on_max'     => TRUE,
+					'parents_only'    => FALSE,
+					'no_cache'        => FALSE,
 
-					'display_emails' => // Show emails?
+					'display_emails'  => // Show emails?
 						is_admin() && current_user_can('moderate_comments'),
+					'allow_empty'     => TRUE,
+					'allow_arbitrary' => TRUE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$display_emails = (boolean)$args['display_emails'];
+				$display_emails  = (boolean)$args['display_emails'];
+				$allow_empty     = (boolean)$args['allow_empty'];
+				$allow_arbitrary = (boolean)$args['allow_arbitrary'];
 
 				if(!$this->plugin->options['comment_select_options_enable'])
 					return ''; // Use input field instead of options.
@@ -470,7 +491,9 @@ namespace comment_mail // Root namespace.
 				if(!($comments = $this->plugin->utils_db->all_comments($post_id, $args)))
 					return ''; // Use input field instead of options.
 
-				$options = '<option value="0"></option>'; // Initialize.
+				$options = ''; // Initialize.
+				if($allow_empty) // Allow empty selection?
+					$options = '<option value="0"></option>';
 
 				foreach($comments as $_comment) // Iterate comments.
 				{
@@ -488,10 +511,11 @@ namespace comment_mail // Root namespace.
 				}
 				unset($_comment, $_selected); // Just a little housekeeping.
 
-				if(!isset($selected_comment_id) && isset($current_comment_id) && $current_comment_id > 0)
-					$options .= '<option value="'.esc_attr($current_comment_id).'" selected="selected">'.
-					            '  '.esc_html(__('Comment', $this->plugin->text_domain).' ID #'.$current_comment_id).
-					            '</option>';
+				if($allow_arbitrary) // Allow arbitrary select option?
+					if(!isset($selected_comment_id) && isset($current_comment_id) && $current_comment_id > 0)
+						$options .= '<option value="'.esc_attr($current_comment_id).'" selected="selected">'.
+						            '  '.esc_html(__('Comment', $this->plugin->text_domain).' ID #'.$current_comment_id).
+						            '</option>';
 
 				return $options; // HTML markup.
 			}
@@ -514,9 +538,15 @@ namespace comment_mail // Root namespace.
 				$current_deliver  = isset($current_deliver)
 					? (string)$current_deliver : NULL;
 
-				$default_args = array();
+				$default_args = array(
+					'allow_empty'     => TRUE,
+					'allow_arbitrary' => TRUE,
+				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
+
+				$allow_empty     = (boolean)$args['allow_empty'];
+				$allow_arbitrary = (boolean)$args['allow_arbitrary'];
 
 				$deliver_options_available = array(
 					'asap'   => $this->plugin->utils_i18n->deliver_label('asap'),
@@ -525,7 +555,9 @@ namespace comment_mail // Root namespace.
 					'weekly' => $this->plugin->utils_i18n->deliver_label('weekly'),
 				); // These are hard-coded; i.e. not expected to change.
 
-				$options = '<option value=""></option>'; // Initialize.
+				$options = ''; // Initialize.
+				if($allow_empty) // Allow empty selection?
+					$options = '<option value=""></option>';
 
 				foreach($deliver_options_available as $_deliver_option => $_deliver_label)
 				{
@@ -541,10 +573,11 @@ namespace comment_mail // Root namespace.
 				}
 				unset($_deliver_option, $_deliver_label, $_selected); // Housekeeping.
 
-				if(!isset($selected_deliver) && isset($current_deliver) && $current_deliver)
-					$options .= '<option value="'.esc_attr($current_deliver).'" selected="selected">'.
-					            '  '.esc_html($current_deliver).
-					            '</option>';
+				if($allow_arbitrary) // Allow arbitrary select option?
+					if(!isset($selected_deliver) && isset($current_deliver) && $current_deliver)
+						$options .= '<option value="'.esc_attr($current_deliver).'" selected="selected">'.
+						            '  '.esc_html($current_deliver).
+						            '</option>';
 
 				return $options; // HTML markup.
 			}
@@ -568,11 +601,15 @@ namespace comment_mail // Root namespace.
 					? (string)$current_status : NULL;
 
 				$default_args = array(
+					'allow_empty'                   => TRUE,
+					'allow_arbitrary'               => TRUE,
 					'ui_protected_data_keys_enable' => !is_admin(),
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
+				$allow_empty                   = (boolean)$args['allow_empty'];
+				$allow_arbitrary               = (boolean)$args['allow_arbitrary'];
 				$ui_protected_data_keys_enable = (boolean)$args['ui_protected_data_keys_enable'];
 
 				$status_options_available = array(
@@ -585,7 +622,9 @@ namespace comment_mail // Root namespace.
 				if($ui_protected_data_keys_enable) // Front-end UI should limit choices.
 					unset($status_options_available['unconfirmed'], $status_options_available['trashed']);
 
-				$options = '<option value=""></option>'; // Initialize.
+				$options = ''; // Initialize.
+				if($allow_empty) // Allow empty selection?
+					$options = '<option value=""></option>';
 
 				foreach($status_options_available as $_status_option => $_status_label)
 				{
@@ -601,11 +640,12 @@ namespace comment_mail // Root namespace.
 				}
 				unset($_status_option, $_status_label, $_selected); // Housekeeping.
 
-				if(!$ui_protected_data_keys_enable) // Front-end UI limits choices.
-					if(!isset($selected_status) && isset($current_status) && $current_status)
-						$options .= '<option value="'.esc_attr($current_status).'" selected="selected">'.
-						            '  '.esc_html($current_status).
-						            '</option>';
+				if($allow_arbitrary) // Allow arbitrary select option?
+					if(!$ui_protected_data_keys_enable) // Front-end UI limits choices.
+						if(!isset($selected_status) && isset($current_status) && $current_status)
+							$options .= '<option value="'.esc_attr($current_status).'" selected="selected">'.
+							            '  '.esc_html($current_status).
+							            '</option>';
 
 				return $options; // HTML markup.
 			}
@@ -615,7 +655,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param array       $options Associative array.
+			 * @param array       $given_ops Options array.
 			 *    Keys are option values; values are labels.
 			 *
 			 * @param string|null $current_value The current value.
@@ -624,20 +664,26 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string Markup for select menu options.
 			 */
-			public function select_options(array $options, $current_value = NULL, array $args = array())
+			public function select_options(array $given_ops, $current_value = NULL, array $args = array())
 			{
 				$_selected_value = NULL; // Initialize.
 				$current_value   = isset($current_value)
 					? (string)$current_value : NULL;
 
-				$default_args = array();
+				$default_args = array(
+					'allow_arbitrary' => TRUE,
+				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$_options = $options; // Working copy of the options.
-				$options  = ''; // Initialize; no options when we start.
+				$allow_arbitrary = (boolean)$args['allow_arbitrary'];
 
-				foreach($_options as $_option_value => $_option_label)
+				$options = ''; // Initialize.
+				// There is no `$allow_empty` argument in this handler.
+				// Note that we do NOT setup a default/empty option value here.
+				// If you want to `$allow_empty`, provide an empty option of your own please.
+
+				foreach($given_ops as $_option_value => $_option_label)
 				{
 					$_selected     = ''; // Initialize.
 					$_option_value = (string)$_option_value;
@@ -653,12 +699,13 @@ namespace comment_mail // Root namespace.
 				}
 				unset($_option_value, $_option_label, $_selected); // Housekeeping.
 
-				if(!isset($_selected_value) && isset($current_value))
-					$options .= '<option value="'.esc_attr($current_value).'" selected="selected">'.
-					            '  '.esc_html($current_value).
-					            '</option>';
+				if($allow_arbitrary) // Allow arbitrary select option?
+					if(!isset($_selected_value) && isset($current_value) && $current_value)
+						$options .= '<option value="'.esc_attr($current_value).'" selected="selected">'.
+						            '  '.esc_html($current_value).
+						            '</option>';
 
-				unset($_options, $_selected_value); // Housekeeping.
+				unset($_selected_value); // Housekeeping.
 
 				return $options; // HTML markup.
 			}

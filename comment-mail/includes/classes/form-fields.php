@@ -331,6 +331,8 @@ namespace comment_mail // Root namespace.
 					'field_class'              => '',
 					'other_attrs'              => '',
 
+					'allow_empty'              => TRUE,
+					'allow_arbitrary'          => TRUE,
 					'input_fallback_args'      => array(),
 				);
 				$args         = array_merge($default_args, $args);
@@ -366,17 +368,21 @@ namespace comment_mail // Root namespace.
 				$field_class          = trim((string)$args['field_class']);
 				$other_attrs          = trim((string)$args['other_attrs']);
 
+				$allow_empty         = (boolean)$args['allow_empty'];
+				$allow_arbitrary     = (boolean)$args['allow_arbitrary'];
+				$select_options_args = compact('allow_empty', 'allow_arbitrary');
+
 				$input_fallback_args = array_merge($args, (array)$args['input_fallback_args']);
 				unset($input_fallback_args['input_fallback_args']); // Unset self reference.
 
-				if($options === '%%users%%') $options = $this->plugin->utils_markup->user_select_options($current_value);
-				else if($options === '%%posts%%') $options = $this->plugin->utils_markup->post_select_options($current_value, array('for_comments_only' => TRUE));
-				else if($options === '%%comments%%') $options = $this->plugin->utils_markup->comment_select_options($post_id, $current_value);
-				else if($options === '%%deliver%%') $options = $this->plugin->utils_markup->deliver_select_options($current_value);
-				else if($options === '%%status%%') $options = $this->plugin->utils_markup->status_select_options($current_value);
-				else if(is_array($options)) $options = $this->plugin->utils_markup->select_options($options, $current_value);
+				if($options === '%%users%%') $options = $this->plugin->utils_markup->user_select_options($current_value, $select_options_args);
+				else if($options === '%%posts%%') $options = $this->plugin->utils_markup->post_select_options($current_value, array_merge($select_options_args, array('for_comments_only' => TRUE)));
+				else if($options === '%%comments%%') $options = $this->plugin->utils_markup->comment_select_options($post_id, $current_value, $select_options_args);
+				else if($options === '%%deliver%%') $options = $this->plugin->utils_markup->deliver_select_options($current_value, $select_options_args);
+				else if($options === '%%status%%') $options = $this->plugin->utils_markup->status_select_options($current_value, $select_options_args);
+				else if(is_array($options)) $options = $this->plugin->utils_markup->select_options($options, $current_value, $select_options_args);
 
-				if(!($options = trim((string)$options))) // No options available?
+				if(!($options = trim((string)$options)) && $allow_empty && $allow_arbitrary)
 					return $this->input_row($input_fallback_args);
 
 				$row = '<tr class="'.esc_attr('form-field'.($required ? ' form-required' : '').' '.$this->class_prefix.$slug).'">';

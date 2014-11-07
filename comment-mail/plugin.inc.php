@@ -52,7 +52,7 @@ namespace comment_mail
 			 *
 			 * @var boolean `TRUE` for pro version.
 			 */
-			public $is_pro = FALSE;
+			public $is_pro = TRUE;
 
 			/**
 			 * Plugin name.
@@ -308,7 +308,7 @@ namespace comment_mail
 
 					/* Related to user authentication. */
 
-					'manage_cap'                                                           => $this->cap, // Capability.
+					'manage_cap'                                                           => 'moderate_comments', // Capability.
 					'uninstall_cap'                                                        => 'delete_plugins', // Capability.
 
 					/* Related to auto-subscribe functionality. */
@@ -316,7 +316,7 @@ namespace comment_mail
 					'auto_subscribe_enable'                                                => '1', // `0|1`; auto-subscribe enable?
 					'auto_subscribe_deliver'                                               => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
 					'auto_subscribe_post_types'                                            => 'post,page', // Comma-delimited post types.
-					'auto_subscribe_post_author'                                           => '1', // `0|1`; auto-subscribe post authors?
+					'auto_subscribe_post_author_enable'                                    => '1', // `0|1`; auto-subscribe post authors?
 					'auto_subscribe_recipients'                                            => '', // Others `;|,` delimited emails.
 
 					/* Auto-confirm functionality and security issues related to this.
@@ -420,9 +420,10 @@ namespace comment_mail
 					'comment_select_options_enable'                                        => '1', // `0|1`; enable?
 					'max_select_options'                                                   => '2000', // Max options.
 
-					/* Related to email footer branding. */
+					/* Related to branding. */
 
 					'email_footer_powered_by_enable'                                       => '1', // `0|1`; enable?
+					'site_footer_powered_by_enable'                                        => '1', // `0|1`; enable?
 
 					/* Template-related site templates. */
 
