@@ -25,7 +25,7 @@ namespace comment_mail;
 ?>
 <?php echo $email_footer_easy; ?>
 
-<hr style="margin-top:100px;" />
+<hr style="margin-top:10em;" />
 
 <?php // Open table to hold important footer links. ?>
 
@@ -34,7 +34,7 @@ namespace comment_mail;
 
 	<?php // CAN-SPAM compliance links; manage/unsubscribe. ?>
 
-	<?php if(stripos($template_file, 'notification') !== FALSE && !empty($sub)): ?>
+	<?php if(stripos($template_file, '/comment-notification/') && !empty($sub)): ?>
 
 		<?php
 		/*
@@ -63,7 +63,7 @@ namespace comment_mail;
 					&nbsp;&#42774;&nbsp; <?php echo sprintf(__('<a href="%1$s">One-Click Unsubscribe</a>', $plugin->text_domain), esc_attr($sub_unsubscribe_url)); ?>
 				</p>
 			</td>
-			<td style="vertical-align:top; padding-left:100px;">
+			<td style="vertical-align:top; padding-left:10em;">
 				<p style="color:#888888;">
 					<strong><?php echo __('Create New Subscription?', $plugin->text_domain); ?></strong><br />
 					<?php echo sprintf(__('<a href="%1$s">Add New Comment Subscription</a>', $plugin->text_domain), esc_attr($sub_new_url)); ?>
@@ -99,7 +99,7 @@ namespace comment_mail;
 				<?php echo sprintf(__('Report Abuse to: <a href="mailto:%1$s">%2$s</a>', $plugin->text_domain), esc_attr(urlencode($can_spam_postmaster)), esc_html($can_spam_postmaster)); ?>
 			</p>
 		</td>
-		<td style="vertical-align:top; padding-left:100px;">
+		<td style="vertical-align:top; padding-left:10em;">
 			<p style="color:#888888;">
 				<strong><?php echo __('Our Mailing Address', $plugin->text_domain); ?></strong><br />
 				<?php echo $can_spam_mailing_address; ?>

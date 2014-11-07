@@ -74,7 +74,7 @@ echo str_replace('%%title%%', __('Unsubscribe All', $plugin->text_domain), $site
 				<?php echo sprintf(__('&lt;%1$s&gt; will no longer be notified about any comments/replies.', $plugin->text_domain), esc_html($sub_email)); ?>
 			</h4>
 
-			<hr style="margin:0 0 10px 0;" />
+			<hr style="margin:0 0 1em 0;" />
 
 			<h5 style="font-style:italic; margin:0;">
 				<i class="fa fa-frown-o"></i> <?php echo sprintf(__('Too many emails? ~ Please feel free to <a href="%1$s">add a new/different subscription</a> if you like!', $plugin->text_domain), esc_attr($sub_new_url)); ?>

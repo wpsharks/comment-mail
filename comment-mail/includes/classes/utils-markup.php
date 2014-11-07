@@ -635,7 +635,7 @@ namespace comment_mail // Root namespace.
 				$args         = array_intersect_key($args, $default_args);
 
 				$_options = $options; // Working copy of the options.
-				$options  = '<option value=""></option>'; // Initialize.
+				$options  = ''; // Initialize; no options when we start.
 
 				foreach($_options as $_option_value => $_option_label)
 				{
@@ -828,6 +828,70 @@ namespace comment_mail // Root namespace.
 				$suffix = $for_wordpress_suffix ? ' '.__('for WordPress', $this->plugin->text_domain) : '';
 
 				return sprintf(__('Powered by %1$s', $this->plugin->text_domain), $anchor.$suffix);
+			}
+
+			/**
+			 * Constructs markup for an anchor tag.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $url URL to link to.
+			 * @param string $clickable Clickable text/markup.
+			 * @param array  $args Any additional specs/behavioral args.
+			 *
+			 * @return string Markup for an anchor tag.
+			 */
+			public function anchor($url, $clickable, array $args = array())
+			{
+				$default_args = array(
+					'target' => '',
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$target = (string)$args['target'];
+
+				return '<a href="'.esc_attr($url).'" target="'.esc_attr($target).'">'.$clickable.'</a>';
+			}
+
+			/**
+			 * Constructs markup for an external anchor tag.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $url URL to link to.
+			 * @param string $clickable Clickable text/markup.
+			 * @param array  $args Any additional specs/behavioral args.
+			 *
+			 * @return string Markup for an external anchor tag.
+			 */
+			public function x_anchor($url, $clickable, array $args = array())
+			{
+				$args = array_merge($args, array('target' => '_blank'));
+
+				return $this->anchor($url, $clickable, $args);
+			}
+
+			/**
+			 * Constructs markup for a plugin menu page path.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string Markup for a plugin menu page path.
+			 */
+			public function pmp_path()
+			{
+				$path = '<code class="pmp-path">';
+				$path .= __('WP Dashboard', $this->plugin->text_domain);
+				# $path .= ' &#10609; '.__('Comments', $this->plugin->text_domain);
+				$path .= ' &#10609; '.esc_html($this->plugin->name).'&trade;';
+
+				foreach(func_get_args() as $_path_name)
+					$path .= ' &#10609; '.(string)$_path_name;
+
+				$path .= '</code>';
+
+				return $path;
 			}
 		}
 	}

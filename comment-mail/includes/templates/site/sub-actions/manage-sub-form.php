@@ -78,7 +78,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 						</li>
 					<?php endforeach; ?>
 				</ul>
-				<p style="margin-top:10px;">
+				<p style="margin-top:1em;">
 					<a href="<?php echo esc_attr($plugin->utils_url->sub_manage_summary_url($sub_key, NULL, TRUE)); ?>">
 						<i class="fa fa-arrow-circle-left"></i> <?php echo __('Back to My Subscriptions', $plugin->text_domain); ?>
 					</a>
@@ -161,7 +161,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 							</li>
 						<?php endforeach; ?>
 					</ul>
-					<p style="margin-top:10px;">
+					<p style="margin-top:1em;">
 						<a href="<?php echo esc_attr($sub_summary_return_url); ?>">
 							<i class="fa fa-arrow-circle-left"></i> <?php echo __('Back to My Subscriptions', $plugin->text_domain); ?>
 						</a>
@@ -192,7 +192,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 							'placeholder'         => __('Select a Post ID...', $plugin->text_domain),
 							'label'               => __('<i class="fa fa-fw fa-thumb-tack"></i> Post ID #', $plugin->text_domain),
 							'name'                => 'post_id', 'required' => TRUE, 'options' => '%%posts%%', 'current_value' => $current_value_for('post_id'),
-							'notes'               => __('Required; the Post ID you\'re subscribed to.', $plugin->text_domain),
+							'notes_after'         => __('Required; the Post ID you\'re subscribed to.', $plugin->text_domain),
 							'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'placeholder' => '', 'current_value_empty_on_0' => TRUE),
 						)); ?>
 					<?php echo $form_fields->select_row(
@@ -201,7 +201,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 							'placeholder'         => __('— All Comments/Replies —', $plugin->text_domain),
 							'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID #', $plugin->text_domain),
 							'name'                => 'comment_id', 'required' => FALSE, 'options' => '%%comments%%', 'post_id' => $current_value_for('post_id'), 'current_value' => $current_value_for('comment_id'),
-							'notes'               => __('If empty, you\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $plugin->text_domain),
+							'notes_after'         => __('If empty, you\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $plugin->text_domain),
 							'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'current_value_empty_on_0' => TRUE),
 						)); ?>
 					<?php /* -------------------------------------------------------------------- */ ?>
@@ -221,7 +221,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 						)); ?>
 					<?php echo $form_fields->input_row(
 						array(
-							'label' => __('<i class="fa fa-fw fa-level-up fa-rotate-90" style="margin-left:1px;"></i> Last Name', $plugin->text_domain),
+							'label' => __('<i class="fa fa-fw fa-level-up fa-rotate-90"></i> Last Name', $plugin->text_domain),
 							'name'  => 'lname', 'required' => FALSE, 'maxlength' => 100, 'current_value' => $current_value_for('lname'),
 						)); ?>
 					<?php /* -------------------------------------------------------------------- */ ?>
@@ -241,7 +241,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 							'placeholder' => __('Select a Delivery Option...', $plugin->text_domain),
 							'label'       => __('<i class="fa fa-fw fa-paper-plane-o"></i> Deliver', $plugin->text_domain),
 							'name'        => 'deliver', 'required' => TRUE, 'options' => '%%deliver%%', 'current_value' => $current_value_for('deliver'),
-							'notes'       => __('Any value that is not <code>asap</code> results in a digest instead of instant notifications.', $plugin->text_domain),
+							'notes_after' => __('Any value that is not <code>asap</code> results in a digest instead of instant notifications.', $plugin->text_domain),
 						)); ?>
 
 					</tbody>

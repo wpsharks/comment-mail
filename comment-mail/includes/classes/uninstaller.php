@@ -40,8 +40,8 @@ namespace comment_mail // Root namespace.
 				if(empty($GLOBALS[__NAMESPACE__.'_uninstalling']))
 					return; // Expecting uninstall file.
 
-				if(!$this->plugin->options['uninstall_on_deletion'])
-					return; // Nothing to do here.
+				if($this->plugin->options['uninstall_safeguards_enable'])
+					return; // Nothing to do here; safeguarding.
 
 				if(!current_user_can($this->plugin->uninstall_cap))
 					return; // Extra layer of security.

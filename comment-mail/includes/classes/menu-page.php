@@ -31,9 +31,9 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
-				$which = (string)$which;
-				if($which && method_exists($this, $which))
-					$this->{$which}();
+				$which = $this->plugin->utils_string->trim((string)$which, '', '_');
+				if($which && method_exists($this, $which.'_'))
+					$this->{$which.'_'}();
 			}
 
 			/**
@@ -41,9 +41,33 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function options()
+			protected function options_()
 			{
-				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-area').'">'."\n";
+				$_this             = $this;
+				$form_field_args   = array(
+					'ns_id_suffix'   => '-options-form',
+					'ns_name_suffix' => '[save_options]',
+					'class_prefix'   => 'pmp-options-form-',
+				);
+				$form_fields       = new form_fields($form_field_args);
+				$current_value_for = function ($key) use ($_this)
+				{
+					if(strpos($key, 'template__') === 0)
+						if(isset($_this->plugin->options[$key]))
+						{
+							if($_this->plugin->options[$key])
+								return $_this->plugin->options[$key];
+
+							$file             = template::option_key_to_file($key);
+							$default_template = new template($file, TRUE);
+
+							return $default_template->file_contents();
+						}
+					return isset($_this->plugin->options[$key]) ? $_this->plugin->options[$key] : NULL;
+				};
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-options '.$this->plugin->slug.'-menu-page-area').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_only()).'" novalidate="novalidate">'."\n";
 
 				echo '      '.$this->heading(__('Plugin Options', $this->plugin->text_domain), 'logo.png').
@@ -51,32 +75,142 @@ namespace comment_mail // Root namespace.
 
 				echo '      <div class="pmp-body">'."\n";
 
-				echo '         <div class="pmp-panel">'."\n";
-				echo '            <a href="#" class="pmp-panel-heading'.((!$this->plugin->options['enable']) ? ' open' : '').'">'."\n";
-				echo '               <i class="fa fa-flag"></i> '.__('Enable/Disable', $this->plugin->text_domain)."\n";
-				echo '            </a>'."\n";
+				/* ----------------------------------------------------------------------------------------- */
 
-				echo '            <div class="pmp-panel-body'.((!$this->plugin->options['enable']) ? ' open' : '').' pmp-clearfix">'."\n";
-				echo '               <p><label class="pmp-switch-primary"><input type="radio" name="'.esc_attr(__NAMESPACE__).'[save_options][enable]" value="1"'.checked($this->plugin->options['enable'], '1', FALSE).' /> <i class="fa fa-magic fa-flip-horizontal"></i> '.sprintf(__('Yes, enable %1$s&trade;', $this->plugin->text_domain), esc_html($this->plugin->name)).'</label> &nbsp;&nbsp;&nbsp; <label><input type="radio" name="'.esc_attr(__NAMESPACE__).'[save_options][enable]" value="0"'.checked($this->plugin->options['enable'], '0', FALSE).' /> '.__('No, disable.', $this->plugin->text_domain).'</label></p>'."\n";
-				echo '            </div>'."\n";
-				echo '         </div>'."\n";
+				$_panel_body = '<table>'.
+				               ' <tbody>'.
+				               $form_fields->select_row(
+					               array(
+						               'label'       => sprintf(__('Enable %1$s&trade; Functionality?', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						               'placeholder' => __('Select an Option...', $this->plugin->text_domain),
+						               'name'        => 'enable', 'current_value' => $current_value_for('enable'),
+						               'options'     => array(
+							               '1' => sprintf(__('Yes, enable %1$s&trade; (recommended)', $this->plugin->text_domain), esc_html($this->plugin->name)),
+							               '0' => sprintf(__('No, disable %1$s&trade; temporarily', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						               ),
+						               'notes_after' => '<div class="pmp-notif-warning pmp-panel-if-disabled-show">'.
+						                                '   <p style="font-weight:bold; font-size:110%; margin:0;">'.sprintf(__('When %1$s&trade; is disabled in this way:', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'.
+						                                '   <ul class="pmp-list-items">'.
+						                                '      <li>'.sprintf(__('Comment subscription options (for receiving email notifications regarding comments/replies) no longer appear on comment forms; i.e. no new subscriptions are allowed. In addition, the ability to add a new subscription through any/all front-end forms is disabled too. All other front &amp; back-end functionality (including the ability for subscribers to edit and/or unsubscribe from existing subscriptions on the front-end) remains available.', $this->plugin->text_domain)).'</li>'.
+						                                '      <li>'.sprintf(__('The mail queue processor will stop processing, until such time as the plugin is renabled; i.e. no more email notifications. Mail queue injections continue, but no queue processing. If it is desirable that any queued notifications NOT be processed at all upon re-enabling, you can choose to delete all existing queued notifications before doing so. See: %1$s.', $this->plugin->text_domain), $this->plugin->utils_markup->pmp_path('Mail Queue')).'</li>'.
+						                                '   </ul>'.
+						                                '<p><em>'.sprintf(__('<strong>Note:</strong> If you want to disable %1$s&trade; completely, please deactivate it from the plugins menu in WordPress.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</em></p>'.
+						                                '</div>',
+					               )).
+				               ' </tbody>'.
+				               '</table>';
 
-				echo '         <div class="pmp-panel">'."\n";
-				echo '            <a href="#" class="pmp-panel-heading">'."\n";
-				echo '               <i class="fa fa-shield"></i> '.__('Plugin Deletion Safeguards', $this->plugin->text_domain)."\n";
-				echo '            </a>'."\n";
+				$_panel_body .= '<div class="pmp-panel-if-enabled"><hr />'.
+				                ' <table>'.
+				                '    <tbody>'.
+				                $form_fields->select_row(
+					                array(
+						                'label'       => sprintf(__('Allow New Subsciptions?', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						                'placeholder' => __('Select an Option...', $this->plugin->text_domain),
+						                'name'        => 'new_subs_enable', 'current_value' => $current_value_for('new_subs_enable'), 'field_class' => 'no-if-enabled',
+						                'options'     => array(
+							                '1' => __('Yes, allow new subscriptions (recommended)', $this->plugin->text_domain),
+							                '0' => __('No, disallow new subscriptions temporarily', $this->plugin->text_domain),
+						                ),
+						                'notes_after' => '<p>'.sprintf(__('If you disallow, comment subscription options (for receiving email notifications regarding comments/replies) no longer appear on comment forms; i.e. no new subscriptions are allowed. In addition, the ability to add a new subscription through any/all front-end forms is disabled too. All other front &amp; back-end functionality (including the ability for subscribers to edit and/or unsubscribe from existing subscriptions on the front-end) remains available.', $this->plugin->text_domain)).'</p>',
+					                )).
+				                '    </tbody>'.
+				                ' </table>'.
 
-				echo '            <div class="pmp-panel-body pmp-clearfix">'."\n";
-				echo '               <i class="fa fa-shield fa-4x" style="float:right; margin: 0 0 0 25px;"></i>'."\n";
-				echo '               <h3>'.__('Uninstall on Plugin Deletion; or Safeguard Options?', $this->plugin->text_domain).'</h3>'."\n";
-				echo '               <p>'.sprintf(__('<strong>Tip:</strong> By default, if you delete %1$s using the plugins menu in WordPress, nothing is lost. However, if you want to completely uninstall %1$s you should set this to <code>Yes</code> and <strong>THEN</strong> deactivate &amp; delete %1$s from the plugins menu in WordPress. This way %1$s will erase your options for the plugin, erase database tables created by the plugin, remove subscriptions, terminate CRON jobs, etc. It erases itself from existence completely.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'."\n";
-				echo '               <p><select name="'.esc_attr(__NAMESPACE__).'[save_options][uninstall_on_deletion]">'."\n";
-				echo '                     <option value="0"'.selected($this->plugin->options['uninstall_on_deletion'], '0', FALSE).'>'.__('Safeguard my options and subscriptions (recommended).', $this->plugin->text_domain).'</option>'."\n";
-				echo '                     <option value="1"'.selected($this->plugin->options['uninstall_on_deletion'], '1', FALSE).'>'.sprintf(__('Yes, uninstall (completely erase) %1$s on plugin deletion.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</option>'."\n";
-				echo '                  </select></p>'."\n";
-				echo '               <p><input type="text" placeholder="hello world" /></p>'."\n";
-				echo '            </div>'."\n";
-				echo '         </div>'."\n";
+				                ' <table>'.
+				                '    <tbody>'.
+				                $form_fields->select_row(
+					                array(
+						                'label'       => sprintf(__('Enable Mail Queue Processing?', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						                'placeholder' => __('Select an Option...', $this->plugin->text_domain),
+						                'name'        => 'queue_processing_enable', 'current_value' => $current_value_for('queue_processing_enable'), 'field_class' => 'no-if-enabled',
+						                'options'     => array(
+							                '1' => __('Yes, enable mail queue processing (recommended)', $this->plugin->text_domain),
+							                '0' => __('No, disable mail queue processing temporarily', $this->plugin->text_domain),
+						                ),
+						                'notes_after' => '<p>'.sprintf(__('If disabled, all mail queue processing will stop, until such time as the plugin is renabled; i.e. no more email notifications. Mail queue injections continue, but no queue processing. If it is desirable that any queued notifications NOT be processed at all upon re-enabling, you can choose to delete all existing queued notifications before doing so. See: %1$s.', $this->plugin->text_domain), $this->plugin->utils_markup->pmp_path('Mail Queue')).'</p>',
+					                )).
+				                '    </tbody>'.
+				                ' </table>'.
+				                '</div>';
+
+				echo $this->panel('Enable/Disable', $_panel_body, array('open' => !$this->plugin->options['enable']));
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->select_row(
+					               array(
+						               'label'       => sprintf(__('Uninstall on Plugin Deletion, or Safeguard Options?', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						               'placeholder' => __('Select an Option...', $this->plugin->text_domain),
+						               'name'        => 'uninstall_safeguards_enable', 'current_value' => $current_value_for('uninstall_safeguards_enable'),
+						               'options'     => array(
+							               '1' => __('Safeguards on; i.e. protect my plugin options &amp; comment subscriptions (recommended)', $this->plugin->text_domain),
+							               '0' => sprintf(__('Safeguards off; uninstall (completely erase) %1$s on plugin deletion', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						               ),
+						               'notes_after' => '<p>'.sprintf(__('By default, if you delete %1$s using the plugins menu in WordPress, no data is lost. However, if you want to completely uninstall %1$s you should turn Safeguards off, and <strong>THEN</strong> deactivate &amp; delete %1$s from the plugins menu in WordPress. This way %1$s will erase your options for the plugin, erase database tables created by the plugin, remove subscriptions, terminate CRON jobs, etc. In short, when Safeguards are off, %1$s erases itself from existence completely when you delete it.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel('Plugin Deletion Safeguards', $_panel_body, array());
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->select_row(
+					               array(
+						               'label'       => sprintf(__('Enable Comment Form Subscr. Options Template?', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						               'placeholder' => __('Select an Option...', $this->plugin->text_domain),
+						               'name'        => 'comment_form_template_enable', 'current_value' => $current_value_for('comment_form_template_enable'),
+						               'options'     => array(
+							               '1' => __('Yes, use built-in template system (recommended)', $this->plugin->text_domain),
+							               '0' => sprintf(__('No, disable built-in template system; I have a deep theme integration of my own', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						               ),
+						               'notes_after' => '<p>'.sprintf(__('The built-in template system is quite flexible already; you can even customize the default template yourself if you want to. Therefore, it is not recommended that you disable the default template system. This option only exists for very advanced users; i.e. those who prefer to disable the template completely in favor of their own custom implementation. If you disable the built-in template, you\'ll need to integrate HTML markup of your own into the proper location of your theme.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				$_panel_body .= '<div class="pmp-panel-if-disabled-show">'.
+				                '  <table>'.
+				                '     <tbody>'.
+				                $form_fields->select_row(
+					                array(
+						                'label'       => sprintf(__('Also Disable Scripts Associated w/ Comment Form Subscr. Options?', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						                'placeholder' => __('Select an Option...', $this->plugin->text_domain),
+						                'name'        => 'comment_form_scripts_enable', 'current_value' => $current_value_for('comment_form_scripts_enable'), 'field_class' => 'no-if-enabled',
+						                'options'     => array(
+							                '1' => __('No, leave scripts associated w/ comment form subscr. options template enabled (recommended)', $this->plugin->text_domain),
+							                '0' => sprintf(__('Yes, disable built-in scripts also; I have a deep theme integration of my own', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						                ),
+						                'notes_after' => '<p>'.sprintf(__('For advanced use only. If you disable the built-in template system, you may also want to disable the built-in JavaScript associated w/ this template.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+					                )).
+				                '     </tbody>'.
+				                '  </table>'.
+				                '</div>';
+
+				$_panel_body .= '<div class="pmp-panel-if-enabled-show"><hr />'.
+				                '  <table>'.
+				                '     <tbody>'.
+				                $form_fields->textarea_row(
+					                array(
+						                'label'        => sprintf(__('Comment Form Subscr. Options Template', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						                'placeholder'  => __('Template Content...', $this->plugin->text_domain),
+						                'name'         => 'template__site__comment_form__sub_ops', 'current_value' => $current_value_for('template__site__comment_form__sub_ops'), 'cm_mode' => 'application/x-httpd-php',
+						                'notes_before' => '<p class="pmp-notif-notice">'.sprintf(__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, there are a few themes out there :-) If your theme is not playing well with the default template; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain)).'</p>',
+						                'notes_after'  => '<p>'.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>comment_form_field_comment</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>comment_form</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'.
+						                                  '<p class="pmp-notif-info">'.sprintf(__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain)).'</p>',
+					                )).
+				                '     </tbody>'.
+				                '  </table>'.
+				                '</div>';
+
+				echo $this->panel('Comment Form Subscription Options', $_panel_body, array());
+
+				/* ----------------------------------------------------------------------------------------- */
 
 				echo '         <div class="pmp-save">'."\n";
 				echo '            <button type="submit">'.__('Save All Changes', $this->plugin->text_domain).' <i class="fa fa-save"></i></button>'."\n";
@@ -92,19 +226,39 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function subs()
+			protected function stats_()
+			{
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-stats '.$this->plugin->slug.'-menu-page-area').'">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_only()).'" novalidate="novalidate">'."\n";
+
+				echo '      '.$this->heading(__('Statistics', $this->plugin->text_domain), 'logo.png').
+				     '      '.$this->notifications(); // Heading/notifications.
+
+				echo '      <div class="pmp-body">'."\n";
+
+				echo '      </div>'."\n";
+				echo '   </form>'."\n";
+				echo '</div>';
+			}
+
+			/**
+			 * Displays menu page.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function subs_()
 			{
 				switch(!empty($_REQUEST['action']) ? $_REQUEST['action'] : '')
 				{
 					case 'new': // Add new subscription.
 
-						$this->sub_new(); // Display form.
+						$this->_sub_new(); // Display form.
 
 						break; // Break switch handler.
 
 					case 'edit': // Edit existing subscription.
 
-						$this->sub_edit(); // Display form.
+						$this->_sub_edit(); // Display form.
 
 						break; // Break switch handler.
 
@@ -129,7 +283,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function sub_new()
+			protected function _sub_new()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-sub-new '.$this->plugin->slug.'-menu-page-form '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only(array('action'))).'" novalidate="novalidate">'."\n";
@@ -147,7 +301,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function sub_edit()
+			protected function _sub_edit()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-sub-edit '.$this->plugin->slug.'-menu-page-form '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only(array('action', 'subscription'))).'" novalidate="novalidate">'."\n";
@@ -165,7 +319,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function sub_event_log()
+			protected function sub_event_log_()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-sub-event-log '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only()).'" novalidate="novalidate">'."\n";
@@ -183,7 +337,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function queue()
+			protected function queue_()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-queue '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only()).'" novalidate="novalidate">'."\n";
@@ -201,7 +355,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function queue_event_log()
+			protected function queue_event_log_()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-queue-event-log '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only()).'" novalidate="novalidate">'."\n";
@@ -284,6 +438,55 @@ namespace comment_mail // Root namespace.
 					$notices .= '</div>'."\n";
 				}
 				return $notices; // All notices; if any apply.
+			}
+
+			/**
+			 * Constructs a menu page panel.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $title Panel title.
+			 * @param string $body Panel body; i.e. HTML markup.
+			 * @param array  $args Any additional specs/behavorial args.
+			 *
+			 * @return string Markup for this menu page panel.
+			 */
+			protected function panel($title, $body, array $args = array())
+			{
+				$title = (string)$title;
+				$body  = (string)$body;
+
+				$default_args = array(
+					'icon'             =>
+						'<i class="fa fa-gears"></i>',
+
+					'pro_preview_only' => FALSE,
+					'open'             => FALSE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$icon = (string)$args['icon'];
+
+				$pro_preview_only = (boolean)$args['pro_preview_only'];
+				$open             = (boolean)$args['open'];
+
+				if($pro_preview_only && !$this->plugin->utils_env->is_pro_preview())
+					return ''; // Not applicable.
+
+				$panel = '<div class="pmp-panel">'."\n";
+				$panel .= '   <a href="#" class="pmp-panel-heading'.($open ? ' open' : '').'">'."\n";
+				$panel .= '      '.$icon.' '.$title."\n";
+				$panel .= '   </a>'."\n";
+
+				$panel .= '   <div class="pmp-panel-body'.($open ? ' open' : '').' pmp-clearfix">'."\n";
+
+				$panel .= '      '.$body."\n";
+
+				$panel .= '   </div>'."\n";
+				$panel .= '</div>'."\n";
+
+				return $panel; // Markup for this panel.
 			}
 		}
 	}

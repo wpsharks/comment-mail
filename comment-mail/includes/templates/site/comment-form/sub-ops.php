@@ -72,7 +72,7 @@ namespace comment_mail;
 <style type="text/css">
 	.comment-sub-ops
 	{
-		margin : 10px 0 10px 0;
+		margin : 1em 0 1em 0;
 	}
 	.comment-sub-ops label
 	{
@@ -101,7 +101,7 @@ namespace comment_mail;
 	{
 		font-size      : 80%;
 		text-transform : lowercase;
-		margin         : 0 0 0 5px;
+		margin         : 0 0 0 .5em;
 		clear          : both;
 	}
 </style>

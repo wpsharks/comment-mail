@@ -58,4 +58,4 @@ $icon_bubbles_url = $plugin->utils_url->to('/client-s/images/icon-bubbles.png');
 	</table>
 </header>
 
-<hr style="margin-bottom:25px;" />
+<hr style="margin-bottom:2em;" />

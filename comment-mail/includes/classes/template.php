@@ -35,6 +35,13 @@ namespace comment_mail // Root namespace.
 			protected $file_option_key;
 
 			/**
+			 * @var boolean Force default template?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $force_default;
+
+			/**
 			 * @var string Template file contents.
 			 *
 			 * @since 14xxxx First documented version.
@@ -46,29 +53,43 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param string $file Template file.
+			 * @param string  $file Template file.
+			 * @param boolean $force_default Force default template?
 			 *
 			 * @throws \exception If `$file` is empty.
 			 */
-			public function __construct($file)
+			public function __construct($file, $force_default = FALSE)
 			{
 				parent::__construct();
 
 				$this->file = (string)$file;
 				$this->file = $this->plugin->utils_string->trim_deep($this->file, '', '/');
+				$this->file = $this->plugin->utils_fs->n_seps($this->file);
 
 				if(!$this->file) // Empty file property?
 					throw new \exception(__('Empty file property.', $this->plugin->text_domain));
 
-				// e.g. `site/comment-form/subscription-ops.php`.
-				// e.g. `email/confirmation-request-message.php`.
-				// becomes: `template_site_comment_form_subscription_ops`.
-				// becomes: `template_email_confirmation_request_message`.
-				$this->file_option_key = preg_replace('/\.php$/i', '', $this->file);
-				$this->file_option_key = str_replace(array('/', '-'), '_', $this->file_option_key);
-				$this->file_option_key = 'template_'.$this->file_option_key;
+				$this->file_option_key = $this->file; // Initialize.
+				$this->file_option_key = preg_replace('/\.php$/i', '', $this->file_option_key);
+				$this->file_option_key = str_replace('/', '__', $this->file_option_key);
+				$this->file_option_key = str_replace('-', '_', $this->file_option_key);
+				$this->file_option_key = 'template__'.$this->file_option_key;
+
+				$this->force_default = (boolean)$force_default;
 
 				$this->file_contents = $this->get_file_contents();
+			}
+
+			/**
+			 * Public access to file contents.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string Unparsed template file contents.
+			 */
+			public function file_contents()
+			{
+				return $this->file_contents;
 			}
 
 			/**
@@ -221,18 +242,37 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function get_file_contents()
 			{
-				// e.g. `site/comment-form/subscription-ops.php`.
-				// e.g. `email/confirmation-request-message.php`.
-				// becomes: `template_site_comment_form_subscription_ops`.
-				// becomes: `template_email_confirmation_request_message`.
-				if(!empty($this->plugin->options[$this->file_option_key]))
-					return $this->plugin->options[$this->file_option_key];
+				if($this->force_default)
+					goto default_template;
 
+				check_theme_dirs: // Target point.
+
+				$dirs = array(); // Initialize.
 				// e.g. `wp-content/themes/[theme]/[plugin slug]`.
 				// e.g. `wp-content/themes/[theme]/[plugin slug]/site/comment-form/subscription-ops.php`.
 				// e.g. `wp-content/themes/[theme]/[plugin slug]/email/confirmation-request-message.php`.
 				$dirs[] = get_stylesheet_directory().'/'.$this->plugin->slug;
 				$dirs[] = get_template_directory().'/'.$this->plugin->slug;
+
+				foreach($dirs as $_dir /* In order of precedence. */)
+					// Note: don't check `filesize()` here; templates CAN be empty.
+					if(is_file($_dir.'/'.$this->file) && is_readable($_dir.'/'.$this->file))
+						return file_get_contents($_dir.'/'.$this->file);
+				unset($_dir); // Housekeeping.
+
+				check_option_key: // Target point.
+
+				// e.g. `site/comment-form/sub-ops.php`.
+				// e.g. `email/confirmation-request-message.php`.
+				// becomes: `template__site__comment_form__sub_ops`.
+				// becomes: `template__email__confirmation_request_message`.
+				if(!empty($this->plugin->options[$this->file_option_key]))
+					return $this->plugin->options[$this->file_option_key];
+
+				default_template: // Target point; default template.
+
+				// Default template directory.
+				$dirs   = array(); // Initialize.
 				$dirs[] = dirname(dirname(__FILE__)).'/templates';
 
 				foreach($dirs as $_dir /* In order of precedence. */)
@@ -242,6 +282,26 @@ namespace comment_mail // Root namespace.
 				unset($_dir); // Housekeeping.
 
 				throw new \exception(sprintf(__('Missing template for: `%1$s`.', $this->plugin->text_domain), $this->file));
+			}
+
+			/**
+			 * Transforms an option key into a file path.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string $file_option_key Option key.
+			 *
+			 * @return string Relative file path matching the input option key.
+			 */
+			public static function option_key_to_file($file_option_key)
+			{
+				$file = $file_option_key; // Initialize.
+
+				$file = preg_replace('/^template__/', '', $file);
+				$file = str_replace('__', '/', $file);
+				$file = str_replace('_', '-', $file);
+
+				return $file.'.php'; // Relative file path.
 			}
 		}
 	}

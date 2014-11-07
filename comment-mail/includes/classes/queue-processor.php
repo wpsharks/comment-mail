@@ -156,8 +156,8 @@ namespace comment_mail // Root namespace.
 				$upper_max_limit = (integer)apply_filters(__CLASS__.'_upper_max_limit', 1000);
 				if($this->max_limit > $upper_max_limit) $this->max_limit = $upper_max_limit;
 
-				$this->subject_template = new template('email/comment-notification-subject.php');
-				$this->message_template = new template('email/comment-notification-message.php');
+				$this->subject_template = new template('email/comment-notification/subject.php');
+				$this->message_template = new template('email/comment-notification/message.php');
 
 				$this->message_headers = array(); // Initialize.
 				if($this->plugin->options['reply_to_email']) // Reply-To?

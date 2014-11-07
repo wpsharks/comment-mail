@@ -173,8 +173,8 @@ namespace comment_mail // Root namespace.
 
 				$template_vars = get_defined_vars(); // Everything above.
 
-				$subject_template = new template('email/confirmation-request-subject.php');
-				$message_template = new template('email/confirmation-request-message.php');
+				$subject_template = new template('email/sub-confirmation/subject.php');
+				$message_template = new template('email/sub-confirmation/message.php');
 
 				$subject = trim(preg_replace('/\s+/', ' ', $subject_template->parse($template_vars)));
 				$message = $message_template->parse($template_vars); // With confirmation link.

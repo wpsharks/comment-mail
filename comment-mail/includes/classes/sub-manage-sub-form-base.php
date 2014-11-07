@@ -196,6 +196,9 @@ namespace comment_mail // Root namespace.
 				else if($this->is_edit && $this->sub_key !== $this->sub->key)
 					$error_codes[] = 'invalid_sub_key';
 
+				else if(!$this->is_edit && !$this->plugin->options['enable'])
+					$error_codes[] = 'new_subs_disabled';
+
 				else if(!$this->is_edit && !$this->plugin->options['new_subs_enable'])
 					$error_codes[] = 'new_subs_disabled';
 
@@ -367,7 +370,7 @@ namespace comment_mail // Root namespace.
 						static::$processing_email_key_change = $sub_updater->email_key_changed();
 					}
 				}
-				else if($plugin->options['new_subs_enable']) // Only if `new_subs_enable=1`.
+				else if($plugin->options['enable'] && $plugin->options['new_subs_enable'])
 					// This check is for added security only. The form should not be available.
 				{
 					$sub_inserter = new sub_inserter($request_args, $args); // Run inserter.

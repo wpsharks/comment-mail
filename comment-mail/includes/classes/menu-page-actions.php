@@ -90,6 +90,18 @@ namespace comment_mail // Root namespace.
 
 				$this->plugin->options = array_merge($this->plugin->default_options, $this->plugin->options, $request_args);
 				$this->plugin->options = array_intersect_key($this->plugin->options, $this->plugin->default_options);
+
+				foreach($this->plugin->options as $_key => &$_option)
+					if(strpos($_key, 'template__') === 0)
+					{
+						$_file             = template::option_key_to_file($_key);
+						$_default_template = new template($_file, TRUE);
+
+						if(trim($_option) === trim($_default_template->file_contents()))
+							$_option = ''; // Empty this out; it's a default value.
+					}
+				unset($_key, $_option, $_file, $_default_template); // Housekeeping.
+
 				update_option(__NAMESPACE__.'_options', $this->plugin->options); // Update.
 
 				wp_redirect($this->plugin->utils_url->options_updated()).exit();

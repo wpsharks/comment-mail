@@ -265,8 +265,8 @@ namespace comment_mail
 				$this->default_options = array(
 					/* Core/systematic option keys. */
 
-					'version'                                                           => $this->version,
-					'crons_setup'                                                       => '0', // `0` or timestamp.
+					'version'                                                              => $this->version,
+					'crons_setup'                                                          => '0', // `0` or timestamp.
 
 					/* Low-level switches to enable/disable certain functionalities.
 					 *
@@ -299,25 +299,25 @@ namespace comment_mail
 					 *    Note that `comment_form_template_enable` must also be disabled for this option to actually work;
 					 *    i.e. the default comment form template relies on this; so IT must be off to turn this off.
 					 */
-					'enable'                                                            => '1', // `0|1`; enable?
-					'new_subs_enable'                                                   => '1', // `0|1`; enable?
-					'queue_processing_enable'                                           => '1', // `0|1`; enable?
+					'enable'                                                               => '1', // `0|1`; enable?
+					'new_subs_enable'                                                      => '1', // `0|1`; enable?
+					'queue_processing_enable'                                              => '1', // `0|1`; enable?
 
-					'comment_form_template_enable'                                      => '1', // `0|1`; enable?
-					'comment_form_scripts_enable'                                       => '1', // `0|1`; enable?
+					'comment_form_template_enable'                                         => '1', // `0|1`; enable?
+					'comment_form_scripts_enable'                                          => '1', // `0|1`; enable?
 
 					/* Related to user authentication. */
 
-					'manage_cap'                                                        => $this->cap, // Capability.
-					'uninstall_cap'                                                     => 'delete_plugins', // Capability.
+					'manage_cap'                                                           => $this->cap, // Capability.
+					'uninstall_cap'                                                        => 'delete_plugins', // Capability.
 
 					/* Related to auto-subscribe functionality. */
 
-					'auto_subscribe_enable'                                             => '1', // `0|1`; auto-subscribe enable?
-					'auto_subscribe_deliver'                                            => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
-					'auto_subscribe_post_types'                                         => 'post,page', // Comma-delimited post types.
-					'auto_subscribe_post_author'                                        => '1', // `0|1`; auto-subscribe post authors?
-					'auto_subscribe_recipients'                                         => '', // Others `;|,` delimited emails.
+					'auto_subscribe_enable'                                                => '1', // `0|1`; auto-subscribe enable?
+					'auto_subscribe_deliver'                                               => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
+					'auto_subscribe_post_types'                                            => 'post,page', // Comma-delimited post types.
+					'auto_subscribe_post_author'                                           => '1', // `0|1`; auto-subscribe post authors?
+					'auto_subscribe_recipients'                                            => '', // Others `;|,` delimited emails.
 
 					/* Auto-confirm functionality and security issues related to this.
 
@@ -349,130 +349,131 @@ namespace comment_mail
 					 * explicitly that they force every user to confirm via email before being allowed to log into the site.
 					 * Otherwise, we will not trust the email addresses associated with registered users.
 					 */
-					'auto_confirm_force_enable'                                         => '0', // `0|1`; auto-confirm enable?
-					'auto_confirm_if_already_subscribed_u0ip_enable'                    => '0', // `0|1`; auto-confirm enable?
-					'all_wp_users_confirm_email'                                        => '0', // WP users confirm their email?
+					'auto_confirm_force_enable'                                            => '0', // `0|1`; auto-confirm enable?
+					'auto_confirm_if_already_subscribed_u0ip_enable'                       => '0', // `0|1`; auto-confirm enable?
+					'all_wp_users_confirm_email'                                           => '0', // WP users confirm their email?
 
 					/* Related to SMPT configuration. */
 
-					'smtp_enable'                                                       => '0', // `0|1`; enable?
+					'smtp_enable'                                                          => '0', // `0|1`; enable?
 
-					'smtp_host'                                                         => '', // SMTP host name.
-					'smtp_port'                                                         => '', // SMTP port number.
-					'smtp_secure'                                                       => '', // ``, `ssl` or `tls`.
+					'smtp_host'                                                            => '', // SMTP host name.
+					'smtp_port'                                                            => '', // SMTP port number.
+					'smtp_secure'                                                          => '', // ``, `ssl` or `tls`.
 
-					'smtp_username'                                                     => '', // SMTP username.
-					'smtp_password'                                                     => '', // SMTP password.
+					'smtp_username'                                                        => '', // SMTP username.
+					'smtp_password'                                                        => '', // SMTP password.
 
-					'smtp_from_name'                                                    => '', // SMTP from name.
-					'smtp_from_email'                                                   => '', // SMTP from email.
-					'smtp_force_from'                                                   => '1', // `0|1`; force?
+					'smtp_from_name'                                                       => '', // SMTP from name.
+					'smtp_from_email'                                                      => '', // SMTP from email.
+					'smtp_force_from'                                                      => '1', // `0|1`; force?
 
 					/* Related to queue processing. */
 
-					'queue_processor_max_time'                                          => '30', // In seconds.
-					'queue_processor_delay'                                             => '250', // In milliseconds.
-					'queue_processor_max_limit'                                         => '100', // Total queue entries.
+					'queue_processor_max_time'                                             => '30', // In seconds.
+					'queue_processor_delay'                                                => '250', // In milliseconds.
+					'queue_processor_max_limit'                                            => '100', // Total queue entries.
 
-					'queue_processor_immediate_max_time'                                => '10', // In seconds.
-					'queue_processor_immediate_max_limit'                               => '5', // Total queue entries.
+					'queue_processor_immediate_max_time'                                   => '10', // In seconds.
+					'queue_processor_immediate_max_limit'                                  => '5', // Total queue entries.
 
 					/* Related to CRON jobs. */
 
-					'sub_cleaner_max_time'                                              => '60', // In seconds.
+					'sub_cleaner_max_time'                                                 => '60', // In seconds.
 
-					'unconfirmed_expiration_time'                                       => '60 days', // `strtotime()` compatible.
+					'unconfirmed_expiration_time'                                          => '60 days', // `strtotime()` compatible.
 					// Or, this can be left empty to disable automatic expirations altogether.
 
-					'trashed_expiration_time'                                           => '60 days', // `strtotime()` compatible.
+					'trashed_expiration_time'                                              => '60 days', // `strtotime()` compatible.
 					// Or, this can be left empty to disable automatic deletions altogether.
 
 					/* Related to CAN-SPAM compliance. */
 
-					'can_spam_postmaster'                                               => get_bloginfo('admin_email'),
-					'can_spam_mailing_address'                                          => '', // CAN-SPAM contact info.
-					'can_spam_privacy_policy_url'                                       => '', // CAN-SPAM privacy policy.
+					'can_spam_postmaster'                                                  => get_bloginfo('admin_email'),
+					'can_spam_mailing_address'                                             => '', // CAN-SPAM contact info.
+					'can_spam_privacy_policy_url'                                          => '', // CAN-SPAM privacy policy.
 
 					/* Related to blacklisting. */
 
-					'email_blacklist_patterns'                                          => '', // A line-delimited list of blacklisted emails/domains.
+					'email_blacklist_patterns'                                             => '', // A line-delimited list of blacklisted emails/domains.
 
 					/* Related to replies-via-email. */
 
-					'reply_to_email'                                                    => '', // Reply-To header.
+					'reply_to_email'                                                       => '', // Reply-To header.
 
 					/* Related to comment notifications. */
 
-					'comment_notification_parent_content_clip_max_chars'                => '100', // Max chars to include in notifications.
-					'comment_notification_content_clip_max_chars'                       => '200', // Max chars to include in notifications.
+					'comment_notification_parent_content_clip_max_chars'                   => '100', // Max chars to include in notifications.
+					'comment_notification_content_clip_max_chars'                          => '200', // Max chars to include in notifications.
 
 					/* Related to front-end UI for subscribers. */
 
-					'comment_form_default_sub_type_option'                              => 'comment', // ``, `comment` or `comments`.
-					'comment_form_default_sub_deliver_option'                           => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
-					'sub_manage_summary_max_limit'                                      => '25', // Subscriptions per page.
+					'comment_form_default_sub_type_option'                                 => 'comment', // ``, `comment` or `comments`.
+					'comment_form_default_sub_deliver_option'                              => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
+					'sub_manage_summary_max_limit'                                         => '25', // Subscriptions per page.
 
 					/* Related to select menu options. */
 
-					'user_select_options_enable'                                        => '1', // `0|1`; enable?
-					'post_select_options_enable'                                        => '1', // `0|1`; enable?
-					'post_select_options_media_enable'                                  => '0', // `0|1`; enable?
-					'comment_select_options_enable'                                     => '1', // `0|1`; enable?
-					'max_select_options'                                                => '2000', // Max options.
+					'user_select_options_enable'                                           => '1', // `0|1`; enable?
+					'post_select_options_enable'                                           => '1', // `0|1`; enable?
+					'post_select_options_media_enable'                                     => '0', // `0|1`; enable?
+					'comment_select_options_enable'                                        => '1', // `0|1`; enable?
+					'max_select_options'                                                   => '2000', // Max options.
 
 					/* Related to email footer branding. */
 
-					'email_footer_powered_by_enable'                                    => '1', // `0|1`; enable?
+					'email_footer_powered_by_enable'                                       => '1', // `0|1`; enable?
 
 					/* Template-related site templates. */
 
-					'template_site_site_header'                                         => '', // HTML/PHP code.
-					'template_site_site_header_styles'                                  => '', // HTML/PHP code.
-					'template_site_site_header_scripts'                                 => '', // HTML/PHP code.
-					'template_site_site_header_easy'                                    => '', // HTML/PHP code.
+					'template__site__site_header'                                          => '', // HTML/PHP code.
+					'template__site__site_header_styles'                                   => '', // HTML/PHP code.
+					'template__site__site_header_scripts'                                  => '', // HTML/PHP code.
+					'template__site__site_header_easy'                                     => '', // HTML/PHP code.
 
-					'template_site_site_footer_easy'                                    => '', // HTML/PHP code.
-					'template_site_site_footer'                                         => '', // HTML/PHP code.
+					'template__site__site_footer_easy'                                     => '', // HTML/PHP code.
+					'template__site__site_footer'                                          => '', // HTML/PHP code.
 
-					'template_site_comment_form_sub_ops'                                => '', // HTML/PHP code.
-					'template_site_comment_form_sub_op_scripts'                         => '', // HTML/PHP code.
+					'template__site__comment_form__sub_ops'                                => '', // HTML/PHP code.
+					'template__site__comment_form__sub_op_scripts'                         => '', // HTML/PHP code.
 
-					'template_site_sub_actions_confirmed'                               => '', // HTML/PHP code.
-					'template_site_sub_actions_unsubscribed'                            => '', // HTML/PHP code.
-					'template_site_sub_actions_manage_summary'                          => '', // HTML/PHP code.
-					'template_site_sub_actions_manage_sub_form'                         => '', // HTML/PHP code.
-					'template_site_sub_actions_manage_sub_form_comment_id_row_via_ajax' => '', // HTML/PHP code.
+					'template__site__sub_actions__confirmed'                               => '', // HTML/PHP code.
+					'template__site__sub_actions__unsubscribed'                            => '', // HTML/PHP code.
+					'template__site__sub_actions__manage_summary'                          => '', // HTML/PHP code.
+					'template__site__sub_actions__manage_sub_form'                         => '', // HTML/PHP code.
+					'template__site__sub_actions__manage_sub_form_comment_id_row_via_ajax' => '', // HTML/PHP code.
 
 					/* Template-related email templates. */
 
-					'template_email_email_header'                                       => '', // HTML/PHP code.
-					'template_email_email_header_styles'                                => '', // HTML/PHP code.
-					'template_email_email_header_scripts'                               => '', // HTML/PHP code.
-					'template_email_email_header_easy'                                  => '', // HTML/PHP code.
+					'template__email__email_header'                                        => '', // HTML/PHP code.
+					'template__email__email_header_styles'                                 => '', // HTML/PHP code.
+					'template__email__email_header_scripts'                                => '', // HTML/PHP code.
+					'template__email__email_header_easy'                                   => '', // HTML/PHP code.
 
-					'template_email_email_footer_easy'                                  => '', // HTML/PHP code.
-					'template_email_email_footer'                                       => '', // HTML/PHP code.
+					'template__email__email_footer_easy'                                   => '', // HTML/PHP code.
+					'template__email__email_footer'                                        => '', // HTML/PHP code.
 
-					'template_email_confirmation_request_subject'                       => '', // HTML/PHP code.
-					'template_email_confirmation_request_message'                       => '', // HTML/PHP code.
+					'template__email__sub_confirmation__subject'                           => '', // HTML/PHP code.
+					'template__email__sub_confirmation__message'                           => '', // HTML/PHP code.
 
-					'template_email_comment_notification_subject'                       => '', // HTML/PHP code.
-					'template_email_comment_notification_message'                       => '', // HTML/PHP code.
+					'template__email__comment_notification__subject'                       => '', // HTML/PHP code.
+					'template__email__comment_notification__message'                       => '', // HTML/PHP code.
 
 					/* Related to meta boxes. */
 
-					'excluded_meta_box_post_types'                                      => 'link,comment,revision,attachment,nav_menu_item,snippet,redirect',
+					'excluded_meta_box_post_types'                                         => 'link,comment,revision,attachment,nav_menu_item,snippet,redirect',
 
 					/* Related to data safeguards. */
 
-					'uninstall_on_deletion'                                             => '0', // `0|1`; run uninstaller?
+					'uninstall_safeguards_enable'                                          => '1', // `0|1`; safeguards on?
 
 				); // Default options are merged with those defined by the site owner.
 				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options); // Allow filters.
 				$this->options         = is_array($this->options = get_option(__NAMESPACE__.'_options')) ? $this->options : array();
-				$this->options         = array_merge($this->default_options, $this->options); // Merge into default options.
-				$this->options         = array_intersect_key($this->options, $this->default_options); // Valid keys only.
-				$this->options         = apply_filters(__METHOD__.'__options', $this->options); // Allow filters.
+
+				$this->options = array_merge($this->default_options, $this->options); // Merge into default options.
+				$this->options = array_intersect_key($this->options, $this->default_options); // Valid keys only.
+				$this->options = apply_filters(__METHOD__.'__options', $this->options); // Allow filters.
 
 				$this->manage_cap    = $this->options['manage_cap'] ? (string)$this->options['manage_cap'] : $this->cap;
 				$this->uninstall_cap = $this->options['uninstall_cap'] ? (string)$this->options['uninstall_cap'] : 'delete_plugins';
@@ -730,8 +731,9 @@ namespace comment_mail
 				if($this->utils_env->is_menu_page(__NAMESPACE__)) // Main options page only.
 				{
 					$deps[] = 'codemirror'; // CodeMirror dependency is added to the array now.
-					wp_enqueue_style('codemirror', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/codemirror.min.css'), array(), NULL, 'all');
-					wp_enqueue_style('codemirror-twilight-theme', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/theme/twilight.css'), array('codemirror'), NULL, 'all');
+					wp_enqueue_style('codemirror', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/codemirror.min.css'), array(), NULL, 'all');
+					wp_enqueue_style('codemirror-fullscreen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/addon/display/fullscreen.min.css'), array('codemirror'), NULL, 'all');
+					wp_enqueue_style('codemirror-ambiance-theme', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/theme/ambiance.min.css'), array('codemirror'), NULL, 'all');
 				}
 				wp_enqueue_style('chosen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.min.css'), array(), NULL, 'all');
 				wp_enqueue_style('font-awesome', set_url_scheme('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css'), array(), NULL, 'all');
@@ -757,14 +759,15 @@ namespace comment_mail
 				if($this->utils_env->is_menu_page(__NAMESPACE__)) // Main options page only.
 				{
 					$deps[] = 'codemirror'; // CodeMirror dependency is added to the array now.
-					wp_enqueue_script('codemirror', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/codemirror.min.js'), array(), NULL, TRUE);
-					wp_enqueue_script('codemirror-matchbrackets', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/addon/edit/matchbrackets.js'), array('codemirror'), NULL, TRUE);
-					wp_enqueue_script('codemirror-htmlmixed', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/mode/htmlmixed/htmlmixed.js'), array('codemirror'), NULL, TRUE);
-					wp_enqueue_script('codemirror-xml', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/mode/xml/xml.js'), array('codemirror'), NULL, TRUE);
-					wp_enqueue_script('codemirror-javascript', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/mode/javascript/javascript.js'), array('codemirror'), NULL, TRUE);
-					wp_enqueue_script('codemirror-css', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/mode/css/css.js'), array('codemirror'), NULL, TRUE);
-					wp_enqueue_script('codemirror-clike', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/mode/clike/clike.js'), array('codemirror'), NULL, TRUE);
-					wp_enqueue_script('codemirror-php', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.4.0/mode/php/php.js'), array('codemirror'), NULL, TRUE);
+					wp_enqueue_script('codemirror', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/codemirror.min.js'), array(), NULL, TRUE);
+					wp_enqueue_script('codemirror-fullscreen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/addon/display/fullscreen.min.js'), array('codemirror'), NULL, TRUE);
+					wp_enqueue_script('codemirror-matchbrackets', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/addon/edit/matchbrackets.js'), array('codemirror'), NULL, TRUE);
+					wp_enqueue_script('codemirror-htmlmixed', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/htmlmixed/htmlmixed.js'), array('codemirror'), NULL, TRUE);
+					wp_enqueue_script('codemirror-xml', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/xml/xml.js'), array('codemirror'), NULL, TRUE);
+					wp_enqueue_script('codemirror-javascript', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/javascript/javascript.js'), array('codemirror'), NULL, TRUE);
+					wp_enqueue_script('codemirror-css', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/css/css.js'), array('codemirror'), NULL, TRUE);
+					wp_enqueue_script('codemirror-clike', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/clike/clike.js'), array('codemirror'), NULL, TRUE);
+					wp_enqueue_script('codemirror-php', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/php/php.js'), array('codemirror'), NULL, TRUE);
 				}
 				wp_enqueue_script('chosen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.min.js'), array('jquery'), NULL, TRUE);
 				wp_enqueue_script(__NAMESPACE__, $this->utils_url->to('/client-s/js/menu-pages.min.js'), $deps, $this->version, TRUE);
@@ -830,9 +833,14 @@ namespace comment_mail
 				$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_queue_event_log', array($this, 'menu_page_queue_event_log'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'], array($this, 'menu_page_queue_event_log_screen'));
 
+				$menu_title                                    = $_.__('Statistics', $this->text_domain);
+				$page_title                                    = $this->name.'&trade; &#10609; '.__('Statistics', $this->text_domain);
+				$this->menu_page_hooks[__NAMESPACE__.'_stats'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_stats', array($this, 'menu_page_stats'));
+				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_stats'], array($this, 'menu_page_stats_screen'));
+
 				$menu_title = $_.__('Config. Options', $this->text_domain);
 				$page_title = $this->name.'&trade; &#10609; '.__('Config. Options', $this->text_domain);
-				add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__, array($this, 'menu_page_options'));
+				add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
 			}
 
 			/**
@@ -892,6 +900,40 @@ namespace comment_mail
 			public function menu_page_options()
 			{
 				new menu_page('options');
+			}
+
+			/**
+			 * Menu page screen; for stats.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_stats']` action.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_stats_screen()
+			{
+				$screen = get_current_screen();
+				if(!($screen instanceof \WP_Screen))
+					return; // Not possible.
+
+				if(empty($this->menu_page_hooks[__NAMESPACE__.'_stats'])
+				   || $screen->id !== $this->menu_page_hooks[__NAMESPACE__.'_stats']
+				) return; // Not applicable.
+
+				return; // No screen for this page right now.
+			}
+
+			/**
+			 * Menu page for stats.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_stats()
+			{
+				new menu_page('stats');
 			}
 
 			/**

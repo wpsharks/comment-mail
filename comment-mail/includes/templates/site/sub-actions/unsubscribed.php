@@ -114,7 +114,7 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 				</h4>
 			</div>
 
-			<div class="alert alert-warning text-center pull-right" style="margin:10px 0 20px 20px;">
+			<div class="alert alert-warning text-center pull-right" style="margin:1em 0 1em 1em;">
 				<a href="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
 					data-action="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
 					data-confirmation="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address? Are you absolutely sure?', $plugin->text_domain); ?>"
@@ -148,7 +148,7 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 				<?php endif; ?>
 			</h4>
 
-			<hr style="margin:0 0 10px 0;" />
+			<hr style="margin:0 0 1em 0;" />
 
 			<h5 style="font-style:italic; margin:0;">
 				<i class="fa fa-frown-o"></i> <?php echo sprintf(__('Too many emails? ~ Please feel free to <a href="%1$s">add a new/different subscription</a> if you like!', $plugin->text_domain), esc_attr($sub_new_url)); ?>
