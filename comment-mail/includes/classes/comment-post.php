@@ -58,7 +58,6 @@ namespace comment_mail // Root namespace.
 
 				$this->maybe_inject_sub();
 				$this->maybe_inject_queue();
-				$this->maybe_immediately_process_queue();
 			}
 
 			/**
@@ -109,28 +108,6 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				new queue_injector($this->comment_id);
-			}
-
-			/**
-			 * Immediately process queued emails.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected function maybe_immediately_process_queue()
-			{
-				if(!$this->comment_id)
-					return; // Not applicable.
-
-				if($this->comment_status !== 'approve')
-					return; // Not applicable.
-
-				if(($immediate_max_time = (integer)$this->plugin->options['queue_processor_immediate_max_time']) <= 0)
-					return; // Immediate queue processing is not enabled right now.
-
-				if(($immediate_max_limit = (integer)$this->plugin->options['queue_processor_immediate_max_limit']) <= 0)
-					return; // Immediate queue processing is not enabled right now.
-
-				new queue_processor(FALSE, $immediate_max_time, 0, $immediate_max_limit); // No delay.
 			}
 		}
 	}

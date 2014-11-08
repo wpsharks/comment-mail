@@ -420,6 +420,40 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Statistics menu page URL.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @return string Statistics menu page URL.
+			 */
+			public function stats_menu_page_only($scheme = 'admin')
+			{
+				$url = admin_url('/edit-comments.php');
+
+				return $this->page_only(__NAMESPACE__.'_stats', $url, $scheme);
+			}
+
+			/**
+			 * Import/export menu page URL.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @return string Import/export menu page URL.
+			 */
+			public function import_export_menu_page_only($scheme = 'admin')
+			{
+				$url = admin_url('/edit-comments.php');
+
+				return $this->page_only(__NAMESPACE__.'_import_export', $url, $scheme);
+			}
+
+			/**
 			 * Restore default options URL.
 			 *
 			 * @since 14xxxx First documented version.

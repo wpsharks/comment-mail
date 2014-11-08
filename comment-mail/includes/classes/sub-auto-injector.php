@@ -156,7 +156,7 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				$recipients = $this->plugin->options['auto_subscribe_recipients'];
-				$recipients = $this->plugin->utils_mail->parse_recipients_deep($recipients);
+				$recipients = $this->plugin->utils_mail->parse_addresses_deep($recipients);
 
 				foreach($recipients as $_recipient)
 				{

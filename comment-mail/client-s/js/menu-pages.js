@@ -29,7 +29,7 @@
 			},
 
 			codeMirrors = [], cmOptions = {
-				lineNumbers  : true,
+				lineNumbers  : false,
 				matchBrackets: true,
 				theme        : 'ambiance',
 				tabSize      : 3, indentWithTabs: true,

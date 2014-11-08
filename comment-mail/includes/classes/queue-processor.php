@@ -21,13 +21,6 @@ namespace comment_mail // Root namespace.
 		class queue_processor extends abs_base
 		{
 			/**
-			 * @var boolean Is a CRON job?
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected $is_cron;
-
-			/**
 			 * @var integer Start time.
 			 *
 			 * @since 14xxxx First documented version.
@@ -102,8 +95,6 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param boolean      $is_cron Is a CRON job?
-			 *
 			 * @param integer|null $max_time Max time (in seconds).
 			 *
 			 *    This cannot be less than `10` seconds.
@@ -125,11 +116,9 @@ namespace comment_mail // Root namespace.
 			 *
 			 *    * A default value is taken from the plugin options.
 			 */
-			public function __construct($is_cron = TRUE, $max_time = NULL, $delay = NULL, $max_limit = NULL)
+			public function __construct($max_time = NULL, $delay = NULL, $max_limit = NULL)
 			{
 				parent::__construct();
-
-				$this->is_cron = (boolean)$is_cron;
 
 				$this->start_time = time(); // Start time.
 
@@ -167,7 +156,7 @@ namespace comment_mail // Root namespace.
 				$this->total_entries           = 0; // Initialize; zero for now.
 				$this->processed_entry_counter = 0; // Initialize; zero for now.
 
-				$this->maybe_prep_cron_job();
+				$this->prep_cron_job();
 				$this->maybe_process();
 			}
 
@@ -176,11 +165,8 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function maybe_prep_cron_job()
+			protected function prep_cron_job()
 			{
-				if(!$this->is_cron)
-					return; // Nothing to do.
-
 				ignore_user_abort(TRUE);
 
 				@set_time_limit($this->max_time); // Max time only (first).

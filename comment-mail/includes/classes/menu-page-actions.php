@@ -104,14 +104,23 @@ namespace comment_mail // Root namespace.
 
 				update_option(__NAMESPACE__.'_options', $this->plugin->options); // Update.
 
-				if(!empty($request_args['smtp_test']) && ($smtp_test_to = trim((string)$request_args['smtp_test'])))
+				if(!empty($request_args['mail_test']) && ($smtp_test_to = trim((string)$request_args['mail_test'])))
+				{
+					$smtp_test = $this->plugin->utils_mail->test(
+						$smtp_test_to, // To the address specificed in the request args.
+						sprintf(__('Test Email Message sent by %1$s™', $this->plugin->text_domain), $this->plugin->name),
+						sprintf(__('Test email message sent by %1$s&trade; from: <code>%2$s</code>.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html($this->plugin->utils_url->current_host_path()))
+					);
+					$this->plugin->enqueue_user_notice($smtp_test->results_markup, array('transient' => TRUE));
+				}
+				if(!empty($request_args['mail_smtp_test']) && ($smtp_test_to = trim((string)$request_args['mail_smtp_test'])))
 				{
 					$smtp_test = $this->plugin->utils_mail->smtp_test(
 						$smtp_test_to, // To the address specificed in the request args.
 						sprintf(__('Test Email Message sent by %1$s™', $this->plugin->text_domain), $this->plugin->name),
 						sprintf(__('Test email message sent by %1$s&trade; from: <code>%2$s</code>.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html($this->plugin->utils_url->current_host_path()))
 					);
-					$this->plugin->enqueue_user_notice($smtp_test->results, array('transient' => TRUE));
+					$this->plugin->enqueue_user_notice($smtp_test->results_markup, array('transient' => TRUE));
 				}
 				wp_redirect($this->plugin->utils_url->options_updated()).exit();
 			}
@@ -163,7 +172,7 @@ namespace comment_mail // Root namespace.
 				if(!current_user_can($this->plugin->cap))
 					return; // Unauthenticated; ignore.
 
-				$class    = 'import_'.$request_args['type'];
+				$class    = '\\'.__NAMESPACE__.'\\import_'.$request_args['type'];
 				$importer = new $class($request_args); // Instantiate.
 			}
 
@@ -187,7 +196,7 @@ namespace comment_mail // Root namespace.
 				if(!current_user_can($this->plugin->cap))
 					return; // Unauthenticated; ignore.
 
-				$class    = 'export_'.$request_args['type'];
+				$class    = '\\'.__NAMESPACE__.'\\export_'.$request_args['type'];
 				$exporter = new $class($request_args); // Instantiate.
 			}
 

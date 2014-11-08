@@ -28,11 +28,11 @@ namespace comment_mail // Root namespace.
 			protected $debug;
 
 			/**
-			 * @var string Debug output.
+			 * @var string Debug output in HTML markup.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected $debug_output;
+			protected $debug_output_markup;
 
 			/**
 			 * @var string From name.
@@ -47,6 +47,13 @@ namespace comment_mail // Root namespace.
 			 * @since 14xxxx First documented version.
 			 */
 			protected $from_email;
+
+			/**
+			 * @var string Reply-to email address.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $reply_to_email;
 
 			/**
 			 * @var array Recipients.
@@ -103,11 +110,12 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
-				$this->debug        = (boolean)$debug;
-				$this->debug_output = '';
+				$this->debug               = (boolean)$debug;
+				$this->debug_output_markup = '';
 
-				$this->from_name  = '';
-				$this->from_email = '';
+				$this->from_name      = '';
+				$this->from_email     = '';
+				$this->reply_to_email = '';
 
 				$this->recipients = array();
 
@@ -137,11 +145,11 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @return string Current debug ouput.
+			 * @return string Current debug ouput in HTML markup.
 			 */
-			public function debug_output()
+			public function debug_output_markup()
 			{
-				return $this->debug_output;
+				return $this->debug_output_markup;
 			}
 
 			/**
@@ -166,15 +174,16 @@ namespace comment_mail // Root namespace.
 			{
 				$this->reset(); // Reset state; i.e. class properties.
 
-				$this->from_name  = $this->plugin->options['smtp_from_name'];
-				$this->from_email = $this->plugin->options['smtp_from_email'];
+				$this->from_name      = $this->plugin->options['smtp_from_name'];
+				$this->from_email     = $this->plugin->options['smtp_from_email'];
+				$this->reply_to_email = $this->plugin->options['smtp_reply_to_email'];
 
-				$this->recipients = $this->plugin->utils_mail->parse_recipients_deep($to, FALSE, TRUE);
+				$this->recipients = $this->plugin->utils_mail->parse_addresses_deep($to, FALSE, TRUE);
 
 				$this->subject = (string)$subject; // Force string at all times.
 				$this->message = (string)$message; // Force string at all times.
 
-				$this->headers     = $this->plugin->utils_mail->parse_headers_deep($headers, $this->from_name, $this->from_email, $this->recipients);
+				$this->headers     = $this->plugin->utils_mail->parse_headers_deep($headers, $this->from_name, $this->from_email, $this->reply_to_email, $this->recipients);
 				$this->attachments = $this->plugin->utils_mail->parse_attachments_deep($attachments);
 
 				if(!$this->from_email || !$this->recipients || !$this->subject || !$this->message)
@@ -203,6 +212,9 @@ namespace comment_mail // Root namespace.
 					if($this->plugin->options['smtp_force_from'] && $this->plugin->options['smtp_from_email'])
 						$this->mailer->SetFrom($this->plugin->options['smtp_from_email'], $this->plugin->options['smtp_from_name']);
 
+					if($this->reply_to_email) // Add reply-to email.
+						$this->mailer->addReplyTo($this->reply_to_email);
+
 					foreach($this->recipients as $_recipient)
 						$this->mailer->AddAddress($_recipient);
 					unset($_recipient); // Housekeeping.
@@ -228,7 +240,7 @@ namespace comment_mail // Root namespace.
 					{
 						$this->mailer->smtpClose();
 						// So we pickup goodbye errors too.
-						$this->debug_output .= ob_get_clean();
+						$this->debug_output_markup .= ob_get_clean();
 					}
 					return (boolean)$response;
 				}
@@ -236,7 +248,7 @@ namespace comment_mail // Root namespace.
 				{
 					if($this->debug) // Debugging?
 					{
-						$this->debug_output // Add to debug output.
+						$this->debug_output_markup // Add to debug output.
 							.= esc_html($exception->getMessage()).'<br />'."\n";
 
 						try // So we pickup goodbye errors too.
@@ -245,10 +257,10 @@ namespace comment_mail // Root namespace.
 						}
 						catch(\exception $exception_on_close)
 						{
-							$this->debug_output // Add to debug output.
+							$this->debug_output_markup // Add to debug output.
 								.= esc_html($exception_on_close->getMessage()).'<br />'."\n";
 						}
-						$this->debug_output .= ob_get_clean();
+						$this->debug_output_markup .= ob_get_clean();
 					}
 					if($throw) throw $exception;
 
@@ -263,8 +275,9 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function reset()
 			{
-				$this->from_name  = '';
-				$this->from_email = '';
+				$this->from_name      = '';
+				$this->from_email     = '';
+				$this->reply_to_email = '';
 
 				$this->recipients = array();
 

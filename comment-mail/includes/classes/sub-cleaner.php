@@ -28,6 +28,13 @@ namespace comment_mail // Root namespace.
 			protected $start_time;
 
 			/**
+			 * @var integer Max execution time.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $max_time;
+
+			/**
 			 * @var integer Total cleaned subs.
 			 *
 			 * @since 14xxxx First documented version.
