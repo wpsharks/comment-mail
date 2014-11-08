@@ -89,6 +89,9 @@ namespace comment_mail;
 
 	// CAN-SPAM mailing address; as configured in plugin options.
 	$can_spam_mailing_address = $plugin->options['can_spam_mailing_address'];
+
+	// Privacy policy URL; as configured in plugin options via the dashboard.
+	$can_spam_privacy_policy_url = $plugin->options['can_spam_privacy_policy_url'];
 	?>
 
 	<tr>
@@ -97,6 +100,9 @@ namespace comment_mail;
 				<strong><?php echo __('Contact Info', $plugin->text_domain); ?></strong><br />
 				<?php echo sprintf(__('Website URL: <a href="%1$s">%2$s</a>', $plugin->text_domain), esc_attr($home_url), esc_html($home_url)); ?><br />
 				<?php echo sprintf(__('Report Abuse to: <a href="mailto:%1$s">%2$s</a>', $plugin->text_domain), esc_attr(urlencode($can_spam_postmaster)), esc_html($can_spam_postmaster)); ?>
+				<?php if($can_spam_privacy_policy_url): ?><br />
+					<?php echo sprintf(__('Privacy Policy: <a href="%1$s">%2$s</a>', $plugin->text_domain), esc_attr($can_spam_privacy_policy_url), esc_html($can_spam_privacy_policy_url)); ?>
+				<?php endif; ?>
 			</p>
 		</td>
 		<td style="vertical-align:top; padding-left:10em;">

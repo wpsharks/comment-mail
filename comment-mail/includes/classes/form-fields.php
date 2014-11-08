@@ -79,6 +79,8 @@ namespace comment_mail // Root namespace.
 				$default_args = array(
 					'type'                     => 'text',
 					'label'                    => '',
+					'checkbox_label'           => '',
+					'radio_label'              => '',
 					'placeholder'              => '',
 
 					'name'                     => '',
@@ -100,9 +102,11 @@ namespace comment_mail // Root namespace.
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$type        = trim((string)$args['type']);
-				$label       = trim((string)$args['label']);
-				$placeholder = trim((string)$args['placeholder']);
+				$type           = trim((string)$args['type']);
+				$label          = trim((string)$args['label']);
+				$checkbox_label = trim((string)$args['checkbox_label']);
+				$radio_label    = trim((string)$args['radio_label']);
+				$placeholder    = trim((string)$args['placeholder']);
 
 				$name      = trim((string)$args['name']);
 				$root_name = (boolean)$args['root_name'];
@@ -164,6 +168,12 @@ namespace comment_mail // Root namespace.
 
 				             '     '.$other_attrs.' />'.
 
+				             ($type === 'checkbox' && $checkbox_label
+					             ? '<label for="'.esc_attr($id).'">'.$checkbox_label.'</label>' : '').
+
+				             ($type === 'radio' && $radio_label
+					             ? '<label for="'.esc_attr($id).'">'.$radio_label.'</label>' : '').
+
 				             ($notes_after ? // Display notes after?
 					             '<div class="notes notes-after">'.$notes_after.'</div>' : '').
 
@@ -195,6 +205,7 @@ namespace comment_mail // Root namespace.
 					'name'                     => '',
 					'root_name'                => FALSE,
 
+					'rows'                     => 3,
 					'required'                 => FALSE,
 					'maxlength'                => 0,
 					'current_value'            => NULL,
@@ -226,6 +237,7 @@ namespace comment_mail // Root namespace.
 				$id   = __NAMESPACE__.$this->ns_id_suffix.'-'.$slug;
 				$name = $root_name ? $name : __NAMESPACE__.$this->ns_name_suffix.'['.$name.']';
 
+				$rows                     = (integer)$args['rows'];
 				$required                 = (boolean)$args['required'];
 				$maxlength                = (integer)$args['maxlength'];
 				$current_value            = $this->isset_or($args['current_value'], NULL, 'string');
@@ -270,6 +282,8 @@ namespace comment_mail // Root namespace.
 				        '     class="'.esc_attr('form-control '.$field_class).'"'.
 
 				        '     id="'.esc_attr($id).'" name="'.esc_attr($name).'"'.
+
+				        '     rows="'.esc_attr($rows).'"'. // Height of area.
 
 				        '     aria-required="'.esc_attr($required ? 'true' : 'false').'"'.
 				        '     '.($required ? ' required="required"' : ''). // JS validation.

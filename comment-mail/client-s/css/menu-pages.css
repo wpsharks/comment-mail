@@ -338,7 +338,7 @@ Menu page styles.
 .comment-mail-menu-page textarea,
 .comment-mail-menu-page input:not([type='radio']):not([type='checkbox'])
 {
-	color      : #000000;
+	color      : #626262;
 	background : #E0E0E0;
 }
 .comment-mail-menu-page select
@@ -349,6 +349,15 @@ Menu page styles.
 .comment-mail-menu-page textarea:focus,
 .comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus,
 .comment-mail-menu-page /* CodeMirror. */.cm
+{
+	color : #000000;
+}
+.comment-mail-menu-page textarea:focus,
+.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus
+{
+	background : #E8E8E8;
+}
+.comment-mail-menu-page select:focus
 {
 	background : #FFFFFF;
 }

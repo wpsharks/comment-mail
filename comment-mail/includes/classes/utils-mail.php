@@ -71,6 +71,49 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * SMTP mail testing utility.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @note This method always (ALWAYS) sends email in HTML format;
+			 *    w/ a plain text alternative — generated automatically.
+			 *
+			 * @param string|array $to Email address(es).
+			 * @param string       $subject Email subject line.
+			 * @param string       $message Message contents.
+			 * @param string|array $headers Optional. Additional headers.
+			 * @param string|array $attachments Optional. Files to attach.
+			 *
+			 * @return \stdClass With the following properties:
+			 *
+			 *    • `debug_output` = a string w/ any debugging output.
+			 *    • `sent` = `yes` if the email was sent successfully; else `no`.
+			 *    • `results` = Markup with all of the above in test response format.
+			 */
+			public function smtp_test($to, $subject, $message, $headers = array(), $attachments = array())
+			{
+				$sent         = 'no'; // Initialize.
+				$debug_output = ''; // Initialize.
+
+				if($this->plugin->options['smtp_enable'] // SMTP mailer enabled?
+				   && $this->plugin->options['smtp_host'] && $this->plugin->options['smtp_port']
+				) // If the SMTP mailer is enabled & configured; i.e. ready for use.
+				{
+					$mail_smtp    = new mail_smtp(TRUE); // Single instance w/ debugging.
+					$sent         = $mail_smtp->send($to, $subject, $message, $headers, $attachments);
+					$sent         = $sent ? __('yes', $this->plugin->text_domain) : __('no', $this->plugin->text_domain);
+					$debug_output = $mail_smtp->debug_output();
+				}
+				$results = '<h4 style="margin:0;">'.sprintf(__('Test email sent by %1$s&trade; to: &lt;<code>%2$s</code>&gt;', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html($to)).'</h4>';
+				$results .= '<h4 style="margin:0 0 1em 0;">'.sprintf(__('Email sent successfully? <code>%1$s</code>', $this->plugin->text_domain), esc_html($sent)).'</h4>';
+
+				$results .= '<h4 style="margin:0;">'.__('Debug Output:', $this->plugin->text_domain).'</h4><hr />'.
+				            '<div style="margin:0;">'.$debug_output.'</div>'; // Already HTML markup.
+
+				return (object)compact('sent', 'debug_output', 'results');
+			}
+
+			/**
 			 * Parses recipients deeply.
 			 *
 			 * @since 14xxxx First documented version.
@@ -284,6 +327,49 @@ namespace comment_mail // Root namespace.
 
 				return $attachments ? array_unique($attachments) : array();
 			}
+
+			/**
+			 * @var array Role-based blacklist patterns.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			public static $role_based_blacklist_patterns = array(
+				'abuse@*',
+				'admin@*',
+				'billing@*',
+				'compliance@*',
+				'devnull@*',
+				'dns@*',
+				'ftp@*',
+				'hostmaster@*',
+				'inoc@*',
+				'ispfeedback@*',
+				'ispsupport@*',
+				'list-request@*',
+				'list@*',
+				'maildaemon@*',
+				'noc@*',
+				'no-reply@*',
+				'noreply@*',
+				'null@*',
+				'phish@*',
+				'phishing@*',
+				'postmaster@*',
+				'privacy@*',
+				'registrar@*',
+				'root@*',
+				'security@*',
+				'spam@*',
+				'support@*',
+				'sysadmin@*',
+				'tech@*',
+				'undisclosed-recipients@*',
+				'unsubscribe@*',
+				'usenet@*',
+				'uucp@*',
+				'webmaster@*',
+				'www@*',
+			);
 		}
 	}
 }

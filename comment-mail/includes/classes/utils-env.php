@@ -169,7 +169,7 @@ namespace comment_mail // Root namespace.
 				if(!$page_to_check) // Any menu page?
 					return ($is = TRUE); // Yep, it is!
 
-				$page_to_check_regex = '/^'.preg_replace('/\\\\\*/', '.*?', preg_quote($page_to_check, '/')).'$/i';
+				$page_to_check_regex = '/^'.preg_replace(array('/\\\\\*/', '/\\\\\^/'), array('.*?', '[^_]*?'), preg_quote($page_to_check, '/')).'$/i';
 
 				return ($is = (boolean)preg_match($page_to_check_regex, $current_page));
 			}

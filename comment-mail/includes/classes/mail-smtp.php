@@ -21,6 +21,20 @@ namespace comment_mail // Root namespace.
 		class mail_smtp extends abs_base
 		{
 			/**
+			 * @var boolean Debugging enable?
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $debug;
+
+			/**
+			 * @var string Debug output.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected $debug_output;
+
+			/**
 			 * @var string From name.
 			 *
 			 * @since 14xxxx First documented version.
@@ -80,10 +94,17 @@ namespace comment_mail // Root namespace.
 			 * Class constructor.
 			 *
 			 * @since 14xxxx First documented version.
+			 *
+			 * @param boolean $debug Enable debugging?
+			 *
+			 * @throws \exception If !`smtp_enable` or `smtp_host|port` are missing.
 			 */
-			public function __construct()
+			public function __construct($debug = FALSE)
 			{
 				parent::__construct();
+
+				$this->debug        = (boolean)$debug;
+				$this->debug_output = '';
 
 				$this->from_name  = '';
 				$this->from_email = '';
@@ -109,6 +130,18 @@ namespace comment_mail // Root namespace.
 
 				if(!$this->plugin->options['smtp_host'] || !$this->plugin->options['smtp_port'])
 					throw new \exception(__('SMTP host/port missing.', $this->plugin->text_domain));
+			}
+
+			/**
+			 * Mail sending utility; `wp_mail()` compatible.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string Current debug ouput.
+			 */
+			public function debug_output()
+			{
+				return $this->debug_output;
 			}
 
 			/**
@@ -149,6 +182,12 @@ namespace comment_mail // Root namespace.
 
 				try // PHPMailer (catch exceptions).
 				{
+					if($this->debug)
+					{
+						ob_start();
+						$this->mailer->SMTPDebug   = 2;
+						$this->mailer->Debugoutput = 'html';
+					}
 					$this->mailer->IsSMTP();
 					$this->mailer->SingleTo = TRUE;
 
@@ -166,7 +205,7 @@ namespace comment_mail // Root namespace.
 
 					foreach($this->recipients as $_recipient)
 						$this->mailer->AddAddress($_recipient);
-					unset($_recipient);
+					unset($_recipient); // Housekeeping.
 
 					$this->mailer->CharSet = 'UTF-8';
 					$this->mailer->Subject = $subject;
@@ -183,10 +222,34 @@ namespace comment_mail // Root namespace.
 						$this->mailer->AddAttachment($_attachment);
 					unset($_attachment); // Housekeeping.
 
-					return $this->mailer->Send();
+					$response = $this->mailer->Send();
+
+					if($this->debug) // Debugging?
+					{
+						$this->mailer->smtpClose();
+						// So we pickup goodbye errors too.
+						$this->debug_output .= ob_get_clean();
+					}
+					return (boolean)$response;
 				}
 				catch(\exception $exception)
 				{
+					if($this->debug) // Debugging?
+					{
+						$this->debug_output // Add to debug output.
+							.= esc_html($exception->getMessage()).'<br />'."\n";
+
+						try // So we pickup goodbye errors too.
+						{
+							$this->mailer->smtpClose();
+						}
+						catch(\exception $exception_on_close)
+						{
+							$this->debug_output // Add to debug output.
+								.= esc_html($exception_on_close->getMessage()).'<br />'."\n";
+						}
+						$this->debug_output .= ob_get_clean();
+					}
 					if($throw) throw $exception;
 
 					return FALSE; // Failure.
@@ -212,7 +275,9 @@ namespace comment_mail // Root namespace.
 				$this->attachments = array();
 
 				$this->mailer->isSMTP();
-				$this->mailer->SingleTo = TRUE;
+				$this->mailer->SMTPDebug   = 0;
+				$this->mailer->Debugoutput = 'html';
+				$this->mailer->SingleTo    = TRUE;
 
 				$this->mailer->SMTPSecure = '';
 				$this->mailer->Host       = '';

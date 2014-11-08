@@ -390,12 +390,16 @@ namespace comment_mail
 					/* Related to CAN-SPAM compliance. */
 
 					'can_spam_postmaster'                                                  => get_bloginfo('admin_email'),
-					'can_spam_mailing_address'                                             => '', // CAN-SPAM contact info.
+					'can_spam_mailing_address'                                             => get_bloginfo('name').'<br />'."\n".
+					                                                                          '123 Somewhere Street<br />'."\n".
+					                                                                          'Attn: Comment Subscriptions<br />'."\n".
+					                                                                          'Somewhere, USA 99999 ~ Ph: 555-555-5555', // CAN-SPAM contact info.
 					'can_spam_privacy_policy_url'                                          => '', // CAN-SPAM privacy policy.
 
 					/* Related to blacklisting. */
 
-					'email_blacklist_patterns'                                             => '', // A line-delimited list of blacklisted emails/domains.
+					'email_blacklist_patterns'                                             => implode("\n", utils_mail::$role_based_blacklist_patterns),
+					// A line-delimited list of blacklisted emails/domains.
 
 					/* Related to replies-via-email. */
 

@@ -107,7 +107,7 @@ namespace comment_mail // Root namespace.
 				if(is_object($this->___overload) && property_exists($this->___overload, $property))
 					return $this->___overload->{$property};
 
-				throw new \exception(__('Undefined overload property.', $this->text_domain));
+				throw new \exception(__('Undefined overload property.', $this->plugin->text_domain));
 			}
 
 			/**

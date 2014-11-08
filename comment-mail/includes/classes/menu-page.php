@@ -93,7 +93,7 @@ namespace comment_mail // Root namespace.
 						               'notes_after'     => '<div class="pmp-note pmp-warning pmp-panel-if-disabled-show">'.
 						                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.sprintf(__('When %1$s&trade; is disabled in this way:', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'.
 						                                    '   <ul class="pmp-list-items">'.
-						                                    '      <li>'.__('Comment subscription options (for receiving email notifications regarding comments/replies) no longer appear on comment forms; i.e. no new subscriptions are allowed. In addition, the ability to add a new subscription through any/all front-end forms is disabled too. All other front &amp; back-end functionality (including the ability for subscribers to edit and/or unsubscribe from existing subscriptions on the front-end) remains available.', $this->plugin->text_domain).'</li>'.
+						                                    '      <li>'.__('Comment Subscription Options (options for receiving email notifications regarding comments/replies) no longer appear on comment forms. In short, no new subscriptions are allowed. In addition, the ability to add a new subscription through any/all front-end forms is disabled too. All other front &amp; back-end functionality (including the ability for subscribers to edit and/or unsubscribe from existing subscriptions on the front-end) remains available.', $this->plugin->text_domain).'</li>'.
 						                                    '      <li>'.sprintf(__('The mail queue processor will stop processing, until such time as the plugin is renabled; i.e. no more email notifications. Mail queue injections continue, but no queue processing. If it is desirable that any queued notifications NOT be processed at all upon re-enabling, you can choose to delete all existing queued notifications before doing so. See: %1$s.', $this->plugin->text_domain), $this->plugin->utils_markup->pmp_path('Mail Queue')).'</li>'.
 						                                    '   </ul>'.
 						                                    '   <p><em>'.sprintf(__('<strong>Note:</strong> If you want to disable %1$s&trade; completely, please deactivate it from the plugins menu in WordPress.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</em></p>'.
@@ -117,7 +117,7 @@ namespace comment_mail // Root namespace.
 							                '1' => __('Yes, allow new subscriptions (recommended)', $this->plugin->text_domain),
 							                '0' => __('No, disallow new subscriptions temporarily', $this->plugin->text_domain),
 						                ),
-						                'notes_after'     => '<p>'.__('If you disallow, comment subscription options (for receiving email notifications regarding comments/replies) no longer appear on comment forms; i.e. no new subscriptions are allowed. In addition, the ability to add a new subscription through any/all front-end forms is disabled too. All other front &amp; back-end functionality (including the ability for subscribers to edit and/or unsubscribe from existing subscriptions on the front-end) remains available.', $this->plugin->text_domain).'</p>',
+						                'notes_after'     => '<p>'.__('If you set this to <code>No</code> (disallow), Comment Subscription Options (options for receiving email notifications regarding comments/replies) no longer appear on comment forms. In short, no new subscriptions are allowed. In addition, the ability to add a new subscription through any/all front-end forms is disabled too. All other front &amp; back-end functionality (including the ability for subscribers to edit and/or unsubscribe from existing subscriptions on the front-end) remains available.', $this->plugin->text_domain).'</p>',
 					                )).
 				                '    </tbody>'.
 				                ' </table>'.
@@ -136,7 +136,7 @@ namespace comment_mail // Root namespace.
 							                '1' => __('Yes, enable mail queue processing (recommended)', $this->plugin->text_domain),
 							                '0' => __('No, disable mail queue processing temporarily', $this->plugin->text_domain),
 						                ),
-						                'notes_after'     => '<p>'.sprintf(__('If disabled, all mail queue processing will stop, until such time as the plugin is renabled; i.e. no more email notifications. Mail queue injections continue, but no queue processing. If it is desirable that any queued notifications NOT be processed at all upon re-enabling, you can choose to delete all existing queued notifications before doing so. See: %1$s.', $this->plugin->text_domain), $this->plugin->utils_markup->pmp_path('Mail Queue')).'</p>',
+						                'notes_after'     => '<p>'.sprintf(__('If you set this to <code>No</code> (disabled), all mail queue processing will stop; until such time as the plugin is renabled. In short, no more email notifications will be sent. Mail queue injections continue, but no queue processing. If it is desirable that any queued notifications NOT be processed at all upon re-enabling, you can choose to delete all existing queued notifications before doing so. See: %1$s.', $this->plugin->text_domain), $this->plugin->utils_markup->pmp_path('Mail Queue')).'</p>',
 					                )).
 				                '    </tbody>'.
 				                ' </table>'.
@@ -181,7 +181,7 @@ namespace comment_mail // Root namespace.
 							               '1' => __('Yes, use built-in template system (recommended)', $this->plugin->text_domain),
 							               '0' => __('No, disable built-in template system; I have a deep theme integration of my own', $this->plugin->text_domain),
 						               ),
-						               'notes_after'     => '<p>'.__('The built-in template system is quite flexible already; you can even customize the default template yourself if you want to. Therefore, it is not recommended that you disable the default template system. This option only exists for very advanced users; i.e. those who prefer to disable the template completely in favor of their own custom implementation. If you disable the built-in template, you\'ll need to integrate HTML markup of your own into the proper location of your theme.', $this->plugin->text_domain).'</p>',
+						               'notes_after'     => '<p>'.__('The built-in template system is quite flexible already; you can even customize the default template yourself if you want to (as seen below). Therefore, it is not recommended that you disable the default template system. This option only exists for very advanced users; i.e. those who prefer to disable the template completely in favor of their own custom implementation. If you disable the built-in template, you\'ll need to integrate HTML markup of your own into the proper location of your theme.', $this->plugin->text_domain).'</p>',
 					               )).
 				               '  </tbody>'.
 				               '</table>';
@@ -221,6 +221,43 @@ namespace comment_mail // Root namespace.
 						                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sub-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
 						                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>'.
 						                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					                )).
+				                '     </tbody>'.
+				                '  </table>'.
+
+				                ' <hr />'.
+
+				                '  <table>'.
+				                '     <tbody>'.
+				                $form_fields->select_row(
+					                array(
+						                'label'           => __('Default Subscription Option Selected for Commenters:', $this->plugin->text_domain),
+						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						                'name'            => 'comment_form_default_sub_type_option',
+						                'current_value'   => $current_value_for('comment_form_default_sub_type_option'),
+						                'allow_arbitrary' => FALSE, // Must be one of these.
+						                'options'         => array(
+							                ''         => __('do not subscribe', $this->plugin->text_domain),
+							                'comment'  => __('replies only (recommended)', $this->plugin->text_domain),
+							                'comments' => __('all comments/replies', $this->plugin->text_domain),
+						                ),
+						                'notes_after'     => '<p>'.__('This is the option that will be pre-selected for each commenter as the default value. You can change the wording that appears for these options by editing the template above. However, the default choice is determined systematically, based on the one that you choose here — assuming that you haven\'t dramatically altered code in the template. For most sites, the most logical default choice is: <code>replies only</code>; i.e. the commenter will only receive notifications for replies to the comment they are posting.', $this->plugin->text_domain).'</p>',
+					                )).
+				                '     </tbody>'.
+				                '  </table>'.
+
+				                '  <table>'.
+				                '     <tbody>'.
+				                $form_fields->select_row(
+					                array(
+						                'label'           => __('Default Subscription Delivery Option Selected for Commenters:', $this->plugin->text_domain),
+						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						                'name'            => 'comment_form_default_sub_deliver_option',
+						                'current_value'   => $current_value_for('comment_form_default_sub_deliver_option'),
+						                'allow_empty'     => FALSE, // Do not offer empty option value.
+						                'allow_arbitrary' => FALSE, // Must be one of these.
+						                'options'         => '%%deliver%%', // Predefined options.
+						                'notes_after'     => '<p>'.__('This is the option that will be pre-selected for each commenter as the default value. You can change the wording that appears for these options by editing the template above. However, the default choice is determined systematically, based on the one that you choose here — assuming that you haven\'t dramatically altered code in the template. For most sites, the most logical default choice is: <code>asap</code> (aka: instantly); i.e. the commenter will receive instant notifications regarding replies to their comment.', $this->plugin->text_domain).'</p>',
 					                )).
 				                '     </tbody>'.
 				                '  </table>'.
@@ -294,7 +331,7 @@ namespace comment_mail // Root namespace.
 				                '    <tbody>'.
 				                $form_fields->input_row(
 					                array(
-						                'label'         => __('Also Auto-Subscribe the Following Email Addresses:', $this->plugin->text_domain),
+						                'label'         => __('Auto-Subscribe the Following Email Addresses:', $this->plugin->text_domain),
 						                'placeholder'   => __('"John" <john@example.com>; jane@example.com; "Susan Smith" <susan@example.com>', $this->plugin->text_domain),
 						                'name'          => 'auto_subscribe_recipients',
 						                'current_value' => $current_value_for('auto_subscribe_recipients'),
@@ -329,7 +366,7 @@ namespace comment_mail // Root namespace.
 						                'placeholder'   => __('e.g. post,page,portfolio,gallery', $this->plugin->text_domain),
 						                'name'          => 'auto_subscribe_post_types',
 						                'current_value' => $current_value_for('auto_subscribe_post_types'),
-						                'notes_after'   => '<p>'.sprintf(__('These are the %1$s that will be included in the auto-subscribe behavior. The default list is adequate for most sites. However, if you have other %1$s enabled by a theme/plugin, you might wish to include those here. e.g. <code>post,page,portfolio,gallery</code>; where <code>portfolio,gallery</code> might be two %2$s that you add to the default list; if applicable.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Post_Types', __('Post Types', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Post_Types#Custom_Post_Types', __('Custom Post Types', $this->plugin->text_domain))).'</p>',
+						                'notes_after'   => '<p>'.sprintf(__('These are the %2$s that will trigger automatic subscriptions; i.e. %1$s will only auto-subscribe people to these types of posts. The default list is adequate for most sites. However, if you have other %2$s enabled by a theme/plugin, you might wish to include those here. e.g. <code>post,page,portfolio,gallery</code>; where <code>portfolio,gallery</code> might be two %3$s that you add to the default list, if applicable.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Post_Types', __('Post Types', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Post_Types#Custom_Post_Types', __('Custom Post Types', $this->plugin->text_domain))).'</p>',
 					                )).
 				                '    </tbody>'.
 				                ' </table>'.
@@ -435,7 +472,7 @@ namespace comment_mail // Root namespace.
 						                                    '   <ul class="pmp-list-items">'.
 						                                    '      <li>'.sprintf(__('Instead of using the default <code>%2$s</code> function, %1$s will send email confirmation requests &amp; comment/reply notifications through an SMTP server of your choosing; i.e. all email processed by %1$s will be routed through an SMTP server that you\'ve dedicated to comment subscriptions. This is highly recommended, since it can significantly improve the deliverability rate of emails that are sent by %1$s. In addition, it may also speed up your site (i.e. reduce the burden on your own web server). This is because an SMTP host is generally associated with an external server that is dedicated to email processing.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/functions/wp_mail/', 'wp_mail')).'</li>'.
 						                                    '   </ul>'.
-						                                    '  <p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> If you are already running a plugin like %2$s (i.e. a plugin that reconfigures the <code>%3$s</code> function globally); that is usually enough, and you should generally NOT enable SMTP integration here also. In other words, if <code>%3$s</code> is already configured to route mail through an SMTP server, you would only need the options below if your intention was to override your existing SMTP configuration specifically for %1$s.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('https://wordpress.org/plugins/wp-mail-smtp/', 'WP Mail SMTP'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/functions/wp_mail/', 'wp_mail')).'</p>'.
+						                                    '  <p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> If you are already running a plugin like %2$s (i.e. a plugin that reconfigures the <code>%3$s</code> function globally); that is usually enough, and you should generally NOT enable SMTP integration here also. In other words, if <code>%3$s</code> is already configured globally to route mail through an SMTP server, you would only need the options below if your intention was to override your existing SMTP configuration specifically for %1$s.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('https://wordpress.org/plugins/wp-mail-smtp/', 'WP Mail SMTP'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/functions/wp_mail/', 'wp_mail')).'</p>'.
 						                                    '</div>',
 					               )).
 				               ' </tbody>'.
@@ -570,9 +607,91 @@ namespace comment_mail // Root namespace.
 					                )).
 				                '  </tbody>'.
 				                ' </table>'. */
+
+				                '<hr />'.
+
+				                ' <table>'.
+				                '  <tbody>'.
+				                $form_fields->input_row(
+					                array(
+						                'type'        => 'email',
+						                'label'       => __('Test SMTP Server Settings?', $this->plugin->text_domain),
+						                'placeholder' => __('e.g. me@mysite.com', $this->plugin->text_domain),
+						                'name'        => 'smtp_test', // Not an actual option key; but the `save_options` handler picks this up.
+						                'notes_after' => sprintf(__('Enter an email address to have %1$s&trade; send a test message when you save these options, and report back about any success or failure.', $this->plugin->text_domain), esc_html($this->plugin->name)),
+					                )).
+				                '  </tbody>'.
+				                ' </table>'.
 				                '</div>';
 
 				echo $this->panel('SMTP Server Integration', $_panel_body, array());
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->input_row(
+					               array(
+						               'type'          => 'email',
+						               'label'         => __('Postmaster Email Address', $this->plugin->text_domain),
+						               'placeholder'   => __('e.g. postmaster@example.com or abuse@example.com', $this->plugin->text_domain),
+						               'name'          => 'can_spam_postmaster',
+						               'current_value' => $current_value_for('can_spam_postmaster'),
+						               'notes_after'   => '<p>'.sprintf(__('This is NOT the address that emails are sent from. This address is simply displayed at the bottom of each email sent by %1$s, as a way for people to report any abuse of the system.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				$_panel_body .= '<table>'.
+				                '  <tbody>'.
+				                $form_fields->textarea_row(
+					                array(
+						                'label'         => sprintf(__('Mailing Address (Required for %1$s)', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/CAN-SPAM_Act_of_2003', __('CAN-SPAM Compliance', $this->plugin->text_domain))),
+						                'placeholder'   => __('e.g. 123 Somewhere Street; Somewhere, USA 99999', $this->plugin->text_domain),
+						                'cm_mode'       => 'text/html',
+						                'name'          => 'can_spam_mailing_address',
+						                'current_value' => $current_value_for('can_spam_mailing_address'),
+						                'notes_before'  => '<p class="pmp-note pmp-notice">'.sprintf(__('Please be sure to provide a mailing address that %1$s can include at the bottom of every email that it sends. This is required for %2$s.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/CAN-SPAM_Act_of_2003', __('CAN-SPAM Compliance', $this->plugin->text_domain))).'</p>',
+						                'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Note:</strong> this needs to be provided in HTML format please. For line breaks please use: <code>&lt;br /&gt;</code>', $this->plugin->text_domain).'</p>',
+					                )).
+				                '  </tbody>'.
+				                '</table>';
+
+				$_panel_body .= '<table>'.
+				                '  <tbody>'.
+				                $form_fields->input_row(
+					                array(
+						                'type'          => 'url',
+						                'label'         => __('Privacy Policy URL (Optional)', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g. http://example.com/privacy-policy/', $this->plugin->text_domain),
+						                'name'          => 'can_spam_privacy_policy_url',
+						                'current_value' => $current_value_for('can_spam_privacy_policy_url'),
+						                'notes_after'   => '<p>'.sprintf(__('If you fill this in, %1$s will display a link to your privacy policy in strategic locations.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+					                )).
+				                '  </tbody>'.
+				                '</table>';
+
+				echo $this->panel('CAN-SPAM Compliance', $_panel_body, array());
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Email Blacklist Patterns (One Per Line)', $this->plugin->text_domain),
+						               'placeholder'   => __('e.g. webmaster@*', $this->plugin->text_domain),
+						               'name'          => 'email_blacklist_patterns',
+						               'rows'          => 15, // Give them some room here.
+						               'other_attrs'   => 'spellcheck="false"',
+						               'current_value' => $current_value_for('email_blacklist_patterns'),
+						               'notes_after'   => '<p>'.__('One pattern per line please. A <code>*</code> wildcard character can be used to match zero or more characters of any kind. A <code>^</code> caret symbol can be used to match zero or more characters that are NOT the <code>@</code> symbol.', $this->plugin->text_domain).'</p>'.
+						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> It is suggested that you blacklist role-based email addresses to avoid sending email notifications to addresses not associated w/ individuals. Role-based email addresses (like admin@, help@, sales@) are email addresses that are not associated with a particular person, but rather with a company, department, position or group of recipients. They are not generally intended for personal use, as they typically include a distribution list of recipients.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel('Blacklisted Email Addresses', $_panel_body, array());
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -599,6 +718,8 @@ namespace comment_mail // Root namespace.
 				     '      '.$this->notifications(); // Heading/notifications.
 
 				echo '      <div class="pmp-body">'."\n";
+
+				echo '         '.__('Coming soon...', $this->plugin->text_domain)."\n";
 
 				echo '      </div>'."\n";
 				echo '   </form>'."\n";

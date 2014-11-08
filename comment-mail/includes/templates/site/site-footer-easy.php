@@ -36,7 +36,7 @@ $sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url(!empty($sub
 $current_host_path = $plugin->utils_url->current_host_path();
 
 // Privacy policy URL; as configured in plugin options via the dashboard.
-$privacy_policy_url = $plugin->options['can_spam_privacy_policy_url'];
+$can_spam_privacy_policy_url = $plugin->options['can_spam_privacy_policy_url'];
 ?>
 
 <footer class="center-block clearfix">
@@ -56,9 +56,9 @@ $privacy_policy_url = $plugin->options['can_spam_privacy_policy_url'];
 				<i class="fa fa-home"></i> <?php echo sprintf(__('Return to "%1$s"', $plugin->text_domain), esc_html($blog_name_clip)); ?>
 			</a>
 
-			<?php if($privacy_policy_url): ?>
+			<?php if($can_spam_privacy_policy_url): ?>
 				<span class="text-muted">|</span>
-				<a href="<?php echo esc_attr($privacy_policy_url); ?>">
+				<a href="<?php echo esc_attr($can_spam_privacy_policy_url); ?>">
 					<?php echo __('Privacy Policy', $plugin->text_domain); ?>
 				</a>
 			<?php endif; ?>

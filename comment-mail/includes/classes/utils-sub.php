@@ -904,7 +904,7 @@ namespace comment_mail // Root namespace.
 				if(is_null($blacklist_patterns = &$this->cache_key(__FUNCTION__, 'blacklist_patterns')))
 					$blacklist_patterns = '(?:'.implode('|', array_map(function ($pattern)
 						{
-							return preg_replace('/\\\\\*/', '.*?', preg_quote($pattern, '/')); #
+							return preg_replace(array('/\\\\\*/', '/\\\\\^/'), array('.*?', '[^@]*?'), preg_quote($pattern, '/')); #
 
 						}, preg_split('/['."\r\n".']+/', $blacklist, NULL, PREG_SPLIT_NO_EMPTY))).')';
 
