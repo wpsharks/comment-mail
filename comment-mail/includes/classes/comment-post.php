@@ -58,6 +58,7 @@ namespace comment_mail // Root namespace.
 
 				$this->maybe_inject_sub();
 				$this->maybe_inject_queue();
+				$this->maybe_process_queue_in_realtime();
 			}
 
 			/**
@@ -108,6 +109,28 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				new queue_injector($this->comment_id);
+			}
+
+			/**
+			 * Process queued emails in real-time.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function maybe_process_queue_in_realtime()
+			{
+				if(!$this->comment_id)
+					return; // Not applicable.
+
+				if($this->comment_status !== 'approve')
+					return; // Not applicable.
+
+				if(($realtime_max_limit = (integer)$this->plugin->options['queue_processor_realtime_max_limit']) <= 0)
+					return; // Real-time queue processing is not enabled right now.
+
+				$upper_max_limit = (integer)apply_filters(__CLASS__.'_upper_max_limit', 100);
+				if($realtime_max_limit > $upper_max_limit) $realtime_max_limit = $upper_max_limit;
+
+				new queue_processor(FALSE, 10, 0, $realtime_max_limit); // No delay.
 			}
 		}
 	}

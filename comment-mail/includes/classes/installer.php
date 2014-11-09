@@ -72,11 +72,11 @@ namespace comment_mail // Root namespace.
 				if(get_option(__NAMESPACE__.'_install_time'))
 					return; // Not applicable.
 
-				$notice = file_get_contents(dirname(dirname(dirname(__FILE__))).'/client-s/images/inline-icon.svg').
-				          ' '.sprintf(__('%1$s&trade; installed successfully! Please see: <a href="%2$s">Config. Options</a>.', $this->plugin->text_domain),
-				                      esc_html($this->plugin->name), esc_attr($this->plugin->utils_url->main_menu_page_only()));
+				$notice_markup = file_get_contents(dirname(dirname(dirname(__FILE__))).'/client-s/images/inline-icon.svg').
+				                 ' '.sprintf(__('%1$s&trade; installed successfully! Please <a href="%2$s"><strong>click here to configure</strong></a> basic options.', $this->plugin->text_domain),
+				                             esc_html($this->plugin->name), esc_attr($this->plugin->utils_url->main_menu_page_only()));
 
-				$this->plugin->enqueue_user_notice($notice); // A quick reminder to configure options.
+				$this->plugin->enqueue_user_notice($notice_markup); // A quick reminder to configure options.
 			}
 
 			/**

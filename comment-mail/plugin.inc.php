@@ -400,6 +400,7 @@ namespace comment_mail
 					'queue_processor_max_time'                                             => '30', // In seconds.
 					'queue_processor_delay'                                                => '250', // In milliseconds.
 					'queue_processor_max_limit'                                            => '100', // Total queue entries.
+					'queue_processor_realtime_max_limit'                                   => '5', // Total queue entries.
 
 					'sub_cleaner_max_time'                                                 => '30', // In seconds.
 					'unconfirmed_expiration_time'                                          => '60 days', // `strtotime()` compatible.
@@ -426,10 +427,13 @@ namespace comment_mail
 					'comment_select_options_enable'                                        => '1', // `0|1`; enable?
 					'max_select_options'                                                   => '2000', // Max options.
 
-					/* Related to branding. */
+					/* Related to branding.
+					~ See: <https://wordpress.org/plugins/about/guidelines/>
+					#10. The plugin must NOT embed external links on the public site (like a "powered by" link) without
+					explicitly asking the user's permission. Any such options in the plugin must default to NOT show the link. */
 
-					'email_footer_powered_by_enable'                                       => '1', // `0|1`; enable?
-					'site_footer_powered_by_enable'                                        => '1', // `0|1`; enable?
+					'email_footer_powered_by_enable'                                       => '0', // `0|1`; enable?
+					'site_footer_powered_by_enable'                                        => '0', // `0|1`; enable?
 
 					/* Template-related site templates. */
 
@@ -446,6 +450,7 @@ namespace comment_mail
 
 					'template__site__sub_actions__confirmed'                               => '', // HTML/PHP code.
 					'template__site__sub_actions__unsubscribed'                            => '', // HTML/PHP code.
+					'template__site__sub_actions__unsubscribed_all'                        => '', // HTML/PHP code.
 					'template__site__sub_actions__manage_summary'                          => '', // HTML/PHP code.
 					'template__site__sub_actions__manage_sub_form'                         => '', // HTML/PHP code.
 					'template__site__sub_actions__manage_sub_form_comment_id_row_via_ajax' => '', // HTML/PHP code.
@@ -662,6 +667,39 @@ namespace comment_mail
 			}
 
 			/*
+			 * Option-Related Methods
+			 */
+
+			/**
+			 * Saves new plugin options.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param array $options An array of new plugin options.
+			 */
+			public function options_save(array $options)
+			{
+				$this->plugin->options = array_merge($this->plugin->default_options, $this->plugin->options, $options);
+				$this->plugin->options = array_intersect_key($this->plugin->options, $this->plugin->default_options);
+
+				foreach($this->plugin->options as $_template_option_key => &$_option_template)
+					if(strpos($_template_option_key, 'template__') === 0) // Only looking at templates.
+					{
+						$_template_file    = template::option_key_to_file($_template_option_key);
+						$_default_template = new template($_template_file, TRUE);
+
+						$_option_template_nws  = preg_replace('/\s+/', '', $_option_template);
+						$_default_template_nws = preg_replace('/\s+/', '', $_default_template->file_contents());
+
+						if($_option_template_nws === $_default_template_nws)
+							$_option_template = ''; // Empty; it's a default value.
+					}
+				unset($_template_option_key, $_option_template, $_template_file, $_default_template, $_option_template_nws, $_default_template_nws); // Housekeeping.
+
+				update_option(__NAMESPACE__.'_options', $this->plugin->options); // Update plugin options.
+			}
+
+			/*
 			 * Admin Meta-Box-Related Methods
 			 */
 
@@ -739,7 +777,7 @@ namespace comment_mail
 
 				$deps = array('chosen', 'font-awesome', 'sharkicons'); // Dependencies.
 
-				if($this->utils_env->is_menu_page(__NAMESPACE__)) // Main options page only.
+				if($this->utils_env->is_menu_page(__NAMESPACE__) || $this->utils_env->is_menu_page(__NAMESPACE__.'_*_templates'))
 				{
 					$deps[] = 'codemirror'; // CodeMirror dependency is added to the array now.
 					wp_enqueue_style('codemirror', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/codemirror.min.css'), array(), NULL, 'all');
@@ -767,7 +805,7 @@ namespace comment_mail
 
 				$deps = array('jquery', 'chosen'); // Dependencies.
 
-				if($this->utils_env->is_menu_page(__NAMESPACE__)) // Main options page only.
+				if($this->utils_env->is_menu_page(__NAMESPACE__) || $this->utils_env->is_menu_page(__NAMESPACE__.'_*_templates'))
 				{
 					$deps[] = 'codemirror'; // CodeMirror dependency is added to the array now.
 					wp_enqueue_script('codemirror', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/codemirror.min.js'), array(), NULL, TRUE);
@@ -808,55 +846,68 @@ namespace comment_mail
 					if(!current_user_can($this->cap))
 						return; // Do not add meta boxes.
 
-				// Menu page titles use UTF-8 char: `⥱`; <http://unicode-table.com/en/2971/>.
-
 				// Menu page icon uses an SVG graphic specifically designed for inline display.
 				$icon = file_get_contents(dirname(__FILE__).'/client-s/images/inline-icon.svg');
 
-				$_ = // Each branch uses the following UTF-8 char `꜖`; <http://unicode-table.com/en/A716/>.
-					'<span style="inline-block; margin-left:.5em; position:relative; top:-.2em; left:-.2em; font-weight:normal; opacity:0.2;">&#42774;</span> ';
+				$indent = // Indent used by various menu items below.
+					'<span style="inline-block; margin-left:1em;"></span>';
 
-				$__ = // Each branch uses the following UTF-8 char `꜖`; <http://unicode-table.com/en/A716/>.
+				$child_branch_indent = // Each child branch uses the following UTF-8 char `꜖`; <http://unicode-table.com/en/A716/>.
 					'<span style="inline-block; margin-left:1.5em; position:relative; top:-.2em; left:-.2em; font-weight:normal; opacity:0.2;">&#42774;</span> ';
 
-				$menu_title                           = $this->name.'&trade; '.$icon;
+				$divider = // Dividing line used by various menu items below.
+					'<span style="display:block; padding:0; margin:0 0 12px 0; height:1px; line-height:1px; background:#CCCCCC; opacity:0.1;"></span>';
+
+				// Menu page titles use UTF-8 char: `⥱`; <http://unicode-table.com/en/2971/>.
+
+				$menu_title                           = $divider.$this->name.'&trade; '.$icon;
 				$page_title                           = $this->name.'&trade;'; // w/o icon.
 				$this->menu_page_hooks[__NAMESPACE__] = add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__], array($this, 'menu_page_options_screen'));
 
-				$menu_title                                   = $_.__('Subscriptions', $this->text_domain);
+				$menu_title                                   = $divider.$indent.__('Subscriptions', $this->text_domain);
 				$page_title                                   = $this->name.'&trade; &#10609; '.__('Subscriptions', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_subs'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_subs', array($this, 'menu_page_subs'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_subs'], array($this, 'menu_page_subs_screen'));
 
-				$menu_title                                            = $__.__('Event Log', $this->text_domain);
+				$menu_title                                            = $child_branch_indent.__('Event Log', $this->text_domain);
 				$page_title                                            = $this->name.'&trade; &#10609; '.__('Sub. Event Log', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_sub_event_log'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_sub_event_log', array($this, 'menu_page_sub_event_log'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_sub_event_log'], array($this, 'menu_page_sub_event_log_screen'));
 
-				$menu_title                                    = $_.__('Mail Queue', $this->text_domain);
+				$menu_title                                    = $divider.$indent.__('Mail Queue', $this->text_domain);
 				$page_title                                    = $this->name.'&trade; &#10609; '.__('Mail Queue', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_queue'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue'], array($this, 'menu_page_queue_screen'));
 
-				$menu_title                                              = $__.__('Event Log', $this->text_domain);
+				$menu_title                                              = $child_branch_indent.__('Event Log', $this->text_domain);
 				$page_title                                              = $this->name.'&trade; &#10609; '.__('Queue Event Log', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_queue_event_log', array($this, 'menu_page_queue_event_log'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'], array($this, 'menu_page_queue_event_log_screen'));
 
-				$menu_title                                    = $_.__('Statistics', $this->text_domain);
-				$page_title                                    = $this->name.'&trade; &#10609; '.__('Statistics', $this->text_domain);
+				$menu_title                                    = $divider.$indent.__('Statistics/Charts', $this->text_domain);
+				$page_title                                    = $this->name.'&trade; &#10609; '.__('Statistics/Charts', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_stats'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_stats', array($this, 'menu_page_stats'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_stats'], array($this, 'menu_page_stats_screen'));
 
-				$menu_title = $_.__('Config. Options', $this->text_domain);
+				$menu_title = $divider.$indent.__('Config. Options', $this->text_domain);
 				$page_title = $this->name.'&trade; &#10609; '.__('Config. Options', $this->text_domain);
 				add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
 
-				$menu_title                                            = $_.__('Import/Export', $this->text_domain);
+				$menu_title                                            = $indent.__('Import/Export', $this->text_domain);
 				$page_title                                            = $this->name.'&trade; &#10609; '.__('Import/Export', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_import_export'] = add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__.'_import_export', array($this, 'menu_page_import_export'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_import_export'], array($this, 'menu_page_import_export_screen'));
+
+				$menu_title                                              = $indent.__('Email Templates', $this->text_domain);
+				$page_title                                              = $this->name.'&trade; &#10609; '.__('Email Templates', $this->text_domain);
+				$this->menu_page_hooks[__NAMESPACE__.'_email_templates'] = add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__.'_email_templates', array($this, 'menu_page_email_templates'));
+				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_email_templates'], array($this, 'menu_page_email_templates_screen'));
+
+				$menu_title                                             = $indent.__('Site Templates', $this->text_domain);
+				$page_title                                             = $this->name.'&trade; &#10609; '.__('Site Templates', $this->text_domain);
+				$this->menu_page_hooks[__NAMESPACE__.'_site_templates'] = add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__.'_site_templates', array($this, 'menu_page_site_templates'));
+				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_site_templates'], array($this, 'menu_page_site_templates_screen'));
 			}
 
 			/**
@@ -1170,6 +1221,74 @@ namespace comment_mail
 			public function menu_page_import_export()
 			{
 				new menu_page('import_export');
+			}
+
+			/**
+			 * Menu page screen; for email templates.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_email_templates']` action.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_email_templates_screen()
+			{
+				$screen = get_current_screen();
+				if(!($screen instanceof \WP_Screen))
+					return; // Not possible.
+
+				if(empty($this->menu_page_hooks[__NAMESPACE__.'_email_templates'])
+				   || $screen->id !== $this->menu_page_hooks[__NAMESPACE__.'_email_templates']
+				) return; // Not applicable.
+
+				return; // No screen for this page right now.
+			}
+
+			/**
+			 * Menu page for email templates.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_email_templates()
+			{
+				new menu_page('email_templates');
+			}
+
+			/**
+			 * Menu page screen; for site templates.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_site_templates']` action.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_site_templates_screen()
+			{
+				$screen = get_current_screen();
+				if(!($screen instanceof \WP_Screen))
+					return; // Not possible.
+
+				if(empty($this->menu_page_hooks[__NAMESPACE__.'_site_templates'])
+				   || $screen->id !== $this->menu_page_hooks[__NAMESPACE__.'_site_templates']
+				) return; // Not applicable.
+
+				return; // No screen for this page right now.
+			}
+
+			/**
+			 * Menu page for site templates.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @see add_menu_pages()
+			 */
+			public function menu_page_site_templates()
+			{
+				new menu_page('site_templates');
 			}
 
 			/**

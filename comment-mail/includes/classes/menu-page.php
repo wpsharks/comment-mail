@@ -71,14 +71,19 @@ namespace comment_mail // Root namespace.
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_only()).'" novalidate="novalidate">'."\n";
 
 				echo '      '.$this->heading(__('Plugin Options', $this->plugin->text_domain), 'logo.png').
-				     '      '.$this->notifications(); // Heading/notifications.
+				     '      '.$this->notes(); // Heading/notifications.
 
 				echo '      <div class="pmp-body">'."\n";
 
-				echo '<h2 class="pmp-section-heading">'.
-				     '   '.__('Basic Configuration (Required)', $this->plugin->text_domain).
-				     '   <small>'.sprintf(__('Please review these basic options &amp; %1$s&trade; is ready-to-go!', $this->plugin->text_domain), esc_html($this->plugin->name)).'</small>'.
-				     '</h2>';
+				echo '         '.$this->all_panel_togglers();
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '         <h2 class="pmp-section-heading">'.
+				     '            '.__('Basic Configuration (Required)', $this->plugin->text_domain).
+				     '            <small'.($this->plugin->install_time() > strtotime('-1 hour') ? ' class="pmp-hilite"' : '').'>'.
+				     sprintf(__('Review these basic options and %1$s&trade; will be ready-to-go!', $this->plugin->text_domain), esc_html($this->plugin->name)).'</small>'.
+				     '         </h2>';
 
 				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
@@ -147,7 +152,9 @@ namespace comment_mail // Root namespace.
 				                ' </table>'.
 				                '</div>';
 
-				echo $this->panel('Enable/Disable', $_panel_body, array('open' => !$this->plugin->options['enable']));
+				echo $this->panel(__('Enable/Disable', $this->plugin->text_domain), $_panel_body, array('open' => !$this->plugin->options['enable']));
+
+				unset($_panel_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -169,7 +176,9 @@ namespace comment_mail // Root namespace.
 				               '  </tbody>'.
 				               '</table>';
 
-				echo $this->panel('Data Safeguards', $_panel_body, array());
+				echo $this->panel(__('Data Safeguards', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -231,7 +240,9 @@ namespace comment_mail // Root namespace.
 				                '  </tbody>'.
 				                ' </table>';
 
-				echo $this->panel('Email Message Headers', $_panel_body, array());
+				echo $this->panel(__('Email Message Headers', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -255,7 +266,7 @@ namespace comment_mail // Root namespace.
 					                array(
 						                'label'         => sprintf(__('Mailing Address (Required for %1$s)', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/CAN-SPAM_Act_of_2003', __('CAN-SPAM Compliance', $this->plugin->text_domain))),
 						                'placeholder'   => __('e.g. 123 Somewhere Street; Somewhere, USA 99999', $this->plugin->text_domain),
-						                'cm_mode'       => 'text/html',
+						                'cm_mode'       => 'text/html', 'cm_height' => 150,
 						                'name'          => 'can_spam_mailing_address',
 						                'current_value' => $current_value_for('can_spam_mailing_address'),
 						                'notes_before'  => '<p class="pmp-note pmp-notice">'.sprintf(__('Please be sure to provide a mailing address that %1$s can include at the bottom of every email that it sends. This is required for %2$s.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/CAN-SPAM_Act_of_2003', __('CAN-SPAM Compliance', $this->plugin->text_domain))).'</p>',
@@ -278,14 +289,58 @@ namespace comment_mail // Root namespace.
 				                '  </tbody>'.
 				                '</table>';
 
-				echo $this->panel('CAN-SPAM Compliance', $_panel_body, array());
+				echo $this->panel(__('CAN-SPAM Compliance', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
-				echo '<h2 class="pmp-section-heading">'.
-				     '   '.__('Advanced Configuration (All Optional)', $this->plugin->text_domain).
-				     '   <small>'.__('Recommended for advanced site owners only; already pre-configured for most WP installs.', $this->plugin->text_domain).'</small>'.
-				     '</h2>';
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->select_row(
+					               array(
+						               'label'           => sprintf(__('Enable "<small><code>Powered by %1$s&trade;</code></small>" in Email Footer?', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						               'field_class'     => 'no-if-enabled',
+						               'name'            => 'email_footer_powered_by_enable',
+						               'current_value'   => $current_value_for('email_footer_powered_by_enable'),
+						               'allow_arbitrary' => FALSE,
+						               'options'         => array(
+							               '1' => sprintf(__('Yes, enable "powered by" note at the bottom of all emails sent by %1$s&trade;', $this->plugin->text_domain), esc_html($this->plugin->name)),
+							               '0' => sprintf(__('No, disable "powered by" note', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						               ),
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				$_panel_body .= '<table>'.
+				                '  <tbody>'.
+				                $form_fields->select_row(
+					                array(
+						                'label'           => sprintf(__('Enable "<small><code>Powered by %1$s&trade;</code></small>" in Site Footer?', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						                'field_class'     => 'no-if-enabled',
+						                'name'            => 'site_footer_powered_by_enable',
+						                'current_value'   => $current_value_for('site_footer_powered_by_enable'),
+						                'allow_arbitrary' => FALSE,
+						                'options'         => array(
+							                '1' => sprintf(__('Yes, enable "powered by" note at the bottom of all pages generated by %1$s&trade;', $this->plugin->text_domain), esc_html($this->plugin->name)),
+							                '0' => sprintf(__('No, disable "powered by" note', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						                ),
+					                )).
+				                '  </tbody>'.
+				                '</table>';
+
+				echo $this->panel(__('Powered by Notes', $this->plugin->text_domain), $_panel_body, array('note' => sprintf(__('Help support %1$s&trade;', $this->plugin->text_domain), esc_html($this->plugin->name))));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '         <h2 class="pmp-section-heading">'.
+				     '            '.__('Advanced Configuration (All Optional)', $this->plugin->text_domain).
+				     '            <small>'.__('Recommended for advanced site owners only; already pre-configured for most WP installs.', $this->plugin->text_domain).'</small>'.
+				     '         </h2>';
 
 				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
@@ -335,7 +390,7 @@ namespace comment_mail // Root namespace.
 					                array(
 						                'label'         => __('Comment Form Subscr. Options Template', $this->plugin->text_domain),
 						                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						                'cm_mode'       => 'application/x-httpd-php',
+						                'cm_mode'       => 'application/x-httpd-php', 'cm_height' => 250,
 						                'name'          => 'template__site__comment_form__sub_ops',
 						                'current_value' => $current_value_for('template__site__comment_form__sub_ops'),
 						                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
@@ -384,7 +439,9 @@ namespace comment_mail // Root namespace.
 				                '  </table>'.
 				                '</div>';
 
-				echo $this->panel('Comment Form', $_panel_body, array());
+				echo $this->panel(__('Comment Form', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -476,7 +533,9 @@ namespace comment_mail // Root namespace.
 				                ' </table>'.
 				                '</div>';
 
-				echo $this->panel('Auto-Subscribe Settings', $_panel_body, array());
+				echo $this->panel(__('Auto-Subscribe Settings', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -554,7 +613,9 @@ namespace comment_mail // Root namespace.
 				                ' </tbody>'.
 				                '</table>';
 
-				echo $this->panel('Auto-Confirm Settings', $_panel_body, array());
+				echo $this->panel(__('Auto-Confirm Settings', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -588,7 +649,9 @@ namespace comment_mail // Root namespace.
 				                '  </tbody>'.
 				                '</table>';
 
-				echo $this->panel('Email Notification Clips', $_panel_body, array());
+				echo $this->panel(__('Email Notification Clips', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -778,7 +841,9 @@ namespace comment_mail // Root namespace.
 				                ' </table>'.
 				                '</div>';
 
-				echo $this->panel('SMTP Server Integration', $_panel_body, array());
+				echo $this->panel(__('SMTP Server Integration', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -799,7 +864,9 @@ namespace comment_mail // Root namespace.
 				               '  </tbody>'.
 				               '</table>';
 
-				echo $this->panel('Blacklisted Email Addresses', $_panel_body, array());
+				echo $this->panel(__('Blacklisted Email Addresses', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -895,7 +962,27 @@ namespace comment_mail // Root namespace.
 				                '  </tbody>'.
 				                '</table>';
 
-				echo $this->panel('Performance Tuning Adjustments', $_panel_body, array());
+				$_panel_body .= '<hr />';
+
+				$_panel_body .= '<table>'.
+				                '  <tbody>'.
+				                $form_fields->input_row(
+					                array(
+						                'type'          => 'number',
+						                'label'         => __('Real-Time Queue Processor; Max Email Notifications in Real-Time', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g. 5', $this->plugin->text_domain),
+						                'name'          => 'queue_processor_realtime_max_limit',
+						                'current_value' => $current_value_for('queue_processor_realtime_max_limit'),
+						                'other_attrs'   => 'min="0" max="100"',
+						                'notes_after'   => '<p>'.__('In addition to the Queue Processor running via WP-Cron, it can also run in real-time as a comment is being posted (assuming that particular comment is automatically approved; i.e. that it doesn\'t require administrative approval). In cases where it\'s possible, real-time queue processing allows for easier testing and for more-immediate notifications. It is particularly helpful on posts that only have just a few subscribers anyway. There is no mass-mailing needed in such a scenario.', $this->plugin->text_domain).'</p>'.
+						                                   '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> It is recommended that you keep this number very low; i.e. just a few notifications should be attempted in real-time. The rest (if there are any) can be handled by queue processes running via WP-Cron on a regular schedule. A suggested setting for this option is <code>5</code>. If you set this to <code>0</code> it will effectively disable real-time queue processing if you so desire. There is an upper limit of <code>100</code> to avoid serious real-time processing delays for end-users. Under no circumstance (no matter what you configure here), will real-time processing ever be allowed to continue for more than <code>10</code> seconds. Therefore, whatever you configure here will be a maximum allowed within the <code>10</code> second timeframe. If you set this too high for completion within <code>10</code> seconds, whatever remains will be processed by WP-Cron queue runners later.', $this->plugin->text_domain).'</p>'
+					                )).
+				                '  </tbody>'.
+				                '</table>';
+
+				echo $this->panel(__('Performance Tuning Adjustments', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -912,7 +999,9 @@ namespace comment_mail // Root namespace.
 				               '  </tbody>'.
 				               '</table>';
 
-				echo $this->panel('Subscription Management Access', $_panel_body, array());
+				echo $this->panel(__('Subscription Management Access', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -929,7 +1018,9 @@ namespace comment_mail // Root namespace.
 				               '  </tbody>'.
 				               '</table>';
 
-				echo $this->panel('Post Meta Box Settings', $_panel_body, array());
+				echo $this->panel(__('Post Meta Box Settings', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -1047,7 +1138,9 @@ namespace comment_mail // Root namespace.
 				                '  </tbody>'.
 				                '</table>';
 
-				echo $this->panel('Misc. UI-Related Settings', $_panel_body, array());
+				echo $this->panel(__('Misc. UI-Related Settings', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -1065,23 +1158,130 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
+			protected function stats_()
+			{
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-stats '.$this->plugin->slug.'-menu-page-area').'">'."\n";
+
+				echo '   '.$this->heading(__('Statistics', $this->plugin->text_domain), 'logo.png').
+				     '   '.$this->notes(); // Heading/notifications.
+
+				echo '   <div class="pmp-body">'."\n";
+
+				echo '         '.$this->all_panel_togglers();
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '   '.__('Coming soon...', $this->plugin->text_domain)."\n";
+
+				echo '   </div>'."\n";
+				echo '</div>';
+			}
+
+			/**
+			 * Displays menu page.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
 			protected function import_export_()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-import-export '.$this->plugin->slug.'-menu-page-area').'">'."\n";
 
 				echo '   '.$this->heading(__('Import/Export', $this->plugin->text_domain), 'logo.png').
-				     '   '.$this->notifications(); // Heading/notifications.
+				     '   '.$this->notes(); // Heading/notifications.
 
 				echo '   <div class="pmp-body">'."\n";
 
+				echo '         '.$this->all_panel_togglers();
+
 				/* ----------------------------------------------------------------------------------------- */
 
-				echo '<h2 class="pmp-section-heading">'.
-				     '   '.__('Subscriptions Import/Export (Optional)', $this->plugin->text_domain).
-				     '   <small>'.__('This allows you to import/export subscriptions from other software.', $this->plugin->text_domain).'</small>'.
-				     '</h2>';
+				echo '      <h2 class="pmp-section-heading">'.
+				     '         '.__('Import/Export Subscriptions', $this->plugin->text_domain).
+				     '         <small>'.sprintf(__('This allows you to import/export %1$s&trade; subscriptions.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</small>'.
+				     '      </h2>';
 
 				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+				$_form_field_args = array(
+					'ns_id_suffix'   => '-import-subs-form',
+					'ns_name_suffix' => '[import]',
+					'class_prefix'   => 'pmp-import-subs-form-',
+				);
+				$_form_fields     = new form_fields($_form_field_args);
+
+				$_panel_body = '<form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_only()).'" novalidate="novalidate">'."\n";
+
+				$_panel_body .= ' <h3 style="margin-bottom:0;">'.sprintf(__('Import New %1$s&trade; Subscriptions, or Update Existing Subscriptions', $this->plugin->text_domain), esc_html($this->plugin->name)).'</h3>';
+				$_panel_body .= ' <p>'.sprintf(__('The importation routine will accept direct CSV input in the textarea below, or you can choose to upload a prepared CSV file.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>';
+				$_panel_body .= ' <p class="pmp-note pmp-notice" style="font-size:90%;">'.sprintf(__('<strong>Note:</strong> The format required for importation is %2$s. For mass updates, an <code>"ID"</code> is the only column that is absolutely required. The <code>"ID"</code> column (if present) indicates that you want to update an existing subscription with a particular ID. However, for new subscriptions; please omit the <code>"ID"</code> column. When importing new subscriptions, your CSV file need only contain the <code>"email"</code> and <code>"post_id"</code> columns. There are %3$s w/ a full list of all possible import columns. In either case (direct input or file upload) the first line should be a list of columns you\'re importing; aka: headers.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Comma-separated_values', 'CSV (Comma Separated Values)'), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/CSV-Subscription-Imports', __('additional details here', $this->plugin->text_domain))).'</p>';
+				$_panel_body .= ' <p class="pmp-note pmp-info" style="font-size:90%;">'.sprintf(__('<strong>Tip:</strong> If you\'re looking for more elaborate examples, you can simply use the "CSV Export" panel on this page. The easiest way to see how this works is by looking at a CSV export file generated by %1$s&trade; itself. That\'s the format you should follow please. In fact, you could even pull an export, make changes to the file, and then import that modified file to mass update existing subscriptions.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>';
+				$_panel_body .= ' <p class="pmp-note pmp-warning" style="font-size:90%;">'.sprintf(__('<strong>Upper Limits:</strong> There is an upper limit of <code>5000</code> lines allowed per import; i.e. you must limit each import to this number of lines so as to avoid extremely long-running PHP processes. In addition, given your current web host (i.e. PHP configuration); if you choose to upload a prepared CSV file, the maximum allowed file upload size is currently: <code>%1$s</code>.', $this->plugin->text_domain), esc_html($this->plugin->utils_fs->bytes_abbr($this->plugin->utils_env->max_upload_size()))).'</p>';
+
+				$_panel_body .= ' <table>'.
+				                '   <tbody>'.
+				                $_form_fields->textarea_row(
+					                array(
+						                'label'         => __('Direct CSV Input Data:', $this->plugin->text_domain),
+						                'placeholder'   => __('"email", "post_id", "status"'."\n".'"john@example.com", "1", "subscribed"', $this->plugin->text_domain),
+						                'name'          => 'data',
+						                'rows'          => 15,
+						                'current_value' => !empty($_POST[__NAMESPACE__]['import']['data']) ? trim(stripslashes((string)$_POST[__NAMESPACE__]['import']['data'])) : NULL,
+						                'notes_before'  => '<p>'.__('The first line of this input should be CSV headers; e.g. <code>"email", "post_id", "status"</code>', $this->plugin->text_domain).'</p>',
+					                )).
+				                '   </tbody>'.
+				                ' </table>';
+
+				$_panel_body .= ' <hr />';
+
+				$_panel_body .= ' <table>'.
+				                '   <tbody>'.
+				                $_form_fields->input_row(
+					                array(
+						                'type'         => 'file',
+						                'label'        => __('Or, a Prepared CSV File Upload:', $this->plugin->text_domain),
+						                'placeholder'  => __('e.g. comment-subscriptions.csv', $this->plugin->text_domain),
+						                'name'         => 'data_file',
+						                'notes_before' => '<p>'.__('The first line of this file should be CSV headers; e.g. <code>"email", "post_id", "status"</code>', $this->plugin->text_domain).'</p>',
+						                'notes_after'  => '<p>'.__('If you upload a file, it will be used instead of any direct input above; i.e. a file takes precedence over direct input.', $this->plugin->text_domain).'</p>',
+					                )).
+				                '   </tbody>'.
+				                ' </table>';
+
+				if(!$this->plugin->options['auto_confirm_force_enable'])
+				{
+					$_panel_body .= ' <hr />';
+
+					$_panel_body .= '  <table>'.
+					                '    <tbody>'.
+					                $_form_fields->input_row(
+						                array(
+							                'type'           => 'checkbox',
+							                'label'          => __('Process Email Confirmations?', $this->plugin->text_domain),
+							                'checkbox_label' => __('Yes, send an email confirmation to anyone being inserted or updated with an <code>unconfirmed</code> status.', $this->plugin->text_domain),
+							                'name'           => 'process_confirmations',
+							                'current_value'  => '1',
+							                'notes_before'   => '<p class="pmp-note pmp-warning">'.__('<strong>Warning:</strong> Please be cautious with this choice. If you import new subscriptions and don\'t specify a particular status, the default status is <code>unconfirmed</code>. Thus, checking this box will attempt to confirm new subscriptions via email. Depending on the number of subscriptions you\'re importing, this could be a very large number of emails going out all at one time! Please use this with extreme caution.', $this->plugin->text_domain).'</p>'
+						                )).
+					                '    </tbody>'.
+					                '  </table>';
+				}
+				$_panel_body .= ' <hr />';
+
+				$_panel_body .= ' <div style="display:none;">'.
+				                '  '.$_form_fields->hidden_input(array('name' => 'type', 'current_value' => 'subs')).
+				                ' </div>';
+
+				$_panel_body .= ' <button type="submit" style="width:100%;">'.
+				                '  '.__('Import Now', $this->plugin->text_domain).' <i class="fa fa-upload"></i>'.
+				                ' </button>';
+
+				$_panel_body .= '</form>';
+
+				echo $this->panel(__('CSV Import and/or Mass Update', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-upload"></i>'));
+
+				unset($_form_field_args, $_form_fields, $_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
 
 				if(import_stcr::data_exists())
 				{
@@ -1094,28 +1294,189 @@ namespace comment_mail // Root namespace.
 
 					$_panel_body = '<form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_only()).'"'.
 					               ' target="'.esc_attr(__NAMESPACE__.'_import_stcr_iframe').'" novalidate="novalidate">'."\n";
-					$_panel_body .= $_form_fields->hidden_input(array('name' => 'type', 'current_value' => 'stcr'));
-					$_panel_body .= ' <button type="submit" class="pmp-right" style="margin-bottom:1em;">'.
-					                ' '.__('Begin StCR Auto-Importation', $this->plugin->text_domain).' <i class="fa fa-magic"></i>'.
-					                '</button>';
+
+					$_panel_body .= ' <table style="table-layout:auto;">'.
+					                '    <tbody>'.
+					                '       <tr>';
+					$_panel_body .= '          <td style="white-space:nowrap;">'.
+					                '             <button type="submit" class="pmp-left">'.
+					                '                '.__('Begin StCR Auto-Importation', $this->plugin->text_domain).' <i class="fa fa-magic"></i>'.
+					                '             </button>'.
+					                '          </td>';
+					$_panel_body .= '          <td style="width:100%;">'.
+					                '             <p>'.sprintf(__('%1$s&trade; has detected that you have data in your WordPress database tables containing comment subscriptions associated with Subscribe to Comments Reloaded (StCR). If you would like %1$s to import this data automagically, please click this button to proceed.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'.
+					                '          </td>';
+					$_panel_body .= '       </tr>'.
+					                '    </tbody>'.
+					                ' </table>';
+
+					$_panel_body .= ' <div style="display:none;">'.
+					                '  '.$_form_fields->hidden_input(array('name' => 'type', 'current_value' => 'stcr')).
+					                ' </div>';
+
+					$_panel_body .= ' <p class="pmp-note pmp-info" style="font-size:90%;">'.sprintf(__('<strong>Note:</strong> This process may take several minutes. %1$s will work through each post in your database, collecting all of the StCR subscriptions that exist (just a few at a time to prevent any script timeouts). The status bar below may refresh several times during this process. When it\'s complete, you should see a message that reads "<strong>Import complete!</strong>", along with a few details regarding the importation. When it is finished, you may <a href="%2$s">click here</a> to view a list of all subscriptions; which will include any that were imported from StCR. If the importation is interrupted for any reason, you may simply click the button again and %1$s will resume where it left off.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_attr($this->plugin->utils_url->subs_menu_page_only())).'</p>';
+
 					$_panel_body .= '</form>';
 
 					$_panel_body .= '<iframe src="'.esc_attr($this->plugin->utils_url->to('/client-s/blanks/cccccc.html')).'" name="'.esc_attr(__NAMESPACE__.'_import_stcr_iframe').'" class="pmp-import-iframe-output"></iframe>';
 
-					echo $this->panel('Subscribe to Comments Reloaded', $_panel_body, array('open' => !import_stcr::ever_imported()));
+					echo $this->panel(__('Subscribe to Comments Reloaded (StCR)', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-upload"></i>', 'open' => !import_stcr::ever_imported()));
+
+					unset($_form_field_args, $_form_fields, $_panel_body); // Housekeeping.
 				}
 				/* ----------------------------------------------------------------------------------------- */
 
-				echo '<h2 class="pmp-section-heading">'.
-				     '   '.__('Config. Options Import/Export (Optional)', $this->plugin->text_domain).
-				     '   <small>'.__('This allows you to import/export config. options from other WP installations.', $this->plugin->text_domain).'</small>'.
-				     '</h2>';
+				$_form_field_args = array(
+					'ns_id_suffix'   => '-export-subs-form',
+					'ns_name_suffix' => '[export]',
+					'class_prefix'   => 'pmp-export-subs-form-',
+				);
+				$_form_fields     = new form_fields($_form_field_args);
+
+				$_panel_body = '<form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_only()).'" novalidate="novalidate">'."\n";
+
+				$_total_subs_in_db = $this->plugin->utils_sub->query_total(NULL, array('auto_discount_trash' => FALSE));
+				$_panel_body .= ' <h3 style="margin-bottom:0;">'.sprintf(__('Export All of your %1$s&trade; Subscriptions', $this->plugin->text_domain), esc_html($this->plugin->name)).'</h3>';
+				$_panel_body .= ' <p>'.sprintf(__('There are currently %1$s in the database. You can export these in sets of however many you like, as configured below.', $this->plugin->text_domain), esc_html($this->plugin->utils_i18n->subscriptions($_total_subs_in_db))).'</p>';
+
+				$_panel_body .= ' <table>'.
+				                '    <tbody>'.
+				                $_form_fields->input_row(
+					                array(
+						                'type'          => 'number',
+						                'label'         => __('Start Position:', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g. 1', $this->plugin->text_domain),
+						                'name'          => 'start_from',
+						                'current_value' => '1',
+						                'other_attrs'   => 'min="1"',
+						                'notes_after'   => '<p>'.__('e.g. If you already downloaded the first 1000, set this to <code>1001</code> to export the next set.', $this->plugin->text_domain).'</p>'
+					                )).
+				                '    </tbody>'.
+				                ' </table>';
+
+				$_panel_body .= '  <table>'.
+				                '    <tbody>'.
+				                $_form_fields->input_row(
+					                array(
+						                'type'          => 'number',
+						                'label'         => __('Max Subscriptions in this Set:', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g. 1000', $this->plugin->text_domain),
+						                'name'          => 'max_limit',
+						                'current_value' => '1000',
+						                'other_attrs'   => 'min="1" max="5000"',
+						                'notes_after'   => '<p>'.__('e.g. If you start from <code>1</code> and set this to <code>1000</code>, you will get the first 1000 DB rows. If you want the next 1000 rows, set Start Position to <code>1001</code> and leave this as-is.', $this->plugin->text_domain).'</p>'.
+						                                   '<p class="pmp-note pmp-warning">'.__('<strong>Upper Limit:</strong> There is an upper limit of <code>5000</code> per file to prevent extremely slow DB queries; i.e. you cannot set this higher than <code>5000</code>.', $this->plugin->text_domain).'</p>'
+					                )).
+				                '    </tbody>'.
+				                '  </table>';
+
+				$_panel_body .= ' <hr />';
+
+				$_panel_body .= '  <table>'.
+				                '    <tbody>'.
+				                $_form_fields->input_row(
+					                array(
+						                'type'           => 'checkbox',
+						                'label'          => __('Include UTF-8 BOM (Byte Order Marker)?', $this->plugin->text_domain),
+						                'checkbox_label' => __('Yes, my spreadsheet application needs this to detect UTF-8 encoding properly.', $this->plugin->text_domain),
+						                'name'           => 'include_utf8_bom',
+						                'current_value'  => '1',
+					                )).
+				                '    </tbody>'.
+				                '  </table>';
+
+				$_panel_body .= ' <hr />';
+
+				$_panel_body .= ' <div style="display:none;">'.
+				                '  '.$_form_fields->hidden_input(array('name' => 'type', 'current_value' => 'subs')).
+				                ' </div>';
+
+				$_panel_body .= ' <button type="submit" style="width:100%;">'.
+				                '  '.__('Download CSV Export File', $this->plugin->text_domain).' <i class="fa fa-download"></i>'.
+				                ' </button>';
+
+				$_panel_body .= '</form>';
+
+				echo $this->panel(__('CSV Export (File Download)', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-download"></i>'));
+
+				unset($_form_field_args, $_form_fields, $_total_subs_in_db, $_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '      <h2 class="pmp-section-heading">'.
+				     '         '.__('Import/Export Config. Options', $this->plugin->text_domain).
+				     '         <small>'.sprintf(__('This allows you to import/export %1$s&trade; configuration options.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</small>'.
+				     '      </h2>';
 
 				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
-				$_panel_body = ''; // @TODO;
-				echo $this->panel('Import Config. Options', $_panel_body, array());
-				echo $this->panel('Export Config. Options', $_panel_body, array());
+				$_form_field_args = array(
+					'ns_id_suffix'   => '-import-ops-form',
+					'ns_name_suffix' => '[import]',
+					'class_prefix'   => 'pmp-import-ops-form-',
+				);
+				$_form_fields     = new form_fields($_form_field_args);
+
+				$_panel_body = '<form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_only()).'" novalidate="novalidate">'."\n";
+
+				$_panel_body .= ' <h3 style="margin-bottom:0;">'.sprintf(__('Import a New Set of %1$s&trade; Config. Options', $this->plugin->text_domain), esc_html($this->plugin->name)).'</h3>';
+				$_panel_body .= ' <p>'.sprintf(__('Configuration options are imported using a JSON-encoded file obtained from another copy of %1$s&trade;.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>';
+				$_panel_body .= ' <p class="pmp-note pmp-info" style="font-size:90%;">'.sprintf(__('<strong>Tip:</strong> To save time you can import your options from another WordPress installation where you\'ve already configured %1$s&trade; before.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>';
+
+				$_panel_body .= ' <table>'.
+				                '   <tbody>'.
+				                $_form_fields->input_row(
+					                array(
+						                'type'        => 'file',
+						                'label'       => __('JSON Config. Options File:', $this->plugin->text_domain),
+						                'placeholder' => __('e.g. config-options.json', $this->plugin->text_domain),
+						                'name'        => 'data_file',
+					                )).
+				                '   </tbody>'.
+				                ' </table>';
+
+				$_panel_body .= ' <div style="display:none;">'.
+				                '  '.$_form_fields->hidden_input(array('name' => 'type', 'current_value' => 'ops')).
+				                ' </div>';
+
+				$_panel_body .= ' <button type="submit" style="width:100%;">'.
+				                '  '.__('Import JSON Config. Options File', $this->plugin->text_domain).' <i class="fa fa-upload"></i>'.
+				                ' </button>';
+
+				$_panel_body .= '</form>';
+
+				echo $this->panel(__('Import Config. Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-upload"></i>'));
+
+				unset($_form_field_args, $_form_fields, $_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_form_field_args = array(
+					'ns_id_suffix'   => '-export-ops-form',
+					'ns_name_suffix' => '[export]',
+					'class_prefix'   => 'pmp-export-ops-form-',
+				);
+				$_form_fields     = new form_fields($_form_field_args);
+
+				$_panel_body = '<form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_only()).'" novalidate="novalidate">'."\n";
+
+				$_panel_body .= ' <h3 style="margin-bottom:0;">'.sprintf(__('Export All of your %1$s&trade; Config. Options', $this->plugin->text_domain), esc_html($this->plugin->name)).'</h3>';
+				$_panel_body .= ' <p>'.__('Configuration options are downloaded as a JSON-encoded file.', $this->plugin->text_domain).'</p>';
+				$_panel_body .= ' <p class="pmp-note pmp-info" style="font-size:90%;">'.__('<strong>Tip:</strong> Export your configuration on this site, and then import it into another WordPress installation to save time in the future.', $this->plugin->text_domain).'</p>';
+
+				$_panel_body .= ' <div style="display:none;">'.
+				                '  '.$_form_fields->hidden_input(array('name' => 'type', 'current_value' => 'ops')).
+				                ' </div>';
+
+				$_panel_body .= ' <button type="submit" style="width:100%;">'.
+				                '  '.__('Download JSON Config. Options File', $this->plugin->text_domain).' <i class="fa fa-download"></i>'.
+				                ' </button>';
+
+				$_panel_body .= '</form>';
+
+				echo $this->panel(__('Export Config. Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-download"></i>'));
+
+				unset($_form_field_args, $_form_fields, $_panel_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -1128,18 +1489,655 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function stats_()
+			protected function email_templates_()
 			{
-				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-stats '.$this->plugin->slug.'-menu-page-area').'">'."\n";
+				$_this             = $this;
+				$form_field_args   = array(
+					'ns_id_suffix'   => '-email-templates-form',
+					'ns_name_suffix' => '[save_options]',
+					'class_prefix'   => 'pmp-email-templates-form-',
+				);
+				$form_fields       = new form_fields($form_field_args);
+				$current_value_for = function ($key) use ($_this)
+				{
+					if(strpos($key, 'template__') === 0)
+						if(isset($_this->plugin->options[$key]))
+						{
+							if($_this->plugin->options[$key])
+								return $_this->plugin->options[$key];
 
-				echo '   '.$this->heading(__('Statistics', $this->plugin->text_domain), 'logo.png').
-				     '   '.$this->notifications(); // Heading/notifications.
+							$file             = template::option_key_to_file($key);
+							$default_template = new template($file, TRUE);
 
-				echo '   <div class="pmp-body">'."\n";
+							return $default_template->file_contents();
+						}
+					return isset($_this->plugin->options[$key]) ? $_this->plugin->options[$key] : NULL;
+				};
+				/* ----------------------------------------------------------------------------------------- */
 
-				echo '   '.__('Coming soon...', $this->plugin->text_domain)."\n";
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-email-templates '.$this->plugin->slug.'-menu-page-area').'">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_only()).'" novalidate="novalidate">'."\n";
 
-				echo '   </div>'."\n";
+				echo '      '.$this->heading(__('Email Templates', $this->plugin->text_domain), 'logo.png').
+				     '      '.$this->notes(); // Heading/notifications.
+
+				echo '      <div class="pmp-body">'."\n";
+
+				echo '         '.$this->all_panel_togglers();
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '         <h2 class="pmp-section-heading">'.
+				     '            '.__('Email Header/Footer Templates', $this->plugin->text_domain).
+				     '            <small>'.__('These are used in all emails; i.e. global header/footer.', $this->plugin->text_domain).'</small>'.
+				     '         </h2>';
+
+				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Email Header Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__email__email_header',
+						               'current_value' => $current_value_for('template__email__email_header'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Email Header', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Email Header Styles Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__email__email_header_styles',
+						               'current_value' => $current_value_for('template__email__email_header_styles'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Email Header Styles', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Email Header Scripts Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__email__email_header_scripts',
+						               'current_value' => $current_value_for('template__email__email_header_scripts'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Email Header Scripts', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Email Header Easy Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__email__email_header_easy',
+						               'current_value' => $current_value_for('template__email__email_header_easy'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Email Header Easy', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Email Footer Easy Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__email__email_footer_easy',
+						               'current_value' => $current_value_for('template__email__email_footer_easy'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Email Footer Easy', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Email Footer Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__email__email_footer',
+						               'current_value' => $current_value_for('template__email__email_footer'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Email Footer', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '         <h2 class="pmp-section-heading">'.
+				     '            '.__('Email Subscr. Confirmation Templates', $this->plugin->text_domain).
+				     '            <small>'.sprintf(__('Email subject line &amp; message used in %1$s&trade; confirmation requests.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</small>'.
+				     '         </h2>';
+
+				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Subscr. Confirmation Subject Line Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__email__sub_confirmation__subject',
+						               'current_value' => $current_value_for('template__email__sub_confirmation__subject'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Subscr. Confirmation Subject', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Subscr. Confirmation Message Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__email__sub_confirmation__message',
+						               'current_value' => $current_value_for('template__email__sub_confirmation__message'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Subscr. Confirmation Message', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '         <h2 class="pmp-section-heading">'.
+				     '            '.__('Comment Notification Email Templates', $this->plugin->text_domain).
+				     '            <small>'.sprintf(__('Email subject line &amp; message used in %1$s&trade; notifications.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</small>'.
+				     '         </h2>';
+
+				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Comment Notification Subject Line Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__email__comment_notification__subject',
+						               'current_value' => $current_value_for('template__email__comment_notification__subject'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Comment Notification Subject', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Comment Notification Message Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__email__comment_notification__message',
+						               'current_value' => $current_value_for('template__email__comment_notification__message'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Comment Notification Message', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '         <div class="pmp-save">'."\n";
+				echo '            <button type="submit">'.__('Save All Changes', $this->plugin->text_domain).' <i class="fa fa-save"></i></button>'."\n";
+				echo '         </div>'."\n";
+
+				echo '      </div>'."\n";
+				echo '   </form>'."\n";
+				echo '</div>';
+			}
+
+			/**
+			 * Displays menu page.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function site_templates_()
+			{
+				$_this             = $this;
+				$form_field_args   = array(
+					'ns_id_suffix'   => '-site-templates-form',
+					'ns_name_suffix' => '[save_options]',
+					'class_prefix'   => 'pmp-site-templates-form-',
+				);
+				$form_fields       = new form_fields($form_field_args);
+				$current_value_for = function ($key) use ($_this)
+				{
+					if(strpos($key, 'template__') === 0)
+						if(isset($_this->plugin->options[$key]))
+						{
+							if($_this->plugin->options[$key])
+								return $_this->plugin->options[$key];
+
+							$file             = template::option_key_to_file($key);
+							$default_template = new template($file, TRUE);
+
+							return $default_template->file_contents();
+						}
+					return isset($_this->plugin->options[$key]) ? $_this->plugin->options[$key] : NULL;
+				};
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-site-templates '.$this->plugin->slug.'-menu-page-area').'">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_only()).'" novalidate="novalidate">'."\n";
+
+				echo '      '.$this->heading(__('Site Templates', $this->plugin->text_domain), 'logo.png').
+				     '      '.$this->notes(); // Heading/notifications.
+
+				echo '      <div class="pmp-body">'."\n";
+
+				echo '         '.$this->all_panel_togglers();
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '         <h2 class="pmp-section-heading">'.
+				     '            '.__('Site Header/Footer Templates', $this->plugin->text_domain).
+				     '            <small>'.__('These are used in all portions of the front-end UI; i.e. global header/footer.', $this->plugin->text_domain).'</small>'.
+				     '         </h2>';
+
+				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Site Header Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__site__site_header',
+						               'current_value' => $current_value_for('template__site__site_header'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Site Header', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Site Header Styles Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__site__site_header_styles',
+						               'current_value' => $current_value_for('template__site__site_header_styles'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Site Header Styles', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Site Header Scripts Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__site__site_header_scripts',
+						               'current_value' => $current_value_for('template__site__site_header_scripts'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Site Header Scripts', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Site Header Easy Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__site__site_header_easy',
+						               'current_value' => $current_value_for('template__site__site_header_easy'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Site Header Easy', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Site Footer Easy Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__site__site_footer_easy',
+						               'current_value' => $current_value_for('template__site__site_footer_easy'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Site Footer Easy', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Site Footer Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__site__site_footer',
+						               'current_value' => $current_value_for('template__site__site_footer'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Site Footer', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '         <h2 class="pmp-section-heading">'.
+				     '            '.__('Subscr. Action Templates', $this->plugin->text_domain).
+				     '            <small>'.__('These are shown to a subscriber when they confirm and/or unsubscribe.', $this->plugin->text_domain).'</small>'.
+				     '         </h2>';
+
+				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Subscr. Confirmed Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__site__sub_actions__confirmed',
+						               'current_value' => $current_value_for('template__site__sub_actions__confirmed'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Subscr. Confirmed', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Unsubscribed Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__site__sub_actions__unsubscribed',
+						               'current_value' => $current_value_for('template__site__sub_actions__unsubscribed'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Unsubscribed', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Unsubscribed All Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__site__sub_actions__unsubscribed_all',
+						               'current_value' => $current_value_for('template__site__sub_actions__unsubscribed_all'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Unsubscribed All', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '         <h2 class="pmp-section-heading">'.
+				     '            '.__('Subscr. Summary Templates', $this->plugin->text_domain).
+				     '            <small>'.__('Related to the Summary (aka: "My Subscriptions") page and add/edit form.', $this->plugin->text_domain).'</small>'.
+				     '         </h2>';
+
+				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Summary Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__site__sub_actions__manage_summary',
+						               'current_value' => $current_value_for('template__site__sub_actions__manage_summary'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Summary', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Add/Edit Form Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__site__sub_actions__manage_sub_form',
+						               'current_value' => $current_value_for('template__site__sub_actions__manage_sub_form'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Add/Edit Form', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Add/Edit Form Template (Comment ID Row via AJAX)', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__site__sub_actions__manage_sub_form_comment_id_row_via_ajax',
+						               'current_value' => $current_value_for('template__site__sub_actions__manage_sub_form_comment_id_row_via_ajax'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Comment ID Row via AJAX', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '         <h2 class="pmp-section-heading">'.
+				     '            '.__('Comment Form Templates', $this->plugin->text_domain).
+				     '            <small>'.__('Provides options that allow commenters to subscribe &amp; receive notifications.', $this->plugin->text_domain).'</small>'.
+				     '         </h2>';
+
+				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Comment Form Subscr. Options Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__site__comment_form__sub_ops',
+						               'current_value' => $current_value_for('template__site__comment_form__sub_ops'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Comment Form Subscr. Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Comment Form Scripts for Subscr. Options', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__site__comment_form__sub_op_scripts',
+						               'current_value' => $current_value_for('template__site__comment_form__sub_op_scripts'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Comment Form Scripts for Subscr. Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '         <div class="pmp-save">'."\n";
+				echo '            <button type="submit">'.__('Save All Changes', $this->plugin->text_domain).' <i class="fa fa-save"></i></button>'."\n";
+				echo '         </div>'."\n";
+
+				echo '      </div>'."\n";
+				echo '   </form>'."\n";
 				echo '</div>';
 			}
 
@@ -1292,20 +2290,35 @@ namespace comment_mail // Root namespace.
 
 				$heading .= '  <div class="pmp-heading-links">'."\n";
 
-				if(!$this->plugin->utils_env->is_menu_page(__NAMESPACE__))
-					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->main_menu_page_only()).'"><i class="fa fa-gears"></i> '.__('Options', $this->plugin->text_domain).'</a>'."\n";
+				$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->stats_menu_page_only()).'"'.
+				            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_stats') ? ' class="pmp-active"' : '').'>'.
+				            '<i class="fa fa-bar-chart"></i> '.__('Statistics', $this->plugin->text_domain).'</a>'."\n";
 
-				if(!$this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_stats'))
-					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->stats_menu_page_only()).'"><i class="fa fa-bar-chart"></i> '.__('Statistics', $this->plugin->text_domain).'</a>'."\n";
+				$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->main_menu_page_only()).'"'.
+				            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__) ? ' class="pmp-active"' : '').'>'.
+				            '<i class="fa fa-gears"></i> '.__('Options', $this->plugin->text_domain).'</a>'."\n";
 
-				if(!$this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_import_export'))
-					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->import_export_menu_page_only()).'"><i class="fa fa-upload"></i> '.__('Import/Export', $this->plugin->text_domain).
-					            ($this->plugin->install_time() > strtotime('-2 days') && import_stcr::data_exists() && !import_stcr::ever_imported()
-						            ? '<span class="pmp-blink">'.__('StCR Auto-Import', $this->plugin->text_domain).'</span>' : '').
-					            '</a>'."\n";
+				$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->import_export_menu_page_only()).'"'.
+				            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_import_export') ? ' class="pmp-active"' : '').'>'.
+				            '<i class="fa fa-upload"></i> '.__('Import/Export', $this->plugin->text_domain).
+				            (!$this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_import_export') // Call to action for StCR users.
+				             && $this->plugin->install_time() > strtotime('-2 days') && import_stcr::data_exists() && !import_stcr::ever_imported()
+					            ? '<span class="pmp-blink">'.__('StCR Auto-Import', $this->plugin->text_domain).'</span>' : '').'</a>'."\n";
+
+				$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->email_templates_menu_page_only()).'"'.
+				            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_email_templates') ? ' class="pmp-active"' : '').'>'.
+				            '<i class="fa fa-code"></i> '.__('Email Templates', $this->plugin->text_domain).'</a>'."\n";
+
+				$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->site_templates_menu_page_only()).'"'.
+				            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_site_templates') ? ' class="pmp-active"' : '').'>'.
+				            '<i class="fa fa-code"></i> '.__('Site Templates', $this->plugin->text_domain).'</a>'."\n";
+
 				if(!$this->plugin->is_pro) // Display pro preview/upgrade related links?
 				{
-					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->pro_preview()).'"><i class="fa fa-eye"></i> Preview Pro Features</a>'."\n";
+					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->pro_preview()).'"'.
+					            ($this->plugin->utils_env->is_pro_preview() ? ' class="pmp-active"' : '').'>'.
+					            '<i class="fa fa-eye"></i> '.__('Preview Pro Features', $this->plugin->text_domain).'</a>'."\n";
+
 					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->product_page()).'" target="_blank"><i class="fa fa-heart-o"></i> '.__('Pro Upgrade', $this->plugin->text_domain).'</a>'."\n";
 				}
 				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->subscribe_page()).'" target="_blank"><i class="fa fa-envelope"></i> '.__('Newsletter (Subscribe)', $this->plugin->text_domain).'</a>'."\n";
@@ -1319,43 +2332,48 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Constructs menu page notifications.
+			 * All-panel togglers.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @return string The notifications for this menu page.
+			 * @return string Markup for all-panel togglers.
 			 */
-			protected function notifications()
+			protected function all_panel_togglers()
 			{
-				$notices = ''; // Initialize notifications.
+				$togglers = '<div class="pmp-all-panel-togglers">'."\n";
+				$togglers .= ' <a href="#" class="pmp-panels-open" title="'.esc_attr(__('Open All Panels', $this->plugin->text_domain)).'"><i class="fa fa-chevron-circle-down"></i></a>'."\n";
+				$togglers .= ' <a href="#" class="pmp-panels-close" title="'.esc_attr(__('Close All Panels', $this->plugin->text_domain)).'"><i class="fa fa-chevron-circle-up"></i></a>'."\n";
+				$togglers .= '</div>'."\n";
 
-				if($this->plugin->utils_env->is_options_updated()) // @TODO make this an enqueued notice.
-				{
-					$notices .= '<div class="pmp-note pmp-notice">'."\n";
-					$notices .= '  <i class="fa fa-thumbs-up"></i> '.__('Options updated successfully.', $this->plugin->text_domain)."\n";
-					$notices .= '</div>'."\n";
-				}
-				if($this->plugin->utils_env->is_options_restored()) // @TODO make this an enqueued notice.
-				{
-					$notices .= '<div class="pmp-note pmp-notice">'."\n";
-					$notices .= '  <i class="fa fa-thumbs-up"></i> '.__('Default options successfully restored.', $this->plugin->text_domain)."\n";
-					$notices .= '</div>'."\n";
-				}
+				return $togglers; // Toggles all panels open/closed.
+			}
+
+			/**
+			 * Constructs menu page notes.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return string The notes for this menu page.
+			 */
+			protected function notes()
+			{
+				$notes = ''; // Initialize notes.
+
 				if($this->plugin->utils_env->is_pro_preview())
 				{
-					$notices .= '<div class="pmp-note pmp-info">'."\n";
-					$notices .= '  <a href="'.esc_attr($this->plugin->utils_url->page_only()).'" style="float:right; margin:0 0 15px 25px; font-variant:small-caps; text-decoration:none;">'.__('close', $this->plugin->text_domain).' <i class="fa fa-eye-slash"></i></a>'."\n";
-					$notices .= '  <i class="fa fa-eye"></i> '.sprintf(__('<strong>Pro Features (Preview)</strong> ~ New option panels below. Please explore before <a href="%1$s" target="_blank">upgrading <i class="fa fa-heart-o"></i></a>.', $this->plugin->text_domain), esc_attr($this->plugin->utils_url->product_page())).'<br />'."\n";
-					$notices .= '  '.sprintf(__('<small>NOTE: the free version of %1$s (i.e. this lite version); is more-than-adequate for most sites. Please upgrade only if you desire advanced features or would like to support the developer.</small>', $this->plugin->text_domain), esc_html($this->plugin->name))."\n";
-					$notices .= '</div>'."\n";
+					$notes .= '<div class="pmp-note pmp-info">'."\n";
+					$notes .= '  <a href="'.esc_attr($this->plugin->utils_url->page_only()).'" style="float:right; margin:0 0 15px 25px; font-variant:small-caps; text-decoration:none;">'.__('close', $this->plugin->text_domain).' <i class="fa fa-eye-slash"></i></a>'."\n";
+					$notes .= '  <i class="fa fa-eye"></i> '.sprintf(__('<strong>Pro Features (Preview)</strong> ~ New option panels below. Please explore before <a href="%1$s" target="_blank">upgrading <i class="fa fa-heart-o"></i></a>.', $this->plugin->text_domain), esc_attr($this->plugin->utils_url->product_page())).'<br />'."\n";
+					$notes .= '  '.sprintf(__('<small>NOTE: the free version of %1$s (i.e. this lite version); is more-than-adequate for most sites. Please upgrade only if you desire advanced features or would like to support the developer.</small>', $this->plugin->text_domain), esc_html($this->plugin->name))."\n";
+					$notes .= '</div>'."\n";
 				}
-				if(!$this->plugin->options['enable'] && $this->plugin->utils_env->is_menu_page(__NAMESPACE__))
+				if($this->plugin->install_time() > strtotime('-48 hours') && $this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_*_templates'))
 				{
-					$notices .= '<div class="pmp-note pmp-warning">'."\n";
-					$notices .= '  <i class="fa fa-warning"></i> '.sprintf(__('%1$s is currently disabled; please review options below.', $this->plugin->text_domain), esc_html($this->plugin->name))."\n";
-					$notices .= '</div>'."\n";
+					$notes .= '<div class="pmp-note pmp-notice">'."\n";
+					$notes .= '  '.sprintf(__('All templates come preconfigured <i class="fa fa-smile-o"></i> — it is not necessary to customize. This area is intended for developers only.', $this->plugin->text_domain), esc_html($this->plugin->name))."\n";
+					$notes .= '</div>'."\n";
 				}
-				return $notices; // All notices; if any apply.
+				return $notes; // All notices; if any apply.
 			}
 
 			/**
@@ -1375,26 +2393,27 @@ namespace comment_mail // Root namespace.
 				$body  = (string)$body;
 
 				$default_args = array(
-					'icon'             =>
+					'note'     => '',
+					'icon'     =>
 						'<i class="fa fa-gears"></i>',
-
-					'pro_preview_only' => FALSE,
-					'open'             => FALSE,
+					'pro_only' => FALSE,
+					'open'     => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$icon = (string)$args['icon'];
+				$note     = trim((string)$args['note']);
+				$icon     = trim((string)$args['icon']);
+				$pro_only = (boolean)$args['pro_only'];
+				$open     = (boolean)$args['open'];
 
-				$pro_preview_only = (boolean)$args['pro_preview_only'];
-				$open             = (boolean)$args['open'];
+				if($pro_only && !$this->plugin->is_pro && !$this->plugin->utils_env->is_pro_preview())
+					return ''; // Not applicable; not pro, or not a pro preview.
 
-				if($pro_preview_only && !$this->plugin->utils_env->is_pro_preview())
-					return ''; // Not applicable.
-
-				$panel = '<div class="pmp-panel">'."\n";
+				$panel = '<div class="pmp-panel'.esc_attr($pro_only && !$this->plugin->is_pro ? ' pmp-pro-preview' : '').'">'."\n";
 				$panel .= '   <a href="#" class="pmp-panel-heading'.($open ? ' open' : '').'">'."\n";
 				$panel .= '      '.$icon.' '.$title."\n";
+				$panel .= $note ? '<span class="pmp-panel-heading-note">'.$note.'</span>' : '';
 				$panel .= '   </a>'."\n";
 
 				$panel .= '   <div class="pmp-panel-body'.($open ? ' open' : '').' pmp-clearfix">'."\n";

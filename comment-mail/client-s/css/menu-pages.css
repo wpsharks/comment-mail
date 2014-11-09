@@ -131,10 +131,20 @@ A menu page area ~ utilities.
 	background    : #FFFFFF !important;
 	border        : 1px solid rgba(0, 0, 0, .3) !important;
 }
+.comment-mail-menu-page-area .pmp-hilite
+{
+	opacity       : 1 !important;
+	border        : 0 !important;
+	border-radius : 5px !important;
+	display       : table !important;
+	color         : #000000 !important;
+	background    : #FFFBB2 !important;
+	padding       : .25em .5em .25em .5em !important;
+}
 .comment-mail-menu-page-area .pmp-blink
 {
-	animation         : pmp-blink .5s steps(5, start) infinite;
-	-webkit-animation : pmp-blink .5s steps(5, start) infinite;
+	animation         : pmp-blink .5s steps(5, start) infinite !important;
+	-webkit-animation : pmp-blink .5s steps(5, start) infinite !important;
 }
 @keyframes pmp-blink
 {
@@ -154,29 +164,12 @@ A menu page area ~ utilities.
 	WP core elements under plugin-specific conditions.
 ------------------------------------------------------------------------------------------------------------ */
 /*
-Alter wrap bg color.
-*/
-.comments_page_comment_mail #wpwrap::after
-{
-	content    : '';
-	opacity    : 0.08;
-	background : url('../../client-s/images/wp-logo.png') no-repeat top right;
-
-	top        : 1em;
-	right      : 1em;
-	width      : 100%;
-	height     : 100%;
-	position   : absolute;
-	z-index    : -1;
-}
-/*
 Align w/ menu page.
 */
-.comments_page_comment_mail div.updated,
-.comments_page_comment_mail div.error
+body[class*='comment_mail'] #wpbody-content > div.updated,
+body[class*='comment_mail'] #wpbody-content > div.error
 {
-	font-size : 14px;
-	margin    : 1.25em 1.25em 1.25em .25em;
+	margin : 1.25em 1.25em 1.25em .25em;
 }
 /* ------------------------------------------------------------------------------------------------------------
 	Plugin-specific styles for an actual/standard plugin menu page; e.g. options.
@@ -500,18 +493,26 @@ Menu page heading styles.
 	margin-left : 10px;
 	width       : 500px;
 }
-.comment-mail-menu-page .pmp-heading .pmp-heading-links
-{
-	bottom     : 1em;
-	left       : 550px;
-	position   : absolute;
-	text-align : center;
-}
 .comment-mail-menu-page .pmp-heading .pmp-heading-links a
 {
 	text-decoration : none;
-	margin          : 1em 1em 0 1em;
+	text-align      : center;
 	display         : inline-block;
+	margin          : 1em 0 0 0;
+
+	opacity         : 0.25;
+	border-radius   : 4px;
+	background      : transparent;
+	padding         : .25em .5em .25em .5em;
+}
+.comment-mail-menu-page .pmp-heading .pmp-heading-links a:hover,
+.comment-mail-menu-page .pmp-heading .pmp-heading-links a.pmp-active
+{
+	opacity : 1;
+}
+.comment-mail-menu-page .pmp-heading .pmp-heading-links a.pmp-active
+{
+	background : #FFFFFF;
 }
 .comment-mail-menu-page .pmp-heading .pmp-heading-links a:first-child
 {
@@ -526,6 +527,18 @@ Menu page heading styles.
 	font-size : 80%;
 	display   : block;
 	margin    : .25em 0 0 0;
+}
+/*
+Menu page body styles.
+*/
+.comment-mail-menu-page .pmp-body .pmp-all-panel-togglers
+{
+	outline   : none;
+	float     : right;
+	font-size : 300%;
+	margin    : 0 0 0 2em;
+	position  : relative;
+	z-index   : 1;
 }
 /*
 Menu page section heading styles.
@@ -577,6 +590,14 @@ Menu page panel styles.
 {
 	background : #307D27;
 	color      : #FFFFFF !important;
+}
+.comment-mail-menu-page .pmp-panel-heading > .pmp-panel-heading-note
+{
+	font-size  : 70%;
+	opacity    : 0.5;
+	font-style : italic;
+	margin     : 0 0 0 .5em;
+	display    : inline-block;
 }
 .comment-mail-menu-page .pmp-panel-heading:after
 {

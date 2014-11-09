@@ -212,7 +212,7 @@ namespace comment_mail // Root namespace.
 					'current_value_empty_on_0' => FALSE,
 
 					'cm_mode'                  => '',
-					'cm_height'                => 250,
+					'cm_height'                => 500,
 
 					'notes_before'             => '',
 					'notes_after'              => '',

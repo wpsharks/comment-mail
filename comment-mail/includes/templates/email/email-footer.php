@@ -118,6 +118,12 @@ namespace comment_mail;
 	</tbody>
 </table>
 
+<?php if($plugin->options['email_footer_powered_by_enable']): ?>
+	<hr /><p style="color:#888888;">
+		<?php echo $plugin->utils_markup->powered_by(); ?>
+	</p>
+<?php endif; ?>
+
 <?php // Close body. ?>
 
 </body>

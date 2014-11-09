@@ -80,7 +80,7 @@ namespace comment_mail // Root namespace.
 					'data'                  => '',
 					'data_file'             => '',
 					'process_confirmations' => FALSE,
-					'max_limit'             => 500,
+					'max_limit'             => 5000,
 				);
 				$request_args         = array_merge($default_request_args, $request_args);
 				$request_args         = array_intersect_key($request_args, $default_request_args);
@@ -99,7 +99,7 @@ namespace comment_mail // Root namespace.
 				if($this->max_limit < 1) // Too low?
 					$this->max_limit = 1; // At least one.
 
-				$upper_max_limit = (integer)apply_filters(__CLASS__.'_upper_max_limit', 1000);
+				$upper_max_limit = (integer)apply_filters(__CLASS__.'_upper_max_limit', 5000);
 				if($this->max_limit > $upper_max_limit)
 					$this->max_limit = $upper_max_limit;
 

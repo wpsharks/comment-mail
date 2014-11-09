@@ -352,7 +352,7 @@ namespace comment_mail // Root namespace.
 
 				       " WHERE  `comment_post_ID` = '".esc_sql($post_id)."'".
 				       " AND  `comment_author_email` = '".esc_sql($email)."'".
-				       " AND `comment_status` IN('approve', 'approved', '1')".
+				       " AND `comment_approved` IN('approve', 'approved', '1')".
 
 				       " ORDER BY `comment_date` ASC"; // Oldest to newest.
 

@@ -218,18 +218,6 @@ namespace comment_mail // Root namespace.
 				$email_footer_vars = compact('email_footer_easy'); // Only one for now.
 				$email_footer      = $email_footer_template->parse(array_merge($vars, $email_footer_vars));
 
-				// Add "powered by" note at the bottom of all email templates?
-
-				if(!$this->plugin->is_pro || $this->plugin->options['email_footer_powered_by_enable'])
-				{
-					$powered_by   = '<hr />'. // Leading divider to help separate this.
-					                '<p style="color:#888888;">'. // Powered by note at the bottom of all emails.
-					                ' ~ '.$this->plugin->utils_markup->powered_by(). // e.g. `powered by Comment Mail™ for WordPress`.
-					                ' &lt;<a href="'.esc_attr($this->plugin->utils_url->product_page()).'" target="_blank" style="text-decoration:none;">'.
-					                esc_html($this->plugin->utils_url->product_page()).'</a>&gt;'.
-					                '</p>';
-					$email_footer = str_ireplace('</body>', $powered_by.'</body>', $email_footer); // Before closing body tag.
-				}
 				return compact('email_header', 'email_footer'); // Header/footer.
 			}
 

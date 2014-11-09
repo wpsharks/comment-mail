@@ -112,6 +112,78 @@ namespace comment_mail // Root namespace.
 				   || strpos($path, '/.') !== FALSE || stripos(basename($path), 'config') !== FALSE
 				) throw new \exception(sprintf(__('Security flag. Dangerous file path: `%1$s`.', $this->plugin->text_domain), $path));
 			}
+
+			/**
+			 * Abbreviated byte notation for file sizes.
+			 *
+			 * @param float   $bytes File size in bytes. A (float) value.
+			 *    We need this converted to a (float), so it's possible to deal with numbers beyond that of an integer.
+			 *
+			 * @param integer $precision Number of decimals to use.
+			 *
+			 * @return string Byte notation.
+			 */
+			public function bytes_abbr($bytes, $precision = 2)
+			{
+				$bytes     = (float)$bytes;
+				$precision = (integer)$precision;
+
+				$precision = $precision >= 0 ? $precision : 2;
+				$units     = array('bytes', 'kbs', 'MB', 'GB', 'TB');
+
+				$bytes = $bytes > 0 ? $bytes : 0;
+				$power = floor(($bytes ? log($bytes) : 0) / log(1024));
+
+				$abbr_bytes = round($bytes / pow(1024, $power), $precision);
+				$abbr       = $units[min($power, count($units) - 1)];
+
+				if($abbr_bytes === (float)1 && $abbr === 'bytes')
+					$abbr = 'byte'; // Quick fix here.
+
+				else if($abbr_bytes === (float)1 && $abbr === 'kbs')
+					$abbr = 'kb'; // Quick fix here.
+
+				return $abbr_bytes.' '.$abbr;
+			}
+
+			/**
+			 * Converts an abbreviated byte notation into bytes.
+			 *
+			 * @param string $string A string value in byte notation.
+			 *
+			 * @return float A float indicating the number of bytes.
+			 */
+			public function abbr_bytes($string)
+			{
+				$string = trim((string)$string);
+
+				$notation = '/^(?P<value>[0-9\.]+)\s*(?P<modifier>bytes|byte|kbs|kb|k|mb|m|gb|g|tb|t)$/i';
+
+				if(!preg_match($notation, $string, $_op))
+					return (float)0;
+
+				$value    = (float)$_op['value'];
+				$modifier = strtolower($_op['modifier']);
+				unset($_op); // Housekeeping.
+
+				switch($modifier) // Fall through based on modifier.
+				{
+					case 't': // Multiplied four times.
+					case 'tb':
+						$value *= 1024;
+					case 'g': // Multiplied three times.
+					case 'gb':
+						$value *= 1024;
+					case 'm': // Multiple two times.
+					case 'mb':
+						$value *= 1024;
+					case 'k': // One time only.
+					case 'kb':
+					case 'kbs':
+						$value *= 1024;
+				}
+				return (float)$value;
+			}
 		}
 	}
 }

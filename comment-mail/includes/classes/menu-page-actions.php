@@ -55,26 +55,6 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Restores defaults options.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param mixed $request_args Input argument(s).
-			 */
-			protected function restore_default_options($request_args)
-			{
-				$request_args = NULL; // Not used here.
-
-				if(!current_user_can($this->plugin->cap))
-					return; // Unauthenticated; ignore.
-
-				delete_option(__NAMESPACE__.'_options');
-				$this->plugin->options = $this->plugin->default_options;
-
-				wp_redirect($this->plugin->utils_url->options_restored()).exit();
-			}
-
-			/**
 			 * Saves options.
 			 *
 			 * @since 14xxxx First documented version.
@@ -88,21 +68,11 @@ namespace comment_mail // Root namespace.
 				if(!current_user_can($this->plugin->cap))
 					return; // Unauthenticated; ignore.
 
-				$this->plugin->options = array_merge($this->plugin->default_options, $this->plugin->options, $request_args);
-				$this->plugin->options = array_intersect_key($this->plugin->options, $this->plugin->default_options);
+				$this->plugin->options_save($request_args);
 
-				foreach($this->plugin->options as $_key => &$_option)
-					if(strpos($_key, 'template__') === 0)
-					{
-						$_file             = template::option_key_to_file($_key);
-						$_default_template = new template($_file, TRUE);
-
-						if(trim($_option) === trim($_default_template->file_contents()))
-							$_option = ''; // Empty this out; it's a default value.
-					}
-				unset($_key, $_option, $_file, $_default_template); // Housekeeping.
-
-				update_option(__NAMESPACE__.'_options', $this->plugin->options); // Update.
+				$notice_markup = // Notice regarding options having been updated successfully.
+					sprintf(__('%1$s&trade; options updated successfully.', $this->plugin->text_domain), esc_html($this->plugin->name));
+				$this->plugin->enqueue_user_notice($notice_markup, array('transient' => TRUE));
 
 				if(!empty($request_args['mail_test']) && ($smtp_test_to = trim((string)$request_args['mail_test'])))
 				{
@@ -123,6 +93,30 @@ namespace comment_mail // Root namespace.
 					$this->plugin->enqueue_user_notice($smtp_test->results_markup, array('transient' => TRUE));
 				}
 				wp_redirect($this->plugin->utils_url->options_updated()).exit();
+			}
+
+			/**
+			 * Restores defaults options.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param mixed $request_args Input argument(s).
+			 */
+			protected function restore_default_options($request_args)
+			{
+				$request_args = NULL; // Not used here.
+
+				if(!current_user_can($this->plugin->cap))
+					return; // Unauthenticated; ignore.
+
+				delete_option(__NAMESPACE__.'_options');
+				$this->plugin->options = $this->plugin->default_options;
+
+				$notice_markup = // Notice regarding options having been retored successfully.
+					sprintf(__('%1$s&trade; default options restored successfully.', $this->plugin->text_domain), esc_html($this->plugin->name));
+				$this->plugin->enqueue_user_notice($notice_markup, array('transient' => TRUE));
+
+				wp_redirect($this->plugin->utils_url->default_options_restored()).exit();
 			}
 
 			/**
@@ -166,11 +160,14 @@ namespace comment_mail // Root namespace.
 				if(empty($request_args['type']) || !is_string($request_args['type']))
 					return; // Missing and/or invalid import type.
 
-				if(!in_array($request_args['type'], array('subs', 'stcr'), TRUE))
+				if(!in_array($request_args['type'], array('subs', 'stcr', 'ops'), TRUE))
 					return; // Invalid import type.
 
 				if(!current_user_can($this->plugin->cap))
 					return; // Unauthenticated; ignore.
+
+				if(!empty($_FILES[__NAMESPACE__]['tmp_name']['import']['data_file']))
+					$request_args['data_file'] = $_FILES[__NAMESPACE__]['tmp_name']['import']['data_file'];
 
 				$class    = '\\'.__NAMESPACE__.'\\import_'.$request_args['type'];
 				$importer = new $class($request_args); // Instantiate.
@@ -190,7 +187,7 @@ namespace comment_mail // Root namespace.
 				if(empty($request_args['type']) || !is_string($request_args['type']))
 					return; // Missing and/or invalid import type.
 
-				if(!in_array($request_args['type'], array('subs'), TRUE))
+				if(!in_array($request_args['type'], array('subs', 'ops'), TRUE))
 					return; // Invalid import type.
 
 				if(!current_user_can($this->plugin->cap))
