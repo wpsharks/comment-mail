@@ -72,7 +72,7 @@ namespace comment_mail // Root namespace.
 				$args          = array_intersect_key($args, $defaults_args);
 
 				if($this->post && $this->post->post_author)
-					if($this->plugin->options['auto_subscribe_post_author'])
+					if($this->plugin->options['auto_subscribe_post_author_enable'])
 						$this->post_author = new \WP_User($this->post->post_author);
 
 				$this->post_types = strtolower($this->plugin->options['auto_subscribe_post_types']);
@@ -125,7 +125,7 @@ namespace comment_mail // Root namespace.
 				if(!$this->post_author->user_email)
 					return; // Not possible.
 
-				if(!$this->plugin->options['auto_subscribe_post_author'])
+				if(!$this->plugin->options['auto_subscribe_post_author_enable'])
 					return; // Not applicable.
 
 				$data = array(
@@ -156,7 +156,7 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				$recipients = $this->plugin->options['auto_subscribe_recipients'];
-				$recipients = $this->plugin->utils_mail->parse_recipients_deep($recipients);
+				$recipients = $this->plugin->utils_mail->parse_addresses_deep($recipients);
 
 				foreach($recipients as $_recipient)
 				{

@@ -62,7 +62,7 @@ namespace comment_mail // Root namespace.
 
 				$default_request_args = array(
 					'start_from'       => 1,
-					'max_limit'        => 500,
+					'max_limit'        => 1000,
 					'include_utf8_bom' => FALSE,
 				);
 				$request_args         = array_merge($default_request_args, $request_args);
@@ -76,7 +76,7 @@ namespace comment_mail // Root namespace.
 					$this->start_from = 1; // At least one.
 
 				if($this->max_limit < 1) $this->max_limit = 1;
-				$upper_max_limit = (integer)apply_filters(__CLASS__.'_upper_max_limit', 1000);
+				$upper_max_limit = (integer)apply_filters(__CLASS__.'_upper_max_limit', 5000);
 				if($this->max_limit > $upper_max_limit)
 					$this->max_limit = $upper_max_limit;
 
@@ -105,8 +105,8 @@ namespace comment_mail // Root namespace.
 				if($this->include_utf8_bom && $data)
 					$data = $this->utf8_bom.$data;
 
-				$from = $this->start_from + 1;
-				$to   = $from + count($results);
+				$from = $this->start_from;
+				$to   = $from - 1 + count($results);
 
 				$output_file_args = array(
 					'data'                => $data,

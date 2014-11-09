@@ -21,7 +21,7 @@ namespace comment_mail // Root namespace.
 		class queue_processor extends abs_base
 		{
 			/**
-			 * @var boolean Is a CRON job?
+			 * @var boolean A CRON job?
 			 *
 			 * @since 14xxxx First documented version.
 			 */
@@ -102,7 +102,8 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
-			 * @param boolean      $is_cron Is a CRON job?
+			 * @param boolean      $is_cron Is this a CRON job?
+			 *    Defaults to a `TRUE` value. If calling directly pass `FALSE`.
 			 *
 			 * @param integer|null $max_time Max time (in seconds).
 			 *
@@ -156,8 +157,8 @@ namespace comment_mail // Root namespace.
 				$upper_max_limit = (integer)apply_filters(__CLASS__.'_upper_max_limit', 1000);
 				if($this->max_limit > $upper_max_limit) $this->max_limit = $upper_max_limit;
 
-				$this->subject_template = new template('email/comment-notification-subject.php');
-				$this->message_template = new template('email/comment-notification-message.php');
+				$this->subject_template = new template('email/comment-notification/subject.php');
+				$this->message_template = new template('email/comment-notification/message.php');
 
 				$this->message_headers = array(); // Initialize.
 				if($this->plugin->options['reply_to_email']) // Reply-To?
@@ -179,7 +180,7 @@ namespace comment_mail // Root namespace.
 			protected function maybe_prep_cron_job()
 			{
 				if(!$this->is_cron)
-					return; // Nothing to do.
+					return; // Not applicable.
 
 				ignore_user_abort(TRUE);
 

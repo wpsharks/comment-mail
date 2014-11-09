@@ -25,7 +25,7 @@ namespace comment_mail;
 ?>
 <?php echo $email_footer_easy; ?>
 
-<hr style="margin-top:100px;" />
+<hr style="margin-top:10em;" />
 
 <?php // Open table to hold important footer links. ?>
 
@@ -34,7 +34,7 @@ namespace comment_mail;
 
 	<?php // CAN-SPAM compliance links; manage/unsubscribe. ?>
 
-	<?php if(stripos($template_file, 'notification') !== FALSE && !empty($sub)): ?>
+	<?php if(stripos($template_file, '/comment-notification/') && !empty($sub)): ?>
 
 		<?php
 		/*
@@ -63,7 +63,7 @@ namespace comment_mail;
 					&nbsp;&#42774;&nbsp; <?php echo sprintf(__('<a href="%1$s">One-Click Unsubscribe</a>', $plugin->text_domain), esc_attr($sub_unsubscribe_url)); ?>
 				</p>
 			</td>
-			<td style="vertical-align:top; padding-left:100px;">
+			<td style="vertical-align:top; padding-left:10em;">
 				<p style="color:#888888;">
 					<strong><?php echo __('Create New Subscription?', $plugin->text_domain); ?></strong><br />
 					<?php echo sprintf(__('<a href="%1$s">Add New Comment Subscription</a>', $plugin->text_domain), esc_attr($sub_new_url)); ?>
@@ -89,6 +89,9 @@ namespace comment_mail;
 
 	// CAN-SPAM mailing address; as configured in plugin options.
 	$can_spam_mailing_address = $plugin->options['can_spam_mailing_address'];
+
+	// Privacy policy URL; as configured in plugin options via the dashboard.
+	$can_spam_privacy_policy_url = $plugin->options['can_spam_privacy_policy_url'];
 	?>
 
 	<tr>
@@ -97,9 +100,12 @@ namespace comment_mail;
 				<strong><?php echo __('Contact Info', $plugin->text_domain); ?></strong><br />
 				<?php echo sprintf(__('Website URL: <a href="%1$s">%2$s</a>', $plugin->text_domain), esc_attr($home_url), esc_html($home_url)); ?><br />
 				<?php echo sprintf(__('Report Abuse to: <a href="mailto:%1$s">%2$s</a>', $plugin->text_domain), esc_attr(urlencode($can_spam_postmaster)), esc_html($can_spam_postmaster)); ?>
+				<?php if($can_spam_privacy_policy_url): ?><br />
+					<?php echo sprintf(__('Privacy Policy: <a href="%1$s">%2$s</a>', $plugin->text_domain), esc_attr($can_spam_privacy_policy_url), esc_html($can_spam_privacy_policy_url)); ?>
+				<?php endif; ?>
 			</p>
 		</td>
-		<td style="vertical-align:top; padding-left:100px;">
+		<td style="vertical-align:top; padding-left:10em;">
 			<p style="color:#888888;">
 				<strong><?php echo __('Our Mailing Address', $plugin->text_domain); ?></strong><br />
 				<?php echo $can_spam_mailing_address; ?>
@@ -111,6 +117,12 @@ namespace comment_mail;
 
 	</tbody>
 </table>
+
+<?php if($plugin->options['email_footer_powered_by_enable']): ?>
+	<hr /><p style="color:#888888;">
+		<?php echo $plugin->utils_markup->powered_by(); ?>
+	</p>
+<?php endif; ?>
 
 <?php // Close body. ?>
 

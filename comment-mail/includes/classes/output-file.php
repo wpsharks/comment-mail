@@ -161,10 +161,13 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function content_length()
 			{
-				if($this->data_file)
-					return filesize($this->data_file);
+				if(!is_null($content_length = &$this->cache_key(__FUNCTION__)))
+					return $content_length; // Already cached this.
 
-				return strlen($this->data);
+				if($this->data_file) // File has precedence.
+					return ($content_length = filesize($this->data_file));
+
+				return ($content_length = strlen($this->data));
 			}
 
 			/**
@@ -177,11 +180,12 @@ namespace comment_mail // Root namespace.
 				if($this->data_file)
 					return; // Nothing to do here.
 
+				$content_length = // Initialize.
 				$_bytes_to_read = $this->content_length();
 
 				while($_bytes_to_read > 0) // While we have bytes.
 				{
-					$_reading_from = $this->content_length - $_bytes_to_read;
+					$_reading_from = $content_length - $_bytes_to_read;
 					$_reading      = $_bytes_to_read > $this->chunk_size
 						? $this->chunk_size : $_bytes_to_read;
 
@@ -207,11 +211,12 @@ namespace comment_mail // Root namespace.
 				if(!($resource = fopen($this->data_file, 'rb')))
 					return; // Not applicable.
 
+				$content_length = // Initialize.
 				$_bytes_to_read = $this->content_length();
 
 				while($_bytes_to_read > 0) // While we have bytes.
 				{
-					$_reading_from = $this->content_length - $_bytes_to_read;
+					$_reading_from = $content_length - $_bytes_to_read;
 					$_reading      = $_bytes_to_read > $this->chunk_size
 						? $this->chunk_size : $_bytes_to_read;
 

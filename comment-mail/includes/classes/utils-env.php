@@ -50,42 +50,6 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Have plugin options been restored?
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return boolean `TRUE` if plugin options have been restored.
-			 */
-			public function is_options_restored()
-			{
-				if(!is_null($is = &$this->static_key(__FUNCTION__)))
-					return $is; // Cached this already.
-
-				if(!$this->is_menu_page(__NAMESPACE__.'*'))
-					return ($is = FALSE);
-
-				return ($is = !empty($_REQUEST[__NAMESPACE__.'_options_restored']));
-			}
-
-			/**
-			 * Have plugin options been updated?
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return boolean `TRUE` if plugin options have been updated.
-			 */
-			public function is_options_updated()
-			{
-				if(!is_null($is = &$this->static_key(__FUNCTION__)))
-					return $is; // Cached this already.
-
-				if(!$this->is_menu_page(__NAMESPACE__.'*'))
-					return ($is = FALSE);
-
-				return ($is = !empty($_REQUEST[__NAMESPACE__.'_options_updated']));
-			}
-
-			/**
 			 * Current request is for a pro version preview?
 			 *
 			 * @since 14xxxx First documented version.
@@ -169,7 +133,7 @@ namespace comment_mail // Root namespace.
 				if(!$page_to_check) // Any menu page?
 					return ($is = TRUE); // Yep, it is!
 
-				$page_to_check_regex = '/^'.preg_replace('/\\\\\*/', '.*?', preg_quote($page_to_check, '/')).'$/i';
+				$page_to_check_regex = '/^'.preg_replace(array('/\\\\\*/', '/\\\\\^/'), array('.*?', '[^_]*?'), preg_quote($page_to_check, '/')).'$/i';
 
 				return ($is = (boolean)preg_match($page_to_check_regex, $current_page));
 			}
@@ -212,6 +176,32 @@ namespace comment_mail // Root namespace.
 			{
 				$this->maximize_memory();
 				$this->prep_for_output();
+			}
+
+			/**
+			 * Max allowed file upload size.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return float A floating point number.
+			 */
+			public function max_upload_size()
+			{
+				if(!is_null($max = &$this->static_key(__FUNCTION__)))
+					return $max; // Already cached this.
+
+				$limits = array(PHP_INT_MAX); // Initialize.
+
+				if(($max_upload_size = ini_get('upload_max_filesize')))
+					$limits[] = $this->plugin->utils_fs->abbr_bytes($max_upload_size);
+
+				if(($post_max_size = ini_get('post_max_size')))
+					$limits[] = $this->plugin->utils_fs->abbr_bytes($post_max_size);
+
+				if(($memory_limit = ini_get('memory_limit')))
+					$limits[] = $this->plugin->utils_fs->abbr_bytes($memory_limit);
+
+				return ($max = min($limits));
 			}
 		}
 	}

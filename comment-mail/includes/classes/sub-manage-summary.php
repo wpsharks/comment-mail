@@ -183,7 +183,9 @@ namespace comment_mail // Root namespace.
 				$this->query_vars = new \stdClass; // Initialize.
 
 				$this->query_vars->current_page = max(1, (integer)$request_args['page']);
+				$upper_max_limit                = (integer)apply_filters(__CLASS__.'_upper_max_limit', 1000);
 				$this->query_vars->per_page     = (integer)$this->plugin->options['sub_manage_summary_max_limit'];
+				if($this->query_vars->per_page > $upper_max_limit) $this->query_vars->per_page = $upper_max_limit;
 
 				$this->query_vars->post_id = $this->isset_or($request_args['post_id'], NULL, 'integer');
 				$this->query_vars->status  = trim(strtolower((string)$request_args['status']));

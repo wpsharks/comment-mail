@@ -6,44 +6,45 @@
 		$window = $(window),
 		$document = $(document);
 
-	plugin.scriptsLoading = {};
-
-	plugin.loadScript = function(url)
-	{
-		url = String(url);
-
-		var ajaxOptions = {
-			url     : url,
-			cache   : true,
-			dataType: 'script',
-			success : function()
-			{
-				delete plugin.scriptsLoading[url];
-			}
-		};
-		plugin.scriptsLoading[url] = -1,
-			$.ajax(ajaxOptions);
-	};
-	plugin.scriptsReady = function()
-	{
-		return $.isEmptyObject(plugin.scriptsLoading);
-	};
 	plugin.onReady = function() // jQuery DOM ready event handler.
 	{
-		if(!plugin.scriptsReady()) return setTimeout(plugin.onReady, 100);
-
 		/* ------------------------------------------------------------------------------------------------------------
 		 Plugin-specific selectors needed by routines below.
 		 ------------------------------------------------------------------------------------------------------------ */
 
 		var namespace = 'comment_mail',
 			namespaceSlug = 'comment-mail',
+
 			$menuPage = $('.' + namespaceSlug + '-menu-page'),
 			$menuPageArea = $('.' + namespaceSlug + '-menu-page-area'),
 			$menuPageTable = $('.' + namespaceSlug + '-menu-page-table'),
 			$menuPageForm = $('.' + namespaceSlug + '-menu-page-form'),
+
 			vars = window[namespace + '_vars'], i18n = window[namespace + '_i18n'],
-			chosenOps = {search_contains: true, disable_search_threshold: 10, allow_single_deselect: true};
+
+			chosenOps = {
+				search_contains         : true,
+				disable_search_threshold: 10,
+				allow_single_deselect   : true
+			},
+
+			codeMirrors = [], cmOptions = {
+				lineNumbers  : false,
+				matchBrackets: true,
+				theme        : 'ambiance',
+				tabSize      : 3, indentWithTabs: true,
+				extraKeys    : {
+					'F11': function(cm)
+					{
+						if(cm.getOption('fullScreen'))
+							cm.setOption('fullScreen', false),
+								$('#adminmenuwrap, #wpadminbar').show();
+
+						else cm.setOption('fullScreen', true),
+							$('#adminmenuwrap, #wpadminbar').hide();
+					}
+				}
+			};
 
 		/* ------------------------------------------------------------------------------------------------------------
 		 Plugin-specific JS for any menu page area of the dashboard.
@@ -62,10 +63,34 @@
 		 JS for an actual/standard plugin menu page; e.g. options.
 		 ------------------------------------------------------------------------------------------------------------ */
 
+		$menuPage.find('[data-cm-mode]')
+			.each(function() // CodeMirrors.
+			      {
+				      var $this = $(this),
+					      cmMode = $this.data('cmMode'),
+					      cmHeight = $this.data('cmHeight'),
+					      $textarea = $this.find('textarea');
+
+				      if($textarea.length !== 1) return; // Invalid markup.
+
+				      window.CodeMirror = CodeMirror || {fromTextArea: function(){}};
+
+				      $this.addClass('cm'), // See `menu-pages.css` to customize styles.
+					      codeMirrors.push(CodeMirror.fromTextArea($textarea[0], $.extend({}, cmOptions, {mode: cmMode}))),
+					      codeMirrors[codeMirrors.length - 1].setSize(null, cmHeight);
+			      });
+		var refreshCodeMirrors = function(/* Refresh CodeMirrors. */)
+		{
+			$.each(codeMirrors, function(i, codeMirror){ codeMirror.refresh(); });
+		};
+
+		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
 		$menuPage.find('.pmp-panels-open').on('click', function()
 		{
 			$menuPage.find('.pmp-panel-heading').addClass('open')
-				.next('.pmp-panel-body').addClass('open');
+				.next('.pmp-panel-body').addClass('open'),
+				refreshCodeMirrors(); // Refresh CodeMirrors also.
 		});
 
 		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -73,7 +98,8 @@
 		$menuPage.find('.pmp-panels-close').on('click', function()
 		{
 			$menuPage.find('.pmp-panel-heading').removeClass('open')
-				.next('.pmp-panel-body').removeClass('open');
+				.next('.pmp-panel-body').removeClass('open'),
+				refreshCodeMirrors(); // Refresh CodeMirrors also.
 		});
 
 		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -83,21 +109,49 @@
 			e.preventDefault(), e.stopImmediatePropagation();
 
 			$(this).toggleClass('open') // Toggle this panel now.
-				.next('.pmp-panel-body').toggleClass('open');
+				.next('.pmp-panel-body').toggleClass('open'),
+				refreshCodeMirrors(); // Refresh CodeMirrors also.
 		});
 
 		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-		$menuPage.find('select[name$="_enable\\]"], select[name$="_enable_flavor\\]"]').not('.no-if-enabled').on('change', function()
-		{
-			var $this = $(this), thisName = $this[0].name, thisValue = $this.val(),
-				$thisPanel = $this.closest('.pmp-panel');
+		$menuPage.find('select[name$="\\[enable\\]"], select[name$="_enable\\]"]')
+			.not('.no-if-enabled').not('.no-if-disabled')
+			.on('change', function()
+			    {
+				    var $this = $(this),
+					    thisValue = $.trim($this.val()),
+					    $thisPanel = $this.closest('.pmp-panel');
 
-			if((thisName.indexOf('_enable]') !== -1 && (thisValue === '' || thisValue === '1'))
-			   || (thisName.indexOf('_flavor]') !== -1 && thisValue !== '0')) // Enabled?
-				$thisPanel.find('.pmp-panel-if-enabled').css('opacity', 1).find(':input').removeAttr('readonly');
-			else $thisPanel.find('.pmp-panel-if-enabled').css('opacity', 0.4).find(':input').attr('readonly', 'readonly');
-		})
+				    var enabled = thisValue !== '' && thisValue !== '0',
+					    disabled = !enabled; // The opposite.
+
+				    var ifEnabled = '.pmp-panel-if-enabled',
+					    ifEnabledShow = '.pmp-panel-if-enabled-show';
+
+				    var ifDisabled = '.pmp-panel-if-disabled',
+					    ifDisabledShow = '.pmp-panel-if-disabled-show';
+
+				    if(enabled) $thisPanel.find(ifEnabled + ',' + ifEnabledShow).show().css('opacity', 1)
+					    .find(':input').removeAttr('disabled');
+
+				    else // We use opacity to conceal; and hide if applicable.
+				    {
+					    $thisPanel.find(ifEnabled + ',' + ifEnabledShow).css('opacity', 0.2)
+						    .find(':input').attr('disabled', 'disabled'),
+						    $thisPanel.find(ifEnabledShow).hide();
+				    }
+				    if(disabled) $thisPanel.find(ifDisabled + ',' + ifDisabledShow).show().css('opacity', 1)
+					    .find(':input').removeAttr('disabled');
+
+				    else // We use opacity to conceal; and hide if applicable.
+				    {
+					    $thisPanel.find(ifDisabled + ',' + ifDisabledShow).css('opacity', 0.2)
+						    .find(':input').attr('disabled', 'disabled'),
+						    $thisPanel.find(ifDisabledShow).hide();
+				    }
+				    refreshCodeMirrors(); // Refresh CodeMirrors also.
+			    })
 			.trigger('change'); // Initialize.
 
 		/* ------------------------------------------------------------------------------------------------------------
@@ -260,7 +314,5 @@
 		});
 		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 	};
-	plugin.loadScript('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.min.js');
-
 	$document.ready(plugin.onReady); // DOM ready handler.
 })(jQuery);

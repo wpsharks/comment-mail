@@ -32,6 +32,8 @@ namespace comment_mail // Root namespace.
 				$this->plugin->setup();
 
 				$this->create_db_tables();
+				$this->maybe_enqueue_notice();
+				$this->set_install_time();
 			}
 
 			/**
@@ -58,6 +60,34 @@ namespace comment_mail // Root namespace.
 							throw new \exception(sprintf(__('DB table creation failure: `%1$s`.', $this->plugin->text_domain), $_sql_file_table));
 					}
 				unset($_sql_file, $_sql_file_table, $_sql); // Housekeeping.
+			}
+
+			/**
+			 * First time install displays notice.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function maybe_enqueue_notice()
+			{
+				if(get_option(__NAMESPACE__.'_install_time'))
+					return; // Not applicable.
+
+				$notice_markup = file_get_contents(dirname(dirname(dirname(__FILE__))).'/client-s/images/inline-icon.svg').
+				                 ' '.sprintf(__('%1$s&trade; installed successfully! Please <a href="%2$s"><strong>click here to configure</strong></a> basic options.', $this->plugin->text_domain),
+				                             esc_html($this->plugin->name), esc_attr($this->plugin->utils_url->main_menu_page_only()));
+
+				$this->plugin->enqueue_user_notice($notice_markup); // A quick reminder to configure options.
+			}
+
+			/**
+			 * Update installation time.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			protected function set_install_time()
+			{
+				if(!get_option(__NAMESPACE__.'_install_time'))
+					update_option(__NAMESPACE__.'_install_time', time());
 			}
 		}
 	}

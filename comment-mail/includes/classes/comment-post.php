@@ -58,7 +58,7 @@ namespace comment_mail // Root namespace.
 
 				$this->maybe_inject_sub();
 				$this->maybe_inject_queue();
-				$this->maybe_immediately_process_queue();
+				$this->maybe_process_queue_in_realtime();
 			}
 
 			/**
@@ -112,11 +112,11 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Immediately process queued emails.
+			 * Process queued emails in real-time.
 			 *
 			 * @since 14xxxx First documented version.
 			 */
-			protected function maybe_immediately_process_queue()
+			protected function maybe_process_queue_in_realtime()
 			{
 				if(!$this->comment_id)
 					return; // Not applicable.
@@ -124,13 +124,13 @@ namespace comment_mail // Root namespace.
 				if($this->comment_status !== 'approve')
 					return; // Not applicable.
 
-				if(($immediate_max_time = (integer)$this->plugin->options['queue_processor_immediate_max_time']) <= 0)
-					return; // Immediate queue processing is not enabled right now.
+				if(($realtime_max_limit = (integer)$this->plugin->options['queue_processor_realtime_max_limit']) <= 0)
+					return; // Real-time queue processing is not enabled right now.
 
-				if(($immediate_max_limit = (integer)$this->plugin->options['queue_processor_immediate_max_limit']) <= 0)
-					return; // Immediate queue processing is not enabled right now.
+				$upper_max_limit = (integer)apply_filters(__CLASS__.'_upper_max_limit', 100);
+				if($realtime_max_limit > $upper_max_limit) $realtime_max_limit = $upper_max_limit;
 
-				new queue_processor(FALSE, $immediate_max_time, 0, $immediate_max_limit); // No delay.
+				new queue_processor(FALSE, 10, 0, $realtime_max_limit); // No delay.
 			}
 		}
 	}

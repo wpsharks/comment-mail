@@ -135,7 +135,7 @@ echo str_replace('%%title%%', __('Confirmation', $plugin->text_domain), $site_he
 				<?php endif; ?>
 			</h4>
 
-			<hr style="margin:0 0 10px 0;" />
+			<hr style="margin:0 0 1em 0;" />
 
 			<p>
 				<?php echo sprintf(__('Your email address is: &lt;<code>%1$s</code>&gt;;', $plugin->text_domain), esc_html($sub->email)); ?><br />
@@ -155,7 +155,7 @@ echo str_replace('%%title%%', __('Confirmation', $plugin->text_domain), $site_he
 				?>
 			</p>
 
-			<hr style="margin:0 0 10px 0;" />
+			<hr style="margin:0 0 1em 0;" />
 
 			<h5 style="font-style:italic; margin:0;">
 				<i class="fa fa-lightbulb-o"></i> <?php echo sprintf(__('If any of this is incorrect, please <a href="%1$s">click here to edit</a> your subscription.', $plugin->text_domain), esc_attr($sub_edit_url)); ?>

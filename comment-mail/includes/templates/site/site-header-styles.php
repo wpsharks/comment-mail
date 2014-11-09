@@ -84,7 +84,7 @@ namespace comment_mail;
 	header
 	{
 		z-index       : 2;
-		margin-bottom : 10px;
+		margin-bottom : 1em;
 		position      : relative;
 	}
 	header h1
@@ -129,7 +129,7 @@ namespace comment_mail;
 	.manage-summary .subs-table tr .hover-links
 	{
 		visibility : hidden;
-		margin     : 0 0 0 20px;
+		margin     : 0 0 0 1em;
 	}
 	.manage-summary .subs-table tr:hover .hover-links
 	{
@@ -153,12 +153,21 @@ namespace comment_mail;
 	}
 	.manage-sub-form form table td
 	{
-		padding : 0 0 10px 10px;
+		padding : 0 0 1em 1em;
 	}
-	.manage-sub-form form table .description
+	.manage-sub-form form table .description,
+	.manage-sub-form form table .notes
 	{
-		opacity    : 0.8;
+		opacity    : 0.75;
 		font-style : italic;
+	}
+	.manage-sub-form form table .notes-before
+	{
+		margin-bottom : .25em;
+	}
+	.manage-sub-form form table .notes-after
+	{
+		margin-top : .25em;
 	}
 	.manage-sub-form form input[type='submit']
 	{
@@ -179,7 +188,7 @@ namespace comment_mail;
 	*/
 	footer
 	{
-		margin-bottom : 30px;
+		margin-bottom : 1em;
 	}
 	footer a
 	{

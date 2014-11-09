@@ -420,6 +420,89 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Statistics menu page URL.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @return string Statistics menu page URL.
+			 */
+			public function stats_menu_page_only($scheme = 'admin')
+			{
+				$url = admin_url('/edit-comments.php');
+
+				return $this->page_only(__NAMESPACE__.'_stats', $url, $scheme);
+			}
+
+			/**
+			 * Import/export menu page URL.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @return string Import/export menu page URL.
+			 */
+			public function import_export_menu_page_only($scheme = 'admin')
+			{
+				$url = admin_url('/edit-comments.php');
+
+				return $this->page_only(__NAMESPACE__.'_import_export', $url, $scheme);
+			}
+
+			/**
+			 * Email templates menu page URL.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @return string Email templates menu page URL.
+			 */
+			public function email_templates_menu_page_only($scheme = 'admin')
+			{
+				$url = admin_url('/edit-comments.php');
+
+				return $this->page_only(__NAMESPACE__.'_email_templates', $url, $scheme);
+			}
+
+			/**
+			 * Site templates menu page URL.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @return string Site templates menu page URL.
+			 */
+			public function site_templates_menu_page_only($scheme = 'admin')
+			{
+				$url = admin_url('/edit-comments.php');
+
+				return $this->page_only(__NAMESPACE__.'_site_templates', $url, $scheme);
+			}
+
+			/**
+			 * Options updated URL.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @return string Options updated URL.
+			 */
+			public function options_updated($scheme = 'admin')
+			{
+				return $this->page_only('', '', $scheme);
+			}
+
+			/**
 			 * Restore default options URL.
 			 *
 			 * @since 14xxxx First documented version.
@@ -447,36 +530,9 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string Options restored URL.
 			 */
-			public function options_restored($scheme = 'admin')
+			public function default_options_restored($scheme = 'admin')
 			{
-				$url  = $this->main_menu_page_only($scheme);
-				$args = array(__NAMESPACE__.'_options_restored' => '1');
-
-				return add_query_arg(urlencode_deep($args), $url);
-			}
-
-			/**
-			 * Options updated URL.
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @param string      $url The input URL to work from (optional).
-			 *    If empty, defaults to the current menu page.
-			 *
-			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link set_scheme()} method for further details.
-			 *
-			 * @return string Options updated URL.
-			 */
-			public function options_updated($url = '', $scheme = 'admin')
-			{
-				if(!($url = trim((string)$url)))
-					$url = $this->page_only();
-
-				$args = array(__NAMESPACE__.'_options_updated' => '1');
-				$url  = add_query_arg(urlencode_deep($args), $url);
-
-				return $this->set_scheme($url, $scheme);
+				return $this->main_menu_page_only($scheme);
 			}
 
 			/**

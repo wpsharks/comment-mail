@@ -1,43 +1,34 @@
 /* ------------------------------------------------------------------------------------------------------------
-	Other resources; compatible w/ the WP core.
------------------------------------------------------------------------------------------------------------- */
-@import url('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.min.css');
-@import url('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css');
-@import url('../../submodules/sharkicons/styles.min.css');
-
-/* ------------------------------------------------------------------------------------------------------------
 	Plugin-specific styles for any menu page area of the dashboard.
 ------------------------------------------------------------------------------------------------------------ */
 /*
 A menu page area ~ notifications.
 */
-.comment-mail-menu-page-area .pmp-notif-info,
-.comment-mail-menu-page-area .pmp-notif-notice,
-.comment-mail-menu-page-area .pmp-notif-warning,
-.comment-mail-menu-page-area .pmp-notif-error
+.comment-mail-menu-page-area .pmp-note
 {
 	border-radius : 5px;
-	padding       : 1px 12px 1px 12px;
+	padding       : .5em;
+	margin        : 0 0 1em 0;
 	box-shadow    : 0 1px 1px 0 rgba(0, 0, 0, .1);
 }
-.comment-mail-menu-page-area .pmp-notif-info
+.comment-mail-menu-page-area .pmp-note.pmp-info
 {
-	background : #C9E0FA;
+	background : #CEE5FF;
 	border     : 1px solid #35558A;
 }
-.comment-mail-menu-page-area .pmp-notif-notice
+.comment-mail-menu-page-area .pmp-note.pmp-notice
 {
-	background : #FFFBCC;
+	background : #FFFDE8;
 	border     : 1px solid #E6DB55;
 }
-.comment-mail-menu-page-area .pmp-notif-warning
+.comment-mail-menu-page-area .pmp-note.pmp-warning
 {
-	background : #FADDAB;
+	background : #FFEFD3;
 	border     : 1px solid #D29A04;
 }
-.comment-mail-menu-page-area .pmp-notif-error
+.comment-mail-menu-page-area .pmp-note.pmp-error
 {
-	background : #FABBC6;
+	background : #FFC0CB;
 	border     : 1px solid #711E1E;
 }
 /*
@@ -47,7 +38,7 @@ A menu page area ~ list items.
 .comment-mail-menu-page-area ul.pmp-list-items ul
 {
 	padding-left : 0;
-	margin-left  : 40px;
+	margin-left  : 3em;
 	list-style   : disc;
 }
 .comment-mail-menu-page-area ul.pmp-list-items ul
@@ -70,7 +61,7 @@ A menu page area ~ clean list items.
 }
 .comment-mail-menu-page-area ul.pmp-clean-list-items ul
 {
-	margin-left : 20px;
+	margin-left : 1.5em;
 	list-style  : circle;
 }
 .comment-mail-menu-page-area ul.pmp-clean-list-items li
@@ -91,7 +82,7 @@ A menu page area ~ post com/sub bubbles.
 	text-align      : left;
 	text-decoration : none;
 	background      : #BBBBBB;
-	padding         : 0 5px 0 4px;
+	padding         : 0 .5em 0 .35em;
 	display         : inline-block;
 }
 .comment-mail-menu-page-area .pmp-post-sub-count::before
@@ -104,7 +95,7 @@ A menu page area ~ post com/sub bubbles.
 	-webkit-font-smoothing : antialiased;
 
 	float                  : left;
-	margin                 : 0 5px 0 0;
+	margin                 : 0 .5em 0 0;
 	display                : inline-block;
 }
 .comment-mail-menu-page-area .pmp-post-sub-count > .pmp-sub-count
@@ -120,24 +111,65 @@ A menu page area ~ post com/sub bubbles.
 {
 	color : #FFFFFF;
 }
+/*
+A menu page area ~ utilities.
+*/
+.comment-mail-menu-page-area .pmp-left
+{
+	margin-right : 1em;
+	float        : left !important;
+}
+.comment-mail-menu-page-area .pmp-right
+{
+	margin-left : 1em;
+	float       : right !important;
+}
+.comment-mail-menu-page-area .pmp-borders-padding
+{
+	border-radius : 4px !important;
+	padding       : .5em !important;
+	background    : #FFFFFF !important;
+	border        : 1px solid rgba(0, 0, 0, .3) !important;
+}
+.comment-mail-menu-page-area .pmp-hilite
+{
+	opacity       : 1 !important;
+	border        : 0 !important;
+	border-radius : 5px !important;
+	display       : table !important;
+	color         : #000000 !important;
+	background    : #FFFBB2 !important;
+	padding       : .25em .5em .25em .5em !important;
+}
+.comment-mail-menu-page-area .pmp-blink
+{
+	animation         : pmp-blink .5s steps(5, start) infinite !important;
+	-webkit-animation : pmp-blink .5s steps(5, start) infinite !important;
+}
+@keyframes pmp-blink
+{
+	to
+	{
+		visibility : hidden;
+	}
+}
+@-webkit-keyframes pmp-blink
+{
+	to
+	{
+		visibility : hidden;
+	}
+}
 /* ------------------------------------------------------------------------------------------------------------
 	WP core elements under plugin-specific conditions.
 ------------------------------------------------------------------------------------------------------------ */
 /*
-Alter wrap bg color.
-*/
-.comments_page_comment_mail #wpwrap
-{
-	background : #C7C7C7;
-}
-/*
 Align w/ menu page.
 */
-.comments_page_comment_mail div.updated,
-.comments_page_comment_mail div.error
+body[class*='comment_mail'] #wpbody-content > div.updated,
+body[class*='comment_mail'] #wpbody-content > div.error
 {
-	font-size : 120%;
-	margin    : 25px 25px 25px 5px;
+	margin : 1.25em 1.25em 1.25em .25em;
 }
 /* ------------------------------------------------------------------------------------------------------------
 	Plugin-specific styles for an actual/standard plugin menu page; e.g. options.
@@ -147,45 +179,83 @@ Menu page styles.
 */
 .comment-mail-menu-page
 {
-	font-size     : 14px;
-	padding       : 25px;
-	min-width     : 800px;
-	margin        : 25px 25px 25px 5px;
-
-	border-radius : 5px;
-	border        : 1px solid #333333;
-	box-shadow    : 0 0 8px 0 rgba(0, 0, 0, 0.2) !important;
-	background    : #FFFFFF url('../images/trans-bg.png') repeat left top;
+	font-size : 14px;
+	min-width : 800px;
+	margin    : 1.25em 1.25em 1.25em .25em;
 }
 .comment-mail-menu-page a
 {
-	color : #003E75;
+	color : #346098;
 }
 .comment-mail-menu-page a:hover,
 .comment-mail-menu-page a:active
 {
-	color : #027E02;
+	color : #307D27;
+}
+.comment-mail-menu-page p,
+.comment-mail-menu-page pre,
+.comment-mail-menu-page output,
+.comment-mail-menu-page table,
+.comment-mail-menu-page blockquote,
+.comment-mail-menu-page audio,
+.comment-mail-menu-page video,
+.comment-mail-menu-page ul,
+.comment-mail-menu-page ol,
+.comment-mail-menu-page dl
+{
+	margin : 1em 0 1em 0;
+}
+.comment-mail-menu-page .cm pre
+{
+	margin : 0;
+}
+.comment-mail-menu-page *:not(hr):first-child
+{
+	margin-top : 0 !important;
+}
+.comment-mail-menu-page *:not(hr):last-child
+{
+	margin-bottom : 0 !important;
 }
 .comment-mail-menu-page p,
 .comment-mail-menu-page code
 {
 	font-size : inherit;
 }
-.comment-mail-menu-page p:first-child,
-.comment-mail-menu-page pre:first-child
+.comment-mail-menu-page table
 {
-	margin-top : 0;
+	width        : 100%;
+	table-layout : fixed;
 }
-.comment-mail-menu-page p:last-child,
-.comment-mail-menu-page pre:last-child
+.comment-mail-menu-page table .form-field th,
+.comment-mail-menu-page table .form-field td
 {
-	margin-bottom : 0;
+	display    : block;
+	text-align : left;
+}
+.comment-mail-menu-page table .description,
+.comment-mail-menu-page table .notes
+{
+	opacity   : 0.75;
+	font-size : 90%;
+}
+.comment-mail-menu-page table .description
+{
+	font-style : italic;
+}
+.comment-mail-menu-page table .notes-before
+{
+	margin-bottom : .5em;
+}
+.comment-mail-menu-page table .notes-after
+{
+	margin-top : .5em;
 }
 .comment-mail-menu-page code
 {
 	border-radius : 3px;
-	padding       : 1px 5px 1px 5px;
-	background    : rgba(255, 255, 255, 0.25);
+	padding       : .1em .25em .1em .25em;
+	background    : rgba(178, 178, 178, 0.25);
 	font-family   : 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
 }
 .comment-mail-menu-page pre.pmp-code
@@ -202,26 +272,21 @@ Menu page styles.
 	max-width     : 100%;
 
 	border-radius : 4px;
-	padding       : 10px;
+	padding       : .5em;
 	display       : block;
-	box-shadow    : 0 0 2px 1px #000000 inset, 0 0 1px 1px rgba(223, 245, 165, 0.5);
+	box-shadow    : 0 0 2px 1px #000000 inset, 0 0 1px 1px rgba(0, 0, 0, 0.5);
 }
 .comment-mail-menu-page img
 {
 	border : 0;
 }
-.comment-mail-menu-page img.pmp-bordered
-{
-	border-radius : 4px;
-	padding       : 10px;
-	background    : #FFFFFF;
-	border        : 1px solid #AFAFAF;
-	box-shadow    : 0 0 2px 1px #D8D8D8 inset, 0 0 1px 1px rgba(223, 245, 165, 0.5);
-}
 .comment-mail-menu-page hr
 {
-	margin : 25px 0 25px 0;
-	border : 1px solid #91DD97;
+	border     : 0;
+	padding    : 0;
+	height     : 1px;
+	margin     : 1em 0 1em 0;
+	background : linear-gradient(to left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
 }
 .comment-mail-menu-page label
 {
@@ -229,8 +294,10 @@ Menu page styles.
 	-moz-user-select    : none;
 	user-select         : none;
 }
-.comment-mail-menu-page select, .comment-mail-menu-page select:focus,
-.comment-mail-menu-page textarea, .comment-mail-menu-page textarea:focus,
+.comment-mail-menu-page select,
+.comment-mail-menu-page select:focus,
+.comment-mail-menu-page textarea,
+.comment-mail-menu-page textarea:focus,
 .comment-mail-menu-page input:not([type='radio']):not([type='checkbox']),
 .comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus
 {
@@ -244,43 +311,71 @@ Menu page styles.
 
 	box-sizing  : border-box;
 }
-.comment-mail-menu-page textarea, .comment-mail-menu-page textarea:focus,
+.comment-mail-menu-page textarea,
+.comment-mail-menu-page textarea:focus,
 .comment-mail-menu-page input:not([type='radio']):not([type='checkbox']),
 .comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus,
-.comment-mail-menu-page /* CodeMirror wrappers. */.cm, .comment-mail-menu-page .cm .CodeMirror
+.comment-mail-menu-page /* CodeMirror. */.cm,
+.comment-mail-menu-page .cm .CodeMirror
 {
 	font-size   : 1em; /* Font size again, for CodeMirror too. */
 	font-family : 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
 }
-.comment-mail-menu-page textarea, .comment-mail-menu-page textarea:focus
+.comment-mail-menu-page textarea,
+.comment-mail-menu-page textarea:focus
 {
-	height      : auto; /* Textareas auto. */
-	white-space : pre; /* Preserve whitespace. */
+	height      : auto;
+	white-space : pre;
 }
-.comment-mail-menu-page select, .comment-mail-menu-page select:focus,
-.comment-mail-menu-page textarea, .comment-mail-menu-page textarea:focus,
+.comment-mail-menu-page select,
+.comment-mail-menu-page select:focus,
+.comment-mail-menu-page textarea,
+.comment-mail-menu-page textarea:focus,
 .comment-mail-menu-page input:not([type='radio']):not([type='checkbox']),
 .comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus,
 .comment-mail-menu-page /* CodeMirror wrappers. */.cm
 {
-	border        : 0;
-	padding       : 5px;
 	border-radius : 4px;
-	box-shadow    : 0 0 1px 1px rgba(37, 47, 26, 0.75) inset, 0 0 1px 1px rgba(223, 245, 165, 0.5);
+	padding       : .25em;
+	border        : 1px solid #C5C5C5;
+	box-shadow    : 0 1px 0 0 rgba(0, 0, 0, 0.05) inset, 0 -1px 1px 0 rgba(0, 0, 0, 0.06) inset;
+}
+.comment-mail-menu-page select,
+.comment-mail-menu-page select:focus,
+.comment-mail-menu-page /* CodeMirror. */.cm
+{
+	box-shadow : 0 2px 0 0 rgba(255, 255, 255, 0.25) inset, 0 -1px 1px 0 rgba(165, 165, 165, 0.42) inset;
 }
 .comment-mail-menu-page select,
 .comment-mail-menu-page textarea,
 .comment-mail-menu-page input:not([type='radio']):not([type='checkbox'])
 {
-	color      : #F7F7F7;
-	background : #73834B;
+	color      : #626262;
+	background : #E0E0E0;
+}
+.comment-mail-menu-page select
+{
+	background : linear-gradient(to bottom, rgba(239, 239, 239, 1) 0%, rgba(228, 228, 228, 1) 100%);
 }
 .comment-mail-menu-page select:focus,
 .comment-mail-menu-page textarea:focus,
 .comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus,
-.comment-mail-menu-page /* CodeMirror wrappers. */.cm
+.comment-mail-menu-page /* CodeMirror. */.cm
 {
-	background : #637041;
+	color : #000000;
+}
+.comment-mail-menu-page textarea:focus,
+.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus
+{
+	background : #E8E8E8;
+}
+.comment-mail-menu-page select:focus
+{
+	background : #FFFFFF;
+}
+.comment-mail-menu-page .cm .cm-s-ambiance .cm-qualifier
+{
+	color : #C7FFC5; /* Hate the default that comes w/ ambiance. */
 }
 .comment-mail-menu-page select.pmp-max-width,
 .comment-mail-menu-page textarea.pmp-max-width,
@@ -291,27 +386,27 @@ Menu page styles.
 }
 .comment-mail-menu-page input::-webkit-input-placeholder
 {
-	padding-top : 3px;
+	padding-top : .1em;
 	font-style  : italic;
-	color       : rgba(255, 255, 255, 0.2);
+	color       : rgba(0, 0, 0, 0.2);
 }
 .comment-mail-menu-page input::-moz-placeholder
 {
-	padding-top : 3px;
+	padding-top : .1em;
 	font-style  : italic;
-	color       : rgba(255, 255, 255, 0.2);
+	color       : rgba(0, 0, 0, 0.2);
 }
 .comment-mail-menu-page input:-moz-placeholder
 {
-	padding-top : 3px;
+	padding-top : .1em;
 	font-style  : italic;
-	color       : rgba(255, 255, 255, 0.2);
+	color       : rgba(0, 0, 0, 0.2);
 }
 .comment-mail-menu-page input:-ms-input-placeholder
 {
-	padding-top : 3px;
+	padding-top : .1em;
 	font-style  : italic;
-	color       : rgba(255, 255, 255, 0.2);
+	color       : rgba(0, 0, 0, 0.2);
 }
 .comment-mail-menu-page input[disabled],
 .comment-mail-menu-page select[disabled],
@@ -319,17 +414,13 @@ Menu page styles.
 {
 	opacity : 0.5;
 }
-.comment-mail-menu-page table
-{
-	margin : 1em 0 1em 0;
-}
 .comment-mail-menu-page button
 {
 	line-height         : 1em;
 	font-size           : 150%;
 	font-weight         : bold;
 	color               : #FFFFFF;
-	background          : #0E4152;
+	background          : #3E76B8;
 
 	border-radius       : 4px;
 	border              : 1px solid rgba(0, 0, 0, 0.5);
@@ -339,7 +430,7 @@ Menu page styles.
 
 	margin              : 0;
 	box-sizing          : border-box;
-	padding             : 6px 12px 6px 12px;
+	padding             : .25em;
 
 	outline             : none;
 
@@ -350,31 +441,16 @@ Menu page styles.
 }
 .comment-mail-menu-page button:hover
 {
-	background : #0D1F2F;
+	background : #307D27;
 }
 .comment-mail-menu-page button:active
 {
 	-webkit-transform : scale(0.98, 0.98);
 	transform         : scale(0.98, 0.98);
 }
-.comment-mail-menu-page button[type='submit']
-{
-	background : #5F7523;
-}
-.comment-mail-menu-page button[type='submit']:hover
-{
-	background : #4C6324;
-}
 .comment-mail-menu-page .pmp-pro-preview
 {
 	opacity : 0.5;
-}
-.comment-mail-menu-page .pmp-notif-info,
-.comment-mail-menu-page .pmp-notif-notice,
-.comment-mail-menu-page .pmp-notif-warning,
-.comment-mail-menu-page .pmp-notif-error
-{
-	margin : 0 0 25px 0;
 }
 .comment-mail-menu-page .pmp-clearfix:before,
 .comment-mail-menu-page .pmp-clearfix:after
@@ -386,49 +462,105 @@ Menu page styles.
 {
 	clear : both;
 }
+.comment-mail-menu-page > .pmp-note,
+.comment-mail-menu-page > * > .pmp-note
+{
+	margin : -1em 0 2em 0;
+}
 /*
 Menu page heading styles.
 */
 .comment-mail-menu-page .pmp-heading
 {
-	padding-bottom : 15px;
-	margin-bottom  : 25px;
-	border-bottom  : 1px solid #CCCCCC;
+	padding-bottom : 1em;
+	margin-bottom  : 2em;
+	position       : relative;
 }
-.comment-mail-menu-page .pmp-heading button[type='submit'],
-.comment-mail-menu-page .pmp-heading .pmp-restore-defaults,
-.comment-mail-menu-page .pmp-heading .pmp-panel-togglers
+.comment-mail-menu-page .pmp-heading::after
 {
-	float : right;
-}
-.comment-mail-menu-page .pmp-heading .pmp-restore-defaults,
-.comment-mail-menu-page .pmp-heading .pmp-panel-togglers
-{
-	margin : 0 25px 0 0;
-}
-.comment-mail-menu-page .pmp-heading .pmp-upsells
-{
-	float      : right;
-	clear      : right;
+	content    : '';
+	bottom     : 0;
+	left       : 0;
+	position   : absolute;
 
-	max-width  : 375px;
-	margin     : 10px 0 0 0;
+	width      : 100%;
+	height     : .25em;
 
-	text-align : center;
+	background : linear-gradient(to left, rgba(204, 204, 204, 0), rgba(204, 204, 204, 0.75), rgba(204, 204, 204, 0));
 }
-.comment-mail-menu-page .pmp-heading .pmp-upsells a
+.comment-mail-menu-page .pmp-heading img.pmp-logo-icon
 {
-	line-height     : 1.5em;
+	margin-left : 10px;
+	width       : 500px;
+}
+.comment-mail-menu-page .pmp-heading .pmp-heading-links a
+{
 	text-decoration : none;
-	margin          : 0 5px 0 5px;
+	text-align      : center;
 	display         : inline-block;
+	margin          : 1em 0 0 0;
+
+	opacity         : 0.25;
+	border-radius   : 4px;
+	background      : transparent;
+	padding         : .25em .5em .25em .5em;
+}
+.comment-mail-menu-page .pmp-heading .pmp-heading-links a:hover,
+.comment-mail-menu-page .pmp-heading .pmp-heading-links a.pmp-active
+{
+	opacity : 1;
+}
+.comment-mail-menu-page .pmp-heading .pmp-heading-links a.pmp-active
+{
+	background : #FFFFFF;
+}
+.comment-mail-menu-page .pmp-heading .pmp-heading-links a:first-child
+{
+	margin-left : 0;
+}
+.comment-mail-menu-page .pmp-heading .pmp-heading-links a:last-child
+{
+	margin-right : 0;
+}
+.comment-mail-menu-page .pmp-heading .pmp-heading-links a > .pmp-blink
+{
+	font-size : 80%;
+	display   : block;
+	margin    : .25em 0 0 0;
+}
+/*
+Menu page body styles.
+*/
+.comment-mail-menu-page .pmp-body .pmp-all-panel-togglers
+{
+	outline   : none;
+	float     : right;
+	font-size : 300%;
+	margin    : 0 0 0 2em;
+	position  : relative;
+	z-index   : 1;
+}
+/*
+Menu page section heading styles.
+*/
+.comment-mail-menu-page .pmp-section-heading
+{
+	margin : 1em 0 1em 0;
+}
+.comment-mail-menu-page .pmp-section-heading > small
+{
+	font-size  : 65%;
+	opacity    : 0.5;
+	font-style : italic;
+	display    : block;
+	margin     : .25em 0 0 0 !important;
 }
 /*
 Menu page panel styles.
 */
 .comment-mail-menu-page .pmp-panel
 {
-	margin : 25px 0 25px 0;
+	margin : 1em 0 1em 0;
 }
 .comment-mail-menu-page .pmp-panel:first-child
 {
@@ -439,13 +571,10 @@ Menu page panel styles.
 	display             : block;
 	text-decoration     : none;
 
-	z-index             : 1;
-	position            : relative;
-
-	padding             : 10px;
+	padding             : .5em;
 	font-size           : 150%;
 	font-weight         : bold;
-	background          : #173B47;
+	background          : #346098;
 	color               : #EEEEEE !important;
 
 	border-radius       : 4px;
@@ -459,8 +588,16 @@ Menu page panel styles.
 .comment-mail-menu-page .pmp-panel-heading:hover,
 .comment-mail-menu-page .pmp-panel-heading.open
 {
-	background : #0D1F2F;
+	background : #307D27;
 	color      : #FFFFFF !important;
+}
+.comment-mail-menu-page .pmp-panel-heading > .pmp-panel-heading-note
+{
+	font-size  : 70%;
+	opacity    : 0.5;
+	font-style : italic;
+	margin     : 0 0 0 .5em;
+	display    : inline-block;
 }
 .comment-mail-menu-page .pmp-panel-heading:after
 {
@@ -470,7 +607,7 @@ Menu page panel styles.
 	font-family : 'FontAwesome';
 
 	float       : right;
-	margin      : 0 0 0 5px;
+	margin      : 0 0 0 .5em;
 	display     : inline-block;
 }
 .comment-mail-menu-page .pmp-panel-heading.open:after
@@ -489,34 +626,24 @@ Menu page panel styles.
 	margin                     : 0 auto 0 auto;
 	box-sizing                 : border-box;
 
-	z-index                    : 0;
-	position                   : relative;
 	display                    : none;
 
-	padding                    : 25px;
+	padding                    : 1em;
 	color                      : #333333;
-	background                 : #D0DDAD;
+	background                 : #FFFFFF;
 
 	border-bottom-left-radius  : 4px;
 	border-bottom-right-radius : 4px;
 
-	box-shadow                 : 0 1px 1px 0 rgba(0, 0, 0, 0.5);
+	box-shadow                 : 0 1px 1px 0 rgba(0, 0, 0, 0.5), 0 3px 1px -1px rgba(0, 0, 0, 0.25) inset;
 }
 .comment-mail-menu-page .pmp-panel-body.open
 {
 	display : block;
 }
-.comment-mail-menu-page .pmp-panel-body .pmp-notif-notice,
-.comment-mail-menu-page .pmp-panel-body .pmp-notif-info,
-.comment-mail-menu-page .pmp-panel-body .pmp-notif-warning,
-.comment-mail-menu-page .pmp-panel-body .pmp-notif-error
-{
-	display   : table;
-	font-size : inherit;
-}
 .comment-mail-menu-page .pmp-panel-body h3
 {
-	margin : 0 0 5px 0;
+	margin : 0 0 1em 0;
 }
 .comment-mail-menu-page .pmp-panel-body h3:first-child
 {
@@ -526,9 +653,52 @@ Menu page panel styles.
 {
 	margin-top : 0;
 }
+.comment-mail-menu-page .pmp-panel-body .pmp-note
+{
+	padding   : 5px;
+	font-size : inherit;
+	margin    : 1em 0 1em 0;
+}
+.comment-mail-menu-page .pmp-panel-body .pmp-note.pmp-max-width
+{
+	display : table;
+}
+.comment-mail-menu-page .pmp-panel-body .pmp-import-iframe-output
+{
+	display       : block;
+
+	width         : 100%;
+	height        : 75px;
+	box-sizing    : border-box;
+
+	padding       : 0;
+	margin        : 1em 0 1em 0;
+
+	border-radius : 4px;
+	background    : transparent;
+	border        : 1px dashed #CCCCCC;
+}
 /*
 Menu page save button styles.
 */
+.comment-mail-menu-page .pmp-save
+{
+	margin-top  : 2em;
+	padding-top : 1em;
+	position    : relative;
+}
+.comment-mail-menu-page .pmp-save::before
+{
+	content    : '';
+	top        : 0;
+	left       : 0;
+	position   : absolute;
+
+	width      : 100%;
+	height     : .25em;
+
+	background : linear-gradient(to left, rgba(204, 204, 204, 0), rgba(204, 204, 204, 0.75), rgba(204, 204, 204, 0));
+}
 .comment-mail-menu-page .pmp-save button[type='submit']
 {
 	width       : 100%;
@@ -542,7 +712,7 @@ Menu page table filter styles.
 */
 .comment-mail-menu-page-table ul.pmp-navigable-filters li
 {
-	margin  : 0 10px 0 0;
+	margin  : 0 .5em 0 0;
 	display : inline-block;
 }
 .comment-mail-menu-page-table ul.pmp-navigable-filters li > a
@@ -551,7 +721,7 @@ Menu page table filter styles.
 	text-decoration : none;
 	color           : #A6A6A6;
 	background      : #EAEAEA;
-	padding         : 0 5px 0 5px;
+	padding         : 0 .35em 0 .35em;
 	display         : inline-block;
 }
 .comment-mail-menu-page-table ul.pmp-navigable-filters li > a:hover,
@@ -742,13 +912,23 @@ Menu page table columns; i.e. media queries.
 	Plugin-specific styles for menu page forms that follow a WP standard; but need a few tweaks.
 ------------------------------------------------------------------------------------------------------------ */
 /*
-Menu page table filter styles.
+Menu page form field styles.
 */
 .comment-mail-menu-page-form .form-field input:not([type='radio']):not([type='checkbox']),
 .comment-mail-menu-page-form .form-field select,
 .comment-mail-menu-page-form .form-field textarea,
-.comment-mail-menu-page-form .form-field p.description
+.comment-mail-menu-page-form .form-field .notes
 {
 	width     : 100%;
 	max-width : 600px;
+}
+.comment-mail-menu-page-form .form-field .description,
+.comment-mail-menu-page-form .form-field .notes
+{
+	opacity    : 0.75;
+	font-style : italic;
+}
+.comment-mail-menu-page-form .form-field .notes
+{
+	margin-top : .25em;
 }

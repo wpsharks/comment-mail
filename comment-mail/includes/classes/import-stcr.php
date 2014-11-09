@@ -104,6 +104,55 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * StCR data exists?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean `TRUE` if StCR data exists.
+			 */
+			public static function data_exists()
+			{
+				$plugin = plugin(); // Need this below.
+
+				$sql = "SELECT `meta_id` FROM `".esc_sql($plugin->utils_db->wp->postmeta)."`".
+				       " WHERE `meta_key` LIKE '%\\_stcr@\\_%' LIMIT 1";
+
+				return (boolean)$plugin->utils_db->wp->get_var($sql);
+			}
+
+			/**
+			 * Ever done an StCR import?
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean `TRUE` if ever done an StCR import.
+			 */
+			public static function ever_imported()
+			{
+				$plugin = plugin(); // Need this below.
+
+				$sql = "SELECT `meta_id` FROM `".esc_sql($plugin->utils_db->wp->postmeta)."`".
+				       " WHERE `meta_key` LIKE '%".esc_sql($plugin->utils_db->wp->esc_like(__NAMESPACE__.'_imported_stcr_subs'))."%' LIMIT 1";
+
+				return (boolean)$plugin->utils_db->wp->get_var($sql);
+			}
+
+			/**
+			 * Erase import history.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			public static function erase_import_history()
+			{
+				$plugin = plugin(); // Need this below.
+
+				$sql = "DELETE FROM `".esc_sql($plugin->utils_db->wp->postmeta)."`".
+				       " WHERE `meta_key` LIKE '%".esc_sql($plugin->utils_db->wp->esc_like(__NAMESPACE__.'_imported_stcr_subs'))."%'";
+
+				$plugin->utils_db->wp->query($sql);
+			}
+
+			/**
 			 * Import processor.
 			 *
 			 * @since 14xxxx First documented version.
@@ -112,9 +161,6 @@ namespace comment_mail // Root namespace.
 			{
 				if(!current_user_can($this->plugin->cap))
 					return; // Unauthenticated; ignore.
-
-				if(!$this->unimported_post_ids)
-					return; // Nothing to do.
 
 				foreach($this->unimported_post_ids as $_post_id)
 				{
@@ -304,9 +350,9 @@ namespace comment_mail // Root namespace.
 
 				$sql = "SELECT `comment_ID` FROM  `".esc_sql($this->plugin->utils_db->wp->comments)."`".
 
-				       " WHERE  `comment_post_ID` = '".esc_sql($post_id)."".
+				       " WHERE  `comment_post_ID` = '".esc_sql($post_id)."'".
 				       " AND  `comment_author_email` = '".esc_sql($email)."'".
-				       " AND `comment_status` IN('approve', 'approved', '1')".
+				       " AND `comment_approved` IN('approve', 'approved', '1')".
 
 				       " ORDER BY `comment_date` ASC"; // Oldest to newest.
 
@@ -394,9 +440,9 @@ namespace comment_mail // Root namespace.
 				$status .= '      <title>'.esc_html(__('StCR Importer', $this->plugin->text_domain)).'</title>'."\n";
 
 				$status .= '      <style type="text/css">'."\n";
-				$status .= '         body { background: #FFFFFF; color: #000000; }'."\n";
+				$status .= '         body { background: #CCCCCC; color: #000000; }'."\n";
 				$status .= '         body { font-size: 13px; line-height: 1em; font-family: sans-serif; }'."\n";
-				$status .= '         body { padding: 5px; text-align: center; }'."\n";
+				$status .= '         body { padding: .5em; text-align: center; }'."\n";
 				$status .= '      </style>'."\n";
 
 				$status .= '      <script type="text/javascript"'. // jQuery dependency.

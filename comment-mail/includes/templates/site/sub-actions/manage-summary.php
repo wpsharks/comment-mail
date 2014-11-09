@@ -168,7 +168,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $
 
 			<h2 style="margin-top:0;">
 				<a href="<?php echo esc_attr($sub_new_url); ?>" title="<?php echo __('Add New Subscription', $plugin->text_domain); ?>">
-					<i class="fa fa-plus-square text-success pull-right" style="margin-left:15px;"></i>
+					<i class="fa fa-plus-square text-success pull-right" style="margin-left:.5em;"></i>
 				</a>
 				<a href="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
 					data-action="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
@@ -177,7 +177,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $
 					<i class="fa fa-times-circle text-danger pull-right"></i>
 				</a>
 				<?php echo __('My Comment Subscriptions', $plugin->text_domain); ?><br />
-				<em style="margin-left:10px;">
+				<em style="margin-left:.5em;">
 					<small>&lt;<?php echo esc_html(implode('&gt;, &lt;', array_slice($sub_emails, 0, 100))); ?>&gt;</small>
 				</em>
 			</h2>

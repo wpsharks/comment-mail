@@ -53,9 +53,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function send($to, $subject, $message, $headers = array(), $attachments = array(), $throw = FALSE)
 			{
-				if($this->plugin->options['smtp_enable'] // SMTP mailer enabled?
-				   && $this->plugin->options['smtp_host'] && $this->plugin->options['smtp_port']
-				) // If the SMTP mailer is enabled & configured; i.e. ready for use.
+				if($this->has_smtp_enabled()) // Can use SMTP; i.e. enabled?
 				{
 					if(is_null($mail_smtp = &$this->cache_key(__FUNCTION__, 'mail_smtp')))
 						/** @var $mail_smtp mail_smtp Reference for IDEs. */
@@ -63,15 +61,205 @@ namespace comment_mail // Root namespace.
 
 					return $mail_smtp->send($to, $subject, $message, $headers, $attachments, $throw);
 				}
-				if(is_array($headers)) // Append `Content-Type`.
-					$headers[] = 'Content-Type: text/html; charset=UTF-8';
-				else $headers = trim((string)$headers."\r\n".'Content-Type: text/html; charset=UTF-8');
+				if(!is_array($headers)) // Force array.
+					$headers = explode("\r\n", (string)$headers);
+
+				$headers[] = 'Content-Type: text/html; charset=UTF-8';
+
+				if($this->plugin->options['from_email']) // Specific `From:` address?
+					$headers[] = 'From: "'.$this->plugin->utils_string->esc_dq($this->plugin->options['from_name']).'"'.
+					             ' <'.$this->plugin->options['from_email'].'>';
+
+				if($this->plugin->options['reply_to_email']) // Specific `Reply-To:` address?
+					$headers[] = 'Reply-To: '.$this->plugin->options['reply_to_email'];
 
 				return wp_mail($to, $subject, $message, $headers, $attachments);
 			}
 
 			/**
-			 * Parses recipients deeply.
+			 * A mail testing utility.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @note This method always (ALWAYS) sends email in HTML format;
+			 *    w/ a plain text alternative — generated automatically.
+			 *
+			 * @param string|array $to Email address(es).
+			 * @param string       $subject Email subject line.
+			 * @param string       $message Message contents.
+			 * @param string|array $headers Optional. Additional headers.
+			 * @param string|array $attachments Optional. Files to attach.
+			 *
+			 * @return \stdClass With the following properties:
+			 *
+			 *    • `to` = addresses the test was sent to; as an array.
+			 *    • `via` = the transport layer used in the test; as a string.
+			 *    • `sent` = `TRUE` if the email was sent successfully; as a boolean.
+			 *    • `debug_output_markup` = HTML markup w/ any debugging output; as a string.
+			 *    • `results_markup` = Markup with all of the above in test response format; as a string.
+			 */
+			public function test($to, $subject, $message, $headers = array(), $attachments = array())
+			{
+				if($this->has_smtp_enabled()) // Can use SMTP; i.e. enabled?
+					return $this->smtp_test($to, $subject, $message, $headers, $attachments);
+
+				$to = array_map('strval', (array)$to); // Force array.
+
+				$via  = 'wp_mail'; // Via `wp_mail` in this case.
+				$sent = FALSE; // Initialize as `FALSE`.
+
+				global $phpmailer; // WP global var.
+				if(!($phpmailer instanceof \PHPMailer))
+				{
+					require_once ABSPATH.WPINC.'/class-phpmailer.php';
+					require_once ABSPATH.WPINC.'/class-smtp.php';
+					$phpmailer = new \PHPMailer(TRUE);
+				}
+				ob_start();
+				$phpmailer->SMTPDebug   = 2;
+				$phpmailer->Debugoutput = 'html';
+
+				// Note: `wp_mail()` might not actually use \PHPMailer.
+				// If that's the case, then debug output below will likely be empty.
+				// It's also possible that \PHPMailer is not using SMTP. That's OK too.
+
+				if(!is_array($headers)) // Force array.
+					$headers = explode("\r\n", (string)$headers);
+
+				$headers[] = 'Content-Type: text/html; charset=UTF-8';
+
+				if($this->plugin->options['from_email']) // Specific `From:` address?
+					$headers[] = 'From: "'.$this->plugin->utils_string->esc_dq($this->plugin->options['from_name']).'"'.
+					             ' <'.$this->plugin->options['from_email'].'>';
+
+				if($this->plugin->options['reply_to_email']) // Specific `Reply-To:` address?
+					$headers[] = 'Reply-To: '.$this->plugin->options['reply_to_email'];
+
+				$sent = wp_mail($to, $subject, $message, $headers, $attachments);
+				if($phpmailer instanceof \PHPMailer && $phpmailer->Mailer === 'smtp') $phpmailer->smtpClose();
+				unset($phpmailer); // Unset so WordPress will recreate if it needs it again in this process.
+
+				$debug_output_markup = $this->plugin->utils_string->trim_html(ob_get_clean());
+				$results_markup      = $this->test_results_markup($to, $via, $sent, $debug_output_markup);
+
+				return (object)compact('to', 'via', 'sent', 'debug_output_markup', 'results_markup');
+			}
+
+			/**
+			 * SMTP mail testing utility.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @note This method always (ALWAYS) sends email in HTML format;
+			 *    w/ a plain text alternative — generated automatically.
+			 *
+			 * @param string|array $to Email address(es).
+			 * @param string       $subject Email subject line.
+			 * @param string       $message Message contents.
+			 * @param string|array $headers Optional. Additional headers.
+			 * @param string|array $attachments Optional. Files to attach.
+			 *
+			 * @return \stdClass With the following properties:
+			 *
+			 *    • `to` = addresses the test was sent to; as an array.
+			 *    • `via` = the transport layer used in the test; as a string.
+			 *    • `sent` = `TRUE` if the email was sent successfully; as a boolean.
+			 *    • `debug_output_markup` = HTML markup w/ any debugging output; as a string.
+			 *    • `results_markup` = Markup with all of the above in test response format; as a string.
+			 */
+			public function smtp_test($to, $subject, $message, $headers = array(), $attachments = array())
+			{
+				$to = array_map('strval', (array)$to); // Force array.
+
+				$via  = 'smtp'; // Via SMTP in this case.
+				$sent = FALSE; // Initialize as `FALSE`.
+
+				if($this->has_smtp_enabled()) // Can use SMTP; i.e. enabled?
+				{
+					$mail_smtp = new mail_smtp(TRUE); // Single instance w/ debugging.
+
+					$sent                = $mail_smtp->send($to, $subject, $message, $headers, $attachments);
+					$debug_output_markup = $this->plugin->utils_string->trim_html($mail_smtp->debug_output_markup());
+				}
+				else $debug_output_markup = __('Complete failure; configuration incomplete.', $this->plugin->text_domain);
+
+				$results_markup = $this->test_results_markup($to, $via, $sent, $debug_output_markup);
+
+				return (object)compact('to', 'via', 'sent', 'debug_output_markup', 'results_markup');
+			}
+
+			/**
+			 * Test results formatter.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @note This method always (ALWAYS) sends email in HTML format;
+			 *    w/ a plain text alternative — generated automatically.
+			 *
+			 * @param array   $to Addresses test was sent to.
+			 * @param string  $via Transport layer used for the test.
+			 * @param boolean $sent Was the test sent succesfully?
+			 * @param string  $debug_output_markup Any debug out; in HTML markup.
+			 *
+			 * @return string Full HTML markup with test results; for back-end display.
+			 */
+			public function test_results_markup(array $to, $via, $sent, $debug_output_markup)
+			{
+				$to = array_map('strval', $to);
+
+				$via                 = (string)$via;
+				$sent                = (boolean)$sent;
+				$debug_output_markup = (string)$debug_output_markup;
+				$debug_output_markup = $this->plugin->utils_string->trim_html($debug_output_markup);
+
+				if($via === 'wp_mail') // Convert this to HTML markup.
+					$via_markup = $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/functions/wp_mail/', 'wp_mail');
+
+				else if($via === 'smtp') // Convert this to HTML markup.
+					$via_markup = $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol', 'SMTP');
+
+				else $via_markup = esc_html($via); // Convert this to HTML markup.
+
+				if(!$debug_output_markup) // There might not be any output in some cases; e.g. if SMTP is not in use.
+					$debug_output_markup = esc_html(__('— please check your email to be sure you received the message —', $this->plugin->text_domain));
+
+				$results_markup = '<h4 style="margin:0 0 1em 0;">'.
+				                  '   '.sprintf(__('%1$s&trade; sent a test email via %2$s to:', $this->plugin->text_domain),
+				                                esc_html($this->plugin->name), $via_markup).'<br />'.
+				                  '   &lt;<code>'.esc_html(implode('; ', $to)).'</code>&gt;'.
+				                  '</h4>';
+
+				$results_markup .= '<h4 style="margin:0 0 1em 0;">'.
+				                   '   '.__('Email sent successfully?', $this->plugin->text_domain).'<br />'.
+				                   '<code>'.esc_html($sent ? __('seems so; please check your email to be sure', $this->plugin->text_domain) : __('no', $this->plugin->text_domain)).'</code>'.
+				                   '</h4>';
+
+				$results_markup .= '<h4 style="margin:0;">'.
+				                   '   '.__('Debug Output:', $this->plugin->text_domain).
+				                   '</h4>'.
+				                   '<hr />'.
+				                   '<div style="margin:0 0 1em 0;">'.
+				                   '   '.$debug_output_markup.
+				                   '</div>';
+
+				return $results_markup; // Full HTML markup for back-end display.
+			}
+
+			/**
+			 * `TRUE` if we can send mail via SMTP.
+			 *
+			 * @since 14xxxx First documented version.
+			 *
+			 * @return boolean `TRUE` if we can send mail via SMTP.
+			 */
+			public function has_smtp_enabled()
+			{
+				return $this->plugin->options['smtp_enable'] // Enabled & configured?
+				       && $this->plugin->options['smtp_host'] && $this->plugin->options['smtp_port'];
+			}
+
+			/**
+			 * Parses addresses deeply.
 			 *
 			 * @since 14xxxx First documented version.
 			 *
@@ -83,21 +271,21 @@ namespace comment_mail // Root namespace.
 			 * @param boolean $emails_only Optional. Defaults to a `FALSE` value.
 			 *    If `TRUE`, this returns an array of email addresses only.
 			 *
-			 * @return \stdClass[]|string[] Unique/associative array of all recipients.
+			 * @return \stdClass[]|string[] Unique/associative array of all addresses.
 			 *    Each object in the array contains 3 properties: `fname`, `lname`, `email`.
 			 *    If `$emails_only` is `TRUE`, each element is simply an email address.
 			 *
-			 * @note Array keys contain the email address for each recipient.
+			 * @note Array keys contain the email address for each address.
 			 *    This is true even when `$emails_only` are requested here.
 			 */
-			public function parse_recipients_deep($value, $strict = FALSE, $emails_only = FALSE)
+			public function parse_addresses_deep($value, $strict = FALSE, $emails_only = FALSE)
 			{
-				$recipients = array(); // Initialize.
+				$addresses = array(); // Initialize.
 
 				if(is_array($value) || is_object($value))
 				{
-					foreach($value as $_key => $_value) // Collect all recipients.
-						$recipients = array_merge($recipients, $this->parse_recipients_deep($_value, $strict, $emails_only));
+					foreach($value as $_key => $_value) // Collect all addresses.
+						$addresses = array_merge($addresses, $this->parse_addresses_deep($_value, $strict, $emails_only));
 					unset($_key, $_value); // A little housekeeping.
 
 					goto finale; // Return handlers.
@@ -106,14 +294,14 @@ namespace comment_mail // Root namespace.
 				$delimiter                   = (strpos($value, ';') !== FALSE) ? ';' : ',';
 				$regex_delimitation_splitter = '/'.preg_quote($delimiter, '/').'+/';
 
-				$possible_recipients = preg_split($regex_delimitation_splitter, $value, NULL, PREG_SPLIT_NO_EMPTY);
-				$possible_recipients = $this->plugin->utils_string->trim_deep($possible_recipients);
+				$possible_addresses = preg_split($regex_delimitation_splitter, $value, NULL, PREG_SPLIT_NO_EMPTY);
+				$possible_addresses = $this->plugin->utils_string->trim_deep($possible_addresses);
 
-				foreach($possible_recipients as $_recipient) // Iterate all possible recipients.
+				foreach($possible_addresses as $_address) // Iterate all possible addresses.
 				{
-					if(strpos($_recipient, '@') === FALSE) continue; // NOT an email address.
+					if(strpos($_address, '@') === FALSE) continue; // NOT an email address.
 
-					if(strpos($_recipient, '<') !== FALSE && preg_match('/(?:"(?P<name>[^"]+?)"\s*)?\<(?P<email>.+?)\>/', $_recipient, $_m))
+					if(strpos($_address, '<') !== FALSE && preg_match('/(?:"(?P<name>[^"]+?)"\s*)?\<(?P<email>.+?)\>/', $_address, $_m))
 						if($_m['email'] && strpos($_m['email'], '@', 1) !== FALSE && (!$strict || is_email($_m['email'])))
 						{
 							$_email = strtolower($_m['email']);
@@ -121,34 +309,34 @@ namespace comment_mail // Root namespace.
 							$_fname = $this->plugin->utils_string->first_name($_name, $_email);
 							$_lname = $this->plugin->utils_string->last_name($_name);
 
-							$recipients[$_email] = (object)array('fname' => $_fname, 'lname' => $_lname, 'email' => $_email);
+							$addresses[$_email] = (object)array('fname' => $_fname, 'lname' => $_lname, 'email' => $_email);
 
 							continue; // Inside brackets; all done here.
 						}
-					if($_recipient && strpos($_recipient, '@', 1) !== FALSE && (!$strict || is_email($_recipient)))
+					if($_address && strpos($_address, '@', 1) !== FALSE && (!$strict || is_email($_address)))
 					{
-						$_email = strtolower($_recipient);
+						$_email = strtolower($_address);
 						$_fname = $this->plugin->utils_string->first_name('', $_email);
 						$_lname = ''; // Not possible in this case.
 
-						$recipients[$_email] = (object)array('fname' => $_fname, 'lname' => $_lname, 'email' => $_email);
+						$addresses[$_email] = (object)array('fname' => $_fname, 'lname' => $_lname, 'email' => $_email);
 					}
 				}
-				unset($_recipient, $_m, $_email, $_name, $_fname, $_lname); // Housekeeping.
+				unset($_address, $_m, $_email, $_name, $_fname, $_lname); // Housekeeping.
 
 				finale: // Target point; grand finale w/ return handlers.
 
 				if($emails_only) // Return emails only?
 				{
-					$recipient_emails = array();
+					$address_emails = array();
 
-					foreach($recipients as $_email_key => $_recipient)
-						$recipient_emails[$_email_key] = $_recipient->email;
-					unset($_email_key, $_recipient); // Housekeeping.
+					foreach($addresses as $_email_key => $_address)
+						$address_emails[$_email_key] = $_address->email;
+					unset($_email_key, $_address); // Housekeeping.
 
-					return $recipient_emails ? array_unique($recipient_emails) : array();
+					return $address_emails ? array_unique($address_emails) : array();
 				}
-				return $recipients ? $this->plugin->utils_array->unique_deep($recipients) : array();
+				return $addresses ? $this->plugin->utils_array->unique_deep($addresses) : array();
 			}
 
 			/**
@@ -159,6 +347,7 @@ namespace comment_mail // Root namespace.
 			 * @param mixed   $value Input value w/ headers.
 			 * @param string  $from_name From name; by reference.
 			 * @param string  $from_email From address; by reference.
+			 * @param string  $reply_to_email Reply-to address; by reference.
 			 * @param array   $recipients Recipients; by reference.
 			 *
 			 * @param boolean $strict Optional. Defaults to `FALSE` (faster).
@@ -166,7 +355,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return array Unique/associative array of all parsed headers.
 			 */
-			public function parse_headers_deep($value, &$from_name, &$from_email, array &$recipients, $strict = FALSE)
+			public function parse_headers_deep($value, &$from_name, &$from_email, &$reply_to_email, array &$recipients, $strict = FALSE)
 			{
 				$headers = array(); // Initialize.
 
@@ -175,8 +364,8 @@ namespace comment_mail // Root namespace.
 					foreach($value as $_key => $_value)
 					{
 						if(is_string($_key) && is_string($_value)) // Associative array?
-							$headers = array_merge($headers, $this->parse_headers_deep($_key.': '.$_value, $from_name, $from_email, $recipients));
-						else $headers = array_merge($headers, $this->parse_headers_deep($_value, $from_name, $from_email, $recipients));
+							$headers = array_merge($headers, $this->parse_headers_deep($_key.': '.$_value, $from_name, $from_email, $reply_to_email, $recipients));
+						else $headers = array_merge($headers, $this->parse_headers_deep($_value, $from_name, $from_email, $reply_to_email, $recipients));
 					}
 					unset($_key, $_value); // A little housekeeping.
 
@@ -205,35 +394,31 @@ namespace comment_mail // Root namespace.
 
 						case 'from': // Custom `From:` header?
 
-							if(strpos($_value, '<') !== FALSE) // e.g. "Name" <email>.
+							if(($_from_addresses = $this->parse_addresses_deep($_value)))
 							{
-								$_from_name = substr($_value, 0, strpos($_value, '<') - 1);
-								$_from_name = str_replace('"', '', $_from_name);
-								$_from_name = trim($_from_name);
-
-								$_from_email = substr($_value, strpos($_value, '<') + 1);
-								$_from_email = str_replace('>', '', $_from_email);
-								$_from_email = trim($_from_email);
-
-								if($_from_email && strpos($_from_email, '@', 1) !== FALSE && is_email($_value))
-								{
-									$from_name  = $_from_name; // Use name in `From:` header.
-									$from_email = $_from_email; // Use email in `From:` header.
-								}
+								$_from      = array_pop($_from_addresses); // Just one.
+								$from_name  = trim($_from->fname.' '.$_from->lname);
+								$from_email = $_from->email; // By reference.
 							}
-							else if($_value && strpos($_value, '@', 1) !== FALSE && is_email($_value))
+							unset($_from_addresses, $_from); // Housekeeping.
+
+							break; // Break switch handler.
+
+						case 'reply-to': // Custom `Reply-To` header?
+
+							if(($_reply_to_emails = $this->parse_addresses_deep($_value, FALSE, TRUE)))
 							{
-								$from_name  = ''; // No name in `From:` header.
-								$from_email = $_value; // Use email in `From:` header.
+								$_reply_to_email = array_pop($_reply_to_emails);  // Just one.
+								$reply_to_email  = $_reply_to_email; // By reference.
 							}
-							unset($_from_name, $_from_email); // Housekeeping.
+							unset($_reply_to_emails, $_reply_to_email); // Housekeeping.
 
 							break; // Break switch handler.
 
 						case 'cc':  // A `CC:` header; i.e. carbon copies?
 						case 'bcc': // A `BCC:` header; i.e. blind carbon copies?
 
-							if(($_cc_bcc_emails = $this->parse_recipients_deep($_value, $strict, TRUE)))
+							if(($_cc_bcc_emails = $this->parse_addresses_deep($_value, $strict, TRUE)))
 							{
 								$recipients = array_merge($recipients, $_cc_bcc_emails);
 								$recipients = array_unique($recipients); // Unique only.
@@ -284,6 +469,51 @@ namespace comment_mail // Root namespace.
 
 				return $attachments ? array_unique($attachments) : array();
 			}
+
+			/**
+			 * @var array Role-based blacklist patterns.
+			 *
+			 * @since 14xxxx First documented version.
+			 */
+			public static $role_based_blacklist_patterns = array(
+				'abuse@*',
+				'admin@*',
+				'billing@*',
+				'compliance@*',
+				'devnull@*',
+				'dns@*',
+				'ftp@*',
+				'help@*',
+				'hostmaster@*',
+				'inoc@*',
+				'ispfeedback@*',
+				'ispsupport@*',
+				'list-request@*',
+				'list@*',
+				'maildaemon@*',
+				'noc@*',
+				'no-reply@*',
+				'noreply@*',
+				'null@*',
+				'phish@*',
+				'phishing@*',
+				'postmaster@*',
+				'privacy@*',
+				'registrar@*',
+				'root@*',
+				'sales@*',
+				'security@*',
+				'spam@*',
+				'support@*',
+				'sysadmin@*',
+				'tech@*',
+				'undisclosed-recipients@*',
+				'unsubscribe@*',
+				'usenet@*',
+				'uucp@*',
+				'webmaster@*',
+				'www@*',
+			);
 		}
 	}
 }

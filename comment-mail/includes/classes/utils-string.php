@@ -154,6 +154,54 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Trims HTML markup.
+			 *
+			 * @param string $string A string value.
+			 *
+			 * @param string $chars Other specific chars to trim (HTML whitespace is always trimmed).
+			 *    Defaults to PHP's trim: " \r\n\t\0\x0B". Use an empty string to bypass this argument and specify additional chars only.
+			 *
+			 * @param string $extra_chars Additional specific chars to trim.
+			 *
+			 * @return string Trimmed string (HTML whitespace is always trimmed).
+			 */
+			public function trim_html($string, $chars = '', $extra_chars = '')
+			{
+				return $this->trim_html_deep($string, $chars, $extra_chars);
+			}
+
+			/**
+			 * Trims HTML markup deeply.
+			 *
+			 * @param mixed  $value Any value can be converted into a trimmed string.
+			 *    Actually, objects can't, but this recurses into objects.
+			 *
+			 * @param string $chars Other specific chars to trim (HTML whitespace is always trimmed).
+			 *    Defaults to PHP's trim: " \r\n\t\0\x0B". Use an empty string to bypass this argument and specify additional chars only.
+			 *
+			 * @param string $extra_chars Additional specific chars to trim.
+			 *
+			 * @return string|array|object Trimmed string, array, object (HTML whitespace is always trimmed).
+			 */
+			public function trim_html_deep($value, $chars = '', $extra_chars = '')
+			{
+				if(is_array($value) || is_object($value))
+				{
+					foreach($value as $_key => &$_value)
+						$_value = $this->trim_html_deep($_value, $chars, $extra_chars);
+					unset($_key, $_value); // Housekeeping.
+
+					return $this->trim_deep($value, $chars, $extra_chars);
+				}
+				if(is_null($whitespace = &$this->static_key(__FUNCTION__, 'whitespace')))
+					$whitespace = implode('|', array_keys($this->html_whitespace));
+
+				$value = preg_replace('/^(?:'.$whitespace.')+|(?:'.$whitespace.')+$/', '', (string)$value);
+
+				return $this->trim_deep($value, $chars, $extra_chars);
+			}
+
+			/**
 			 * Escape single quotes.
 			 *
 			 * @since 14xxxx First documented version.
@@ -785,6 +833,20 @@ namespace comment_mail // Root namespace.
 			{
 				return $this->markdown($string, array_merge($args, array('no_p' => TRUE)));
 			}
+
+			/**
+			 * HTML whitespace. Keys are actually regex patterns here.
+			 *
+			 * @var array HTML whitespace. Keys are actually regex patterns here.
+			 */
+			public $html_whitespace = array(
+				'\0\x0B'                  => "\0\x0B",
+				'\s'                      => "\r\n\t ",
+				'&nbsp;'                  => '&nbsp;',
+				'\<br\>'                  => '<br>',
+				'\<br\s*\/\>'             => '<br/>',
+				'\<p\>(?:&nbsp;)*\<\/p\>' => '<p></p>'
+			);
 		}
 	}
 }
