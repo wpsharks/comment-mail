@@ -2,7 +2,7 @@
 /**
  * Autoloader
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -18,14 +18,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Autoloader
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class autoloader extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -37,7 +37,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Handles autoloading for the plugin's namespace.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string `namespace\class` to load up.
 			 */
@@ -56,7 +56,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Registers autoloader.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function register()
 			{

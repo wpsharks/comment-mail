@@ -2,7 +2,7 @@
 /**
  * Sub Cleaner
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,35 +16,35 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Sub Cleaner
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class sub_cleaner extends abs_base
 		{
 			/**
 			 * @var integer Start time.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $start_time;
 
 			/**
 			 * @var integer Max execution time.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $max_time;
 
 			/**
 			 * @var integer Total cleaned subs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $cleaned;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|null $max_time Max time (in seconds).
 			 *
@@ -75,7 +75,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Total subs cleaned.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function cleaned()
 			{
@@ -85,7 +85,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Prep CRON job.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function prep_cron_job()
 			{
@@ -102,7 +102,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Cleanup nonexistent users.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @note This does NOT cover multisite `capabilities`.
 			 *    That's intentional. There is too much room for error in that case.
@@ -128,7 +128,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Cleanup unconfirmed subscriptions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_clean_unconfirmed_expirations()
 			{
@@ -153,7 +153,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Cleanup trashed subscriptions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_clean_trashed_expirations()
 			{
@@ -178,7 +178,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Out of time yet?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean TRUE if out of time.
 			 */

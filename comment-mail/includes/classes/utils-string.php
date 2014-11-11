@@ -2,7 +2,7 @@
 /**
  * String Utilities
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * String Utilities
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class utils_string extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -33,7 +33,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Strips slashes.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $string See {@link strip_deep()}.
 			 *
@@ -47,7 +47,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Strips slashes in strings deeply.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $values Anything can be converted into a stripped string.
 			 *    Actually, objects can't, but this recurses into objects.
@@ -72,7 +72,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Trims string.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $string See {@link trim_deep()}.
 			 * @param string $chars See {@link trim_deep()}.
@@ -88,7 +88,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Trims strings deeply.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed  $values Any value can be converted into a trimmed string.
 			 *    Actually, objects can't, but this recurses into objects.
@@ -120,7 +120,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Trims/strips string.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $string See {@link trim_strip_deep()}.
 			 * @param string $chars See {@link trim_strip_deep()}.
@@ -136,7 +136,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Trims and strips slashes in strings deeply.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed  $values Any value can be converted into a trimmed/stripped string.
 			 *    Actually, objects can't, but this recurses into objects.
@@ -204,7 +204,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Escape single quotes.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $string See {@link esc_sq_deep()}.
 			 * @param integer $times See {@link esc_sq_deep()}.
@@ -288,7 +288,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Escape double quotes.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $string See {@link esc_dq_deep()}.
 			 * @param integer $times See {@link esc_dq_deep()}.
@@ -329,7 +329,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Escape double quotes for CSV.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $string See {@link esc_csv_dq_deep()}.
 			 * @param integer $times See {@link esc_csv_dq_deep()}.
@@ -370,7 +370,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * String replace ONE time (caSe-insensitive).
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $needle See {@link str_replace_once_deep()}.
 			 * @param string $replace See {@link str_replace_once_deep()}.
@@ -386,7 +386,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * String replace ONE time deeply (caSe-insensitive).
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $needle See {@link replace_once_deep()}.
 			 * @param string $replace See {@link replace_once_deep()}.
@@ -402,7 +402,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * String replace ONE time.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $needle See {@link str_replace_once_deep()}.
 			 * @param string  $replace See {@link str_replace_once_deep()}.
@@ -419,7 +419,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * String replace ONE time deeply.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $needle A string to search/replace.
 			 * @param string  $replace What to replace `$needle` with.
@@ -454,7 +454,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get first name from a full name, user, or email address.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string                       $name The full name; or display name.
 			 *
@@ -496,7 +496,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Name from email address.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $string Input email address.
 			 * @param integer $max_length The maximum length of the name.
@@ -516,7 +516,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get last name from a full name or user.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string                $name The full name; or display name.
 			 *
@@ -555,7 +555,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Cleans a full name.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $string See {@link clean_names_deep()}.
 			 *
@@ -569,7 +569,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Cleans full name(s) deeply.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $values Input name(s) to clean.
 			 *
@@ -598,7 +598,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Clips a string to X chars.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $string See {@link clip_deep()}.
 			 * @param integer $max_length See {@link clip_deep()}.
@@ -614,7 +614,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Clips string(s) to X chars deeply.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed   $values Input string(s) to clip.
 			 * @param integer $max_length Defaults to a value of `45`.
@@ -654,7 +654,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Mid-clips a string to X chars.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $string See {@link mid_clip_deep()}.
 			 * @param integer $max_length See {@link mid_clip_deep()}
@@ -669,7 +669,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Mid-clips string(s) to X chars deeply.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed   $values Input string(s) to mid-clip.
 			 * @param integer $max_length Defaults to a value of `45`.
@@ -715,7 +715,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Is a string in HTML format?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $string Any input string to test here.
 			 *
@@ -732,7 +732,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Convert plain text to HTML markup.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $string Input string to convert.
 			 *
@@ -749,7 +749,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Convert HTML markup converted to plain text.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $string Input string to convert.
 			 * @param array  $args Any additional behavioral args.
@@ -782,7 +782,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * A very simple markdown parser.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $string Input string to convert.
 			 * @param array  $args Any additional behavioral args.
@@ -822,7 +822,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * A very simple markdown parser.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $string See {@link markdown()}.
 			 * @param array  $args See {@link markdown()}.

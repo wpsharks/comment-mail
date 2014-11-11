@@ -2,7 +2,7 @@
 /**
  * Encryption Utilities
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Encryption Utilities
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class utils_enc extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -66,7 +66,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * A unique, unguessable, non-numeric, caSe-insensitive key (20 chars max).
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @note 32-bit systems usually have `PHP_INT_MAX` = `2147483647`.
 			 *    We limit `mt_rand()` to a max of `999999999`.

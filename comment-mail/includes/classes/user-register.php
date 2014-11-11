@@ -2,7 +2,7 @@
 /**
  * User Register
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * User Register
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class user_register extends abs_base
 		{
 			/**
 			 * @var \WP_User|null
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $user;
 
@@ -32,7 +32,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param integer|string $user_id User ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct($user_id)
 			{
@@ -47,7 +47,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Update subscriptions; set user ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @throws \exception If a deletion failure occurs.
 			 */

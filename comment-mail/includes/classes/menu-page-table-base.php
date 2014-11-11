@@ -2,7 +2,7 @@
 /**
  * Menu Page Table Base
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -19,7 +19,7 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Menu Page Table Base
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		abstract class menu_page_table_base extends \WP_List_Table
 		{
@@ -30,91 +30,91 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var plugin Plugin reference.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $plugin;
 
 			/**
 			 * @var string Singular item name.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $singular_name;
 
 			/**
 			 * @var string Singular item label.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $singular_label;
 
 			/**
 			 * @var string Plural item name.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $plural_name;
 
 			/**
 			 * @var string Plural item label.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $plural_label;
 
 			/**
 			 * @var string Regex for sub IDs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $sub_ids_regex;
 
 			/**
 			 * @var string Regex for user IDs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $user_ids_regex;
 
 			/**
 			 * @var string Regex for post IDs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $post_ids_regex;
 
 			/**
 			 * @var string Regex for comment IDs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $comment_ids_regex;
 
 			/**
 			 * @var string Regex for `AND`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $and_regex;
 
 			/**
 			 * @var string Regex for statuses.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $statuses_regex;
 
 			/**
 			 * @var string Regex for events.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $events_regex;
 
 			/**
 			 * @var array Merged result sets.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $merged_result_sets;
 
@@ -125,7 +125,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $args Constructor arguments.
 			 */
@@ -155,12 +155,13 @@ namespace comment_mail // Root namespace.
 				$this->items = array(); // Initialize.
 
 				// Filters; i.e. `:`= filter; `::` = navigable filter.
-				$this->sub_ids_regex     = '/\bsub_ids?\:(?P<sub_ids>[0-9|;,]+)/i';
-				$this->user_ids_regex    = '/\buser_ids?\:(?P<user_ids>[0-9|;,]+)/i';
-				$this->post_ids_regex    = '/\bpost_ids?\:(?P<post_ids>[0-9|;,]+)/i';
-				$this->comment_ids_regex = '/\bcomment_ids?\:(?P<comment_ids>[0-9|;,]+)/i';
-				$this->statuses_regex    = '/\bstatus(?:es)?\:\:(?P<statuses>[\w|;,]+)/i';
-				$this->events_regex      = '/\bevents?\:\:(?P<events>[\w|;,]+)/i';
+				$this->sub_ids_regex     = '/\bsub_ids?\:(?P<sub_ids>[^\s]+)/i';
+				$this->sub_emails_regex  = '/\bsub_emails?\:(?P<sub_emails>[^\s]+)/i';
+				$this->user_ids_regex    = '/\buser_ids?\:(?P<user_ids>[^\s]+)/i';
+				$this->post_ids_regex    = '/\bpost_ids?\:(?P<post_ids>[^\s]+)/i';
+				$this->comment_ids_regex = '/\bcomment_ids?\:(?P<comment_ids>[^\s]+)/i';
+				$this->statuses_regex    = '/\bstatus(?:es)?\:\:(?P<statuses>[^\s]+)/i';
+				$this->events_regex      = '/\bevents?\:\:(?P<events>[^\s]+)/i';
 
 				$this->and_regex = '/(?:^|\s+)\+(?:\s+|$)/i';
 				// Must NOT conflict with SQL: <http://bit.ly/1tNam85>
@@ -179,7 +180,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all table columns.
 			 */
@@ -191,7 +192,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all table columns.
 			 *
@@ -205,7 +206,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Hidden table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all hidden table columns.
 			 */
@@ -217,7 +218,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Hidden table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all hidden table columns.
 			 *
@@ -231,7 +232,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Searchable fulltext table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all fulltext searchables.
 			 */
@@ -243,7 +244,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Searchable fulltext table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all fulltext searchables.
 			 *
@@ -257,7 +258,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Searchable table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all searchables.
 			 */
@@ -269,7 +270,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Searchable table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all searchables.
 			 *
@@ -283,7 +284,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Unsortable table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all unsortable table columns.
 			 */
@@ -298,7 +299,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Unsortable table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all unsortable table columns.
 			 *
@@ -312,7 +313,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Sortable table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all sortable table columns.
 			 */
@@ -324,7 +325,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Sortable table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all sortable table columns.
 			 */
@@ -350,7 +351,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Navigable table filters.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all navigable table filters.
 			 */
@@ -362,7 +363,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Navigable table filters.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all navigable table filters.
 			 *
@@ -380,7 +381,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 *
@@ -394,7 +395,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 *
@@ -414,7 +415,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 *
@@ -434,7 +435,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 *
@@ -455,11 +456,9 @@ namespace comment_mail // Root namespace.
 					return $id_only; // All we can do.
 
 				$name_email_args = array(
-					'separator'          => '<br />',
-					'email_style'        => 'font-weight:bold;',
-					'anchor_to'          => 'summary',
-					'anchor_target'      => '_blank',
-					'summary_anchor_key' => $item->sub_key,
+					'separator'   => '<br />',
+					'anchor_to'   => 'search',
+					'email_style' => 'font-weight:bold;',
 				);
 				$name            = $item->sub_fname.' '.$item->sub_lname; // Concatenate.
 				$sub_info        = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
@@ -477,7 +476,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 *
@@ -498,11 +497,9 @@ namespace comment_mail // Root namespace.
 					return $id_only; // All we can do.
 
 				$name_email_args = array(
-					'separator'          => '<br />',
-					'email_style'        => 'font-weight:bold;',
-					'anchor_to'          => 'summary',
-					'anchor_target'      => '_blank',
-					'summary_anchor_key' => $item->oby_sub_key,
+					'separator'   => '<br />',
+					'anchor_to'   => 'search',
+					'email_style' => 'font-weight:bold;',
 				);
 				$name            = $item->oby_sub_fname.' '.$item->oby_sub_lname; // Concatenate.
 				$oby_sub_info    = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
@@ -520,7 +517,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 *
@@ -542,6 +539,7 @@ namespace comment_mail // Root namespace.
 
 				$name_email_args = array(
 					'separator'   => '<br />',
+					'anchor_to'   => 'search',
 					'email_style' => 'font-weight:normal;',
 				);
 				$user_info       = '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ username in hover title.
@@ -559,7 +557,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 *
@@ -613,7 +611,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 *
@@ -634,6 +632,7 @@ namespace comment_mail // Root namespace.
 					return $id_only; // All we can do.
 
 				$name_email_args          = array(
+					'anchor_to'   => 'search',
 					'email_style' => 'font-weight:normal;',
 				);
 				$comment_parent_date_time = $this->plugin->utils_date->i18n('M j, Y, g:i a', strtotime($item->comment_parent_date_gmt));
@@ -658,7 +657,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 *
@@ -679,6 +678,7 @@ namespace comment_mail // Root namespace.
 					return $id_only; // All we can do.
 
 				$name_email_args   = array(
+					'anchor_to'   => 'search',
 					'email_style' => 'font-weight:normal;',
 				);
 				$comment_date_time = $this->plugin->utils_date->i18n('M j, Y, g:i a', strtotime($item->comment_date_gmt));
@@ -703,7 +703,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 *
@@ -723,7 +723,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 *
@@ -743,7 +743,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 *
@@ -763,7 +763,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 *
@@ -786,7 +786,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 *
@@ -803,7 +803,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 *
@@ -825,7 +825,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 * @param string    $property Column we need to build markup for.
@@ -859,7 +859,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get raw search query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Raw search query; w/ search tokens.
 			 */
@@ -880,7 +880,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Clean search query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Clean search query; minus search tokens.
 			 */
@@ -889,6 +889,7 @@ namespace comment_mail // Root namespace.
 				$s = $this->get_raw_search_query();
 
 				$s = $s ? preg_replace($this->sub_ids_regex, '', $s) : '';
+				$s = $s ? preg_replace($this->sub_emails_regex, '', $s) : '';
 				$s = $s ? preg_replace($this->user_ids_regex, '', $s) : '';
 				$s = $s ? preg_replace($this->post_ids_regex, '', $s) : '';
 				$s = $s ? preg_replace($this->comment_ids_regex, '', $s) : '';
@@ -903,7 +904,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * A clean `$_POST['search-submit']`?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean `TRUE` if a clean `$_POST['search-submit']`.
 			 */
@@ -915,7 +916,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get sub IDs in the search query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array Sub IDs in the search query.
 			 */
@@ -933,9 +934,29 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Get sub emails in the search query.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array Sub emails in the search query.
+			 */
+			protected function get_sub_emails_in_search_query()
+			{
+				$sub_emails = array(); // Initialize.
+				$s          = $this->get_raw_search_query();
+
+				if($s && preg_match_all($this->sub_emails_regex, $s, $_m))
+					foreach(preg_split('/[|;,]+/', implode(',', $_m['sub_emails']), NULL, PREG_SPLIT_NO_EMPTY) as $_sub_email)
+						if(($_sub_email = trim(strtolower($_sub_email)))) $sub_emails[$_sub_email] = $_sub_email;
+				unset($_m, $_sub_email); // Housekeeping.
+
+				return $sub_emails;
+			}
+
+			/**
 			 * Get user IDs in the search query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array User IDs in the search query.
 			 */
@@ -955,7 +976,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get post IDs in the search query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array Post IDs in the search query.
 			 */
@@ -975,7 +996,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get comment IDs in the search query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array Comment IDs in the search query.
 			 */
@@ -995,7 +1016,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get statuses in the search query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array Statuses in the search query.
 			 */
@@ -1006,7 +1027,7 @@ namespace comment_mail // Root namespace.
 
 				if($s && preg_match_all($this->statuses_regex, $s, $_m))
 					foreach(preg_split('/[|;,]+/', implode(',', $_m['statuses']), NULL, PREG_SPLIT_NO_EMPTY) as $_status)
-						if(isset($_status[0])) $statuses[$_status] = $_status;
+						if(($_status = trim(strtolower($_status)))) $statuses[$_status] = $_status;
 				unset($_m, $_status); // Housekeeping.
 
 				return $statuses;
@@ -1015,7 +1036,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get events in the search query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array Events in the search query.
 			 */
@@ -1026,7 +1047,7 @@ namespace comment_mail // Root namespace.
 
 				if($s && preg_match_all($this->events_regex, $s, $_m))
 					foreach(preg_split('/[|;,]+/', implode(',', $_m['events']), NULL, PREG_SPLIT_NO_EMPTY) as $_event)
-						if(isset($_event[0])) $events[$_event] = $_event;
+						if(($_event = trim(strtolower($_event)))) $events[$_event] = $_event;
 				unset($_m, $_event); // Housekeeping.
 
 				return $events;
@@ -1035,7 +1056,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Are we dealing w/ an `AND` search?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean `TRUE` if it's an `AND` search.
 			 */
@@ -1049,7 +1070,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get orderby value.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string The orderby value.
 			 */
@@ -1076,7 +1097,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get default orderby value.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string The default orderby value.
 			 *
@@ -1090,7 +1111,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get order value.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string The order value.
 			 */
@@ -1117,7 +1138,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get default order value.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string The default order value.
 			 *
@@ -1135,7 +1156,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Runs DB query; sets pagination args.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @extenders Extenders should ALWAYS override this.
 			 */
@@ -1149,6 +1170,7 @@ namespace comment_mail // Root namespace.
 				$current_offset              = $this->get_current_offset();
 				$clean_search_query          = $this->get_clean_search_query();
 				$sub_ids_in_search_query     = $this->get_sub_ids_in_search_query();
+				$sub_emails_in_search_query  = $this->get_sub_emails_in_search_query();
 				$user_ids_in_search_query    = $this->get_user_ids_in_search_query();
 				$post_ids_in_search_query    = $this->get_post_ids_in_search_query();
 				$comment_ids_in_search_query = $this->get_comment_ids_in_search_query();
@@ -1171,7 +1193,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Prepares searchable columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $template The template to use for matches.
 			 *    Defaults to `= %1$s` for exact matches.
@@ -1208,7 +1230,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Gets configured items per page.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return integer Configured items per page.
 			 */
@@ -1226,7 +1248,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Gets current page number.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return integer Current page number.
 			 */
@@ -1238,7 +1260,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Gets current SQL offset.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return integer Current SQL offset value.
 			 */
@@ -1250,7 +1272,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Sets total items and pagination args.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass[] An array of \stdClass objects.
 			 *
@@ -1264,7 +1286,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Sets total items and pagination args.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $calc_found_rows Total found rows using `SQL_CALC_FOUND_ROWS`.
 			 *
@@ -1287,7 +1309,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Assists w/ DB query; i.e. item preparations.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function prepare_items_merge_sub_type_property()
 			{
@@ -1312,7 +1334,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Assists w/ DB query; i.e. item preparations.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function prepare_items_merge_sub_properties()
 			{
@@ -1399,7 +1421,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Assists w/ DB query; i.e. item preparations.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function prepare_items_merge_user_properties()
 			{
@@ -1457,7 +1479,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Assists w/ DB query; i.e. item preparations.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function prepare_items_merge_post_properties()
 			{
@@ -1513,7 +1535,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Assists w/ DB query; i.e. item preparations.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function prepare_items_merge_comment_properties()
 			{
@@ -1597,7 +1619,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Bulk actions for this table.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all bulk actions.
 			 *
@@ -1611,7 +1633,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Bulk action handler for this table.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_process_bulk_action()
 			{
@@ -1657,7 +1679,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Bulk action handler for this table.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $bulk_action The bulk action to process.
 			 * @param array  $ids The bulk action IDs to process.
@@ -1678,7 +1700,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Display search box.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $text The search button `value=""`.
 			 *    This will default to a value of `Search`.
@@ -1718,11 +1740,12 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Display search query filter descs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function search_query_filter_descriptions()
 			{
 				$sub_ids           = $this->get_sub_ids_in_search_query();
+				$sub_emails        = $this->get_sub_emails_in_search_query();
 				$user_ids          = $this->get_user_ids_in_search_query();
 				$post_ids          = $this->get_post_ids_in_search_query();
 				$comment_ids       = $this->get_comment_ids_in_search_query();
@@ -1731,7 +1754,7 @@ namespace comment_mail // Root namespace.
 				$navigable_filters = $this->get_navigable_filters();
 				$raw_search_query  = $this->get_raw_search_query();
 
-				$query_contains_filters           = $sub_ids || $user_ids || $post_ids || $comment_ids;
+				$query_contains_filters           = $sub_ids || $sub_emails || $user_ids || $post_ids || $comment_ids;
 				$query_contains_navigable_filters = !empty($statuses) || !empty($events);
 				$navigable_filters_exist          = !empty($navigable_filters);
 
@@ -1739,7 +1762,7 @@ namespace comment_mail // Root namespace.
 					return; // Nothing to do here.
 
 				$subs    = $users = $posts = $comments = array(); // Array of bject references.
-				$sub_lis = $user_lis = $post_lis = $comment_lis = $navigable_filter_lis = $unknown_lis = array();
+				$sub_lis = $sub_email_lis = $user_lis = $post_lis = $comment_lis = $navigable_filter_lis = $unknown_lis = array();
 
 				foreach($sub_ids as $_sub_id)
 					if(($_sub = $this->plugin->utils_sub->get($_sub_id)))
@@ -1769,16 +1792,14 @@ namespace comment_mail // Root namespace.
 						continue; // Duplicate.
 
 					$_name_email_args = array(
-						'email_style'        => 'font-weight:bold;',
-						'anchor_to'          => 'summary',
-						'anchor_target'      => '_blank',
-						'summary_anchor_key' => $_sub->key,
+						'anchor_to'   => 'search',
+						'email_style' => 'font-weight:bold;',
 					);
 					$_sub_name        = $_sub->fname.' '.$_sub->lname; // Concatenate.
 					$_sub_edit_link   = $this->plugin->utils_url->edit_sub_short($_sub->ID);
 
-					$sub_lis[$_sub->ID] = '<li>'. // ♙ ID "Name" <email> [edit].
-					                      '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
+					$sub_lis[$_sub->ID] = '<li>'. // [icon] ID "Name" <email> [edit].
+					                      '<i class="'.esc_attr('wsi-'.$this->plugin->slug).'"></i>'.
 					                      ' <span style="font-weight:bold;" title="'.esc_attr($_sub->key).'">ID #'.esc_html($_sub->ID).'</span>'.
 					                      ' '.$this->plugin->utils_markup->name_email($_sub_name, $_sub->email, $_name_email_args).
 					                      ($_sub_edit_link // Only if they can edit the subscription ID; else this will be empty.
@@ -1786,6 +1807,25 @@ namespace comment_mail // Root namespace.
 					                      '</li>';
 				}
 				unset($_sub, $_name_email_args, $_sub_name, $_sub_edit_link); // Housekeeping.
+
+				foreach($sub_emails as $_sub_email) // Strings only.
+				{
+					$_sub_email = trim(strtolower($_sub_email));
+
+					if(isset($sub_email_lis[$_sub_email]))
+						continue; // Duplicate.
+
+					$_name_email_args           = array(
+						'anchor_to'   => 'search',
+						'email_style' => 'font-weight:bold;',
+					);
+					$sub_email_lis[$_sub_email] = '<li>'. // [icon] <email>.
+					                              '<i class="fa fa-envelope"></i>'. // e.g. [icon] <email>.
+					                              ' <span style="font-weight:bold;" title="'.esc_attr($_sub_email).'">'.__('Email:', $this->plugin->text_domain).'</span>'.
+					                              ' '.$this->plugin->utils_markup->name_email('', $_sub_email, $_name_email_args).
+					                              '</li>';
+				}
+				unset($_sub_email, $_name_email_args); // Housekeeping.
 
 				foreach($users as $_user) // `\WP_User` objects.
 				{
@@ -1795,12 +1835,13 @@ namespace comment_mail // Root namespace.
 						continue; // Duplicate.
 
 					$_name_email_args = array(
+						'anchor_to'   => 'search',
 						'email_style' => 'font-weight:normal;',
 					);
 					$_user_edit_link  = get_edit_user_link($_user->ID);
 
-					$user_lis[$_user->ID] = '<li>'. // ♙ ID "Name" <email> [edit].
-					                        '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ key in hover title.
+					$user_lis[$_user->ID] = '<li>'. // [icon] ID "Name" <email> [edit].
+					                        '<i class="fa fa-user"></i>'. // e.g. [icon] ID "Name" <email>; w/ key in hover title.
 					                        ' <span style="font-weight:bold;" title="'.esc_attr($_user->user_login).'">ID #'.esc_html($_user->ID).'</span>'.
 					                        ' '.$this->plugin->utils_markup->name_email($_user->display_name, $_user->user_email, $_name_email_args).
 					                        ($_user_edit_link // Only if they can edit the user ID; else this will be empty.
@@ -1849,6 +1890,7 @@ namespace comment_mail // Root namespace.
 						continue; // Unable to determine type.
 
 					$_name_email_args = array(
+						'anchor_to'   => 'search',
 						'email_style' => 'font-weight:normal;',
 					);
 					$_post_permalink  = get_permalink($_post->ID);
@@ -1900,7 +1942,7 @@ namespace comment_mail // Root namespace.
 				}
 				unset($_navigable_filter_s, $_navigable_filter_label); // Housekeeping.
 
-				$filter_lis_exist           = $sub_lis || $user_lis || $post_lis || $comment_lis; // Have any of these?
+				$filter_lis_exist           = $sub_lis || $sub_email_lis || $user_lis || $post_lis || $comment_lis;
 				$navigable_filter_lis_exist = !empty($navigable_filter_lis); // Have any navigable list items?
 
 				if($query_contains_filters) // If query contains non-navigable filters.
@@ -1913,6 +1955,7 @@ namespace comment_mail // Root namespace.
 					     '   '.sprintf(__('<strong>Search Filters Applied</strong> :: only showing %1$s for:', $this->plugin->text_domain), esc_html($this->plural_label)).
 					     '</h3>';
 					if($sub_lis) echo '<ul class="pmp-search-filters pmp-filters pmp-list-items">'.implode('', $sub_lis).'</ul>';
+					if($sub_email_lis) echo '<ul class="pmp-search-filters pmp-filters pmp-list-items">'.implode('', $sub_email_lis).'</ul>';
 					if($user_lis) echo '<ul class="pmp-search-filters pmp-filters pmp-list-items">'.implode('', $user_lis).'</ul>';
 					if($post_lis) echo '<ul class="pmp-search-filters pmp-filters pmp-list-items">'.implode('', $post_lis).'</ul>';
 					if($comment_lis) echo '<ul class="pmp-search-filters pmp-filters pmp-list-items">'.implode('', $comment_lis).'</ul>';
@@ -1928,7 +1971,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Prints column headers.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param boolean $with_id Add an `id=""` attribute?
 			 */
@@ -1955,7 +1998,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Prints no items message.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function no_items()
 			{
@@ -1965,7 +2008,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Display the table.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function display()
 			{

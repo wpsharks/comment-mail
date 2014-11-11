@@ -2,7 +2,7 @@
 /**
  * URL Utilities
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * URL Utilities
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class utils_url extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -33,7 +33,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Current scheme; lowercase.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Current scheme; lowercase.
 			 */
@@ -48,7 +48,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Current front scheme; lowercase.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Current front scheme; lowercase.
 			 *
@@ -66,7 +66,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Sets URL scheme.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string      $url The input URL to work from (optional).
 			 *    If empty, defaults to the current URL.
@@ -102,7 +102,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Current host name; lowercase.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param boolean $no_port No port number? Defaults to `FALSE`.
 			 *
@@ -129,7 +129,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Current `host[/path]`; w/ multisite compat.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Current `host/path`; w/ multisite compat.
 			 *
@@ -152,7 +152,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Current URI; with a leading `/`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Current URI; with a leading `/`.
 			 */
@@ -167,7 +167,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Current URI/path; with a leading `/`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Current URI/path; with a leading `/`.
 			 */
@@ -182,7 +182,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Current URL; i.e. scheme.host.URI put together.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
 			 *    See {@link set_scheme()} method for further details.
@@ -202,7 +202,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * URL without a query string.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string      $url The input URL to work from (optional).
 			 *    If empty, defaults to the current URL.
@@ -225,7 +225,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * URL with `_wpnonce`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string      $nonce_action A specific nonce action.
 			 *    Defaults to `__NAMESPACE__`.
@@ -252,7 +252,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * URL with only a `page` var (if applicable).
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string      $page A specific page value (optional).
 			 *    If empty, we use `page` from the URL; else current `page`.
@@ -291,7 +291,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * URL with only a `page` var (if applicable) and `_wpnonce`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string      $page A specific page value (optional).
 			 *    If empty, we use `page` from the URL; else current `page`.
@@ -317,7 +317,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Main menu page URL.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
 			 *    See {@link set_scheme()} method for further details.
@@ -334,7 +334,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Main menu page URL; w/ `_wpnonce`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string      $nonce_action A specific nonce action.
 			 *    Defaults to `__NAMESPACE__`.
@@ -354,7 +354,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Subscriptions menu page URL.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
 			 *    See {@link set_scheme()} method for further details.
@@ -371,7 +371,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Sub. event log menu page URL.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
 			 *    See {@link set_scheme()} method for further details.
@@ -388,7 +388,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Queue menu page URL.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
 			 *    See {@link set_scheme()} method for further details.
@@ -405,7 +405,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Queue event log menu page URL.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
 			 *    See {@link set_scheme()} method for further details.
@@ -422,7 +422,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Statistics menu page URL.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
 			 *    See {@link set_scheme()} method for further details.
@@ -439,7 +439,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Import/export menu page URL.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
 			 *    See {@link set_scheme()} method for further details.
@@ -456,7 +456,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Email templates menu page URL.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
 			 *    See {@link set_scheme()} method for further details.
@@ -473,7 +473,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Site templates menu page URL.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
 			 *    See {@link set_scheme()} method for further details.
@@ -490,7 +490,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Options updated URL.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
 			 *    See {@link set_scheme()} method for further details.
@@ -505,7 +505,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Restore default options URL.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
 			 *    See {@link set_scheme()} method for further details.
@@ -523,7 +523,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Options restored URL.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
 			 *    See {@link set_scheme()} method for further details.
@@ -538,7 +538,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Pro preview URL.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string      $url The input URL to work from (optional).
 			 *    If empty, defaults to the main menu page.
@@ -562,7 +562,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Adds search filter(s) to the `s` key for tables.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|array $filters A string or an array of filters.
 			 *    e.g. `array('post_ids:1,2,3', 'comment_ids:4,5,6')`.
@@ -596,7 +596,7 @@ namespace comment_mail // Root namespace.
 
 				$s            = !empty($query_vars['s']) ? (string)$query_vars['s'] : '';
 				$filters      = preg_split('/\s+/', $filters, NULL, PREG_SPLIT_NO_EMPTY);
-				$filter_regex = '/\b(?P<type>\w+)(?P<group>\:+)(?P<values>[\w+|;,]+)?/i';
+				$filter_regex = '/\b(?P<type>\w+)(?P<group>\:+)(?P<values>[^\s]+)?/i';
 
 				foreach($filters as $_filter) // Remove filters in <group> or of <type><group>.
 				{
@@ -627,7 +627,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Bulk action URL generator for tables.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string      $plural Plural table name/key.
 			 * @param array       $ids An array of IDs to act upon.
@@ -658,7 +658,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * URL w/ page & table nav vars only — from a given URL and/or `$_REQUEST` vars.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array       $also_keep Any additional names/keys to keep.
 			 *    Built-in names/keys to keep already includes the following:
@@ -718,7 +718,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * URL w/ page, nonce & table nav vars only — from a given URL and/or `$_REQUEST` vars.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array       $also_keep See {@link page_table_nav_vars_only()}.
 			 * @param string      $url See {@link page_table_nav_vars_only()}.
@@ -735,7 +735,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Notice dimissal URL.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string      $notice_key The notice key to dismiss.
 			 *
@@ -757,7 +757,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Notice dimissed URL.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
 			 *    See {@link set_scheme()} method for further details.
@@ -774,7 +774,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Product page URL; normally at WebSharks™.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
 			 *    See {@link set_scheme()} method for further details.
@@ -793,7 +793,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Subscribe page URL; normally at WebSharks™.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
 			 *    See {@link set_scheme()} method for further details.
@@ -812,7 +812,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * URL to a plugin file.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string      $file Optional file path; relative to plugin directory.
 			 *
@@ -832,7 +832,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Checks for a valid `_wpnonce` value.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $nonce_action A specific nonce action.
 			 *    Defaults to `__NAMESPACE__`.
@@ -857,7 +857,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Creates a post shortlink w/o a DB query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer     $post_id A WP post ID.
 			 *
@@ -879,7 +879,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Creates a post edit shortlink w/o a DB query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer     $post_id A WP post ID.
 			 *
@@ -901,7 +901,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Creates an edit comments shortlink w/o a DB query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer     $post_id A WP post ID.
 			 *
@@ -923,7 +923,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Creates an edit subscriptions shortlink w/o a DB query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer     $post_id A WP post ID.
 			 * @param string      $s Any additional search words/filters.
@@ -945,9 +945,31 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Search subscriptions shortlink w/o a DB query.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string      $s Search words/filters.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @return string Search subscriptions shortlink.
+			 */
+			public function search_subs_short($s = '', $scheme = 'admin')
+			{
+				$s = trim((string)$s); // Search words/filters.
+
+				$url  = $this->subs_menu_page_only($scheme);
+				$args = array('s' => $s); // Query args.
+
+				return add_query_arg(urlencode_deep($args), $url);
+			}
+
+			/**
 			 * Creates a new subscription shortlink w/o a DB query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $scheme Optional . Defaults to `admin`.
 			 *    See {@link set_scheme()} method for further details.
@@ -966,7 +988,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Creates an edit subscription shortlink w/o a DB query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer     $sub_id Subscription ID.
 			 *
@@ -989,7 +1011,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Creates an edit user shortlink w/o a DB query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer     $user_id A WP User ID.
 			 *
@@ -1011,7 +1033,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Creates a comment shortlink w/o a DB query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer     $comment_id A WP comment ID.
 			 *
@@ -1033,7 +1055,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Creates a comment edit shortlink w/o a DB query.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer     $comment_id A WP comment ID.
 			 *
@@ -1055,7 +1077,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Confirmation URL for a specific sub. key.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string      $sub_key Unique subscription key.
 			 *
@@ -1078,7 +1100,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Unsubscribe URL for a specific sub. key.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string      $sub_key Unique subscription key.
 			 *
@@ -1101,7 +1123,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Unsubscribe ALL URL for a specific sub. email.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string      $sub_email Subscriber's email address.
 			 *
@@ -1124,7 +1146,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Manage URL for a specific sub. key.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string      $sub_key Unique subscription key.
 			 *    If empty, the subscription management system will use
@@ -1149,7 +1171,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Manage URL for a specific sub. key.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string        $sub_key Unique subscription key.
 			 *    If empty, the subscription management system will use
@@ -1186,7 +1208,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Summary nav vars in a given URL and/or current `$_REQUEST` vars.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param boolean|array $include_nav_vars Defaults to a `TRUE` value.
 			 *    Use a non-empty array to add new nav vars; `TRUE` to simply include existing nav vars.
@@ -1255,7 +1277,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Manage URL for adding a new subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null   $scheme Optional. Defaults to a `NULL` value.
 			 *    See {@link set_scheme()} method for further details.
@@ -1280,7 +1302,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Manage URL to edit a specific sub. key.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string        $sub_key Unique subscription key.
 			 *
@@ -1310,7 +1332,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Manage URL to delete a specific sub. key.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string        $sub_key Unique subscription key.
 			 *

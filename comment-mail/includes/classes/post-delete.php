@@ -2,7 +2,7 @@
 /**
  * Post Deletion Handler
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,21 +16,21 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Post Deletion Handler
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class post_delete extends abs_base
 		{
 			/**
 			 * @var integer Post ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $post_id;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|string $post_id Post ID.
 			 */
@@ -46,7 +46,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Purges subscriptions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_purge_subs()
 			{

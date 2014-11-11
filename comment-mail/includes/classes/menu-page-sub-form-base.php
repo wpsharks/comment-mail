@@ -2,7 +2,7 @@
 /**
  * Menu Page Sub. Form Base
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,7 +16,7 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Menu Page Sub. Form Base
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class menu_page_sub_form_base extends abs_base
 		{
@@ -27,21 +27,21 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var boolean Editing?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $is_edit;
 
 			/**
 			 * @var \stdClass|null Subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $sub;
 
 			/**
 			 * @var form_fields Class instance.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $form_fields;
 
@@ -52,7 +52,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var array Form field config. args.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $form_field_args = array(
 				'ns_id_suffix'   => '-sub-form',
@@ -67,7 +67,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $sub_id Subscription ID.
 			 */
@@ -96,7 +96,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Displays form.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_display()
 			{
@@ -202,7 +202,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Collects current value for a particular property.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $key_prop The key/property to acquire.
 			 *
@@ -229,7 +229,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Constructs a comment ID row via AJAX.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $post_id A post ID.
 			 *
@@ -262,7 +262,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get user ID info via AJAX.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $user_id A WP user ID.
 			 *
@@ -312,7 +312,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Form processor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $request_args Incoming action request args.
 			 *

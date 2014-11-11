@@ -2,7 +2,7 @@
 /**
  * Mail Utilities
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Mail Utilities
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class utils_mail extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -33,7 +33,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Mail sending utility; `wp_mail()` compatible.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @note This method always (ALWAYS) sends email in HTML format;
 			 *    w/ a plain text alternative — generated automatically.
@@ -79,7 +79,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * A mail testing utility.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @note This method always (ALWAYS) sends email in HTML format;
 			 *    w/ a plain text alternative — generated automatically.
@@ -148,7 +148,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * SMTP mail testing utility.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @note This method always (ALWAYS) sends email in HTML format;
 			 *    w/ a plain text alternative — generated automatically.
@@ -191,7 +191,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Test results formatter.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @note This method always (ALWAYS) sends email in HTML format;
 			 *    w/ a plain text alternative — generated automatically.
@@ -248,7 +248,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * `TRUE` if we can send mail via SMTP.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean `TRUE` if we can send mail via SMTP.
 			 */
@@ -261,7 +261,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Parses addresses deeply.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed   $value Any input value w/ recipients.
 			 *
@@ -342,7 +342,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Parses headers deeply.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed   $value Input value w/ headers.
 			 * @param string  $from_name From name; by reference.
@@ -444,7 +444,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Parses attachments deeply.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $value Any input value w/ attachments.
 			 *
@@ -473,7 +473,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var array Role-based blacklist patterns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public static $role_based_blacklist_patterns = array(
 				'abuse@*',

@@ -2,7 +2,7 @@
 /**
  * Sub Purger
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,35 +16,35 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Sub Purger
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class sub_purger extends abs_base
 		{
 			/**
 			 * @var integer Post ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $post_id;
 
 			/**
 			 * @var integer Comment ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $comment_id;
 
 			/**
 			 * @var integer User ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $user_id;
 
 			/**
 			 * @var integer Total subs purged.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $purged;
 
@@ -57,7 +57,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param integer|string $user_id User ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct($post_id, $comment_id = 0, $user_id = 0)
 			{
@@ -75,7 +75,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Total subs purged.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function purged()
 			{
@@ -85,7 +85,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Purges subscriptions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_purge()
 			{
@@ -96,7 +96,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Purges subscriptions on post/comment deletions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_purge_post_comment()
 			{
@@ -115,7 +115,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Purges subscriptions on user deletions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_purge_user()
 			{

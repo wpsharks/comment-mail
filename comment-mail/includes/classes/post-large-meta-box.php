@@ -2,7 +2,7 @@
 /**
  * Post Large Meta Box
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,21 +16,21 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Post Large Meta Box
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class post_large_meta_box extends abs_base
 		{
 			/**
 			 * @var \WP_Post A WP post object.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $post;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \WP_Post $post A WP post object reference.
 			 */
@@ -46,7 +46,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Display meta box. @TODO
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function display()
 			{
@@ -54,6 +54,7 @@ namespace comment_mail // Root namespace.
 					= $this->plugin->utils_db->post_comment_status__($this->post->comment_status);
 
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-area').'">'."\n";
+				echo __('Coming soon...', $this->plugin->text_domain);
 				echo '</div>';
 
 				if($post_comment_status !== 'open' && !$this->post->comment_count)

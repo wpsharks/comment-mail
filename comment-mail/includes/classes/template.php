@@ -2,7 +2,7 @@
 /**
  * Template
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,42 +16,42 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Template
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class template extends abs_base
 		{
 			/**
 			 * @var string Template file.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $file;
 
 			/**
 			 * @var string Template file option key.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $file_option_key;
 
 			/**
 			 * @var boolean Force default template?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $force_default;
 
 			/**
 			 * @var string Template file contents.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $file_contents;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $file Template file.
 			 * @param boolean $force_default Force default template?
@@ -83,7 +83,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Public access to file contents.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Unparsed template file contents.
 			 */
@@ -95,7 +95,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Parse template file.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $vars Optional array of variables to parse.
 			 *
@@ -120,7 +120,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Site template vars.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $vars Optional array of variables to parse.
 			 *
@@ -172,7 +172,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Email template vars.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $vars Optional array of variables to parse.
 			 *
@@ -224,7 +224,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Template file contents.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @throws \exception If unable to locate the template.
 			 */
@@ -275,7 +275,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Transforms an option key into a file path.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $file_option_key Option key.
 			 *

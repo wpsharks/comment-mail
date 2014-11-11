@@ -311,7 +311,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 							if(!commentIdProps.$lastRow.length || !commentIdProps.$lastInput.length)
 								return; // Nothing we can do here; expecting a comment ID row.
 
-							commentIdProps.$lastChosenContainer.remove(), // Loading indicator.
+							commentIdProps.$lastChosenContainer.remove(), // New progress bar.
 								commentIdProps.$lastInput.replaceWith($(subFormPostIdProps.progress));
 
 							requestVars[namespace] = {manage: {sub_form_comment_id_row_via_ajax: {post_id: subFormPostIdProps.newId}}},

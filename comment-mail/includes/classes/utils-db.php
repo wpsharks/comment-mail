@@ -2,7 +2,7 @@
 /**
  * DB Utilities
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,21 +16,21 @@ namespace comment_mail // Root namespace.
 		/**
 		 * DB Utilities
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class utils_db extends abs_base
 		{
 			/**
 			 * @var \wpdb WP DB class reference.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public $wp;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -42,7 +42,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Current DB prefix for this plugin.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Current DB table prefix.
 			 */
@@ -54,7 +54,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Typify result properties deeply.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $value Any value can be typified deeply.
 			 *
@@ -85,7 +85,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Should an array/object key contain an integer value?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $key The input key to check.
 			 *
@@ -121,7 +121,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Should an array/object key contain a float value?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $key The input key to check.
 			 *
@@ -135,7 +135,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Check DB engine compat. w/ fulltext indexes.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $sql Input SQL to check.
 			 *
@@ -170,7 +170,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Comment status translator.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|string $status
 			 *
@@ -218,7 +218,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Post comment status translator.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|string $status
 			 *
@@ -253,7 +253,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Counts total users.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $args Behavioral args (optional).
 			 *
@@ -289,7 +289,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * All users quickly.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $args Behavioral args (optional).
 			 *
@@ -345,7 +345,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Counts total posts.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $args Behavioral args (optional).
 			 *
@@ -394,7 +394,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * All posts quickly.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $args Behavioral args (optional).
 			 *
@@ -497,7 +497,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Counts total comments.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $post_id A post ID.
 			 * @param array   $args Behavioral args (optional).
@@ -545,7 +545,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * All comments quickly.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $post_id A post ID.
 			 * @param array   $args Behavioral args (optional).
@@ -614,7 +614,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Pagination links start page.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $current_page The current page number.
 			 * @param integer $total_pages The total pages available.

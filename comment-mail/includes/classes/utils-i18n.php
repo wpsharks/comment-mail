@@ -2,7 +2,7 @@
 /**
  * i18n Utilities
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * i18n Utilities
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class utils_i18n extends abs_base
 		{
 			/**
 			 * Action past tense translation.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $action An action; e.g. `confirm`, `delete`, `unconfirm`, etc.
 			 *
@@ -62,7 +62,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Status label translation.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $status A status e.g. `approve`, `hold`, `unconfirmed`, etc.
 			 *
@@ -113,7 +113,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Event label translation.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $event An event e.g. `inserted`, `updated`, `deleted`, etc.
 			 *
@@ -155,7 +155,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Deliver option label translation.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $deliver A delivery option; e.g. `asap`, `hourly`, etc.
 			 *
@@ -185,7 +185,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Sub. type label translation.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $sub_type A sub. type; i.e. `comments`, `comment`.
 			 *
@@ -209,7 +209,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * `X subscription` or `X subscriptions`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $counter Total subscriptions; i.e. a counter value.
 			 *
@@ -225,7 +225,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * `X sub. event log entry` or `X sub. event log entries`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $counter Total sub. event log entries; i.e. a counter value.
 			 *
@@ -241,7 +241,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * `X queued notification` or `X queued notifications`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $counter Total queued notifications; i.e. a counter value.
 			 *
@@ -257,7 +257,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * `X queue event log entry` or `X queue event log entries`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $counter Total queue event log entries; i.e. a counter value.
 			 *
@@ -273,7 +273,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * A confirmation/warning regarding log entry deletions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Confirmation/warning regarding log entry deletions.
 			 */

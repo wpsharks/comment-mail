@@ -2,7 +2,7 @@
 /**
  * Options Importer
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,28 +16,28 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Options Importer
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class import_ops extends abs_base
 		{
 			/**
 			 * @var string Input data.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $data;
 
 			/**
 			 * @var string Input data file.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $data_file;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $request_args Arguments to the constructor.
 			 *    These should NOT be trusted; they come from a `$_REQUEST` action.
@@ -68,7 +68,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Import processor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_import()
 			{
@@ -90,7 +90,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Notices and redirection.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function enqueue_notices_and_redirect()
 			{

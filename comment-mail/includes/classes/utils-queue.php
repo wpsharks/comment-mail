@@ -2,7 +2,7 @@
 /**
  * Queue Utilities
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Queue Utilities
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class utils_queue extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -33,7 +33,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Unique IDs only.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $queue_ids Queued notification IDs.
 			 *
@@ -59,7 +59,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Delete queued notification.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|string $queue_id Queued notification ID.
 			 * @param array          $args Any additional behavioral args.
@@ -87,7 +87,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Bulk delete queued notifications.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $queue_ids Queued notification IDs.
 			 * @param array $args Any additional behavioral args.

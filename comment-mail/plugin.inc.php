@@ -2,7 +2,7 @@
 /**
  * Plugin Class
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -37,7 +37,7 @@ namespace comment_mail
 		 * @property-read utils_url             $utils_url
 		 * @property-read utils_user            $utils_user
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class plugin extends abs_base
 		{
@@ -48,7 +48,7 @@ namespace comment_mail
 			/**
 			 * Identifies pro version.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @var boolean `TRUE` for pro version.
 			 */
@@ -57,7 +57,7 @@ namespace comment_mail
 			/**
 			 * Plugin name.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @var string Plugin name.
 			 */
@@ -66,7 +66,7 @@ namespace comment_mail
 			/**
 			 * Plugin name (abbreviated).
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @var string Plugin name (abbreviated).
 			 */
@@ -75,7 +75,7 @@ namespace comment_mail
 			/**
 			 * Plugin product page URL.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @var string Plugin product page URL.
 			 */
@@ -84,7 +84,7 @@ namespace comment_mail
 			/**
 			 * Used by the plugin's uninstall handler.
 			 *
-			 * @since 14xxxx Adding uninstall handler.
+			 * @since 141111 Adding uninstall handler.
 			 *
 			 * @var boolean Defined by constructor.
 			 */
@@ -93,7 +93,7 @@ namespace comment_mail
 			/**
 			 * Text domain for translations; based on `__NAMESPACE__`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @var string Defined by class constructor; for translations.
 			 */
@@ -102,7 +102,7 @@ namespace comment_mail
 			/**
 			 * Plugin slug; based on `__NAMESPACE__`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @var string Defined by constructor.
 			 */
@@ -111,7 +111,7 @@ namespace comment_mail
 			/**
 			 * Stub `__FILE__` location.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @var string Defined by class constructor.
 			 */
@@ -120,11 +120,11 @@ namespace comment_mail
 			/**
 			 * Version string in YYMMDD[+build] format.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @var string Current version of the software.
 			 */
-			public $version = '14xxxx';
+			public $version = '141111';
 
 			/*
 			 * Public Properties (Defined @ Setup)
@@ -133,7 +133,7 @@ namespace comment_mail
 			/**
 			 * An array of all default option values.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @var array Default options array.
 			 */
@@ -142,7 +142,7 @@ namespace comment_mail
 			/**
 			 * Configured option values.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @var array Options configured by site owner.
 			 */
@@ -151,7 +151,7 @@ namespace comment_mail
 			/**
 			 * General capability requirement.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @var string Capability required to administer.
 			 */
@@ -160,7 +160,7 @@ namespace comment_mail
 			/**
 			 * Management capability requirement.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @var string Capability required to manage.
 			 */
@@ -169,7 +169,7 @@ namespace comment_mail
 			/**
 			 * Uninstall capability requirement.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @var string Capability required to uninstall.
 			 */
@@ -191,7 +191,7 @@ namespace comment_mail
 			 * @param boolean $enable_hooks Defaults to a TRUE value.
 			 *    If FALSE, setup runs but without adding any hooks.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct($enable_hooks = TRUE)
 			{
@@ -235,7 +235,7 @@ namespace comment_mail
 			/**
 			 * Setup the plugin.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function setup()
 			{
@@ -311,6 +311,9 @@ namespace comment_mail
 					'enable'                                                               => '1', // `0|1`; enable?
 					'new_subs_enable'                                                      => '1', // `0|1`; enable?
 					'queue_processing_enable'                                              => '1', // `0|1`; enable?
+
+					// @TODO add options to allow for disabling event logging for subs and/or the queue.
+					//    Or, if not that; allow for a data retention period to be configured.
 
 					'comment_form_template_enable'                                         => '1', // `0|1`; enable?
 					'comment_form_scripts_enable'                                          => '1', // `0|1`; enable?
@@ -583,7 +586,7 @@ namespace comment_mail
 			/**
 			 * First installation time.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return integer UNIX timestamp.
 			 */
@@ -595,7 +598,7 @@ namespace comment_mail
 			/**
 			 * Plugin activation hook.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to {@link \register_activation_hook()}
 			 */
@@ -607,7 +610,7 @@ namespace comment_mail
 			/**
 			 * Check current plugin version.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `admin_init` action.
 			 */
@@ -626,7 +629,7 @@ namespace comment_mail
 			/**
 			 * Plugin deactivation hook.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to {@link \register_deactivation_hook()}
 			 */
@@ -638,7 +641,7 @@ namespace comment_mail
 			/**
 			 * Plugin uninstall handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @called-by {@link uninstall}
 			 */
@@ -654,7 +657,7 @@ namespace comment_mail
 			/**
 			 * Plugin action handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `init` action.
 			 */
@@ -673,7 +676,7 @@ namespace comment_mail
 			/**
 			 * Saves new plugin options.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $options An array of new plugin options.
 			 */
@@ -706,7 +709,7 @@ namespace comment_mail
 			/**
 			 * Adds plugin meta boxes.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `add_meta_boxes` action.
 			 *
@@ -725,15 +728,20 @@ namespace comment_mail
 				if(in_array($post_type, $excluded_post_types, TRUE))
 					return; // Ignore; this post type excluded.
 
-				add_meta_box(__NAMESPACE__.'_small', $this->name.'&trade;', array($this, 'post_small_meta_box'), $post_type, 'side', 'high');
-				add_meta_box(__NAMESPACE__.'_large', $this->name.'&trade; '.__('Subscriptions', $this->text_domain),
-				             array($this, 'post_large_meta_box'), $post_type, 'normal', 'high');
+				// Meta boxes use an SVG graphic.
+				$icon = $this->utils_fs->inline_icon_svg();
+
+				add_meta_box(__NAMESPACE__.'_small', $icon.' '.$this->name.'&trade;', array($this, 'post_small_meta_box'), $post_type, 'side', 'high');
+
+				// @TODO disabling this for now.
+				//add_meta_box(__NAMESPACE__.'_large', $icon.' '.$this->name.'&trade; '.__('Subscriptions', $this->text_domain),
+				//             array($this, 'post_large_meta_box'), $post_type, 'normal', 'high');
 			}
 
 			/**
 			 * Builds small meta box for this plugin.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \WP_Post $post A WP post object reference.
 			 *
@@ -747,7 +755,7 @@ namespace comment_mail
 			/**
 			 * Builds large meta box for this plugin.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \WP_Post $post A WP post object reference.
 			 *
@@ -765,26 +773,47 @@ namespace comment_mail
 			/**
 			 * Adds CSS for administrative menu pages.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `admin_enqueue_scripts` action.
 			 */
 			public function enqueue_admin_styles()
 			{
-				if(!$this->utils_env->is_menu_page(__NAMESPACE__.'*')
-				   && !$this->utils_env->is_menu_page('post.php')
-				) return; // Nothing to do; not applicable.
+				if($this->utils_env->is_menu_page('post.php'))
+					$this->_enqueue_post_admin_styles();
 
-				$deps = array('chosen', 'font-awesome', 'sharkicons'); // Dependencies.
+				if(!$this->utils_env->is_menu_page(__NAMESPACE__.'*'))
+					return; // Nothing to do; not applicable.
 
-				if($this->utils_env->is_menu_page(__NAMESPACE__) || $this->utils_env->is_menu_page(__NAMESPACE__.'_*_templates'))
-				{
-					$deps[] = 'codemirror'; // CodeMirror dependency is added to the array now.
-					wp_enqueue_style('codemirror', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/codemirror.min.css'), array(), NULL, 'all');
-					wp_enqueue_style('codemirror-fullscreen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/addon/display/fullscreen.min.css'), array('codemirror'), NULL, 'all');
-					wp_enqueue_style('codemirror-ambiance-theme', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/theme/ambiance.min.css'), array('codemirror'), NULL, 'all');
-				}
+				$deps = array('codemirror', 'jquery-datetimepicker', 'chosen', 'font-awesome', 'sharkicons'); // Dependencies.
+
+				wp_enqueue_style('codemirror', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/codemirror.min.css'), array(), NULL, 'all');
+				wp_enqueue_style('codemirror-fullscreen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/addon/display/fullscreen.min.css'), array('codemirror'), NULL, 'all');
+				wp_enqueue_style('codemirror-ambiance-theme', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/theme/ambiance.min.css'), array('codemirror'), NULL, 'all');
+
+				wp_enqueue_style('jquery-datetimepicker', $this->utils_url->to('/submodules/datetimepicker/jquery.datetimepicker.css'), array(), NULL, 'all');
 				wp_enqueue_style('chosen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.min.css'), array(), NULL, 'all');
+				wp_enqueue_style('font-awesome', set_url_scheme('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css'), array(), NULL, 'all');
+				wp_enqueue_style('sharkicons', $this->utils_url->to('/submodules/sharkicons/styles.min.css'), array(), NULL, 'all');
+
+				wp_enqueue_style(__NAMESPACE__, $this->utils_url->to('/client-s/css/menu-pages.min.css'), $deps, $this->version, 'all');
+			}
+
+			/**
+			 * Adds CSS for administrative menu pages.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @attaches-to `admin_enqueue_scripts` action indirectly.
+			 */
+			public function _enqueue_post_admin_styles()
+			{
+				if(!$this->utils_env->is_menu_page('post.php'))
+					return; // Nothing to do; not applicable.
+
+				$deps = array('font-awesome', 'sharkicons'); // Dependencies.
+
+				wp_enqueue_style('font-awesome', set_url_scheme('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css'), array(), NULL, 'all');
 				wp_enqueue_style('font-awesome', set_url_scheme('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css'), array(), NULL, 'all');
 				wp_enqueue_style('sharkicons', $this->utils_url->to('/submodules/sharkicons/styles.min.css'), array(), NULL, 'all');
 
@@ -794,7 +823,7 @@ namespace comment_mail
 			/**
 			 * Adds JS for administrative menu pages.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `admin_enqueue_scripts` action.
 			 */
@@ -803,40 +832,64 @@ namespace comment_mail
 				if(!$this->utils_env->is_menu_page(__NAMESPACE__.'*'))
 					return; // Nothing to do; NOT a plugin menu page.
 
-				$deps = array('jquery', 'chosen'); // Dependencies.
+				$deps = array('jquery', 'jquery-datetimepicker', 'postbox', 'codemirror', 'chartjs', 'chosen'); // Dependencies.
 
-				if($this->utils_env->is_menu_page(__NAMESPACE__) || $this->utils_env->is_menu_page(__NAMESPACE__.'_*_templates'))
-				{
-					$deps[] = 'codemirror'; // CodeMirror dependency is added to the array now.
-					wp_enqueue_script('codemirror', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/codemirror.min.js'), array(), NULL, TRUE);
-					wp_enqueue_script('codemirror-fullscreen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/addon/display/fullscreen.min.js'), array('codemirror'), NULL, TRUE);
-					wp_enqueue_script('codemirror-matchbrackets', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/addon/edit/matchbrackets.js'), array('codemirror'), NULL, TRUE);
-					wp_enqueue_script('codemirror-htmlmixed', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/htmlmixed/htmlmixed.js'), array('codemirror'), NULL, TRUE);
-					wp_enqueue_script('codemirror-xml', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/xml/xml.js'), array('codemirror'), NULL, TRUE);
-					wp_enqueue_script('codemirror-javascript', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/javascript/javascript.js'), array('codemirror'), NULL, TRUE);
-					wp_enqueue_script('codemirror-css', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/css/css.js'), array('codemirror'), NULL, TRUE);
-					wp_enqueue_script('codemirror-clike', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/clike/clike.js'), array('codemirror'), NULL, TRUE);
-					wp_enqueue_script('codemirror-php', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/php/php.js'), array('codemirror'), NULL, TRUE);
-				}
+				wp_enqueue_script('codemirror', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/codemirror.min.js'), array(), NULL, TRUE);
+				wp_enqueue_script('codemirror-fullscreen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/addon/display/fullscreen.min.js'), array('codemirror'), NULL, TRUE);
+				wp_enqueue_script('codemirror-matchbrackets', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/addon/edit/matchbrackets.js'), array('codemirror'), NULL, TRUE);
+				wp_enqueue_script('codemirror-htmlmixed', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/htmlmixed/htmlmixed.js'), array('codemirror'), NULL, TRUE);
+				wp_enqueue_script('codemirror-xml', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/xml/xml.js'), array('codemirror'), NULL, TRUE);
+				wp_enqueue_script('codemirror-javascript', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/javascript/javascript.js'), array('codemirror'), NULL, TRUE);
+				wp_enqueue_script('codemirror-css', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/css/css.js'), array('codemirror'), NULL, TRUE);
+				wp_enqueue_script('codemirror-clike', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/clike/clike.js'), array('codemirror'), NULL, TRUE);
+				wp_enqueue_script('codemirror-php', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/php/php.js'), array('codemirror'), NULL, TRUE);
+
+				wp_enqueue_script('jquery-datetimepicker', $this->utils_url->to('/submodules/datetimepicker/jquery.datetimepicker.js'), array('jquery'), NULL, TRUE);
+				wp_enqueue_script('chartjs', set_url_scheme('//cdn.jsdelivr.net/chart.js/1.0.1-beta.4/Chart.min.js'), array(), NULL, TRUE);
 				wp_enqueue_script('chosen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.min.js'), array('jquery'), NULL, TRUE);
 				wp_enqueue_script(__NAMESPACE__, $this->utils_url->to('/client-s/js/menu-pages.min.js'), $deps, $this->version, TRUE);
 
 				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_vars', array(
 					'pluginUrl'    => rtrim($this->utils_url->to('/'), '/'),
-					'ajaxEndpoint' => rtrim($this->utils_url->page_nonce_only(), '/')
+					'ajaxEndpoint' => rtrim($this->utils_url->page_nonce_only(), '/'),
 				));
 				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_i18n', array(
 					'bulkReconfirmConfirmation' => __('Resend email confirmation link? Are you sure?', $this->text_domain),
 					'bulkDeleteConfirmation'    => $this->utils_env->is_menu_page('*_event_log')
 						? $this->utils_i18n->log_entry_js_deletion_confirmation_warning()
 						: __('Delete permanently? Are you sure?', $this->text_domain),
+					'dateTimePickerI18n'        => array('en' => array(
+						'months'    => array(
+							__('January', $this->plugin->text_domain),
+							__('February', $this->plugin->text_domain),
+							__('March', $this->plugin->text_domain),
+							__('April', $this->plugin->text_domain),
+							__('May', $this->plugin->text_domain),
+							__('June', $this->plugin->text_domain),
+							__('July', $this->plugin->text_domain),
+							__('August', $this->plugin->text_domain),
+							__('September', $this->plugin->text_domain),
+							__('October', $this->plugin->text_domain),
+							__('November', $this->plugin->text_domain),
+							__('December', $this->plugin->text_domain),
+						),
+						'dayOfWeek' => array(
+							__('Sun', $this->plugin->text_domain),
+							__('Mon', $this->plugin->text_domain),
+							__('Tue', $this->plugin->text_domain),
+							__('Wed', $this->plugin->text_domain),
+							__('Thu', $this->plugin->text_domain),
+							__('Fri', $this->plugin->text_domain),
+							__('Sat', $this->plugin->text_domain),
+						),
+					)),
 				));
 			}
 
 			/**
 			 * Creates admin menu pages.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `admin_menu` action.
 			 */
@@ -846,8 +899,8 @@ namespace comment_mail
 					if(!current_user_can($this->cap))
 						return; // Do not add meta boxes.
 
-				// Menu page icon uses an SVG graphic specifically designed for inline display.
-				$icon = file_get_contents(dirname(__FILE__).'/client-s/images/inline-icon.svg');
+				// Menu page icon uses an SVG graphic.
+				$icon = $this->utils_fs->inline_icon_svg();
 
 				$indent = // Indent used by various menu items below.
 					'<span style="inline-block; margin-left:1em;"></span>';
@@ -860,10 +913,14 @@ namespace comment_mail
 
 				// Menu page titles use UTF-8 char: `⥱`; <http://unicode-table.com/en/2971/>.
 
+				/* ----------------------------------------- */
+
 				$menu_title                           = $divider.$this->name.'&trade; '.$icon;
 				$page_title                           = $this->name.'&trade;'; // w/o icon.
 				$this->menu_page_hooks[__NAMESPACE__] = add_comments_page($page_title, $menu_title, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__], array($this, 'menu_page_options_screen'));
+
+				/* ----------------------------------------- */
 
 				$menu_title                                   = $divider.$indent.__('Subscriptions', $this->text_domain);
 				$page_title                                   = $this->name.'&trade; &#10609; '.__('Subscriptions', $this->text_domain);
@@ -875,6 +932,8 @@ namespace comment_mail
 				$this->menu_page_hooks[__NAMESPACE__.'_sub_event_log'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_sub_event_log', array($this, 'menu_page_sub_event_log'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_sub_event_log'], array($this, 'menu_page_sub_event_log_screen'));
 
+				/* ----------------------------------------- */
+
 				$menu_title                                    = $divider.$indent.__('Mail Queue', $this->text_domain);
 				$page_title                                    = $this->name.'&trade; &#10609; '.__('Mail Queue', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_queue'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
@@ -885,10 +944,14 @@ namespace comment_mail
 				$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_queue_event_log', array($this, 'menu_page_queue_event_log'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'], array($this, 'menu_page_queue_event_log_screen'));
 
+				/* ----------------------------------------- */
+
 				$menu_title                                    = $divider.$indent.__('Statistics/Charts', $this->text_domain);
 				$page_title                                    = $this->name.'&trade; &#10609; '.__('Statistics/Charts', $this->text_domain);
 				$this->menu_page_hooks[__NAMESPACE__.'_stats'] = add_comments_page($page_title, $menu_title, $this->manage_cap, __NAMESPACE__.'_stats', array($this, 'menu_page_stats'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_stats'], array($this, 'menu_page_stats_screen'));
+
+				/* ----------------------------------------- */
 
 				$menu_title = $divider.$indent.__('Config. Options', $this->text_domain);
 				$page_title = $this->name.'&trade; &#10609; '.__('Config. Options', $this->text_domain);
@@ -913,7 +976,7 @@ namespace comment_mail
 			/**
 			 * Set plugin-related screen options.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `set-screen-option` filter.
 			 *
@@ -938,7 +1001,7 @@ namespace comment_mail
 			/**
 			 * Menu page screen; for options.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__]` action.
 			 *
@@ -960,7 +1023,7 @@ namespace comment_mail
 			/**
 			 * Menu page for options.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @see add_menu_pages()
 			 */
@@ -972,7 +1035,7 @@ namespace comment_mail
 			/**
 			 * Menu page screen; for subs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_subs']` action.
 			 *
@@ -1007,7 +1070,7 @@ namespace comment_mail
 			/**
 			 * Menu page for subscriptions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @see add_menu_pages()
 			 */
@@ -1019,7 +1082,7 @@ namespace comment_mail
 			/**
 			 * Menu page screen; for subs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_subs']` action.
 			 *
@@ -1054,7 +1117,7 @@ namespace comment_mail
 			/**
 			 * Menu page for sub. event log.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @see add_menu_pages()
 			 */
@@ -1066,7 +1129,7 @@ namespace comment_mail
 			/**
 			 * Menu page screen; for queue.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue']` action.
 			 *
@@ -1100,7 +1163,7 @@ namespace comment_mail
 			/**
 			 * Menu page for mail queue.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @see add_menu_pages()
 			 */
@@ -1112,7 +1175,7 @@ namespace comment_mail
 			/**
 			 * Menu page screen; for queue event log.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log']` action.
 			 *
@@ -1146,7 +1209,7 @@ namespace comment_mail
 			/**
 			 * Menu page for mail queue event log.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @see add_menu_pages()
 			 */
@@ -1158,7 +1221,7 @@ namespace comment_mail
 			/**
 			 * Menu page screen; for stats.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_stats']` action.
 			 *
@@ -1180,7 +1243,7 @@ namespace comment_mail
 			/**
 			 * Menu page for stats.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @see add_menu_pages()
 			 */
@@ -1192,7 +1255,7 @@ namespace comment_mail
 			/**
 			 * Menu page screen; for import/export.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_import_export']` action.
 			 *
@@ -1214,7 +1277,7 @@ namespace comment_mail
 			/**
 			 * Menu page for import/export.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @see add_menu_pages()
 			 */
@@ -1226,7 +1289,7 @@ namespace comment_mail
 			/**
 			 * Menu page screen; for email templates.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_email_templates']` action.
 			 *
@@ -1248,7 +1311,7 @@ namespace comment_mail
 			/**
 			 * Menu page for email templates.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @see add_menu_pages()
 			 */
@@ -1260,7 +1323,7 @@ namespace comment_mail
 			/**
 			 * Menu page screen; for site templates.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_site_templates']` action.
 			 *
@@ -1282,7 +1345,7 @@ namespace comment_mail
 			/**
 			 * Menu page for site templates.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @see add_menu_pages()
 			 */
@@ -1294,7 +1357,7 @@ namespace comment_mail
 			/**
 			 * Adds link(s) to plugin row on the WP plugins page.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `plugin_action_links_'.plugin_basename($this->file)` filter.
 			 *
@@ -1318,7 +1381,7 @@ namespace comment_mail
 			/**
 			 * Enqueue an administrative notice.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $markup HTML markup containing the notice itself.
 			 * @param array  $args An array of additional args; i.e. presentation/style.
@@ -1372,7 +1435,7 @@ namespace comment_mail
 			/**
 			 * Enqueue an administrative notice; for a particular user.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $markup HTML markup. See {@link enqueue_notice()}.
 			 * @param array  $args Additional args. See {@link enqueue_notice()}.
@@ -1388,7 +1451,7 @@ namespace comment_mail
 			/**
 			 * Enqueue an administrative error.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $markup HTML markup. See {@link enqueue_notice()}.
 			 * @param array  $args Additional args. See {@link enqueue_notice()}.
@@ -1401,7 +1464,7 @@ namespace comment_mail
 			/**
 			 * Enqueue an administrative error; for a particular user.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $markup HTML markup. See {@link enqueue_error()}.
 			 * @param array  $args Additional args. See {@link enqueue_notice()}.
@@ -1417,7 +1480,7 @@ namespace comment_mail
 			/**
 			 * Render admin notices; across all admin dashboard views.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `all_admin_notices` action.
 			 */
@@ -1528,7 +1591,7 @@ namespace comment_mail
 			/**
 			 * Post status handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `transition_post_status` action.
 			 *
@@ -1577,7 +1640,7 @@ namespace comment_mail
 			/**
 			 * Post deletion handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `before_delete_post` action.
 			 *
@@ -1595,7 +1658,7 @@ namespace comment_mail
 			/**
 			 * Comment shortlink redirections.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `init` action.
 			 */
@@ -1610,7 +1673,7 @@ namespace comment_mail
 			/**
 			 * Comment form handler; via filter.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `comment_form_field_comment` filter.
 			 *
@@ -1638,7 +1701,7 @@ namespace comment_mail
 			/**
 			 * Comment form handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `comment_form` action.
 			 */
@@ -1656,7 +1719,7 @@ namespace comment_mail
 			/**
 			 * Comment post handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `comment_post` action.
 			 *
@@ -1677,7 +1740,7 @@ namespace comment_mail
 			/**
 			 * Comment status handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `transition_comment_status` action.
 			 *
@@ -1709,7 +1772,7 @@ namespace comment_mail
 			/**
 			 * User registration handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `user_register` action.
 			 *
@@ -1723,7 +1786,7 @@ namespace comment_mail
 			/**
 			 * User deletion handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `delete_user` action.
 			 * @attaches-to `wpmu_delete_user` action.
@@ -1744,7 +1807,7 @@ namespace comment_mail
 			/**
 			 * Extends WP-Cron schedules.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `cron_schedules` filter.
 			 *
@@ -1763,7 +1826,7 @@ namespace comment_mail
 			/**
 			 * Queue processor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `_cron_'.__NAMESPACE__.'_queue_processor` action.
 			 */
@@ -1775,7 +1838,7 @@ namespace comment_mail
 			/**
 			 * Sub cleaner.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @attaches-to `_cron_'.__NAMESPACE__.'_sub_cleaner` action.
 			 */
@@ -1793,7 +1856,7 @@ namespace comment_mail
 		 * Used internally by other classes as an easy way to reference
 		 *    the core {@link plugin} class instance.
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 *
 		 * @return plugin Class instance.
 		 */
@@ -1809,7 +1872,7 @@ namespace comment_mail
 		/**
 		 * A global reference to the plugin.
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 *
 		 * @var plugin Main plugin class.
 		 */

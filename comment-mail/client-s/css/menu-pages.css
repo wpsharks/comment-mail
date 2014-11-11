@@ -69,6 +69,16 @@ A menu page area ~ clean list items.
 	list-style : inherit;
 }
 /*
+A menu page area ~ chosen select menus.
+*/
+.comment-mail-menu-page-area .chosen-container,
+.comment-mail-menu-page-area .chosen-drop,
+.comment-mail-menu-page-area .chosen-drop .chosen-search
+{
+	box-sizing : border-box;
+	width      : 100% !important;
+}
+/*
 A menu page area ~ post com/sub bubbles.
 */
 .comment-mail-menu-page-area .pmp-post-com-count
@@ -82,7 +92,7 @@ A menu page area ~ post com/sub bubbles.
 	text-align      : left;
 	text-decoration : none;
 	background      : #BBBBBB;
-	padding         : 0 .5em 0 .35em;
+	padding         : .25em .5em .25em .4em;
 	display         : inline-block;
 }
 .comment-mail-menu-page-area .pmp-post-sub-count::before
@@ -110,6 +120,45 @@ A menu page area ~ post com/sub bubbles.
 .comment-mail-menu-page-area .pmp-post-sub-count:hover::before
 {
 	color : #FFFFFF;
+}
+/*
+A menu page area ~ postboxes.
+*/
+.comment-mail-menu-page-area .pmp-postbox-container
+{
+	width : 100%;
+}
+.comment-mail-menu-page-area .pmp-postbox-hndle
+{
+	cursor : pointer !important;
+}
+.comment-mail-menu-page-area .pmp-postbox-hndle-note
+{
+	font-size  : 70%;
+	opacity    : 0.5;
+	font-style : italic;
+	margin     : 0 0 0 .5em;
+	display    : inline-block;
+}
+.comment-mail-menu-page-area .pmp-postbox-handle::before
+{
+	top                     : 0;
+	right                   : .25em;
+	position                : relative;
+
+	content                 : '\f142';
+	font                    : 400 1.5em/1em dashicons;
+
+	-webkit-font-smoothing  : antialiased;
+	-moz-osx-font-smoothing : grayscale;
+	text-decoration         : none !important;
+
+	display                 : inline-block;
+	padding                 : .5em 0 .5em 0;
+}
+.comment-mail-menu-page-area .pmp-postbox.closed .pmp-postbox-handle::before
+{
+	content : '\f140';
 }
 /*
 A menu page area ~ utilities.
@@ -298,8 +347,8 @@ Menu page styles.
 .comment-mail-menu-page select:focus,
 .comment-mail-menu-page textarea,
 .comment-mail-menu-page textarea:focus,
-.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']),
-.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus
+.comment-mail-menu-page :not(.chosen-search) > input:not([type='radio']):not([type='checkbox']),
+.comment-mail-menu-page :not(.chosen-search) > input:not([type='radio']):not([type='checkbox']):focus
 {
 	margin      : 0;
 	width       : 100%;
@@ -313,8 +362,8 @@ Menu page styles.
 }
 .comment-mail-menu-page textarea,
 .comment-mail-menu-page textarea:focus,
-.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']),
-.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus,
+.comment-mail-menu-page :not(.chosen-search) > input:not([type='radio']):not([type='checkbox']),
+.comment-mail-menu-page :not(.chosen-search) > input:not([type='radio']):not([type='checkbox']):focus,
 .comment-mail-menu-page /* CodeMirror. */.cm,
 .comment-mail-menu-page .cm .CodeMirror
 {
@@ -331,8 +380,8 @@ Menu page styles.
 .comment-mail-menu-page select:focus,
 .comment-mail-menu-page textarea,
 .comment-mail-menu-page textarea:focus,
-.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']),
-.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus,
+.comment-mail-menu-page :not(.chosen-search) > input:not([type='radio']):not([type='checkbox']),
+.comment-mail-menu-page :not(.chosen-search) > input:not([type='radio']):not([type='checkbox']):focus,
 .comment-mail-menu-page /* CodeMirror wrappers. */.cm
 {
 	border-radius : 4px;
@@ -348,7 +397,7 @@ Menu page styles.
 }
 .comment-mail-menu-page select,
 .comment-mail-menu-page textarea,
-.comment-mail-menu-page input:not([type='radio']):not([type='checkbox'])
+.comment-mail-menu-page :not(.chosen-search) > input:not([type='radio']):not([type='checkbox'])
 {
 	color      : #626262;
 	background : #E0E0E0;
@@ -359,13 +408,13 @@ Menu page styles.
 }
 .comment-mail-menu-page select:focus,
 .comment-mail-menu-page textarea:focus,
-.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus,
+.comment-mail-menu-page :not(.chosen-search) > input:not([type='radio']):not([type='checkbox']):focus,
 .comment-mail-menu-page /* CodeMirror. */.cm
 {
 	color : #000000;
 }
 .comment-mail-menu-page textarea:focus,
-.comment-mail-menu-page input:not([type='radio']):not([type='checkbox']):focus
+.comment-mail-menu-page :not(.chosen-search) > input:not([type='radio']):not([type='checkbox']):focus
 {
 	background : #E8E8E8;
 }
@@ -379,7 +428,7 @@ Menu page styles.
 }
 .comment-mail-menu-page select.pmp-max-width,
 .comment-mail-menu-page textarea.pmp-max-width,
-.comment-mail-menu-page input.pmp-max-width:not([type='radio']):not([type='checkbox'])
+.comment-mail-menu-page :not(.chosen-search) > input.pmp-max-width:not([type='radio']):not([type='checkbox'])
 {
 	width     : auto;
 	min-width : 400px;
@@ -408,9 +457,9 @@ Menu page styles.
 	font-style  : italic;
 	color       : rgba(0, 0, 0, 0.2);
 }
-.comment-mail-menu-page input[disabled],
 .comment-mail-menu-page select[disabled],
-.comment-mail-menu-page textarea[disabled]
+.comment-mail-menu-page textarea[disabled],
+.comment-mail-menu-page :not(.chosen-search) > input[disabled]
 {
 	opacity : 0.5;
 }
@@ -537,8 +586,9 @@ Menu page body styles.
 	float     : right;
 	font-size : 300%;
 	margin    : 0 0 0 2em;
-	position  : relative;
+
 	z-index   : 1;
+	position  : relative;
 }
 /*
 Menu page section heading styles.
@@ -591,14 +641,6 @@ Menu page panel styles.
 	background : #307D27;
 	color      : #FFFFFF !important;
 }
-.comment-mail-menu-page .pmp-panel-heading > .pmp-panel-heading-note
-{
-	font-size  : 70%;
-	opacity    : 0.5;
-	font-style : italic;
-	margin     : 0 0 0 .5em;
-	display    : inline-block;
-}
 .comment-mail-menu-page .pmp-panel-heading:after
 {
 	font-size   : 80%;
@@ -619,6 +661,14 @@ Menu page panel styles.
 	font-variant : small-caps !important;
 	font-family  : sans-serif !important;
 	content      : 'pro version only' !important;
+}
+.comment-mail-menu-page-area .pmp-panel-heading-note
+{
+	font-size  : 70%;
+	opacity    : 0.5;
+	font-style : italic;
+	margin     : 0 0 0 .5em;
+	display    : inline-block;
 }
 .comment-mail-menu-page .pmp-panel-body
 {
@@ -914,13 +964,15 @@ Menu page table columns; i.e. media queries.
 /*
 Menu page form field styles.
 */
-.comment-mail-menu-page-form .form-field input:not([type='radio']):not([type='checkbox']),
 .comment-mail-menu-page-form .form-field select,
 .comment-mail-menu-page-form .form-field textarea,
+.comment-mail-menu-page-form .form-field :not(.chosen-search) > input:not([type='radio']):not([type='checkbox']),
+.comment-mail-menu-page-form .form-field .chosen-container,
 .comment-mail-menu-page-form .form-field .notes
 {
-	width     : 100%;
-	max-width : 600px;
+	width      : 100%;
+	max-width  : 600px;
+	box-sizing : border-box;
 }
 .comment-mail-menu-page-form .form-field .description,
 .comment-mail-menu-page-form .form-field .notes
@@ -931,4 +983,97 @@ Menu page form field styles.
 .comment-mail-menu-page-form .form-field .notes
 {
 	margin-top : .25em;
+}
+/* ------------------------------------------------------------------------------------------------------------
+	Plugin-specific styles for menu page stats that follow a WP standard; but need a few tweaks.
+------------------------------------------------------------------------------------------------------------ */
+/*
+Menu page statistical form field styles.
+*/
+.comment-mail-menu-page-stats .form-field select,
+.comment-mail-menu-page-stats .form-field textarea,
+.comment-mail-menu-page-stats .form-field :not(.chosen-search) > input:not([type='radio']):not([type='checkbox']),
+.comment-mail-menu-page-stats .form-field .notes
+{
+	width      : 100%;
+	box-sizing : border-box;
+}
+.comment-mail-menu-page-stats .form-field .description,
+.comment-mail-menu-page-stats .form-field .notes
+{
+	opacity    : 0.75;
+	font-style : italic;
+}
+.comment-mail-menu-page-stats .form-field .notes
+{
+	margin-top : .25em;
+}
+/*
+Menu page statistical view styles.
+*/
+.comment-mail-menu-page-stats .pmp-stats-view-table,
+.comment-mail-menu-page-stats .pmp-stats-view-table table
+{
+	width        : 100%;
+	table-layout : fixed;
+}
+.comment-mail-menu-page-stats .pmp-stats-view-table th,
+.comment-mail-menu-page-stats .pmp-stats-view-table td
+{
+	margin         : 0;
+	padding        : 0;
+	vertical-align : middle;
+}
+.comment-mail-menu-page-stats .pmp-stats-view-table .pmp-stats-view-col th,
+.comment-mail-menu-page-stats .pmp-stats-view-table .pmp-stats-view-col td
+{
+	width      : 100%;
+	display    : block;
+	text-align : left;
+}
+.comment-mail-menu-page-stats .pmp-stats-view-table .pmp-stats-view-col input
+{
+	border-radius : 4px;
+}
+.comment-mail-menu-page-stats .pmp-stats-view-table .pmp-stats-view-col input,
+.comment-mail-menu-page-stats .pmp-stats-view-table .pmp-stats-view-col button
+{
+	width     : 100%;
+	max-width : 100%;
+}
+.comment-mail-menu-page-stats .pmp-stats-view-table .pmp-stats-view-col.pmp-stats-view-submit,
+.comment-mail-menu-page-stats .pmp-stats-view-table .pmp-stats-view-col.pmp-stats-view-submit button
+{
+	width          : 150px;
+	white-space    : nowrap;
+	text-align     : center;
+	vertical-align : bottom;
+}
+.comment-mail-menu-page-stats .pmp-stats-view .pmp-progress
+{
+	display : block;
+	margin  : 1em auto 1em auto;
+}
+.comment-mail-menu-page-stats .pmp-stats-view canvas
+{
+	box-sizing : border-box;
+	margin     : 1em 0 0 0;
+}
+@media (max-width : 991px)
+{
+	.comment-mail-menu-page-stats .pmp-stats-view th,
+	.comment-mail-menu-page-stats .pmp-stats-view td,
+	.comment-mail-menu-page-stats .pmp-stats-view input,
+	.comment-mail-menu-page-stats .pmp-stats-view button
+	{
+		display    : block !important;
+		text-align : center !important;
+
+		width      : 100% !important;
+		max-width  : 100% !important;
+	}
+	.comment-mail-menu-page-stats .pmp-stats-view-table > tbody > tr > td:not(:first-child)
+	{
+		margin-top : 1em !important;
+	}
 }

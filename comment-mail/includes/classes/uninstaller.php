@@ -2,7 +2,7 @@
 /**
  * Uninstall Routines
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Uninstall Routines
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class uninstaller extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -52,16 +52,16 @@ namespace comment_mail // Root namespace.
 				$this->delete_options();
 				$this->delete_notices();
 				$this->delete_install_time();
-
+				$this->delete_post_meta_keys();
+				$this->delete_user_meta_keys();
 				$this->clear_cron_hooks();
-				$this->erase_stcr_history();
 				$this->drop_db_tables();
 			}
 
 			/**
 			 * Delete plugin-related options.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function delete_options()
 			{
@@ -71,7 +71,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Delete plugin-related notices.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function delete_notices()
 			{
@@ -81,7 +81,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Delete install time.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function delete_install_time()
 			{
@@ -91,7 +91,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Clear scheduled CRON hooks.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function clear_cron_hooks()
 			{
@@ -100,19 +100,58 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Erase StCR import history.
+			 * Delete post meta keys.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
-			protected function erase_stcr_history()
+			protected function delete_post_meta_keys()
 			{
-				import_stcr::erase_import_history();
+				$like = // e.g. Delete all keys LIKE `%comment\_mail%`.
+					'%'.$this->plugin->utils_db->wp->esc_like(__NAMESPACE__).'%';
+
+				$sql = // This will remove our StCR import history also.
+					"DELETE FROM `".esc_sql($this->plugin->utils_db->wp->postmeta)."`".
+					" WHERE `meta_key` LIKE '".esc_sql($like)."'";
+
+				$this->plugin->utils_db->wp->query($sql);
+			}
+
+			/**
+			 * Delete user meta keys.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected function delete_user_meta_keys()
+			{
+				if(is_multisite()) // Prefixed keys on networks.
+				{
+					$ms_prefix = $this->plugin->utils_db->wp->prefix;
+
+					$like = $this->plugin->utils_db->wp->esc_like($ms_prefix).
+					        // e.g. Delete all keys LIKE `wp\_5\_%comment\_mail%`.
+					        // Or, on the main site it might be: `wp\_%comment\_mail%`.
+					        '%'.$this->plugin->utils_db->wp->esc_like(__NAMESPACE__).'%';
+
+					$sql = // This will delete all screen options too.
+						"DELETE FROM `".esc_sql($this->plugin->utils_db->wp->usermeta)."`".
+						" WHERE `meta_key` LIKE '".esc_sql($like)."'";
+				}
+				else // No special considerations; there is only one blog.
+				{
+					$like = // e.g. Delete all keys LIKE `%comment\_mail%`.
+						'%'.$this->plugin->utils_db->wp->esc_like(__NAMESPACE__).'%';
+
+					$sql = // This will delete all screen options too.
+						"DELETE FROM `".esc_sql($this->plugin->utils_db->wp->usermeta)."`".
+						" WHERE `meta_key` LIKE '".esc_sql($like)."'";
+				}
+				$this->plugin->utils_db->wp->query($sql);
 			}
 
 			/**
 			 * Uninstall DB tables.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function drop_db_tables()
 			{

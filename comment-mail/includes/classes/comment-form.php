@@ -2,7 +2,7 @@
 /**
  * Comment Form
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Comment Form
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class comment_form extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -35,7 +35,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Display subscription options.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function maybe_display_sub_ops()
 			{
@@ -67,7 +67,7 @@ namespace comment_mail // Root namespace.
 				$sub_deliver_name = __NAMESPACE__.'_sub_deliver';
 
 				$sub_summary_url = $this->plugin->utils_url->sub_manage_summary_url();
-				$inline_icon_svg = file_get_contents(dirname(dirname(dirname(__FILE__))).'/client-s/images/inline-icon.svg');
+				$inline_icon_svg = $this->plugin->utils_fs->inline_icon_svg();
 
 				$template_vars = get_defined_vars(); // Everything above.
 				$template      = new template('site/comment-form/sub-ops.php');

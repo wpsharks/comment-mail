@@ -2,7 +2,7 @@
 /**
  * Markup Utilities
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Markup Utilities
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class utils_markup extends abs_base
 		{
 			/**
 			 * @var array Regex block tags.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public $regex_block_tags = array(
 				'p',
@@ -45,7 +45,7 @@ namespace comment_mail // Root namespace.
 			 * @var array Regex block container tags.
 			 *    i.e. block tags that serve as inline containers.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public $regex_block_container_tags = array(
 				'p',
@@ -55,7 +55,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -65,7 +65,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Mid-clips a string to X chars.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $name Full name to format.
 			 * @param string $email Email adddress to format.
@@ -79,34 +79,34 @@ namespace comment_mail // Root namespace.
 				$email = (string)$email;
 
 				$default_args = array(
-					'separator'          => ' ',
-					'force_separator'    => FALSE,
+					'separator'              => ' ',
 
-					'span_title'         => TRUE,
+					'span_title'             => TRUE,
 
-					'name_style'         => '',
-					'email_style'        => '',
+					'name_style'             => '',
+					'email_style'            => '',
 
-					'anchor'             => TRUE,
-					'anchor_to'          => 'mailto',
-					// `mailto|summary|[custom URL]`.
-					'anchor_target'      => '',
-					'anchor_summary_key' => '',
+					'anchor'                 => TRUE,
+					'anchor_to'              => 'mailto',
+					// `mailto|search|summary|[custom URL]`.
+					'anchor_target'          => '',
+					'anchor_edit_sub_id'     => '',
+					'anchor_summary_sub_key' => '',
 				);
 				$args         = array_merge($default_args, $args);
 
-				$separator       = (string)$args['separator'];
-				$force_separator = (boolean)$args['force_separator'];
+				if(!($separator = (string)$args['separator']))
+					$separator = ' '; // Must have.
 
 				$span_title = (boolean)$args['span_title'];
 
-				$name_style  = (string)$args['name_style'];
-				$email_style = (string)$args['email_style'];
+				$name_style  = trim((string)$args['name_style']);
+				$email_style = trim((string)$args['email_style']);
 
-				$anchor             = (boolean)$args['anchor'];
-				$anchor_to          = (string)$args['anchor_to'];
-				$anchor_target      = (string)$args['anchor_target'];
-				$anchor_summary_key = (string)$args['anchor_summary_key'];
+				$anchor                 = (boolean)$args['anchor'];
+				$anchor_to              = trim((string)$args['anchor_to']);
+				$anchor_target          = trim((string)$args['anchor_target']);
+				$anchor_summary_sub_key = trim((string)$args['anchor_summary_sub_key']);
 
 				$name       = $name ? $this->plugin->utils_string->clean_name($name) : '';
 				$name_clip  = $name ? $this->plugin->utils_string->mid_clip($name) : '';
@@ -115,17 +115,22 @@ namespace comment_mail // Root namespace.
 				$name_email_attr_value = ($name ? '"'.$name.'"' : '').($name && $email ? ' ' : '').($email ? '<'.$email.'>' : '');
 				$name_span_tag         = $name ? '<span style="'.esc_attr($name_style).'">"'.esc_html($name_clip).'"</span>' : '';
 
-				if($anchor_to === 'summary' && $email && !$anchor_summary_key)
-					$anchor_summary_key = $this->plugin->utils_sub->email_latest_key($email);
+				if($anchor_to === 'search' && $email) // Back-end search?
+					$anchor_search_url = $this->plugin->utils_url->search_subs_short('sub_email:'.$email);
 
-				if($anchor_to === 'summary' && $anchor_summary_key) // Construct summary URL; if possible.
-					$summary_anchor_url = $this->plugin->utils_url->sub_manage_summary_url($anchor_summary_key);
+				if($anchor_to === 'summary' && !$anchor_summary_sub_key && $email)
+					$anchor_summary_sub_key = $this->plugin->utils_sub->email_latest_key($email);
+
+				if($anchor_to === 'summary' && $anchor_summary_sub_key) // Front-end summary?
+					$summary_anchor_url = $this->plugin->utils_url->sub_manage_summary_url($anchor_summary_sub_key);
 
 				$mailto_anchor_tag  = $email ? '<a href="mailto:'.esc_attr(urlencode($email)).'" target="'.esc_attr($anchor_target).'" style="'.esc_attr($email_style).'">'.esc_html($email_clip).'</a>' : '';
-				$summary_anchor_tag = !empty($summary_anchor_url) ? '<a href="'.esc_attr($summary_anchor_url).'" target="'.esc_attr($anchor_target).'" style="'.esc_attr($email_style).'">'.esc_html($email_clip).'</a>' : '';
+				$search_anchor_tag  = $email && !empty($anchor_search_url) ? '<a href="'.esc_attr($anchor_search_url).'" target="'.esc_attr($anchor_target).'" style="'.esc_attr($email_style).'">'.esc_html($email_clip).'</a>' : '';
+				$summary_anchor_tag = $email && !empty($summary_anchor_url) ? '<a href="'.esc_attr($summary_anchor_url).'" target="'.esc_attr($anchor_target).'" style="'.esc_attr($email_style).'">'.esc_html($email_clip).'</a>' : '';
 				$custom_anchor_tag  = $anchor_to ? '<a href="'.esc_attr($anchor_to).'" target="'.esc_attr($anchor_target).'" style="'.esc_attr($email_style).'">'.esc_html($email_clip).'</a>' : '';
 
 				if($anchor_to === 'mailto') $anchor_tag = $mailto_anchor_tag; // e.g. `mailto:email`.
+				else if($anchor_to === 'search') $anchor_tag = $search_anchor_tag; // i.e. back-end search.
 				else if($anchor_to === 'summary') $anchor_tag = $summary_anchor_tag; // i.e. front-end summary.
 				else $anchor_tag = $custom_anchor_tag; // Default behavior; assume a custom URL was given.
 
@@ -133,8 +138,7 @@ namespace comment_mail // Root namespace.
 
 				       ($name ? $name_span_tag : '').
 				       ($name && $email ? $separator : '').
-				       ($email ? '&lt;'.($anchor ? $anchor_tag : esc_html($email_clip)).'&gt;' : '').
-				       ($force_separator && (!$name || !$email) ? $separator : '').
+				       ($email ? '&lt;'.($anchor && $anchor_tag ? $anchor_tag : esc_html($email_clip)).'&gt;' : '').
 
 				       ($span_title ? '</span>' : '');
 			}
@@ -142,7 +146,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Comment count bubble.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $post_id The post ID.
 			 * @param integer $post_total_comments Total comments.
@@ -173,7 +177,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Subscription count bubble.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $post_id The post ID.
 			 * @param integer $post_total_subs Total subscriptions.
@@ -187,24 +191,29 @@ namespace comment_mail // Root namespace.
 				$post_total_subs = (integer)$post_total_subs;
 
 				$default_args = array(
-					'style' => 'float:right; margin-left:5px;'
+					'style'         => 'float:right; margin-left:5px;',
+					'subscriptions' => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 
-				$style = (string)$args['style'];
+				$style         = (string)$args['style'];
+				$subscriptions = (boolean)$args['subscriptions'];
+
+				$post_total_subs_label = $subscriptions // What should label contain?
+					? $this->plugin->utils_i18n->subscriptions($post_total_subs) : $post_total_subs;
 
 				$post_total_subs_desc = sprintf(_n('%1$s Subscription', '%1$s Subscriptions', $post_total_subs, $this->plugin->text_domain), esc_html($post_total_subs));
 				$post_edit_subs_url   = $this->plugin->utils_url->post_edit_subs_short($post_id);
 
 				return '<a href="'.esc_attr($post_edit_subs_url).'" class="pmp-post-sub-count" style="'.esc_attr($style).'" title="'.esc_attr($post_total_subs_desc).'">'.
-				       '  <span class="pmp-sub-count">'.esc_html($post_total_subs).'</span>'.
+				       '  <span class="pmp-sub-count">'.esc_html($post_total_subs_label).'</span>'.
 				       '</a>';
 			}
 
 			/**
 			 * Last X subscriptions w/ a given status.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer      $x The total number to return.
 			 *
@@ -221,8 +230,6 @@ namespace comment_mail // Root namespace.
 			 */
 			public function last_x_subs($x = 0, $post_id = NULL, array $args = array())
 			{
-				$last_x_email_lis = array(); // Initialize.
-
 				$default_args = array(
 					'offset'                => 0,
 
@@ -236,39 +243,33 @@ namespace comment_mail // Root namespace.
 					'group_by_email'        => FALSE,
 					'no_cache'              => FALSE,
 
+					'show_fname'            => FALSE,
+					'show_lname'            => FALSE,
+					'name_email_args'       => array('anchor_to' => 'search'),
 					'list_style'            => 'margin:0;',
-					'email_style'           => 'font-weight:bold;',
-					'anchor_style'          => 'text-decoration:none;',
-					'anchor_to'             => 'summary', // `edit|summary`.
-					'anchor_target'         => !empty($args['anchor_to']) && $args['anchor_to'] !== 'summary'
-						? '' : '_blank', // We use a dynamic default value here.
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$list_style    = (string)$args['list_style'];
-				$email_style   = (string)$args['email_style'];
-				$anchor_style  = (string)$args['anchor_style'];
-				$anchor_to     = (string)$args['anchor_to'];
-				$anchor_target = (string)$args['anchor_target'];
+				$show_fname      = (boolean)$args['show_fname'];
+				$show_lname      = (boolean)$args['show_lname'];
+				$name_email_args = (array)$args['name_email_args'];
+				$list_style      = trim((string)$args['list_style']);
 
 				foreach($this->plugin->utils_sub->last_x($x, $post_id, $args) as $_sub)
 				{
-					$_name_email_args = array(
-						'anchor'      => FALSE,
-						'email_style' => $email_style,
-					);
-					$_anchor_url      = $anchor_to === 'edit' ? $this->plugin->utils_url->edit_sub_short($_sub->ID)
-						: $this->plugin->utils_url->sub_manage_summary_url($_sub->key); // Default behavior.
+					$_name_maybe = ''; // Initialize.
+					if($show_fname) $_name_maybe .= $_sub->fname;
+					if($show_lname) $_name_maybe .= ' '.$_sub->lname;
 
-					$last_x_email_lis[] = '<li>'. // Based on `anchor_to` specification above.
-					                      ' <a href="'.esc_attr($_anchor_url).'" target="'.esc_attr($anchor_target).'" style="'.esc_attr($anchor_style).'">'.
-					                      ' <i class="fa fa-user"></i> '.$this->name_email('', $_sub->email, $_name_email_args).'</a>'.
+					$last_x_email_lis[] = '<li>'. // Display varies based on arguments.
+					                      ' <i class="'.esc_attr('wsi-'.$this->plugin->slug).'"></i> '.
+					                      $this->name_email($_name_maybe, $_sub->email, $name_email_args).'</a>'.
 					                      '</li>';
 				}
-				unset($_sub, $_name_email_args, $_anchor_url); // Housekeeping.
+				unset($_sub, $_name_maybe); // Housekeeping.
 
-				if(!$last_x_email_lis) // If no results, add a no subscriptions message.
+				if(empty($last_x_email_lis)) // If no results, add a no subscriptions message.
 					$last_x_email_lis[] = '<li style="font-style:italic;">'.
 					                      ' '.__('No subscriptions at this time.', $this->plugin->text_domain).
 					                      '</li>';
@@ -281,7 +282,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Markup for user select menu options.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|null $current_user_id Current user ID.
 			 *
@@ -359,7 +360,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Markup for post select menu options.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|null $current_post_id Current post ID.
 			 *
@@ -443,7 +444,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Markup for comment select menu options.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer      $post_id A post ID.
 			 * @param integer|null $current_comment_id Current comment ID.
@@ -523,7 +524,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Markup for deliver select menu options.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $current_deliver Current delivery option.
 			 * @param array       $args Any additional style-related arguments.
@@ -585,7 +586,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Markup for status select menu options.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|null $current_status Current status.
 			 * @param array       $args Any additional style-related arguments.
@@ -653,7 +654,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Markup for select menu options.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array       $given_ops Options array.
 			 *    Keys are option values; values are labels.
@@ -713,7 +714,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Wraps inline markup (and optional leader) inside `<p></p>` tags.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $markup Input markup to wrap.
 			 *
@@ -765,7 +766,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Parses comment content by applying necessary filters.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $comment Comment object.
 			 *
@@ -783,7 +784,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Parses comment content by applying necessary filters.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass      $comment Comment object.
 			 *
@@ -813,7 +814,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Parses comment content by applying necessary filters.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass      $comment Comment object.
 			 *
@@ -841,7 +842,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Generates markup for powered-by link.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $args Any style-related arguments.
 			 *
@@ -880,7 +881,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Constructs markup for an anchor tag.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $url URL to link to.
 			 * @param string $clickable Clickable text/markup.
@@ -904,7 +905,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Constructs markup for an external anchor tag.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $url URL to link to.
 			 * @param string $clickable Clickable text/markup.
@@ -922,7 +923,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Constructs markup for a plugin menu page path.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Markup for a plugin menu page path.
 			 */

@@ -2,7 +2,7 @@
 /**
  * Queue Event Log Inserter
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,21 +16,21 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Queue Event Log Inserter
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class queue_event_log_inserter extends abs_base
 		{
 			/**
 			 * @var array Log entry data.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $entry;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $entry Log entry data.
 			 *
@@ -78,7 +78,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Record event; if applicable.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @throws \exception If an insertion failure occurs.
 			 */

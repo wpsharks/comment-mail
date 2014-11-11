@@ -2,7 +2,7 @@
 /**
  * User Utilities
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * User Utilities
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class utils_user extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -33,7 +33,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Screen option value.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \WP_Screen $screen A screen object instance.
 			 * @param string     $option The screen option to get.
@@ -59,7 +59,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \WP_User|integer A user to check; object or ID.
 			 * @param boolean          $allow_0 Allow `0`-based checks also?

@@ -2,7 +2,7 @@
 /**
  * Sub. Management Sub. Form Base
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,7 +16,7 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Sub. Management Sub. Form Base
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class sub_manage_sub_form_base extends abs_base
 		{
@@ -27,28 +27,28 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var string|null Unique subscription key.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $sub_key;
 
 			/**
 			 * @var boolean Editing?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $is_edit;
 
 			/**
 			 * @var \stdClass|null Subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $sub;
 
 			/**
 			 * @var form_fields Class instance.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $form_fields;
 
@@ -59,7 +59,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var array Form field config. args.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $form_field_args = array(
 				'ns_id_suffix'   => '-manage-sub-form',
@@ -70,56 +70,56 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var boolean Processing form?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $processing = FALSE;
 
 			/**
 			 * @var array Any processing errors.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $processing_errors = array();
 
 			/**
 			 * @var array Any processing error codes.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $processing_error_codes = array();
 
 			/**
 			 * @var array Any processing errors w/ HTML markup.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $processing_errors_html = array();
 
 			/**
 			 * @var array Any processing successes.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $processing_successes = array();
 
 			/**
 			 * @var array Any processing success codes.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $processing_success_codes = array();
 
 			/**
 			 * @var array Any processing successes w/ HTML markup.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $processing_successes_html = array();
 
 			/**
 			 * @var boolean Processing email change?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $processing_email_key_change = FALSE;
 
@@ -130,7 +130,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $sub_key Unique subscription key.
 			 */
@@ -156,7 +156,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Displays form.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_display()
 			{
@@ -219,7 +219,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Collects current value for a particular property.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $key_prop The key/property to acquire.
 			 *
@@ -243,7 +243,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Hidden inputs needed for form processing.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Hidden inputs needed for form processing.
 			 */
@@ -307,7 +307,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Constructs a comment ID row via AJAX.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $post_id A post ID.
 			 *
@@ -330,7 +330,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Form processor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $request_args Incoming action request args.
 			 *

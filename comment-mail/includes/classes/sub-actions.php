@@ -2,7 +2,7 @@
 /**
  * Subscriber Actions
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Subscriber Actions
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class sub_actions extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -35,7 +35,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Action handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_handle()
 			{
@@ -54,7 +54,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Confirm handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $request_args Input argument(s).
 			 */
@@ -98,7 +98,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Unsubscribe handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $request_args Input argument(s).
 			 */
@@ -142,7 +142,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Unsubscribe ALL handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $request_args Input argument(s).
 			 */
@@ -172,7 +172,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Manage handler w/ sub. actions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $request_args Input argument(s).
 			 */

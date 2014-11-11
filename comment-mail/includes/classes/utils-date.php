@@ -2,7 +2,7 @@
 /**
  * Date Utilities
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,7 +16,7 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Date Utilities
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class utils_date extends abs_base
 		{
@@ -106,6 +106,24 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Is a `strtotime()` input relative?
+			 *
+			 * @param string $string string to test here.
+			 *
+			 * @return boolean `TRUE` if input string is a relative date.
+			 */
+			public function is_relative($string)
+			{
+				if(!($string = trim((string)$string)))
+					return FALSE; // Nope.
+
+				$non_relative = strtotime($string);
+				$relative     = strtotime($string, time() - 100);
+
+				return $relative !== $non_relative;
+			}
+
+			/**
 			 * Calculates approx time different (in human readable format).
 			 *
 			 * @param integer $from A UTC timestamp to calculate from (i.e. start time).
@@ -113,7 +131,7 @@ namespace comment_mail // Root namespace.
 			 * @param integer $to A UTC timestamp to calculate to (i.e. the end time).
 			 *    If `NULL` (default value) this will default to the current time.
 			 *
-			 * @param string $suffix Optional suffix chars.
+			 * @param string  $suffix Optional suffix chars.
 			 *    If `NULL` (default value) this will default to ` ago`.
 			 *
 			 * @return string Approx. time different (in human readable format).

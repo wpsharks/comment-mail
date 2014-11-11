@@ -2,7 +2,7 @@
 /**
  * SMTP Mailer
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,91 +16,91 @@ namespace comment_mail // Root namespace.
 		/**
 		 * SMTP Mailer
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class mail_smtp extends abs_base
 		{
 			/**
 			 * @var boolean Debugging enable?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $debug;
 
 			/**
 			 * @var string Debug output in HTML markup.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $debug_output_markup;
 
 			/**
 			 * @var string From name.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $from_name;
 
 			/**
 			 * @var string From email address.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $from_email;
 
 			/**
 			 * @var string Reply-to email address.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $reply_to_email;
 
 			/**
 			 * @var array Recipients.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $recipients;
 
 			/**
 			 * @var string Subject line.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $subject;
 
 			/**
 			 * @var string Message content body.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $message;
 
 			/**
 			 * @var array Additional headers.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $headers;
 
 			/**
 			 * @var array Attachments.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $attachments;
 
 			/**
 			 * @var \PHPMailer PHPMailer instance.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $mailer;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param boolean $debug Enable debugging?
 			 *
@@ -143,7 +143,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Mail sending utility; `wp_mail()` compatible.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Current debug ouput in HTML markup.
 			 */
@@ -155,7 +155,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Mail sending utility; `wp_mail()` compatible.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string|array $to Email address(es).
 			 * @param string       $subject Email subject line.
@@ -271,7 +271,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Reset state; i.e. class properties.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function reset()
 			{

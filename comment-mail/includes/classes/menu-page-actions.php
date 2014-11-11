@@ -2,7 +2,7 @@
 /**
  * Menu Page Actions
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Menu Page Actions
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class menu_page_actions extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -35,7 +35,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Action handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_handle()
 			{
@@ -57,7 +57,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Saves options.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $request_args Input argument(s).
 			 */
@@ -98,7 +98,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Restores defaults options.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $request_args Input argument(s).
 			 */
@@ -122,7 +122,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Dismisses a persistent notice.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $request_args Input argument(s).
 			 */
@@ -149,7 +149,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Runs a specific import type.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $request_args Input argument(s).
 			 */
@@ -176,7 +176,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Runs a specific export type.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $request_args Input argument(s).
 			 */
@@ -200,7 +200,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Acquires comment ID row via AJAX.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $request_args Input argument(s).
 			 *
@@ -226,7 +226,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Acquires user ID info via AJAX.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $request_args Input argument(s).
 			 *
@@ -254,7 +254,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Processes sub. form inserts/updates.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $request_args Input argument(s).
 			 *
@@ -270,6 +270,28 @@ namespace comment_mail // Root namespace.
 						return; // Unauthenticated; ignore.
 
 				menu_page_sub_form_base::process($request_args);
+			}
+
+			/**
+			 * Outputs chart data for stats.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param mixed $request_args Input argument(s).
+			 */
+			protected function stats_chart_data_via_ajax($request_args)
+			{
+				$request_args = (array)$request_args;
+
+				if(!current_user_can($this->plugin->manage_cap))
+					if(!current_user_can($this->plugin->cap))
+						exit; // Unauthenticated; ignore.
+
+				header('Content-Type: application/json; charset=UTF-8');
+
+				new chart_data($request_args); // With JSON output.
+
+				exit(); // Stop after output; always.
 			}
 		}
 	}

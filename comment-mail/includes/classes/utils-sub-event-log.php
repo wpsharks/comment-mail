@@ -2,7 +2,7 @@
 /**
  * Sub. Event Log Utilities
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Sub. Event Log Utilities
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class utils_sub_event_log extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -33,7 +33,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Unique IDs only.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $log_entry_ids Event log entry IDs.
 			 *
@@ -59,7 +59,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Delete log entry.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|string $log_entry_id Log entry ID.
 			 * @param array          $args Any additional behavioral args.
@@ -87,7 +87,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Bulk delete log entries.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $log_entry_ids Log entry IDs.
 			 * @param array $args Any additional behavioral args.

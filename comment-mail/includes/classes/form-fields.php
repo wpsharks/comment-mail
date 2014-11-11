@@ -2,7 +2,7 @@
 /**
  * Form Fields
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,35 +16,35 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Form Fields
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class form_fields extends abs_base
 		{
 			/**
 			 * @var string Namespaced ID suffix.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $ns_id_suffix;
 
 			/**
 			 * @var string Namespaced name suffix.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $ns_name_suffix;
 
 			/**
 			 * @var string Class prefix.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $class_prefix;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $args Configuration args.
 			 */
@@ -68,7 +68,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Constructs an input field row.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $args Specs and behavorial args.
 			 *
@@ -98,6 +98,7 @@ namespace comment_mail // Root namespace.
 					'nested_checkbox_args'     => array(),
 					'field_class'              => '',
 					'other_attrs'              => '',
+					'exclude_th'               => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
@@ -114,7 +115,7 @@ namespace comment_mail // Root namespace.
 				$slug = trim(preg_replace('/[^a-z0-9]/i', '-', $name), '-');
 				$slug = $root_name ? 'root-'.$slug : $slug;
 
-				$id   = __NAMESPACE__.$this->ns_id_suffix.'-'.$slug;
+				$id   = $this->plugin->slug.$this->ns_id_suffix.'-'.$slug;
 				$name = $root_name ? $name : __NAMESPACE__.$this->ns_name_suffix.'['.$name.']';
 
 				$required                 = (boolean)$args['required'];
@@ -132,16 +133,19 @@ namespace comment_mail // Root namespace.
 				$nested_checkbox_args = (array)$args['nested_checkbox_args'];
 				$field_class          = trim((string)$args['field_class']);
 				$other_attrs          = trim((string)$args['other_attrs']);
+				$exclude_th           = (boolean)$args['exclude_th'];
 
 				$row = '<tr class="'.esc_attr('form-field'.($required ? ' form-required' : '').' '.$this->class_prefix.$slug).'">';
 
-				$row .= ' <th scope="row">';
-				$row .= '    <label for="'.esc_attr($id).'">'.
-				        '       '.$label.($required ? // Change the short description based on this boolean.
-						'           <span class="description">'.__('(required) *', $this->plugin->text_domain).'</span>' : '').
-				        '    </label>';
-				$row .= ' </th>';
-
+				if(!$exclude_th) // Only if not excluding the table header.
+				{
+					$row .= '<th scope="row">';
+					$row .= '   <label for="'.esc_attr($id).'">'.
+					        '      '.$label.($required ? // Change the short description based on this boolean.
+							'        <span class="description">'.__('(required) *', $this->plugin->text_domain).'</span>' : '').
+					        '   </label>';
+					$row .= '</th>';
+				}
 				$row .= ' <td>';
 
 				if($type === 'hidden') // Special case.
@@ -190,7 +194,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Constructs a textarea field row.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $args Specs and behavorial args.
 			 *
@@ -221,6 +225,7 @@ namespace comment_mail // Root namespace.
 					'nested_checkbox_args'     => array(),
 					'field_class'              => '',
 					'other_attrs'              => '',
+					'exclude_th'               => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
@@ -234,7 +239,7 @@ namespace comment_mail // Root namespace.
 				$slug = trim(preg_replace('/[^a-z0-9]/i', '-', $name), '-');
 				$slug = $root_name ? 'root-'.$slug : $slug;
 
-				$id   = __NAMESPACE__.$this->ns_id_suffix.'-'.$slug;
+				$id   = $this->plugin->slug.$this->ns_id_suffix.'-'.$slug;
 				$name = $root_name ? $name : __NAMESPACE__.$this->ns_name_suffix.'['.$name.']';
 
 				$rows                     = (integer)$args['rows'];
@@ -256,19 +261,22 @@ namespace comment_mail // Root namespace.
 				$nested_checkbox_args = (array)$args['nested_checkbox_args'];
 				$field_class          = trim((string)$args['field_class']);
 				$other_attrs          = trim((string)$args['other_attrs']);
+				$exclude_th           = (boolean)$args['exclude_th'];
 
 				$row = '<tr class="'.esc_attr('form-field'.($required ? ' form-required' : '').' '.$this->class_prefix.$slug).'">';
 
-				$row .= ' <th scope="row">';
-				$row .= '    <label for="'.esc_attr($id).'">'.
-				        '       '.$label.($required ? // Change the short description based on this boolean.
-						'           <span class="description">'.__('(required) *', $this->plugin->text_domain).'</span>' : '').
-				        ($cm_mode ? '<span class="description" style="margin-left:2em;">'.
-				                    '   <small>'.__('(<code>F11</code> toggles fullscreen editing)', $this->plugin->text_domain).'</small>'.
-				                    '</span>' : '').
-				        '    </label>';
-				$row .= ' </th>';
-
+				if(!$exclude_th) // Only if not excluding the table header.
+				{
+					$row .= '<th scope="row">';
+					$row .= '   <label for="'.esc_attr($id).'">'.
+					        '      '.$label.($required ? // Change the short description based on this boolean.
+							'        <span class="description">'.__('(required) *', $this->plugin->text_domain).'</span>' : '').
+					        ($cm_mode ? '<span class="description" style="margin-left:2em;">'.
+					                    '   <small>'.__('(<code>F11</code> toggles fullscreen editing)', $this->plugin->text_domain).'</small>'.
+					                    '</span>' : '').
+					        '   </label>';
+					$row .= '</th>';
+				}
 				$row .= ' <td>';
 
 				$row .= ($notes_before ? // Display notes before?
@@ -314,7 +322,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Constructs a select field row.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $args Specs and behavorial args.
 			 *
@@ -344,6 +352,7 @@ namespace comment_mail // Root namespace.
 					'nested_checkbox_args'     => array(),
 					'field_class'              => '',
 					'other_attrs'              => '',
+					'exclude_th'               => FALSE,
 
 					'allow_empty'              => TRUE,
 					'allow_arbitrary'          => TRUE,
@@ -362,7 +371,7 @@ namespace comment_mail // Root namespace.
 				$slug = trim(preg_replace('/[^a-z0-9]/i', '-', $name), '-');
 				$slug = $root_name ? 'root-'.$slug : $slug;
 
-				$id   = __NAMESPACE__.$this->ns_id_suffix.'-'.$slug;
+				$id   = $this->plugin->slug.$this->ns_id_suffix.'-'.$slug;
 				$name = $root_name ? $name : __NAMESPACE__.$this->ns_name_suffix.'['.$name.']';
 
 				$required                 = (boolean)$args['required'];
@@ -381,6 +390,7 @@ namespace comment_mail // Root namespace.
 				$nested_checkbox_args = (array)$args['nested_checkbox_args'];
 				$field_class          = trim((string)$args['field_class']);
 				$other_attrs          = trim((string)$args['other_attrs']);
+				$exclude_th           = (boolean)$args['exclude_th'];
 
 				$allow_empty         = (boolean)$args['allow_empty'];
 				$allow_arbitrary     = (boolean)$args['allow_arbitrary'];
@@ -401,13 +411,15 @@ namespace comment_mail // Root namespace.
 
 				$row = '<tr class="'.esc_attr('form-field'.($required ? ' form-required' : '').' '.$this->class_prefix.$slug).'">';
 
-				$row .= ' <th scope="row">';
-				$row .= '    <label for="'.esc_attr($id).'">'.
-				        '       '.$label.($required ? // Change the short description based on this boolean.
-						'           <span class="description">'.__('(required) *', $this->plugin->text_domain).'</span>' : '').
-				        '    </label>';
-				$row .= ' </th>';
-
+				if(!$exclude_th) // Only if not excluding the table header.
+				{
+					$row .= '<th scope="row">';
+					$row .= '   <label for="'.esc_attr($id).'">'.
+					        '      '.$label.($required ? // Change the short description based on this boolean.
+							'        <span class="description">'.__('(required) *', $this->plugin->text_domain).'</span>' : '').
+					        '   </label>';
+					$row .= '</th>';
+				}
 				$row .= ' <td>';
 
 				$row .= ($notes_before ? // Display notes before?
@@ -449,7 +461,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Constructs an HR field row.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string HTML markup for this field row.
 			 */
@@ -469,7 +481,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Nested checkbox.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $args Specs and behavorial args.
 			 *
@@ -499,7 +511,7 @@ namespace comment_mail // Root namespace.
 				$slug = trim(preg_replace('/[^a-z0-9]/i', '-', $name), '-');
 				$slug = $root_name ? 'root-'.$slug : $slug;
 
-				$id   = __NAMESPACE__.$this->ns_id_suffix.'-'.$slug;
+				$id   = $this->plugin->slug.$this->ns_id_suffix.'-'.$slug;
 				$name = $root_name ? $name : __NAMESPACE__.$this->ns_name_suffix.'['.$name.']';
 
 				$current_value = $this->isset_or($args['current_value'], NULL, 'string');
@@ -532,7 +544,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Constructs a hidden input.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $args Specs and behavorial args.
 			 *
@@ -558,7 +570,7 @@ namespace comment_mail // Root namespace.
 				$slug = trim(preg_replace('/[^a-z0-9]/i', '-', $name), '-');
 				$slug = $root_name ? 'root-'.$slug : $slug;
 
-				$id   = __NAMESPACE__.$this->ns_id_suffix.'-'.$slug;
+				$id   = $this->plugin->slug.$this->ns_id_suffix.'-'.$slug;
 				$name = $root_name ? $name : __NAMESPACE__.$this->ns_name_suffix.'['.$name.']';
 
 				$current_value = $this->isset_or($args['current_value'], NULL, 'string');

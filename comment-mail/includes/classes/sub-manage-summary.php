@@ -2,7 +2,7 @@
 /**
  * Sub. Management Summary
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,7 +16,7 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Sub. Management Summary
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class sub_manage_summary extends abs_base
 		{
@@ -27,49 +27,49 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var string Unique subscription key.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $sub_key;
 
 			/**
 			 * @var string Email address via key.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $sub_email;
 
 			/**
 			 * @var array WP user IDs associated w/ email address.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $sub_user_ids;
 
 			/**
 			 * @var array WP user ID-based list of email addresses.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $sub_user_id_emails;
 
 			/**
 			 * @var \stdClass Query vars.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $query_vars;
 
 			/**
 			 * @var \stdClass[] Subscriptions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $subs; // Array of subs.
 
 			/**
 			 * @var \stdClass|null Pagination vars.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $pagination_vars;
 
@@ -80,49 +80,49 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var boolean Processing form?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $processing = FALSE;
 
 			/**
 			 * @var array Any processing errors.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $processing_errors = array();
 
 			/**
 			 * @var array Any processing error codes.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $processing_error_codes = array();
 
 			/**
 			 * @var array Any processing errors w/ HTML markup.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $processing_errors_html = array();
 
 			/**
 			 * @var array Any processing successes.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $processing_successes = array();
 
 			/**
 			 * @var array Any processing success codes.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $processing_success_codes = array();
 
 			/**
 			 * @var array Any processing successes w/ HTML markup.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $processing_successes_html = array();
 
@@ -133,7 +133,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var array Default nav vars.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public static $default_nav_vars = array(
 				'page'    => 1,
@@ -148,7 +148,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $sub_key Unique subscription key (optional).
 			 *    If this is empty (or invalid), we use the sub's current email address.
@@ -203,7 +203,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Displays summary.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_display()
 			{
@@ -300,7 +300,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Gets current SQL offset.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return integer Current SQL offset value.
 			 */
@@ -312,7 +312,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Set pagination vars.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $calc_found_rows `SQL_CALC_FOUND_ROWS`.
 			 */
@@ -336,7 +336,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param string $sub_key Unique subscription key.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public static function delete($sub_key)
 			{

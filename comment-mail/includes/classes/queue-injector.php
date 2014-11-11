@@ -2,7 +2,7 @@
 /**
  * Queue Injector
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Queue Injector
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class queue_injector extends abs_base
 		{
 			/**
 			 * @var \stdClass|null Comment object.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $comment;
 
@@ -32,7 +32,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param integer|string $comment_id Comment ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct($comment_id)
 			{
@@ -49,7 +49,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Queue injections.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @throws \exception If an insertion failure occurs.
 			 */
@@ -86,7 +86,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get subscriptions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return \stdClass[] All subscriptions.
 			 */

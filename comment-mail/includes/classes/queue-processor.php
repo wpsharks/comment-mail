@@ -2,7 +2,7 @@
 /**
  * Queue Processor
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,91 +16,91 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Queue Processor
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class queue_processor extends abs_base
 		{
 			/**
 			 * @var boolean A CRON job?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $is_cron;
 
 			/**
 			 * @var integer Start time.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $start_time;
 
 			/**
 			 * @var integer Max time (in seconds).
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $max_time;
 
 			/**
 			 * @var integer Delay (in milliseconds).
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $delay;
 
 			/**
 			 * @var integer Max entries to process.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $max_limit;
 
 			/**
 			 * @var template Subject template.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $subject_template;
 
 			/**
 			 * @var template Message template.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $message_template;
 
 			/**
 			 * @var array Message headers.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $message_headers;
 
 			/**
 			 * @var \stdClass[] Entries being processed.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $entries;
 
 			/**
 			 * @var integer Total entries.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $total_entries;
 
 			/**
 			 * @var integer Processed entry counter.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $processed_entry_counter;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param boolean      $is_cron Is this a CRON job?
 			 *    Defaults to a `TRUE` value. If calling directly pass `FALSE`.
@@ -175,7 +175,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Prep CRON job.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_prep_cron_job()
 			{
@@ -197,7 +197,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Queue processor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_process()
 			{
@@ -228,7 +228,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Process entry.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $entry Queue entry.
 			 */
@@ -275,7 +275,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Log entry event w/ note code.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $entry_props Entry properties.
 			 */
@@ -318,7 +318,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Log/record entry digestables.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $entry_props Entry properties.
 			 */
@@ -357,7 +357,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Delete entry.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $entry Queue entry.
 			 */
@@ -369,7 +369,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Validated entry properties.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $entry Queue entry.
 			 *
@@ -509,7 +509,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Structured entry props.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string         $event Event type; `invalidated` or `notified`.
 			 * @param string         $note_code See {@link utils_event::queue_note_code()}.
@@ -613,7 +613,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Check hold until time.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $entry_props Entry properties.
 			 *
@@ -635,7 +635,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Entry hold until time.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $entry_props Entry properties.
 			 *
@@ -663,7 +663,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Update hold until time.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $entry_props Entry properties.
 			 *
@@ -694,7 +694,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Entry last notified time.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $entry_props Entry properties.
 			 *
@@ -722,7 +722,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Compile digestable entries.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdclass $entry_props entry properties.
 			 *
@@ -759,7 +759,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Queued digestable entries.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdclass $entry_props entry properties.
 			 *
@@ -801,7 +801,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Queued entries.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of up to `$this->max_limit` entries.
 			 */
@@ -832,7 +832,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * process entry subject.
 			 *
-			 * @since 14xxxx first documented version.
+			 * @since 141111 first documented version.
 			 *
 			 * @param \stdclass $entry_props entry properties.
 			 *
@@ -846,7 +846,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * process entry message.
 			 *
-			 * @since 14xxxx first documented version.
+			 * @since 141111 first documented version.
 			 *
 			 * @param \stdclass $entry_props entry properties.
 			 *
@@ -860,7 +860,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Out of time yet?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean TRUE if out of time.
 			 */
@@ -875,7 +875,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Out of time after a possible delay?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean TRUE if out of time.
 			 */

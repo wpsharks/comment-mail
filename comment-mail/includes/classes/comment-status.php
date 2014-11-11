@@ -2,7 +2,7 @@
 /**
  * Comment Status
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Comment Status
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class comment_status extends abs_base
 		{
 			/**
 			 * @var \stdClass|null Comment.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $comment;
 
@@ -31,7 +31,7 @@ namespace comment_mail // Root namespace.
 			 * @var string New comment status applied now.
 			 *    One of: `approve`, `hold`, `trash`, `spam`, `delete`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $new_comment_status;
 
@@ -39,14 +39,14 @@ namespace comment_mail // Root namespace.
 			 * @var string Old comment status from before.
 			 *    One of: `approve`, `hold`, `trash`, `spam`, `delete`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $old_comment_status;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|string $new_comment_status New comment status.
 			 *
@@ -79,7 +79,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Inject/queue emails.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_inject_queue()
 			{
@@ -93,7 +93,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Purges subscriptions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_purge_subs()
 			{

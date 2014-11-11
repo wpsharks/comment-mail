@@ -2,7 +2,7 @@
 /**
  * Sub Importer
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,56 +16,56 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Sub Importer
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class import_subs extends abs_base
 		{
 			/**
 			 * @var string Input data.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $data;
 
 			/**
 			 * @var string Input data file.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $data_file;
 
 			/**
 			 * @var boolean Process confirmations?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $process_confirmations;
 
 			/**
 			 * @var integer SQL max limit.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $max_limit;
 
 			/**
 			 * @var integer Total imported subs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $total_imported_subs;
 
 			/**
 			 * @var array An array of any/all errors.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $errors;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $request_args Arguments to the constructor.
 			 *    These should NOT be trusted; they come from a `$_REQUEST` action.
@@ -112,7 +112,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Import processor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_import()
 			{
@@ -202,7 +202,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Line column value for a particular CSV column.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $csv_column The CSV column value to acquire.
 			 * @param array  $csv_headers An array of CSV headers.
@@ -222,7 +222,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Notices and redirection.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function enqueue_notices_and_redirect()
 			{
@@ -247,7 +247,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * CSV resource file to read from.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return resource|boolean Resource on success.
 			 */
@@ -267,7 +267,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * An array of all errors w/ HTML markup.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array Errors w/ HTML markup.
 			 */

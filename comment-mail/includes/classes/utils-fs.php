@@ -2,7 +2,7 @@
 /**
  * File System Utilities
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * File System Utilities
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class utils_fs extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -33,7 +33,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Adds tmp suffix to a directory|file `/path`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $path Directory|file `/path`.
 			 *
@@ -50,7 +50,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Normalizes `/path` separators.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed   $path Directory|file `/path`.
 			 *
@@ -88,7 +88,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Checks an uploaded file `/path`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $path A file `/path` to check.
 			 *    If it's an uploaded file, use the `tmp_name`.
@@ -183,6 +183,19 @@ namespace comment_mail // Root namespace.
 						$value *= 1024;
 				}
 				return (float)$value;
+			}
+
+			/**
+			 * Inline SVG plugin icon.
+			 *
+			 * @return string SVG icon for inline markup.
+			 */
+			public function inline_icon_svg()
+			{
+				if(!is_null($icon = &$this->static_key(__FUNCTION__)))
+					return $icon; // Already cached this.
+
+				return ($icon = file_get_contents(dirname(dirname(dirname(__FILE__))).'/client-s/images/inline-icon.svg'));
 			}
 		}
 	}

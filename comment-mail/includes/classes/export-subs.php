@@ -2,7 +2,7 @@
 /**
  * Sub Exporter
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,42 +16,42 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Sub Exporter
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class export_subs extends abs_base
 		{
 			/**
 			 * @var integer Starting row.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $start_from;
 
 			/**
 			 * @var integer SQL max limit.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $max_limit;
 
 			/**
 			 * @var boolean Include UTF-8 byte order marker?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $include_utf8_bom;
 
 			/**
 			 * @var string UTF-8 byte order marker.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $utf8_bom = "\xEF\xBB\xBF";
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $request_args Arguments to the constructor.
 			 *    These should NOT be trusted; they come from a `$_REQUEST` action.
@@ -86,7 +86,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Export handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_export()
 			{
@@ -120,7 +120,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Formats a CSV data line.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $row A row object.
 			 * @param boolean   $headers Defaults to a `FALSE` value.
@@ -139,7 +139,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Results query; for exportation.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return \stdClass[] An array of row objects.
 			 */

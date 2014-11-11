@@ -10,3 +10,6 @@
 [submodule "comment-mail/submodules/sharkicons"]
 	path = comment-mail/submodules/sharkicons
 	url = https://github.com/websharks/sharkicons
+[submodule "comment-mail/submodules/datetimepicker"]
+	path = comment-mail/submodules/datetimepicker
+	url = https://github.com/xdan/datetimepicker

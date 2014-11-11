@@ -2,7 +2,7 @@
 /**
  * Sub Inserter
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,7 +16,7 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Sub Inserter
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class sub_inserter extends abs_base
 		{
@@ -25,14 +25,14 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var array Based on request args.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $data;
 
 			/**
 			 * @var boolean Did we validate?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $validated;
 
@@ -41,21 +41,21 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var boolean An insert?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $is_insert;
 
 			/**
 			 * @var boolean Did we insert?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $inserted;
 
 			/**
 			 * @var integer Insertion ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $insert_id;
 
@@ -64,28 +64,28 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var boolean An update?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $is_update;
 
 			/**
 			 * @var \stdClass|null Subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $sub; // On update only.
 
 			/**
 			 * @var boolean Did we update?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $updated;
 
 			/**
 			 * @var boolean Email & key changed?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $email_key_changed;
 
@@ -94,56 +94,56 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var boolean Auto-confirm?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $auto_confirm;
 
 			/**
 			 * @var boolean Process events?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $process_events;
 
 			/**
 			 * @var boolean Process confirmation?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $process_confirmation;
 
 			/**
 			 * @var boolean User initiated?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $user_initiated;
 
 			/**
 			 * @var boolean User-initiated data key protections?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $ui_protected_data_keys_enable;
 
 			/**
 			 * @var \WP_User|null Initiating user.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $ui_protected_data_user;
 
 			/**
 			 * @var boolean Interpret `0` as current?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $user_allow_0;
 
 			/**
 			 * @var boolean Keep existing?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $keep_existing;
 
@@ -152,14 +152,14 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var \WP_User|null Subscriber.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $user; // Subscriber.
 
 			/**
 			 * @var boolean Subscriber is current user?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $is_current_user;
 
@@ -168,14 +168,14 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var array An array of any duplicate key IDs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $duplicate_key_ids;
 
 			/**
 			 * @var array An array of any other duplicate IDs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $other_duplicate_ids;
 
@@ -184,7 +184,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var sub_confirmer|null Sub confirmer.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $sub_confirmer;
 
@@ -193,14 +193,14 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var array An array of any errors.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $errors;
 
 			/**
 			 * @var array An array of any successes.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $successes;
 
@@ -211,7 +211,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $request_args Arguments to the constructor.
 			 *    These should NOT be trusted; they come from a `$_REQUEST` action.
@@ -427,7 +427,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Subscription object reference.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return \stdClass|null Subscription.
 			 */
@@ -439,7 +439,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Did insert|update successfully?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean Did we insert|update?
 			 */
@@ -451,7 +451,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Inserted successfully?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean Did we insert?
 			 */
@@ -463,7 +463,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Insertion ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return integer Insertion ID; if applicable.
 			 */
@@ -475,7 +475,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Updated successfully?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean Did we update?
 			 */
@@ -487,7 +487,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Email & key changed?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean Email & key changed?
 			 */
@@ -499,7 +499,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Instance of sub confirmer.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return sub_confirmer|null Sub confirmer; if applicable.
 			 */
@@ -511,7 +511,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Do we have errors?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean `TRUE` if has errors.
 			 */
@@ -523,7 +523,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Array of any errors.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of any/all errors.
 			 */
@@ -535,7 +535,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Array of any error codes.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of any/all error codes.
 			 */
@@ -547,7 +547,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Array of any errors w/ HTML markup.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of any/all errors.
 			 */
@@ -559,7 +559,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Do we have errors?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean `TRUE` if has errors.
 			 */
@@ -571,7 +571,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Array of any successes.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of any/all successes.
 			 */
@@ -583,7 +583,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Array of any success codes.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of any/all success codes.
 			 */
@@ -595,7 +595,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Array of any successes w/ HTML markup.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of any/all errors.
 			 */
@@ -611,7 +611,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Updates a subscription; or inserts a new one.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_insert_update()
 			{
@@ -630,7 +630,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Inserts a subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @throws \exception If an insertion failure occurs.
 			 */
@@ -689,7 +689,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Updates a subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @throws \exception If an update failure occurs.
 			 */
@@ -751,7 +751,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Is there an existing subscription that will suffice?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean `TRUE` if there's an existing subscription that will suffice.
 			 */
@@ -784,7 +784,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Check if we can/should auto-confirm in this instance.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @note Only if {@link $auto_confirm} is `NULL` (i.e. the default value).
 			 */
@@ -817,7 +817,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Collects duplicate key IDs before an insert occurs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @note This also caches the underlying subs for deletion later.
 			 *    It's import NOT to nullify the cache until these are dealt with
@@ -846,7 +846,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Overwrites duplicate key IDs after an insert occurs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function overwrite_duplicate_key_ids_after_insert()
 			{
@@ -867,7 +867,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Overwrites duplicate key IDs before an update occurs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function overwrite_duplicate_key_ids_before_update()
 			{
@@ -906,7 +906,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Overwrites any other subscriptions after an insert|update occurs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function overwrite_any_others_after_insert_update()
 			{
@@ -939,7 +939,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * New value for a key/property.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $key_prop The key/property to acquire.
 			 *
@@ -970,7 +970,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Sanitizes/validates request args; i.e. {@link $data}.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @note Fill the {@link $errors} property on validation failure(s).
 			 */

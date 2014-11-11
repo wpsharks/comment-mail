@@ -2,7 +2,7 @@
 /**
  * Auto Sub Injector
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,42 +16,42 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Auto Sub Injector
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class sub_auto_injector extends abs_base
 		{
 			/**
 			 * @var \stdClass|null Post object.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $post;
 
 			/**
 			 * @var \WP_User|null Post author.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $post_author;
 
 			/**
 			 * @var array Auto-subscribable post types.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $post_types;
 
 			/**
 			 * @var boolean Process events?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $process_events;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|string $post_id Post ID.
 			 * @param array          $args Any additional behavioral args.
@@ -86,7 +86,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Injects subscriptions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_auto_inject()
 			{
@@ -112,7 +112,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Injects post author.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_inject_post_author()
 			{
@@ -148,7 +148,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Injects recipients.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_inject_recipients()
 			{

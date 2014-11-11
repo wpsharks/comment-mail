@@ -1,6 +1,6 @@
 === Comment Mail™ (WP Comment Subscriptions) ===
 
-Stable tag: 14xxxx
+Stable tag: 141111
 Requires at least: 4.0
 Tested up to: 4.0
 Text Domain: comment-mail
@@ -100,12 +100,12 @@ Released under the terms of the [GNU General Public License](http://www.gnu.org/
 
 == Upgrade Notice ==
 
-= v14xxxx =
+= v141111 =
 
 Requires PHP v5.3+.
 
 == Changelog ==
 
-= v14xxxx =
+= v141111 =
 
 - Initial release.

@@ -2,7 +2,7 @@
 /**
  * StCR Importer
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,56 +16,56 @@ namespace comment_mail // Root namespace.
 		/**
 		 * StCR Importer
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class import_stcr extends abs_base
 		{
 			/**
 			 * @var integer Max number of post IDs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $max_post_ids_limit;
 
 			/**
 			 * @var array Unimported post IDs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $unimported_post_ids;
 
 			/**
 			 * @var array Imported post IDs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $imported_post_ids;
 
 			/**
 			 * @var integer Total imported post IDs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $total_imported_post_ids;
 
 			/**
 			 * @var integer Total imported subs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $total_imported_subs;
 
 			/**
 			 * @var boolean Has more posts to import?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $has_more_posts_to_import;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $request_args Arguments to the constructor.
 			 *    These should NOT be trusted; they come from a `$_REQUEST` action.
@@ -104,58 +104,9 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * StCR data exists?
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return boolean `TRUE` if StCR data exists.
-			 */
-			public static function data_exists()
-			{
-				$plugin = plugin(); // Need this below.
-
-				$sql = "SELECT `meta_id` FROM `".esc_sql($plugin->utils_db->wp->postmeta)."`".
-				       " WHERE `meta_key` LIKE '%\\_stcr@\\_%' LIMIT 1";
-
-				return (boolean)$plugin->utils_db->wp->get_var($sql);
-			}
-
-			/**
-			 * Ever done an StCR import?
-			 *
-			 * @since 14xxxx First documented version.
-			 *
-			 * @return boolean `TRUE` if ever done an StCR import.
-			 */
-			public static function ever_imported()
-			{
-				$plugin = plugin(); // Need this below.
-
-				$sql = "SELECT `meta_id` FROM `".esc_sql($plugin->utils_db->wp->postmeta)."`".
-				       " WHERE `meta_key` LIKE '%".esc_sql($plugin->utils_db->wp->esc_like(__NAMESPACE__.'_imported_stcr_subs'))."%' LIMIT 1";
-
-				return (boolean)$plugin->utils_db->wp->get_var($sql);
-			}
-
-			/**
-			 * Erase import history.
-			 *
-			 * @since 14xxxx First documented version.
-			 */
-			public static function erase_import_history()
-			{
-				$plugin = plugin(); // Need this below.
-
-				$sql = "DELETE FROM `".esc_sql($plugin->utils_db->wp->postmeta)."`".
-				       " WHERE `meta_key` LIKE '%".esc_sql($plugin->utils_db->wp->esc_like(__NAMESPACE__.'_imported_stcr_subs'))."%'";
-
-				$plugin->utils_db->wp->query($sql);
-			}
-
-			/**
 			 * Import processor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_import()
 			{
@@ -178,7 +129,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Mark as imported post ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $post_id Post ID.
 			 */
@@ -193,7 +144,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Post import processor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $post_id Post ID.
 			 */
@@ -213,7 +164,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Sub. import processor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer   $post_id Post ID.
 			 * @param \stdClass $sub Subscriber obj. data.
@@ -261,7 +212,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Collect all StCR subscribers for a given post ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $post_id Subscribers for which post ID.
 			 *
@@ -334,7 +285,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Subscriber's comment IDs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $post_id Post ID to check.
 			 * @param string  $email Email address (i.e. subscriber).
@@ -364,7 +315,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Up to `$max_limit` unimported post IDs.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $max_limit Max IDs to return.
 			 *
@@ -401,7 +352,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Output status; for public API use.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function output_status()
 			{
@@ -423,7 +374,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Parent output status.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $child_status_uri Child status URI.
 			 *
@@ -493,7 +444,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Child output status.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string HTML markup for the status.
 			 */
@@ -528,6 +479,43 @@ namespace comment_mail // Root namespace.
 				$status .= '</html>';
 
 				return $status; // HTML markup.
+			}
+
+			/**
+			 * StCR data exists?
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return boolean `TRUE` if StCR data exists.
+			 */
+			public static function data_exists()
+			{
+				$plugin = plugin(); // Need this below.
+
+				$sql = "SELECT `meta_id` FROM `".esc_sql($plugin->utils_db->wp->postmeta)."`".
+				       " WHERE `meta_key` LIKE '%\\_stcr@\\_%' LIMIT 1";
+
+				return (boolean)$plugin->utils_db->wp->get_var($sql);
+			}
+
+			/**
+			 * Ever done an StCR import?
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return boolean `TRUE` if ever done an StCR import.
+			 */
+			public static function ever_imported()
+			{
+				$plugin = plugin(); // Need this below.
+
+				$like = // e.g. LIKE `%comment\_mail\_imported\_stcr\_subs%`.
+					'%'.$plugin->utils_db->wp->esc_like(__NAMESPACE__.'_imported_stcr_subs').'%';
+
+				$sql = "SELECT `meta_id` FROM `".esc_sql($plugin->utils_db->wp->postmeta)."`".
+				       " WHERE `meta_key` LIKE '".esc_sql($like)."' LIMIT 1";
+
+				return (boolean)$plugin->utils_db->wp->get_var($sql);
 			}
 		}
 	}

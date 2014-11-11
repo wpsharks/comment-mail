@@ -2,7 +2,7 @@
 /**
  * Base Abstraction
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,49 +16,49 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Base Abstraction
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		abstract class abs_base
 		{
 			/**
 			 * @var plugin Plugin reference.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $plugin;
 
 			/**
 			 * @var array Instance cache.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $cache = array();
 
 			/**
 			 * @var array Global static cache ref.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $static = array();
 
 			/**
 			 * @var array Global static cache.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected static $___static = array();
 
 			/**
 			 * @var \stdClass Overload properties.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $___overload;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -381,7 +381,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Unset cache keys.
 			 *
-			 * @since 14xxxx first documented version.
+			 * @since 141111 first documented version.
 			 *
 			 * @param array $preserve Preserve certain keys?
 			 */
@@ -396,7 +396,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Unset static keys.
 			 *
-			 * @since 14xxxx first documented version.
+			 * @since 141111 first documented version.
 			 *
 			 * @param array $preserve Preserve certain keys?
 			 */

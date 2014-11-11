@@ -2,7 +2,7 @@
 /**
  * Sub Confirmer
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,63 +16,63 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Sub Confirmer
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class sub_confirmer extends abs_base
 		{
 			/**
 			 * @var \stdClass|null Subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $sub;
 
 			/**
 			 * @var null|boolean Auto-confirm?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $auto_confirm;
 
 			/**
 			 * @var boolean Process events?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $process_events;
 
 			/**
 			 * @var boolean User initiated?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $user_initiated;
 
 			/**
 			 * @var boolean Auto confirmed?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $auto_confirmed;
 
 			/**
 			 * @var boolean Confirming via email?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $confirming_via_email;
 
 			/**
 			 * @var boolean Sent an email?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $sent_email_successfully;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $sub_id Subscriber ID.
 			 *
@@ -110,7 +110,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Auto-confirmed?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean `TRUE` if auto-confirmed.
 			 */
@@ -122,7 +122,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Confirming via email?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean `TRUE` if confirming via email.
 			 */
@@ -134,7 +134,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Sent email successfully?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean `TRUE` if sent email successfully.
 			 */
@@ -146,7 +146,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Send confirmation request.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_send_confirmation_request()
 			{
@@ -191,7 +191,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Auto-confirm, if possible.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean TRUE if auto-confirmed in some way.
 			 */

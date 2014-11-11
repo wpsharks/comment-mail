@@ -2,7 +2,7 @@
 /**
  * Sub Deleter
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,70 +16,70 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Sub Deleter
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class sub_deleter extends abs_base
 		{
 			/**
 			 * @var \stdClass|null Subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $sub; // Subscription.
 
 			/**
 			 * @var string Last IP.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $last_ip;
 
 			/**
 			 * @var integer Overwritten by subscription ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $oby_sub_id;
 
 			/**
 			 * @var boolean Purging?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $purging;
 
 			/**
 			 * @var boolean Cleaning?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $cleaning;
 
 			/**
 			 * @var boolean Process events?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $process_events;
 
 			/**
 			 * @var boolean User initiated?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $user_initiated;
 
 			/**
 			 * @var string Event type.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $event_type;
 
 			/**
 			 * @var boolean Deleted?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $deleted;
 
@@ -89,7 +89,7 @@ namespace comment_mail // Root namespace.
 			 * @param integer $sub_id Subscription ID.
 			 * @param array   $args Any additional behavior args.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct($sub_id, array $args = array())
 			{
@@ -155,7 +155,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Public access to deleted property.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function did_delete()
 			{
@@ -165,7 +165,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Deletes subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_delete()
 			{

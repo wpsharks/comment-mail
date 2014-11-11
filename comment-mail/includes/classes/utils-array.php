@@ -2,7 +2,7 @@
 /**
  * Array Utilities
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Array Utilities
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class utils_array extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -33,7 +33,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Unique values deeply (preserving keys).
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $array An input array.
 			 *
@@ -68,7 +68,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Prepend a key/value pair onto an array.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array          $array An input array; by reference.
 			 * @param string|integer New array key; string or integer.
@@ -97,7 +97,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Shuffles an array (preserving keys).
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $array An input array; by reference.
 			 *
@@ -126,7 +126,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Shuffles an array deeply (preserving keys).
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $array An input array; by reference.
 			 *
@@ -153,7 +153,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Removes `NULL` key/values.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $array An input array to work from.
 			 *
@@ -174,7 +174,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Removes `NULL` key/values deeply.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $array An input array to work from.
 			 *

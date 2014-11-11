@@ -2,7 +2,7 @@
 /**
  * Sub Injector
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,77 +16,77 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Sub Injector
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class sub_injector extends abs_base
 		{
 			/**
 			 * @var \WP_User|null Subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $user;
 
 			/**
 			 * @var \stdClass|null Comment.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $comment;
 
 			/**
 			 * @var string Subscription type.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $type;
 
 			/**
 			 * @var string Subscription delivery option.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $deliver;
 
 			/**
 			 * @var null|boolean Auto-confirm?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $auto_confirm;
 
 			/**
 			 * @var boolean Process events?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $process_events;
 
 			/**
 			 * @var boolean User initiated?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $user_initiated;
 
 			/**
 			 * @var boolean Keep existing?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $keep_existing;
 
 			/**
 			 * @var sub_inserter|null Sub inserter.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $sub_inserter;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \WP_User|null  $user Subscribing user.
 			 * @param integer|string $comment_id Comment ID.
@@ -139,7 +139,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Sub inserter.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return sub_inserter|null Sub inserter.
 			 */
@@ -151,7 +151,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Injects a new subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_inject()
 			{

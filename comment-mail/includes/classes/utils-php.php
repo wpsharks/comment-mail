@@ -2,7 +2,7 @@
 /**
  * PHP Utilities
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,7 +16,7 @@ namespace comment_mail // Root namespace.
 		/**
 		 * PHP Utilities
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class utils_php extends abs_base
 		{
@@ -26,7 +26,7 @@ namespace comment_mail // Root namespace.
 			 * @var array PHP's language constructs.
 			 *    Keys are currently unimportant. Subject to change.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $constructs = array(
 				'die'             => 'die',
@@ -49,7 +49,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -59,7 +59,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Evaluates PHP code.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $___string String (possibly containing PHP tags).
 			 *    If `$pure_php` is TRUE; this should NOT have PHP tags.
@@ -107,7 +107,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Is a particular function, static method, or PHP language construct possible?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $fsmlc Function, static method, or a PHP language construct.
 			 *
@@ -141,7 +141,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Gets all disabled PHP functions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all disabled functions, else an empty array.
 			 */

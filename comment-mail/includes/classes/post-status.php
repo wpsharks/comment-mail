@@ -2,7 +2,7 @@
 /**
  * Post Status Change Handler
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Post Status Change Handler
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class post_status extends abs_base
 		{
 			/**
 			 * @var \WP_Post|null Post object (now).
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $post;
 
@@ -45,7 +45,7 @@ namespace comment_mail // Root namespace.
 			 *    See also: {@link get_available_post_statuses()}
 			 *       Custom post types may have their own statuses.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $new_post_status;
 
@@ -68,14 +68,14 @@ namespace comment_mail // Root namespace.
 			 *    See also: {@link get_available_post_statuses()}
 			 *       Custom post types may have their own statuses.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $old_post_status;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string        $new_post_status New post status.
 			 *
@@ -128,7 +128,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Auto inject post author and/or recipients.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_sub_auto_inject()
 			{

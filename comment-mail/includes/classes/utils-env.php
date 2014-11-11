@@ -2,7 +2,7 @@
 /**
  * Environment Utilities
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Environment Utilities
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class utils_env extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -33,7 +33,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Current user IP address.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Current user's IP address; else an empty string.
 			 */
@@ -52,7 +52,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Current request is for a pro version preview?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return boolean `TRUE` if the current request is for a pro preview.
 			 */
@@ -70,7 +70,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Current `$GLOBALS['pagenow']`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Current `$GLOBALS['pagenow']`.
 			 */
@@ -85,7 +85,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Current admin menu page.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Current admin menu page.
 			 */
@@ -106,7 +106,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Checks if current page is a menu page.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $page_to_check A specific page to check (optional).
 			 *    If empty, this returns `TRUE` for any admin menu page.
@@ -141,7 +141,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Maxmizes available memory.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function maximize_memory()
 			{
@@ -154,7 +154,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Prepares for output delivery.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function prep_for_output()
 			{
@@ -170,7 +170,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Prepares for large output delivery.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function prep_for_large_output()
 			{
@@ -181,7 +181,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Max allowed file upload size.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return float A floating point number.
 			 */

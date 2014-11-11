@@ -2,7 +2,7 @@
 /**
  * Subscription Utilities
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Subscription Utilities
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class utils_sub extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -33,7 +33,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Sanitizes a subscription key.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $sub_key Input subscription key.
 			 *
@@ -58,7 +58,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Checks a subscription key.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $sub_key Input value to check on.
 			 *
@@ -79,7 +79,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Subscription key to ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $sub_key Input key to convert to an ID.
 			 *
@@ -100,7 +100,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Subscription key to email address.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $sub_key Input key to convert to an email address.
 			 *
@@ -121,7 +121,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Unique IDs only, from IDs/keys.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $sub_ids_or_keys An array of IDs/keys.
 			 *
@@ -155,7 +155,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|string $sub_id_or_key Subscription ID.
 			 *
@@ -199,7 +199,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Reconfirm subscription via email.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|string $sub_id_or_key Subscription ID.
 			 * @param array          $args Any additional behavioral args.
@@ -236,7 +236,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Bulk reconfirm subscriptions via email.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
@@ -258,7 +258,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Confirm subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|string $sub_id_or_key Subscription ID.
 			 * @param array          $args Any additional behavioral args.
@@ -289,7 +289,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Bulk confirm subscriptions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
@@ -311,7 +311,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Unconfirm subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|string $sub_id_or_key Subscription ID.
 			 * @param array          $args Any additional behavioral args.
@@ -342,7 +342,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Bulk unconfirm subscriptions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
@@ -364,7 +364,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Suspend subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|string $sub_id_or_key Subscription ID.
 			 * @param array          $args Any additional behavioral args.
@@ -395,7 +395,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Bulk suspend subscriptions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
@@ -417,7 +417,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Trash subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|string $sub_id_or_key Subscription ID.
 			 * @param array          $args Any additional behavioral args.
@@ -448,7 +448,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Bulk trash subscriptions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
@@ -470,7 +470,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Delete subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|string $sub_id_or_key Subscription ID.
 			 * @param array          $args Any additional behavioral args.
@@ -498,7 +498,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Bulk delete subscriptions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $sub_ids_or_keys Subscription IDs/keys.
 			 * @param array $args Any additional behavioral args.
@@ -520,7 +520,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Delete email/user all; for unsubscribe all functionality.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $sub_email An input email address.
 			 * @param array  $args Any additional behavioral args.
@@ -545,7 +545,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Query total subscriptions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|null $post_id Defaults to a `NULL` value.
 			 *    i.e. defaults to any post ID. Pass this to limit the query.
@@ -628,7 +628,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Last X subscriptions w/ a given status.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer      $x The total number to return.
 			 *
@@ -718,7 +718,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * User initiated, but by an admin on behalf of another?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $sub_email Email address to check.
 			 * @param boolean $user_initiated Current value for this flag.
@@ -741,7 +741,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Latest key associated w/ a particular email address.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $sub_email Email address to check.
 			 * @param boolean $no_cache Disallow a previously cached value?
@@ -766,7 +766,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * All keys associated w/ a particular email address.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $sub_email Email address to check.
 			 * @param boolean $no_cache Disallow a previously cached value?
@@ -790,7 +790,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * All user IDs associated w/ a particular email address.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $sub_email Email address to check.
 			 * @param boolean $no_cache Disallow a previously cached value?
@@ -822,7 +822,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * All user ID-based emails associated w/ a particular email address.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $sub_email Email address to check.
 			 * @param boolean $no_cache Disallow a previously cached value?
@@ -855,7 +855,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Last IP associated w/ email address.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $sub_email Email address to check.
 			 * @param boolean $no_cache Disallow a previously cached value?
@@ -883,7 +883,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Is an email address blacklisted?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string  $sub_email Email address to check.
 			 * @param boolean $no_cache Disallow a previously cached value?
@@ -914,7 +914,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Can a subscription be auto-confirmed?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer      $post_id A WP post ID.
 			 * @param integer      $sub_user_id Subscriber's WP user ID.
@@ -1033,7 +1033,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Set current sub's email address.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $sub_key Subscription key; MUST match the email address.
 			 * @param string $sub_email Subscriber's current email address.
@@ -1068,7 +1068,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Current sub's email address.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Current subscriber's email address.
 			 */
@@ -1090,7 +1090,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Current `sub_email`, `sub_type`, `sub_deliver` for a specific post ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer $post_id Post ID to check here.
 			 * @param boolean $use_comment_form_defaults Use comment form defaults?
@@ -1158,7 +1158,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Nullify the object cache.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param array $sub_ids_or_keys An array of IDs/keys.
 			 */

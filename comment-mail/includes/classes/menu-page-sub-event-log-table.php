@@ -2,7 +2,7 @@
 /**
  * Menu Page Sub. Event Log Table
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,7 +16,7 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Menu Page Sub. Event Log Table
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class menu_page_sub_event_log_table extends menu_page_table_base
 		{
@@ -27,7 +27,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -50,7 +50,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all table columns.
 			 */
@@ -88,7 +88,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Hidden table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all hidden table columns.
 			 */
@@ -112,7 +112,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Searchable fulltext table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all fulltext searchables.
 			 */
@@ -136,7 +136,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Searchable table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all searchables.
 			 */
@@ -150,7 +150,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Unsortable table columns.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all unsortable table columns.
 			 */
@@ -166,7 +166,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Navigable table filters.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all navigable table filters.
 			 */
@@ -191,7 +191,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Table column handler.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 *
@@ -222,7 +222,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Runs DB query; sets pagination args.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function prepare_items() // The heart of this class.
 			{
@@ -230,6 +230,7 @@ namespace comment_mail // Root namespace.
 				$current_offset              = $this->get_current_offset();
 				$clean_search_query          = $this->get_clean_search_query();
 				$sub_ids_in_search_query     = $this->get_sub_ids_in_search_query();
+				$sub_emails_in_search_query  = $this->get_sub_emails_in_search_query();
 				$user_ids_in_search_query    = $this->get_user_ids_in_search_query();
 				$post_ids_in_search_query    = $this->get_post_ids_in_search_query();
 				$comment_ids_in_search_query = $this->get_comment_ids_in_search_query();
@@ -252,14 +253,28 @@ namespace comment_mail // Root namespace.
 
 				       " WHERE 1=1". // Default where clause.
 
-				       ($sub_ids_in_search_query || $user_ids_in_search_query || $post_ids_in_search_query || $comment_ids_in_search_query
+				       ($sub_ids_in_search_query || $sub_emails_in_search_query || $user_ids_in_search_query || $post_ids_in_search_query || $comment_ids_in_search_query
 					       ? " AND (".$this->plugin->utils_string->trim( // Trim the following...
 
-						       ($sub_ids_in_search_query ? " ".$and_or." (`sub_id` IN('".implode("','", array_map('esc_sql', $sub_ids_in_search_query))."')".
-						                                   " OR `oby_sub_id` IN('".implode("','", array_map('esc_sql', $sub_ids_in_search_query))."'))" : '').
-						       ($user_ids_in_search_query ? " ".$and_or." `user_id` IN('".implode("','", array_map('esc_sql', $user_ids_in_search_query))."')" : '').
-						       ($post_ids_in_search_query ? " ".$and_or." `post_id` IN('".implode("','", array_map('esc_sql', $post_ids_in_search_query))."')" : '').
-						       ($comment_ids_in_search_query ? " ".$and_or." `comment_id` IN('".implode("','", array_map('esc_sql', $comment_ids_in_search_query))."')" : '')
+						       ($sub_ids_in_search_query // Search both fields here.
+							       ? " ".$and_or." (`sub_id` IN('".implode("','", array_map('esc_sql', $sub_ids_in_search_query))."')".
+							         "               OR `oby_sub_id` IN('".implode("','", array_map('esc_sql', $sub_ids_in_search_query))."'))" : '').
+
+						       ($sub_emails_in_search_query // Search both fields here.
+							       ? " ".$and_or." (`email` IN('".implode("','", array_map('esc_sql', $sub_emails_in_search_query))."')".
+							         "               OR `email_before` IN('".implode("','", array_map('esc_sql', $sub_emails_in_search_query))."'))" : '').
+
+						       ($user_ids_in_search_query // Search both fields here.
+							       ? " ".$and_or." (`user_id` IN('".implode("','", array_map('esc_sql', $user_ids_in_search_query))."')".
+							         "              OR `user_id_before` IN('".implode("','", array_map('esc_sql', $user_ids_in_search_query))."'))" : '').
+
+						       ($post_ids_in_search_query // Search both fields here.
+							       ? " ".$and_or." (`post_id` IN('".implode("','", array_map('esc_sql', $post_ids_in_search_query))."')".
+							         "              OR `post_id_before` IN('".implode("','", array_map('esc_sql', $post_ids_in_search_query))."'))" : '').
+
+						       ($comment_ids_in_search_query // Search both fields here.
+							       ? " ".$and_or." (`comment_id` IN('".implode("','", array_map('esc_sql', $comment_ids_in_search_query))."')".
+							         "              OR `comment_id_before` IN('".implode("','", array_map('esc_sql', $comment_ids_in_search_query))."'))" : '')
 
 						       , '', 'AND OR').")" : ''). // Trims `AND OR` leftover after concatenation occurs.
 
@@ -297,7 +312,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get default orderby value.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string The default orderby value.
 			 */
@@ -309,7 +324,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Get default order value.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string The default order value.
 			 */
@@ -325,7 +340,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Bulk actions for this table.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all bulk actions.
 			 */
@@ -339,7 +354,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Bulk action handler for this table.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $bulk_action The bulk action to process.
 			 * @param array  $ids The bulk action IDs to process.

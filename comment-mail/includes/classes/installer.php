@@ -2,7 +2,7 @@
 /**
  * Install Routines
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Install Routines
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class installer extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct()
 			{
@@ -39,7 +39,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Create DB tables.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @throws \exception If table creation fails.
 			 */
@@ -65,14 +65,14 @@ namespace comment_mail // Root namespace.
 			/**
 			 * First time install displays notice.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_enqueue_notice()
 			{
 				if(get_option(__NAMESPACE__.'_install_time'))
 					return; // Not applicable.
 
-				$notice_markup = file_get_contents(dirname(dirname(dirname(__FILE__))).'/client-s/images/inline-icon.svg').
+				$notice_markup = $this->plugin->utils_fs->inline_icon_svg().
 				                 ' '.sprintf(__('%1$s&trade; installed successfully! Please <a href="%2$s"><strong>click here to configure</strong></a> basic options.', $this->plugin->text_domain),
 				                             esc_html($this->plugin->name), esc_attr($this->plugin->utils_url->main_menu_page_only()));
 
@@ -82,7 +82,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Update installation time.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function set_install_time()
 			{

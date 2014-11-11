@@ -2,7 +2,7 @@
 /**
  * Menu Pages
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Menu Pages
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class menu_page extends abs_base
 		{
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $which Which menu page to display?
 			 */
@@ -39,7 +39,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Displays menu page.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function options_()
 			{
@@ -1156,31 +1156,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Displays menu page.
 			 *
-			 * @since 14xxxx First documented version.
-			 */
-			protected function stats_()
-			{
-				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-stats '.$this->plugin->slug.'-menu-page-area').'">'."\n";
-
-				echo '   '.$this->heading(__('Statistics', $this->plugin->text_domain), 'logo.png').
-				     '   '.$this->notes(); // Heading/notifications.
-
-				echo '   <div class="pmp-body">'."\n";
-
-				echo '         '.$this->all_panel_togglers();
-
-				/* ----------------------------------------------------------------------------------------- */
-
-				echo '   '.__('Coming soon...', $this->plugin->text_domain)."\n";
-
-				echo '   </div>'."\n";
-				echo '</div>';
-			}
-
-			/**
-			 * Displays menu page.
-			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function import_export_()
 			{
@@ -1225,7 +1201,7 @@ namespace comment_mail // Root namespace.
 						                'placeholder'   => __('"email", "post_id", "status"'."\n".'"john@example.com", "1", "subscribed"', $this->plugin->text_domain),
 						                'name'          => 'data',
 						                'rows'          => 15,
-						                'current_value' => !empty($_POST[__NAMESPACE__]['import']['data']) ? trim(stripslashes((string)$_POST[__NAMESPACE__]['import']['data'])) : NULL,
+						                'current_value' => !empty($_REQUEST[__NAMESPACE__]['import']['data']) ? trim(stripslashes((string)$_REQUEST[__NAMESPACE__]['import']['data'])) : NULL,
 						                'notes_before'  => '<p>'.__('The first line of this input should be CSV headers; e.g. <code>"email", "post_id", "status"</code>', $this->plugin->text_domain).'</p>',
 					                )).
 				                '   </tbody>'.
@@ -1487,7 +1463,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Displays menu page.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function email_templates_()
 			{
@@ -1770,7 +1746,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Displays menu page.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function site_templates_()
 			{
@@ -2144,7 +2120,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Displays menu page.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function subs_()
 			{
@@ -2168,7 +2144,7 @@ namespace comment_mail // Root namespace.
 						echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-subs '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 						echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only()).'" novalidate="novalidate">'."\n";
 
-						echo '      <h2>'.sprintf(__('%1$s&trade; &#10609; Subscriptions', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="'.esc_attr('wsi-'.$this->plugin->slug).'"></i>'.
+						echo '      <h2>'.sprintf(__('%1$s&trade; &raquo; Subscriptions', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="'.esc_attr('wsi-'.$this->plugin->slug).'"></i>'.
 						     '       <a href="'.esc_attr($this->plugin->utils_url->new_sub_short()).'" class="add-new-h2">'.__('Add New', $this->plugin->text_domain).'</a></h2>'."\n";
 
 						new menu_page_subs_table(); // Displays table.
@@ -2181,14 +2157,14 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Displays menu page.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function _sub_new()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-sub-new '.$this->plugin->slug.'-menu-page-form '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only(array('action'))).'" novalidate="novalidate">'."\n";
 
-				echo '      <h2>'.sprintf(__('%1$s&trade; &#10609; New Subscription', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i></h2>'."\n";
+				echo '      <h2>'.sprintf(__('%1$s&trade; &raquo; New Subscription', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i></h2>'."\n";
 
 				new menu_page_sub_new_form(); // Displays form to add new subscription.
 
@@ -2199,14 +2175,14 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Displays menu page.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function _sub_edit()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-sub-edit '.$this->plugin->slug.'-menu-page-form '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only(array('action', 'subscription'))).'" novalidate="novalidate">'."\n";
 
-				echo '      <h2>'.sprintf(__('%1$s&trade; &#10609; Edit Subscription', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i></h2>'."\n";
+				echo '      <h2>'.sprintf(__('%1$s&trade; &raquo; Edit Subscription', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i></h2>'."\n";
 
 				new menu_page_sub_edit_form(!empty($_REQUEST['subscription']) ? (integer)$_REQUEST['subscription'] : 0); // Displays form.
 
@@ -2217,14 +2193,14 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Displays menu page.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function sub_event_log_()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-sub-event-log '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only()).'" novalidate="novalidate">'."\n";
 
-				echo '      <h2>'.sprintf(__('%1$s&trade; &#10609; Subscription Event Log', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="fa fa-history"></i></h2>'."\n";
+				echo '      <h2>'.sprintf(__('%1$s&trade; &raquo; Subscriptions &raquo; Event Log', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="fa fa-history"></i></h2>'."\n";
 
 				new menu_page_sub_event_log_table(); // Displays table.
 
@@ -2235,14 +2211,14 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Displays menu page.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function queue_()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-queue '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only()).'" novalidate="novalidate">'."\n";
 
-				echo '      <h2>'.sprintf(__('%1$s&trade; &#10609; Queued (Pending) Notifications', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="fa fa-envelope-o"></i></h2>'."\n";
+				echo '      <h2>'.sprintf(__('%1$s&trade; &raquo; Queued (Pending) Notifications', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="fa fa-envelope-o"></i></h2>'."\n";
 
 				new menu_page_queue_table(); // Displays table.
 
@@ -2253,14 +2229,14 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Displays menu page.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function queue_event_log_()
 			{
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-queue-event-log '.$this->plugin->slug.'-menu-page-table '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_table_nav_vars_only()).'" novalidate="novalidate">'."\n";
 
-				echo '      <h2>'.sprintf(__('%1$s&trade; &#10609; Queue Event Log', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="fa fa-paper-plane"></i></h2>'."\n";
+				echo '      <h2>'.sprintf(__('%1$s&trade; &raquo; Queue &raquo; Event Log', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="fa fa-paper-plane"></i></h2>'."\n";
 
 				new menu_page_queue_event_log_table(); // Displays table.
 
@@ -2269,9 +2245,204 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Displays menu page.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected function stats_()
+			{
+				$_this             = $this;
+				$timezone          = $this->plugin->utils_date->i18n('T');
+				$current_value_for = function ($key) use ($_this)
+				{
+					return isset($_REQUEST[__NAMESPACE__]['stats'][$key])
+						? trim(stripslashes((string)$_REQUEST[__NAMESPACE__]['stats'][$key])) : NULL;
+				};
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-stats '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
+
+				echo '   <h2>'.sprintf(__('%1$s&trade; &raquo; Statistics/Charts', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="fa fa-bar-chart"></i></h2>'."\n";
+
+				echo '   <div class="pmp-postbox-container postbox-container">'.
+				     '      <div class="pmp-postbox-holder metabox-holder">';
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$date_info        = // For use in JavaScript alerts (as seen below).
+					__('You can type (or select) a particular date/time. Upon clicking the input field a date picker will open for you.', $this->plugin->text_domain)."\n\n".
+					__('TIP: you can also type things like: now, 30 days ago, -30 days, -2 weeks, and more. Anything compatible with PHP\'s strtotime() function will work here.', $this->plugin->text_domain)."\n\n".
+					__('As expected, relative dates like: -30 days; are based on your current local time when used in the From Date; i.e. your current local time -30 days.', $this->plugin->text_domain)."\n\n".
+					__('However, relative dates used in the To Date are slightly different. With the exception of the phrase "now", relative To Date phrases are relative to the From Date you\'ve given.', $this->plugin->text_domain)."\n\n".
+					__('Typing (or selecting) a specific date in either field will behave as expected; i.e. you get data from (or to) that specific date. Only relative dates (i.e. phrases) are impacted by the above.', $this->plugin->text_domain);
+				$date_info_anchor = '<a href="#" onclick="alert(\''.esc_attr($this->plugin->utils_string->esc_js_sq($date_info)).'\'); return false;" style="text-decoration:none;">'.__('[?]', $this->plugin->text_domain).'</a>';
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_postbox_view = 'subs_overview'; // This statistical view.
+
+				$_form_field_args = array(
+					'ns_id_suffix'   => '-stats-form-'.str_replace('_', '-', $_postbox_view),
+					'ns_name_suffix' => '[stats_chart_data_via_ajax]',
+					'class_prefix'   => 'pmp-stats-form-',
+				);
+				$_form_fields     = new form_fields($_form_field_args);
+
+				$_postbox_body = $this->stats_view(
+					$_postbox_view,
+					array(
+						$_form_fields->hidden_input(
+							array(
+								'name'          => 'view',
+								'current_value' => $_postbox_view,
+							)),
+						$_form_fields->select_row(
+							array(
+								'label'           => __('Chart Type', $this->plugin->text_domain),
+								'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+								'name'            => 'type',
+								'current_value'   => $this->coalesce($current_value_for('type'), 'event_subscribed_totals'),
+								'allow_arbitrary' => FALSE,
+								'options'         => array(
+									'subscribed_totals'                   => __('Actual/Current Subscr. Totals', $this->plugin->text_domain),
+									'event_subscribed_totals'             => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
+									'event_subscribed_most_popular_posts' => __('Most Popular Posts (Based on Event Logs)', $this->plugin->text_domain),
+								),
+							)),
+						$_form_fields->input_row(
+							array(
+								'label'         => sprintf(__('From Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
+								'placeholder'   => sprintf(__('e.g. 7 days ago; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y', strtotime('-7 days')))),
+								'name'          => 'from',
+								'other_attrs'   => 'data-toggle="date-time-picker"',
+								'current_value' => $this->coalesce($current_value_for('from'), '7 days ago'),
+							)),
+						$_form_fields->input_row(
+							array(
+								'label'         => sprintf(__('To Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
+								'placeholder'   => sprintf(__('e.g. now; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y'))),
+								'name'          => 'to',
+								'other_attrs'   => 'data-toggle="date-time-picker"',
+								'current_value' => $this->coalesce($current_value_for('to'), 'now'),
+							)),
+						$_form_fields->select_row(
+							array(
+								'label'           => __('Breakdown By', $this->plugin->text_domain),
+								'placeholder'     => __('e.g. hours, days, weeks, months, years', $this->plugin->text_domain),
+								'name'            => 'by',
+								'current_value'   => $this->coalesce($current_value_for('by'), 'days'),
+								'allow_arbitrary' => FALSE,
+								'options'         => array(
+									'hours'  => __('hours', $this->plugin->text_domain),
+									'days'   => __('days', $this->plugin->text_domain),
+									'weeks'  => __('weeks', $this->plugin->text_domain),
+									'months' => __('months', $this->plugin->text_domain),
+									'years'  => __('years', $this->plugin->text_domain),
+								),
+							)),
+					),
+					array('auto_chart' => $current_value_for('view') === $_postbox_view));
+
+				echo $this->postbox(__('Subscriptions Overview', $this->plugin->text_domain), $_postbox_body,
+				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => !$current_value_for('view') || $current_value_for('view') === $_postbox_view));
+
+				unset($_postbox_view, $_postbox_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_postbox_view = 'subs_by_post_id'; // This statistical view.
+
+				$_form_field_args = array(
+					'ns_id_suffix'   => '-stats-form-'.str_replace('_', '-', $_postbox_view),
+					'ns_name_suffix' => '[stats_chart_data_via_ajax]',
+					'class_prefix'   => 'pmp-stats-form-',
+				);
+				$_form_fields     = new form_fields($_form_field_args);
+
+				$_postbox_body = $this->stats_view(
+					$_postbox_view,
+					array(
+						$_form_fields->hidden_input(
+							array(
+								'name'          => 'view',
+								'current_value' => $_postbox_view,
+							)),
+						$_form_fields->select_row(
+							array(
+								'label'               => __('Post ID', $this->plugin->text_domain),
+								'placeholder'         => __('Select an Option...', $this->plugin->text_domain),
+								'name'                => 'post_id',
+								'current_value'       => $this->coalesce($current_value_for('post_id'), NULL),
+								'options'             => '%%posts%%',
+								'input_fallback_args' => array(
+									'type'                     => 'number',
+									'placeholder'              => '',
+									'maxlength'                => 20,
+									'current_value_empty_on_0' => TRUE,
+									'other_attrs'              => 'min="1" max="18446744073709551615"',
+								),
+							)),
+						$_form_fields->select_row(
+							array(
+								'label'           => __('Chart Type', $this->plugin->text_domain),
+								'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+								'name'            => 'type',
+								'current_value'   => $this->coalesce($current_value_for('type'), 'event_subscribed_totals'),
+								'allow_arbitrary' => FALSE,
+								'options'         => array(
+									'subscribed_totals'       => __('Actual/Current Subscr. Totals', $this->plugin->text_domain),
+									'event_subscribed_totals' => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
+								),
+							)),
+						$_form_fields->input_row(
+							array(
+								'label'         => sprintf(__('From Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
+								'placeholder'   => sprintf(__('e.g. 7 days ago; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y', strtotime('-7 days')))),
+								'name'          => 'from',
+								'other_attrs'   => 'data-toggle="date-time-picker"',
+								'current_value' => $this->coalesce($current_value_for('from'), '7 days ago'),
+							)),
+						$_form_fields->input_row(
+							array(
+								'label'         => sprintf(__('To Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
+								'placeholder'   => sprintf(__('e.g. now; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y'))),
+								'name'          => 'to',
+								'other_attrs'   => 'data-toggle="date-time-picker"',
+								'current_value' => $this->coalesce($current_value_for('to'), 'now'),
+							)),
+						$_form_fields->select_row(
+							array(
+								'label'           => __('Breakdown By', $this->plugin->text_domain),
+								'placeholder'     => __('e.g. hours, days, weeks, months, years', $this->plugin->text_domain),
+								'name'            => 'by',
+								'current_value'   => $this->coalesce($current_value_for('by'), 'days'),
+								'allow_arbitrary' => FALSE,
+								'options'         => array(
+									'hours'  => __('hours', $this->plugin->text_domain),
+									'days'   => __('days', $this->plugin->text_domain),
+									'weeks'  => __('weeks', $this->plugin->text_domain),
+									'months' => __('months', $this->plugin->text_domain),
+									'years'  => __('years', $this->plugin->text_domain),
+								),
+							)),
+					),
+					array('auto_chart' => $current_value_for('view') === $_postbox_view));
+
+				echo $this->postbox(__('Subscriptions by Post ID', $this->plugin->text_domain), $_postbox_body,
+				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => !$current_value_for('view') || $current_value_for('view') === $_postbox_view));
+
+				unset($_postbox_view, $_postbox_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '      </div>'.
+				     '   </div>';
+
+				echo '</div>';
+			}
+
+			/**
 			 * Constructs menu page heading.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $title Title of this menu page.
 			 * @param string $logo_icon Logo/icon for this menu page.
@@ -2289,10 +2460,6 @@ namespace comment_mail // Root namespace.
 				$heading .= '  <img class="pmp-logo-icon" src="'.$this->plugin->utils_url->to('/client-s/images/'.$logo_icon).'" alt="'.esc_attr($title).'" />'."\n";
 
 				$heading .= '  <div class="pmp-heading-links">'."\n";
-
-				$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->stats_menu_page_only()).'"'.
-				            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_stats') ? ' class="pmp-active"' : '').'>'.
-				            '<i class="fa fa-bar-chart"></i> '.__('Statistics', $this->plugin->text_domain).'</a>'."\n";
 
 				$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->main_menu_page_only()).'"'.
 				            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__) ? ' class="pmp-active"' : '').'>'.
@@ -2334,7 +2501,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * All-panel togglers.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string Markup for all-panel togglers.
 			 */
@@ -2351,7 +2518,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Constructs menu page notes.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @return string The notes for this menu page.
 			 */
@@ -2370,16 +2537,76 @@ namespace comment_mail // Root namespace.
 				if($this->plugin->install_time() > strtotime('-48 hours') && $this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_*_templates'))
 				{
 					$notes .= '<div class="pmp-note pmp-notice">'."\n";
-					$notes .= '  '.sprintf(__('All templates come preconfigured <i class="fa fa-smile-o"></i> — it is not necessary to customize. This area is intended for developers only.', $this->plugin->text_domain), esc_html($this->plugin->name))."\n";
+					$notes .= '  '.__('All templates come preconfigured; customization is optional <i class="fa fa-smile-o"></i>', $this->plugin->text_domain)."\n";
 					$notes .= '</div>'."\n";
 				}
 				return $notes; // All notices; if any apply.
 			}
 
 			/**
+			 * Constructs a menu page stats view.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $view Statistical view specification.
+			 * @param array  $form_field_rows An array of form fields rows needed by this view.
+			 * @param array  $args Any additional specs/behavorial args.
+			 *
+			 * @return string Markup for this menu page stats view.
+			 */
+			protected function stats_view($view, array $form_field_rows = array(), array $args = array())
+			{
+				$view = trim(strtolower((string)$view));
+
+				$default_args = array(
+					'auto_chart' => FALSE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$auto_chart = (boolean)$args['auto_chart'];
+
+				$view = '<div class="'.esc_attr('pmp-stats-view pmp-stats-view-'.str_replace('_', '-', $view)).'">'."\n";
+				$view .= '  <form novalidate="novalidate" onsubmit="return false;">'."\n";
+
+				foreach($form_field_rows as $_form_field_row)
+					if(stripos($_form_field_row, '<input type="hidden"') !== FALSE)
+						$view .= '<div style="display:none;">'.$_form_field_row.'</div>'."\n";
+				unset($_form_field_row); // Housekeeping.
+
+				$view .= '     <table class="pmp-stats-view-table">'."\n";
+				$view .= '        <tbody>'."\n";
+				$view .= '           <tr>'."\n";
+
+				foreach($form_field_rows as $_form_field_row)
+					if(stripos($_form_field_row, '<input type="hidden"') === FALSE)
+					{
+						$view .= '        <td class="pmp-stats-view-col">'."\n";
+						$view .= '           <table><tbody>'.$_form_field_row.'</tbody></table>'."\n";
+						$view .= '        </td>'."\n";
+					}
+				unset($_form_field_row); // Housekeeping.
+
+				$view .= '              <td class="pmp-stats-view-col pmp-stats-view-submit">'."\n";
+				$view .= '                 <button type="button" class="button button-primary"'.($auto_chart ? ' data-auto-chart' : '').'>'."\n";
+				$view .= '                    '.__('Display Chart', $this->plugin->text_domain)."\n";
+				$view .= '                 </button>'."\n";
+				$view .= '              </td>'."\n";
+
+				$view .= '           </tr>'."\n";
+				$view .= '        </tbody>'."\n";
+				$view .= '     </table>'."\n";
+
+				$view .= '  </form>'."\n";
+				$view .= '</div>'."\n";
+
+				return $view; // Markup for this stats view.
+			}
+
+			/**
 			 * Constructs a menu page panel.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param string $title Panel title.
 			 * @param string $body Panel body; i.e. HTML markup.
@@ -2424,6 +2651,61 @@ namespace comment_mail // Root namespace.
 				$panel .= '</div>'."\n";
 
 				return $panel; // Markup for this panel.
+			}
+
+			/**
+			 * Constructs a menu page postbox.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $title Postbox title.
+			 * @param string $body Postbox body; i.e. HTML markup.
+			 * @param array  $args Any additional specs/behavorial args.
+			 *
+			 * @return string Markup for this menu page postbox.
+			 */
+			protected function postbox($title, $body, array $args = array())
+			{
+				$title = (string)$title;
+				$body  = (string)$body;
+
+				$default_args = array(
+					'note'     => '',
+					'icon'     =>
+						'<i class="fa fa-gears"></i>',
+					'pro_only' => FALSE,
+					'open'     => FALSE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$note     = trim((string)$args['note']);
+				$icon     = trim((string)$args['icon']);
+				$pro_only = (boolean)$args['pro_only'];
+				$open     = (boolean)$args['open'];
+
+				$id = 'pb-'.md5($title.$icon.$note); // Auto-generate.
+
+				if($pro_only && !$this->plugin->is_pro && !$this->plugin->utils_env->is_pro_preview())
+					return ''; // Not applicable; not pro, or not a pro preview.
+
+				$postbox = '<div id="'.esc_attr($id).'"'. // Expected by `postbox.js` in WP core.
+				           ' class="pmp-postbox postbox'.esc_attr((!$open ? ' closed' : ''). // Add `closed` class.
+				                                                  ($pro_only && !$this->plugin->is_pro ? ' pmp-pro-preview' : '')).'">'."\n";
+				$postbox .= '  <div class="pmp-postbox-handle handlediv"><br /></div>'."\n";
+
+				$postbox .= '  <h3 class="pmp-postbox-hndle hndle">'."\n";
+				$postbox .= '      '.$icon.' '.$title."\n";
+				$postbox .= $note ? '<span class="pmp-postbox-hndle-note">'.$note.'</span>' : '';
+				$postbox .= '  </h3>'."\n";
+
+				$postbox .= '  <div class="pmp-postbox-inside inside">'."\n";
+				$postbox .= '     '.$body."\n";
+				$postbox .= '  </div>'."\n";
+
+				$postbox .= '</div>'."\n";
+
+				return $postbox; // Markup for this postbox.
 			}
 		}
 	}

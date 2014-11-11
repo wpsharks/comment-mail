@@ -2,7 +2,7 @@
 /**
  * User Deletion Handler
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,28 +16,28 @@ namespace comment_mail // Root namespace.
 		/**
 		 * User Deletion Handler
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class user_delete extends abs_base
 		{
 			/**
 			 * @var integer User ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $user_id;
 
 			/**
 			 * @var integer Blog ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $blog_id;
 
 			/**
 			 * @var boolean Switched blog?
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $switched_blog;
 
@@ -47,7 +47,7 @@ namespace comment_mail // Root namespace.
 			 * @param integer|string $user_id User ID.
 			 * @param integer|string $blog_id Blog ID. Defaults to `0` (current blog).
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			public function __construct($user_id, $blog_id = 0)
 			{
@@ -63,7 +63,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Purges subscriptions.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_purge_subs()
 			{

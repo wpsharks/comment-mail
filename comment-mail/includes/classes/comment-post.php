@@ -2,7 +2,7 @@
 /**
  * Comment Post
  *
- * @since 14xxxx First documented version.
+ * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
@@ -16,14 +16,14 @@ namespace comment_mail // Root namespace.
 		/**
 		 * Comment Post
 		 *
-		 * @since 14xxxx First documented version.
+		 * @since 141111 First documented version.
 		 */
 		class comment_post extends abs_base
 		{
 			/**
 			 * @var integer Comment ID.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $comment_id;
 
@@ -31,14 +31,14 @@ namespace comment_mail // Root namespace.
 			 * @var string Current/initial comment status.
 			 *    One of: `approve`, `hold`, `trash`, `spam`, `delete`.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected $comment_status;
 
 			/**
 			 * Class constructor.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 *
 			 * @param integer|string $comment_id Comment ID.
 			 *
@@ -64,7 +64,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Inject subscription.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_inject_sub()
 			{
@@ -98,7 +98,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Inject/queue emails.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_inject_queue()
 			{
@@ -114,7 +114,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Process queued emails in real-time.
 			 *
-			 * @since 14xxxx First documented version.
+			 * @since 141111 First documented version.
 			 */
 			protected function maybe_process_queue_in_realtime()
 			{
