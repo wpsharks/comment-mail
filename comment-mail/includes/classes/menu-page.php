@@ -2355,9 +2355,10 @@ namespace comment_mail // Root namespace.
 								'current_value'   => $this->coalesce($current_value_for('type'), 'event_subscribed_totals'),
 								'allow_arbitrary' => FALSE,
 								'options'         => array(
-									'subscribed_totals'                   => __('Actual/Current Subscr. Totals', $this->plugin->text_domain),
-									'event_subscribed_totals'             => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
-									'event_subscribed_most_popular_posts' => __('Most Popular Posts (Based on Event Logs)', $this->plugin->text_domain),
+									'subscribed_totals'                    => __('Actual/Current Subscr. Totals', $this->plugin->text_domain),
+									'event_subscribed_totals'              => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
+									'event_subscribed_most_popular_posts'  => __('Most Popular Posts (Based on Event Logs)', $this->plugin->text_domain),
+									'event_subscribed_least_popular_posts' => __('Least Popular Posts (Based on Event Logs)', $this->plugin->text_domain),
 								),
 							)),
 						$_form_fields->input_row(

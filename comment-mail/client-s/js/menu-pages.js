@@ -378,9 +378,12 @@
 			    {
 				    var $this = $(this), val = $this.val(),
 					    $statsView = $this.closest('.pmp-stats-view'),
-					    $byTr = $statsView.find('tr.pmp-stats-form-by');
-
-				    $byTr.css({opacity: val === 'event_subscribed_most_popular_posts' ? 0.2 : 1});
+					    $byTr = $statsView.find('tr.pmp-stats-form-by'),
+					    byExclusionTypes = [
+						    'event_subscribed_most_popular_posts',
+						    'event_subscribed_least_popular_posts'
+					    ];
+				    $byTr.css({opacity: $.inArray(val, byExclusionTypes) !== -1 ? 0.2 : 1});
 			    }).trigger('change');
 
 		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

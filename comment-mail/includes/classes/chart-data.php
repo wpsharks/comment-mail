@@ -294,6 +294,60 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @throws \exception If there is a query failure.
 			 */
+			protected function subs_overview__event_subscribed_least_popular_posts()
+			{
+				$labels = $data = array(); // Initialize.
+
+				$sql = "SELECT COUNT(*) AS `total_subs`, `post_id`".
+				       " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
+
+				       " WHERE 1=1". // Initialize where clause.
+
+				       " AND `post_id` > '0'".
+				       " AND `status` = 'subscribed'". // Subscribed status only.
+				       " AND `status_before` IN('', 'unconfirmed')".
+
+				       " AND `time` BETWEEN '".esc_sql($this->chart->from_time)."'".
+				       "             AND '".esc_sql($this->chart->to_time)."'".
+
+				       " GROUP BY `post_id`".
+				       " ORDER BY `total_subs` ASC".
+
+				       " LIMIT 25";
+
+				if(($results = $this->plugin->utils_db->wp->get_results($sql)))
+					foreach(($results = $this->plugin->utils_db->typify_deep($results)) as $_result)
+					{
+						$_result_post       = get_post($_result->post_id);
+						$_result_post_title = $_result_post ? ' — '.$this->plugin->utils_string->clip($_result_post->post_title, 20) : '';
+
+						$labels[] = sprintf(__('Post ID #%1$s%2$s', $this->plugin->text_domain), $_result->post_id, $_result_post_title);
+						$data[]   = (integer)$_result->total_subs;
+					}
+				unset($_result, $_result_post, $_result_post_title); // Housekeeping.
+
+				return array('data'    => array('labels'   => $labels,
+				                                'datasets' => array(
+					                                array_merge($this->colors, array(
+						                                'label' => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
+						                                'data'  => $data,
+					                                )),
+				                                )),
+				             'options' => array(
+					             'scaleLabel'      => '<%=value%>',
+					             'tooltipTemplate' => '<%if (label){%><%=label%>: <%}%><%= value %> '.__('subscriptions', $this->plugin->text_domain),
+				             ));
+			}
+
+			/**
+			 * Chart data for a particular view.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array An array of all chart data.
+			 *
+			 * @throws \exception If there is a query failure.
+			 */
 			protected function subs_by_post_id_()
 			{
 				return $this->{__FUNCTION__.'_'.$this->chart->type}();
@@ -421,6 +475,7 @@ namespace comment_mail // Root namespace.
 						'subscribed_totals',
 						'event_subscribed_totals',
 						'event_subscribed_most_popular_posts',
+						'event_subscribed_least_popular_posts',
 					), TRUE)
 				) $this->errors[] = __('Missing or invalid Chart Type. Please try again.', $this->plugin->text_domain);
 

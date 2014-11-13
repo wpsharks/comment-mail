@@ -184,6 +184,7 @@ namespace comment_mail // Root namespace.
 				{
 					$sub_insert_data = array(
 						'post_id' => $post_id,
+						'status'  => 'subscribed',
 						'deliver' => 'asap',
 
 						'fname'   => $sub->fname,
@@ -201,6 +202,7 @@ namespace comment_mail // Root namespace.
 					$_sub_insert_data = array(
 						'post_id'    => $post_id,
 						'comment_id' => $_comment_id,
+						'status'     => 'subscribed',
 						'deliver'    => 'asap',
 
 						'fname'      => $sub->fname,
