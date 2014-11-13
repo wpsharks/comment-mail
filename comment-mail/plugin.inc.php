@@ -814,9 +814,9 @@ namespace comment_mail
 			 */
 			public function _enqueue_post_admin_styles()
 			{
-				if($this->utils_env->is_menu_page('post.php')
-				   || $this->utils_env->is_menu_page('post-new.php')
-				) $this->_enqueue_post_admin_styles();
+				if(!$this->utils_env->is_menu_page('post.php')
+				   && !$this->utils_env->is_menu_page('post-new.php')
+				) return; // Not applicable.
 
 				$deps = array('font-awesome', 'sharkicons'); // Dependencies.
 
