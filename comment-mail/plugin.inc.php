@@ -312,9 +312,6 @@ namespace comment_mail
 					'new_subs_enable'                                                      => '1', // `0|1`; enable?
 					'queue_processing_enable'                                              => '1', // `0|1`; enable?
 
-					// @TODO add options to allow for disabling event logging for subs and/or the queue.
-					//    Or, if not that; allow for a data retention period to be configured.
-
 					'comment_form_template_enable'                                         => '1', // `0|1`; enable?
 					'comment_form_scripts_enable'                                          => '1', // `0|1`; enable?
 
@@ -408,6 +405,10 @@ namespace comment_mail
 					'sub_cleaner_max_time'                                                 => '30', // In seconds.
 					'unconfirmed_expiration_time'                                          => '60 days', // `strtotime()` compatible.
 					'trashed_expiration_time'                                              => '60 days', // `strtotime()` compatible.
+
+					'log_cleaner_max_time'                                                 => '30', // In seconds.
+					'sub_event_log_expiration_time'                                        => '', // `strtotime()` compatible.
+					'queue_event_log_expiration_time'                                      => '', // `strtotime()` compatible.
 
 					/* Related to meta boxes. */
 
@@ -539,11 +540,15 @@ namespace comment_mail
 					wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_sub_cleaner');
 					wp_schedule_event(time() + 60, 'hourly', '_cron_'.__NAMESPACE__.'_sub_cleaner');
 
+					wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_log_cleaner');
+					wp_schedule_event(time() + 60, 'hourly', '_cron_'.__NAMESPACE__.'_log_cleaner');
+
 					$this->options['crons_setup'] = (string)time();
 					update_option(__NAMESPACE__.'_options', $this->options);
 				}
 				add_action('_cron_'.__NAMESPACE__.'_queue_processor', array($this, 'queue_processor'));
 				add_action('_cron_'.__NAMESPACE__.'_sub_cleaner', array($this, 'sub_cleaner'));
+				add_action('_cron_'.__NAMESPACE__.'_log_cleaner', array($this, 'log_cleaner'));
 
 				/*
 				 * Fire setup completion hooks.
@@ -1845,6 +1850,18 @@ namespace comment_mail
 			public function sub_cleaner()
 			{
 				new sub_cleaner();
+			}
+
+			/**
+			 * Log cleaner.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @attaches-to `_cron_'.__NAMESPACE__.'_log_cleaner` action.
+			 */
+			public function log_cleaner()
+			{
+				new log_cleaner();
 			}
 		}
 
