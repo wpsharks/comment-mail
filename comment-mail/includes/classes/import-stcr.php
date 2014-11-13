@@ -180,33 +180,38 @@ namespace comment_mail // Root namespace.
 				if($sub->status !== 'Y' && $sub->status !== 'R')
 					return; // Not an active subscriber.
 
-				if(!($comment_ids = $this->sub_comment_ids($post_id, $sub->email)))
-					return; // Not possible; could not find any comment IDs.
-
-				if($sub->status === 'R') // Specific comment(s); i.e. "Replies Only"?
+				if($sub->status === 'Y') // All comments?
 				{
-					foreach($comment_ids as $_comment_id) // Comment subscriptions.
-					{
-						new sub_injector(NULL, $_comment_id, array(
-							'type'         => 'comment',
-							'deliver'      => 'asap',
-							'auto_confirm' => TRUE,
-						)); // With behavioral args.
+					$sub_insert_data = array(
+						'post_id' => $post_id,
+						'deliver' => 'asap',
 
-						$this->total_imported_subs++;
-					}
-					unset($_comment_id); // A little housekeeping.
+						'fname'   => $sub->fname,
+						'email'   => $sub->email,
+					);
+					$sub_insert_args = array('auto_confirm' => TRUE);
+					$sub_inserter    = new sub_inserter($sub_insert_data, $sub_insert_args);
+
+					if($sub_inserter->did_insert()) $this->total_imported_subs++;
 				}
-				else // Subscribe them to all comments on this post ID.
+				# Otherwise, specific comment(s) only; i.e. "Replies Only".
+
+				foreach($this->sub_comment_ids($post_id, $sub->email) as $_comment_id)
 				{
-					new sub_injector(NULL, $comment_ids[0], array(
-						'type'         => 'comments',
-						'deliver'      => 'asap',
-						'auto_confirm' => TRUE,
-					)); // With behavioral args.
+					$_sub_insert_data = array(
+						'post_id'    => $post_id,
+						'comment_id' => $_comment_id,
+						'deliver'    => 'asap',
 
-					$this->total_imported_subs++;
+						'fname'      => $sub->fname,
+						'email'      => $sub->email,
+					);
+					$_sub_insert_args = array('auto_confirm' => TRUE);
+					$_sub_inserter    = new sub_inserter($_sub_insert_data, $_sub_insert_args);
+
+					if($_sub_inserter->did_insert()) $this->total_imported_subs++;
 				}
+				unset($_comment_id, $_sub_insert_data, $_sub_insert_args, $_sub_inserter); // Housekeeping.
 			}
 
 			/**
@@ -219,6 +224,8 @@ namespace comment_mail // Root namespace.
 			 * @return \stdClass[] Array of objects; i.e. StCR subscribers for the post ID.
 			 *
 			 *    Each object in the array will contain the following properties.
+			 *
+			 *    - `(string)fname` The subscriber's first name (based on email address).
 			 *
 			 *    - `(string)email` The subscriber's email address (lowercase).
 			 *          Note: each key in the array is also indexed by this email address.
@@ -275,7 +282,8 @@ namespace comment_mail // Root namespace.
 					if(!isset($subs[$_email]) || ($_status === 'R' && $subs[$_email]->status === 'Y'))
 						// Give precedence to any subscription that chose to receive "Replies Only".
 						// See: <https://github.com/websharks/comment-mail/issues/7#issuecomment-57252200>
-						$subs[$_email] = (object)array('email' => $_email, 'time' => $_time, 'status' => $_status);
+						$subs[$_email] = (object)array('fname' => $this->plugin->utils_string->first_name('', $_email),
+						                               'email' => $_email, 'time' => $_time, 'status' => $_status);
 				}
 				unset($_result, $_email, $_local_datetime, $_status); // Housekeeping.
 
