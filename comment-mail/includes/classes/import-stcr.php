@@ -190,9 +190,7 @@ namespace comment_mail // Root namespace.
 						'fname'   => $sub->fname,
 						'email'   => $sub->email,
 					);
-					$sub_insert_args = array('auto_confirm' => TRUE);
-					$sub_inserter    = new sub_inserter($sub_insert_data, $sub_insert_args);
-
+					$sub_inserter    = new sub_inserter($sub_insert_data);
 					if($sub_inserter->did_insert()) $this->total_imported_subs++;
 				}
 				# Otherwise, specific comment(s) only; i.e. "Replies Only".
@@ -208,12 +206,10 @@ namespace comment_mail // Root namespace.
 						'fname'      => $sub->fname,
 						'email'      => $sub->email,
 					);
-					$_sub_insert_args = array('auto_confirm' => TRUE);
-					$_sub_inserter    = new sub_inserter($_sub_insert_data, $_sub_insert_args);
-
+					$_sub_inserter    = new sub_inserter($_sub_insert_data);
 					if($_sub_inserter->did_insert()) $this->total_imported_subs++;
 				}
-				unset($_comment_id, $_sub_insert_data, $_sub_insert_args, $_sub_inserter); // Housekeeping.
+				unset($_comment_id, $_sub_insert_data, $_sub_inserter); // Housekeeping.
 			}
 
 			/**
