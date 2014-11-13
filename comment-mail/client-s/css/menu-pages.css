@@ -549,19 +549,15 @@ Menu page heading styles.
 	display         : inline-block;
 	margin          : 1em 0 0 0;
 
-	opacity         : 0.25;
 	border-radius   : 4px;
 	background      : transparent;
 	padding         : .25em .5em .25em .5em;
 }
-.comment-mail-menu-page .pmp-heading .pmp-heading-links a:hover,
 .comment-mail-menu-page .pmp-heading .pmp-heading-links a.pmp-active
 {
-	opacity : 1;
-}
-.comment-mail-menu-page .pmp-heading .pmp-heading-links a.pmp-active
-{
-	background : #FFFFFF;
+	font-weight : bold;
+	color       : #307D27;
+	background  : #FFFFFF;
 }
 .comment-mail-menu-page .pmp-heading .pmp-heading-links a:first-child
 {
