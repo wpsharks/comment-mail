@@ -362,13 +362,19 @@ namespace comment_mail // Root namespace.
 				nocache_headers(); // No browser cache.
 				header('Content-Type: text/html; charset=UTF-8');
 
-				$class_var        = str_replace('\\', '_', __CLASS__);
-				$child_status_var = $class_var.'_child_status';
-				$child_status_uri = add_query_arg($child_status_var, '1');
+				$child_status_var = // Child identifier.
+					str_replace('\\', '_', __CLASS__).'_child_status';
+
+				$child_status_request_args = array(
+					$child_status_var => 1, // Child process identifier.
+					__NAMESPACE__     => array('import' => array('type' => 'stcr')),
+				);
+				$child_status_url          = $this->plugin->utils_url->nonce();
+				$child_status_url          = add_query_arg(urlencode_deep($child_status_request_args), $child_status_url);
 
 				if(!empty($_REQUEST[$child_status_var]))
-					exit($this->child_output_status($child_status_uri));
-				exit($this->parent_output_status($child_status_uri));
+					exit($this->child_output_status());
+				exit($this->parent_output_status($child_status_url));
 			}
 
 			/**
@@ -376,11 +382,11 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @param string $child_status_uri Child status URI.
+			 * @param string $child_status_url Child status URL.
 			 *
 			 * @return string HTML markup for the status.
 			 */
-			protected function parent_output_status($child_status_uri)
+			protected function parent_output_status($child_status_url)
 			{
 				$status = '<!DOCTYPE html>'."\n";
 				$status .= '<html>'."\n";
@@ -431,7 +437,7 @@ namespace comment_mail // Root namespace.
 				           '      <code id="total-imported-subs">'.esc_html($this->total_imported_subs).'</code> '.__('subscriptions', $this->plugin->text_domain).'.'."\n";
 
 				if($this->has_more_posts_to_import) // Import will contiue w/ child processes?
-					$status .= '   <iframe src="'.esc_attr((string)$child_status_uri).'" style="width:1px; height:1px; border:0; visibility:hidden;"></iframe>';
+					$status .= '   <iframe src="'.esc_attr((string)$child_status_url).'" style="width:1px; height:1px; border:0; visibility:hidden;"></iframe>';
 				else $status .= ' <div><strong>'.__('Import complete!', $this->plugin->text_domain).'</strong></div>';
 
 				$status .= '   </body>'."\n";
