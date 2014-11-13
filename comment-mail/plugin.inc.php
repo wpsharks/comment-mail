@@ -784,8 +784,9 @@ namespace comment_mail
 			 */
 			public function enqueue_admin_styles()
 			{
-				if($this->utils_env->is_menu_page('post.php'))
-					$this->_enqueue_post_admin_styles();
+				if($this->utils_env->is_menu_page('post.php')
+				   || $this->utils_env->is_menu_page('post-new.php')
+				) $this->_enqueue_post_admin_styles();
 
 				if(!$this->utils_env->is_menu_page(__NAMESPACE__.'*'))
 					return; // Nothing to do; not applicable.
@@ -813,8 +814,9 @@ namespace comment_mail
 			 */
 			public function _enqueue_post_admin_styles()
 			{
-				if(!$this->utils_env->is_menu_page('post.php'))
-					return; // Nothing to do; not applicable.
+				if($this->utils_env->is_menu_page('post.php')
+				   || $this->utils_env->is_menu_page('post-new.php')
+				) $this->_enqueue_post_admin_styles();
 
 				$deps = array('font-awesome', 'sharkicons'); // Dependencies.
 
