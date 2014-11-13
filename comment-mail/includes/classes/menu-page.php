@@ -889,11 +889,11 @@ namespace comment_mail // Root namespace.
 				                '  <tbody>'.
 				                $form_fields->input_row(
 					                array(
-						                'label'         => __('Unconfirmed Expiration Time', $this->plugin->text_domain),
+						                'label'         => sprintf(__('Unconfirmed Expiration Time (<code>%1$s</code> Compatible)', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')),
 						                'placeholder'   => __('e.g. 60 days', $this->plugin->text_domain),
 						                'name'          => 'unconfirmed_expiration_time',
 						                'current_value' => $current_value_for('unconfirmed_expiration_time'),
-						                'notes_after'   => '<p>'.sprintf(__('How long should unconfirmed subscriptions be kept in the database? e.g. <code>2 days</code>, <code>1 week</code>, <code>2 months</code>. Anything compatible with PHP\'s %1$s function will work here.', $this->plugin->text_domain).'</p>'.
+						                'notes_after'   => '<p>'.sprintf(__('How long should unconfirmed subscriptions be kept in the database? e.g. <code>2 days</code>, <code>1 week</code>, <code>2 months</code>. Anything compatible with PHP\'s <code>%1$s</code> function will work here.', $this->plugin->text_domain).'</p>'.
 						                                                 '<p class="pmp-note pmp-info">'.__('If you empty this field, unconfirmed subscriptions will not be cleaned, they will remain indefinitely.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')).'</p>'
 					                )).
 				                '  </tbody>'.
@@ -903,11 +903,11 @@ namespace comment_mail // Root namespace.
 				                '  <tbody>'.
 				                $form_fields->input_row(
 					                array(
-						                'label'         => __('Trash Expiration Time', $this->plugin->text_domain),
+						                'label'         => sprintf(__('Trash Expiration Time (<code>%1$s</code> Compatible)', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')),
 						                'placeholder'   => __('e.g. 60 days', $this->plugin->text_domain),
 						                'name'          => 'trashed_expiration_time',
 						                'current_value' => $current_value_for('trashed_expiration_time'),
-						                'notes_after'   => '<p>'.sprintf(__('How long should trashed subscriptions be kept in the database? e.g. <code>2 days</code>, <code>1 week</code>, <code>2 months</code>. Anything compatible with PHP\'s %1$s function will work here.', $this->plugin->text_domain).'</p>'.
+						                'notes_after'   => '<p>'.sprintf(__('How long should trashed subscriptions be kept in the database? e.g. <code>2 days</code>, <code>1 week</code>, <code>2 months</code>. Anything compatible with PHP\'s <code>%1$s</code> function will work here.', $this->plugin->text_domain).'</p>'.
 						                                                 '<p class="pmp-note pmp-info">'.__('If you empty this field, trashed subscriptions will not be cleaned, they will remain indefinitely.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')).'</p>'
 					                )).
 				                '  </tbody>'.
@@ -920,29 +920,29 @@ namespace comment_mail // Root namespace.
 				/* ----------------------------------------------------------------------------------------- */
 
 				$_panel_body = '<table>'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'number',
-						                'label'         => __('Max Execution Time (In Seconds)', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. 30', $this->plugin->text_domain),
-						                'name'          => 'log_cleaner_max_time',
-						                'current_value' => $current_value_for('log_cleaner_max_time'),
-						                'other_attrs'   => 'min="10" max="3600"',
-						                'notes_after'   => '<p>'.sprintf(__('The Log Cleaner can automatically delete very old event log entries. It runs via %1$s every hour. This setting determines how much time you want to allow each cleaning process to run for. The minimum allowed value is <code>10</code> seconds. Maximum allowed value is <code>3600</code> seconds. A good default value is <code>30</code> seconds. That\'s more than adequate for most sites.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://www.smashingmagazine.com/2013/10/16/schedule-events-using-wordpress-cron/', 'WP-Cron')).'</p>'
-					                )).
-				                '  </tbody>'.
-				                '</table>';
+				               '  <tbody>'.
+				               $form_fields->input_row(
+					               array(
+						               'type'          => 'number',
+						               'label'         => __('Max Execution Time (In Seconds)', $this->plugin->text_domain),
+						               'placeholder'   => __('e.g. 30', $this->plugin->text_domain),
+						               'name'          => 'log_cleaner_max_time',
+						               'current_value' => $current_value_for('log_cleaner_max_time'),
+						               'other_attrs'   => 'min="10" max="3600"',
+						               'notes_after'   => '<p>'.sprintf(__('The Log Cleaner can automatically delete very old event log entries. It runs via %1$s every hour. This setting determines how much time you want to allow each cleaning process to run for. The minimum allowed value is <code>10</code> seconds. Maximum allowed value is <code>3600</code> seconds. A good default value is <code>30</code> seconds. That\'s more than adequate for most sites.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://www.smashingmagazine.com/2013/10/16/schedule-events-using-wordpress-cron/', 'WP-Cron')).'</p>'
+					               )).
+				               '  </tbody>'.
+				               '</table>';
 
 				$_panel_body .= '<table>'.
 				                '  <tbody>'.
 				                $form_fields->input_row(
 					                array(
-						                'label'         => __('Sub. Event Log Expiration Time', $this->plugin->text_domain),
+						                'label'         => sprintf(__('Sub. Event Log Expiration Time (<code>%1$s</code> Compatible)', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')),
 						                'placeholder'   => __('e.g. 7 years', $this->plugin->text_domain),
 						                'name'          => 'sub_event_log_expiration_time',
 						                'current_value' => $current_value_for('sub_event_log_expiration_time'),
-						                'notes_after'   => '<p>'.sprintf(__('How long should should subscription event log entries be kept in the database? e.g. <code>90 days</code>, <code>1 year</code>, <code>10 years</code>. Anything compatible with PHP\'s %1$s function will work here.', $this->plugin->text_domain).'</p>'.
+						                'notes_after'   => '<p>'.sprintf(__('How long should should subscription event log entries be kept in the database? e.g. <code>90 days</code>, <code>1 year</code>, <code>10 years</code>. Anything compatible with PHP\'s <code>%1$s</code> function will work here.', $this->plugin->text_domain).'</p>'.
 						                                                 '<p class="pmp-note pmp-info">'.__('If you empty this field, log entries will not be cleaned; they will remain indefinitely (default behavior). By default, log entries remain indefinitely since these are the underlying data used for statistical reporting. However, if you are not concerned about long-term historical data, feel free to define an expiration time. If you do, it is recommended that your expiration time be <code>1 year</code> (or more) so that statistical reporting will still function properly for short-term data.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')).'</p>'
 					                )).
 				                '  </tbody>'.
@@ -952,11 +952,11 @@ namespace comment_mail // Root namespace.
 				                '  <tbody>'.
 				                $form_fields->input_row(
 					                array(
-						                'label'         => __('Queue Event Log Expiration Time', $this->plugin->text_domain),
+						                'label'         => sprintf(__('Queue Event Log Expiration Time (<code>%1$s</code> Compatible)', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')),
 						                'placeholder'   => __('e.g. 7 years', $this->plugin->text_domain),
 						                'name'          => 'queue_event_log_expiration_time',
 						                'current_value' => $current_value_for('queue_event_log_expiration_time'),
-						                'notes_after'   => '<p>'.sprintf(__('How long should should queue event log entries be kept in the database? e.g. <code>90 days</code>, <code>1 year</code>, <code>10 years</code>. Anything compatible with PHP\'s %1$s function will work here.', $this->plugin->text_domain).'</p>'.
+						                'notes_after'   => '<p>'.sprintf(__('How long should should queue event log entries be kept in the database? e.g. <code>90 days</code>, <code>1 year</code>, <code>10 years</code>. Anything compatible with PHP\'s <code>%1$s</code> function will work here.', $this->plugin->text_domain).'</p>'.
 						                                                 '<p class="pmp-note pmp-info">'.__('If you empty this field, log entries will not be cleaned; they will remain indefinitely (default behavior). By default, log entries remain indefinitely since these are the underlying data used for statistical reporting. However, if you are not concerned about long-term historical data, feel free to define an expiration time. If you do, it is recommended that your expiration time be <code>1 year</code> (or more) so that statistical reporting will still function properly for short-term data.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')).'</p>'
 					                )).
 				                '  </tbody>'.
@@ -969,19 +969,19 @@ namespace comment_mail // Root namespace.
 				/* ----------------------------------------------------------------------------------------- */
 
 				$_panel_body = '<table>'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'number',
-						                'label'         => __('Max Execution Time (In Seconds)', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. 30', $this->plugin->text_domain),
-						                'name'          => 'queue_processor_max_time',
-						                'current_value' => $current_value_for('queue_processor_max_time'),
-						                'other_attrs'   => 'min="10" max="300"',
-						                'notes_after'   => '<p>'.sprintf(__('The Queue Processor sends email notifications. It runs via %1$s every 5 minutes. This setting determines how much time you want to allow each process to run for. The minimum allowed value is <code>10</code> seconds. Maximum allowed value is <code>300</code> seconds. A good default value is <code>30</code> seconds. That\'s more than adequate for most sites.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://www.smashingmagazine.com/2013/10/16/schedule-events-using-wordpress-cron/', 'WP-Cron')).'</p>'
-					                )).
-				                '  </tbody>'.
-				                '</table>';
+				               '  <tbody>'.
+				               $form_fields->input_row(
+					               array(
+						               'type'          => 'number',
+						               'label'         => __('Max Execution Time (In Seconds)', $this->plugin->text_domain),
+						               'placeholder'   => __('e.g. 30', $this->plugin->text_domain),
+						               'name'          => 'queue_processor_max_time',
+						               'current_value' => $current_value_for('queue_processor_max_time'),
+						               'other_attrs'   => 'min="10" max="300"',
+						               'notes_after'   => '<p>'.sprintf(__('The Queue Processor sends email notifications. It runs via %1$s every 5 minutes. This setting determines how much time you want to allow each process to run for. The minimum allowed value is <code>10</code> seconds. Maximum allowed value is <code>300</code> seconds. A good default value is <code>30</code> seconds. That\'s more than adequate for most sites.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://www.smashingmagazine.com/2013/10/16/schedule-events-using-wordpress-cron/', 'WP-Cron')).'</p>'
+					               )).
+				               '  </tbody>'.
+				               '</table>';
 
 				$_panel_body .= '<table>'.
 				                '  <tbody>'.
@@ -1004,7 +1004,7 @@ namespace comment_mail // Root namespace.
 				                $form_fields->input_row(
 					                array(
 						                'type'          => 'number',
-						                'label'         => __('Max Email Notifications Per Process', $this->plugin->text_domain),
+						                'label'         => __('Max Email Notifications Per Process (Integer)', $this->plugin->text_domain),
 						                'placeholder'   => __('e.g. 100', $this->plugin->text_domain),
 						                'name'          => 'queue_processor_max_limit',
 						                'current_value' => $current_value_for('queue_processor_max_limit'),
@@ -1022,7 +1022,7 @@ namespace comment_mail // Root namespace.
 				                $form_fields->input_row(
 					                array(
 						                'type'          => 'number',
-						                'label'         => __('Real-Time Queue Processor; Max Email Notifications in Real-Time', $this->plugin->text_domain),
+						                'label'         => __('Real-Time Queue Processor; Max Email Notifications in Real-Time (Integer)', $this->plugin->text_domain),
 						                'placeholder'   => __('e.g. 5', $this->plugin->text_domain),
 						                'name'          => 'queue_processor_realtime_max_limit',
 						                'current_value' => $current_value_for('queue_processor_realtime_max_limit'),
