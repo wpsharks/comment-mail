@@ -131,8 +131,11 @@ namespace comment_mail // Root namespace.
 
 				if($this->oby_sub_id) // Resolve conflicts.
 					$this->purging = $this->cleaning = FALSE;
+
 				if($this->purging) $this->cleaning = FALSE;
+
 				if($this->cleaning) $this->purging = FALSE;
+
 				if($this->purging || $this->cleaning)
 					$this->oby_sub_id = 0;
 

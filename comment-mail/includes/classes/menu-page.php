@@ -2357,6 +2357,7 @@ namespace comment_mail // Root namespace.
 								'options'         => array(
 									'subscribed_totals'                    => __('Actual/Current Subscr. Totals', $this->plugin->text_domain),
 									'event_subscribed_totals'              => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
+									'event_unsubscribe_totals'             => __('Unsubscribe Totals (Based on Event Logs)', $this->plugin->text_domain),
 									'event_subscribed_most_popular_posts'  => __('Most Popular Posts (Based on Event Logs)', $this->plugin->text_domain),
 									'event_subscribed_least_popular_posts' => __('Least Popular Posts (Based on Event Logs)', $this->plugin->text_domain),
 								),
@@ -2421,6 +2422,18 @@ namespace comment_mail // Root namespace.
 							)),
 						$_form_fields->select_row(
 							array(
+								'label'           => __('Chart Type', $this->plugin->text_domain),
+								'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+								'name'            => 'type',
+								'current_value'   => $this->coalesce($current_value_for('type'), 'event_subscribed_totals'),
+								'allow_arbitrary' => FALSE,
+								'options'         => array(
+									'subscribed_totals'       => __('Actual/Current Subscr. Totals', $this->plugin->text_domain),
+									'event_subscribed_totals' => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
+								),
+							)),
+						$_form_fields->select_row(
+							array(
 								'label'               => __('Post ID', $this->plugin->text_domain),
 								'placeholder'         => __('Select an Option...', $this->plugin->text_domain),
 								'name'                => 'post_id',
@@ -2432,18 +2445,6 @@ namespace comment_mail // Root namespace.
 									'maxlength'                => 20,
 									'current_value_empty_on_0' => TRUE,
 									'other_attrs'              => 'min="1" max="18446744073709551615"',
-								),
-							)),
-						$_form_fields->select_row(
-							array(
-								'label'           => __('Chart Type', $this->plugin->text_domain),
-								'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-								'name'            => 'type',
-								'current_value'   => $this->coalesce($current_value_for('type'), 'event_subscribed_totals'),
-								'allow_arbitrary' => FALSE,
-								'options'         => array(
-									'subscribed_totals'       => __('Actual/Current Subscr. Totals', $this->plugin->text_domain),
-									'event_subscribed_totals' => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
 								),
 							)),
 						$_form_fields->input_row(

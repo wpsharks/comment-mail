@@ -206,6 +206,7 @@ namespace comment_mail // Root namespace.
 				{
 					$this->plugin->utils_sub->confirm($this->sub->ID, array(
 						'process_events' => $this->process_events,
+						'user_initiated' => $this->user_initiated,
 					)); // With behavioral args.
 
 					return ($this->auto_confirmed = TRUE);
