@@ -671,18 +671,19 @@ namespace comment_mail // Root namespace.
 						'user_initiated' => $this->user_initiated,
 					))); // Log event data.
 				}
-				if($this->process_confirmation && $this->sub->status === 'unconfirmed')
-				{
-					$this->sub_confirmer = new sub_confirmer($this->sub->ID, array(
-						'auto_confirm'   => $this->auto_confirm,
-						'process_events' => $this->process_events,
-						'user_initiated' => $this->user_initiated,
-					)); // With behavioral args.
+				if($this->auto_confirm || $this->process_confirmation)
+					if($this->sub->status === 'unconfirmed')
+					{
+						$this->sub_confirmer = new sub_confirmer($this->sub->ID, array(
+							'auto_confirm'   => $this->auto_confirm,
+							'process_events' => $this->process_events,
+							'user_initiated' => $this->user_initiated,
+						)); // With behavioral args.
 
-					if($this->sub_confirmer->sent_email_successfully())
-						$this->successes['sent_confirmation_email_successfully'] // Success entry!
-							= __('Request for email confirmation sent successfully.', $this->plugin->text_domain);
-				}
+						if($this->sub_confirmer->sent_email_successfully())
+							$this->successes['sent_confirmation_email_successfully'] // Success entry!
+								= __('Request for email confirmation sent successfully.', $this->plugin->text_domain);
+					}
 				$this->overwrite_any_others_after_insert_update(); // Overwrites any others.
 			}
 
@@ -729,18 +730,19 @@ namespace comment_mail // Root namespace.
 						'user_initiated' => $this->user_initiated,
 					)), $sub_before); // Log event data.
 				}
-				if($this->process_confirmation && $this->sub->status === 'unconfirmed')
-				{
-					$this->sub_confirmer = new sub_confirmer($this->sub->ID, array(
-						'auto_confirm'   => $this->auto_confirm,
-						'process_events' => $this->process_events,
-						'user_initiated' => $this->user_initiated,
-					)); // With behavioral args.
+				if($this->auto_confirm || $this->process_confirmation)
+					if($this->sub->status === 'unconfirmed')
+					{
+						$this->sub_confirmer = new sub_confirmer($this->sub->ID, array(
+							'auto_confirm'   => $this->auto_confirm,
+							'process_events' => $this->process_events,
+							'user_initiated' => $this->user_initiated,
+						)); // With behavioral args.
 
-					if($this->sub_confirmer->sent_email_successfully())
-						$this->successes['sent_confirmation_email_successfully'] // Success entry!
-							= __('Request for email confirmation sent successfully.', $this->plugin->text_domain);
-				}
+						if($this->sub_confirmer->sent_email_successfully())
+							$this->successes['sent_confirmation_email_successfully'] // Success entry!
+								= __('Request for email confirmation sent successfully.', $this->plugin->text_domain);
+					}
 				$this->overwrite_any_others_after_insert_update(); // Overwrites any others.
 			}
 
@@ -792,9 +794,6 @@ namespace comment_mail // Root namespace.
 			{
 				if(isset($this->auto_confirm))
 					return; // Already set.
-
-				if(!$this->process_confirmation)
-					return; // Not applicable.
 
 				if(($this->new_value_for('status')) !== 'unconfirmed')
 					return; // Not applicable.
