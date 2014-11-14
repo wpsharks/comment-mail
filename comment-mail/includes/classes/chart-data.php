@@ -192,7 +192,9 @@ namespace comment_mail // Root namespace.
 				                                )),
 				             'options' => array(
 					             'scaleLabel'      => '<%=value%>',
-					             'tooltipTemplate' => '<%if (label){%><%=label%>: <%}%><%= value %> '.__('subscriptions', $this->plugin->text_domain),
+					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
+					                                  '<%if(value < 1 || value > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
+					                                  '<%if(value === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
 				             ));
 			}
 
@@ -255,7 +257,9 @@ namespace comment_mail // Root namespace.
 				                                )),
 				             'options' => array(
 					             'scaleLabel'      => '<%=value%>',
-					             'tooltipTemplate' => '<%if (label){%><%=label%>: <%}%><%= value %> '.__('subscriptions', $this->plugin->text_domain),
+					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
+					                                  '<%if(value < 1 || value > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
+					                                  '<%if(value === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
 				             ));
 			}
 
@@ -318,7 +322,9 @@ namespace comment_mail // Root namespace.
 				                                )),
 				             'options' => array(
 					             'scaleLabel'      => '<%=value%>',
-					             'tooltipTemplate' => '<%if (label){%><%=label%>: <%}%><%= value %> '.__('subscriptions', $this->plugin->text_domain),
+					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
+					                                  '<%if(value < 1 || value > 1){%>'.__('confirmations', $this->plugin->text_domain).'<%}%>'.
+					                                  '<%if(value === 1){%>'.__('confirmation', $this->plugin->text_domain).'<%}%>',
 				             ));
 			}
 
@@ -381,7 +387,9 @@ namespace comment_mail // Root namespace.
 				                                )),
 				             'options' => array(
 					             'scaleLabel'      => '<%=value%>',
-					             'tooltipTemplate' => '<%if (label){%><%=label%>: <%}%><%= value %> '.__('subscriptions', $this->plugin->text_domain),
+					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
+					                                  '<%if(value < 1 || value > 1){%>'.__('unsubscribes', $this->plugin->text_domain).'<%}%>'.
+					                                  '<%if(value === 1){%>'.__('unsubscribe', $this->plugin->text_domain).'<%}%>',
 				             ));
 			}
 
@@ -446,7 +454,9 @@ namespace comment_mail // Root namespace.
 				                                )),
 				             'options' => array(
 					             'scaleLabel'      => '<%=value%>',
-					             'tooltipTemplate' => '<%if (label){%><%=label%>: <%}%><%= value %> '.__('subscriptions', $this->plugin->text_domain),
+					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
+					                                  '<%if(value < 1 || value > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
+					                                  '<%if(value === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
 				             ));
 			}
 
@@ -511,7 +521,9 @@ namespace comment_mail // Root namespace.
 				                                )),
 				             'options' => array(
 					             'scaleLabel'      => '<%=value%>',
-					             'tooltipTemplate' => '<%if (label){%><%=label%>: <%}%><%= value %> '.__('subscriptions', $this->plugin->text_domain),
+					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
+					                                  '<%if(value < 1 || value > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
+					                                  '<%if(value === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
 				             ));
 			}
 
