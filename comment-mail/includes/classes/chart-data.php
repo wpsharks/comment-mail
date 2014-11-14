@@ -296,10 +296,10 @@ namespace comment_mail // Root namespace.
 					        ($this->chart->post_id // Specific post ID?
 						        ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
 
-					        " AND `event` IN('inserted','updated')".
+					        " AND `event` IN('updated')".
 
 					        " AND `status` IN('subscribed')".
-					        " AND `status_before` IN('','unconfirmed')".
+					        " AND `status_before` IN('unconfirmed')".
 
 					        ($this->chart->user_initiated_only // User initiated only?
 						        ? " AND `user_initiated` > '0'" : '').
@@ -333,6 +333,75 @@ namespace comment_mail // Root namespace.
 					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
 					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('confirmations', $this->plugin->text_domain).'<%}%>'.
 					                                  '<%if(parseInt(value) === 1){%>'.__('confirmation', $this->plugin->text_domain).'<%}%>',
+				             ));
+			}
+
+			/**
+			 * Chart data for a particular view.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array An array of all chart data; for ChartJS.
+			 *
+			 * @throws \exception If there is a query failure.
+			 */
+			protected function subs_overview__event_suspension_totals()
+			{
+				$labels = $data = array(); // Initialize.
+
+				foreach($this->chart->time_periods as $_time_period)
+					$labels[] = $_time_period['from_label'].' - '.$_time_period['to_label'];
+				unset($_time_period); // Housekeeping.
+
+				foreach($this->chart->time_periods as $_time_period)
+				{
+					$_oby_sub_ids = $this->oby_sub_ids($_time_period['from_time'], $_time_period['to_time']);
+
+					$_sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
+					        " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
+
+					        " WHERE 1=1". // Initialize where clause.
+
+					        ($this->chart->post_id // Specific post ID?
+						        ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
+
+					        " AND `event` IN('updated')".
+
+					        " AND `status` IN('suspended')".
+					        " AND `status_before` IN('subscribed')".
+
+					        ($this->chart->user_initiated_only // User initiated only?
+						        ? " AND `user_initiated` > '0'" : '').
+
+					        " AND `time`". // In this time period only.
+					        "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
+					        "          AND '".esc_sql($_time_period['to_time'])."'".
+
+					        " AND `sub_id` NOT IN(".$_oby_sub_ids.")". // Exclude.
+
+					        " GROUP BY `sub_id`". // Unique subs only.
+
+					        " LIMIT 1"; // Only need one to check.
+
+					if($this->plugin->utils_db->wp->query($_sql) === FALSE)
+						throw new \exception(__('Query failure.', $this->plugin->text_domain));
+
+					$data[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
+				}
+				unset($_time_period, $_oby_sub_ids, $_sql); // Housekeeping.
+
+				return array('data'    => array('labels'   => $labels,
+				                                'datasets' => array(
+					                                array_merge($this->colors, array(
+						                                'label' => __('Suspension Totals (Based on Event Logs)', $this->plugin->text_domain),
+						                                'data'  => $data,
+					                                )),
+				                                )),
+				             'options' => array(
+					             'scaleLabel'      => '<%=value%>',
+					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
+					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('suspensions', $this->plugin->text_domain).'<%}%>'.
+					                                  '<%if(parseInt(value) === 1){%>'.__('suspension', $this->plugin->text_domain).'<%}%>',
 				             ));
 			}
 
@@ -593,7 +662,7 @@ namespace comment_mail // Root namespace.
 			protected function chart_is_valid()
 			{
 				if(!$this->view || !method_exists($this, $this->view.'_'))
-					$this->errors[] = __('Invalid Chart View.Please try again.', $this->plugin->text_domain);
+					$this->errors[] = __('Invalid Chart View. Please try again.', $this->plugin->text_domain);
 
 				if(!method_exists($this, $this->view.'__'.$this->chart->type))
 					$this->errors[] = __('Missing or invalid Chart Type. Please try again.', $this->plugin->text_domain);

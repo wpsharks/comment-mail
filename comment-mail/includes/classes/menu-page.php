@@ -2355,12 +2355,21 @@ namespace comment_mail // Root namespace.
 								'current_value'   => $this->coalesce($current_value_for('type'), 'event_subscribed_totals'),
 								'allow_arbitrary' => FALSE,
 								'options'         => array(
+									'@optgroup_open_subscr_totals'         => __('Subscr. Totals', $this->plugin->text_domain),
 									'subscribed_totals'                    => __('Actual/Current Subscr. Totals', $this->plugin->text_domain),
 									'event_subscribed_totals'              => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
+									'@optgroup_close_subscr_totals'        => '', // Close this group.
+
+									'@optgroup_open_status_changes'        => __('Status Changes', $this->plugin->text_domain),
 									'event_confirmation_totals'            => __('Confirmation Totals (Based on Event Logs)', $this->plugin->text_domain),
+									'event_suspension_totals'              => __('Suspension Totals (Based on Event Logs)', $this->plugin->text_domain),
 									'event_unsubscribe_totals'             => __('Unsubscribe Totals (Based on Event Logs)', $this->plugin->text_domain),
+									'@optgroup_close_status_changes'       => '', // Close this group.
+
+									'@optgroup_open_post_popularity'       => __('Post Popularity', $this->plugin->text_domain),
 									'event_subscribed_most_popular_posts'  => __('Most Popular Posts (Based on Event Logs)', $this->plugin->text_domain),
 									'event_subscribed_least_popular_posts' => __('Least Popular Posts (Based on Event Logs)', $this->plugin->text_domain),
+									'@optgroup_close_post_popularity'      => '', // Close this group.
 								),
 							)),
 						$_form_fields->input_row(
@@ -2404,7 +2413,7 @@ namespace comment_mail // Root namespace.
 
 				/* ----------------------------------------------------------------------------------------- */
 
-				$_postbox_view = 'subs_by_post_id'; // This statistical view.
+				$_postbox_view = 'subs_overview_by_post_id'; // This statistical view.
 
 				$_form_field_args = array(
 					'ns_id_suffix'   => '-stats-form-'.str_replace('_', '-', $_postbox_view),
@@ -2429,8 +2438,16 @@ namespace comment_mail // Root namespace.
 								'current_value'   => $this->coalesce($current_value_for('type'), 'event_subscribed_totals'),
 								'allow_arbitrary' => FALSE,
 								'options'         => array(
-									'subscribed_totals'       => __('Actual/Current Subscr. Totals', $this->plugin->text_domain),
-									'event_subscribed_totals' => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
+									'@optgroup_open_subscr_totals'   => __('Subscr. Totals', $this->plugin->text_domain),
+									'subscribed_totals'              => __('Actual/Current Subscr. Totals', $this->plugin->text_domain),
+									'event_subscribed_totals'        => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
+									'@optgroup_close_subscr_totals'  => '', // Close this group.
+
+									'@optgroup_open_status_changes'  => __('Status Changes', $this->plugin->text_domain),
+									'event_confirmation_totals'      => __('Confirmation Totals (Based on Event Logs)', $this->plugin->text_domain),
+									'event_suspension_totals'        => __('Suspension Totals (Based on Event Logs)', $this->plugin->text_domain),
+									'event_unsubscribe_totals'       => __('Unsubscribe Totals (Based on Event Logs)', $this->plugin->text_domain),
+									'@optgroup_close_status_changes' => '', // Close this group.
 								),
 							)),
 						$_form_fields->select_row(

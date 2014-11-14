@@ -690,13 +690,22 @@ namespace comment_mail // Root namespace.
 					$_option_value = (string)$_option_value;
 					$_option_label = (string)$_option_label;
 
-					if(!isset($_selected_value) && isset($current_value))
-						if(($_selected = selected($_option_value, $current_value, FALSE)))
-							$_selected_value = $_option_value;
+					if(stripos($_option_value, '@optgroup_open') === 0)
+						$options .= '<optgroup label="'.esc_attr($_option_label).'">';
 
-					$options .= '<option value="'.esc_attr($_option_value).'"'.$_selected.'>'.
-					            '  '.esc_html($_option_label).
-					            '</option>';
+					else if(stripos($_option_value, '@optgroup_close') === 0)
+						$options .= '</optgroup>'; // Close.
+
+					else // Normal behavior; another option value/label.
+					{
+						if(!isset($_selected_value) && isset($current_value))
+							if(($_selected = selected($_option_value, $current_value, FALSE)))
+								$_selected_value = $_option_value;
+
+						$options .= '<option value="'.esc_attr($_option_value).'"'.$_selected.'>'.
+						            '  '.esc_html($_option_label).
+						            '</option>';
+					}
 				}
 				unset($_option_value, $_option_label, $_selected); // Housekeeping.
 
