@@ -261,7 +261,7 @@ namespace comment_mail // Root namespace.
 
 					       " WHERE 1=1". // Initialize where clause.
 
-					       " AND `event` IN('deleted')".
+					       " AND `event` IN('trashed','deleted')".
 					       " AND `status_before` IN('subscribed','suspended')".
 
 					       // " AND `user_initiated` > '0'".
