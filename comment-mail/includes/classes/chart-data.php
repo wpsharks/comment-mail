@@ -246,6 +246,63 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @throws \exception If there is a query failure.
 			 */
+			protected function subs_overview__event_confirmation_totals()
+			{
+				$labels = $data = array(); // Initialize.
+
+				foreach($this->chart->time_periods as $_time_period)
+					$labels[] = $_time_period['from_label'].' - '.$_time_period['to_label'];
+				unset($_time_period); // Housekeeping.
+
+				foreach($this->chart->time_periods as $_time_period)
+				{
+					$sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
+					       " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
+
+					       " WHERE 1=1". // Initialize where clause.
+
+					       " AND `event` IN('inserted','updated')".
+
+					       " AND `status` IN('subscribed')".
+					       " AND `status_before` IN('','unconfirmed')".
+
+					       // " AND `user_initiated` > '0'".
+
+					       " AND `time`". // In this time period only.
+					       "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
+					       "          AND '".esc_sql($_time_period['to_time'])."'".
+
+					       " GROUP BY `sub_id`"; // Unique subs only.
+
+					if($this->plugin->utils_db->wp->query($sql) === FALSE)
+						throw new \exception(__('Query failure.', $this->plugin->text_domain));
+
+					$data[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
+				}
+				unset($_time_period); // Housekeeping.
+
+				return array('data'    => array('labels'   => $labels,
+				                                'datasets' => array(
+					                                array_merge($this->colors, array(
+						                                'label' => __('Confirmation Totals (Based on Event Logs)', $this->plugin->text_domain),
+						                                'data'  => $data,
+					                                )),
+				                                )),
+				             'options' => array(
+					             'scaleLabel'      => '<%=value%>',
+					             'tooltipTemplate' => '<%if (label){%><%=label%>: <%}%><%= value %> '.__('subscriptions', $this->plugin->text_domain),
+				             ));
+			}
+
+			/**
+			 * Chart data for a particular view.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array An array of all chart data.
+			 *
+			 * @throws \exception If there is a query failure.
+			 */
 			protected function subs_overview__event_unsubscribe_totals()
 			{
 				$labels = $data = array(); // Initialize.
@@ -261,7 +318,9 @@ namespace comment_mail // Root namespace.
 
 					       " WHERE 1=1". // Initialize where clause.
 
-					       " AND `event` IN('trashed','deleted')".
+					       " AND `event` IN('updated','deleted')".
+
+					       " AND `status` IN('trashed','deleted')".
 					       " AND `status_before` IN('subscribed','suspended')".
 
 					       // " AND `user_initiated` > '0'".
@@ -557,6 +616,7 @@ namespace comment_mail // Root namespace.
 				if($this->view === 'subs_overview' && !in_array($this->chart->type, array(
 						'subscribed_totals',
 						'event_subscribed_totals',
+						'event_confirmation_totals',
 						'event_unsubscribe_totals',
 						'event_subscribed_most_popular_posts',
 						'event_subscribed_least_popular_posts',

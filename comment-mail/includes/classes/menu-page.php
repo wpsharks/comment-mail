@@ -2357,6 +2357,7 @@ namespace comment_mail // Root namespace.
 								'options'         => array(
 									'subscribed_totals'                    => __('Actual/Current Subscr. Totals', $this->plugin->text_domain),
 									'event_subscribed_totals'              => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
+									'event_confirmation_totals'            => __('Confirmation Totals (Based on Event Logs)', $this->plugin->text_domain),
 									'event_unsubscribe_totals'             => __('Unsubscribe Totals (Based on Event Logs)', $this->plugin->text_domain),
 									'event_subscribed_most_popular_posts'  => __('Most Popular Posts (Based on Event Logs)', $this->plugin->text_domain),
 									'event_subscribed_least_popular_posts' => __('Least Popular Posts (Based on Event Logs)', $this->plugin->text_domain),
