@@ -75,15 +75,16 @@ namespace comment_mail // Root namespace.
 				parent::__construct();
 
 				$default_request_args = array(
-					'view'    => '',
+					'view'                => '',
 
-					'type'    => '',
-					'post_id' => '',
+					'type'                => '',
+					'post_id'             => '',
+					'user_initiated_only' => FALSE,
 
-					'from'    => '',
-					'to'      => '',
+					'from'                => '',
+					'to'                  => '',
 
-					'by'      => '',
+					'by'                  => '',
 				);
 				$request_args         = array_merge($default_request_args, $request_args);
 				$request_args         = array_intersect_key($request_args, $default_request_args);
@@ -94,8 +95,9 @@ namespace comment_mail // Root namespace.
 
 				$this->chart = new \stdClass; // Object properties.
 
-				$this->chart->type    = trim((string)$request_args['type']);
-				$this->chart->post_id = (integer)$request_args['post_id'];
+				$this->chart->type                = trim((string)$request_args['type']);
+				$this->chart->post_id             = (integer)$request_args['post_id'];
+				$this->chart->user_initiated_only = (boolean)$request_args['user_initiated_only'];
 
 				$this->chart->from_time = $this->plugin->utils_string->trim((string)$request_args['from'], '', ',;');
 				$this->chart->to_time   = $this->plugin->utils_string->trim((string)$request_args['to'], '', ',;');
@@ -170,7 +172,9 @@ namespace comment_mail // Root namespace.
 
 					       " AND `insertion_time`". // In this time period only.
 					       "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
-					       "          AND '".esc_sql($_time_period['to_time'])."'";
+					       "          AND '".esc_sql($_time_period['to_time'])."'".
+
+					       " LIMIT 1"; // Only need one to check.
 
 					if($this->plugin->utils_db->wp->query($sql) === FALSE)
 						throw new \exception(__('Query failure.', $this->plugin->text_domain));
@@ -224,13 +228,16 @@ namespace comment_mail // Root namespace.
 					       " AND `status` IN('subscribed')".
 					       " AND `status_before` IN('', 'unconfirmed')".
 
-					       // " AND `user_initiated` > '0'".
+					       ($this->chart->user_initiated_only // User initiated only?
+						       ? " AND `user_initiated` > '0'" : '').
 
 					       " AND `time`". // In this time period only.
 					       "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
 					       "          AND '".esc_sql($_time_period['to_time'])."'".
 
-					       " GROUP BY `sub_id`"; // Unique subs only.
+					       " GROUP BY `sub_id`". // Unique subs only.
+
+					       " LIMIT 1"; // Only need one to check.
 
 					if($this->plugin->utils_db->wp->query($sql) === FALSE)
 						throw new \exception(__('Query failure.', $this->plugin->text_domain));
@@ -284,13 +291,16 @@ namespace comment_mail // Root namespace.
 					       " AND `status` IN('subscribed')".
 					       " AND `status_before` IN('','unconfirmed')".
 
-					       // " AND `user_initiated` > '0'".
+					       ($this->chart->user_initiated_only // User initiated only?
+						       ? " AND `user_initiated` > '0'" : '').
 
 					       " AND `time`". // In this time period only.
 					       "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
 					       "          AND '".esc_sql($_time_period['to_time'])."'".
 
-					       " GROUP BY `sub_id`"; // Unique subs only.
+					       " GROUP BY `sub_id`". // Unique subs only.
+
+					       " LIMIT 1"; // Only need one to check.
 
 					if($this->plugin->utils_db->wp->query($sql) === FALSE)
 						throw new \exception(__('Query failure.', $this->plugin->text_domain));
@@ -344,13 +354,16 @@ namespace comment_mail // Root namespace.
 					       " AND `status` IN('trashed','deleted')".
 					       " AND `status_before` IN('subscribed','suspended')".
 
-					       // " AND `user_initiated` > '0'".
+					       ($this->chart->user_initiated_only // User initiated only?
+						       ? " AND `user_initiated` > '0'" : '').
 
 					       " AND `time`". // In this time period only.
 					       "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
 					       "          AND '".esc_sql($_time_period['to_time'])."'".
 
-					       " GROUP BY `sub_id`"; // Unique subs only.
+					       " GROUP BY `sub_id`". // Unique subs only.
+
+					       " LIMIT 1"; // Only need one to check.
 
 					if($this->plugin->utils_db->wp->query($sql) === FALSE)
 						throw new \exception(__('Query failure.', $this->plugin->text_domain));
@@ -397,7 +410,8 @@ namespace comment_mail // Root namespace.
 				       " AND `status` IN('subscribed')".
 				       " AND `status_before` IN('', 'unconfirmed')".
 
-				       // " AND `user_initiated` > '0'".
+				       ($this->chart->user_initiated_only // User initiated only?
+					       ? " AND `user_initiated` > '0'" : '').
 
 				       " AND `time`". // In this time period only.
 				       "       BETWEEN '".esc_sql($this->chart->from_time)."'".
@@ -419,6 +433,9 @@ namespace comment_mail // Root namespace.
 						$data[]   = (integer)$_result->total_subs;
 					}
 				unset($_result, $_result_post, $_result_post_title); // Housekeeping.
+
+				if(empty($labels)) $labels[] = '—'; // Must have something.
+				if(empty($data)) $data[] = 0; // Must have something.
 
 				return array('data'    => array('labels'   => $labels,
 				                                'datasets' => array(
@@ -458,7 +475,8 @@ namespace comment_mail // Root namespace.
 				       " AND `status` IN('subscribed')".
 				       " AND `status_before` IN('', 'unconfirmed')".
 
-				       // " AND `user_initiated` > '0'".
+				       ($this->chart->user_initiated_only // User initiated only?
+					       ? " AND `user_initiated` > '0'" : '').
 
 				       " AND `time`". // In this time period only.
 				       "       BETWEEN '".esc_sql($this->chart->from_time)."'".
@@ -480,6 +498,9 @@ namespace comment_mail // Root namespace.
 						$data[]   = (integer)$_result->total_subs;
 					}
 				unset($_result, $_result_post, $_result_post_title); // Housekeeping.
+
+				if(empty($labels)) $labels[] = '—'; // Must have something.
+				if(empty($data)) $data[] = 0; // Must have something.
 
 				return array('data'    => array('labels'   => $labels,
 				                                'datasets' => array(
