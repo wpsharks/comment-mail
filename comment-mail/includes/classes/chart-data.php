@@ -118,6 +118,9 @@ namespace comment_mail // Root namespace.
 				if($this->input_view === 'subs_overview_by_post_id')
 					$this->view = 'subs_overview'; // Same handler.
 
+				if($this->input_view === 'queued_notifications_overview_by_post_id')
+					$this->view = 'queued_notifications_overview'; // Same handler.
+
 				$this->chart = new \stdClass; // Object properties.
 
 				$this->chart->type    = trim((string)$request_args['type']);
@@ -516,7 +519,7 @@ namespace comment_mail // Root namespace.
 			 *    This sub-select allows us to detect when that was the case, so that `2` can be excluded from the query.
 			 *
 			 *    However, we do want to include calculations where an overwrite might have taken place outside the current timeframe.
-			 *    For instance, if `2` was overwritten by `3`; but that occurred sometime after the timeframe that we querying; we don't want to
+			 *    For instance, if `2` was overwritten by `3`; but that occurred sometime after the timeframe that we're querying; we don't want to
 			 *    exclude `2` in such a scenario, because `2` did occur within that particular timeframe and we need to count it in that case.
 			 */
 			protected function oby_sub_ids_sql($from_time, $to_time, array $args = array())
@@ -543,6 +546,292 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Chart data for a particular view.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array An array of all chart data.
+			 */
+			protected function queued_notifications_overview_()
+			{
+				return $this->{__FUNCTION__.'_'.$this->chart->type}();
+			}
+
+			/**
+			 * Chart data for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array An array of all chart data; for ChartJS.
+			 */
+			protected function queued_notifications_overview__event_processed_totals()
+			{
+				return $this->queued_notifications_overview_event_processed_totals();
+			}
+
+			/**
+			 * Chart data for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array An array of all chart data; for ChartJS.
+			 */
+			protected function queued_notifications_overview__event_processed_percentages()
+			{
+				return $this->queued_notifications_overview_event_percentages(array('invalidated', 'notified'), 'Processed');
+			}
+
+			/**
+			 * Chart data for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array An array of all chart data; for ChartJS.
+			 */
+			protected function queued_notifications_overview__event_notified_percentages()
+			{
+				return $this->queued_notifications_overview_event_percentages(array('notified'), 'Notified');
+			}
+
+			/**
+			 * Chart data for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array An array of all chart data; for ChartJS.
+			 */
+			protected function queued_notifications_overview__event_invalidated_percentages()
+			{
+				return $this->queued_notifications_overview_event_percentages(array('invalidated'), 'Invalidated');
+			}
+
+			/**
+			 * Chart data helper; for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array An array of all chart data; for ChartJS.
+			 *
+			 * @throws \exception If there is a query failure.
+			 */
+			protected function queued_notifications_overview_event_processed_totals()
+			{
+				$labels = $data = array(); // Initialize.
+
+				foreach($this->chart->time_periods as $_time_period)
+					$labels[] = $_time_period['from_label'].' - '.$_time_period['to_label'];
+				unset($_time_period); // Housekeeping.
+
+				foreach($this->chart->time_periods as $_time_period)
+				{
+					$_new_queue_ids_sql = $this->new_queue_ids_sql($_time_period['from_time'], $_time_period['to_time']);
+
+					$_sql = "SELECT SQL_CALC_FOUND_ROWS `queue_id`". // Calc enable.
+					        " FROM `".esc_sql($this->plugin->utils_db->prefix().'queue_event_log')."`".
+
+					        " WHERE 1=1". // Initialize where clause.
+
+					        " AND `queue_id` IN(".$_new_queue_ids_sql.")".
+					        " AND `event` IN('invalidated','notified')".
+
+					        " GROUP BY `queue_id`". // Unique entries only.
+
+					        " LIMIT 1"; // Only need one to check.
+
+					if($this->plugin->utils_db->wp->query($_sql) === FALSE)
+						throw new \exception(__('Query failure.', $this->plugin->text_domain));
+
+					$data[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
+				}
+				unset($_time_period, $_oby_sub_ids, $_sql); // Housekeeping.
+
+				return array('data'    => array('labels'   => $labels,
+				                                'datasets' => array(
+					                                array_merge($this->colors, array(
+						                                'label' => __('Total Processed Notifications', $this->plugin->text_domain),
+						                                'data'  => $data,
+					                                )),
+				                                )),
+				             'options' => array(
+					             'scaleLabel'      => '<%=value%>',
+
+					             'tooltipTemplate' => '<%=label%>: <%=value%> '.
+					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('notifications', $this->plugin->text_domain).'<%}%>'.
+					                                  '<%if(parseInt(value) === 1){%>'.__('notification', $this->plugin->text_domain).'<%}%>',
+				             ));
+			}
+
+			/**
+			 * Chart data helper; for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param array  $event Event (or events) we are looking for.
+			 * @param string $label Label for this processing percentage.
+			 *
+			 * @return array An array of all chart data; for ChartJS.
+			 *
+			 * @throws \exception If there is a query failure.
+			 */
+			protected function queued_notifications_overview_event_percentages(array $event, $label)
+			{
+				$labels = $data1 = $data2 = $percent = array(); // Initialize.
+
+				foreach($this->chart->time_periods as $_time_period)
+					$labels[] = $_time_period['from_label'].' - '.$_time_period['to_label'];
+				unset($_time_period); // Housekeeping.
+
+				foreach($this->chart->time_periods as $_time_period)
+				{
+					$_sql1 = $this->new_queue_ids_sql($_time_period['from_time'], $_time_period['to_time'], array('calc_enable' => TRUE));
+
+					$_new_queue_ids_sql2 = $this->new_queue_ids_sql($_time_period['from_time'], $_time_period['to_time']);
+
+					$_sql2 = "SELECT SQL_CALC_FOUND_ROWS `queue_id`". // Calc enable.
+					         " FROM `".esc_sql($this->plugin->utils_db->prefix().'queue_event_log')."`".
+
+					         " WHERE 1=1". // Initialize where clause.
+
+					         " AND `queue_id` IN(".$_new_queue_ids_sql2.")".
+					         " AND `event` IN('".implode("','", array_map('esc_sql', $event))."')".
+
+					         " GROUP BY `queue_id`". // Unique entries only.
+
+					         " LIMIT 1"; // Only need one to check.
+
+					if($this->plugin->utils_db->wp->query($_sql1) === FALSE)
+						throw new \exception(__('Query failure.', $this->plugin->text_domain));
+
+					$data1[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
+
+					if($this->plugin->utils_db->wp->query($_sql2) === FALSE)
+						throw new \exception(__('Query failure.', $this->plugin->text_domain));
+
+					$data2[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
+				}
+				unset($_time_period, $_sql1, $_new_queue_ids_sql2, $_sql2); // Housekeeping.
+
+				foreach(array_keys($data2) as $_key) // Calculate percentages.
+					$percent[$_key] = $this->plugin->utils_math->percent($data2[$_key], $data1[$_key]);
+				unset($_key); // Housekeeping.
+
+				return array('data'    => array('labels'   => $labels,
+				                                'datasets' => array(
+					                                array_merge($this->secondary_colors, array(
+						                                'label' => __('Queued Notifications', $this->plugin->text_domain),
+						                                'data'  => $data1,
+					                                )),
+					                                array_merge($this->primary_colors, array(
+						                                'label' => sprintf(__('Total %1$s', $this->plugin->text_domain), $label),
+						                                'data'  => $data2, 'percent' => $percent,
+					                                )),
+				                                )),
+				             'options' => array(
+					             'scaleLabel'           => '<%=value%>',
+
+					             'multiTooltipTemplate' => '<%=datasetLabel%>: <%=value%>'.
+					                                       '<%if(typeof percent === "number"){%> (<%=percent%>%)<%}%>',
+				             ));
+			}
+
+			/**
+			 * Sub-select SQL to acquire new queue IDs.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param integer $from_time Time period from; UNIX timestamp.
+			 * @param integer $to_time Time period to; UNIX timestamp.
+			 * @param array   $args Any additional behavioral args.
+			 *
+			 * @return string Sub-select SQL to acquire new queue IDs.
+			 */
+			protected function new_queue_ids_sql($from_time, $to_time, array $args = array())
+			{
+				$from_time = (integer)$from_time;
+				$to_time   = (integer)$to_time;
+
+				$default_args = array(
+					'calc_enable'      => FALSE,
+					'check_post_id'    => TRUE,
+					'check_exclusions' => TRUE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$calc_enable      = (boolean)$args['calc_enable'];
+				$check_post_id    = (boolean)$args['check_post_id'];
+				$check_exclusions = (boolean)$args['check_exclusions'];
+
+				$dby_queue_ids_sql = $this->dby_queue_ids_sql($from_time, $to_time);
+
+				return // Queue IDs that were processed during this timeframe.
+
+					"SELECT".($calc_enable ? " SQL_CALC_FOUND_ROWS" : '')." `queue_id`".
+					" FROM `".esc_sql($this->plugin->utils_db->prefix().'queue_event_log')."`".
+
+					" WHERE 1=1". // Initialize where clause.
+
+					($check_post_id && $this->chart->post_id // Specific post ID?
+						? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
+
+					" AND `time` BETWEEN '".esc_sql($from_time)."' AND '".esc_sql($to_time)."'".
+
+					" AND `queue_id` NOT IN(".$dby_queue_ids_sql.")". // Exclude these.
+					// See notes below regarding these overwritten exclusions.
+
+					" GROUP BY `queue_id`". // Unique entries only (always).
+
+					($calc_enable  // Only need one to check?
+						? " LIMIT 1" : '');
+			}
+
+			/**
+			 * Sub-select SQL to acquire queue IDs digested by others.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param integer $from_time Time period from; UNIX timestamp.
+			 * @param integer $to_time Time period to; UNIX timestamp.
+			 * @param array   $args Any additional behavioral args.
+			 *
+			 * @return string Sub-select SQL to acquire queue IDs digested by others.
+			 *
+			 * @note The reason for this sub-select is that we want to avoid counting duplicates
+			 *    where an event took place against two or more unique queue IDs, but where some of these
+			 *    queue IDs were digested by another; which really points to the same underlying notification.
+			 *
+			 *    For instance, we might have queue IDs: `1`, `2`, `3`; where `2` was digested by `3` in the same timeframe.
+			 *    In a case such as this, there were really only two notifications. Queue ID `2` should be excluded in favor of `3`.
+			 *    This sub-select allows us to detect when that was the case, so that `2` can be excluded from the query.
+			 *
+			 *    However, we do want to include calculations where an digest might have taken place outside the current timeframe.
+			 *    For instance, if `2` was digested by `3`; but that occurred sometime after the timeframe that we're querying; we don't want to
+			 *    exclude `2` in such a scenario, because `2` did occur within that particular timeframe and we need to count it in that case.
+			 */
+			protected function dby_queue_ids_sql($from_time, $to_time, array $args = array())
+			{
+				$from_time = (integer)$from_time;
+				$to_time   = (integer)$to_time;
+
+				$default_args = array(); // None at this time.
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				return // Queue IDs that were digested by others during this timeframe.
+
+					"SELECT `queue_id`". // Need the queue IDs for sub-queries.
+					" FROM `".esc_sql($this->plugin->utils_db->prefix().'queue_event_log')."`".
+
+					" WHERE 1=1". // Initialize where clause.
+
+					" AND `dby_queue_id` > '0'". // Digested by another.
+
+					" AND `time` BETWEEN '".esc_sql($from_time)."' AND '".esc_sql($to_time)."'".
+
+					" GROUP BY `queue_id`"; // Unique queue entries only (always).
+			}
+
+			/**
 			 * Validates chart data.
 			 *
 			 * @since 141111 First documented version.
@@ -557,7 +846,7 @@ namespace comment_mail // Root namespace.
 				if(!method_exists($this, $this->view.'__'.$this->chart->type))
 					$this->errors[] = __('Missing or invalid Chart Type. Please try again.', $this->plugin->text_domain);
 
-				if($this->input_view === 'subs_overview_by_post_id' && $this->chart->post_id <= 0)
+				if(stripos($this->input_view, '_by_post_id') !== FALSE && $this->chart->post_id <= 0)
 					$this->errors[] = __('Missing or invalid Post ID. Please try again.', $this->plugin->text_domain);
 
 				if(!$this->chart->from_time || !$this->chart->to_time)

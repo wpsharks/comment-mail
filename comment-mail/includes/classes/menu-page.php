@@ -2351,6 +2351,10 @@ namespace comment_mail // Root namespace.
 
 				/* ----------------------------------------------------------------------------------------- */
 
+				echo '<hr style="margin-top:0;" />'; // Dividing line before each view category.
+
+				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
 				$_postbox_view = 'subs_overview'; // This statistical view.
 
 				$_form_field_args = array(
@@ -2440,7 +2444,7 @@ namespace comment_mail // Root namespace.
 					array('auto_chart' => $current_value_for('view') === $_postbox_view));
 
 				echo $this->postbox(__('Subscriptions Overview', $this->plugin->text_domain), $_postbox_body,
-				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => $current_value_for('view') === $_postbox_view));
+				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => !$current_value_for('view') || $current_value_for('view') === $_postbox_view));
 
 				unset($_postbox_view, $_postbox_body); // Housekeeping.
 
@@ -2545,6 +2549,181 @@ namespace comment_mail // Root namespace.
 					array('auto_chart' => $current_value_for('view') === $_postbox_view));
 
 				echo $this->postbox(__('Subscriptions by Post ID', $this->plugin->text_domain), $_postbox_body,
+				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => $current_value_for('view') === $_postbox_view));
+
+				unset($_postbox_view, $_postbox_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '<hr />'; // Dividing line before each view category.
+
+				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+				$_postbox_view = 'queued_notifications_overview'; // This statistical view.
+
+				$_form_field_args = array(
+					'ns_id_suffix'   => '-stats-form-'.str_replace('_', '-', $_postbox_view),
+					'ns_name_suffix' => '[stats_chart_data_via_ajax]',
+					'class_prefix'   => 'pmp-stats-form-',
+				);
+				$_form_fields     = new form_fields($_form_field_args);
+
+				$_postbox_body = $this->stats_view(
+					$_postbox_view,
+					array(
+						array('hidden_input' => $_form_fields->hidden_input(
+							array(
+								'name'          => 'view',
+								'current_value' => $_postbox_view,
+							))),
+						array('row'      => $_form_fields->select_row(
+							array(
+								'label'           => __('Chart Type', $this->plugin->text_domain),
+								'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+								'name'            => 'type',
+								'current_value'   => $this->coalesce($current_value_for('type'), 'event_queued_notification_processed_percentages'),
+								'allow_arbitrary' => FALSE,
+								'options'         => array(
+									'@optgroup_open_queued_notification_totals'          => __('Processed Notification Totals', $this->plugin->text_domain),
+									'event_processed_totals'                             => __('Total Processed Notifications', $this->plugin->text_domain),
+									'@optgroup_close_queued_notification_totals'         => '', // Close this group.
+
+									'@optgroup_open_processed_notification_percentages'  => __('Processed Notification Percentages', $this->plugin->text_domain),
+									'event_processed_percentages'                        => __('Processed Percentages', $this->plugin->text_domain),
+									'event_notified_percentages'                         => __('Notified Percentages', $this->plugin->text_domain),
+									'event_invalidated_percentages'                      => __('Invalidated Percentages', $this->plugin->text_domain),
+									'@optgroup_close_processed_notification_percentages' => '', // Close this group.
+								),
+							)), 'colspan' => 4, 'ends_row' => TRUE),
+
+						$_form_fields->input_row(
+							array(
+								'label'         => sprintf(__('From Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
+								'placeholder'   => sprintf(__('e.g. 7 days ago; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y', strtotime('-7 days')))),
+								'name'          => 'from',
+								'other_attrs'   => 'data-toggle="date-time-picker"',
+								'current_value' => $this->coalesce($current_value_for('from'), '7 days ago'),
+							)),
+						$_form_fields->input_row(
+							array(
+								'label'         => sprintf(__('To Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
+								'placeholder'   => sprintf(__('e.g. now; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y'))),
+								'name'          => 'to',
+								'other_attrs'   => 'data-toggle="date-time-picker"',
+								'current_value' => $this->coalesce($current_value_for('to'), 'now'),
+							)),
+						$_form_fields->select_row(
+							array(
+								'label'           => __('Breakdown By', $this->plugin->text_domain),
+								'placeholder'     => __('e.g. hours, days, weeks, months, years', $this->plugin->text_domain),
+								'name'            => 'by',
+								'current_value'   => $this->coalesce($current_value_for('by'), 'days'),
+								'allow_arbitrary' => FALSE,
+								'options'         => array(
+									'hours'  => __('hours', $this->plugin->text_domain),
+									'days'   => __('days', $this->plugin->text_domain),
+									'weeks'  => __('weeks', $this->plugin->text_domain),
+									'months' => __('months', $this->plugin->text_domain),
+									'years'  => __('years', $this->plugin->text_domain),
+								),
+							)),
+					),
+					array('auto_chart' => $current_value_for('view') === $_postbox_view));
+
+				echo $this->postbox(__('Queued Notifications Overview', $this->plugin->text_domain), $_postbox_body,
+				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => $current_value_for('view') === $_postbox_view));
+
+				unset($_postbox_view, $_postbox_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_postbox_view = 'queued_notifications_overview_by_post_id'; // This statistical view.
+
+				$_form_field_args = array(
+					'ns_id_suffix'   => '-stats-form-'.str_replace('_', '-', $_postbox_view),
+					'ns_name_suffix' => '[stats_chart_data_via_ajax]',
+					'class_prefix'   => 'pmp-stats-form-',
+				);
+				$_form_fields     = new form_fields($_form_field_args);
+
+				$_postbox_body = $this->stats_view(
+					$_postbox_view,
+					array(
+						array('hidden_input' => $_form_fields->hidden_input(
+							array(
+								'name'          => 'view',
+								'current_value' => $_postbox_view,
+							))),
+						$_form_fields->select_row(
+							array(
+								'label'           => __('Chart Type', $this->plugin->text_domain),
+								'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+								'name'            => 'type',
+								'current_value'   => $this->coalesce($current_value_for('type'), 'event_queued_notification_processed_percentages'),
+								'allow_arbitrary' => FALSE,
+								'options'         => array(
+									'@optgroup_open_queued_notification_totals'          => __('Processed Notification Totals', $this->plugin->text_domain),
+									'event_processed_totals'                             => __('Total Processed Notifications (for Post ID)', $this->plugin->text_domain),
+									'@optgroup_close_queued_notification_totals'         => '', // Close this group.
+
+									'@optgroup_open_processed_notification_percentages'  => __('Processed Notification Percentages', $this->plugin->text_domain),
+									'event_processed_percentages'                        => __('Processed Percentages (for Post ID)', $this->plugin->text_domain),
+									'event_notified_percentages'                         => __('Notified Percentages (for Post ID)', $this->plugin->text_domain),
+									'event_invalidated_percentages'                      => __('Invalidated Percentages (for Post ID)', $this->plugin->text_domain),
+									'@optgroup_close_processed_notification_percentages' => '', // Close this group.
+								),
+							)),
+						array('row'      => $_form_fields->select_row(
+							array(
+								'label'               => __('Post ID', $this->plugin->text_domain),
+								'placeholder'         => __('Select an Option...', $this->plugin->text_domain),
+								'name'                => 'post_id',
+								'current_value'       => $this->coalesce($current_value_for('post_id'), NULL),
+								'options'             => '%%posts%%',
+								'input_fallback_args' => array(
+									'type'                     => 'number',
+									'placeholder'              => '',
+									'maxlength'                => 20,
+									'current_value_empty_on_0' => TRUE,
+									'other_attrs'              => 'min="1" max="18446744073709551615"',
+								),
+							)), 'colspan' => 3, 'ends_row' => TRUE),
+
+						$_form_fields->input_row(
+							array(
+								'label'         => sprintf(__('From Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
+								'placeholder'   => sprintf(__('e.g. 7 days ago; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y', strtotime('-7 days')))),
+								'name'          => 'from',
+								'other_attrs'   => 'data-toggle="date-time-picker"',
+								'current_value' => $this->coalesce($current_value_for('from'), '7 days ago'),
+							)),
+						$_form_fields->input_row(
+							array(
+								'label'         => sprintf(__('To Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
+								'placeholder'   => sprintf(__('e.g. now; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y'))),
+								'name'          => 'to',
+								'other_attrs'   => 'data-toggle="date-time-picker"',
+								'current_value' => $this->coalesce($current_value_for('to'), 'now'),
+							)),
+						$_form_fields->select_row(
+							array(
+								'label'           => __('Breakdown By', $this->plugin->text_domain),
+								'placeholder'     => __('e.g. hours, days, weeks, months, years', $this->plugin->text_domain),
+								'name'            => 'by',
+								'current_value'   => $this->coalesce($current_value_for('by'), 'days'),
+								'allow_arbitrary' => FALSE,
+								'options'         => array(
+									'hours'  => __('hours', $this->plugin->text_domain),
+									'days'   => __('days', $this->plugin->text_domain),
+									'weeks'  => __('weeks', $this->plugin->text_domain),
+									'months' => __('months', $this->plugin->text_domain),
+									'years'  => __('years', $this->plugin->text_domain),
+								),
+							)),
+					),
+					array('auto_chart' => $current_value_for('view') === $_postbox_view));
+
+				echo $this->postbox(__('Queued Notifications by Post ID', $this->plugin->text_domain), $_postbox_body,
 				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => $current_value_for('view') === $_postbox_view));
 
 				unset($_postbox_view, $_postbox_body); // Housekeeping.

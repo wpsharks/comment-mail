@@ -152,6 +152,17 @@ A menu page area ~ post com/sub bubbles.
 	color : #FFFFFF;
 }
 /*
+A menu page area ~ horizontal lines.
+*/
+.comment-mail-menu-page-area hr
+{
+	border     : 0;
+	padding    : 0;
+	height     : 1px;
+	margin     : 1em 0 1em 0;
+	background : linear-gradient(to left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+}
+/*
 A menu page area ~ postboxes.
 */
 .comment-mail-menu-page-area .pmp-postbox-container
