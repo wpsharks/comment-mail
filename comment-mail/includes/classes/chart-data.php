@@ -160,28 +160,28 @@ namespace comment_mail // Root namespace.
 
 				foreach($this->chart->time_periods as $_time_period)
 				{
-					$sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
-					       " FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+					$_sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
+					        " FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
-					       " WHERE 1=1". // Initialize where clause.
+					        " WHERE 1=1". // Initialize where clause.
 
-					       ($this->chart->post_id // Specific post ID?
-						       ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
+					        ($this->chart->post_id // Specific post ID?
+						        ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
 
-					       " AND `status` IN('subscribed')".
+					        " AND `status` IN('subscribed')".
 
-					       " AND `insertion_time`". // In this time period only.
-					       "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
-					       "          AND '".esc_sql($_time_period['to_time'])."'".
+					        " AND `insertion_time`". // In this time period only.
+					        "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
+					        "          AND '".esc_sql($_time_period['to_time'])."'".
 
-					       " LIMIT 1"; // Only need one to check.
+					        " LIMIT 1"; // Only need one to check.
 
-					if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					if($this->plugin->utils_db->wp->query($_sql) === FALSE)
 						throw new \exception(__('Query failure.', $this->plugin->text_domain));
 
 					$data[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
 				}
-				unset($_time_period); // Housekeeping.
+				unset($_time_period, $_sql); // Housekeeping.
 
 				return array('data'    => array('labels'   => $labels,
 				                                'datasets' => array(
@@ -193,8 +193,8 @@ namespace comment_mail // Root namespace.
 				             'options' => array(
 					             'scaleLabel'      => '<%=value%>',
 					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
-					                                  '<%if(value < 1 || value > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
-					                                  '<%if(value === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
+					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
+					                                  '<%if(parseInt(value) === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
 				             ));
 			}
 
@@ -217,36 +217,40 @@ namespace comment_mail // Root namespace.
 
 				foreach($this->chart->time_periods as $_time_period)
 				{
-					$sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
-					       " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
+					$_oby_sub_ids = $this->oby_sub_ids($_time_period['from_time'], $_time_period['to_time']);
 
-					       " WHERE 1=1". // Initialize where clause.
+					$_sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
+					        " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
 
-					       ($this->chart->post_id // Specific post ID?
-						       ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
+					        " WHERE 1=1". // Initialize where clause.
 
-					       " AND `event` IN('inserted', 'updated')".
+					        ($this->chart->post_id // Specific post ID?
+						        ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
 
-					       " AND `status` IN('subscribed')".
-					       " AND `status_before` IN('', 'unconfirmed')".
+					        " AND `event` IN('inserted', 'updated')".
 
-					       ($this->chart->user_initiated_only // User initiated only?
-						       ? " AND `user_initiated` > '0'" : '').
+					        " AND `status` IN('subscribed')".
+					        " AND `status_before` IN('', 'unconfirmed')".
 
-					       " AND `time`". // In this time period only.
-					       "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
-					       "          AND '".esc_sql($_time_period['to_time'])."'".
+					        ($this->chart->user_initiated_only // User initiated only?
+						        ? " AND `user_initiated` > '0'" : '').
 
-					       " GROUP BY `sub_id`". // Unique subs only.
+					        " AND `time`". // In this time period only.
+					        "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
+					        "          AND '".esc_sql($_time_period['to_time'])."'".
 
-					       " LIMIT 1"; // Only need one to check.
+					        " AND `sub_id` NOT IN(".$_oby_sub_ids.")". // Exclude.
 
-					if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					        " GROUP BY `sub_id`". // Unique subs only.
+
+					        " LIMIT 1"; // Only need one to check.
+
+					if($this->plugin->utils_db->wp->query($_sql) === FALSE)
 						throw new \exception(__('Query failure.', $this->plugin->text_domain));
 
 					$data[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
 				}
-				unset($_time_period); // Housekeeping.
+				unset($_time_period, $_oby_sub_ids, $_sql); // Housekeeping.
 
 				return array('data'    => array('labels'   => $labels,
 				                                'datasets' => array(
@@ -258,8 +262,8 @@ namespace comment_mail // Root namespace.
 				             'options' => array(
 					             'scaleLabel'      => '<%=value%>',
 					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
-					                                  '<%if(value < 1 || value > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
-					                                  '<%if(value === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
+					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
+					                                  '<%if(parseInt(value) === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
 				             ));
 			}
 
@@ -282,36 +286,40 @@ namespace comment_mail // Root namespace.
 
 				foreach($this->chart->time_periods as $_time_period)
 				{
-					$sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
-					       " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
+					$_oby_sub_ids = $this->oby_sub_ids($_time_period['from_time'], $_time_period['to_time']);
 
-					       " WHERE 1=1". // Initialize where clause.
+					$_sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
+					        " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
 
-					       ($this->chart->post_id // Specific post ID?
-						       ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
+					        " WHERE 1=1". // Initialize where clause.
 
-					       " AND `event` IN('inserted','updated')".
+					        ($this->chart->post_id // Specific post ID?
+						        ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
 
-					       " AND `status` IN('subscribed')".
-					       " AND `status_before` IN('','unconfirmed')".
+					        " AND `event` IN('inserted','updated')".
 
-					       ($this->chart->user_initiated_only // User initiated only?
-						       ? " AND `user_initiated` > '0'" : '').
+					        " AND `status` IN('subscribed')".
+					        " AND `status_before` IN('','unconfirmed')".
 
-					       " AND `time`". // In this time period only.
-					       "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
-					       "          AND '".esc_sql($_time_period['to_time'])."'".
+					        ($this->chart->user_initiated_only // User initiated only?
+						        ? " AND `user_initiated` > '0'" : '').
 
-					       " GROUP BY `sub_id`". // Unique subs only.
+					        " AND `time`". // In this time period only.
+					        "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
+					        "          AND '".esc_sql($_time_period['to_time'])."'".
 
-					       " LIMIT 1"; // Only need one to check.
+					        " AND `sub_id` NOT IN(".$_oby_sub_ids.")". // Exclude.
 
-					if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					        " GROUP BY `sub_id`". // Unique subs only.
+
+					        " LIMIT 1"; // Only need one to check.
+
+					if($this->plugin->utils_db->wp->query($_sql) === FALSE)
 						throw new \exception(__('Query failure.', $this->plugin->text_domain));
 
 					$data[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
 				}
-				unset($_time_period); // Housekeeping.
+				unset($_time_period, $_oby_sub_ids, $_sql); // Housekeeping.
 
 				return array('data'    => array('labels'   => $labels,
 				                                'datasets' => array(
@@ -323,8 +331,8 @@ namespace comment_mail // Root namespace.
 				             'options' => array(
 					             'scaleLabel'      => '<%=value%>',
 					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
-					                                  '<%if(value < 1 || value > 1){%>'.__('confirmations', $this->plugin->text_domain).'<%}%>'.
-					                                  '<%if(value === 1){%>'.__('confirmation', $this->plugin->text_domain).'<%}%>',
+					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('confirmations', $this->plugin->text_domain).'<%}%>'.
+					                                  '<%if(parseInt(value) === 1){%>'.__('confirmation', $this->plugin->text_domain).'<%}%>',
 				             ));
 			}
 
@@ -347,36 +355,40 @@ namespace comment_mail // Root namespace.
 
 				foreach($this->chart->time_periods as $_time_period)
 				{
-					$sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
-					       " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
+					$_oby_sub_ids = $this->oby_sub_ids($_time_period['from_time'], $_time_period['to_time']);
 
-					       " WHERE 1=1". // Initialize where clause.
+					$_sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
+					        " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
 
-					       ($this->chart->post_id // Specific post ID?
-						       ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
+					        " WHERE 1=1". // Initialize where clause.
 
-					       " AND `event` IN('updated','deleted')".
+					        ($this->chart->post_id // Specific post ID?
+						        ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
 
-					       " AND `status` IN('trashed','deleted')".
-					       " AND `status_before` IN('subscribed','suspended')".
+					        " AND `event` IN('updated','deleted')".
 
-					       ($this->chart->user_initiated_only // User initiated only?
-						       ? " AND `user_initiated` > '0'" : '').
+					        " AND `status` IN('trashed','deleted')".
+					        " AND `status_before` IN('subscribed','suspended')".
 
-					       " AND `time`". // In this time period only.
-					       "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
-					       "          AND '".esc_sql($_time_period['to_time'])."'".
+					        ($this->chart->user_initiated_only // User initiated only?
+						        ? " AND `user_initiated` > '0'" : '').
 
-					       " GROUP BY `sub_id`". // Unique subs only.
+					        " AND `time`". // In this time period only.
+					        "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
+					        "          AND '".esc_sql($_time_period['to_time'])."'".
 
-					       " LIMIT 1"; // Only need one to check.
+					        " AND `sub_id` NOT IN(".$_oby_sub_ids.")". // Exclude.
 
-					if($this->plugin->utils_db->wp->query($sql) === FALSE)
+					        " GROUP BY `sub_id`". // Unique subs only.
+
+					        " LIMIT 1"; // Only need one to check.
+
+					if($this->plugin->utils_db->wp->query($_sql) === FALSE)
 						throw new \exception(__('Query failure.', $this->plugin->text_domain));
 
 					$data[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
 				}
-				unset($_time_period); // Housekeeping.
+				unset($_time_period, $_oby_sub_ids, $_sql); // Housekeeping.
 
 				return array('data'    => array('labels'   => $labels,
 				                                'datasets' => array(
@@ -388,8 +400,8 @@ namespace comment_mail // Root namespace.
 				             'options' => array(
 					             'scaleLabel'      => '<%=value%>',
 					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
-					                                  '<%if(value < 1 || value > 1){%>'.__('unsubscribes', $this->plugin->text_domain).'<%}%>'.
-					                                  '<%if(value === 1){%>'.__('unsubscribe', $this->plugin->text_domain).'<%}%>',
+					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('unsubscribes', $this->plugin->text_domain).'<%}%>'.
+					                                  '<%if(parseInt(value) === 1){%>'.__('unsubscribe', $this->plugin->text_domain).'<%}%>',
 				             ));
 			}
 
@@ -406,7 +418,9 @@ namespace comment_mail // Root namespace.
 			{
 				$labels = $data = array(); // Initialize.
 
-				$sql = "SELECT COUNT(*) AS `total_subs`, `post_id`".
+				$oby_sub_ids = $this->oby_sub_ids($this->chart->from_time, $this->chart->to_time);
+
+				$sql = "SELECT `post_id`, `sub_id`, COUNT(DISTINCT(`sub_id`)) AS `total_subs`".
 				       " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
 
 				       " WHERE 1=1". // Initialize where clause.
@@ -425,11 +439,13 @@ namespace comment_mail // Root namespace.
 				       "       BETWEEN '".esc_sql($this->chart->from_time)."'".
 				       "          AND '".esc_sql($this->chart->to_time)."'".
 
-				       " GROUP BY `post_id`, `sub_id`".
+				       " AND `sub_id` NOT IN(".$oby_sub_ids.")". // Exclude.
+
+				       " GROUP BY `post_id`". // Unique posts only.
 
 				       " ORDER BY `total_subs` DESC".
 
-				       " LIMIT 25";
+				       " LIMIT 25"; // 25 max.
 
 				if(($results = $this->plugin->utils_db->wp->get_results($sql)))
 					foreach(($results = $this->plugin->utils_db->typify_deep($results)) as $_result)
@@ -455,8 +471,8 @@ namespace comment_mail // Root namespace.
 				             'options' => array(
 					             'scaleLabel'      => '<%=value%>',
 					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
-					                                  '<%if(value < 1 || value > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
-					                                  '<%if(value === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
+					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
+					                                  '<%if(parseInt(value) === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
 				             ));
 			}
 
@@ -473,7 +489,9 @@ namespace comment_mail // Root namespace.
 			{
 				$labels = $data = array(); // Initialize.
 
-				$sql = "SELECT COUNT(*) AS `total_subs`, `post_id`".
+				$oby_sub_ids = $this->oby_sub_ids($this->chart->from_time, $this->chart->to_time);
+
+				$sql = "SELECT `post_id`, `sub_id`, COUNT(DISTINCT(`sub_id`)) AS `total_subs`".
 				       " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
 
 				       " WHERE 1=1". // Initialize where clause.
@@ -492,11 +510,13 @@ namespace comment_mail // Root namespace.
 				       "       BETWEEN '".esc_sql($this->chart->from_time)."'".
 				       "          AND '".esc_sql($this->chart->to_time)."'".
 
-				       " GROUP BY `post_id`, `sub_id`".
+				       " AND `sub_id` NOT IN(".$oby_sub_ids.")". // Exclude.
+
+				       " GROUP BY `post_id`". // Unique posts only.
 
 				       " ORDER BY `total_subs` ASC".
 
-				       " LIMIT 25";
+				       " LIMIT 25"; // 25 max.
 
 				if(($results = $this->plugin->utils_db->wp->get_results($sql)))
 					foreach(($results = $this->plugin->utils_db->typify_deep($results)) as $_result)
@@ -522,9 +542,45 @@ namespace comment_mail // Root namespace.
 				             'options' => array(
 					             'scaleLabel'      => '<%=value%>',
 					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
-					                                  '<%if(value < 1 || value > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
-					                                  '<%if(value === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
+					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
+					                                  '<%if(parseInt(value) === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
 				             ));
+			}
+
+			/**
+			 * Sub-select to acquire overwritten sub IDs.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param integer $from_time Time period from; UNIX timestamp.
+			 * @param integer $to_time Time period to; UNIX timestamp.
+			 *
+			 * @return string Sub-select to acquire overwritten sub IDs.
+			 *
+			 * @note The reason for this sub-select, is that we want to avoid counting duplicates
+			 *    where an event took place against two or more unique sub IDs, but where some of these
+			 *    sub IDs were overwritten by another; which really points to the same underlying subscription.
+			 *
+			 *    For instance, we might have sub IDs: `1`, `2`, `3`; where `2` was overwritten by `3` in the same timeframe.
+			 *    In a case such as this, there were really only two subscriptions. Sub ID `2` should be excluded in favor of `3`.
+			 *    This sub-select allows us to detect when that was the case, so that `2` can be excluded from the query.
+			 *
+			 *    However, we do want to include calculations where an overwrite might have taken place outside the current timeframe.
+			 *    For instance, if `2` was overwritten by `3`; but that occurred sometime after the timeframe that we querying; we don't want to
+			 *    exclude `2` in such a scenario, because `2` did occur within that particular timeframe and we need to count it in that case.
+			 */
+			protected function oby_sub_ids($from_time, $to_time)
+			{
+				return "SELECT `sub_id`". // IDs that were overwritten.
+				       " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
+
+				       " WHERE 1=1". // Initialize where clause.
+
+				       " AND `event` = 'overwritten' AND `oby_sub_id` > '0'".
+
+				       " AND `time`". // In this time period only.
+				       "       BETWEEN '".esc_sql((integer)$from_time)."'".
+				       "          AND '".esc_sql((integer)$to_time)."'";
 			}
 
 			/**
