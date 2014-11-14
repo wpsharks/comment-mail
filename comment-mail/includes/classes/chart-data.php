@@ -21,6 +21,13 @@ namespace comment_mail // Root namespace.
 		class chart_data extends abs_base
 		{
 			/**
+			 * @var string Input view.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $input_view;
+
+			/**
 			 * @var string Current view.
 			 *
 			 * @since 141111 First documented version.
@@ -81,7 +88,9 @@ namespace comment_mail // Root namespace.
 				$request_args         = array_merge($default_request_args, $request_args);
 				$request_args         = array_intersect_key($request_args, $default_request_args);
 
-				$this->view = trim(strtolower((string)$request_args['view']));
+				$this->input_view = $this->view = trim(strtolower((string)$request_args['view']));
+				if($this->input_view === 'subs_overview_by_post_id')
+					$this->view = 'subs_overview';
 
 				$this->chart = new \stdClass; // Object properties.
 
@@ -135,7 +144,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @return array An array of all chart data.
+			 * @return array An array of all chart data; for ChartJS.
 			 *
 			 * @throws \exception If there is a query failure.
 			 */
@@ -153,6 +162,9 @@ namespace comment_mail // Root namespace.
 					       " FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 					       " WHERE 1=1". // Initialize where clause.
+
+					       ($this->chart->post_id // Specific post ID?
+						       ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
 
 					       " AND `status` IN('subscribed')".
 
@@ -185,7 +197,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @return array An array of all chart data.
+			 * @return array An array of all chart data; for ChartJS.
 			 *
 			 * @throws \exception If there is a query failure.
 			 */
@@ -203,6 +215,9 @@ namespace comment_mail // Root namespace.
 					       " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
 
 					       " WHERE 1=1". // Initialize where clause.
+
+					       ($this->chart->post_id // Specific post ID?
+						       ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
 
 					       " AND `event` IN('inserted', 'updated')".
 
@@ -242,7 +257,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @return array An array of all chart data.
+			 * @return array An array of all chart data; for ChartJS.
 			 *
 			 * @throws \exception If there is a query failure.
 			 */
@@ -260,6 +275,9 @@ namespace comment_mail // Root namespace.
 					       " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
 
 					       " WHERE 1=1". // Initialize where clause.
+
+					       ($this->chart->post_id // Specific post ID?
+						       ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
 
 					       " AND `event` IN('inserted','updated')".
 
@@ -299,7 +317,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @return array An array of all chart data.
+			 * @return array An array of all chart data; for ChartJS.
 			 *
 			 * @throws \exception If there is a query failure.
 			 */
@@ -317,6 +335,9 @@ namespace comment_mail // Root namespace.
 					       " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
 
 					       " WHERE 1=1". // Initialize where clause.
+
+					       ($this->chart->post_id // Specific post ID?
+						       ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
 
 					       " AND `event` IN('updated','deleted')".
 
@@ -356,7 +377,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @return array An array of all chart data.
+			 * @return array An array of all chart data; for ChartJS.
 			 *
 			 * @throws \exception If there is a query failure.
 			 */
@@ -417,7 +438,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @return array An array of all chart data.
+			 * @return array An array of all chart data; for ChartJS.
 			 *
 			 * @throws \exception If there is a query failure.
 			 */
@@ -474,131 +495,6 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Chart data for a particular view.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @return array An array of all chart data.
-			 *
-			 * @throws \exception If there is a query failure.
-			 */
-			protected function subs_by_post_id_()
-			{
-				return $this->{__FUNCTION__.'_'.$this->chart->type}();
-			}
-
-			/**
-			 * Chart data for a particular view.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @return array An array of all chart data.
-			 *
-			 * @throws \exception If there is a query failure.
-			 */
-			protected function subs_by_post_id__subscribed_totals()
-			{
-				$labels = $data = array(); // Initialize.
-
-				foreach($this->chart->time_periods as $_time_period)
-					$labels[] = $_time_period['from_label'].' - '.$_time_period['to_label'];
-				unset($_time_period); // Housekeeping.
-
-				foreach($this->chart->time_periods as $_time_period)
-				{
-					$sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
-					       " FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-
-					       " WHERE 1=1". // Initialize where clause.
-
-					       " AND `post_id` = '".esc_sql($this->chart->post_id)."'".
-
-					       " AND `status` IN('subscribed')".
-
-					       " AND `insertion_time`". // In this time period only.
-					       "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
-					       "          AND '".esc_sql($_time_period['to_time'])."'";
-
-					if($this->plugin->utils_db->wp->query($sql) === FALSE)
-						throw new \exception(__('Query failure.', $this->plugin->text_domain));
-
-					$data[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
-				}
-				unset($_time_period); // Housekeeping.
-
-				return array('data'    => array('labels'   => $labels,
-				                                'datasets' => array(
-					                                array_merge($this->colors, array(
-						                                'label' => __('Actual/Current Subscr. Totals', $this->plugin->text_domain),
-						                                'data'  => $data,
-					                                )),
-				                                )),
-				             'options' => array(
-					             'scaleLabel'      => '<%=value%>',
-					             'tooltipTemplate' => '<%if (label){%><%=label%>: <%}%><%= value %> '.__('subscriptions', $this->plugin->text_domain),
-				             ));
-			}
-
-			/**
-			 * Chart data for a particular view.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @return array An array of all chart data.
-			 *
-			 * @throws \exception If there is a query failure.
-			 */
-			protected function subs_by_post_id__event_subscribed_totals()
-			{
-				$labels = $data = array(); // Initialize.
-
-				foreach($this->chart->time_periods as $_time_period)
-					$labels[] = $_time_period['from_label'].' - '.$_time_period['to_label'];
-				unset($_time_period); // Housekeeping.
-
-				foreach($this->chart->time_periods as $_time_period)
-				{
-					$sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
-					       " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
-
-					       " WHERE 1=1". // Initialize where clause.
-
-					       " AND `post_id` = '".esc_sql($this->chart->post_id)."'".
-
-					       " AND `event` IN('inserted', 'updated')".
-
-					       " AND `status` IN('subscribed')".
-					       " AND `status_before` IN('', 'unconfirmed')".
-
-					       // " AND `user_initiated` > '0'".
-
-					       " AND `time`". // In this time period only.
-					       "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
-					       "          AND '".esc_sql($_time_period['to_time'])."'".
-
-					       " GROUP BY `sub_id`"; // Unique subs only.
-
-					if($this->plugin->utils_db->wp->query($sql) === FALSE)
-						throw new \exception(__('Query failure.', $this->plugin->text_domain));
-
-					$data[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
-				}
-				unset($_time_period); // Housekeeping.
-
-				return array('data'    => array('labels'   => $labels,
-				                                'datasets' => array(
-					                                array_merge($this->colors, array(
-						                                'label' => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
-						                                'data'  => $data,
-					                                )),
-				                                )),
-				             'options' => array(
-					             'scaleLabel'      => '<%=value%>',
-					             'tooltipTemplate' => '<%if (label){%><%=label%>: <%}%><%= value %> '.__('subscriptions', $this->plugin->text_domain),
-				             ));
-			}
-
-			/**
 			 * Validates chart data.
 			 *
 			 * @since 141111 First documented version.
@@ -610,24 +506,11 @@ namespace comment_mail // Root namespace.
 				if(!$this->view || !method_exists($this, $this->view.'_'))
 					$this->errors[] = __('Invalid Chart View.Please try again.', $this->plugin->text_domain);
 
-				if($this->view === 'subs_by_post_id' && $this->chart->post_id <= 0)
+				if(!method_exists($this, $this->view.'__'.$this->chart->type))
+					$this->errors[] = __('Missing or invalid Chart Type. Please try again.', $this->plugin->text_domain);
+
+				if($this->input_view === 'subs_overview_by_post_id' && $this->chart->post_id <= 0)
 					$this->errors[] = __('Missing or invalid Post ID. Please try again.', $this->plugin->text_domain);
-
-				if($this->view === 'subs_overview' && !in_array($this->chart->type, array(
-						'subscribed_totals',
-						'event_subscribed_totals',
-						'event_confirmation_totals',
-						'event_unsubscribe_totals',
-						'event_subscribed_most_popular_posts',
-						'event_subscribed_least_popular_posts',
-					), TRUE)
-				) $this->errors[] = __('Missing or invalid Chart Type. Please try again.', $this->plugin->text_domain);
-
-				else if($this->view === 'subs_by_post_id' && !in_array($this->chart->type, array(
-						'subscribed_totals',
-						'event_subscribed_totals',
-					), TRUE)
-				) $this->errors[] = __('Missing or invalid Chart Type. Please try again.', $this->plugin->text_domain);
 
 				if(!$this->chart->from_time || !$this->chart->to_time)
 					$this->errors[] = __('Missing or invalid Date(s). Please try again.', $this->plugin->text_domain);
