@@ -1079,18 +1079,39 @@ namespace comment_mail // Root namespace.
 
 				$_panel_body = '<table>'.
 				               '  <tbody>'.
-				               $form_fields->input_row(
+				               $form_fields->select_row(
 					               array(
-						               'type'          => 'number',
-						               'label'         => __('"My Subscriptions" Summary; Max Subscriptions Per Page', $this->plugin->text_domain),
-						               'placeholder'   => __('e.g. 25', $this->plugin->text_domain),
-						               'name'          => 'sub_manage_summary_max_limit',
-						               'current_value' => $current_value_for('sub_manage_summary_max_limit'),
-						               'other_attrs'   => 'min="1" max="1000"',
-						               'notes_after'   => '<p>'.sprintf(__('On the front-end of %1$s, the "My Subscriptions" summary page will list all of the subscriptions currently associated with a subscriber\'s email address. This controls the maximum number of subscriptions to list per page. Minimum value is <code>1</code> subscription per page. Maximum value is <code>1000</code> subscriptions per page. The recommended setting is <code>25</code> subscriptions per page. Based on your setting here; if there are too many to display on a single page, pagination links will appear automatically.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+						               'label'           => sprintf(__('Display %1$s&trade; Logo at the Top of Admin Pages?', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						               'field_class'     => 'no-if-enabled',
+						               'name'            => 'menu_pages_logo_icon_enable',
+						               'current_value'   => $current_value_for('menu_pages_logo_icon_enable'),
+						               'allow_arbitrary' => FALSE,
+						               'options'         => array(
+							               '1' => sprintf(__('Yes, enable logo in back-end administrative areas for %1$s&trade;', $this->plugin->text_domain), esc_html($this->plugin->name)),
+							               '0' => sprintf(__('No, disable logo in back-end administrative areas for %1$s&trade;', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						               ),
+						               'notes_after'     => '<p>'.sprintf(__('Disabling the logo in back-end administrative areas does not impact any functionality; it\'s simply a personal preference.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
 					               )).
 				               '  </tbody>'.
 				               '</table>';
+
+				$_panel_body .= '<hr />';
+
+				$_panel_body .= '<table>'.
+				                '  <tbody>'.
+				                $form_fields->input_row(
+					                array(
+						                'type'          => 'number',
+						                'label'         => __('"My Subscriptions" Summary; Max Subscriptions Per Page', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g. 25', $this->plugin->text_domain),
+						                'name'          => 'sub_manage_summary_max_limit',
+						                'current_value' => $current_value_for('sub_manage_summary_max_limit'),
+						                'other_attrs'   => 'min="1" max="1000"',
+						                'notes_after'   => '<p>'.sprintf(__('On the front-end of %1$s, the "My Subscriptions" summary page will list all of the subscriptions currently associated with a subscriber\'s email address. This controls the maximum number of subscriptions to list per page. Minimum value is <code>1</code> subscription per page. Maximum value is <code>1000</code> subscriptions per page. The recommended setting is <code>25</code> subscriptions per page. Based on your setting here; if there are too many to display on a single page, pagination links will appear automatically.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+					                )).
+				                '  </tbody>'.
+				                '</table>';
 
 				$_panel_body .= '<hr />';
 
@@ -2342,36 +2363,48 @@ namespace comment_mail // Root namespace.
 				$_postbox_body = $this->stats_view(
 					$_postbox_view,
 					array(
-						$_form_fields->hidden_input(
+						array('hidden_input' => $_form_fields->hidden_input(
 							array(
 								'name'          => 'view',
 								'current_value' => $_postbox_view,
-							)),
+							))),
 						$_form_fields->select_row(
 							array(
 								'label'           => __('Chart Type', $this->plugin->text_domain),
 								'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
 								'name'            => 'type',
-								'current_value'   => $this->coalesce($current_value_for('type'), 'event_subscribed_totals'),
+								'current_value'   => $this->coalesce($current_value_for('type'), 'event_confirmation_percentages'),
 								'allow_arbitrary' => FALSE,
 								'options'         => array(
-									'@optgroup_open_subscr_totals'         => __('Subscr. Totals', $this->plugin->text_domain),
-									'subscribed_totals'                    => __('Actual/Current Subscr. Totals', $this->plugin->text_domain),
-									'event_subscribed_totals'              => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
-									'@optgroup_close_subscr_totals'        => '', // Close this group.
+									'@optgroup_open_subscription_totals'            => __('Subscr. Totals', $this->plugin->text_domain),
+									'event_subscribed_totals'                       => __('Total Subscriptions', $this->plugin->text_domain),
+									'@optgroup_close_subscription_totals'           => '', // Close this group.
 
-									'@optgroup_open_status_changes'        => __('Status Changes', $this->plugin->text_domain),
-									'event_confirmation_totals'            => __('Confirmation Totals (Based on Event Logs)', $this->plugin->text_domain),
-									'event_suspension_totals'              => __('Suspension Totals (Based on Event Logs)', $this->plugin->text_domain),
-									'event_unsubscribe_totals'             => __('Unsubscribe Totals (Based on Event Logs)', $this->plugin->text_domain),
-									'@optgroup_close_status_changes'       => '', // Close this group.
+									'@optgroup_open_subscr_totals_post_popularity'  => __('Post Popularity', $this->plugin->text_domain),
+									'event_subscribed_most_popular_posts'           => __('Most Popular Posts', $this->plugin->text_domain),
+									'event_subscribed_least_popular_posts'          => __('Least Popular Posts', $this->plugin->text_domain),
+									'@optgroup_close_subscr_totals_post_popularity' => '', // Close this group.
 
-									'@optgroup_open_post_popularity'       => __('Post Popularity', $this->plugin->text_domain),
-									'event_subscribed_most_popular_posts'  => __('Most Popular Posts (Based on Event Logs)', $this->plugin->text_domain),
-									'event_subscribed_least_popular_posts' => __('Least Popular Posts (Based on Event Logs)', $this->plugin->text_domain),
-									'@optgroup_close_post_popularity'      => '', // Close this group.
+									'@optgroup_open_status_change_percentages'      => __('Status Change Percentages', $this->plugin->text_domain),
+									'event_confirmation_percentages'                => __('Confirmation Percentages', $this->plugin->text_domain),
+									'event_suspension_percentages'                  => __('Suspension Percentages', $this->plugin->text_domain),
+									'event_unsubscribe_percentages'                 => __('Unsubscribe Percentages', $this->plugin->text_domain),
+									'@optgroup_close_status_change_percentages'     => '', // Close this group.
 								),
 							)),
+						array('row'      => $_form_fields->select_row(
+							array(
+								'label'           => __('Exclude', $this->plugin->text_domain),
+								'placeholder'     => __('One or More...', $this->plugin->text_domain),
+								'name'            => 'exclude',
+								'current_value'   => $this->coalesce($current_value_for('exclude'), NULL),
+								'other_attrs'     => 'multiple="multiple"',
+								'allow_arbitrary' => FALSE,
+								'options'         => array(
+									'systematics' => __('Systematics (i.e. Show User-Initiated Events Only)', $this->plugin->text_domain),
+								),
+							)), 'colspan' => 3, 'ends_row' => TRUE),
+
 						$_form_fields->input_row(
 							array(
 								'label'         => sprintf(__('From Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
@@ -2407,7 +2440,7 @@ namespace comment_mail // Root namespace.
 					array('auto_chart' => $current_value_for('view') === $_postbox_view));
 
 				echo $this->postbox(__('Subscriptions Overview', $this->plugin->text_domain), $_postbox_body,
-				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => !$current_value_for('view') || $current_value_for('view') === $_postbox_view));
+				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => $current_value_for('view') === $_postbox_view));
 
 				unset($_postbox_view, $_postbox_body); // Housekeeping.
 
@@ -2425,29 +2458,28 @@ namespace comment_mail // Root namespace.
 				$_postbox_body = $this->stats_view(
 					$_postbox_view,
 					array(
-						$_form_fields->hidden_input(
+						array('hidden_input' => $_form_fields->hidden_input(
 							array(
 								'name'          => 'view',
 								'current_value' => $_postbox_view,
-							)),
+							))),
 						$_form_fields->select_row(
 							array(
 								'label'           => __('Chart Type', $this->plugin->text_domain),
 								'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
 								'name'            => 'type',
-								'current_value'   => $this->coalesce($current_value_for('type'), 'event_subscribed_totals'),
+								'current_value'   => $this->coalesce($current_value_for('type'), 'event_confirmation_percentages'),
 								'allow_arbitrary' => FALSE,
 								'options'         => array(
-									'@optgroup_open_subscr_totals'   => __('Subscr. Totals', $this->plugin->text_domain),
-									'subscribed_totals'              => __('Actual/Current Subscr. Totals', $this->plugin->text_domain),
-									'event_subscribed_totals'        => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
-									'@optgroup_close_subscr_totals'  => '', // Close this group.
+									'@optgroup_open_subscription_totals'        => __('Subscr. Totals', $this->plugin->text_domain),
+									'event_subscribed_totals'                   => __('Total Subscriptions (for Post ID)', $this->plugin->text_domain),
+									'@optgroup_close_subscription_totals'       => '', // Close this group.
 
-									'@optgroup_open_status_changes'  => __('Status Changes', $this->plugin->text_domain),
-									'event_confirmation_totals'      => __('Confirmation Totals (Based on Event Logs)', $this->plugin->text_domain),
-									'event_suspension_totals'        => __('Suspension Totals (Based on Event Logs)', $this->plugin->text_domain),
-									'event_unsubscribe_totals'       => __('Unsubscribe Totals (Based on Event Logs)', $this->plugin->text_domain),
-									'@optgroup_close_status_changes' => '', // Close this group.
+									'@optgroup_open_status_change_percentages'  => __('Status Change Percentages', $this->plugin->text_domain),
+									'event_confirmation_percentages'            => __('Confirmation Percentages (for Post ID)', $this->plugin->text_domain),
+									'event_suspension_percentages'              => __('Suspension Percentages (for Post ID)', $this->plugin->text_domain),
+									'event_unsubscribe_percentages'             => __('Unsubscribe Percentages (for Post ID)', $this->plugin->text_domain),
+									'@optgroup_close_status_change_percentages' => '', // Close this group.
 								),
 							)),
 						$_form_fields->select_row(
@@ -2465,6 +2497,19 @@ namespace comment_mail // Root namespace.
 									'other_attrs'              => 'min="1" max="18446744073709551615"',
 								),
 							)),
+						array('row'      => $_form_fields->select_row(
+							array(
+								'label'           => __('Exclude', $this->plugin->text_domain),
+								'placeholder'     => __('One or More...', $this->plugin->text_domain),
+								'name'            => 'exclude',
+								'current_value'   => $this->coalesce($current_value_for('exclude'), NULL),
+								'other_attrs'     => 'multiple="multiple"',
+								'allow_arbitrary' => FALSE,
+								'options'         => array(
+									'systematics' => __('Systematics (i.e. Show User-Initiated Events Only)', $this->plugin->text_domain),
+								),
+							)), 'colspan' => 2, 'ends_row' => TRUE),
+
 						$_form_fields->input_row(
 							array(
 								'label'         => sprintf(__('From Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
@@ -2500,7 +2545,7 @@ namespace comment_mail // Root namespace.
 					array('auto_chart' => $current_value_for('view') === $_postbox_view));
 
 				echo $this->postbox(__('Subscriptions by Post ID', $this->plugin->text_domain), $_postbox_body,
-				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => !$current_value_for('view') || $current_value_for('view') === $_postbox_view));
+				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => $current_value_for('view') === $_postbox_view));
 
 				unset($_postbox_view, $_postbox_body); // Housekeeping.
 
@@ -2530,7 +2575,8 @@ namespace comment_mail // Root namespace.
 
 				$heading .= '<div class="pmp-heading">'."\n";
 
-				$heading .= '  <img class="pmp-logo-icon" src="'.$this->plugin->utils_url->to('/client-s/images/'.$logo_icon).'" alt="'.esc_attr($title).'" />'."\n";
+				if($this->plugin->options['menu_pages_logo_icon_enable'])
+					$heading .= '  <img class="pmp-logo-icon" src="'.$this->plugin->utils_url->to('/client-s/images/'.$logo_icon).'" alt="'.esc_attr($title).'" />'."\n";
 
 				$heading .= '  <div class="pmp-heading-links">'."\n";
 
@@ -2621,44 +2667,73 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @param string $view Statistical view specification.
-			 * @param array  $form_field_rows An array of form fields rows needed by this view.
-			 * @param array  $args Any additional specs/behavorial args.
+			 * @param string       $view Statistical view specification.
+			 *
+			 * @param array|string $form_fields An array of form fields needed for this view.
+			 *    Each element should contain a nested array of row or hidden input arguments.
+			 *
+			 *    Or, any non-array element will be converted to a string `row` property;
+			 *       i.e. a non-array item is considered a row w/o any other args.
+			 *
+			 * @param array        $args Any additional specs/behavorial args.
 			 *
 			 * @return string Markup for this menu page stats view.
 			 */
-			protected function stats_view($view, array $form_field_rows = array(), array $args = array())
+			protected function stats_view($view, array $form_fields = array(), array $args = array())
 			{
 				$view = trim(strtolower((string)$view));
 
-				$default_args = array(
+				$default_args            = array(
 					'auto_chart' => FALSE,
 				);
-				$args         = array_merge($default_args, $args);
-				$args         = array_intersect_key($args, $default_args);
+				$default_form_field_args = array(
+					'hidden_input' => '',
+					'row'          => '',
+					'colspan'      => 1,
+					'ends_row'     => FALSE,
+				);
+				$args                    = array_merge($default_args, $args);
+				$args                    = array_intersect_key($args, $default_args);
 
 				$auto_chart = (boolean)$args['auto_chart'];
 
 				$view = '<div class="'.esc_attr('pmp-stats-view pmp-stats-view-'.str_replace('_', '-', $view)).'">'."\n";
 				$view .= '  <form novalidate="novalidate" onsubmit="return false;">'."\n";
 
-				foreach($form_field_rows as $_form_field_row)
-					if(stripos($_form_field_row, '<input type="hidden"') !== FALSE)
-						$view .= '<div style="display:none;">'.$_form_field_row.'</div>'."\n";
-				unset($_form_field_row); // Housekeeping.
+				foreach($form_fields as $_form_field_args)
+				{
+					if(!is_array($_form_field_args)) // Force array.
+						$_form_field_args = array('row' => (string)$_form_field_args);
+
+					$_form_field_args = array_merge($default_form_field_args, $_form_field_args);
+					$_form_field_args = array_intersect_key($_form_field_args, $default_form_field_args);
+
+					if($_form_field_args['hidden_input']) // Actually a hidden input field?
+						$view .= '<div style="display:none;">'.$_form_field_args['hidden_input'].'</div>'."\n";
+				}
+				unset($_form_field_args); // Housekeeping.
 
 				$view .= '     <table class="pmp-stats-view-table">'."\n";
 				$view .= '        <tbody>'."\n";
 				$view .= '           <tr>'."\n";
 
-				foreach($form_field_rows as $_form_field_row)
-					if(stripos($_form_field_row, '<input type="hidden"') === FALSE)
-					{
-						$view .= '        <td class="pmp-stats-view-col">'."\n";
-						$view .= '           <table><tbody>'.$_form_field_row.'</tbody></table>'."\n";
-						$view .= '        </td>'."\n";
-					}
-				unset($_form_field_row); // Housekeeping.
+				foreach($form_fields as $_form_field_args)
+				{
+					if(!is_array($_form_field_args)) // Force array.
+						$_form_field_args = array('row' => (string)$_form_field_args);
+
+					$_form_field_args = array_merge($default_form_field_args, $_form_field_args);
+					$_form_field_args = array_intersect_key($_form_field_args, $default_form_field_args);
+
+					if($_form_field_args['hidden_input']) continue; // Already included these above.
+
+					$view .= '           <td class="pmp-stats-view-col"'.($_form_field_args['colspan'] > 1 ? ' colspan="'.esc_attr($_form_field_args['colspan']).'"' : '').'>'."\n";
+					$view .= '              <table><tbody>'.$_form_field_args['row'].'</tbody></table>'."\n";
+					$view .= '           </td>'."\n";
+
+					if($_form_field_args['ends_row']) $view .= '</tr><tr>';
+				}
+				unset($_form_field_args); // Housekeeping.
 
 				$view .= '              <td class="pmp-stats-view-col pmp-stats-view-submit">'."\n";
 				$view .= '                 <button type="button" class="button button-primary"'.($auto_chart ? ' data-auto-chart' : '').'>'."\n";

@@ -315,6 +315,28 @@
 			}
 		});
 		/* ------------------------------------------------------------------------------------------------------------
+		 Plugin-specific JS that extends ChartJS by enhancing the existing bar chart implementation.
+		 ------------------------------------------------------------------------------------------------------------ */
+
+		Chart.types.Bar.extend // Extends Bar chart class.
+		({
+			 name      : 'BetterBar',
+			 initialize: function(data)
+			 {
+				 Chart.types.Bar.prototype.initialize.apply(this, arguments);
+
+				 $.each(this.datasets, function(i, dataset)
+				 {
+					 $.each(dataset.bars, function(j, bar)
+					 {
+						 if(data.datasets[i].percent instanceof Array)
+							 bar.percent = data.datasets[i].percent[j];
+					 });
+				 });
+			 }
+		 }), Chart.BetterBar = Chart.BetterBar || function(){};
+
+		/* ------------------------------------------------------------------------------------------------------------
 		 Plugin-specific JS for menu page stats that follow a WP standard, but need a few tweaks.
 		 ------------------------------------------------------------------------------------------------------------ */
 
@@ -363,7 +385,7 @@
 
 				var chartContext = $canvas.get(0).getContext('2d');
 				var chartOps = $.extend({}, statsViewProps.chartOps, chartData.options);
-				var chart = new Chart(chartContext).Bar(chartData.data, chartOps);
+				var chart = new Chart(chartContext).BetterBar(chartData.data, chartOps);
 
 				$statsView.data('chart', chart), // Save chart reference.
 					$progress.remove(); // Complete; i.e. remove progress bar.

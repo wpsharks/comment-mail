@@ -49,15 +49,39 @@ namespace comment_mail // Root namespace.
 			protected $errors;
 
 			/**
-			 * @var array Charts colors.
+			 * @var array Chart colors.
 			 *
 			 * @since 141111 First documented version.
 			 */
 			protected $colors = array(
-				'fillColor'       => '#339E2B',
-				'strokeColor'     => '#194F16',
-				'highlightFill'   => '#346098',
-				'highlightStroke' => '#172C48',
+				'fillColor'       => 'rgba(51, 158, 43, 1)',
+				'strokeColor'     => 'rgba(25, 79, 22, 1)',
+				'highlightFill'   => 'rgba(52, 96, 152, 1)',
+				'highlightStroke' => 'rgba(23, 44, 72, 1)',
+			);
+
+			/**
+			 * @var array Primary chart colors.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $primary_colors = array(
+				'fillColor'       => 'rgba(52, 96, 152, .5)',
+				'strokeColor'     => 'rgba(52, 96, 152, .7)',
+				'highlightFill'   => 'rgba(52, 96, 152, .7)',
+				'highlightStroke' => 'rgba(52, 96, 152, 1)',
+			);
+
+			/**
+			 * @var array Secondary chart colors.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $secondary_colors = array(
+				'fillColor'       => 'rgba(51, 158, 43, .5)',
+				'strokeColor'     => 'rgba(51, 158, 43, .7)',
+				'highlightFill'   => 'rgba(51, 158, 43, .7)',
+				'highlightStroke' => 'rgba(51, 158, 43, 1)',
 			);
 
 			/**
@@ -75,29 +99,30 @@ namespace comment_mail // Root namespace.
 				parent::__construct();
 
 				$default_request_args = array(
-					'view'                => '',
+					'view'    => '',
 
-					'type'                => '',
-					'post_id'             => '',
-					'user_initiated_only' => FALSE,
+					'type'    => '',
+					'post_id' => '',
+					'exclude' => array(),
 
-					'from'                => '',
-					'to'                  => '',
+					'from'    => '',
+					'to'      => '',
 
-					'by'                  => '',
+					'by'      => '',
 				);
 				$request_args         = array_merge($default_request_args, $request_args);
 				$request_args         = array_intersect_key($request_args, $default_request_args);
 
 				$this->input_view = $this->view = trim(strtolower((string)$request_args['view']));
+
 				if($this->input_view === 'subs_overview_by_post_id')
-					$this->view = 'subs_overview';
+					$this->view = 'subs_overview'; // Same handler.
 
 				$this->chart = new \stdClass; // Object properties.
 
-				$this->chart->type                = trim((string)$request_args['type']);
-				$this->chart->post_id             = (integer)$request_args['post_id'];
-				$this->chart->user_initiated_only = (boolean)$request_args['user_initiated_only'];
+				$this->chart->type    = trim((string)$request_args['type']);
+				$this->chart->post_id = abs((integer)$request_args['post_id']);
+				$this->chart->exclude = (array)$request_args['exclude'];
 
 				$this->chart->from_time = $this->plugin->utils_string->trim((string)$request_args['from'], '', ',;');
 				$this->chart->to_time   = $this->plugin->utils_string->trim((string)$request_args['to'], '', ',;');
@@ -133,8 +158,6 @@ namespace comment_mail // Root namespace.
 			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all chart data.
-			 *
-			 * @throws \exception If there is a query failure.
 			 */
 			protected function subs_overview_()
 			{
@@ -142,411 +165,79 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Chart data for a particular view.
+			 * Chart data for a particular view type.
 			 *
 			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all chart data; for ChartJS.
-			 *
-			 * @throws \exception If there is a query failure.
-			 */
-			protected function subs_overview__subscribed_totals()
-			{
-				$labels = $data = array(); // Initialize.
-
-				foreach($this->chart->time_periods as $_time_period)
-					$labels[] = $_time_period['from_label'].' - '.$_time_period['to_label'];
-				unset($_time_period); // Housekeeping.
-
-				foreach($this->chart->time_periods as $_time_period)
-				{
-					$_sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
-					        " FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-
-					        " WHERE 1=1". // Initialize where clause.
-
-					        ($this->chart->post_id // Specific post ID?
-						        ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
-
-					        " AND `status` IN('subscribed')".
-
-					        " AND `insertion_time`". // In this time period only.
-					        "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
-					        "          AND '".esc_sql($_time_period['to_time'])."'".
-
-					        " LIMIT 1"; // Only need one to check.
-
-					if($this->plugin->utils_db->wp->query($_sql) === FALSE)
-						throw new \exception(__('Query failure.', $this->plugin->text_domain));
-
-					$data[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
-				}
-				unset($_time_period, $_sql); // Housekeeping.
-
-				return array('data'    => array('labels'   => $labels,
-				                                'datasets' => array(
-					                                array_merge($this->colors, array(
-						                                'label' => __('Actual/Current Subscr. Totals', $this->plugin->text_domain),
-						                                'data'  => $data,
-					                                )),
-				                                )),
-				             'options' => array(
-					             'scaleLabel'      => '<%=value%>',
-					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
-					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
-					                                  '<%if(parseInt(value) === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
-				             ));
-			}
-
-			/**
-			 * Chart data for a particular view.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @return array An array of all chart data; for ChartJS.
-			 *
-			 * @throws \exception If there is a query failure.
 			 */
 			protected function subs_overview__event_subscribed_totals()
 			{
-				$labels = $data = array(); // Initialize.
-
-				foreach($this->chart->time_periods as $_time_period)
-					$labels[] = $_time_period['from_label'].' - '.$_time_period['to_label'];
-				unset($_time_period); // Housekeeping.
-
-				foreach($this->chart->time_periods as $_time_period)
-				{
-					$_oby_sub_ids = $this->oby_sub_ids($_time_period['from_time'], $_time_period['to_time']);
-
-					$_sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
-					        " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
-
-					        " WHERE 1=1". // Initialize where clause.
-
-					        ($this->chart->post_id // Specific post ID?
-						        ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
-
-					        " AND `event` IN('inserted', 'updated')".
-
-					        " AND `status` IN('subscribed')".
-					        " AND `status_before` IN('', 'unconfirmed')".
-
-					        ($this->chart->user_initiated_only // User initiated only?
-						        ? " AND `user_initiated` > '0'" : '').
-
-					        " AND `time`". // In this time period only.
-					        "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
-					        "          AND '".esc_sql($_time_period['to_time'])."'".
-
-					        " AND `sub_id` NOT IN(".$_oby_sub_ids.")". // Exclude.
-
-					        " GROUP BY `sub_id`". // Unique subs only.
-
-					        " LIMIT 1"; // Only need one to check.
-
-					if($this->plugin->utils_db->wp->query($_sql) === FALSE)
-						throw new \exception(__('Query failure.', $this->plugin->text_domain));
-
-					$data[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
-				}
-				unset($_time_period, $_oby_sub_ids, $_sql); // Housekeeping.
-
-				return array('data'    => array('labels'   => $labels,
-				                                'datasets' => array(
-					                                array_merge($this->colors, array(
-						                                'label' => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
-						                                'data'  => $data,
-					                                )),
-				                                )),
-				             'options' => array(
-					             'scaleLabel'      => '<%=value%>',
-					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
-					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
-					                                  '<%if(parseInt(value) === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
-				             ));
+				return $this->subs_overview_event_subscribed_totals();
 			}
 
 			/**
-			 * Chart data for a particular view.
+			 * Chart data for a particular view type.
 			 *
 			 * @since 141111 First documented version.
 			 *
 			 * @return array An array of all chart data; for ChartJS.
-			 *
-			 * @throws \exception If there is a query failure.
-			 */
-			protected function subs_overview__event_confirmation_totals()
-			{
-				$labels = $data = array(); // Initialize.
-
-				foreach($this->chart->time_periods as $_time_period)
-					$labels[] = $_time_period['from_label'].' - '.$_time_period['to_label'];
-				unset($_time_period); // Housekeeping.
-
-				foreach($this->chart->time_periods as $_time_period)
-				{
-					$_oby_sub_ids = $this->oby_sub_ids($_time_period['from_time'], $_time_period['to_time']);
-
-					$_sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
-					        " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
-
-					        " WHERE 1=1". // Initialize where clause.
-
-					        ($this->chart->post_id // Specific post ID?
-						        ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
-
-					        " AND `event` IN('updated')".
-
-					        " AND `status` IN('subscribed')".
-					        " AND `status_before` IN('unconfirmed')".
-
-					        ($this->chart->user_initiated_only // User initiated only?
-						        ? " AND `user_initiated` > '0'" : '').
-
-					        " AND `time`". // In this time period only.
-					        "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
-					        "          AND '".esc_sql($_time_period['to_time'])."'".
-
-					        " AND `sub_id` NOT IN(".$_oby_sub_ids.")". // Exclude.
-
-					        " GROUP BY `sub_id`". // Unique subs only.
-
-					        " LIMIT 1"; // Only need one to check.
-
-					if($this->plugin->utils_db->wp->query($_sql) === FALSE)
-						throw new \exception(__('Query failure.', $this->plugin->text_domain));
-
-					$data[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
-				}
-				unset($_time_period, $_oby_sub_ids, $_sql); // Housekeeping.
-
-				return array('data'    => array('labels'   => $labels,
-				                                'datasets' => array(
-					                                array_merge($this->colors, array(
-						                                'label' => __('Confirmation Totals (Based on Event Logs)', $this->plugin->text_domain),
-						                                'data'  => $data,
-					                                )),
-				                                )),
-				             'options' => array(
-					             'scaleLabel'      => '<%=value%>',
-					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
-					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('confirmations', $this->plugin->text_domain).'<%}%>'.
-					                                  '<%if(parseInt(value) === 1){%>'.__('confirmation', $this->plugin->text_domain).'<%}%>',
-				             ));
-			}
-
-			/**
-			 * Chart data for a particular view.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @return array An array of all chart data; for ChartJS.
-			 *
-			 * @throws \exception If there is a query failure.
-			 */
-			protected function subs_overview__event_suspension_totals()
-			{
-				$labels = $data = array(); // Initialize.
-
-				foreach($this->chart->time_periods as $_time_period)
-					$labels[] = $_time_period['from_label'].' - '.$_time_period['to_label'];
-				unset($_time_period); // Housekeeping.
-
-				foreach($this->chart->time_periods as $_time_period)
-				{
-					$_oby_sub_ids = $this->oby_sub_ids($_time_period['from_time'], $_time_period['to_time']);
-
-					$_sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
-					        " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
-
-					        " WHERE 1=1". // Initialize where clause.
-
-					        ($this->chart->post_id // Specific post ID?
-						        ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
-
-					        " AND `event` IN('updated')".
-
-					        " AND `status` IN('suspended')".
-					        " AND `status_before` IN('subscribed')".
-
-					        ($this->chart->user_initiated_only // User initiated only?
-						        ? " AND `user_initiated` > '0'" : '').
-
-					        " AND `time`". // In this time period only.
-					        "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
-					        "          AND '".esc_sql($_time_period['to_time'])."'".
-
-					        " AND `sub_id` NOT IN(".$_oby_sub_ids.")". // Exclude.
-
-					        " GROUP BY `sub_id`". // Unique subs only.
-
-					        " LIMIT 1"; // Only need one to check.
-
-					if($this->plugin->utils_db->wp->query($_sql) === FALSE)
-						throw new \exception(__('Query failure.', $this->plugin->text_domain));
-
-					$data[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
-				}
-				unset($_time_period, $_oby_sub_ids, $_sql); // Housekeeping.
-
-				return array('data'    => array('labels'   => $labels,
-				                                'datasets' => array(
-					                                array_merge($this->colors, array(
-						                                'label' => __('Suspension Totals (Based on Event Logs)', $this->plugin->text_domain),
-						                                'data'  => $data,
-					                                )),
-				                                )),
-				             'options' => array(
-					             'scaleLabel'      => '<%=value%>',
-					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
-					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('suspensions', $this->plugin->text_domain).'<%}%>'.
-					                                  '<%if(parseInt(value) === 1){%>'.__('suspension', $this->plugin->text_domain).'<%}%>',
-				             ));
-			}
-
-			/**
-			 * Chart data for a particular view.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @return array An array of all chart data; for ChartJS.
-			 *
-			 * @throws \exception If there is a query failure.
-			 */
-			protected function subs_overview__event_unsubscribe_totals()
-			{
-				$labels = $data = array(); // Initialize.
-
-				foreach($this->chart->time_periods as $_time_period)
-					$labels[] = $_time_period['from_label'].' - '.$_time_period['to_label'];
-				unset($_time_period); // Housekeeping.
-
-				foreach($this->chart->time_periods as $_time_period)
-				{
-					$_oby_sub_ids = $this->oby_sub_ids($_time_period['from_time'], $_time_period['to_time']);
-
-					$_sql = "SELECT SQL_CALC_FOUND_ROWS `ID`". // Calc enable.
-					        " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
-
-					        " WHERE 1=1". // Initialize where clause.
-
-					        ($this->chart->post_id // Specific post ID?
-						        ? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
-
-					        " AND `event` IN('updated','deleted')".
-
-					        " AND `status` IN('trashed','deleted')".
-					        " AND `status_before` IN('subscribed','suspended')".
-
-					        ($this->chart->user_initiated_only // User initiated only?
-						        ? " AND `user_initiated` > '0'" : '').
-
-					        " AND `time`". // In this time period only.
-					        "       BETWEEN '".esc_sql($_time_period['from_time'])."'".
-					        "          AND '".esc_sql($_time_period['to_time'])."'".
-
-					        " AND `sub_id` NOT IN(".$_oby_sub_ids.")". // Exclude.
-
-					        " GROUP BY `sub_id`". // Unique subs only.
-
-					        " LIMIT 1"; // Only need one to check.
-
-					if($this->plugin->utils_db->wp->query($_sql) === FALSE)
-						throw new \exception(__('Query failure.', $this->plugin->text_domain));
-
-					$data[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
-				}
-				unset($_time_period, $_oby_sub_ids, $_sql); // Housekeeping.
-
-				return array('data'    => array('labels'   => $labels,
-				                                'datasets' => array(
-					                                array_merge($this->colors, array(
-						                                'label' => __('Unsubscribe Totals (Based on Event Logs)', $this->plugin->text_domain),
-						                                'data'  => $data,
-					                                )),
-				                                )),
-				             'options' => array(
-					             'scaleLabel'      => '<%=value%>',
-					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
-					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('unsubscribes', $this->plugin->text_domain).'<%}%>'.
-					                                  '<%if(parseInt(value) === 1){%>'.__('unsubscribe', $this->plugin->text_domain).'<%}%>',
-				             ));
-			}
-
-			/**
-			 * Chart data for a particular view.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @return array An array of all chart data; for ChartJS.
-			 *
-			 * @throws \exception If there is a query failure.
 			 */
 			protected function subs_overview__event_subscribed_most_popular_posts()
 			{
-				$labels = $data = array(); // Initialize.
-
-				$oby_sub_ids = $this->oby_sub_ids($this->chart->from_time, $this->chart->to_time);
-
-				$sql = "SELECT `post_id`, `sub_id`, COUNT(DISTINCT(`sub_id`)) AS `total_subs`".
-				       " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
-
-				       " WHERE 1=1". // Initialize where clause.
-
-				       " AND `post_id` > '0'".
-
-				       " AND `event` IN('inserted', 'updated')".
-
-				       " AND `status` IN('subscribed')".
-				       " AND `status_before` IN('', 'unconfirmed')".
-
-				       ($this->chart->user_initiated_only // User initiated only?
-					       ? " AND `user_initiated` > '0'" : '').
-
-				       " AND `time`". // In this time period only.
-				       "       BETWEEN '".esc_sql($this->chart->from_time)."'".
-				       "          AND '".esc_sql($this->chart->to_time)."'".
-
-				       " AND `sub_id` NOT IN(".$oby_sub_ids.")". // Exclude.
-
-				       " GROUP BY `post_id`". // Unique posts only.
-
-				       " ORDER BY `total_subs` DESC".
-
-				       " LIMIT 25"; // 25 max.
-
-				if(($results = $this->plugin->utils_db->wp->get_results($sql)))
-					foreach(($results = $this->plugin->utils_db->typify_deep($results)) as $_result)
-					{
-						$_result_post       = get_post($_result->post_id);
-						$_result_post_title = $_result_post ? ' — '.$this->plugin->utils_string->clip($_result_post->post_title, 20) : '';
-
-						$labels[] = sprintf(__('Post ID #%1$s%2$s', $this->plugin->text_domain), $_result->post_id, $_result_post_title);
-						$data[]   = (integer)$_result->total_subs;
-					}
-				unset($_result, $_result_post, $_result_post_title); // Housekeeping.
-
-				if(empty($labels)) $labels[] = '—'; // Must have something.
-				if(empty($data)) $data[] = 0; // Must have something.
-
-				return array('data'    => array('labels'   => $labels,
-				                                'datasets' => array(
-					                                array_merge($this->colors, array(
-						                                'label' => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
-						                                'data'  => $data,
-					                                )),
-				                                )),
-				             'options' => array(
-					             'scaleLabel'      => '<%=value%>',
-					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
-					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
-					                                  '<%if(parseInt(value) === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
-				             ));
+				return $this->subs_overview_event_subscribed_post_popularity('most');
 			}
 
 			/**
-			 * Chart data for a particular view.
+			 * Chart data for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array An array of all chart data; for ChartJS.
+			 */
+			protected function subs_overview__event_subscribed_least_popular_posts()
+			{
+				return $this->subs_overview_event_subscribed_post_popularity('least');
+			}
+
+			/**
+			 * Chart data for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array An array of all chart data; for ChartJS.
+			 */
+			protected function subs_overview__event_confirmation_percentages()
+			{
+				return $this->subs_overview_event_status_percentages(array('subscribed'), __('Confirmed', $this->plugin->text_domain));
+			}
+
+			/**
+			 * Chart data for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array An array of all chart data; for ChartJS.
+			 */
+			protected function subs_overview__event_suspension_percentages()
+			{
+				return $this->subs_overview_event_status_percentages(array('suspended'), __('Suspended', $this->plugin->text_domain));
+			}
+
+			/**
+			 * Chart data for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array An array of all chart data; for ChartJS.
+			 */
+			protected function subs_overview__event_unsubscribe_percentages()
+			{
+				return $this->subs_overview_event_status_percentages(array('trashed', 'deleted'), __('Unsubscribed', $this->plugin->text_domain));
+			}
+
+			/**
+			 * Chart data helper; for a particular view type.
 			 *
 			 * @since 141111 First documented version.
 			 *
@@ -554,49 +245,181 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @throws \exception If there is a query failure.
 			 */
-			protected function subs_overview__event_subscribed_least_popular_posts()
+			protected function subs_overview_event_subscribed_totals()
 			{
 				$labels = $data = array(); // Initialize.
 
-				$oby_sub_ids = $this->oby_sub_ids($this->chart->from_time, $this->chart->to_time);
+				foreach($this->chart->time_periods as $_time_period)
+					$labels[] = $_time_period['from_label'].' - '.$_time_period['to_label'];
+				unset($_time_period); // Housekeeping.
 
-				$sql = "SELECT `post_id`, `sub_id`, COUNT(DISTINCT(`sub_id`)) AS `total_subs`".
-				       " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
+				foreach($this->chart->time_periods as $_time_period)
+				{
+					$_new_sub_ids_sql = $this->new_sub_ids_sql($_time_period['from_time'], $_time_period['to_time']);
 
-				       " WHERE 1=1". // Initialize where clause.
+					$_sql = "SELECT SQL_CALC_FOUND_ROWS `sub_id`". // Calc enable.
+					        " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
 
-				       " AND `post_id` > '0'".
+					        " WHERE 1=1". // Initialize where clause.
 
-				       " AND `event` IN('inserted', 'updated')".
+					        " AND `sub_id` IN(".$_new_sub_ids_sql.")".
+					        " AND `status` IN('subscribed')".
 
-				       " AND `status` IN('subscribed')".
-				       " AND `status_before` IN('', 'unconfirmed')".
+					        (in_array('systematics', $this->chart->exclude, TRUE)
+						        ? " AND `user_initiated` > '0'" : ''). // User-initiated only.
 
-				       ($this->chart->user_initiated_only // User initiated only?
-					       ? " AND `user_initiated` > '0'" : '').
+					        " GROUP BY `sub_id`". // Unique subs only.
 
-				       " AND `time`". // In this time period only.
-				       "       BETWEEN '".esc_sql($this->chart->from_time)."'".
-				       "          AND '".esc_sql($this->chart->to_time)."'".
+					        " LIMIT 1"; // Only need one to check.
 
-				       " AND `sub_id` NOT IN(".$oby_sub_ids.")". // Exclude.
+					if($this->plugin->utils_db->wp->query($_sql) === FALSE)
+						throw new \exception(__('Query failure.', $this->plugin->text_domain));
 
-				       " GROUP BY `post_id`". // Unique posts only.
+					$data[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
+				}
+				unset($_time_period, $_oby_sub_ids, $_sql); // Housekeeping.
 
-				       " ORDER BY `total_subs` ASC".
+				return array('data'    => array('labels'   => $labels,
+				                                'datasets' => array(
+					                                array_merge($this->colors, array(
+						                                'label' => __('Total Subscriptions', $this->plugin->text_domain),
+						                                'data'  => $data,
+					                                )),
+				                                )),
+				             'options' => array(
+					             'scaleLabel'      => '<%=value%>',
 
-				       " LIMIT 25"; // 25 max.
+					             'tooltipTemplate' => '<%=label%>: <%=value%> '.
+					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
+					                                  '<%if(parseInt(value) === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
+				             ));
+			}
+
+			/**
+			 * Chart data helper; for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param array  $status Status (or statuses) we are looking for.
+			 * @param string $label Label for this change percentage.
+			 *
+			 * @return array An array of all chart data; for ChartJS.
+			 *
+			 * @throws \exception If there is a query failure.
+			 */
+			protected function subs_overview_event_status_percentages(array $status, $label)
+			{
+				$labels = $data1 = $data2 = $percent = array(); // Initialize.
+
+				foreach($this->chart->time_periods as $_time_period)
+					$labels[] = $_time_period['from_label'].' - '.$_time_period['to_label'];
+				unset($_time_period); // Housekeeping.
+
+				foreach($this->chart->time_periods as $_time_period)
+				{
+					$_sql1 = $this->new_sub_ids_sql($_time_period['from_time'], $_time_period['to_time'], array('calc_enable' => TRUE));
+
+					$_new_sub_ids_sql2 = $this->new_sub_ids_sql($_time_period['from_time'], $_time_period['to_time']);
+
+					$_sql2 = "SELECT SQL_CALC_FOUND_ROWS `sub_id`". // Calc enable.
+					         " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
+
+					         " WHERE 1=1". // Initialize where clause.
+
+					         " AND `sub_id` IN(".$_new_sub_ids_sql2.")".
+					         " AND `status` IN('".implode("','", array_map('esc_sql', $status))."')".
+
+					         (in_array('systematics', $this->chart->exclude, TRUE)
+						         ? " AND `user_initiated` > '0'" : ''). // User-initiated only.
+
+					         " GROUP BY `sub_id`". // Unique subs only.
+
+					         " LIMIT 1"; // Only need one to check.
+
+					if($this->plugin->utils_db->wp->query($_sql1) === FALSE)
+						throw new \exception(__('Query failure.', $this->plugin->text_domain));
+
+					$data1[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
+
+					if($this->plugin->utils_db->wp->query($_sql2) === FALSE)
+						throw new \exception(__('Query failure.', $this->plugin->text_domain));
+
+					$data2[] = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()");
+				}
+				unset($_time_period, $_sql1, $_new_sub_ids_sql2, $_sql2); // Housekeeping.
+
+				foreach(array_keys($data2) as $_key) // Calculate percentages.
+					$percent[$_key] = $this->plugin->utils_math->percent($data2[$_key], $data1[$_key]);
+				unset($_key); // Housekeeping.
+
+				return array('data'    => array('labels'   => $labels,
+				                                'datasets' => array(
+					                                array_merge($this->secondary_colors, array(
+						                                'label' => __('New Subscriptions', $this->plugin->text_domain),
+						                                'data'  => $data1,
+					                                )),
+					                                array_merge($this->primary_colors, array(
+						                                'label' => sprintf(__('Total %1$s', $this->plugin->text_domain), $label),
+						                                'data'  => $data2, 'percent' => $percent,
+					                                )),
+				                                )),
+				             'options' => array(
+					             'scaleLabel'           => '<%=value%>',
+
+					             'multiTooltipTemplate' => '<%=datasetLabel%>: <%=value%>'.
+					                                       '<%if(typeof percent === "number"){%> (<%=percent%>%)<%}%>',
+				             ));
+			}
+
+			/**
+			 * Chart data helper; for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $popularity Popularity type; e.g. `most` or `least`.
+			 *
+			 * @return array An array of all chart data; for ChartJS.
+			 *
+			 * @throws \exception If there is a query failure.
+			 */
+			protected function subs_overview_event_subscribed_post_popularity($popularity)
+			{
+				$labels = $data = array(); // Initialize.
+
+				$new_sub_ids_sql = $this->new_sub_ids_sql($this->chart->from_time, $this->chart->to_time);
+
+				$sql // Counts post totals by distinct `sub_id`; ordered by popularity.
+
+					= "SELECT `post_id`, `sub_id`, COUNT(DISTINCT(`sub_id`)) AS `total_subs`".
+					  " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
+
+					  " WHERE 1=1". // Initialize where clause.
+
+					  " AND `sub_id` IN(".$new_sub_ids_sql.")".
+					  " AND `status` IN('subscribed')".
+
+					  (in_array('systematics', $this->chart->exclude, TRUE)
+						  ? " AND `user_initiated` > '0'" : ''). // User-initiated only.
+
+					  " GROUP BY `post_id`". // Unique posts only.
+
+					  " ORDER BY `total_subs` ". // Most or least?
+					  ($popularity === 'least' ? 'ASC' : 'DESC').
+
+					  " LIMIT 25"; // 25 max.
 
 				if(($results = $this->plugin->utils_db->wp->get_results($sql)))
 					foreach(($results = $this->plugin->utils_db->typify_deep($results)) as $_result)
 					{
-						$_result_post       = get_post($_result->post_id);
-						$_result_post_title = $_result_post ? ' — '.$this->plugin->utils_string->clip($_result_post->post_title, 20) : '';
+						$_post            = get_post($_result->post_id);
+						$_post_type       = $_post ? get_post_type_object($_post->post_type) : NULL;
+						$_post_type       = $_post_type ? $_post_type->labels->singular_name : __('Post', $this->plugin->text_domain);
+						$_post_title_clip = $_post && $_post->post_title ? ' — '.$this->plugin->utils_string->clip($_post->post_title, 20) : '';
 
-						$labels[] = sprintf(__('Post ID #%1$s%2$s', $this->plugin->text_domain), $_result->post_id, $_result_post_title);
-						$data[]   = (integer)$_result->total_subs;
+						$labels[] = sprintf(__('%1$s ID #%2$s%3$s', $this->plugin->text_domain), $_post_type, $_result->post_id, $_post_title_clip);
+						$data[]   = (integer)$_result->total_subs; // Total subscriptions.
 					}
-				unset($_result, $_result_post, $_result_post_title); // Housekeeping.
+				unset($_result, $_post, $_post_type, $_post_title_clip); // Housekeeping.
 
 				if(empty($labels)) $labels[] = '—'; // Must have something.
 				if(empty($data)) $data[] = 0; // Must have something.
@@ -604,29 +427,87 @@ namespace comment_mail // Root namespace.
 				return array('data'    => array('labels'   => $labels,
 				                                'datasets' => array(
 					                                array_merge($this->colors, array(
-						                                'label' => __('Subscr. Totals (Based on Event Logs)', $this->plugin->text_domain),
+						                                'label' => __('Total Subscriptions', $this->plugin->text_domain),
 						                                'data'  => $data,
 					                                )),
 				                                )),
 				             'options' => array(
 					             'scaleLabel'      => '<%=value%>',
-					             'tooltipTemplate' => '<%if(label){%><%=label%>: <%}%><%=value%> '.
+
+					             'tooltipTemplate' => '<%=label%>: <%=value%> '.
 					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
 					                                  '<%if(parseInt(value) === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
 				             ));
 			}
 
 			/**
-			 * Sub-select to acquire overwritten sub IDs.
+			 * Sub-select SQL to acquire new sub IDs.
 			 *
 			 * @since 141111 First documented version.
 			 *
 			 * @param integer $from_time Time period from; UNIX timestamp.
 			 * @param integer $to_time Time period to; UNIX timestamp.
+			 * @param array   $args Any additional behavioral args.
 			 *
-			 * @return string Sub-select to acquire overwritten sub IDs.
+			 * @return string Sub-select SQL to acquire new sub IDs.
+			 */
+			protected function new_sub_ids_sql($from_time, $to_time, array $args = array())
+			{
+				$from_time = (integer)$from_time;
+				$to_time   = (integer)$to_time;
+
+				$default_args = array(
+					'calc_enable'      => FALSE,
+					'check_post_id'    => TRUE,
+					'check_exclusions' => TRUE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$calc_enable      = (boolean)$args['calc_enable'];
+				$check_post_id    = (boolean)$args['check_post_id'];
+				$check_exclusions = (boolean)$args['check_exclusions'];
+
+				$oby_sub_ids_sql = $this->oby_sub_ids_sql($from_time, $to_time);
+
+				return // Sub IDs that were inserted during this timeframe.
+
+					"SELECT".($calc_enable ? " SQL_CALC_FOUND_ROWS" : '')." `sub_id`".
+					" FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
+
+					" WHERE 1=1". // Initialize where clause.
+
+					($check_post_id && $this->chart->post_id // Specific post ID?
+						? " AND `post_id` = '".esc_sql($this->chart->post_id)."'" : '').
+
+					" AND `event` IN('inserted')". // New insertions only.
+
+					($check_exclusions && in_array('systematics', $this->chart->exclude, TRUE)
+						? " AND `user_initiated` > '0'" : ''). // User-initiated only.
+
+					" AND `time` BETWEEN '".esc_sql($from_time)."' AND '".esc_sql($to_time)."'".
+
+					" AND `sub_id` NOT IN(".$oby_sub_ids_sql.")". // Exclude these.
+					// See notes below regarding these overwritten exclusions.
+
+					" GROUP BY `sub_id`". // Unique subs only (always).
+
+					($calc_enable  // Only need one to check?
+						? " LIMIT 1" : '');
+			}
+
+			/**
+			 * Sub-select SQL to acquire overwritten sub IDs.
 			 *
-			 * @note The reason for this sub-select, is that we want to avoid counting duplicates
+			 * @since 141111 First documented version.
+			 *
+			 * @param integer $from_time Time period from; UNIX timestamp.
+			 * @param integer $to_time Time period to; UNIX timestamp.
+			 * @param array   $args Any additional behavioral args.
+			 *
+			 * @return string Sub-select SQL to acquire overwritten sub IDs.
+			 *
+			 * @note The reason for this sub-select is that we want to avoid counting duplicates
 			 *    where an event took place against two or more unique sub IDs, but where some of these
 			 *    sub IDs were overwritten by another; which really points to the same underlying subscription.
 			 *
@@ -638,18 +519,27 @@ namespace comment_mail // Root namespace.
 			 *    For instance, if `2` was overwritten by `3`; but that occurred sometime after the timeframe that we querying; we don't want to
 			 *    exclude `2` in such a scenario, because `2` did occur within that particular timeframe and we need to count it in that case.
 			 */
-			protected function oby_sub_ids($from_time, $to_time)
+			protected function oby_sub_ids_sql($from_time, $to_time, array $args = array())
 			{
-				return "SELECT `sub_id`". // IDs that were overwritten.
-				       " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
+				$from_time = (integer)$from_time;
+				$to_time   = (integer)$to_time;
 
-				       " WHERE 1=1". // Initialize where clause.
+				$default_args = array(); // None at this time.
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
 
-				       " AND `event` = 'overwritten' AND `oby_sub_id` > '0'".
+				return // Sub IDs that were overwritten during this timeframe.
 
-				       " AND `time`". // In this time period only.
-				       "       BETWEEN '".esc_sql((integer)$from_time)."'".
-				       "          AND '".esc_sql((integer)$to_time)."'";
+					"SELECT `sub_id`". // Need the sub IDs for sub-queries.
+					" FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
+
+					" WHERE 1=1". // Initialize where clause.
+
+					" AND `event` = 'overwritten' AND `oby_sub_id` > '0'".
+
+					" AND `time` BETWEEN '".esc_sql($from_time)."' AND '".esc_sql($to_time)."'".
+
+					" GROUP BY `sub_id`"; // Unique subs only (always).
 			}
 
 			/**

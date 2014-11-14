@@ -28,6 +28,7 @@ namespace comment_mail
 		 * @property-read utils_i18n            $utils_i18n
 		 * @property-read utils_mail            $utils_mail
 		 * @property-read utils_markup          $utils_markup
+		 * @property-read utils_math            $utils_math
 		 * @property-read utils_php             $utils_php
 		 * @property-read utils_queue           $utils_queue
 		 * @property-read utils_queue_event_log $utils_queue_event_log
@@ -418,6 +419,10 @@ namespace comment_mail
 
 					'comment_notification_parent_content_clip_max_chars'                   => '100', // Max chars to include in notifications.
 					'comment_notification_content_clip_max_chars'                          => '200', // Max chars to include in notifications.
+
+					/* Related to menu pages; i.e. logo display. */
+
+					'menu_pages_logo_icon_enable'                                          => '1', // Display logo/icon on menu pages?
 
 					/* Related to subscription summary. */
 

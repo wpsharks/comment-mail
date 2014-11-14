@@ -72,11 +72,41 @@ A menu page area ~ clean list items.
 A menu page area ~ chosen select menus.
 */
 .comment-mail-menu-page-area .chosen-container,
-.comment-mail-menu-page-area .chosen-drop,
-.comment-mail-menu-page-area .chosen-drop .chosen-search
+.comment-mail-menu-page-area .chosen-container .chosen-drop,
+.comment-mail-menu-page-area .chosen-container .chosen-search,
+.comment-mail-menu-page-area .chosen-container .chosen-choices
 {
 	box-sizing : border-box;
 	width      : 100% !important;
+}
+.comment-mail-menu-page-area .chosen-container .chosen-choices .search-field
+{
+	width : auto !important;
+}
+.comment-mail-menu-page-area .chosen-container .chosen-choices
+{
+	outline       : 0;
+	border-radius : 4px;
+
+	margin        : .05em;
+	padding       : .25em;
+
+	color         : #333333;
+	background    : #FFFFFF;
+	border        : 1px solid #DDDDDD;
+	box-shadow    : inset 0 1px 2px rgba(0, 0, 0, .07);
+	transition    : .05s border-color ease-in-out;
+}
+.comment-mail-menu-page-area .chosen-container .chosen-choices li.search-choice
+{
+	font-size   : .8em;
+	line-height : .9em;
+	margin      : 0 .25em 0 0;
+}
+.comment-mail-menu-page-area .chosen-container .chosen-choices li.search-choice .search-choice-close
+{
+	top   : 2.6em;
+	right : 2.6em;
 }
 /*
 A menu page area ~ post com/sub bubbles.
@@ -1011,6 +1041,10 @@ Menu page statistical view styles.
 .comment-mail-menu-page-stats .pmp-stats-view-table table
 {
 	width        : 100%;
+	table-layout : auto;
+}
+.comment-mail-menu-page-stats .pmp-stats-view-table table
+{
 	table-layout : fixed;
 }
 .comment-mail-menu-page-stats .pmp-stats-view-table th,
@@ -1040,9 +1074,13 @@ Menu page statistical view styles.
 .comment-mail-menu-page-stats .pmp-stats-view-table .pmp-stats-view-col.pmp-stats-view-submit,
 .comment-mail-menu-page-stats .pmp-stats-view-table .pmp-stats-view-col.pmp-stats-view-submit button
 {
-	width          : 150px;
-	white-space    : nowrap;
-	text-align     : center;
+	width       : 150px;
+	white-space : nowrap;
+	text-align  : center;
+}
+.comment-mail-menu-page-stats .pmp-stats-view-table .pmp-stats-view-col.pmp-stats-view-submit
+{
+	padding-left   : 2em;
 	vertical-align : bottom;
 }
 .comment-mail-menu-page-stats .pmp-stats-view .pmp-progress
@@ -1060,6 +1098,7 @@ Menu page statistical view styles.
 	.comment-mail-menu-page-stats .pmp-stats-view th,
 	.comment-mail-menu-page-stats .pmp-stats-view td,
 	.comment-mail-menu-page-stats .pmp-stats-view input,
+	.comment-mail-menu-page-stats .pmp-stats-view .chosen-choices,
 	.comment-mail-menu-page-stats .pmp-stats-view button
 	{
 		display    : block !important;
@@ -1068,8 +1107,9 @@ Menu page statistical view styles.
 		width      : 100% !important;
 		max-width  : 100% !important;
 	}
-	.comment-mail-menu-page-stats .pmp-stats-view-table > tbody > tr > td:not(:first-child)
+	.comment-mail-menu-page-stats .pmp-stats-view .pmp-stats-view-submit
 	{
-		margin-top : 1em !important;
+		padding-left : 0 !important;
+		margin-top   : 1em !important;
 	}
 }

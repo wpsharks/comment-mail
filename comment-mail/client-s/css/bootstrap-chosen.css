@@ -1,9 +1,14 @@
 .chosen-container,
-.chosen-drop,
-.chosen-drop .chosen-search
+.chosen-container .chosen-drop,
+.chosen-container .chosen-search,
+.chosen-container .chosen-choices
 {
 	box-sizing : border-box;
 	width      : 100% !important;
+}
+.chosen-container .chosen-choices .search-field
+{
+	width : auto !important;
 }
 .chosen-container-single .chosen-single
 {
