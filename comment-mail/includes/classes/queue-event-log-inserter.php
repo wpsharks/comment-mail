@@ -43,7 +43,9 @@ namespace comment_mail // Root namespace.
 				$defaults = array(
 					'queue_id'          => 0,
 					'dby_queue_id'      => 0,
+
 					'sub_id'            => 0,
+
 					'user_id'           => 0,
 					'post_id'           => 0,
 					'comment_parent_id' => 0,
@@ -52,21 +54,26 @@ namespace comment_mail // Root namespace.
 					'fname'             => '',
 					'lname'             => '',
 					'email'             => '',
+
 					'ip'                => '',
+					'region'            => '',
+					'country'           => '',
 
 					'status'            => '',
 
 					'event'             => '',
-
 					'note_code'         => '',
 
 					'time'              => time(),
 				);
-				if(empty($entry['ip']) && !empty($entry['last_ip']))
-					$entry['ip'] = $entry['last_ip'];
+				# IP, region, country; auto-fill from subscription data.
 
-				if(empty($entry['ip']) && !empty($entry['insertion_ip']))
-					$entry['ip'] = $entry['insertion_ip'];
+				foreach(array('ip', 'region', 'country') as $_key)
+				{
+					if(empty($entry[$_key])) // Coalesce; giving precedence to the `last_` value.
+						$entry[$_key] = $this->not_empty_coalesce($entry['last_'.$_key], $entry['insertion_'.$_key]);
+				}
+				unset($_key); // Just a little housekeeping.
 
 				$this->entry = array_merge($defaults, $entry);
 				$this->entry = array_intersect_key($this->entry, $defaults);

@@ -148,11 +148,27 @@ namespace comment_mail // Root namespace.
 						'label' => __('<i class="fa fa-fw fa-level-up fa-rotate-90" style="margin-left:1px;"></i> Last Name', $this->plugin->text_domain),
 						'name'  => 'lname', 'required' => FALSE, 'maxlength' => 100, 'current_value' => $this->current_value_for('lname'),
 					));
+				/* -------------------------------------------------------------------- */
+				echo $this->form_fields->horizontal_line_row(/* -------------------------------------------------------------------- */);
+				/* -------------------------------------------------------------------- */
+
 				echo $this->form_fields->input_row(
 					array(
 						'label'       => __('<i class="fa fa-fw fa-bullseye"></i> IP Address', $this->plugin->text_domain),
 						'name'        => 'insertion_ip', 'required' => FALSE, 'maxlength' => 39, 'current_value' => $this->current_value_for('insertion_ip'),
 						'notes_after' => __('If empty, this is filled automatically when a subscriber confirms or updates their subscription.', $this->plugin->text_domain),
+					));
+				echo $this->form_fields->input_row(
+					array(
+						'label'       => __('<i class="fa fa-fw fa-map-marker"></i> IP Region Code', $this->plugin->text_domain),
+						'name'        => 'insertion_region', 'required' => FALSE, 'maxlength' => 2, 'current_value' => $this->current_value_for('insertion_region'),
+						'notes_after' => sprintf(__('If empty, this is filled automatically when a subscriber confirms or updates their subscription. Here is a map of all %1$s; found in the second column of the CSV file.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://www.maxmind.com/download/geoip/misc/region_codes.csv', __('Region Codes', $this->plugin->text_domain))),
+					));
+				echo $this->form_fields->input_row(
+					array(
+						'label'       => __('<i class="fa fa-fw fa-globe"></i> IP Country Code', $this->plugin->text_domain),
+						'name'        => 'insertion_country', 'required' => FALSE, 'maxlength' => 2, 'current_value' => $this->current_value_for('insertion_country'),
+						'notes_after' => sprintf(__('If empty, this is filled automatically when a subscriber confirms or updates their subscription. Here is a map of all %1$s; found in the first column of the CSV file.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://www.maxmind.com/download/geoip/misc/region_codes.csv', __('Country Codes', $this->plugin->text_domain))),
 					));
 				/* -------------------------------------------------------------------- */
 				echo $this->form_fields->horizontal_line_row(/* -------------------------------------------------------------------- */);
@@ -275,10 +291,13 @@ namespace comment_mail // Root namespace.
 				$plugin = plugin();
 
 				$default_info      = array(
-					'email' => '',
-					'fname' => '',
-					'lname' => '',
-					'ip'    => '',
+					'email'   => '',
+					'fname'   => '',
+					'lname'   => '',
+
+					'ip'      => '',
+					'region'  => '',
+					'country' => '',
 				);
 				$default_info_json = json_encode($default_info);
 
@@ -296,12 +315,18 @@ namespace comment_mail // Root namespace.
 					return $default_info_json;
 
 				$info = array(
-					'email' => $user->user_email,
-					'fname' => $plugin->utils_string->first_name('', $user),
-					'lname' => $plugin->utils_string->last_name('', $user),
-					'ip'    => $plugin->utils_user->is_current($user)
-						? $plugin->utils_env->user_ip() // For current user.
+					'email'   => $user->user_email,
+					'fname'   => $plugin->utils_string->first_name('', $user),
+					'lname'   => $plugin->utils_string->last_name('', $user),
+
+					'ip'      => $plugin->utils_user->is_current($user) ? $plugin->utils_ip->current()
 						: $plugin->utils_sub->email_last_ip($user->user_email),
+
+					'region'  => $plugin->utils_user->is_current($user) ? $plugin->utils_ip->current_region()
+						: $plugin->utils_sub->email_last_region($user->user_email),
+
+					'country' => $plugin->utils_user->is_current($user) ? $plugin->utils_ip->current_country()
+						: $plugin->utils_sub->email_last_country($user->user_email),
 				);
 				$info = array_merge($default_info, $info);
 				$info = array_intersect_key($info, $default_info);

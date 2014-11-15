@@ -1353,16 +1353,26 @@ namespace comment_mail // Root namespace.
 				$sql_columns      = array(
 					'ID',
 					'key',
+
 					'user_id',
 					'post_id',
 					'comment_id',
+
 					'deliver',
+					'status',
+
 					'fname',
 					'lname',
 					'email',
+
 					'insertion_ip',
+					'insertion_region',
+					'insertion_country',
+
 					'last_ip',
-					'status',
+					'last_region',
+					'last_country',
+
 					'insertion_time',
 					'last_update_time',
 				);

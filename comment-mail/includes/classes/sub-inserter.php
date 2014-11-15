@@ -254,7 +254,12 @@ namespace comment_mail // Root namespace.
 			 *       • `user_id`; requires `ui_protected_data_user`.
 			 *
 			 *       • `insertion_ip`; inserted/updated systematically.
+			 *       • `insertion_region`; inserted/updated systematically.
+			 *       • `insertion_country`; inserted/updated systematically.
+			 *
 			 *       • `last_ip`; inserted/updated systematically.
+			 *       • `last_region`; inserted/updated systematically.
+			 *       • `last_country`; inserted/updated systematically.
 			 *
 			 *       • `insertion_time`; inserted/updated systematically.
 			 *       • `last_update_time`; inserted/updated systematically.
@@ -271,29 +276,34 @@ namespace comment_mail // Root namespace.
 				/* Related to the data. */
 
 				$default_request_args = array(
-					'ID'               => NULL,
+					'ID'                => NULL,
 					// A key is always auto-generated on insert.
 					// A key can NEVER be updated by anyone — only systematically!
 					// A read-only key is required to update w/ `ui_protected_data_keys_enable`.
-					'key'              => NULL,
+					'key'               => NULL,
 
-					'user_id'          => NULL,
-					'post_id'          => NULL,
-					'comment_id'       => NULL,
+					'user_id'           => NULL,
+					'post_id'           => NULL,
+					'comment_id'        => NULL,
 
-					'deliver'          => NULL,
+					'deliver'           => NULL,
 
-					'fname'            => NULL,
-					'lname'            => NULL,
-					'email'            => NULL,
+					'fname'             => NULL,
+					'lname'             => NULL,
+					'email'             => NULL,
 
-					'insertion_ip'     => NULL,
-					'last_ip'          => NULL,
+					'insertion_ip'      => NULL,
+					'insertion_region'  => NULL,
+					'insertion_country' => NULL,
 
-					'status'           => NULL,
+					'last_ip'           => NULL,
+					'last_region'       => NULL,
+					'last_country'      => NULL,
 
-					'insertion_time'   => NULL,
-					'last_update_time' => NULL,
+					'status'            => NULL,
+
+					'insertion_time'    => NULL,
+					'last_update_time'  => NULL,
 				);
 				$request_args         = array_merge($default_request_args, $request_args);
 				$request_args         = array_intersect_key($request_args, $default_request_args);
@@ -352,8 +362,16 @@ namespace comment_mail // Root namespace.
 				if($this->user_initiated) // Protected data keys?
 					if($this->ui_protected_data_keys_enable)
 					{
-						$this->data['user_id']          = NULL;
-						$this->data['insertion_ip']     = NULL;
+						$this->data['user_id'] = NULL;
+
+						$this->data['insertion_ip']      = NULL;
+						$this->data['insertion_region']  = NULL;
+						$this->data['insertion_country'] = NULL;
+
+						$this->data['last_ip']      = NULL;
+						$this->data['last_region']  = NULL;
+						$this->data['last_country'] = NULL;
+
 						$this->data['insertion_time']   = NULL;
 						$this->data['last_update_time'] = NULL;
 					}
@@ -803,10 +821,17 @@ namespace comment_mail // Root namespace.
 				$new_email   = $this->new_value_for('email');
 				$new_last_ip = $this->new_value_for('last_ip');
 
-				$this->auto_confirm = $this->plugin->utils_sub->can_auto_confirm(
-					$new_post_id, $new_user_id, $new_email, $new_last_ip,
-					$this->user_initiated, $this->auto_confirm
+				$can_auto_confirm_args = array(
+					'post_id'        => $new_post_id,
+
+					'sub_user_id'    => $new_user_id,
+					'sub_email'      => $new_email,
+					'sub_last_ip'    => $new_last_ip,
+
+					'user_initiated' => $this->user_initiated,
+					'auto_confirm'   => $this->auto_confirm,
 				);
+				$this->auto_confirm    = $this->plugin->utils_sub->can_auto_confirm($can_auto_confirm_args);
 			}
 
 			/*
@@ -1201,13 +1226,13 @@ namespace comment_mail // Root namespace.
 								$_value = ''; // Use a default value.
 
 							if($this->is_insert && !$_value && $this->is_current_user)
-								$_value = $this->plugin->utils_env->user_ip();
+								$_value = $this->plugin->utils_ip->current();
 
 							if($this->is_insert && !$_value && $this->data['last_ip'])
 								$_value = (string)$this->data['last_ip'];
 
 							if($this->is_update && $this->sub && !$this->sub->insertion_ip && !$_value && $this->is_current_user)
-								$_value = $this->plugin->utils_env->user_ip();
+								$_value = $this->plugin->utils_ip->current();
 
 							if($this->is_update && isset($_value) && !$_value && $this->data['last_ip'])
 								$_value = (string)$this->data['last_ip'];
@@ -1220,6 +1245,82 @@ namespace comment_mail // Root namespace.
 
 							else if($this->is_insert && (!isset($_value) || strlen($_value) > 39))
 								$this->errors['invalid_sub_insertion_ip'] = sprintf(__('Invalid insertion IP: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'insertion_region': // Insertion region code.
+
+							if($this->user_initiated)
+								if($this->ui_protected_data_keys_enable)
+									$_value = NULL; // Nullify protected key.
+
+							if(isset($_value))
+								$_value = (string)$_value;
+
+							if($this->is_insert && !$_value)
+								$_value = ''; // Use a default value.
+
+							if($this->is_insert && !$_value && $this->is_current_user)
+								$_value = $this->plugin->utils_ip->current_region();
+
+							if($this->is_insert && !$_value && ($this->data['insertion_ip'] || $this->data['last_ip']))
+								$_value = $this->plugin->utils_ip->region($this->coalesce($this->data['insertion_ip'], $this->data['last_ip']));
+
+							if($this->is_update && $this->sub && !$this->sub->insertion_region && !$_value && $this->is_current_user)
+								$_value = $this->plugin->utils_ip->current_region(); // Auto-fill on update.
+
+							if($this->is_update && $this->sub && !$this->sub->insertion_region && !$_value)
+								$_value = $this->plugin->utils_ip->region($this->coalesce($this->sub->insertion_ip, $this->sub->last_ip));
+
+							if($this->is_update && isset($_value) && !$_value && ($this->data['insertion_ip'] || $this->data['last_ip']))
+								$_value = $this->plugin->utils_ip->region($this->coalesce($this->data['insertion_ip'], $this->data['last_ip']));
+
+							if($this->is_update && isset($_value) && !$_value && $this->sub)
+								$_value = $this->plugin->utils_ip->region($this->coalesce($this->sub->insertion_ip, $this->sub->last_ip));
+
+							if(isset($_value) && strlen($_value) > 2)
+								$this->errors['invalid_sub_insertion_region'] = sprintf(__('Invalid insertion region: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || strlen($_value) > 2))
+								$this->errors['invalid_sub_insertion_region'] = sprintf(__('Invalid insertion region: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'insertion_country': // Insertion country code.
+
+							if($this->user_initiated)
+								if($this->ui_protected_data_keys_enable)
+									$_value = NULL; // Nullify protected key.
+
+							if(isset($_value))
+								$_value = (string)$_value;
+
+							if($this->is_insert && !$_value)
+								$_value = ''; // Use a default value.
+
+							if($this->is_insert && !$_value && $this->is_current_user)
+								$_value = $this->plugin->utils_ip->current_country();
+
+							if($this->is_insert && !$_value && ($this->data['insertion_ip'] || $this->data['last_ip']))
+								$_value = $this->plugin->utils_ip->country($this->coalesce($this->data['insertion_ip'], $this->data['last_ip']));
+
+							if($this->is_update && $this->sub && !$this->sub->insertion_country && !$_value && $this->is_current_user)
+								$_value = $this->plugin->utils_ip->current_country(); // Auto-fill on update.
+
+							if($this->is_update && $this->sub && !$this->sub->insertion_country && !$_value)
+								$_value = $this->plugin->utils_ip->country($this->coalesce($this->sub->insertion_ip, $this->sub->last_ip));
+
+							if($this->is_update && isset($_value) && !$_value && ($this->data['insertion_ip'] || $this->data['last_ip']))
+								$_value = $this->plugin->utils_ip->country($this->coalesce($this->data['insertion_ip'], $this->data['last_ip']));
+
+							if($this->is_update && isset($_value) && !$_value && $this->sub)
+								$_value = $this->plugin->utils_ip->country($this->coalesce($this->sub->insertion_ip, $this->sub->last_ip));
+
+							if(isset($_value) && strlen($_value) > 2)
+								$this->errors['invalid_sub_insertion_country'] = sprintf(__('Invalid insertion country: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || strlen($_value) > 2))
+								$this->errors['invalid_sub_insertion_country'] = sprintf(__('Invalid insertion country: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 
@@ -1236,7 +1337,7 @@ namespace comment_mail // Root namespace.
 								$_value = ''; // Use a default value.
 
 							if(!$_value && $this->is_current_user)
-								$_value = $this->plugin->utils_env->user_ip();
+								$_value = $this->plugin->utils_ip->current();
 
 							if($this->is_insert && !$_value && $this->data['insertion_ip'])
 								$_value = (string)$this->data['insertion_ip'];
@@ -1252,6 +1353,70 @@ namespace comment_mail // Root namespace.
 
 							else if($this->is_insert && (!isset($_value) || strlen($_value) > 39))
 								$this->errors['invalid_sub_last_ip'] = sprintf(__('Invalid last IP: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'last_region': // Last known region code.
+
+							if($this->user_initiated)
+								if($this->ui_protected_data_keys_enable)
+									$_value = NULL; // Nullify protected key.
+
+							if(isset($_value))
+								$_value = (string)$_value;
+
+							if($this->is_insert && !$_value)
+								$_value = ''; // Use a default value.
+
+							if(!$_value && $this->is_current_user)
+								$_value = $this->plugin->utils_ip->current_region();
+
+							if($this->is_insert && !$_value && ($this->data['last_ip'] || $this->data['insertion_ip']))
+								$_value = $this->plugin->utils_ip->region($this->coalesce($this->data['last_ip'], $this->data['insertion_ip']));
+
+							if($this->is_update && isset($_value) && !$_value && ($this->data['last_ip'] || $this->data['insertion_ip']))
+								$_value = $this->plugin->utils_ip->region($this->coalesce($this->data['last_ip'], $this->data['insertion_ip']));
+
+							if($this->is_update && isset($_value) && !$_value && $this->sub)
+								$_value = $this->plugin->utils_ip->region($this->coalesce($this->sub->last_ip, $this->sub->insertion_ip));
+
+							if(isset($_value) && strlen($_value) > 2)
+								$this->errors['invalid_sub_last_region'] = sprintf(__('Invalid last region: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || strlen($_value) > 2))
+								$this->errors['invalid_sub_last_region'] = sprintf(__('Invalid last region: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
+
+							break; // Break switch handler.
+
+						case 'last_country': // Last known country code.
+
+							if($this->user_initiated)
+								if($this->ui_protected_data_keys_enable)
+									$_value = NULL; // Nullify protected key.
+
+							if(isset($_value))
+								$_value = (string)$_value;
+
+							if($this->is_insert && !$_value)
+								$_value = ''; // Use a default value.
+
+							if(!$_value && $this->is_current_user)
+								$_value = $this->plugin->utils_ip->current_country();
+
+							if($this->is_insert && !$_value && ($this->data['last_ip'] || $this->data['insertion_ip']))
+								$_value = $this->plugin->utils_ip->country($this->coalesce($this->data['last_ip'], $this->data['insertion_ip']));
+
+							if($this->is_update && isset($_value) && !$_value && ($this->data['last_ip'] || $this->data['insertion_ip']))
+								$_value = $this->plugin->utils_ip->country($this->coalesce($this->data['last_ip'], $this->data['insertion_ip']));
+
+							if($this->is_update && isset($_value) && !$_value && $this->sub)
+								$_value = $this->plugin->utils_ip->country($this->coalesce($this->sub->last_ip, $this->sub->insertion_ip));
+
+							if(isset($_value) && strlen($_value) > 2)
+								$this->errors['invalid_sub_last_country'] = sprintf(__('Invalid last country: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
+
+							else if($this->is_insert && (!isset($_value) || strlen($_value) > 2))
+								$this->errors['invalid_sub_last_country'] = sprintf(__('Invalid last country: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
 							break; // Break switch handler.
 

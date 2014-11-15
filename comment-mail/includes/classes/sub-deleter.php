@@ -25,14 +25,28 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 */
-			protected $sub; // Subscription.
+			protected $sub; // Subscr. data.
 
 			/**
-			 * @var string Last IP.
+			 * @var string Last known IP.
 			 *
 			 * @since 141111 First documented version.
 			 */
 			protected $last_ip;
+
+			/**
+			 * @var string Last known region.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $last_region;
+
+			/**
+			 * @var string Last known country.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $last_country;
 
 			/**
 			 * @var integer Overwritten by subscription ID.
@@ -100,9 +114,10 @@ namespace comment_mail // Root namespace.
 
 				$defaults_args = array(
 					'last_ip'        => '',
+					'last_region'    => '',
+					'last_counry'    => '',
 
 					'oby_sub_id'     => 0,
-
 					'purging'        => FALSE,
 					'cleaning'       => FALSE,
 
@@ -113,12 +128,13 @@ namespace comment_mail // Root namespace.
 				$args          = array_merge($defaults_args, $args);
 				$args          = array_intersect_key($args, $defaults_args);
 
-				$this->last_ip        = (string)$args['last_ip'];
+				$this->last_ip      = trim((string)$args['last_ip']);
+				$this->last_region  = trim((string)$args['last_region']);
+				$this->last_country = trim((string)$args['last_country']);
 
-				$this->oby_sub_id     = (integer)$args['oby_sub_id'];
-
-				$this->purging        = (boolean)$args['purging'];
-				$this->cleaning       = (boolean)$args['cleaning'];
+				$this->oby_sub_id = (integer)$args['oby_sub_id'];
+				$this->purging    = (boolean)$args['purging'];
+				$this->cleaning   = (boolean)$args['cleaning'];
 
 				$this->process_events = (boolean)$args['process_events'];
 
@@ -126,18 +142,32 @@ namespace comment_mail // Root namespace.
 				$this->user_initiated = $this->plugin->utils_sub->check_user_initiated_by_admin(
 					$this->sub ? $this->sub->email : '', $this->user_initiated
 				);
-				if($this->user_initiated && !$this->last_ip)
-					$this->last_ip = $this->plugin->utils_env->user_ip();
+				# Auto-fill last IP, region, country if it's the current user.
 
-				if($this->oby_sub_id) // Resolve conflicts.
+				if($this->user_initiated && !$this->last_ip)
+					$this->last_ip = $this->plugin->utils_ip->current();
+
+				if($this->user_initiated && !$this->last_region)
+					$this->last_region = $this->plugin->utils_ip->current_region();
+
+				if($this->user_initiated && !$this->last_country)
+					$this->last_country = $this->plugin->utils_ip->current_country();
+
+				# Auto-resolve conflicts between deletion event types.
+
+				if($this->oby_sub_id)
 					$this->purging = $this->cleaning = FALSE;
 
-				if($this->purging) $this->cleaning = FALSE;
+				if($this->purging)
+					$this->cleaning = FALSE;
 
-				if($this->cleaning) $this->purging = FALSE;
+				if($this->cleaning)
+					$this->purging = FALSE;
 
 				if($this->purging || $this->cleaning)
 					$this->oby_sub_id = 0;
+
+				# Define the event type based on args.
 
 				if($this->oby_sub_id)
 					$this->event_type = 'overwritten';
@@ -149,6 +179,8 @@ namespace comment_mail // Root namespace.
 					$this->event_type = 'cleaned';
 
 				else $this->event_type = 'deleted';
+
+				# Perform deletion event type.
 
 				$this->deleted = FALSE; // Initialize.
 
@@ -191,7 +223,9 @@ namespace comment_mail // Root namespace.
 
 				$this->sub->status = 'deleted'; // Obj. properties.
 				if($this->last_ip) $this->sub->last_ip = $this->last_ip;
-				$this->sub->last_update_time = time();
+				if($this->last_region) $this->sub->last_region = $this->last_region;
+				if($this->last_country) $this->sub->last_country = $this->last_country;
+				$this->sub->last_update_time = time(); // Updating now by deleting.
 
 				$this->plugin->utils_sub->nullify_cache(array($this->sub->ID, $this->sub->key));
 

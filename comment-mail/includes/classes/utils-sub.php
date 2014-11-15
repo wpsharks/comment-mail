@@ -881,6 +881,62 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Last region associated w/ email address.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string  $sub_email Email address to check.
+			 * @param boolean $no_cache Disallow a previously cached value?
+			 *
+			 * @return string Last region associated w/ email address; else empty string.
+			 */
+			public function email_last_region($sub_email, $no_cache = FALSE)
+			{
+				if(!($sub_email = trim(strtolower((string)$sub_email))))
+					return ''; // Not possible.
+
+				if(!is_null($last_region = &$this->cache_key(__FUNCTION__, $sub_email)) && !$no_cache)
+					return $last_region; // Already cached this.
+
+				$sql = "SELECT `last_region` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				       " WHERE `email` = '".esc_sql($sub_email)."' AND `last_region` != ''".
+
+				       " ORDER BY `last_update_time` DESC".
+
+				       " LIMIT 1"; // One to check.
+
+				return ($last_region = trim((string)$this->plugin->utils_db->wp->get_var($sql)));
+			}
+
+			/**
+			 * Last country associated w/ email address.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string  $sub_email Email address to check.
+			 * @param boolean $no_cache Disallow a previously cached value?
+			 *
+			 * @return string Last country associated w/ email address; else empty string.
+			 */
+			public function email_last_country($sub_email, $no_cache = FALSE)
+			{
+				if(!($sub_email = trim(strtolower((string)$sub_email))))
+					return ''; // Not possible.
+
+				if(!is_null($last_country = &$this->cache_key(__FUNCTION__, $sub_email)) && !$no_cache)
+					return $last_country; // Already cached this.
+
+				$sql = "SELECT `last_country` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				       " WHERE `email` = '".esc_sql($sub_email)."' AND `last_country` != ''".
+
+				       " ORDER BY `last_update_time` DESC".
+
+				       " LIMIT 1"; // One to check.
+
+				return ($last_country = trim((string)$this->plugin->utils_db->wp->get_var($sql)));
+			}
+
+			/**
 			 * Is an email address blacklisted?
 			 *
 			 * @since 141111 First documented version.
@@ -916,19 +972,23 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @param integer      $post_id A WP post ID.
-			 * @param integer      $sub_user_id Subscriber's WP user ID.
-			 * @param string       $sub_email Subscriber email address.
-			 * @param string       $sub_last_ip Subscriber's last IP address.
-			 * @param boolean      $user_initiated Request is user-initiated?
-			 * @param boolean|null $auto_confirm Flag to force specific behavior.
+			 * @param array $args An array w/ the following:
+			 *
+			 *    • integer `post_id` A WP post ID.
+			 *
+			 *    • integer `sub_user_id` Subscriber's WP user ID.
+			 *    • string `sub_email` Subscriber's email address.
+			 *    • string `sub_last_ip` Subscriber's last IP address.
+			 *
+			 *    • boolean `user_initiated` Request is user-initiated?
+			 *    • boolean|null `auto_confirm` Flag to force specific behavior.
 			 *
 			 * @return boolean|null `TRUE` if the subscription can be auto-confirmed.
-			 *    Or, `FALSE` if the subscription CANNOT be autoconfirmed (explicitly).
+			 *    Or, `FALSE` if the subscription CANNOT be auto-confirmed (explicitly).
 			 *
 			 *    Otherwise, we will simply allow an already-`NULL` value to pass through as-is.
 			 *    This preserves our ability to recognize that it was left to the default behavior,
-			 *    and that we could not determine definitely if it should be auto-confirmed or not.
+			 *    and that we could not determine definitively if it should be auto-confirmed or not.
 			 *
 			 * @note Regarding the default auto-confirm-if-already-subscribed behavior:
 			 *
@@ -973,15 +1033,30 @@ namespace comment_mail // Root namespace.
 			 *    All of that said, if `$sub_user_id` > `0` (and `all_wp_users_confirm_email=1`), we can safely continue
 			 *    w/o the additional check against the current plugin options; since the user ID can be matched up properly in that case.
 			 */
-			public function can_auto_confirm($post_id, $sub_user_id, $sub_email, $sub_last_ip, $user_initiated = FALSE, $auto_confirm = NULL)
+			public function can_auto_confirm(array $args)
 			{
-				$post_id     = (integer)$post_id;
-				$sub_user_id = (integer)$sub_user_id;
-				$sub_email   = trim(strtolower((string)$sub_email));
-				$sub_last_ip = trim((string)$sub_last_ip);
+				$default_args = array(
+					'post_id'        => 0,
 
-				$user_initiated = (boolean)$user_initiated;
+					'sub_user_id'    => 0,
+					'sub_email'      => '',
+					'sub_last_ip'    => '',
+
+					'user_initiated' => FALSE,
+					'auto_confirm'   => NULL,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$post_id     = (integer)$args['post_id'];
+				$sub_user_id = (integer)$args['sub_user_id'];
+				$sub_email   = trim(strtolower((string)$args['sub_email']));
+				$sub_last_ip = trim((string)$args['sub_last_ip']);
+
+				$user_initiated = (boolean)$args['user_initiated'];
 				$user_initiated = $this->check_user_initiated_by_admin($sub_email, $user_initiated);
+
+				$auto_confirm = $args['auto_confirm']; // Initialize only.
 
 				if(!$post_id || !$sub_email)
 					return FALSE; // Not possible.

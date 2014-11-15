@@ -61,20 +61,30 @@ namespace comment_mail // Root namespace.
 				return array(
 					'cb'                => '1', // Include checkboxes.
 					'ID'                => __('Entry', $plugin->text_domain),
+
 					'time'              => __('Time', $plugin->text_domain),
+
 					'event'             => __('Event', $plugin->text_domain),
 					'note_code'         => __('Note', $plugin->text_domain),
+
 					'queue_id'          => __('Queue ID', $plugin->text_domain),
 					'dby_queue_id'      => __('Digested by Queue ID', $plugin->text_domain),
+
 					'sub_id'            => __('Subscr. ID', $plugin->text_domain),
+
 					'user_id'           => __('WP User ID', $plugin->text_domain),
 					'post_id'           => __('Subscr. to Post ID', $plugin->text_domain),
 					'comment_parent_id' => __('Subscr. to Comment ID', $plugin->text_domain),
 					'comment_id'        => __('Regarding Comment ID', $plugin->text_domain),
+
 					'fname'             => __('Subscr. First Name', $plugin->text_domain),
 					'lname'             => __('Subscr. Last Name', $plugin->text_domain),
 					'email'             => __('Subscr. Email', $plugin->text_domain),
+
 					'ip'                => __('Subscr. IP', $plugin->text_domain),
+					'region'            => __('Subscr. IP Region', $plugin->text_domain),
+					'country'           => __('Subscr. IP Country', $plugin->text_domain),
+
 					'status'            => __('Subscr. Status', $plugin->text_domain),
 				);
 			}
@@ -90,15 +100,23 @@ namespace comment_mail // Root namespace.
 			{
 				return array(
 					'note_code',
+
 					'queue_id',
 					'dby_queue_id',
+
 					'user_id',
+
 					'comment_parent_id',
 					'comment_id',
+
 					'fname',
 					'lname',
 					'email',
+
 					'ip',
+					'region',
+					'country',
+
 					'status',
 				);
 			}
@@ -116,6 +134,7 @@ namespace comment_mail // Root namespace.
 					'fname',
 					'lname',
 					'email',
+
 					'ip',
 				);
 			}

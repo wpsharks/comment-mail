@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS `%%prefix%%queue_event_log` (
   `lname` varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Subscriber last name; at the time of the event.',
   `email` varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Subscriber email address; at the time of the event.',
   `ip` varchar(39) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Subscriber IP address; at the time of the event.',
+  `region` varchar(2) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Geographic region; at the time of the event.',
+  `country` varchar(2) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Geographic country; at the time of the event.',
   `status` enum('','unconfirmed','subscribed','suspended','trashed') COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT 'Subscription status; at the time of the event.',
   `event` enum('invalidated', 'notified') COLLATE utf8_unicode_ci NOT NULL COMMENT 'Event type.',
   `note_code` varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Optional note during processing.',

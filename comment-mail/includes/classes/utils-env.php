@@ -31,25 +31,6 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Current user IP address.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @return string Current user's IP address; else an empty string.
-			 */
-			public function user_ip()
-			{
-				if(!is_null($ip = &$this->static_key(__FUNCTION__)))
-					return $ip; // Cached this already.
-
-				$ip = ''; // Initialize.
-				if(!empty($_SERVER['REMOTE_ADDR']))
-					$ip = $_SERVER['REMOTE_ADDR'];
-
-				return ($ip = (string)substr($ip, 0, 39));
-			}
-
-			/**
 			 * Current request is for a pro version preview?
 			 *
 			 * @since 141111 First documented version.

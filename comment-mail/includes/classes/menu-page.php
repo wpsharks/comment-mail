@@ -81,8 +81,8 @@ namespace comment_mail // Root namespace.
 
 				echo '         <h2 class="pmp-section-heading">'.
 				     '            '.__('Basic Configuration (Required)', $this->plugin->text_domain).
-				     '            <small'.($this->plugin->install_time() > strtotime('-1 hour') ? ' class="pmp-hilite"' : '').'>'.
-				     sprintf(__('Review these basic options and %1$s&trade; will be ready-to-go!', $this->plugin->text_domain), esc_html($this->plugin->name)).'</small>'.
+				     '            <small><span'.($this->plugin->install_time() > strtotime('-1 hour') ? ' class="pmp-hilite"' : '').'>'.
+				     sprintf(__('Review these basic options and %1$s&trade; will be ready-to-go!', $this->plugin->text_domain), esc_html($this->plugin->name)).'</span></small>'.
 				     '         </h2>';
 
 				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -614,6 +614,51 @@ namespace comment_mail // Root namespace.
 				                '</table>';
 
 				echo $this->panel(__('Auto-Confirm Settings', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table style="margin:0;">'.
+				               ' <tbody>'.
+				               $form_fields->select_row(
+					               array(
+						               'label'           => __('Enable IP Region/Country Tracking?', $this->plugin->text_domain),
+						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						               'field_class'     => 'no-if-enabled',
+						               'name'            => 'geo_location_tracking_enable',
+						               'current_value'   => $current_value_for('geo_location_tracking_enable'),
+						               'allow_arbitrary' => FALSE, // Must be one of these.
+						               'options'         => array(
+							               '0' => __('No, do not enable geographic location tracking for IP addresses', $this->plugin->text_domain),
+							               '1' => __('Yes, automatically gather geographic region/country codes for each subscription (recommended)', $this->plugin->text_domain),
+						               ),
+						               'notes_after'     => '<p>'.sprintf(__('If you enable this feature, %1$s will post user IP addresses to the remote %2$s API behind-the-scenes, asking for geographic data associated with each subscription. %1$s will store this information locally in your WP database so that the data can be exported easily, and even used in statistical reporting. <span class="pmp-hilite">This option is highly recommended, but disabled by default</span> since it requires that you understand a remote connection takes place behind-the-scenes when %1$s speaks to the %2$s API.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://www.geoplugin.com/', 'geoPlugin')).'</p>',
+					               )).
+				               ' </tbody>'.
+				               '</table>';
+
+				$_panel_body .= '<hr />';
+
+				$_panel_body .= '<table>'.
+				                ' <tbody>'.
+				                $form_fields->select_row(
+					                array(
+						                'label'           => __('Give Precedence to <code>$_SERVER[REMOTE_ADDR]</code>?', $this->plugin->text_domain),
+						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						                'name'            => 'prioritize_remote_addr',
+						                'current_value'   => $current_value_for('prioritize_remote_addr'),
+						                'allow_arbitrary' => FALSE, // Must be one of these.
+						                'options'         => array(
+							                '0' => __('No, search through proxies and other forwarded IP address headers first; in the most logical order (recommended)', $this->plugin->text_domain),
+							                '1' => __('Yes, always use $_SERVER[REMOTE_ADDR]; my server deals with advanced IP logic already', $this->plugin->text_domain),
+						                ),
+						                'notes_after'     => '<p>'.sprintf(__('Most hosting companies do NOT adequately fill <code>$_SERVER[REMOTE_ADDR]</code>. Instead, this is left up to your software (e.g. %1$s). So, unless you know for sure that your hosting company <em>is</em> properly analyzing forwarded IP address headers before filling the <code>$_SERVER[REMOTE_ADDR]</code> environment variable, it is suggested that you simply leave this set to <code>No</code>. This way %1$s will always get a visitor\'s real IP address, even if they\'re behind a proxy; or if your server uses a load balancer that alters <code>$_SERVER[REMOTE_ADDR]</code> inadvertently. You\'ll be happy to know that %1$s supports both IPv4 and IPv6 addresses.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+					                )).
+				                ' </tbody>'.
+				                '</table>';
+
+				echo $this->panel(__('Geo IP Region/Country Tracking', $this->plugin->text_domain), $_panel_body, array());
 
 				unset($_panel_body); // Housekeeping.
 

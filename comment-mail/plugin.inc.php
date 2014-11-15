@@ -26,6 +26,7 @@ namespace comment_mail
 		 * @property-read utils_event           $utils_event
 		 * @property-read utils_fs              $utils_fs
 		 * @property-read utils_i18n            $utils_i18n
+		 * @property-read utils_ip              $utils_ip
 		 * @property-read utils_mail            $utils_mail
 		 * @property-read utils_markup          $utils_markup
 		 * @property-read utils_math            $utils_math
@@ -125,7 +126,7 @@ namespace comment_mail
 			 *
 			 * @var string Current version of the software.
 			 */
-			public $version = '141111';
+			public $version = '141115';
 
 			/*
 			 * Public Properties (Defined @ Setup)
@@ -427,6 +428,11 @@ namespace comment_mail
 					/* Related to subscription summary. */
 
 					'sub_manage_summary_max_limit'                                         => '25', // Subscriptions per page.
+
+					/* Related to IP tracking. */
+
+					'prioritize_remote_addr'                                               => '0', // `0|1`; enable?
+					'geo_location_tracking_enable'                                         => '0', // `0|1`; enable?
 
 					/* Related to select options. */
 

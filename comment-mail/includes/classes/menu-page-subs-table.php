@@ -59,22 +59,34 @@ namespace comment_mail // Root namespace.
 				$plugin = plugin(); // Plugin class instance.
 
 				return array(
-					'cb'               => '1', // Include checkboxes.
-					'email'            => __('Subscriber Email', $plugin->text_domain),
-					'fname'            => __('First Name', $plugin->text_domain),
-					'lname'            => __('Last Name', $plugin->text_domain),
-					'user_id'          => __('WP User ID', $plugin->text_domain),
-					'post_id'          => __('Subscr. to Post ID', $plugin->text_domain),
-					'comment_id'       => __('Subscr. to Comment ID', $plugin->text_domain),
-					'insertion_time'   => __('Subscr. Time', $plugin->text_domain),
-					'insertion_ip'     => __('Subscr. IP', $plugin->text_domain),
-					'sub_type'         => __('Subscr. Type', $plugin->text_domain),
-					'deliver'          => __('Delivery', $plugin->text_domain),
-					'last_ip'          => __('Last IP', $plugin->text_domain),
-					'status'           => __('Status', $plugin->text_domain),
-					'last_update_time' => __('Last Update', $plugin->text_domain),
-					'key'              => __('Key', $plugin->text_domain),
-					'ID'               => __('ID', $plugin->text_domain),
+					'cb'                => '1', // Include checkboxes.
+
+					'email'             => __('Subscriber Email', $plugin->text_domain),
+					'fname'             => __('First Name', $plugin->text_domain),
+					'lname'             => __('Last Name', $plugin->text_domain),
+
+					'user_id'           => __('WP User ID', $plugin->text_domain),
+					'post_id'           => __('Subscr. to Post ID', $plugin->text_domain),
+					'comment_id'        => __('Subscr. to Comment ID', $plugin->text_domain),
+
+					'insertion_time'    => __('Subscr. Time', $plugin->text_domain),
+					'last_update_time'  => __('Last Update', $plugin->text_domain),
+
+					'insertion_ip'      => __('Subscr. IP', $plugin->text_domain),
+					'insertion_region'  => __('Subscr. IP Region', $plugin->text_domain),
+					'insertion_country' => __('Subscr. IP Country', $plugin->text_domain),
+
+					'sub_type'          => __('Subscr. Type', $plugin->text_domain),
+					'deliver'           => __('Delivery', $plugin->text_domain),
+
+					'last_ip'           => __('Last IP', $plugin->text_domain),
+					'last_region'       => __('Last IP Region', $plugin->text_domain),
+					'last_country'      => __('Last IP Country', $plugin->text_domain),
+
+					'status'            => __('Status', $plugin->text_domain),
+
+					'key'               => __('Key', $plugin->text_domain),
+					'ID'                => __('ID', $plugin->text_domain),
 				);
 			}
 
@@ -90,11 +102,20 @@ namespace comment_mail // Root namespace.
 				return array(
 					'fname',
 					'lname',
+
 					'user_id',
 					'comment_id',
-					'insertion_ip',
-					'last_ip',
+
 					'last_update_time',
+
+					'insertion_ip',
+					'insertion_region',
+					'insertion_country',
+
+					'last_ip',
+					'last_region',
+					'last_country',
+
 					'key',
 					'ID',
 				);
@@ -113,8 +134,10 @@ namespace comment_mail // Root namespace.
 					'email',
 					'fname',
 					'lname',
+
 					'insertion_ip',
 					'last_ip',
+
 					'key',
 				);
 			}

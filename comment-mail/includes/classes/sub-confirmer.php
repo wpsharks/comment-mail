@@ -197,11 +197,18 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_auto_confirm()
 			{
-				$can_auto_confirm = // Call upon our utility for this.
-					$this->plugin->utils_sub->can_auto_confirm(
-						$this->sub->post_id, $this->sub->user_id, $this->sub->email, $this->sub->last_ip,
-						$this->user_initiated, $this->auto_confirm
-					);
+				$can_auto_confirm_args = array(
+					'post_id'        => $this->sub->post_id,
+
+					'sub_user_id'    => $this->sub->user_id,
+					'sub_email'      => $this->sub->email,
+					'sub_last_ip'    => $this->sub->last_ip,
+
+					'user_initiated' => $this->user_initiated,
+					'auto_confirm'   => $this->auto_confirm,
+				);
+				$can_auto_confirm      = $this->plugin->utils_sub->can_auto_confirm($can_auto_confirm_args);
+
 				if($can_auto_confirm) // Possible to auto-confirm?
 				{
 					$this->plugin->utils_sub->confirm($this->sub->ID, array(

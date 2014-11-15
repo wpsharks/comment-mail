@@ -57,7 +57,10 @@ namespace comment_mail // Root namespace.
 					'fname'             => '',
 					'lname'             => '',
 					'email'             => '',
+
 					'ip'                => '',
+					'region'            => '',
+					'country'           => '',
 
 					'status'            => '',
 
@@ -78,18 +81,31 @@ namespace comment_mail // Root namespace.
 					'fname_before'      => '',
 					'lname_before'      => '',
 					'email_before'      => '',
+
 					'ip_before'         => '',
+					'region_before'     => '',
+					'country_before'    => '',
 
 					'status_before'     => '',
 				);
+				# Sub ID auto-fill from subscription data.
+
 				if(empty($entry['sub_id']) && !empty($entry['ID']))
 					$entry['sub_id'] = $entry['ID'];
 
-				if(empty($entry['ip']) && !empty($entry['last_ip']))
-					$entry['ip'] = $entry['last_ip'];
+				# IP, region, country; auto-fill from subscription data.
 
-				if(empty($entry['ip']) && !empty($entry['insertion_ip']))
-					$entry['ip'] = $entry['insertion_ip'];
+				foreach(array('ip', 'region', 'country') as $_key)
+				{
+					if(empty($entry[$_key])) // Coalesce; giving precedence to the `last_` value.
+						$entry[$_key] = $this->not_empty_coalesce($entry['last_'.$_key], $entry['insertion_'.$_key]);
+
+					if(empty($before[$_key])) // Coalesce; giving precedence to the `last_` value.
+						$before[$_key] = $this->not_empty_coalesce($before['last_'.$_key], $before['insertion_'.$_key]);
+				}
+				unset($_key); // Just a little housekeeping.
+
+				# Auto-suffix subscription data from `_before`.
 
 				foreach($before as $_key => $_value)
 				{
@@ -97,12 +113,6 @@ namespace comment_mail // Root namespace.
 					unset($before[$_key]); // Unset.
 				}
 				unset($_key, $_value); // Housekeeping.
-
-				if(empty($before['ip_before']) && !empty($before['last_ip_before']))
-					$before['ip_before'] = $before['last_ip_before'];
-
-				if(empty($before['ip_before']) && !empty($before['insertion_ip_before']))
-					$before['ip_before'] = $before['insertion_ip_before'];
 
 				$this->entry = array_merge($defaults, $entry, $before);
 				$this->entry = array_intersect_key($this->entry, $defaults);

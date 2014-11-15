@@ -72,16 +72,22 @@ namespace comment_mail // Root namespace.
 					'user_initiated' => __('User Initiated', $plugin->text_domain),
 
 					'oby_sub_id'     => __('Overwritten By', $plugin->text_domain),
+
 					'status_before'  => __('Status Before', $plugin->text_domain),
 					'status'         => __('Status After', $plugin->text_domain),
 
 					'post_id'        => __('Subscr. to Post ID', $plugin->text_domain),
 					'comment_id'     => __('Subscr. to Comment ID', $plugin->text_domain),
+
 					'deliver'        => __('Delivery', $plugin->text_domain),
+
 					'fname'          => __('First Name', $plugin->text_domain),
 					'lname'          => __('Last Name', $plugin->text_domain),
 					'email'          => __('Email', $plugin->text_domain),
+
 					'ip'             => __('IP Address', $plugin->text_domain),
+					'region'         => __('IP Region', $plugin->text_domain),
+					'country'        => __('IP Country', $plugin->text_domain),
 				);
 			}
 
@@ -96,16 +102,25 @@ namespace comment_mail // Root namespace.
 			{
 				return array(
 					'key',
+
 					'user_id',
+
 					'user_initiated',
+
 					'oby_sub_id',
+
 					'post_id',
 					'comment_id',
+
 					'deliver',
+
 					'fname',
 					'lname',
 					'email',
+
 					'ip',
+					'region',
+					'country',
 				);
 			}
 

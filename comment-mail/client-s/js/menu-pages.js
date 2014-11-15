@@ -231,8 +231,10 @@
 
 		subFormUserIdProps.handler = function()
 		{
-			var $this = $(this), $emailTh, $email, $fname, $lname, $ip,
-				requestVars = {}; // Initialize these vars.
+			var $this = $(this), $emailTh,
+				$email, $fname, $lname,
+				$ip, $region, $country,
+				requestVars = {};
 
 			subFormUserIdProps.newId = $.trim($this.val());
 			if(subFormUserIdProps.newId === subFormUserIdProps.lastId)
@@ -240,10 +242,14 @@
 			subFormUserIdProps.lastId = subFormUserIdProps.newId; // Update last ID.
 
 			$emailTh = $menuPageForm.find('> form tr.pmp-sub-form-email th'),
+
 				$email = $menuPageForm.find('> form tr.pmp-sub-form-email input'),
 				$fname = $menuPageForm.find('> form tr.pmp-sub-form-fname input'),
 				$lname = $menuPageForm.find('> form tr.pmp-sub-form-lname input'),
-				$ip = $menuPageForm.find('> form tr.pmp-sub-form-insertion-ip input');
+
+				$ip = $menuPageForm.find('> form tr.pmp-sub-form-insertion-ip input'),
+				$region = $menuPageForm.find('> form tr.pmp-sub-form-insertion-region input'),
+				$country = $menuPageForm.find('> form tr.pmp-sub-form-insertion-country input');
 
 			if(!$emailTh.length || ($email.length + $fname.length + $lname.length) < 1)
 				return; // Not possible; expecting a table header; and at least one of these.
@@ -254,9 +260,8 @@
 			requestVars[namespace] = {sub_form_user_id_info_via_ajax: {user_id: subFormUserIdProps.newId}},
 				$.get(vars.ajaxEndpoint, requestVars, function(newUserInfo)
 				{
-					$email.val(newUserInfo.email), // Prefill these fields.
-						$fname.val(newUserInfo.fname), $lname.val(newUserInfo.lname),
-						$ip.val(newUserInfo.ip); // Normally this will be empty.
+					$email.val(newUserInfo.email), $fname.val(newUserInfo.fname), $lname.val(newUserInfo.lname),
+						$ip.val(newUserInfo.ip), $region.val(newUserInfo.region), $country.val(newUserInfo.country);
 
 					subFormUserIdProps.$progress.remove(); // Complete.
 				});

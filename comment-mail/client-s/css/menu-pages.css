@@ -223,10 +223,8 @@ A menu page area ~ utilities.
 }
 .comment-mail-menu-page-area .pmp-hilite
 {
-	opacity       : 1 !important;
 	border        : 0 !important;
 	border-radius : 5px !important;
-	display       : table !important;
 	color         : #000000 !important;
 	background    : #FFFBB2 !important;
 	padding       : .25em .5em .25em .5em !important;

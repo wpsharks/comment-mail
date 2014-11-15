@@ -290,7 +290,9 @@ namespace comment_mail // Root namespace.
 				$log_entry = array(
 					'queue_id'          => $entry_props->entry->ID,
 					'dby_queue_id'      => $entry_props->dby_queue_id, // Digested?
+
 					'sub_id'            => $entry_props->sub ? $entry_props->sub->ID : $entry_props->entry->sub_id,
+
 					'user_id'           => $entry_props->sub ? $entry_props->sub->user_id : 0, // Default; no user; not possible.
 					'post_id'           => $entry_props->post ? $entry_props->post->ID : ($entry_props->comment ? $entry_props->comment->comment_post_ID : ($entry_props->sub ? $entry_props->sub->post_id : 0)),
 					'comment_id'        => $entry_props->comment ? $entry_props->comment->comment_ID : $entry_props->entry->comment_id,
@@ -299,11 +301,15 @@ namespace comment_mail // Root namespace.
 					'fname'             => $entry_props->sub ? $entry_props->sub->fname : '',
 					'lname'             => $entry_props->sub ? $entry_props->sub->lname : '',
 					'email'             => $entry_props->sub ? $entry_props->sub->email : '',
+
 					'ip'                => $entry_props->sub ? $entry_props->sub->last_ip : '',
+					'region'            => $entry_props->sub ? $entry_props->sub->last_region : '',
+					'country'           => $entry_props->sub ? $entry_props->sub->last_country : '',
+
 					'status'            => $entry_props->sub ? $entry_props->sub->status : '',
 
 					'event'             => $entry_props->event,
-					'note_code'         => $entry_props->note_code
+					'note_code'         => $entry_props->note_code,
 				);
 				new queue_event_log_inserter($log_entry);
 

@@ -155,19 +155,30 @@ namespace comment_mail // Root namespace.
 								' '.__('<code>"ID"</code>, or <code>"email"</code> together with a <code>"post_id"</code>.', $this->plugin->text_domain);
 							break; // Stop here; we have no headers in this importation.
 						}
-					$_import                     = array(); // Reset this on each pass.
-					$_import['ID']               = $this->csv_line_column_value_for('ID', $csv_headers, $_csv_line);
-					$_import['key']              = $this->csv_line_column_value_for('key', $csv_headers, $_csv_line);
-					$_import['user_id']          = $this->csv_line_column_value_for('user_id', $csv_headers, $_csv_line);
-					$_import['post_id']          = $this->csv_line_column_value_for('post_id', $csv_headers, $_csv_line);
-					$_import['comment_id']       = $this->csv_line_column_value_for('comment_id', $csv_headers, $_csv_line);
-					$_import['deliver']          = $this->csv_line_column_value_for('deliver', $csv_headers, $_csv_line);
-					$_import['fname']            = $this->csv_line_column_value_for('fname', $csv_headers, $_csv_line);
-					$_import['lname']            = $this->csv_line_column_value_for('lname', $csv_headers, $_csv_line);
-					$_import['email']            = $this->csv_line_column_value_for('email', $csv_headers, $_csv_line);
-					$_import['insertion_ip']     = $this->csv_line_column_value_for('insertion_ip', $csv_headers, $_csv_line);
-					$_import['last_ip']          = $this->csv_line_column_value_for('last_ip', $csv_headers, $_csv_line);
-					$_import['status']           = $this->csv_line_column_value_for('status', $csv_headers, $_csv_line);
+					$_import = array(); // Reset this on each pass.
+
+					$_import['ID']  = $this->csv_line_column_value_for('ID', $csv_headers, $_csv_line);
+					$_import['key'] = $this->csv_line_column_value_for('key', $csv_headers, $_csv_line);
+
+					$_import['user_id']    = $this->csv_line_column_value_for('user_id', $csv_headers, $_csv_line);
+					$_import['post_id']    = $this->csv_line_column_value_for('post_id', $csv_headers, $_csv_line);
+					$_import['comment_id'] = $this->csv_line_column_value_for('comment_id', $csv_headers, $_csv_line);
+
+					$_import['deliver'] = $this->csv_line_column_value_for('deliver', $csv_headers, $_csv_line);
+					$_import['status']  = $this->csv_line_column_value_for('status', $csv_headers, $_csv_line);
+
+					$_import['fname'] = $this->csv_line_column_value_for('fname', $csv_headers, $_csv_line);
+					$_import['lname'] = $this->csv_line_column_value_for('lname', $csv_headers, $_csv_line);
+					$_import['email'] = $this->csv_line_column_value_for('email', $csv_headers, $_csv_line);
+
+					$_import['insertion_ip']      = $this->csv_line_column_value_for('insertion_ip', $csv_headers, $_csv_line);
+					$_import['insertion_region']  = $this->csv_line_column_value_for('insertion_region', $csv_headers, $_csv_line);
+					$_import['insertion_country'] = $this->csv_line_column_value_for('insertion_country', $csv_headers, $_csv_line);
+
+					$_import['last_ip']      = $this->csv_line_column_value_for('last_ip', $csv_headers, $_csv_line);
+					$_import['last_region']  = $this->csv_line_column_value_for('last_region', $csv_headers, $_csv_line);
+					$_import['last_country'] = $this->csv_line_column_value_for('last_country', $csv_headers, $_csv_line);
+
 					$_import['insertion_time']   = $this->csv_line_column_value_for('insertion_time', $csv_headers, $_csv_line);
 					$_import['last_update_time'] = $this->csv_line_column_value_for('last_update_time', $csv_headers, $_csv_line);
 
