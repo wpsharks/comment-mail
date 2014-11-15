@@ -1097,7 +1097,7 @@ Menu page statistical view styles.
 	display : block;
 	margin  : 1em auto 1em auto;
 }
-.comment-mail-menu-page-stats .pmp-stats-view canvas
+.comment-mail-menu-page-stats .pmp-stats-view .pmp-canvas
 {
 	box-sizing : border-box;
 	margin     : 1em 0 0 0;

@@ -2425,14 +2425,20 @@ namespace comment_mail // Root namespace.
 								'current_value'   => $this->coalesce($current_value_for('type'), 'event_confirmation_percentages'),
 								'allow_arbitrary' => FALSE,
 								'options'         => array(
-									'@optgroup_open_subscription_totals'            => __('Subscr. Totals', $this->plugin->text_domain),
+									'@optgroup_open_subscr_totals'                  => __('Subscr. Totals', $this->plugin->text_domain),
 									'event_subscribed_totals'                       => __('Total Subscriptions', $this->plugin->text_domain),
-									'@optgroup_close_subscription_totals'           => '', // Close this group.
+									'@optgroup_close_subscr_totals'                 => '', // Close this group.
 
 									'@optgroup_open_subscr_totals_post_popularity'  => __('Post Popularity', $this->plugin->text_domain),
 									'event_subscribed_most_popular_posts'           => __('Most Popular Posts', $this->plugin->text_domain),
 									'event_subscribed_least_popular_posts'          => __('Least Popular Posts', $this->plugin->text_domain),
 									'@optgroup_close_subscr_totals_post_popularity' => '', // Close this group.
+
+									'@optgroup_open_subscr_totals_geo_popularity'   => __('Geographic Popularity', $this->plugin->text_domain),
+									'event_subscribed_audience_by_geo_country'      => __('Audience by Country', $this->plugin->text_domain),
+									'event_subscribed_audience_by_geo_us_region'    => __('Audience by US Region', $this->plugin->text_domain),
+									'event_subscribed_audience_by_geo_ca_region'    => __('Audience by CA Region', $this->plugin->text_domain),
+									'@optgroup_close_subscr_totals_geo_popularity'  => '', // Close this group.
 
 									'@optgroup_open_status_change_percentages'      => __('Status Change Percentages', $this->plugin->text_domain),
 									'event_confirmation_percentages'                => __('Confirmation Percentages', $this->plugin->text_domain),
@@ -2489,7 +2495,7 @@ namespace comment_mail // Root namespace.
 					array('auto_chart' => $current_value_for('view') === $_postbox_view));
 
 				echo $this->postbox(__('Subscriptions Overview', $this->plugin->text_domain), $_postbox_body,
-				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => !$current_value_for('view') || $current_value_for('view') === $_postbox_view));
+				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => $current_value_for('view') === $_postbox_view));
 
 				unset($_postbox_view, $_postbox_body); // Housekeeping.
 
@@ -2520,15 +2526,21 @@ namespace comment_mail // Root namespace.
 								'current_value'   => $this->coalesce($current_value_for('type'), 'event_confirmation_percentages'),
 								'allow_arbitrary' => FALSE,
 								'options'         => array(
-									'@optgroup_open_subscription_totals'        => __('Subscr. Totals', $this->plugin->text_domain),
-									'event_subscribed_totals'                   => __('Total Subscriptions (for Post ID)', $this->plugin->text_domain),
-									'@optgroup_close_subscription_totals'       => '', // Close this group.
+									'@optgroup_open_subscr_totals'                 => __('Subscr. Totals', $this->plugin->text_domain),
+									'event_subscribed_totals'                      => __('Total Subscriptions (for Post ID)', $this->plugin->text_domain),
+									'@optgroup_close_subscr_totals'                => '', // Close this group.
 
-									'@optgroup_open_status_change_percentages'  => __('Status Change Percentages', $this->plugin->text_domain),
-									'event_confirmation_percentages'            => __('Confirmation Percentages (for Post ID)', $this->plugin->text_domain),
-									'event_suspension_percentages'              => __('Suspension Percentages (for Post ID)', $this->plugin->text_domain),
-									'event_unsubscribe_percentages'             => __('Unsubscribe Percentages (for Post ID)', $this->plugin->text_domain),
-									'@optgroup_close_status_change_percentages' => '', // Close this group.
+									'@optgroup_open_subscr_totals_geo_popularity'  => __('Geographic Popularity', $this->plugin->text_domain),
+									'event_subscribed_audience_by_geo_country'      => __('Audience by Country (for Post ID)', $this->plugin->text_domain),
+									'event_subscribed_audience_by_geo_us_region'    => __('Audience by US Region (for Post ID)', $this->plugin->text_domain),
+									'event_subscribed_audience_by_geo_ca_region'    => __('Audience by CA Region (for Post ID)', $this->plugin->text_domain),
+									'@optgroup_close_subscr_totals_geo_popularity' => '', // Close this group.
+
+									'@optgroup_open_status_change_percentages'     => __('Status Change Percentages', $this->plugin->text_domain),
+									'event_confirmation_percentages'               => __('Confirmation Percentages (for Post ID)', $this->plugin->text_domain),
+									'event_suspension_percentages'                 => __('Suspension Percentages (for Post ID)', $this->plugin->text_domain),
+									'event_unsubscribe_percentages'                => __('Unsubscribe Percentages (for Post ID)', $this->plugin->text_domain),
+									'@optgroup_close_status_change_percentages'    => '', // Close this group.
 								),
 							)),
 						$_form_fields->select_row(
@@ -2920,8 +2932,9 @@ namespace comment_mail // Root namespace.
 				$args                    = array_intersect_key($args, $default_args);
 
 				$auto_chart = (boolean)$args['auto_chart'];
+				$slug       = str_replace('_', '-', $view);
 
-				$view = '<div class="'.esc_attr('pmp-stats-view pmp-stats-view-'.str_replace('_', '-', $view)).'">'."\n";
+				$view = '<div class="'.esc_attr('pmp-stats-view pmp-stats-view-'.$slug).'" data-view="'.esc_attr($slug).'">'."\n";
 				$view .= '  <form novalidate="novalidate" onsubmit="return false;">'."\n";
 
 				foreach($form_fields as $_form_field_args)

@@ -115,7 +115,7 @@ namespace comment_mail // Root namespace.
 				$defaults_args = array(
 					'last_ip'        => '',
 					'last_region'    => '',
-					'last_counry'    => '',
+					'last_country'   => '',
 
 					'oby_sub_id'     => 0,
 					'purging'        => FALSE,

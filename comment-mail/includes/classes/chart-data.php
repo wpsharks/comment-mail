@@ -85,6 +85,15 @@ namespace comment_mail // Root namespace.
 			);
 
 			/**
+			 * @var array Gradient chart colors.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $gradient_colors = array(
+				'#4EAD47', '#307D27', '#5A85BE', '#346098',
+			);
+
+			/**
 			 * Class constructor.
 			 *
 			 * @since 141111 First documented version.
@@ -208,6 +217,42 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 *
+			 * @return array An array of all chart data; for Google Visualization.
+			 */
+			protected function subs_overview__event_subscribed_audience_by_geo_country()
+			{
+				return $this->subs_overview_event_subscribed_audience_by_geo_country();
+			}
+
+			/**
+			 * Chart data for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array An array of all chart data; for Google Visualization.
+			 */
+			protected function subs_overview__event_subscribed_audience_by_geo_us_region()
+			{
+				return $this->subs_overview_event_subscribed_audience_by_geo_region('US');
+			}
+
+			/**
+			 * Chart data for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array An array of all chart data; for Google Visualization.
+			 */
+			protected function subs_overview__event_subscribed_audience_by_geo_ca_region()
+			{
+				return $this->subs_overview_event_subscribed_audience_by_geo_region('CA');
+			}
+
+			/**
+			 * Chart data for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
 			 * @return array An array of all chart data; for ChartJS.
 			 */
 			protected function subs_overview__event_confirmation_percentages()
@@ -295,6 +340,153 @@ namespace comment_mail // Root namespace.
 					             'tooltipTemplate' => '<%=label%>: <%=value%> '.
 					                                  '<%if(parseInt(value) < 1 || parseInt(value) > 1){%>'.__('subscriptions', $this->plugin->text_domain).'<%}%>'.
 					                                  '<%if(parseInt(value) === 1){%>'.__('subscription', $this->plugin->text_domain).'<%}%>',
+				             ));
+			}
+
+			/**
+			 * Chart data helper; for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array An array of all chart data; for Google Visualization `geochart` map.
+			 *
+			 * @throws \exception If there is a query failure.
+			 */
+			public function subs_overview_event_subscribed_audience_by_geo_country()
+			{
+				$data            = array(
+					array( // Initialize column headers.
+					       __('Country', $this->plugin->text_domain),
+					       __('Total Subscriptions', $this->plugin->text_domain),
+					       __('Percentage', $this->plugin->text_domain),
+					));
+				$grand_total     = 0; // Initialize.
+				$new_sub_ids_sql = $this->new_sub_ids_sql($this->chart->from_time, $this->chart->to_time);
+
+				$sql  // Counts country totals by distinct `sub_id`; ordered by popularity.
+
+					= "SELECT `country`, `sub_id`, COUNT(DISTINCT(`sub_id`)) AS `total_subs`".
+					  " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
+
+					  " WHERE 1=1". // Initialize where clause.
+
+					  " AND `sub_id` IN(".$new_sub_ids_sql.")".
+					  " AND `status` IN('subscribed')".
+					  " AND `country` != ''".
+
+					  (in_array('systematics', $this->chart->exclude, TRUE)
+						  ? " AND `user_initiated` > '0'" : ''). // User-initiated only.
+
+					  " GROUP BY `country`". // Unique countries only.
+
+					  " ORDER BY `total_subs` DESC".
+
+					  " LIMIT 400"; // 400 max allowed by Google; should be plenty.
+
+				if(($results = $this->plugin->utils_db->wp->get_results($sql)))
+					foreach(($results = $this->plugin->utils_db->typify_deep($results)) as $_result)
+					{
+						$_result->total_subs = (integer)$_result->total_subs;
+						$data[]              = array( // Adds a new data row for the table we are building.
+						                              array('v' => strtoupper($_result->country), // Value and full name.
+						                                    'f' => $this->plugin->utils_map->country_name($_result->country)),
+						                              $_result->total_subs, '', // To be filled after.
+						);
+						$grand_total += $_result->total_subs; // Keep a running total of all subscriptions.
+					}
+				unset($_result, $_percent_of_total_subs); // Housekeeping.
+
+				foreach($data as $_key => &$_dataset) // Add total & percentages into tooltips.
+					$_dataset[2] = $this->plugin->utils_i18n->subscriptions($_dataset[1]). // e.g. X subscription(s).
+					               ' ('.$this->plugin->utils_math->percent($_dataset[1], $grand_total, 0, TRUE).')';
+				unset($_key, $_dataset); // Housekeeping.
+
+				return array('data'    => $data,
+				             'options' => array(
+					             'region'      => 'world',
+					             'displayMode' => 'regions',
+					             'width'       => '100%', 'height' => 'auto',
+					             'colors'      => $this->gradient_colors,
+				             ));
+			}
+
+			/**
+			 * Chart data helper; for a particular view type.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $country Regions in which country?
+			 *
+			 * @return array An array of all chart data; for Google Visualization `geochart` map.
+			 *
+			 * @throws \exception If there is a query failure.
+			 */
+			public function subs_overview_event_subscribed_audience_by_geo_region($country)
+			{
+				$country = trim(strtoupper((string)$country));
+
+				if(!in_array($country, array('US', 'CA'), TRUE))
+					$country = 'US'; // Force a valid country.
+
+				$country_lc = strtolower($country);
+
+				$data            = array(
+					array( // Initialize column headers.
+					       __('Region', $this->plugin->text_domain),
+					       __('Total Subscriptions', $this->plugin->text_domain),
+					       __('Percentage', $this->plugin->text_domain),
+					));
+				$grand_total     = 0; // Initialize.
+				$new_sub_ids_sql = $this->new_sub_ids_sql($this->chart->from_time, $this->chart->to_time);
+				$region_codes    = array_keys($this->plugin->utils_map->{'iso_3166_2_'.$country_lc}());
+
+				$sql  // Counts country totals by distinct `sub_id`; ordered by popularity.
+
+					= "SELECT `country`, `region`, `sub_id`, COUNT(DISTINCT(`sub_id`)) AS `total_subs`".
+					  " FROM `".esc_sql($this->plugin->utils_db->prefix().'sub_event_log')."`".
+
+					  " WHERE 1=1". // Initialize where clause.
+
+					  " AND `sub_id` IN(".$new_sub_ids_sql.")".
+					  " AND `status` IN('subscribed')".
+
+					  " AND `region` IN('".implode("','", array_map('esc_sql', $region_codes))."')".
+					  " AND `country` = '".esc_sql($country)."'".
+
+					  (in_array('systematics', $this->chart->exclude, TRUE)
+						  ? " AND `user_initiated` > '0'" : ''). // User-initiated only.
+
+					  " GROUP BY `country`, `region`". // Unique regions.
+
+					  " ORDER BY `total_subs` DESC".
+
+					  " LIMIT 400"; // 400 max allowed by Google; should be plenty.
+
+				if(($results = $this->plugin->utils_db->wp->get_results($sql)))
+					foreach(($results = $this->plugin->utils_db->typify_deep($results)) as $_result)
+					{
+						$_result->total_subs = (integer)$_result->total_subs;
+						$data[]              = array( // Adds a new data row for the table we are building.
+						                              array('v' => strtoupper($_result->country.'-'.$_result->region), // Value and full name.
+						                                    'f' => $this->plugin->utils_map->{$country_lc.'_region_name'}($_result->region).', '.$_result->country),
+						                              $_result->total_subs, '', // To be filled after.
+						);
+						$grand_total += $_result->total_subs; // Keep a running total of all subscriptions.
+					}
+				unset($_result, $_percent_of_total_subs); // Housekeeping.
+
+				foreach($data as $_key => &$_dataset) // Add total & percentages into tooltips.
+					$_dataset[2] = $this->plugin->utils_i18n->subscriptions($_dataset[1]). // e.g. X subscription(s).
+					               ' ('.$this->plugin->utils_math->percent($_dataset[1], $grand_total, 0, TRUE).')';
+				unset($_key, $_dataset); // Housekeeping.
+
+				return array('data'    => $data,
+				             'options' => array(
+					             'region'      => $country,
+					             'resolution'  => 'provinces',
+					             'displayMode' => 'regions',
+					             'width'       => '100%', 'height' => 'auto',
+					             'colors'      => $this->gradient_colors,
 				             ));
 			}
 
@@ -846,7 +1038,10 @@ namespace comment_mail // Root namespace.
 				if(!method_exists($this, $this->view.'__'.$this->chart->type))
 					$this->errors[] = __('Missing or invalid Chart Type. Please try again.', $this->plugin->text_domain);
 
-				if(stripos($this->input_view, '_by_post_id') !== FALSE && $this->chart->post_id <= 0)
+				if(preg_match('/(?:^|_)geo(?:_|$)/i', $this->chart->type) && !$this->plugin->options['geo_location_tracking_enable'])
+					$this->errors[] = __('Geo IP tracking not enabled yet. Please check config. options.', $this->plugin->text_domain);
+
+				if(preg_match('/(?:^|_)by_post_id(?:_|$)/i', $this->input_view) && $this->chart->post_id <= 0)
 					$this->errors[] = __('Missing or invalid Post ID. Please try again.', $this->plugin->text_domain);
 
 				if(!$this->chart->from_time || !$this->chart->to_time)

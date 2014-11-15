@@ -355,27 +355,68 @@
 			$buttons: $menuPageStats.find('.pmp-stats-view button'),
 			progress: // Loading animation; just a tiny progress bar to help convey loading sequence.
 			'<img src="' + vars.pluginUrl + '/client-s/images/tiny-progress-bar.gif" class="pmp-progress" />',
-			chartOps: {responsive: true}
+			chartOps: {responsive: true}, geoChartOps: {displayMode: 'regions'}
 		};
 		statsViewProps.handler = function()
 		{
 			var $this = $(this),
 				$form = $this.closest('form'),
 				$statsView = $this.closest('.pmp-stats-view'),
+
 				$errors = $statsView.find('.pmp-note.pmp-error'),
 				$progress = $statsView.find('.pmp-progress'),
-				$canvas = $statsView.find('canvas'),
+				$canvas = $statsView.find('.pmp-canvas'),
+
+				view = $statsView.data('view'), // View and type.
+				viewType = $statsView.find('select[name$="\\[type\\]"]').val(),
+
 				prevChart = $statsView.data('chart');
 
-			if(prevChart) prevChart.destroy(); // Ditch previous.
+			if(prevChart && typeof prevChart.destroy === 'function')
+				prevChart.destroy(); // Ditch previous.
 
-			$errors.remove(), // Ditch any previous error messages.
-				$canvas.remove(); // Ditch any previous canvas.
+			if(prevChart && typeof prevChart.clearChart === 'function')
+				prevChart.clearChart(); // Ditch previous.
+
+			$statsView.data('chart', null); // Ditch previous.
+			$errors.remove(), $canvas.remove(); // Ditch previous.
 
 			$progress.remove(), // Ditch old progress bar; add new.
 				$statsView.append($progress = $(statsViewProps.progress));
 
-			$.get(vars.ajaxEndpoint, $form.serialize(), function(chartData)
+			if(/(?:^|_)geo(?:_|$)/i.test(viewType)) // Geo visualization map?
+			{
+				$.get(vars.ajaxEndpoint, $form.serialize(), function(chartData)
+				{
+					if(!chartData) return; // Not possible.
+
+					if(typeof chartData.errors === 'string')
+					{
+						$statsView.append($(chartData.errors)), // Append errors.
+							$progress.remove(); // Complete; i.e. remove progress bar.
+
+						return; // All done here.
+					}
+					$canvas = $('<div class="pmp-canvas"></div>'),
+						$statsView.append($canvas); // Add canvas.
+
+					var chartTable = new google.visualization.DataTable(),
+						chartTableCols = chartData.data.shift(), // Shift first row off.
+						chartOps = $.extend({}, statsViewProps.geoChartOps, chartData.options),
+						chart = new google.visualization.GeoChart($canvas[0]);
+
+					chartTable.addColumn('string', 'region', chartTableCols[0]);
+					chartTable.addColumn('number', 'value', chartTableCols[1]);
+					chartTable.addColumn({type: 'string', role: 'tooltip'});
+
+					chartTable.addRows(chartData.data); // Remaining rows.
+
+					chart.draw(chartTable, chartOps), // Draw geo chart/map.
+						$statsView.data('chart', chart), // Save chart reference.
+						$progress.remove(); // Complete; i.e. remove progress bar.
+				});
+			}
+			else $.get(vars.ajaxEndpoint, $form.serialize(), function(chartData)
 			{
 				if(!chartData) return; // Not possible.
 
@@ -386,11 +427,12 @@
 
 					return; // All done here.
 				}
-				$statsView.append($canvas = $('<canvas></canvas>'));
+				$canvas = $('<canvas class="pmp-canvas"></canvas>'),
+					$statsView.append($canvas); // Add canvas tag.
 
-				var chartContext = $canvas.get(0).getContext('2d');
-				var chartOps = $.extend({}, statsViewProps.chartOps, chartData.options);
-				var chart = new Chart(chartContext).BetterBar(chartData.data, chartOps);
+				var chartContext = $canvas.get(0).getContext('2d'),
+					chartOps = $.extend({}, statsViewProps.chartOps, chartData.options),
+					chart = new Chart(chartContext).BetterBar(chartData.data, chartOps);
 
 				$statsView.data('chart', chart), // Save chart reference.
 					$progress.remove(); // Complete; i.e. remove progress bar.
@@ -400,17 +442,14 @@
 			statsViewProps.$buttons.on('click', statsViewProps.handler),
 			statsViewProps.$buttons.filter('[data-auto-chart]').trigger('click');
 
-		$menuPageStats.find('#comment-mail-stats-form-subs-overview-type')
+		statsViewProps.$selects.filter('[name$="\\[type\\]"]')
 			.on('change', function()
 			    {
 				    var $this = $(this), val = $this.val(),
 					    $statsView = $this.closest('.pmp-stats-view'),
-					    $byTr = $statsView.find('tr.pmp-stats-form-by'),
-					    byExclusionTypes = [
-						    'event_subscribed_most_popular_posts',
-						    'event_subscribed_least_popular_posts'
-					    ];
-				    $byTr.css({opacity: $.inArray(val, byExclusionTypes) !== -1 ? 0.2 : 1});
+					    $byTr = $statsView.find('tr.pmp-stats-form-by');
+
+				    $byTr.css({opacity: /(?:^|_)(?:popular_posts|geo)(?:_|$)/i.test(val) ? 0.2 : 1});
 			    }).trigger('change');
 
 		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

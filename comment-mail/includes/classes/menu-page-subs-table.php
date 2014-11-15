@@ -73,8 +73,8 @@ namespace comment_mail // Root namespace.
 					'last_update_time'  => __('Last Update', $plugin->text_domain),
 
 					'insertion_ip'      => __('Subscr. IP', $plugin->text_domain),
-					'insertion_region'  => __('Subscr. IP Region', $plugin->text_domain),
-					'insertion_country' => __('Subscr. IP Country', $plugin->text_domain),
+					'insertion_region'  => __('IP Region', $plugin->text_domain),
+					'insertion_country' => __('IP Country', $plugin->text_domain),
 
 					'sub_type'          => __('Subscr. Type', $plugin->text_domain),
 					'deliver'           => __('Delivery', $plugin->text_domain),

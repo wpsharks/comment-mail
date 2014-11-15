@@ -901,14 +901,16 @@ namespace comment_mail // Root namespace.
 			public function anchor($url, $clickable, array $args = array())
 			{
 				$default_args = array(
-					'target' => '',
+					'target'   => '',
+					'tabindex' => '-1',
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$target = (string)$args['target'];
+				$target   = (string)$args['target'];
+				$tabindex = (integer)$args['tabindex'];
 
-				return '<a href="'.esc_attr($url).'" target="'.esc_attr($target).'">'.$clickable.'</a>';
+				return '<a href="'.esc_attr($url).'" target="'.esc_attr($target).'" tabindex="'.esc_attr($tabindex).'">'.$clickable.'</a>';
 			}
 
 			/**

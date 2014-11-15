@@ -28,6 +28,7 @@ namespace comment_mail
 		 * @property-read utils_i18n            $utils_i18n
 		 * @property-read utils_ip              $utils_ip
 		 * @property-read utils_mail            $utils_mail
+		 * @property-read utils_map             $utils_map
 		 * @property-read utils_markup          $utils_markup
 		 * @property-read utils_math            $utils_math
 		 * @property-read utils_php             $utils_php
@@ -810,6 +811,7 @@ namespace comment_mail
 
 				wp_enqueue_style('jquery-datetimepicker', $this->utils_url->to('/submodules/datetimepicker/jquery.datetimepicker.css'), array(), NULL, 'all');
 				wp_enqueue_style('chosen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.min.css'), array(), NULL, 'all');
+
 				wp_enqueue_style('font-awesome', set_url_scheme('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css'), array(), NULL, 'all');
 				wp_enqueue_style('sharkicons', $this->utils_url->to('/submodules/sharkicons/styles.min.css'), array(), NULL, 'all');
 
@@ -832,7 +834,6 @@ namespace comment_mail
 				$deps = array('font-awesome', 'sharkicons'); // Dependencies.
 
 				wp_enqueue_style('font-awesome', set_url_scheme('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css'), array(), NULL, 'all');
-				wp_enqueue_style('font-awesome', set_url_scheme('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css'), array(), NULL, 'all');
 				wp_enqueue_style('sharkicons', $this->utils_url->to('/submodules/sharkicons/styles.min.css'), array(), NULL, 'all');
 
 				wp_enqueue_style(__NAMESPACE__, $this->utils_url->to('/client-s/css/menu-pages.min.css'), $deps, $this->version, 'all');
@@ -850,7 +851,7 @@ namespace comment_mail
 				if(!$this->utils_env->is_menu_page(__NAMESPACE__.'*'))
 					return; // Nothing to do; NOT a plugin menu page.
 
-				$deps = array('jquery', 'jquery-datetimepicker', 'postbox', 'codemirror', 'chartjs', 'chosen'); // Dependencies.
+				$deps = array('jquery', 'postbox', 'codemirror', 'google-jsapi-modules', 'chartjs', 'jquery-datetimepicker', 'chosen'); // Dependencies.
 
 				wp_enqueue_script('codemirror', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/codemirror.min.js'), array(), NULL, TRUE);
 				wp_enqueue_script('codemirror-fullscreen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/addon/display/fullscreen.min.js'), array('codemirror'), NULL, TRUE);
@@ -862,9 +863,13 @@ namespace comment_mail
 				wp_enqueue_script('codemirror-clike', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/clike/clike.js'), array('codemirror'), NULL, TRUE);
 				wp_enqueue_script('codemirror-php', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/codemirror/4.7.0/mode/php/php.js'), array('codemirror'), NULL, TRUE);
 
-				wp_enqueue_script('jquery-datetimepicker', $this->utils_url->to('/submodules/datetimepicker/jquery.datetimepicker.js'), array('jquery'), NULL, TRUE);
+				$google_jsapi_modules = "{'modules':[{'name':'visualization','version':'1','packages':['geochart']}]}";
+				wp_enqueue_script('google-jsapi-modules', set_url_scheme('//www.google.com/jsapi?autoload='.urlencode($google_jsapi_modules)), array(), NULL, TRUE);
+
 				wp_enqueue_script('chartjs', set_url_scheme('//cdn.jsdelivr.net/chart.js/1.0.1-beta.4/Chart.min.js'), array(), NULL, TRUE);
+				wp_enqueue_script('jquery-datetimepicker', $this->utils_url->to('/submodules/datetimepicker/jquery.datetimepicker.js'), array('jquery'), NULL, TRUE);
 				wp_enqueue_script('chosen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.min.js'), array('jquery'), NULL, TRUE);
+
 				wp_enqueue_script(__NAMESPACE__, $this->utils_url->to('/client-s/js/menu-pages.min.js'), $deps, $this->version, TRUE);
 
 				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_vars', array(
