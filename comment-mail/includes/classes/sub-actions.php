@@ -21,6 +21,13 @@ namespace comment_mail // Root namespace.
 		class sub_actions extends abs_base
 		{
 			/**
+			 * @var array Valid actions.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $valid_actions;
+
+			/**
 			 * Class constructor.
 			 *
 			 * @since 141111 First documented version.
@@ -29,6 +36,14 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
+				$this->valid_actions
+					= array(
+					'confirm',
+					'unsubscribe',
+					'unsubscribe_all',
+
+					'manage',
+				);
 				$this->maybe_handle();
 			}
 
@@ -46,7 +61,7 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				foreach((array)$_REQUEST[__NAMESPACE__] as $_action => $_request_args)
-					if($_action && is_string($_action) && method_exists($this, $_action))
+					if($_action && in_array($_action, $this->valid_actions, TRUE))
 						$this->{$_action}($this->plugin->utils_string->trim_strip_deep($_request_args));
 				unset($_action, $_request_args); // Housekeeping.
 			}

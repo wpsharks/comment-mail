@@ -222,9 +222,9 @@ namespace comment_mail // Root namespace.
 					$this->mailer->CharSet = 'UTF-8';
 					$this->mailer->Subject = $subject;
 
-					if(!$this->plugin->utils_string->is_html($this->message))
-						$this->mailer->MsgHTML($this->plugin->utils_string->to_html($this->message));
-					else $this->mailer->MsgHTML($this->message);
+					if($this->plugin->utils_string->is_html($this->message))
+						$this->mailer->MsgHTML($this->message); // Already contains HTML markup.
+					else $this->mailer->MsgHTML($this->plugin->utils_string->text_to_html($this->message));
 
 					foreach($this->headers as $_header => $_value)
 						$this->mailer->AddCustomHeader($_header, $_value);

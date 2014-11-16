@@ -404,7 +404,7 @@ namespace comment_mail
 					'auto_confirm_if_already_subscribed_u0ip_enable'                       => '0', // `0|1`; auto-confirm enable?
 					'all_wp_users_confirm_email'                                           => '0', // WP users confirm their email?
 
-					/* Related to replies-via-email. */
+					/* Related to email headers. */
 
 					'from_name'                                                            => get_bloginfo('name'), // From: name.
 					'from_email'                                                           => get_bloginfo('admin_email'), // From: <email>.
@@ -425,6 +425,11 @@ namespace comment_mail
 					'smtp_from_email'                                                      => get_bloginfo('admin_email'), // From: <email>.
 					'smtp_reply_to_email'                                                  => get_bloginfo('admin_email'), // Reply-To: <email>.
 					'smtp_force_from'                                                      => '1', // `0|1`; force? Not configurable at this time.
+
+					/* Related to replies-via-email. */
+
+					'rve_mandrill_enable'                                                  => '0', // `0|1`; enable?
+					'rve_mandrill_max_spam_score'                                          => '5', // Max allowable spam score.
 
 					/* Related to blacklisting. */
 

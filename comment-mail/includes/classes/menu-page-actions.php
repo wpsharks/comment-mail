@@ -21,6 +21,13 @@ namespace comment_mail // Root namespace.
 		class menu_page_actions extends abs_base
 		{
 			/**
+			 * @var array Valid actions.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $valid_actions;
+
+			/**
 			 * Class constructor.
 			 *
 			 * @since 141111 First documented version.
@@ -29,6 +36,22 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
+				$this->valid_actions
+					= array(
+					'save_options',
+					'restore_default_options',
+
+					'dismiss_notice',
+
+					'import',
+					'export',
+
+					'sub_form',
+					'sub_form_comment_id_row_via_ajax',
+					'sub_form_user_id_info_via_ajax',
+
+					'stats_chart_data_via_ajax',
+				);
 				$this->maybe_handle();
 			}
 
@@ -49,7 +72,7 @@ namespace comment_mail // Root namespace.
 					return; // Unauthenticated; ignore.
 
 				foreach((array)$_REQUEST[__NAMESPACE__] as $_action => $_request_args)
-					if($_action && is_string($_action) && method_exists($this, $_action))
+					if($_action && in_array($_action, $this->valid_actions, TRUE))
 						$this->{$_action}($this->plugin->utils_string->trim_strip_deep($_request_args));
 				unset($_action, $_request_args); // Housekeeping.
 			}
@@ -198,6 +221,27 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Processes sub. form inserts/updates.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param mixed $request_args Input argument(s).
+			 *
+			 * @see menu_page_sub_form_base::process()
+			 */
+			protected function sub_form($request_args)
+			{
+				if(!($request_args = (array)$request_args))
+					return; // Empty request args.
+
+				if(!current_user_can($this->plugin->manage_cap))
+					if(!current_user_can($this->plugin->cap))
+						return; // Unauthenticated; ignore.
+
+				menu_page_sub_form_base::process($request_args);
+			}
+
+			/**
 			 * Acquires comment ID row via AJAX.
 			 *
 			 * @since 141111 First documented version.
@@ -249,27 +293,6 @@ namespace comment_mail // Root namespace.
 				header('Content-Type: application/json; charset=UTF-8');
 
 				exit(menu_page_sub_form_base::user_id_info_via_ajax($user_id));
-			}
-
-			/**
-			 * Processes sub. form inserts/updates.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param mixed $request_args Input argument(s).
-			 *
-			 * @see menu_page_sub_form_base::process()
-			 */
-			protected function sub_form($request_args)
-			{
-				if(!($request_args = (array)$request_args))
-					return; // Empty request args.
-
-				if(!current_user_can($this->plugin->manage_cap))
-					if(!current_user_can($this->plugin->cap))
-						return; // Unauthenticated; ignore.
-
-				menu_page_sub_form_base::process($request_args);
 			}
 
 			/**

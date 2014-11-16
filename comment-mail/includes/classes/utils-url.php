@@ -1361,6 +1361,25 @@ namespace comment_mail // Root namespace.
 
 				return add_query_arg(urlencode_deep($args), $url);
 			}
+
+			/**
+			 * Webhook URL for replies via email; through Mandrill.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @return string URL w/ the given `$scheme`.
+			 */
+			public function rve_mandrill_webhook_url($scheme = NULL)
+			{
+				$url  = home_url('/', $scheme);
+				$key  = rve_mandrill::key(); // Webhook key.
+				$args = array(__NAMESPACE__ => array('rve_mandrill' => $key));
+
+				return add_query_arg(urlencode_deep($args), $url);
+			}
 		}
 	}
 }

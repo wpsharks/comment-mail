@@ -452,6 +452,330 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Normalizes end of line chars.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Any input string to normalize.
+			 *
+			 * @return string With normalized end of line chars.
+			 */
+			public function n_eols($string)
+			{
+				return $this->n_eols_deep((string)$string);
+			}
+
+			/**
+			 * Normalizes end of line chars deeply.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param mixed $values Any value can be converted into a normalized string.
+			 *    Actually, objects can't, but this recurses into objects.
+			 *
+			 * @return string|array|object With normalized end of line chars deeply.
+			 */
+			public function n_eols_deep($values)
+			{
+				if(is_array($values) || is_object($values))
+				{
+					foreach($values as $_key => &$_values)
+						$_values = $this->n_eols_deep($_values);
+					unset($_key, $_values); // Housekeeping.
+
+					return $values; // All done.
+				}
+				$string = (string)$values;
+
+				$string = str_replace(array("\r\n", "\r"), "\n", $string);
+				$string = preg_replace('/'."\n".'{3,}/', "\n\n", $string);
+
+				return $string; // With normalized line endings.
+			}
+
+			/**
+			 * Clips a string to X chars.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string  $string See {@link clip_deep()}.
+			 * @param integer $max_length See {@link clip_deep()}.
+			 * @param boolean $force_ellipsis See {@link clip_deep()}.
+			 *
+			 * @return string See {@link clip_deep()}.
+			 */
+			public function clip($string, $max_length = 45, $force_ellipsis = FALSE)
+			{
+				return $this->clip_deep((string)$string, $max_length, $force_ellipsis);
+			}
+
+			/**
+			 * Clips string(s) to X chars deeply.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param mixed   $values Input string(s) to clip.
+			 * @param integer $max_length Defaults to a value of `45`.
+			 * @param boolean $force_ellipsis Defaults to a value of `FALSE`.
+			 *
+			 * @return string|array|object Clipped string(s).
+			 */
+			public function clip_deep($values, $max_length = 45, $force_ellipsis = FALSE)
+			{
+				if(is_array($values) || is_object($values))
+				{
+					foreach($values as $_key => &$_values)
+						$_values = $this->clip_deep($_values, $max_length, $force_ellipsis);
+					unset($_key, $_values); // Housekeeping.
+
+					return $values; // All done.
+				}
+				if(!($string = (string)$values))
+					return $string; // Empty.
+
+				$max_length = (integer)$max_length;
+				$max_length = $max_length < 4 ? 4 : $max_length;
+
+				$string = $this->html_to_text($string, array('br2nl' => FALSE));
+
+				if(strlen($string) > $max_length)
+					$string = (string)substr($string, 0, $max_length - 3).'...';
+
+				else if($force_ellipsis && strlen($string) + 3 > $max_length)
+					$string = (string)substr($string, 0, $max_length - 3).'...';
+
+				else $string .= $force_ellipsis ? '...' : '';
+
+				return $string; // Clipped.
+			}
+
+			/**
+			 * Mid-clips a string to X chars.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string  $string See {@link mid_clip_deep()}.
+			 * @param integer $max_length See {@link mid_clip_deep()}
+			 *
+			 * @return string See {@link mid_clip_deep()}
+			 */
+			public function mid_clip($string, $max_length = 45)
+			{
+				return $this->mid_clip_deep((string)$string, $max_length);
+			}
+
+			/**
+			 * Mid-clips string(s) to X chars deeply.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param mixed   $values Input string(s) to mid-clip.
+			 * @param integer $max_length Defaults to a value of `45`.
+			 *
+			 * @return string|array|object Mid-clipped string(s).
+			 */
+			public function mid_clip_deep($values, $max_length = 45)
+			{
+				if(is_array($values) || is_object($values))
+				{
+					foreach($values as $_key => &$_values)
+						$_values = $this->mid_clip_deep($_values, $max_length);
+					unset($_key, $_values); // Housekeeping.
+
+					return $values; // All done.
+				}
+				if(!($string = (string)$values))
+					return $string; // Empty.
+
+				$max_length = (integer)$max_length;
+				$max_length = $max_length < 4 ? 4 : $max_length;
+
+				$string = $this->html_to_text($string, array('br2nl' => FALSE));
+
+				if(strlen($string) <= $max_length)
+					return $string; // Nothing to do.
+
+				$full_string     = $string;
+				$half_max_length = floor($max_length / 2);
+
+				$first_clip = $half_max_length - 3;
+				$string     = ($first_clip >= 1) // Something?
+					? substr($full_string, 0, $first_clip).'...'
+					: '...'; // Ellipsis only.
+
+				$second_clip = strlen($full_string) - ($max_length - strlen($string));
+				$string .= ($second_clip >= 0 && $second_clip >= $first_clip)
+					? substr($full_string, $second_clip) : ''; // Nothing more.
+
+				return $string; // Mid-clipped.
+			}
+
+			/**
+			 * Is a string in HTML format?
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Any input string to test here.
+			 *
+			 * @return boolean TRUE if string is HTML.
+			 */
+			public function is_html($string)
+			{
+				if(!$string || !is_string($string))
+					return FALSE; // Not possible.
+
+				return strpos($string, '<') !== FALSE && preg_match('/\<[^<>]+\>/', $string);
+			}
+
+			/**
+			 * Convert plain text to HTML markup.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Input string to convert.
+			 *
+			 * @return string Plain text converted to HTML markup.
+			 */
+			public function text_to_html($string)
+			{
+				if(!($string = trim((string)$string)))
+					return $string; // Not possible.
+
+				$string = esc_html($string);
+				$string = nl2br($this->n_eols($string));
+				$string = make_clickable($string);
+				$string = $this->trim_html($string);
+
+				return $string; // HTML markup now.
+			}
+
+			/**
+			 * Convert HTML markup converted to plain text.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Input string to convert.
+			 * @param array  $args Any additional behavioral args.
+			 *
+			 * @return string HTML markup converted to plain text.
+			 */
+			public function html_to_text($string, array $args = array())
+			{
+				if(!($string = trim((string)$string)))
+					return $string; // Not possible.
+
+				$default_args = array(
+					'br2nl' => TRUE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$br2nl = (boolean)$args['br2nl'];
+
+				$string = strip_tags($string, $br2nl ? '<br>' : '');
+				$string = wp_specialchars_decode($string); // Decode entities.
+				if($br2nl) $string = preg_replace('/\<br[\s\/]*\>/', "\n", $string);
+				$string = trim(preg_replace('/\s+/', ' ', $string));
+
+				return $string; // Plain text now.
+			}
+
+			/**
+			 * Convert HTML to rich text; w/ allowed tags only.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Input string to convert.
+			 * @param array  $args Any additional behavioral args.
+			 *
+			 * @return string HTML to rich text; w/ allowed tags only.
+			 */
+			public function html_to_rich_text($string, array $args = array())
+			{
+				if(!($string = trim((string)$string)))
+					return $string; // Not possible.
+
+				$default_args = array(
+					'br2nl'        => TRUE,
+					'allowed_tags' => array(
+						'<a>',
+						'<strong>', '<b>',
+						'<i>', '<em>',
+						'<code>', '<pre>',
+					),
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$br2nl        = (boolean)$args['br2nl'];
+				$allowed_tags = array_map('strval', (array)$args['allowed_tags']);
+				if($br2nl) $allowed_tags[] = '<br>'; // Must allow in this case.
+				$allowed_tags = array_unique(array_map('strtolower', $allowed_tags));
+
+				$string = $this->trim_html($string);
+				$string = strip_tags($string, implode('', $allowed_tags));
+				if($br2nl) $string = preg_replace('/\<br[\s\/]*\>/', "\n", $string);
+				$string = $this->trim_html($this->n_eols($string));
+
+				return $string; // HTML markup now.
+			}
+
+			/**
+			 * A very simple markdown parser.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Input string to convert.
+			 * @param array  $args Any additional behavioral args.
+			 *
+			 * @return string Markdown converted to HTML markup.
+			 */
+			public function markdown($string, array $args = array())
+			{
+				if(!($string = trim((string)$string)))
+					return $string; // Not possible.
+
+				$default_args = array(
+					'no_p' => FALSE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$no_p = (boolean)$args['no_p'];
+
+				if(!class_exists('\\Parsedown')) // Need Parsedown class here.
+					require_once dirname(dirname(dirname(__FILE__))).'/submodules/parsedown/Parsedown.php';
+
+				if(is_null($parsedown = &$this->cache_key(__FUNCTION__, 'parsedown')))
+					/** @var $parsedown \Parsedown Reference for IDEs. */
+					$parsedown = new \Parsedown(); // Single instance.
+
+				$html = $parsedown->text($string);
+
+				if($no_p) // Remove `<p></p>` wrap?
+				{
+					$html = preg_replace('/^\<p\>/i', '', $html);
+					$html = preg_replace('/\<\/p\>$/i', '', $html);
+				}
+				return $html; // Gotta love Parsedown :-)
+			}
+
+			/**
+			 * A very simple markdown parser.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string See {@link markdown()}.
+			 * @param array  $args See {@link markdown()}.
+			 *
+			 * @return string See {@link markdown()}.
+			 */
+			public function markdown_no_p($string, array $args = array())
+			{
+				return $this->markdown($string, array_merge($args, array('no_p' => TRUE)));
+			}
+
+			/**
 			 * Get first name from a full name, user, or email address.
 			 *
 			 * @since 141111 First documented version.
@@ -593,245 +917,6 @@ namespace comment_mail // Root namespace.
 				$string = $string ? trim($string) : ''; // Trim again.
 
 				return $string; // Cleaned up now.
-			}
-
-			/**
-			 * Clips a string to X chars.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string  $string See {@link clip_deep()}.
-			 * @param integer $max_length See {@link clip_deep()}.
-			 * @param boolean $force_ellipsis See {@link clip_deep()}.
-			 *
-			 * @return string See {@link clip_deep()}.
-			 */
-			public function clip($string, $max_length = 45, $force_ellipsis = FALSE)
-			{
-				return $this->clip_deep((string)$string, $max_length, $force_ellipsis);
-			}
-
-			/**
-			 * Clips string(s) to X chars deeply.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param mixed   $values Input string(s) to clip.
-			 * @param integer $max_length Defaults to a value of `45`.
-			 * @param boolean $force_ellipsis Defaults to a value of `FALSE`.
-			 *
-			 * @return string|array|object Clipped string(s).
-			 */
-			public function clip_deep($values, $max_length = 45, $force_ellipsis = FALSE)
-			{
-				if(is_array($values) || is_object($values))
-				{
-					foreach($values as $_key => &$_values)
-						$_values = $this->clip_deep($_values, $max_length, $force_ellipsis);
-					unset($_key, $_values); // Housekeeping.
-
-					return $values; // All done.
-				}
-				if(!($string = (string)$values))
-					return $string; // Empty.
-
-				$max_length = (integer)$max_length;
-				$max_length = $max_length < 4 ? 4 : $max_length;
-
-				$string = $this->to_text($string, array('br2nl' => FALSE));
-
-				if(strlen($string) > $max_length)
-					$string = (string)substr($string, 0, $max_length - 3).'...';
-
-				else if($force_ellipsis && strlen($string) + 3 > $max_length)
-					$string = (string)substr($string, 0, $max_length - 3).'...';
-
-				else $string .= $force_ellipsis ? '...' : '';
-
-				return $string; // Clipped.
-			}
-
-			/**
-			 * Mid-clips a string to X chars.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string  $string See {@link mid_clip_deep()}.
-			 * @param integer $max_length See {@link mid_clip_deep()}
-			 *
-			 * @return string See {@link mid_clip_deep()}
-			 */
-			public function mid_clip($string, $max_length = 45)
-			{
-				return $this->mid_clip_deep((string)$string, $max_length);
-			}
-
-			/**
-			 * Mid-clips string(s) to X chars deeply.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param mixed   $values Input string(s) to mid-clip.
-			 * @param integer $max_length Defaults to a value of `45`.
-			 *
-			 * @return string|array|object Mid-clipped string(s).
-			 */
-			public function mid_clip_deep($values, $max_length = 45)
-			{
-				if(is_array($values) || is_object($values))
-				{
-					foreach($values as $_key => &$_values)
-						$_values = $this->mid_clip_deep($_values, $max_length);
-					unset($_key, $_values); // Housekeeping.
-
-					return $values; // All done.
-				}
-				if(!($string = (string)$values))
-					return $string; // Empty.
-
-				$max_length = (integer)$max_length;
-				$max_length = $max_length < 4 ? 4 : $max_length;
-
-				$string = $this->to_text($string, array('br2nl' => FALSE));
-
-				if(strlen($string) <= $max_length)
-					return $string; // Nothing to do.
-
-				$full_string     = $string;
-				$half_max_length = floor($max_length / 2);
-
-				$first_clip = $half_max_length - 3;
-				$string     = ($first_clip >= 1) // Something?
-					? substr($full_string, 0, $first_clip).'...'
-					: '...'; // Ellipsis only.
-
-				$second_clip = strlen($full_string) - ($max_length - strlen($string));
-				$string .= ($second_clip >= 0 && $second_clip >= $first_clip)
-					? substr($full_string, $second_clip) : ''; // Nothing more.
-
-				return $string; // Mid-clipped.
-			}
-
-			/**
-			 * Is a string in HTML format?
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string $string Any input string to test here.
-			 *
-			 * @return boolean TRUE if string is HTML.
-			 */
-			public function is_html($string)
-			{
-				if(!$string || !is_string($string))
-					return FALSE; // Not possible.
-
-				return strpos($string, '<') !== FALSE && preg_match('/\<[^<>]+\>/', $string);
-			}
-
-			/**
-			 * Convert plain text to HTML markup.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string $string Input string to convert.
-			 *
-			 * @return string Plain text converted to HTML markup.
-			 */
-			public function to_html($string)
-			{
-				if(!($string = trim((string)$string)))
-					return $string; // Not possible.
-
-				return make_clickable(nl2br(esc_html($string)));
-			}
-
-			/**
-			 * Convert HTML markup converted to plain text.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string $string Input string to convert.
-			 * @param array  $args Any additional behavioral args.
-			 *
-			 * @return string HTML markup converted to plain text.
-			 */
-			public function to_text($string, array $args = array())
-			{
-				if(!($string = trim((string)$string)))
-					return $string; // Not possible.
-
-				$default_args = array(
-					'br2nl' => TRUE,
-				);
-				$args         = array_merge($default_args, $args);
-				$args         = array_intersect_key($args, $default_args);
-
-				$br2nl = (boolean)$args['br2nl'];
-
-				$text = strip_tags($string, $br2nl ? '<br>' : '');
-				$text = wp_specialchars_decode($text); // Decode entities.
-				$text = trim(preg_replace('/\s+/', ' ', $text));
-
-				if($br2nl) // Convert <br> to line break?
-					$text = preg_replace('/\<br[\s\/]*\>/', "\n", $text);
-
-				return $text; // Plain text now.
-			}
-
-			/**
-			 * A very simple markdown parser.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string $string Input string to convert.
-			 * @param array  $args Any additional behavioral args.
-			 *
-			 * @return string Markdown converted to HTML markup.
-			 */
-			public function markdown($string, array $args = array())
-			{
-				if(!($string = trim((string)$string)))
-					return $string; // Not possible.
-
-				$default_args = array(
-					'no_p' => FALSE,
-				);
-				$args         = array_merge($default_args, $args);
-				$args         = array_intersect_key($args, $default_args);
-
-				$no_p = (boolean)$args['no_p'];
-
-				if(!class_exists('\\Parsedown')) // Need Parsedown class here.
-					require_once dirname(dirname(dirname(__FILE__))).'/submodules/parsedown/Parsedown.php';
-
-				if(is_null($parsedown = &$this->cache_key(__FUNCTION__, 'parsedown')))
-					/** @var $parsedown \Parsedown Reference for IDEs. */
-					$parsedown = new \Parsedown(); // Single instance.
-
-				$html = $parsedown->text($string);
-
-				if($no_p) // Remove `<p></p>` wrap?
-				{
-					$html = preg_replace('/^\<p\>/i', '', $html);
-					$html = preg_replace('/\<\/p\>$/i', '', $html);
-				}
-				return $html; // Gotta love Parsedown :-)
-			}
-
-			/**
-			 * A very simple markdown parser.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string $string See {@link markdown()}.
-			 * @param array  $args See {@link markdown()}.
-			 *
-			 * @return string See {@link markdown()}.
-			 */
-			public function markdown_no_p($string, array $args = array())
-			{
-				return $this->markdown($string, array_merge($args, array('no_p' => TRUE)));
 			}
 
 			/**
