@@ -157,8 +157,10 @@ namespace comment_mail
 			 * @since 141111 First documented version.
 			 *
 			 * @var string Capability required to administer.
+			 *    i.e. to use any aspect of the plugin, including the configuration
+			 *    of any/all plugin options and/or advanced settings.
 			 */
-			public $cap;
+			public $cap; // Most important cap.
 
 			/**
 			 * Management capability requirement.
@@ -166,8 +168,31 @@ namespace comment_mail
 			 * @since 141111 First documented version.
 			 *
 			 * @var string Capability required to manage.
+			 *    i.e. to use/manage the plugin from the back-end,
+			 *    but NOT to allow for any config. changes.
 			 */
 			public $manage_cap;
+
+			/**
+			 * Auto-recompile capability requirement.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @var string Capability required to auto-recompile.
+			 *    i.e. to see notices regarding automatic recompilations
+			 *    following an upgrade the plugin files/version.
+			 */
+			public $auto_recompile_cap;
+
+			/**
+			 * Upgrade capability requirement.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @var string Capability required to upgrade.
+			 *    i.e. the ability to run any sort of plugin upgrader.
+			 */
+			public $upgrade_cap;
 
 			/**
 			 * Uninstall capability requirement.
@@ -175,6 +200,7 @@ namespace comment_mail
 			 * @since 141111 First documented version.
 			 *
 			 * @var string Capability required to uninstall.
+			 *    i.e. the ability to deactivate and even delete the plugin.
 			 */
 			public $uninstall_cap;
 
@@ -258,13 +284,20 @@ namespace comment_mail
 				/*
 				 * Load the plugin's text domain for translations.
 				 */
-				load_plugin_textdomain($this->text_domain); // For translations.
+				load_plugin_textdomain($this->text_domain); // Translations.
 
 				/*
-				 * Setup additional class properties.
+				 * Setup class properties related to authentication/capabilities.
 				 */
-				$this->cap = apply_filters(__METHOD__.'_cap', 'activate_plugins');
+				$this->cap                = apply_filters(__METHOD__.'_cap', 'activate_plugins');
+				$this->manage_cap         = apply_filters(__METHOD__.'_manage_cap', 'moderate_comments');
+				$this->auto_recompile_cap = apply_filters(__METHOD__.'_auto_recompile_cap', 'activate_plugins');
+				$this->upgrade_cap        = apply_filters(__METHOD__.'_upgrade_cap', 'update_plugins');
+				$this->uninstall_cap      = apply_filters(__METHOD__.'_uninstall_cap', 'delete_plugins');
 
+				/*
+				 * Setup the array of all plugin options.
+				 */
 				$this->default_options = array(
 					/* Core/systematic option keys. */
 
@@ -277,8 +310,7 @@ namespace comment_mail
 
 					/* Related to user authentication. */
 
-					'manage_cap'                                                           => 'moderate_comments', // Capability.
-					'uninstall_cap'                                                        => 'delete_plugins', // Capability.
+					'manage_cap'                                                           => $this->manage_cap, // Capability.
 
 					/* Low-level switches to enable/disable certain functionalities.
 					 *
@@ -494,9 +526,10 @@ namespace comment_mail
 				$this->options = array_merge($this->default_options, $this->options); // Merge into default options.
 				$this->options = array_intersect_key($this->options, $this->default_options); // Valid keys only.
 				$this->options = apply_filters(__METHOD__.'__options', $this->options); // Allow filters.
+				$this->options = array_map('strval', $this->options); // Force string values.
 
-				$this->manage_cap    = $this->options['manage_cap'] ? (string)$this->options['manage_cap'] : $this->cap;
-				$this->uninstall_cap = $this->options['uninstall_cap'] ? (string)$this->options['uninstall_cap'] : 'delete_plugins';
+				if($this->options['manage_cap']) // This can be altered by plugin config. options.
+					$this->manage_cap = apply_filters(__METHOD__.'_manage_cap', $this->options['manage_cap']);
 
 				/*
 				 * With or without hooks?
@@ -699,10 +732,11 @@ namespace comment_mail
 			 */
 			public function options_save(array $options)
 			{
-				$this->plugin->options = array_merge($this->plugin->default_options, $this->plugin->options, $options);
-				$this->plugin->options = array_intersect_key($this->plugin->options, $this->plugin->default_options);
+				$this->options = array_merge($this->default_options, $this->options, $options);
+				$this->options = array_intersect_key($this->options, $this->default_options);
+				$this->options = array_map('strval', $this->options); // Force strings.
 
-				foreach($this->plugin->options as $_template_option_key => &$_option_template)
+				foreach($this->options as $_template_option_key => &$_option_template)
 					if(strpos($_template_option_key, 'template__') === 0) // Only looking at templates.
 					{
 						$_template_file    = template::option_key_to_file($_template_option_key);
@@ -714,9 +748,11 @@ namespace comment_mail
 						if($_option_template_nws === $_default_template_nws)
 							$_option_template = ''; // Empty; it's a default value.
 					}
-				unset($_template_option_key, $_option_template, $_template_file, $_default_template, $_option_template_nws, $_default_template_nws); // Housekeeping.
+				unset($_template_option_key, $_option_template,
+					$_template_file, $_default_template, // Housekeeping.
+					$_option_template_nws, $_default_template_nws);
 
-				update_option(__NAMESPACE__.'_options', $this->plugin->options); // Update plugin options.
+				update_option(__NAMESPACE__.'_options', $this->options); // DB update.
 			}
 
 			/*
@@ -883,27 +919,27 @@ namespace comment_mail
 						: __('Delete permanently? Are you sure?', $this->text_domain),
 					'dateTimePickerI18n'        => array('en' => array(
 						'months'    => array(
-							__('January', $this->plugin->text_domain),
-							__('February', $this->plugin->text_domain),
-							__('March', $this->plugin->text_domain),
-							__('April', $this->plugin->text_domain),
-							__('May', $this->plugin->text_domain),
-							__('June', $this->plugin->text_domain),
-							__('July', $this->plugin->text_domain),
-							__('August', $this->plugin->text_domain),
-							__('September', $this->plugin->text_domain),
-							__('October', $this->plugin->text_domain),
-							__('November', $this->plugin->text_domain),
-							__('December', $this->plugin->text_domain),
+							__('January', $this->text_domain),
+							__('February', $this->text_domain),
+							__('March', $this->text_domain),
+							__('April', $this->text_domain),
+							__('May', $this->text_domain),
+							__('June', $this->text_domain),
+							__('July', $this->text_domain),
+							__('August', $this->text_domain),
+							__('September', $this->text_domain),
+							__('October', $this->text_domain),
+							__('November', $this->text_domain),
+							__('December', $this->text_domain),
 						),
 						'dayOfWeek' => array(
-							__('Sun', $this->plugin->text_domain),
-							__('Mon', $this->plugin->text_domain),
-							__('Tue', $this->plugin->text_domain),
-							__('Wed', $this->plugin->text_domain),
-							__('Thu', $this->plugin->text_domain),
-							__('Fri', $this->plugin->text_domain),
-							__('Sat', $this->plugin->text_domain),
+							__('Sun', $this->text_domain),
+							__('Mon', $this->text_domain),
+							__('Tue', $this->text_domain),
+							__('Wed', $this->text_domain),
+							__('Thu', $this->text_domain),
+							__('Fri', $this->text_domain),
+							__('Sat', $this->text_domain),
 						),
 					)),
 				));

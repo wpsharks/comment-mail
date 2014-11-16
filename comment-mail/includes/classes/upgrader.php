@@ -58,9 +58,9 @@ namespace comment_mail // Root namespace.
 
 				$this->plugin->enqueue_notice // Notify site owner about this upgrade process.
 				(
-					sprintf(__('<strong>%1$s&trade;</strong> detected a new version of itself. Recompiling... <strong>All done!</strong> Your existing configuration remains :-)', $this->plugin->text_domain), esc_html($this->plugin->name)),
+					sprintf(__('<strong>%1$s&trade;</strong> was automatically recompiled upon detecting an upgrade to v%2$s. Your existing configuration remains :-)', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html($this->plugin->version)),
 
-					array('requires_cap' => is_multisite() ? 'manage_network_plugins' : 'install_plugins', 'push_to_top' => TRUE)
+					array('requires_cap' => $this->plugin->auto_recompile_cap, 'push_to_top' => TRUE)
 				);
 			}
 		}
