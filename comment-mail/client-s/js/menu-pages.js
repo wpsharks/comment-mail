@@ -66,6 +66,16 @@
 				                format        : 'M j, Y H:i',
 				                i18n          : i18n.dateTimePickerI18n
 			                });
+		$menuPageArea.find('[data-toggle~="other"]').on('click', function(e)
+		{
+			e.preventDefault(), e.stopImmediatePropagation();
+
+			$($(this).data('other')).toggle();
+		});
+		$menuPageArea.find('[data-toggle~="select-all"]').on('click', function()
+		{
+			$(this).select();
+		});
 		/* ------------------------------------------------------------------------------------------------------------
 		 JS for an actual/standard plugin menu page; e.g. options.
 		 ------------------------------------------------------------------------------------------------------------ */
@@ -118,43 +128,64 @@
 		});
 		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-		$menuPage.find('select[name$="\\[enable\\]"], select[name$="_enable\\]"]')
-			.not('.no-if-enabled').not('.no-if-disabled')
-			.on('change', function()
-			    {
-				    var $this = $(this),
-					    thisValue = $.trim($this.val()),
-					    $thisPanel = $this.closest('.pmp-panel');
+		$menuPage.find('.pmp-if-change').on('change', function()
+		{
+			var $this = $(this),
+				thisValue = $.trim($this.val()),
+				$thisPanel = $this.closest('.pmp-panel'),
+				$thisNest = $this.closest('.pmp-if-nest'),
+				$thisContainer = $thisPanel; // Default container.
+			if($thisNest.length) $thisContainer = $thisNest;
+			var matchValue = $this.hasClass('pmp-if-value-match');
 
-				    var enabled = thisValue !== '' && thisValue !== '0',
-					    disabled = !enabled; // The opposite.
+			var enabled = thisValue !== '' && thisValue !== '0',
+				disabled = !enabled; // The opposite.
 
-				    var ifEnabled = '.pmp-panel-if-enabled',
-					    ifEnabledShow = '.pmp-panel-if-enabled-show';
+			var ifEnabled = '.pmp-if-enabled',
+				ifEnabledShow = '.pmp-if-enabled-show',
 
-				    var ifDisabled = '.pmp-panel-if-disabled',
-					    ifDisabledShow = '.pmp-panel-if-disabled-show';
+				ifDisabled = '.pmp-if-disabled',
+				ifDisabledShow = '.pmp-if-disabled-show';
 
-				    if(enabled) $thisPanel.find(ifEnabled + ',' + ifEnabledShow).show().css('opacity', 1)
-					    .find(':input').removeAttr('disabled');
+			var withinANest = function() // Prevents nest conflicts.
+			{
+				if($thisNest.length) return false; // Inside a nest already.
+				// In this case, the set of matches has already been filtered above;
+				// i.e. by restricting the context itself to the closest `.pmp-if-nest`.
 
-				    else // We use opacity to conceal; and hide if applicable.
-				    {
-					    $thisPanel.find(ifEnabled + ',' + ifEnabledShow).css('opacity', 0.2)
-						    .find(':input').attr('disabled', 'disabled'),
-						    $thisPanel.find(ifEnabledShow).hide();
-				    }
-				    if(disabled) $thisPanel.find(ifDisabled + ',' + ifDisabledShow).show().css('opacity', 1)
-					    .find(':input').removeAttr('disabled');
+				// If we are NOT inside a nest, do not include anything that is.
+				return $(this).hasClass('pmp-in-if-nest'); // Class for optimization.
+			};
+			var valueMatches = function() // Matches current value; if applicable.
+			{
+				if(!matchValue) return true; // Not matching current value.
+				// In this case we want to include everything; i.e. do not exclude.
 
-				    else // We use opacity to conceal; and hide if applicable.
-				    {
-					    $thisPanel.find(ifDisabled + ',' + ifDisabledShow).css('opacity', 0.2)
-						    .find(':input').attr('disabled', 'disabled'),
-						    $thisPanel.find(ifDisabledShow).hide();
-				    }
-				    refreshCodeMirrors(); // Refresh CodeMirrors also.
-			    })
+				// Otherwise, we only include this if it has a matching value.
+				return $(this).hasClass('pmp-if-value-' + thisValue);
+			};
+			if(enabled) // If enabled; show and enable all input fields.
+				$thisContainer.find(ifEnabled + ',' + ifEnabledShow).not(withinANest).filter(valueMatches)
+					.show().css('opacity', 1).find(':input').removeAttr('disabled');
+
+			else // We use opacity to conceal; and hide if applicable.
+			{
+				$thisContainer.find(ifEnabled + ',' + ifEnabledShow).not(withinANest)
+					.css('opacity', 0.2).find(':input').attr('disabled', 'disabled'),
+					$thisContainer.find(ifEnabledShow).not(withinANest).hide();
+			}
+			if(disabled) // If disabled; show and enable all input fields.
+				$thisContainer.find(ifDisabled + ',' + ifDisabledShow).not(withinANest)
+					.show().css('opacity', 1).find(':input').removeAttr('disabled');
+
+			else // We use opacity to conceal; and hide if applicable.
+			{
+				$thisContainer.find(ifDisabled + ',' + ifDisabledShow).not(withinANest)
+					.css('opacity', 0.2).find(':input').attr('disabled', 'disabled'),
+					$thisContainer.find(ifDisabledShow).not(withinANest).hide();
+			}
+			refreshCodeMirrors(); // Refresh CodeMirrors also.
+		})
 			.trigger('change'); // Initialize.
 		/* ------------------------------------------------------------------------------------------------------------
 		 Plugin-specific JS for menu page tables that follow a WP standard, but need a few tweaks.

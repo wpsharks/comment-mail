@@ -93,6 +93,7 @@ namespace comment_mail // Root namespace.
 					               array(
 						               'label'           => sprintf(__('Enable %1$s&trade; Functionality?', $this->plugin->text_domain), esc_html($this->plugin->name)),
 						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						               'field_class'     => 'pmp-if-change',
 						               'name'            => 'enable',
 						               'current_value'   => $current_value_for('enable'),
 						               'allow_arbitrary' => FALSE, // Must be one of these.
@@ -100,7 +101,7 @@ namespace comment_mail // Root namespace.
 							               '1' => sprintf(__('Yes, enable %1$s&trade; (recommended)', $this->plugin->text_domain), esc_html($this->plugin->name)),
 							               '0' => sprintf(__('No, disable %1$s&trade; temporarily', $this->plugin->text_domain), esc_html($this->plugin->name)),
 						               ),
-						               'notes_after'     => '<div class="pmp-note pmp-warning pmp-panel-if-disabled-show">'.
+						               'notes_after'     => '<div class="pmp-note pmp-warning pmp-if-disabled-show">'.
 						                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.sprintf(__('When %1$s&trade; is disabled in this way:', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'.
 						                                    '   <ul class="pmp-list-items">'.
 						                                    '      <li>'.__('Comment Subscription Options (options for receiving email notifications regarding comments/replies) no longer appear on comment forms. In short, no new subscriptions are allowed. In addition, the ability to add a new subscription through any/all front-end forms is disabled too. All other front &amp; back-end functionality (including the ability for subscribers to edit and/or unsubscribe from existing subscriptions on the front-end) remains available.', $this->plugin->text_domain).'</li>'.
@@ -112,14 +113,13 @@ namespace comment_mail // Root namespace.
 				               ' </tbody>'.
 				               '</table>';
 
-				$_panel_body .= '<div class="pmp-panel-if-enabled-show"><hr />'.
+				$_panel_body .= '<div class="pmp-if-enabled-show"><hr />'.
 				                ' <table>'.
 				                '    <tbody>'.
 				                $form_fields->select_row(
 					                array(
 						                'label'           => __('Allow New Subsciptions?', $this->plugin->text_domain),
 						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'field_class'     => 'no-if-enabled',
 						                'name'            => 'new_subs_enable',
 						                'current_value'   => $current_value_for('new_subs_enable'),
 						                'allow_arbitrary' => FALSE, // Must be one of these.
@@ -138,7 +138,6 @@ namespace comment_mail // Root namespace.
 					                array(
 						                'label'           => __('Enable Mail Queue Processing?', $this->plugin->text_domain),
 						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'field_class'     => 'no-if-enabled',
 						                'name'            => 'queue_processing_enable',
 						                'current_value'   => $current_value_for('queue_processing_enable'),
 						                'allow_arbitrary' => FALSE, // Must be one of these.
@@ -220,7 +219,8 @@ namespace comment_mail // Root namespace.
 						                'placeholder'   => __('e.g. noreply@example.com', $this->plugin->text_domain),
 						                'name'          => 'reply_to_email',
 						                'current_value' => $current_value_for('reply_to_email'),
-						                'notes_after'   => '<p>'.sprintf(__('All emails sent by %1$s can have a specific <code>%2$s:</code> email header, which might be different from the address that %1$s messages are actually sent <code>%3$s</code>. This makes it so that if someone happens to reply to an email notification, that reply will be directed to a specific email address that you prefer. Some site owners like to use something like <code>noreply@mysite.com</code>, while others find it best to use a real email address that can monitor replies. It is a matter of preference. In the future, %1$s may support replies to comments via email, and this field could become more important at that time.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'
+						                'notes_after'   => '<p>'.sprintf(__('All emails sent by %1$s can have a specific <code>%2$s:</code> email header, which might be different from the address that %1$s messages are actually sent <code>%3$s</code>. This makes it so that if someone happens to reply to an email notification, that reply will be directed to a specific email address that you prefer. Some site owners like to use something like <code>noreply@mysite.com</code>, while others find it best to use a real email address that can monitor replies. It\'s a matter of preference.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'.
+						                                   '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> If you happen to enable a %1$s&trade; RVE Handler (Replies via Email), this value is ignored in favor of the <code>Reply-To</code> address configured for your RVE Handler. In other words, if you enable Replies via Email, you could simply leave this blank if you like. If RVE is enabled, the <code>Reply-To</code> address for the RVE Handler receives precedence always. The address you configure here will not be applied in that case.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'
 					                )).
 				                '  </tbody>'.
 				                '</table>';
@@ -301,7 +301,6 @@ namespace comment_mail // Root namespace.
 					               array(
 						               'label'           => sprintf(__('Enable "<small><code>Powered by %1$s&trade;</code></small>" in Email Footer?', $this->plugin->text_domain), esc_html($this->plugin->name)),
 						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						               'field_class'     => 'no-if-enabled',
 						               'name'            => 'email_footer_powered_by_enable',
 						               'current_value'   => $current_value_for('email_footer_powered_by_enable'),
 						               'allow_arbitrary' => FALSE,
@@ -319,7 +318,6 @@ namespace comment_mail // Root namespace.
 					                array(
 						                'label'           => sprintf(__('Enable "<small><code>Powered by %1$s&trade;</code></small>" in Site Footer?', $this->plugin->text_domain), esc_html($this->plugin->name)),
 						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'field_class'     => 'no-if-enabled',
 						                'name'            => 'site_footer_powered_by_enable',
 						                'current_value'   => $current_value_for('site_footer_powered_by_enable'),
 						                'allow_arbitrary' => FALSE,
@@ -350,6 +348,7 @@ namespace comment_mail // Root namespace.
 					               array(
 						               'label'           => __('Enable Comment Form Subscr. Options Template?', $this->plugin->text_domain),
 						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						               'field_class'     => 'pmp-if-change', // JS change handler.
 						               'name'            => 'comment_form_template_enable',
 						               'current_value'   => $current_value_for('comment_form_template_enable'),
 						               'allow_arbitrary' => FALSE, // Must be one of these.
@@ -362,14 +361,13 @@ namespace comment_mail // Root namespace.
 				               '  </tbody>'.
 				               '</table>';
 
-				$_panel_body .= '<div class="pmp-panel-if-disabled-show">'.
+				$_panel_body .= '<div class="pmp-if-disabled-show">'.
 				                '  <table>'.
 				                '     <tbody>'.
 				                $form_fields->select_row(
 					                array(
 						                'label'           => __('Also Disable Scripts Associated w/ Comment Form Subscr. Options?', $this->plugin->text_domain),
 						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'field_class'     => 'no-if-enabled',
 						                'name'            => 'comment_form_scripts_enable',
 						                'current_value'   => $current_value_for('comment_form_scripts_enable'),
 						                'allow_arbitrary' => FALSE, // Must be one of these.
@@ -383,7 +381,7 @@ namespace comment_mail // Root namespace.
 				                '  </table>'.
 				                '</div>';
 
-				$_panel_body .= '<div class="pmp-panel-if-enabled"><hr />'.
+				$_panel_body .= '<div class="pmp-if-enabled-show"><hr />'.
 				                '  <table>'.
 				                '     <tbody>'.
 				                $form_fields->textarea_row(
@@ -451,6 +449,7 @@ namespace comment_mail // Root namespace.
 					               array(
 						               'label'           => __('Enable Auto-Subscribe?', $this->plugin->text_domain),
 						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						               'field_class'     => 'pmp-if-change', // JS change handler.
 						               'name'            => 'auto_subscribe_enable',
 						               'current_value'   => $current_value_for('auto_subscribe_enable'),
 						               'allow_arbitrary' => FALSE, // Must be one of these.
@@ -458,7 +457,7 @@ namespace comment_mail // Root namespace.
 							               '1' => __('Yes, enable Auto-Subscribe (recommended)', $this->plugin->text_domain),
 							               '0' => __('No, disable all Auto-Subscribe functionality', $this->plugin->text_domain),
 						               ),
-						               'notes_after'     => '<div class="pmp-panel-if-enabled-show">'.
+						               'notes_after'     => '<div class="pmp-if-enabled-show">'.
 						                                    '  <p style="font-weight:bold; font-size:110%; margin:0;">'.__('When Auto-Subscribe is enabled:', $this->plugin->text_domain).'</p>'.
 						                                    '  <ul class="pmp-list-items">'.
 						                                    '     <li>'.__('The author of a post can be subscribed to all comments/replies automatically. This way they\'ll receive email notifications w/o needing to go through the normal comment subscription process.', $this->plugin->text_domain).'</li>'.
@@ -469,14 +468,13 @@ namespace comment_mail // Root namespace.
 				               ' </tbody>'.
 				               '</table>';
 
-				$_panel_body .= '<div class="pmp-panel-if-enabled"><hr />'.
+				$_panel_body .= '<div class="pmp-if-enabled-show"><hr />'.
 				                ' <table>'.
 				                '    <tbody>'.
 				                $form_fields->select_row(
 					                array(
 						                'label'           => __('Auto-Subscribe Post Authors?', $this->plugin->text_domain),
 						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'field_class'     => 'no-if-enabled',
 						                'name'            => 'auto_subscribe_post_author_enable',
 						                'current_value'   => $current_value_for('auto_subscribe_post_author_enable'),
 						                'allow_arbitrary' => FALSE, // Must be one of these.
@@ -545,6 +543,7 @@ namespace comment_mail // Root namespace.
 					               array(
 						               'label'           => __('Auto-Confirm Everyone?', $this->plugin->text_domain),
 						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						               'field_class'     => 'pmp-if-change', // JS change handler.
 						               'name'            => 'auto_confirm_force_enable',
 						               'current_value'   => $current_value_for('auto_confirm_force_enable'),
 						               'allow_arbitrary' => FALSE, // Must be one of these.
@@ -552,8 +551,8 @@ namespace comment_mail // Root namespace.
 							               '0' => __('No, require subscriptions to be confirmed via email (highly recommended)', $this->plugin->text_domain),
 							               '1' => __('Yes, automatically auto-confirm everyone; i.e. never ask for email confirmation', $this->plugin->text_domain),
 						               ),
-						               'notes_after'     => '<div class="pmp-panel-if-enabled-show">'.
-						                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('When Auto-Confirm Everyone is enabled:', $this->plugin->text_domain).'</p>'.
+						               'notes_after'     => '<div class="pmp-if-enabled-show">'.
+						                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('When Auto-Confirm Everyone is enabled (<span class="pmp-note pmp-warning">warning</span>):', $this->plugin->text_domain).'</p>'.
 						                                    '   <ul class="pmp-list-items">'.
 						                                    '      <li>'.sprintf(__('Nobody will be required to confirm a subscription. For instance, when someone leaves a comment and chooses to be subscribed (with whatever email address they\'ve entered), that email address will be added to the list w/o getting confirmation from the real owner of that address. This scenario changes slightly if you %1$s before leaving a comment, via WordPress Discussion Settings. If that\'s the case, then depending on the way your users register (i.e. if they are required to verify their email address in some way), this option might be feasible. That said, in 99%% of all cases this option is NOT recommended. If you enable auto-confirmation for everyone, please take extreme caution.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor(admin_url('/options-discussion.php'), __('require users to be logged-in', $this->plugin->text_domain))).'</li>'.
 						                                    '      <li>'.sprintf(__('In addition to security issues associated w/ auto-confirming everyone automatically; if you enable this behavior it will also have the negative side-effect of making it slightly more difficult for users to view a summary of their existing subscriptions; i.e. they won\'t get an encrypted <code>%2$s</code> cookie right away via email confirmation, as would normally occur. This is how %1$s identifies a user when they are not currently logged into the site (typical w/ commenters). Therefore, if Auto-Confirm Everyone is enabled, the only way users can view a summary of their subscriptions, is if:', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html(__NAMESPACE__.'_sub_email')).
@@ -568,14 +567,13 @@ namespace comment_mail // Root namespace.
 				               ' </tbody>'.
 				               '</table>';
 
-				$_panel_body .= '<div class="pmp-panel-if-disabled-show"><hr />'.
+				$_panel_body .= '<div class="pmp-if-disabled-show"><hr />'.
 				                ' <table>'.
 				                '  <tbody>'.
 				                $form_fields->select_row(
 					                array(
 						                'label'           => __('Auto-Confirm if Already Subscribed w/ the Same IP Address?', $this->plugin->text_domain),
 						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'field_class'     => 'no-if-enabled',
 						                'name'            => 'auto_confirm_if_already_subscribed_u0ip_enable',
 						                'current_value'   => $current_value_for('auto_confirm_if_already_subscribed_u0ip_enable'),
 						                'allow_arbitrary' => FALSE, // Must be one of these.
@@ -625,7 +623,6 @@ namespace comment_mail // Root namespace.
 					               array(
 						               'label'           => __('Enable IP Region/Country Tracking?', $this->plugin->text_domain),
 						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						               'field_class'     => 'no-if-enabled',
 						               'name'            => 'geo_location_tracking_enable',
 						               'current_value'   => $current_value_for('geo_location_tracking_enable'),
 						               'allow_arbitrary' => FALSE, // Must be one of these.
@@ -706,6 +703,7 @@ namespace comment_mail // Root namespace.
 					               array(
 						               'label'           => __('Enable SMTP Integration?', $this->plugin->text_domain),
 						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						               'field_class'     => 'pmp-if-change', // JS change handler.
 						               'name'            => 'smtp_enable',
 						               'current_value'   => $current_value_for('smtp_enable'),
 						               'allow_arbitrary' => FALSE, // Must be one of these.
@@ -713,11 +711,11 @@ namespace comment_mail // Root namespace.
 							               '0' => __('No, use the wp_mail function (default behavior)', $this->plugin->text_domain),
 							               '1' => __('Yes, integrate w/ an SMTP server of my choosing (as configured below)', $this->plugin->text_domain),
 						               ),
-						               'notes_after'     => '<div class="pmp-panel-if-enabled-show">'.
+						               'notes_after'     => '<div class="pmp-if-enabled-show">'.
 						                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('When SMTP Server Integration is enabled:', $this->plugin->text_domain).'</p>'.
 						                                    '   <ul class="pmp-list-items">'.
 						                                    '      <li>'.sprintf(__('Instead of using the default <code>%2$s</code> function, %1$s will send email confirmation requests &amp; comment/reply notifications through an SMTP server of your choosing; i.e. all email processed by %1$s will be routed through an SMTP server that you\'ve dedicated to comment subscriptions. This is highly recommended, since it can significantly improve the deliverability rate of emails that are sent by %1$s. In addition, it may also speed up your site (i.e. reduce the burden on your own web server). This is because an SMTP host is generally associated with an external server that is dedicated to email processing.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/functions/wp_mail/', 'wp_mail')).'</li>'.
-						                                    '      <li>'.sprintf(__('Instead of using the <code>%3$s</code>, <code>%4$s</code>, and <code>%2$s</code> email message headers configured elsewhere in %1$s, the values that you configure for the SMTP server will be used instead; i.e. what you configure here will override other email header options in %1$s. This allows you to be specific about what message headers are passed through your SMTP server whenever SMTP functionality is enabled.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</li>'.
+						                                    '      <li>'.sprintf(__('Instead of using the <code>%3$s</code>, <code>%4$s</code>, and <code>%2$s</code> email message headers configured elsewhere in %1$s, the values that you configure for the SMTP server will be used instead; i.e. what you configure here will override other email header options in %1$s. This allows you to be specific about what message headers are passed through your SMTP server whenever SMTP functionality is enabled. <strong>With one exception.</strong> If you happen to enable the %1$s&trade; RVE handler (Replies via Email), the SMTP <code>Reply-To</code> header is ignored in favor of the <code>Reply-To</code> address configured for the %1$s&trade; RVE handler. If RVE is enabled, the <code>Reply-To</code> address for the RVE handler receives precedence always.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</li>'.
 						                                    '   </ul>'.
 						                                    '  <p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> If you are already running a plugin like %2$s (i.e. a plugin that reconfigures the <code>%3$s</code> function globally); that is usually enough, and you should generally NOT enable SMTP integration here also. In other words, if <code>%3$s</code> is already configured globally to route mail through an SMTP server, you would only need the options below if your intention was to override your existing SMTP configuration specifically for %1$s.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('https://wordpress.org/plugins/wp-mail-smtp/', 'WP Mail SMTP'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/functions/wp_mail/', 'wp_mail')).'</p>'.
 						                                    '</div>',
@@ -725,7 +723,7 @@ namespace comment_mail // Root namespace.
 				               ' </tbody>'.
 				               '</table>';
 
-				$_panel_body .= '<div class="pmp-panel-if-enabled"><hr />'.
+				$_panel_body .= '<div class="pmp-if-enabled-show"><hr />'.
 
 				                '<a href="http://aws.amazon.com/ses/" target="_blank">'.
 				                '  <img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/aws-ses-rec.png')).'" class="pmp-right" style="margin:1em 0 0 3em;" />'.
@@ -847,7 +845,8 @@ namespace comment_mail // Root namespace.
 						                'placeholder'   => __('e.g. moderator@mysite.com', $this->plugin->text_domain),
 						                'name'          => 'smtp_reply_to_email',
 						                'current_value' => $current_value_for('smtp_reply_to_email'),
-						                'notes_after'   => '<p>'.sprintf(__('Email used in the <code>%2$s:</code> header; e.g. <code>moderator@mysite.com</code>. This makes it so that if someone happens to reply to an email notification, that reply will be directed to a specific email address that you prefer. Some site owners like to use something like <code>noreply@mysite.com</code>, while others find it best to use a real email address that can monitor replies. It is a matter of preference. In the future, %1$s may support replies to comments via email, and this field could become more important at that time.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'
+						                'notes_after'   => '<p>'.sprintf(__('Email used in the <code>%2$s:</code> header; e.g. <code>moderator@mysite.com</code>. This makes it so that if someone happens to reply to an email notification, that reply will be directed to a specific email address that you prefer. Some site owners like to use something like <code>noreply@mysite.com</code>, while others find it best to use a real email address that can monitor replies. It\'s a matter of preference.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'.
+						                                   '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> If you happen to enable a %1$s&trade; RVE Handler (Replies via Email), this value is ignored in favor of the <code>Reply-To</code> address configured for your RVE Handler. In other words, if you enable Replies via Email, you could simply leave this blank if you like. If RVE is enabled, the <code>Reply-To</code> address for the RVE Handler receives precedence always. The address you configure here will not be applied in that case.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'
 					                )).
 				                '  </tbody>'.
 				                ' </table>'.
@@ -887,6 +886,144 @@ namespace comment_mail // Root namespace.
 				                '</div>';
 
 				echo $this->panel(__('SMTP Server Integration', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table style="margin:0;">'.
+				               ' <tbody>'.
+				               $form_fields->select_row(
+					               array(
+						               'label'           => __('Enable RVE (Replies via Email)?', $this->plugin->text_domain),
+						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						               'field_class'     => 'pmp-if-change', // JS change handler.
+						               'name'            => 'replies_via_email_enable',
+						               'current_value'   => $current_value_for('replies_via_email_enable'),
+						               'allow_arbitrary' => FALSE, // Must be one of these.
+						               'options'         => array(
+							               '0' => __('No, do not allow comment replies via email', $this->plugin->text_domain),
+							               '1' => __('Yes, allow subscribers to post comment replies via email (recommended)', $this->plugin->text_domain),
+						               ),
+						               'notes_after'     => '<div class="pmp-if-enabled-show">'.
+						                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('When Replies via Email are enabled through an RVE Handler:', $this->plugin->text_domain).'</p>'.
+						                                    '   <ul class="pmp-list-items">'.
+						                                    '      <li>'.sprintf(__('%1$s&trade; will allow replies to comments via email using a special <code>Reply-To</code> address that you will need to set up by following the instructions provided below. Any other <code>Reply-To</code> address configured elsewhere in %1$s will be overridden by the address you configure here for an RVE Handler. There are no special exceptions to this. An RVE Handler takes precedence over any other <code>Reply-To</code> you configure.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
+						                                    '      <li>'.sprintf(__('Replies to comments via email will be functional for all types of notifications sent by %1$s (including digest notifications). However, there are a few things worth noting before you enable an RVE Handler. <a href="#" data-toggle="other" data-other=".pmp-rve-details">Click here to toggle important details</a>.', $this->plugin->text_domain), esc_html($this->plugin->name)).
+						                                    '        <ul class="pmp-rve-details" style="display:none;">'.
+						                                    '           <li>'.sprintf(__('All replies posted via email must be sent to the special <code>Reply-To</code> address that you configure below. Once you configure a <code>Reply-To</code> for an RVE Handler, %1$s will automatically set the <code>Reply-To:</code> header in all email notifications that it sends. This way when somebody replies to a comment notification, their email program will reply to the address required for replies via email to work properly.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
+						                                    '           <li>'.sprintf(__('The <code>Reply-To</code> address that you configure below, will serve as a base for %1$s to work from. For instance, let\'s say you choose: <code>rve@mandrill.%2$s</code>. This base address will be suffixed automatically (at runtime) with details specific to a particular notification that %1$s sends. Ultimately, <code>rve@mandrill.%2$s</code> will look like: <code>rve<strong>+332-96-kgjdgxr4ldqpdrgjdgxr</strong>@mandrill.%2$s</code>. In this example, the additional details (following the <code>+</code> sign) are there to help %1$s route the reply to the proper location, and to provide a means by which to identify the end-user that is posting a reply.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html($this->plugin->utils_url->current_host_base())).'</li>'.
+						                                    '           <li>'.sprintf(__('For single-comment notifications; i.e. where a subscriber chooses delivery type <code>asap</code> (aka: instantly), there is just a single comment in each notification that a subscriber receives. This works best with replies via email, since the <code>Reply-To:</code> header (on its own) is enough for everything to work as expected. Someone replying via email need only hit the Reply button in their email program and start typing. Very simple.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
+						                                    '           <li>'.sprintf(__('For multi-comment notifications; i.e. where a subscriber chooses a delivery type that is not <code>asap</code> (e.g. <code>hourly</code>, <code>daily</code>, etc.); there can be more than a single comment in each notification they receive. If there is more than one comment in the notification, instructions will be provided to the end-user explaining how to reply. The special <code>Reply-To</code> address is still used in this case. However, they also need to specify which comment they want to reply to. To do this, the end-user must start their reply with a special marker provided by %1$s. Again, if there is more than one comment in the notification, instructions will be provided to the end-user explaining how to reply.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
+						                                    '           <li>'.sprintf(__('Comments posted via email are still piped through the same underlying WordPress handler that normal on-site comments go through (i.e. <code>/wp-comments-post.php</code>). This means that all of your existing WordPress Discussion Settings (and/or Akismet settings) will still apply to all comments, even if they are posted via email. <strong>With one exception.</strong> When an RVE Handler is enabled, any comments posted via email are allowed through without an end-user being logged-in. If your WordPress Discussion Settings require that users be logged-in to post comments, that will be overridden temporarily whenever a reply via email comes through. Please note that replies posted via email are generally from confirmed subscribers. Any reply via email that is not from a confirmed subscriber will be forced into moderation by %1$s anyway. Otherwise, whatever your current Discussion Settings are configured to allow, will be adhered to for replies via email also. For instance, if you require that all comments be moderated, that will continue to be the case for all replies via email. %1$s will never approve a comment on it\'s own. Approval of comments is always determined by your WP Discussion Settings.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
+						                                    '           <li>'.sprintf(__('Any reply via email should include one of two things. A copy of the original quoted notification, or a special <code>%2$s</code> marker. Most email clients will include the original message in an email reply, and this is what %1$s will look for. %1$s scans the body of the email looking for an original quoted section and strips it out (along with anything below it). If a reply does not include a quoted section when replying to an email notification, an <code>%2$s</code> marker can be used instead. When %1$s reads <code>%2$s</code>, it will use it as a marker and ignore everything below that line. Everything above <code>%2$s</code> will become the comment reply on your blog. Therefore, you can use the <code>%2$s</code> feature even if you have quoting turned off in your email client. If neither of these are found, the reply is still accepted. However, it will be forced into moderation at all times; i.e. you must approve it manually no matter what the rest of your WordPress Discussion Settings say.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html($this->plugin->utils_rve->manual_end_divider())).'</li>'.
+						                                    '        </ul>'.
+						                                    '     </li>'.
+						                                    '   </ul>'.
+						                                    '</div>',
+					               )).
+				               ' </tbody>'.
+				               '</table>';
+
+				$_panel_body .= '<div class="pmp-if-enabled-show pmp-if-nest"><hr />'.
+
+				                '<a href="https://github.com/websharks/comment-mail/wiki/Mandrill-RVE-Handler" target="_blank">'.
+				                '<img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/mandrill-rec.png')).'" class="pmp-right" style="margin-left:3em;" /></a>'.
+
+				                ' <table style="width:auto; margin-bottom:0;">'.
+				                '    <tbody>'.
+				                $form_fields->select_row(
+					                array(
+						                'label'           => __('Choose an RVE Handler:', $this->plugin->text_domain),
+						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						                'field_class'     => 'pmp-if-change pmp-if-value-match',
+						                'name'            => 'replies_via_email_handler',
+						                'current_value'   => $current_value_for('replies_via_email_handler'),
+						                'allow_arbitrary' => FALSE, // Must be one of these.
+						                'options'         => array(
+							                ''         => '', // Empty value for the sake of making this somewhat understandable.
+							                'mandrill' => __('Mandrill RVE Handler (free; recommended)', $this->plugin->text_domain),
+						                ),
+						                'notes_after'     => '<p>'.sprintf(__('<strong>Note:</strong> %1$s is currently the only choice here; i.e. we have only integrated this with Mandrill thus far <i class="fa fa-smile-o"></i>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/21699367-Inbound-Email-Processing-Overview', 'Mandrill')).'</p>'
+					                )).
+				                '    </tbody>'.
+				                ' </table>'.
+
+				                ' <div class="pmp-if-enabled-show pmp-if-value-mandrill pmp-in-if-nest"><hr />'.
+				                '    <table>'.
+				                '       <tbody>'.
+				                $form_fields->input_row(
+					                array(
+						                'type'          => 'email',
+						                'label'         => __('Mandrill <code>Reply-To</code> Address:', $this->plugin->text_domain),
+						                'placeholder'   => sprintf(__('e.g. rve@mandrill.%1$s', $this->plugin->text_domain), $this->plugin->utils_url->current_host_base()),
+						                'name'          => 'rve_mandrill_reply_to_email',
+						                'current_value' => $current_value_for('rve_mandrill_reply_to_email'),
+						                'notes_after'   => '<p class="pmp-note pmp-info">'.sprintf(__('This is really all it takes to get Replies via Email working. However, it requires that you setup a Mandrill account (free) and then configure an Inbound Mailbox Route that will connect to the Webhook URL shown below. <span class="pmp-hilite">Please see %1$s for detailed instructions.</span>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/Mandrill-RVE-Handler', __('this wiki article', $this->plugin->text_domain))).'</p>'.
+						                                   '<table style="table-layout:auto;"><tr><td style="display:table-cell; white-space:nowrap;">'.__('<strong>Mandrill Webhook URL:</strong>', $this->plugin->text_domain).'</td><td style="display:table-cell; width:100%;"><input type="text" value="'.esc_html($this->plugin->utils_url->rve_mandrill_webhook_url()).'" data-toggle="select-all" style="background:#FFFFFF;" /></td></tr></table>',
+					                )).
+				                '       </tbody>'.
+				                '    </table>'.
+
+				                '    <hr />'.
+
+				                '    <table>'.
+				                '       <tbody>'.
+				                $form_fields->input_row(
+					                array(
+						                'type'          => 'number',
+						                'label'         => __('Mandrill Max Overall Spam Score Allowed:', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g. 5.0', $this->plugin->text_domain),
+						                'name'          => 'rve_mandrill_max_spam_score',
+						                'current_value' => $current_value_for('rve_mandrill_max_spam_score'),
+						                'notes_after'   => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>3.0</code> to <code>5.0</code> is suggested here. Any reply via email with a spam score higher than what is configured here, will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g. if you use Akismet, each comment must also pass through Akismet too.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-', __('checks performed by Mandrill', $this->plugin->text_domain))).'</p>',
+					                )).
+				                '       </tbody>'.
+				                '    </table>'.
+
+				                '    <table>'.
+				                '       <tbody>'.
+				                $form_fields->select_row(
+					                array(
+						                'label'           => __('Mandrill SPF Rejection Policy:', $this->plugin->text_domain),
+						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						                'name'            => 'rve_mandrill_spf_check_enable',
+						                'current_value'   => $current_value_for('rve_mandrill_spf_check_enable'),
+						                'allow_arbitrary' => FALSE, // Must be one of these.
+						                'options'         => array(
+							                '0' => __('Do not check SPF test results at all; i.e. no SPF rejection policy', $this->plugin->text_domain),
+							                '1' => __('Require SPF test result: "pass|neutral|softfail|none"; else flag as spam for moderation (recommended)', $this->plugin->text_domain),
+							                '2' => __('Require SPF test result: "pass|neutral|none"; else flag as spam for moderation', $this->plugin->text_domain),
+							                '3' => __('Require SPF test result: "pass|neutral"; else flag as spam for moderation', $this->plugin->text_domain),
+							                '4' => __('Require SPF test result: "pass"; else flag as spam for moderation', $this->plugin->text_domain),
+						                ),
+						                'notes_after'     => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>pass|neutral|softfail|none</code> is suggested here; where <code>|</code> means "or" (i.e. one of these results). Any reply via email that does not pass your rejection policy will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g. if you use Akismet, each comment must also pass through Akismet too.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-', __('checks performed by Mandrill', $this->plugin->text_domain))).'</p>',
+					                )).
+				                '       </tbody>'.
+				                '    </table>'.
+
+				                '    <table>'.
+				                '       <tbody>'.
+				                $form_fields->select_row(
+					                array(
+						                'label'           => __('Mandrill DKIM Rejection Policy:', $this->plugin->text_domain),
+						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						                'name'            => 'rve_mandrill_dkim_check_enable',
+						                'current_value'   => $current_value_for('rve_mandrill_dkim_check_enable'),
+						                'allow_arbitrary' => FALSE, // Must be one of these.
+						                'options'         => array(
+							                '0' => __('Do not check DKIM test results at all; i.e. no DKIM rejection policy', $this->plugin->text_domain),
+							                '1' => __('If DKIM signature "exists, but it\'s invalid"; flag as spam for moderation (recommended)', $this->plugin->text_domain),
+							                '2' => __('If DKIM signature "is missing or invalid"; flag as spam for moderation', $this->plugin->text_domain),
+						                ),
+						                'notes_after'     => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>signature exists, but invalid</code> is suggested here. Any reply via email that does not pass your rejection policy will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g. if you use Akismet, each comment must also pass through Akismet too.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-', __('checks performed by Mandrill', $this->plugin->text_domain))).'</p>',
+					                )).
+				                '       </tbody>'.
+				                '    </table>'.
+				                ' </div>'.
+				                '</div>';
+
+				echo $this->panel(__('Replies via Email (RVE Handler)', $this->plugin->text_domain), $_panel_body, array());
 
 				unset($_panel_body); // Housekeeping.
 
@@ -1128,7 +1265,6 @@ namespace comment_mail // Root namespace.
 					               array(
 						               'label'           => sprintf(__('Display %1$s&trade; Logo at the Top of Admin Pages?', $this->plugin->text_domain), esc_html($this->plugin->name)),
 						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						               'field_class'     => 'no-if-enabled',
 						               'name'            => 'menu_pages_logo_icon_enable',
 						               'current_value'   => $current_value_for('menu_pages_logo_icon_enable'),
 						               'allow_arbitrary' => FALSE,
@@ -1166,7 +1302,6 @@ namespace comment_mail // Root namespace.
 					                array(
 						                'label'           => __('Select Menu Options; List Posts?', $this->plugin->text_domain),
 						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'field_class'     => 'no-if-enabled',
 						                'name'            => 'post_select_options_enable',
 						                'current_value'   => $current_value_for('post_select_options_enable'),
 						                'allow_arbitrary' => FALSE,
@@ -1185,7 +1320,6 @@ namespace comment_mail // Root namespace.
 					                array(
 						                'label'           => __('Post Select Menu Options; Include Media?', $this->plugin->text_domain),
 						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'field_class'     => 'no-if-enabled',
 						                'name'            => 'post_select_options_media_enable',
 						                'current_value'   => $current_value_for('post_select_options_media_enable'),
 						                'allow_arbitrary' => FALSE,
@@ -1206,7 +1340,6 @@ namespace comment_mail // Root namespace.
 					                array(
 						                'label'           => __('Select Menu Options; List Comments?', $this->plugin->text_domain),
 						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'field_class'     => 'no-if-enabled',
 						                'name'            => 'comment_select_options_enable',
 						                'current_value'   => $current_value_for('comment_select_options_enable'),
 						                'allow_arbitrary' => FALSE,
@@ -1227,7 +1360,6 @@ namespace comment_mail // Root namespace.
 					                array(
 						                'label'           => __('Select Menu Options; List Users?', $this->plugin->text_domain),
 						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'field_class'     => 'no-if-enabled',
 						                'name'            => 'user_select_options_enable',
 						                'current_value'   => $current_value_for('user_select_options_enable'),
 						                'allow_arbitrary' => FALSE,
@@ -2531,9 +2663,9 @@ namespace comment_mail // Root namespace.
 									'@optgroup_close_subscr_totals'                => '', // Close this group.
 
 									'@optgroup_open_subscr_totals_geo_popularity'  => __('Geographic Popularity', $this->plugin->text_domain),
-									'event_subscribed_audience_by_geo_country'      => __('Audience by Country (for Post ID)', $this->plugin->text_domain),
-									'event_subscribed_audience_by_geo_us_region'    => __('Audience by US Region (for Post ID)', $this->plugin->text_domain),
-									'event_subscribed_audience_by_geo_ca_region'    => __('Audience by CA Region (for Post ID)', $this->plugin->text_domain),
+									'event_subscribed_audience_by_geo_country'     => __('Audience by Country (for Post ID)', $this->plugin->text_domain),
+									'event_subscribed_audience_by_geo_us_region'   => __('Audience by US Region (for Post ID)', $this->plugin->text_domain),
+									'event_subscribed_audience_by_geo_ca_region'   => __('Audience by CA Region (for Post ID)', $this->plugin->text_domain),
 									'@optgroup_close_subscr_totals_geo_popularity' => '', // Close this group.
 
 									'@optgroup_open_status_change_percentages'     => __('Status Change Percentages', $this->plugin->text_domain),

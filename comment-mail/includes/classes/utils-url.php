@@ -139,7 +139,7 @@ namespace comment_mail // Root namespace.
 			{
 				if(is_multisite()) // Multisite network?
 				{
-					global $current_blog;
+					global $current_blog; // Current MS blog.
 
 					$host = rtrim($current_blog->domain, '/');
 					$path = trim($current_blog->path, '/');
@@ -147,6 +147,36 @@ namespace comment_mail // Root namespace.
 					return strtolower(trim($host.'/'.$path, '/'));
 				}
 				return strtolower($this->plugin->utils_url->current_host(TRUE));
+			}
+
+			/**
+			 * Current base/root host name; w/ multisite compat.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return string Current base/root host name; w/ multisite compat.
+			 *
+			 * @note We don't cache this, since a blog can get changed at runtime.
+			 */
+			public function current_host_base()
+			{
+				if(is_multisite()) // Multisite network?
+				{
+					global $current_blog; // Current MS blog.
+
+					$host = strtolower(rtrim($current_blog->domain, '/'));
+					if(defined('SUBDOMAIN_INSTALL') && SUBDOMAIN_INSTALL)
+						return $host; // Intentional sub-domain.
+				}
+				else $host = $this->current_host(); // Standard WP installs.
+
+				if(substr_count($host, '.') > 1) // Reduce to base/root host name.
+				{
+					$_parts = explode('.', $host); // e.g. `www.example.com` becomes `example.com`.
+					$host   = $_parts[count($_parts) - 2].'.'.$_parts[count($_parts) - 1];
+					unset($_parts); // Housekeeping.
+				}
+				return strtolower($host); // Base/root host name.
 			}
 
 			/**

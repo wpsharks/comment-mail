@@ -75,7 +75,7 @@ namespace comment_mail // Root namespace.
 
 				new rve_mandrill($key);
 
-				exit(); // Stop now; always.
+				exit(); // Stop; always.
 			}
 		}
 	}

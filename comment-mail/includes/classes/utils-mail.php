@@ -21,6 +21,51 @@ namespace comment_mail // Root namespace.
 		class utils_mail extends abs_base
 		{
 			/**
+			 * @var array Role-based blacklist patterns.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			public static $role_based_blacklist_patterns = array(
+				'abuse@*',
+				'admin@*',
+				'billing@*',
+				'compliance@*',
+				'devnull@*',
+				'dns@*',
+				'ftp@*',
+				'help@*',
+				'hostmaster@*',
+				'inoc@*',
+				'ispfeedback@*',
+				'ispsupport@*',
+				'list-request@*',
+				'list@*',
+				'maildaemon@*',
+				'noc@*',
+				'no-reply@*',
+				'noreply@*',
+				'null@*',
+				'phish@*',
+				'phishing@*',
+				'postmaster@*',
+				'privacy@*',
+				'registrar@*',
+				'root@*',
+				'sales@*',
+				'security@*',
+				'spam@*',
+				'support@*',
+				'sysadmin@*',
+				'tech@*',
+				'undisclosed-recipients@*',
+				'unsubscribe@*',
+				'usenet@*',
+				'uucp@*',
+				'webmaster@*',
+				'www@*',
+			);
+
+			/**
 			 * Class constructor.
 			 *
 			 * @since 141111 First documented version.
@@ -28,6 +73,50 @@ namespace comment_mail // Root namespace.
 			public function __construct()
 			{
 				parent::__construct();
+			}
+
+			/**
+			 * `TRUE` if we can send mail via SMTP.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return boolean `TRUE` if we can send mail via SMTP.
+			 */
+			public function is_smtp_enabled()
+			{
+				return $this->plugin->options['smtp_enable'] // Enabled & configured?
+				       && $this->plugin->options['smtp_host'] && $this->plugin->options['smtp_port'];
+			}
+
+			/**
+			 * Does a particular header already exist?
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $header Header we are looking for.
+			 *    e.g. `Reply-To`, without any `:` suffix or anything else.
+			 *
+			 * @param array  $headers An array of existing headers to search through.
+			 *    This array is expected to contain string elements with full headers.
+			 *    e.g. `Reply-To: [value]` would be a single string header.
+			 *
+			 * @return string[]|integer[]|boolean Array keys where the header exists.
+			 *    This will return an array with all keys where the header currently exists.
+			 *    ~ An empty array if it does NOT exist currently.
+			 */
+			public function header_exists($header, array $headers)
+			{
+				$existing_keys = array(); // Initialize.
+
+				if(!($header = $this->plugin->utils_string->trim((string)$header, '', ':')))
+					return $existing_keys; // Not possible to look for nothing.
+
+				foreach($headers as $_key => $_header)
+					if(stripos($_header, $header.':') === 0)
+						$existing_keys[] = $_key;
+				unset($_key, $_header); // Housekeeping.
+
+				return $existing_keys; // All existing keys.
 			}
 
 			/**
@@ -53,7 +142,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function send($to, $subject, $message, $headers = array(), $attachments = array(), $throw = FALSE)
 			{
-				if($this->has_smtp_enabled()) // Can use SMTP; i.e. enabled?
+				if($this->is_smtp_enabled()) // Can use SMTP; i.e. enabled?
 				{
 					if(is_null($mail_smtp = &$this->cache_key(__FUNCTION__, 'mail_smtp')))
 						/** @var $mail_smtp mail_smtp Reference for IDEs. */
@@ -64,13 +153,18 @@ namespace comment_mail // Root namespace.
 				if(!is_array($headers)) // Force array.
 					$headers = explode("\r\n", (string)$headers);
 
-				$headers[] = 'Content-Type: text/html; charset=UTF-8';
+				if(($_content_type_keys = $this->header_exists('Content-Type', $headers)))
+					foreach($_content_type_keys as $_content_type_key)
+						unset($headers[$_content_type_key]); // Override any existing.
+				unset($_content_type_keys, $_content_type_key); // Housekeeping.
 
-				if($this->plugin->options['from_email']) // Specific `From:` address?
+				$headers[] = 'Content-Type: text/html; charset=UTF-8'; // Force this, always.
+
+				if($this->plugin->options['from_email'] && !$this->header_exists('From', $headers))
 					$headers[] = 'From: "'.$this->plugin->utils_string->esc_dq($this->plugin->options['from_name']).'"'.
 					             ' <'.$this->plugin->options['from_email'].'>';
 
-				if($this->plugin->options['reply_to_email']) // Specific `Reply-To:` address?
+				if($this->plugin->options['reply_to_email'] && !$this->header_exists('Reply-To', $headers))
 					$headers[] = 'Reply-To: '.$this->plugin->options['reply_to_email'];
 
 				return wp_mail($to, $subject, $message, $headers, $attachments);
@@ -100,7 +194,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function test($to, $subject, $message, $headers = array(), $attachments = array())
 			{
-				if($this->has_smtp_enabled()) // Can use SMTP; i.e. enabled?
+				if($this->is_smtp_enabled()) // Can use SMTP; i.e. enabled?
 					return $this->smtp_test($to, $subject, $message, $headers, $attachments);
 
 				$to = array_map('strval', (array)$to); // Force array.
@@ -126,13 +220,18 @@ namespace comment_mail // Root namespace.
 				if(!is_array($headers)) // Force array.
 					$headers = explode("\r\n", (string)$headers);
 
-				$headers[] = 'Content-Type: text/html; charset=UTF-8';
+				if(($_content_type_keys = $this->header_exists('Content-Type', $headers)))
+					foreach($_content_type_keys as $_content_type_key)
+						unset($headers[$_content_type_key]); // Override any existing.
+				unset($_content_type_keys, $_content_type_key); // Housekeeping.
 
-				if($this->plugin->options['from_email']) // Specific `From:` address?
+				$headers[] = 'Content-Type: text/html; charset=UTF-8'; // Force this, always.
+
+				if($this->plugin->options['from_email'] && !$this->header_exists('From', $headers))
 					$headers[] = 'From: "'.$this->plugin->utils_string->esc_dq($this->plugin->options['from_name']).'"'.
 					             ' <'.$this->plugin->options['from_email'].'>';
 
-				if($this->plugin->options['reply_to_email']) // Specific `Reply-To:` address?
+				if($this->plugin->options['reply_to_email'] && !$this->header_exists('Reply-To', $headers))
 					$headers[] = 'Reply-To: '.$this->plugin->options['reply_to_email'];
 
 				$sent = wp_mail($to, $subject, $message, $headers, $attachments);
@@ -174,7 +273,7 @@ namespace comment_mail // Root namespace.
 				$via  = 'smtp'; // Via SMTP in this case.
 				$sent = FALSE; // Initialize as `FALSE`.
 
-				if($this->has_smtp_enabled()) // Can use SMTP; i.e. enabled?
+				if($this->is_smtp_enabled()) // Can use SMTP; i.e. enabled?
 				{
 					$mail_smtp = new mail_smtp(TRUE); // Single instance w/ debugging.
 
@@ -243,19 +342,6 @@ namespace comment_mail // Root namespace.
 				                   '</div>';
 
 				return $results_markup; // Full HTML markup for back-end display.
-			}
-
-			/**
-			 * `TRUE` if we can send mail via SMTP.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @return boolean `TRUE` if we can send mail via SMTP.
-			 */
-			public function has_smtp_enabled()
-			{
-				return $this->plugin->options['smtp_enable'] // Enabled & configured?
-				       && $this->plugin->options['smtp_host'] && $this->plugin->options['smtp_port'];
 			}
 
 			/**
@@ -469,51 +555,6 @@ namespace comment_mail // Root namespace.
 
 				return $attachments ? array_unique($attachments) : array();
 			}
-
-			/**
-			 * @var array Role-based blacklist patterns.
-			 *
-			 * @since 141111 First documented version.
-			 */
-			public static $role_based_blacklist_patterns = array(
-				'abuse@*',
-				'admin@*',
-				'billing@*',
-				'compliance@*',
-				'devnull@*',
-				'dns@*',
-				'ftp@*',
-				'help@*',
-				'hostmaster@*',
-				'inoc@*',
-				'ispfeedback@*',
-				'ispsupport@*',
-				'list-request@*',
-				'list@*',
-				'maildaemon@*',
-				'noc@*',
-				'no-reply@*',
-				'noreply@*',
-				'null@*',
-				'phish@*',
-				'phishing@*',
-				'postmaster@*',
-				'privacy@*',
-				'registrar@*',
-				'root@*',
-				'sales@*',
-				'security@*',
-				'spam@*',
-				'support@*',
-				'sysadmin@*',
-				'tech@*',
-				'undisclosed-recipients@*',
-				'unsubscribe@*',
-				'usenet@*',
-				'uucp@*',
-				'webmaster@*',
-				'www@*',
-			);
 		}
 	}
 }

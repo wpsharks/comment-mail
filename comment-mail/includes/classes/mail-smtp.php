@@ -70,11 +70,25 @@ namespace comment_mail // Root namespace.
 			protected $subject;
 
 			/**
-			 * @var string Message content body.
+			 * @var string Raw message body.
 			 *
 			 * @since 141111 First documented version.
 			 */
 			protected $message;
+
+			/**
+			 * @var string Message HTML body.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $message_html;
+
+			/**
+			 * @var string Message text body.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $message_text;
 
 			/**
 			 * @var array Additional headers.
@@ -119,8 +133,10 @@ namespace comment_mail // Root namespace.
 
 				$this->recipients = array();
 
-				$this->subject = '';
-				$this->message = '';
+				$this->subject      = '';
+				$this->message      = '';
+				$this->message_html = '';
+				$this->message_text = '';
 
 				$this->headers     = array();
 				$this->attachments = array();
@@ -172,21 +188,10 @@ namespace comment_mail // Root namespace.
 			 */
 			public function send($to, $subject, $message, $headers = array(), $attachments = array(), $throw = FALSE)
 			{
-				$this->reset(); // Reset state; i.e. class properties.
+				$this->prep($to, $subject, $message, $headers, $attachments);
 
-				$this->from_name      = $this->plugin->options['smtp_from_name'];
-				$this->from_email     = $this->plugin->options['smtp_from_email'];
-				$this->reply_to_email = $this->plugin->options['smtp_reply_to_email'];
-
-				$this->recipients = $this->plugin->utils_mail->parse_addresses_deep($to, FALSE, TRUE);
-
-				$this->subject = (string)$subject; // Force string at all times.
-				$this->message = (string)$message; // Force string at all times.
-
-				$this->headers     = $this->plugin->utils_mail->parse_headers_deep($headers, $this->from_name, $this->from_email, $this->reply_to_email, $this->recipients);
-				$this->attachments = $this->plugin->utils_mail->parse_attachments_deep($attachments);
-
-				if(!$this->from_email || !$this->recipients || !$this->subject || !$this->message)
+				// Some basic validation. Do we have all required parts? e.g. from, recipients, subject, and body.
+				if(!$this->from_email || !$this->recipients || !$this->subject || !$this->message_html || !$this->message_text)
 					return FALSE; // Not possible. Missing vital argument value(s).
 
 				try // PHPMailer (catch exceptions).
@@ -208,9 +213,10 @@ namespace comment_mail // Root namespace.
 					$this->mailer->Username = $this->plugin->options['smtp_username'];
 					$this->mailer->Password = $this->plugin->options['smtp_password'];
 
-					$this->mailer->SetFrom($this->from_email, $this->from_name);
+					// If forcing a specific from address, override anything else defined previously.
 					if($this->plugin->options['smtp_force_from'] && $this->plugin->options['smtp_from_email'])
 						$this->mailer->SetFrom($this->plugin->options['smtp_from_email'], $this->plugin->options['smtp_from_name']);
+					else $this->mailer->SetFrom($this->from_email, $this->from_name); // What was parsed above already.
 
 					if($this->reply_to_email) // Add reply-to email.
 						$this->mailer->addReplyTo($this->reply_to_email);
@@ -222,9 +228,9 @@ namespace comment_mail // Root namespace.
 					$this->mailer->CharSet = 'UTF-8';
 					$this->mailer->Subject = $subject;
 
-					if($this->plugin->utils_string->is_html($this->message))
-						$this->mailer->MsgHTML($this->message); // Already contains HTML markup.
-					else $this->mailer->MsgHTML($this->plugin->utils_string->text_to_html($this->message));
+					$this->mailer->MsgHTML($this->message_html);
+					$this->mailer->AltBody = // Our text alternative.
+						$this->mailer->normalizeBreaks($this->message_text);
 
 					foreach($this->headers as $_header => $_value)
 						$this->mailer->AddCustomHeader($_header, $_value);
@@ -269,6 +275,56 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Preps for send using args to {@link send()}.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string|array $to Email address(es).
+			 * @param string       $subject Email subject line.
+			 * @param string       $message Message contents.
+			 * @param string|array $headers Optional. Additional headers.
+			 * @param string|array $attachments Optional. Files to attach.
+			 */
+			protected function prep($to, $subject, $message, $headers = array(), $attachments = array())
+			{
+				$this->reset(); // Reset state, always.
+
+				// These serve only as defaults. Override w/ headers.
+				$this->from_name      = $this->plugin->options['smtp_from_name'];
+				$this->from_email     = $this->plugin->options['smtp_from_email'];
+				$this->reply_to_email = $this->plugin->options['smtp_reply_to_email'];
+
+				// Any `Cc:` or `Bcc:` headers will supplement this list below.
+				$this->recipients = $this->plugin->utils_mail->parse_addresses_deep($to, FALSE, TRUE);
+
+				// Establish subject line and raw input message body.
+				$this->subject = (string)$subject; // Force string at all times.
+				$this->message = (string)$message; // Force string at all times.
+
+				// Detect raw message body type for analysis below.
+				$is_message_html = $this->plugin->utils_string->is_html($this->message);
+				$is_message_text = !$is_message_html; // The exact opposite of course.
+
+				if(!$is_message_html) // Create an HTML message part.
+					$this->message_html = $this->plugin->utils_string->text_to_html($this->message);
+				else $this->message_html = $this->message; // Already HTML markup.
+
+				if(!$is_message_text) // Create a plain text message part.
+					$this->message_text = $this->plugin->utils_string->html_to_text($this->message);
+				else $this->message_text = $this->message; // Already text format.
+
+				if(!$this->message_text) // Set a default plain text alternative in this case.
+					$this->message_text = __('To view this email message, open it in a program that understands HTML!', $this->plugin->text_domain);
+
+				// Some of the above details may be overridden by headers parsed here; e.g. `from_name`, `from_email`, `reply_to_email`, or `recipients`.
+				$this->headers = $this->plugin->utils_mail->parse_headers_deep($headers, $this->from_name, $this->from_email, $this->reply_to_email, $this->recipients);
+				unset($this->headers['content-type']); // Ignore this at all times. We always send multipart messages w/ UTF-8 encoding.
+
+				// Parse any attachments that may or may not exist in the call to this method.
+				$this->attachments = $this->plugin->utils_mail->parse_attachments_deep($attachments);
+			}
+
+			/**
 			 * Reset state; i.e. class properties.
 			 *
 			 * @since 141111 First documented version.
@@ -281,8 +337,10 @@ namespace comment_mail // Root namespace.
 
 				$this->recipients = array();
 
-				$this->subject = '';
-				$this->message = '';
+				$this->subject      = '';
+				$this->message      = '';
+				$this->message_html = '';
+				$this->message_text = '';
 
 				$this->headers     = array();
 				$this->attachments = array();

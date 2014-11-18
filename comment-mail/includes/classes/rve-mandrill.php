@@ -21,6 +21,18 @@ namespace comment_mail // Root namespace.
 		class rve_mandrill extends abs_base
 		{
 			/**
+			 * Key for this webhook.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			public static function key()
+			{
+				$plugin = plugin();
+				$class  = get_called_class();
+				return $plugin->utils_enc->hmac_sha256_sign($class);
+			}
+
+			/**
 			 * @var string Key for this webhook.
 			 *
 			 * @since 141111 First documented version.
@@ -70,8 +82,11 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_process()
 			{
-				if(!$this->plugin->options['rve_mandrill_enable'])
-					return; // Mandrill is disabled currently.
+				if(!$this->plugin->options['replies_via_email_enable'])
+					return; // Replies via email are disabled currently.
+
+				if($this->plugin->options['replies_via_email_handler'] !== 'mandrill')
+					return; // Mandrill is not the currently selection RVE handler.
 
 				if($this->key !== static::key())
 					return; // Not authorized.
@@ -95,8 +110,8 @@ namespace comment_mail // Root namespace.
 				if(!is_string($_REQUEST['mandrill_events']))
 					return; // Expecting JSON-encoded events.
 
-				$events = json_decode(stripslashes($_REQUEST['mandrill_events']));
-				if(!is_array($events)) $events = array();
+				$events = json_decode(trim(stripslashes($_REQUEST['mandrill_events'])));
+				if(!is_array($events)) $events = array(); // Force array.
 
 				$this->events = $events; // Collected events.
 			}
@@ -119,27 +134,50 @@ namespace comment_mail // Root namespace.
 					if(empty($_event->msg) || !($_event->msg instanceof \stdClass))
 						continue; // Expecting a msg object w/ properties.
 
+					$_reply_to_email = $this->isset_or($_event->msg->email, '', 'string');
+
 					$_from_name  = $this->isset_or($_event->msg->from_name, '', 'string');
 					$_from_email = $this->isset_or($_event->msg->from_email, '', 'string');
 
 					$_subject = $this->isset_or($_event->msg->subject, '', 'string');
-					$_text    = $this->isset_or($_event->msg->text, '', 'string');
-					$_html    = $this->isset_or($_event->msg->html, '', 'string');
 
-					if(isset($_event->msg->spam_report->score)) // Do we have a `spam_report`?
+					$_text_body = $this->isset_or($_event->msg->text, '', 'string');
+					$_html_body = $this->isset_or($_event->msg->html, '', 'string');
+
+					if(isset($_event->msg->spam_report->score))
 						$_spam_score = (float)$_event->msg->spam_report->score;
-					else $_spam_score = 0.0; // Always a float value.
+					else $_spam_score = 0.0; // Default value.
+
+					if(isset($_event->msg->spf->result))
+						$_spf_result = strtolower((string)$_event->msg->spf->result);
+					else $_spf_result = 'none'; // Default value.
+
+					if(isset($_event->msg->dkim->signed))
+						$_dkim_signed = (boolean)$_event->msg->dkim->signed;
+					else $_dkim_signed = FALSE; // Default value.
+
+					if(isset($_event->msg->dkim->valid))
+						$_dkim_valid = (boolean)$_event->msg->dkim->valid;
+					else $_dkim_valid = FALSE; // Default value.
 
 					$this->maybe_process_comment_reply(
 						array(
-							'from_name'  => $_from_name,
-							'from_email' => $_from_email,
+							'reply_to_email' => $_reply_to_email,
 
-							'subject'    => $_subject,
-							'text'       => $_text,
-							'html'       => $_html,
+							'from_name'      => $_from_name,
+							'from_email'     => $_from_email,
 
-							'spam_score' => $_spam_score,
+							'subject'        => $_subject,
+
+							'text_body'      => $_text_body,
+							'html_body'      => $_html_body,
+
+							'spam_score'     => $_spam_score,
+
+							'spf_result'     => $_spf_result,
+
+							'dkim_signed'    => $_dkim_signed,
+							'dkim_valid'     => $_dkim_valid,
 						));
 				}
 				unset($_event); // Housekeeping.
@@ -155,113 +193,80 @@ namespace comment_mail // Root namespace.
 			protected function maybe_process_comment_reply(array $args)
 			{
 				$default_args = array(
-					'from_name'  => '',
-					'from_email' => '',
+					'reply_to_email' => '',
 
-					'subject'    => '',
-					'text'       => '',
-					'html'       => '',
+					'from_name'      => '',
+					'from_email'     => '',
 
-					'spam_score' => 0.0,
+					'subject'        => '',
+
+					'text_body'      => '',
+					'html_body'      => '',
+
+					'spam_score'     => 0.0,
+
+					'spf_result'     => 'none',
+
+					'dkim_signed'    => FALSE,
+					'dkim_valid'     => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
+
+				$reply_to_email = trim((string)$args['reply_to_email']);
 
 				$from_name  = trim((string)$args['from_name']);
 				$from_email = trim((string)$args['from_email']);
 
 				$subject = trim((string)$args['subject']);
-				$text    = trim((string)$args['text']);
-				$html    = trim((string)$args['html']);
+
+				$text_body = trim((string)$args['text_body']);
+				$html_body = trim((string)$args['html_body']);
 
 				$spam_score = (float)$args['spam_score'];
 
-				if(!$from_email || !is_email($from_email))
-					return; // Invalid from address.
+				$spf_result = trim(strtolower((string)$args['spf_result']));
 
-				if($spam_score >= $this->plugin->options['rve_mandrill_max_spam_score'])
-					return; // Too spammy. Score exceeds configured maximum.
+				$dkim_signed = (boolean)$args['dkim_signed'];
+				$dkim_valid  = (boolean)$args['dkim_valid'];
 
-				$text      = $this->plugin->utils_string->html_to_text($text);
-				$html      = $this->plugin->utils_string->html_to_rich_text($html);
-				$rich_text = $this->coalesce($html, $text); // Prefer HTML markup.
+				$force_status = NULL; // Initialize.
 
-				if(!$rich_text) return; // No message.
-				if(!($sanitized_rich_text = $this->sanitize_rich_text($rich_text)))
-					return; // Sanitized rich text is now empty.
+				if(!$reply_to_email) // Must have this.
+					return; // Missing `Reply-To:` address.
 
-				if(!($in_reply_to_comment_id = $this->in_reply_to_comment_id($subject, $rich_text)))
-					return; // Unable to determine which comment ID the reply is to.
-			}
+				$text_body = $this->plugin->utils_string->html_to_text($text_body);
+				$html_body = $this->plugin->utils_string->html_to_rich_text($html_body);
+				if(!($rich_text_body = $this->coalesce($html_body, $text_body)))
+					return; // Empty reply; nothing to do here.
 
-			/**
-			 * Determine comment ID being replied to.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string $subject Reply subject line.
-			 * @param string $rich_text Rich text message body.
-			 *
-			 * @return integer Comment ID being replied to, else `0` on failure.
-			 */
-			protected function in_reply_to_comment_id($subject, $rich_text)
-			{
-				$comment_id = 0; // Initialize.
+				if($spam_score >= (float)$this->plugin->options['rve_mandrill_max_spam_score'])
+					$force_status = 'spam'; // Force this to be considered `spam`.
 
-				$subject   = trim((string)$subject);
-				$rich_text = trim((string)$rich_text);
-				$text      = $this->plugin->utils_string->html_to_text($rich_text);
+				if(($spf_check = (integer)$this->plugin->options['rve_mandrill_spf_check_enable']))
+					if(($spf_check === 1 && !in_array($spf_result, array('pass', 'neutral', 'softfail', 'none'), TRUE))
+					   || ($spf_check === 2 && !in_array($spf_result, array('pass', 'neutral', 'none'), TRUE))
+					   || ($spf_check === 3 && !in_array($spf_result, array('pass', 'neutral'), TRUE))
+					   || ($spf_check === 4 && !in_array($spf_result, array('pass'), TRUE))
+					) $force_status = 'spam'; // Force this to be considered `spam`.
 
-				if(!$comment_id) // Check subject line for a single comment ID marker.
-					if($subject && preg_match_all('/~#(?P<comment_id>[1-9][0-9]*)/', $subject, $m) === 1)
-					{
-						$comment_id = (integer)$m['comment_id'][0];
-						if($comment_id === PHP_INT_MAX) $comment_id = 0;
-					}
-				if(!$comment_id) // Check text for a single comment ID marker.
-					if($text && preg_match_all('/~#(?P<comment_id>[1-9][0-9]*)/', $text, $m) === 1)
-					{
-						$comment_id = (integer)$m['comment_id'][0];
-						if($comment_id === PHP_INT_MAX) $comment_id = 0;
-					}
-				if(!$comment_id) // Check text for a leading comment ID marker.
-					if($text && preg_match('/^~#(?P<comment_id>[1-9][0-9]*)/', $text, $m))
-					{
-						$comment_id = (integer)$m['comment_id'];
-						if($comment_id === PHP_INT_MAX) $comment_id = 0;
-					}
-				return $comment_id; // This will be `0` on failure.
-			}
+				if(($dkim_check = (integer)$this->plugin->options['rve_mandrill_dkim_check_enable']))
+					if(($dkim_check === 1 && $dkim_signed && !$dkim_valid) || ($dkim_check === 2 && (!$dkim_signed || !$dkim_valid)))
+						$force_status = 'spam'; // Force this to be considered `spam`.
 
-			/**
-			 * Sanitize rich text reply message.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string $rich_text Rich text message body.
-			 *
-			 * @return string Sanitized rich text reply message.
-			 */
-			protected function sanitize_rich_text($rich_text)
-			{
-				if(!($rich_text = trim((string)$rich_text)))
-					return $rich_text; // Empty.
+				$post_comment_args = compact(
+					'reply_to_email',
 
-				$rich_text = preg_replace('/~#[1-9][0-9]*\s*/', '', $rich_text);
+					'from_name',
+					'from_email',
 
-				// @TODO strip original comment off the end of a reply, where all remaining lines begin with `>`.
-			}
+					'subject',
 
-			/**
-			 * Key for this webhook.
-			 *
-			 * @since 141111 First documented version.
-			 */
-			public static function key()
-			{
-				$plugin = plugin();
-				$class  = get_called_class();
-				$key    = $plugin->utils_enc->hmac_sha256_sign($class);
+					'rich_text_body',
+
+					'force_status'
+				);
+				$this->plugin->utils_rve->maybe_post_comment($post_comment_args);
 			}
 		}
 	}
