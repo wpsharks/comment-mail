@@ -70,13 +70,6 @@ namespace comment_mail // Root namespace.
 			protected $message_template;
 
 			/**
-			 * @var array Message headers.
-			 *
-			 * @since 141111 First documented version.
-			 */
-			protected $message_headers;
-
-			/**
 			 * @var \stdClass[] Entries being processed.
 			 *
 			 * @since 141111 First documented version.
@@ -160,10 +153,6 @@ namespace comment_mail // Root namespace.
 				$this->subject_template = new template('email/comment-notification/subject.php');
 				$this->message_template = new template('email/comment-notification/message.php');
 
-				$this->message_headers = array(); // Initialize.
-				if($this->plugin->options['reply_to_email']) // Reply-To?
-					$this->message_headers = array('Reply-To: '.$this->plugin->options['reply_to_email']);
-
 				$this->entries                 = array(); // Initialize.
 				$this->total_entries           = 0; // Initialize; zero for now.
 				$this->processed_entry_counter = 0; // Initialize; zero for now.
@@ -243,8 +232,16 @@ namespace comment_mail // Root namespace.
 				if($this->check_entry_hold_until_time($entry_props))
 					return; // Holding (for now); nothing more.
 
-				$is_digest = $this->check_entry_digestable_entries($entry_props);
+				$this->check_compile_entry_digestable_entries($entry_props);
 
+				if(!($entry_headers = $this->entry_headers($entry_props)))
+				{
+					$entry_props->event     = 'invalidated'; // Invalidate.
+					$entry_props->note_code = 'comment_notification_headers_empty';
+					$this->log_entry($entry_props); // Log invalidation.
+
+					return; // Not possible; headers are empty.
+				}
 				if(!($entry_subject = $this->entry_subject($entry_props)))
 				{
 					$entry_props->event     = 'invalidated'; // Invalidate.
@@ -261,10 +258,6 @@ namespace comment_mail // Root namespace.
 
 					return; // Not possible; message body is empty.
 				}
-				$entry_headers   = $this->message_headers; // Defaults.
-				$entry_headers[] = 'X-Comment-Id: '.$entry_props->comment->comment_ID;
-				$entry_headers[] = 'X-Comment-Parent-Id: '.$entry_props->comment->comment_parent;
-
 				$entry_props->event     = 'notified'; // Notifying now.
 				$entry_props->note_code = 'comment_notification_sent_successfully';
 				$this->log_entry($entry_props); // Log successful processing.
@@ -730,11 +723,11 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @param \stdclass $entry_props entry properties.
+			 * @param \stdClass $entry_props entry properties.
 			 *
 			 * @return boolean TRUE if the entry has other digestable entries.
 			 */
-			protected function check_entry_digestable_entries(\stdClass $entry_props)
+			protected function check_compile_entry_digestable_entries(\stdClass $entry_props)
 			{
 				if($entry_props->sub->deliver === 'asap')
 					return FALSE; // Not applicable; i.e. no other digestables.
@@ -767,7 +760,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @param \stdclass $entry_props entry properties.
+			 * @param \stdClass $entry_props entry properties.
 			 *
 			 * @return array An array of all queued digestable entries.
 			 */
@@ -836,31 +829,80 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * process entry subject.
+			 * Construct entry headers.
 			 *
-			 * @since 141111 first documented version.
+			 * @since 141111 First documented version.
 			 *
-			 * @param \stdclass $entry_props entry properties.
+			 * @param \stdClass $entry_props Entry properties.
 			 *
-			 * @return string subject template content.
+			 * @return array Email headers for this entry.
 			 */
-			protected function entry_subject(\stdclass $entry_props)
+			protected function entry_headers(\stdClass $entry_props)
 			{
-				return trim(preg_replace('/\s+/', ' ', $this->subject_template->parse((array)$entry_props)));
+				$is_digest = count($entry_props->comments) > 1;
+
+				$entry_headers[] = 'X-Post-Id: '.$entry_props->post->ID;
+
+				if(!$is_digest) // Applicable only w/ single comment notifications.
+					$entry_headers[] = 'X-Comment-Id: '.$entry_props->comment->comment_ID;
+
+				$entry_headers[] = 'X-Sub-Key: '.$entry_props->sub->key;
+
+				if($this->plugin->options['replies_via_email_enable']) switch($this->plugin->options['replies_via_email_handler'])
+				{
+					case 'mandrill': // Only choice at the moment; i.e. we have only integrated w/ Mandrill at this time.
+
+						if($this->plugin->options['rve_mandrill_reply_to_email'])
+						{
+							$rve_mandrill_reply_to_email = $this->plugin->options['rve_mandrill_reply_to_email'];
+
+							if($is_digest) // In digests, we only want a post ID and sub key. A comment ID will need to be given by the end-user.
+								$rve_mandrill_reply_to_email = $this->plugin->utils_rve->irt_suffix($rve_mandrill_reply_to_email, $entry_props->post->ID, NULL, $entry_props->sub->key);
+							else $rve_mandrill_reply_to_email = $this->plugin->utils_rve->irt_suffix($rve_mandrill_reply_to_email, $entry_props->post->ID, $entry_props->comment->comment_ID, $entry_props->sub->key);
+
+							$entry_headers[] = 'Reply-To: '.$rve_mandrill_reply_to_email;
+						}
+						break; // Break switch handler.
+				}
+				return $entry_headers; // Pass them back out now.
 			}
 
 			/**
-			 * process entry message.
+			 * Process entry subject.
 			 *
 			 * @since 141111 first documented version.
 			 *
-			 * @param \stdclass $entry_props entry properties.
+			 * @param \stdClass $entry_props entry properties.
+			 *
+			 * @return string subject template content.
+			 */
+			protected function entry_subject(\stdClass $entry_props)
+			{
+				$template_vars = (array)$entry_props;
+
+				return trim(preg_replace('/\s+/', ' ', $this->subject_template->parse($template_vars)));
+			}
+
+			/**
+			 * Process entry message.
+			 *
+			 * @since 141111 first documented version.
+			 *
+			 * @param \stdClass $entry_props entry properties.
 			 *
 			 * @return string message template content.
 			 */
-			protected function entry_message(\stdclass $entry_props)
+			protected function entry_message(\stdClass $entry_props)
 			{
-				return $this->message_template->parse((array)$entry_props);
+				$template_vars = (array)$entry_props;
+
+				$email_rve_end_divider = NULL; // Initialize.
+				if($this->plugin->options['replies_via_email_enable'])
+					$email_rve_end_divider = $this->plugin->utils_rve->end_divider();
+
+				$template_vars = array_merge($template_vars, compact('email_rve_end_divider'));
+
+				return $this->message_template->parse($template_vars);
 			}
 
 			/**

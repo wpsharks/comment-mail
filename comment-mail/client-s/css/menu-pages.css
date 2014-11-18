@@ -305,6 +305,11 @@ Menu page styles.
 {
 	margin-bottom : 0 !important;
 }
+.comment-mail-menu-page li > ul:first-child,
+.comment-mail-menu-page li > ol:first-child
+{
+	margin-top : 1em !important;
+}
 .comment-mail-menu-page p,
 .comment-mail-menu-page code
 {
@@ -438,7 +443,7 @@ Menu page styles.
 .comment-mail-menu-page textarea,
 .comment-mail-menu-page :not(.chosen-search) > input:not([type='radio']):not([type='checkbox'])
 {
-	color      : #626262;
+	color      : #346098;
 	background : #E0E0E0;
 }
 .comment-mail-menu-page select

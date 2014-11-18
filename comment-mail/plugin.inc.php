@@ -27,6 +27,7 @@ namespace comment_mail
 		 * @property-read utils_fs              $utils_fs
 		 * @property-read utils_i18n            $utils_i18n
 		 * @property-read utils_ip              $utils_ip
+		 * @property-read utils_log             $utils_log
 		 * @property-read utils_mail            $utils_mail
 		 * @property-read utils_map             $utils_map
 		 * @property-read utils_markup          $utils_markup
@@ -34,6 +35,7 @@ namespace comment_mail
 		 * @property-read utils_php             $utils_php
 		 * @property-read utils_queue           $utils_queue
 		 * @property-read utils_queue_event_log $utils_queue_event_log
+		 * @property-read utils_rve             $utils_rve
 		 * @property-read utils_string          $utils_string
 		 * @property-read utils_sub             $utils_sub
 		 * @property-read utils_sub_event_log   $utils_sub_event_log
@@ -404,7 +406,7 @@ namespace comment_mail
 					'auto_confirm_if_already_subscribed_u0ip_enable'                       => '0', // `0|1`; auto-confirm enable?
 					'all_wp_users_confirm_email'                                           => '0', // WP users confirm their email?
 
-					/* Related to replies-via-email. */
+					/* Related to email headers. */
 
 					'from_name'                                                            => get_bloginfo('name'), // From: name.
 					'from_email'                                                           => get_bloginfo('admin_email'), // From: <email>.
@@ -425,6 +427,17 @@ namespace comment_mail
 					'smtp_from_email'                                                      => get_bloginfo('admin_email'), // From: <email>.
 					'smtp_reply_to_email'                                                  => get_bloginfo('admin_email'), // Reply-To: <email>.
 					'smtp_force_from'                                                      => '1', // `0|1`; force? Not configurable at this time.
+
+					/* Related to replies via email. */
+
+					'replies_via_email_enable'                                             => '0', // `0|1`; enable?
+					'replies_via_email_handler'                                            => '', // `mandrill`.
+					// Mandrill is currently the only choice. In the future we may add other options to this list.
+
+					'rve_mandrill_reply_to_email'                                          => '', // `Reply-To:` address.
+					'rve_mandrill_max_spam_score'                                          => '5.0', // Max allowable spam score.
+					'rve_mandrill_spf_check_enable'                                        => '1', // `0|1|2|3|4`; where `0` = disable.
+					'rve_mandrill_dkim_check_enable'                                       => '1', // `0|1|2`; where `0` = disable.
 
 					/* Related to blacklisting. */
 
@@ -542,19 +555,19 @@ namespace comment_mail
 				 */
 				add_action('init', array($this, 'actions'), -10);
 
-				add_action('admin_init', array($this, 'check_version'));
-				add_action('all_admin_notices', array($this, 'all_admin_notices'));
+				add_action('admin_init', array($this, 'check_version'), 10);
+				add_action('all_admin_notices', array($this, 'all_admin_notices'), 10);
 
-				add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
-				add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
+				add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'), 10);
+				add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'), 10);
 
-				add_action('admin_menu', array($this, 'add_menu_pages'));
+				add_action('admin_menu', array($this, 'add_menu_pages'), 10);
 				add_filter('set-screen-option', array($this, 'set_screen_option'), 10, 3);
-				add_filter('plugin_action_links_'.plugin_basename($this->file), array($this, 'add_settings_link'));
+				add_filter('plugin_action_links_'.plugin_basename($this->file), array($this, 'add_settings_link'), 10, 1);
 
 				add_action('init', array($this, 'comment_shortlink_redirect'), -11);
 
-				add_action('wp_print_scripts', array($this, 'enqueue_front_scripts'));
+				add_action('wp_print_scripts', array($this, 'enqueue_front_scripts'), 10);
 
 				add_action('transition_post_status', array($this, 'post_status'), 10, 3);
 				add_action('before_delete_post', array($this, 'post_delete'), 10, 1);
@@ -565,17 +578,20 @@ namespace comment_mail
 				add_action('comment_post', array($this, 'comment_post'), 10, 2);
 				add_action('transition_comment_status', array($this, 'comment_status'), 10, 3);
 
+				add_filter('pre_option_comment_registration', array($this, 'pre_option_comment_registration'), 1000, 1);
+				add_filter('pre_comment_approved', array($this, 'pre_comment_approved'), 1000, 2);
+
 				add_action('user_register', array($this, 'user_register'), 10, 1);
 				add_action('delete_user', array($this, 'user_delete'), 10, 1);
 				add_action('wpmu_delete_user', array($this, 'user_delete'), 10, 1);
 				add_action('remove_user_from_blog', array($this, 'user_delete'), 10, 2);
 
-				add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
+				add_action('add_meta_boxes', array($this, 'add_meta_boxes'), 10);
 
 				/*
 				 * Setup CRON-related hooks.
 				 */
-				add_filter('cron_schedules', array($this, 'extend_cron_schedules'));
+				add_filter('cron_schedules', array($this, 'extend_cron_schedules'), 10, 1);
 
 				if((integer)$this->options['crons_setup'] < 1382523750)
 				{
@@ -591,9 +607,9 @@ namespace comment_mail
 					$this->options['crons_setup'] = (string)time();
 					update_option(__NAMESPACE__.'_options', $this->options);
 				}
-				add_action('_cron_'.__NAMESPACE__.'_queue_processor', array($this, 'queue_processor'));
-				add_action('_cron_'.__NAMESPACE__.'_sub_cleaner', array($this, 'sub_cleaner'));
-				add_action('_cron_'.__NAMESPACE__.'_log_cleaner', array($this, 'log_cleaner'));
+				add_action('_cron_'.__NAMESPACE__.'_queue_processor', array($this, 'queue_processor'), 10);
+				add_action('_cron_'.__NAMESPACE__.'_sub_cleaner', array($this, 'sub_cleaner'), 10);
+				add_action('_cron_'.__NAMESPACE__.'_log_cleaner', array($this, 'log_cleaner'), 10);
 
 				/*
 				 * Fire setup completion hooks.
@@ -1822,6 +1838,51 @@ namespace comment_mail
 			public function comment_status($new_comment_status, $old_comment_status, \stdClass $comment = NULL)
 			{
 				new comment_status($new_comment_status, $old_comment_status, $comment);
+			}
+
+			/**
+			 * Filters `comment_registration` option in WordPress.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @attaches-to `pre_option_comment_registration` filter.
+			 *
+			 * @param integer|string|boolean $registration_required `FALSE` if not yet defined by another filter.
+			 *
+			 * @return integer|string|boolean Filtered `$comment_registration` value.
+			 */
+			public function pre_option_comment_registration($registration_required)
+			{
+				if($this->options['replies_via_email_enable'])
+					$registration_required = $this->utils_rve->pre_option_comment_registration($registration_required);
+
+				return $registration_required; // Pass through.
+			}
+
+			/**
+			 * Filters `pre_comment_approved` value in WordPress.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @attaches-to `pre_comment_approved` filter.
+			 *
+			 * @param integer|string $comment_status New comment status.
+			 *
+			 *    One of the following:
+			 *       - `0` (aka: ``, `hold`, `unapprove`, `unapproved`, `moderated`),
+			 *       - `1` (aka: `approve`, `approved`),
+			 *       - or `trash`, `post-trashed`, `spam`, `delete`.
+			 *
+			 * @param array          $comment_data An array of all comment data associated w/ a new comment being created.
+			 *
+			 * @return integer|string Filtered `$comment_status` value.
+			 */
+			public function pre_comment_approved($comment_status, array $comment_data)
+			{
+				if($this->options['replies_via_email_enable'])
+					$comment_status = $this->utils_rve->pre_comment_approved($comment_status, $comment_data);
+
+				return $comment_status; // Pass through.
 			}
 
 			/*

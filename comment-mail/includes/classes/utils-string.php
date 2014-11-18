@@ -110,9 +110,12 @@ namespace comment_mail // Root namespace.
 
 					return $values; // Trimmed deeply.
 				}
-				$string = (string)$values;
-				$chars  = isset($chars[0]) ? $chars : " \r\n\t\0\x0B";
-				$chars  = $chars.$extra_chars; // Concatenate.
+				$string      = (string)$values;
+				$chars       = (string)$chars;
+				$extra_chars = (string)$extra_chars;
+
+				$chars = isset($chars[0]) ? $chars : " \r\n\t\0\x0B";
+				$chars = $chars.$extra_chars; // Concatenate.
 
 				return trim($string, $chars);
 			}
@@ -173,7 +176,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Trims HTML markup deeply.
 			 *
-			 * @param mixed  $value Any value can be converted into a trimmed string.
+			 * @param mixed  $values Any value can be converted into a trimmed string.
 			 *    Actually, objects can't, but this recurses into objects.
 			 *
 			 * @param string $chars Other specific chars to trim (HTML whitespace is always trimmed).
@@ -183,22 +186,24 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string|array|object Trimmed string, array, object (HTML whitespace is always trimmed).
 			 */
-			public function trim_html_deep($value, $chars = '', $extra_chars = '')
+			public function trim_html_deep($values, $chars = '', $extra_chars = '')
 			{
-				if(is_array($value) || is_object($value))
+				if(is_array($values) || is_object($values))
 				{
-					foreach($value as $_key => &$_value)
-						$_value = $this->trim_html_deep($_value, $chars, $extra_chars);
-					unset($_key, $_value); // Housekeeping.
+					foreach($values as $_key => &$_values)
+						$_values = $this->trim_html_deep($_values, $chars, $extra_chars);
+					unset($_key, $_values); // Housekeeping.
 
-					return $this->trim_deep($value, $chars, $extra_chars);
+					return $this->trim_deep($values, $chars, $extra_chars);
 				}
+				$string = (string)$values;
+
 				if(is_null($whitespace = &$this->static_key(__FUNCTION__, 'whitespace')))
 					$whitespace = implode('|', array_keys($this->html_whitespace));
 
-				$value = preg_replace('/^(?:'.$whitespace.')+|(?:'.$whitespace.')+$/', '', (string)$value);
+				$string = preg_replace('/^(?:'.$whitespace.')+|(?:'.$whitespace.')+$/i', '', $string);
 
-				return $this->trim_deep($value, $chars, $extra_chars);
+				return $this->trim($string, $chars, $extra_chars);
 			}
 
 			/**
@@ -452,6 +457,542 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Quote regex meta chars deeply.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param mixed       $values Input string(s) to mid-clip.
+			 * @param null|string $delimiter Delimiter to use; if applicable.
+			 *
+			 * @return string|array|object Quoted string(s).
+			 */
+			public function preg_quote_deep($values, $delimiter = NULL)
+			{
+				if(is_array($values) || is_object($values))
+				{
+					foreach($values as $_key => &$_values)
+						$_values = $this->preg_quote_deep($_values, $delimiter);
+					unset($_key, $_values); // Housekeeping.
+
+					return $values; // All done.
+				}
+				$string = (string)$values;
+
+				return preg_quote($string, $delimiter);
+			}
+
+			/**
+			 * Normalizes end of line chars.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Any input string to normalize.
+			 *
+			 * @return string With normalized end of line chars.
+			 */
+			public function n_eols($string)
+			{
+				return $this->n_eols_deep((string)$string);
+			}
+
+			/**
+			 * Normalizes end of line chars deeply.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param mixed $values Any value can be converted into a normalized string.
+			 *    Actually, objects can't, but this recurses into objects.
+			 *
+			 * @return string|array|object With normalized end of line chars deeply.
+			 */
+			public function n_eols_deep($values)
+			{
+				if(is_array($values) || is_object($values))
+				{
+					foreach($values as $_key => &$_values)
+						$_values = $this->n_eols_deep($_values);
+					unset($_key, $_values); // Housekeeping.
+
+					return $values; // All done.
+				}
+				$string = (string)$values;
+
+				$string = str_replace(array("\r\n", "\r"), "\n", $string);
+				$string = preg_replace('/'."\n".'{3,}/', "\n\n", $string);
+
+				return $string; // With normalized line endings.
+			}
+
+			/**
+			 * Normalizes HTML whitespace.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Any input string to normalize.
+			 *
+			 * @return string With normalized HTML whitespace.
+			 */
+			public function n_html_whitespace($string)
+			{
+				return $this->n_html_whitespace_deep((string)$string);
+			}
+
+			/**
+			 * Normalizes HTML whitespace deeply.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param mixed $values Any value can be converted into a normalized string.
+			 *    Actually, objects can't, but this recurses into objects.
+			 *
+			 * @return string|array|object With normalized HTML whitespace deeply.
+			 */
+			public function n_html_whitespace_deep($values)
+			{
+				if(is_array($values) || is_object($values))
+				{
+					foreach($values as $_key => &$_values)
+						$_values = $this->n_html_whitespace_deep($_values);
+					unset($_key, $_values); // Housekeeping.
+
+					return $this->n_eols_deep($values); // All done.
+				}
+				$string = (string)$values;
+
+				if(is_null($whitespace = &$this->static_key(__FUNCTION__, 'whitespace')))
+					$whitespace = implode('|', array_keys($this->html_whitespace));
+
+				$string = preg_replace('/('.$whitespace.')('.$whitespace.')('.$whitespace.')+/i', '${1}${2}', $string);
+
+				return $this->n_eols($string); // With normalized HTML whitespace.
+			}
+
+			/**
+			 * Clips a string to X chars.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string  $string See {@link clip_deep()}.
+			 * @param integer $max_length See {@link clip_deep()}.
+			 * @param boolean $force_ellipsis See {@link clip_deep()}.
+			 *
+			 * @return string See {@link clip_deep()}.
+			 */
+			public function clip($string, $max_length = 45, $force_ellipsis = FALSE)
+			{
+				return $this->clip_deep((string)$string, $max_length, $force_ellipsis);
+			}
+
+			/**
+			 * Clips string(s) to X chars deeply.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param mixed   $values Input string(s) to clip.
+			 * @param integer $max_length Defaults to a value of `45`.
+			 * @param boolean $force_ellipsis Defaults to a value of `FALSE`.
+			 *
+			 * @return string|array|object Clipped string(s).
+			 */
+			public function clip_deep($values, $max_length = 45, $force_ellipsis = FALSE)
+			{
+				if(is_array($values) || is_object($values))
+				{
+					foreach($values as $_key => &$_values)
+						$_values = $this->clip_deep($_values, $max_length, $force_ellipsis);
+					unset($_key, $_values); // Housekeeping.
+
+					return $values; // All done.
+				}
+				if(!($string = (string)$values))
+					return $string; // Empty.
+
+				$max_length = (integer)$max_length;
+				$max_length = $max_length < 4 ? 4 : $max_length;
+
+				$string = $this->html_to_text($string, array('br2nl' => FALSE));
+
+				if(strlen($string) > $max_length)
+					$string = (string)substr($string, 0, $max_length - 3).'...';
+
+				else if($force_ellipsis && strlen($string) + 3 > $max_length)
+					$string = (string)substr($string, 0, $max_length - 3).'...';
+
+				else $string .= $force_ellipsis ? '...' : '';
+
+				return $string; // Clipped.
+			}
+
+			/**
+			 * Mid-clips a string to X chars.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string  $string See {@link mid_clip_deep()}.
+			 * @param integer $max_length See {@link mid_clip_deep()}
+			 *
+			 * @return string See {@link mid_clip_deep()}
+			 */
+			public function mid_clip($string, $max_length = 45)
+			{
+				return $this->mid_clip_deep((string)$string, $max_length);
+			}
+
+			/**
+			 * Mid-clips string(s) to X chars deeply.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param mixed   $values Input string(s) to mid-clip.
+			 * @param integer $max_length Defaults to a value of `45`.
+			 *
+			 * @return string|array|object Mid-clipped string(s).
+			 */
+			public function mid_clip_deep($values, $max_length = 45)
+			{
+				if(is_array($values) || is_object($values))
+				{
+					foreach($values as $_key => &$_values)
+						$_values = $this->mid_clip_deep($_values, $max_length);
+					unset($_key, $_values); // Housekeeping.
+
+					return $values; // All done.
+				}
+				if(!($string = (string)$values))
+					return $string; // Empty.
+
+				$max_length = (integer)$max_length;
+				$max_length = $max_length < 4 ? 4 : $max_length;
+
+				$string = $this->html_to_text($string, array('br2nl' => FALSE));
+
+				if(strlen($string) <= $max_length)
+					return $string; // Nothing to do.
+
+				$full_string     = $string;
+				$half_max_length = floor($max_length / 2);
+
+				$first_clip = $half_max_length - 3;
+				$string     = ($first_clip >= 1) // Something?
+					? substr($full_string, 0, $first_clip).'...'
+					: '...'; // Ellipsis only.
+
+				$second_clip = strlen($full_string) - ($max_length - strlen($string));
+				$string .= ($second_clip >= 0 && $second_clip >= $first_clip)
+					? substr($full_string, $second_clip) : ''; // Nothing more.
+
+				return $string; // Mid-clipped.
+			}
+
+			/**
+			 * Is a string in HTML format?
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Any input string to test here.
+			 *
+			 * @return boolean TRUE if string is HTML.
+			 */
+			public function is_html($string)
+			{
+				if(!$string || !is_string($string))
+					return FALSE; // Not possible.
+
+				return strpos($string, '<') !== FALSE && preg_match('/\<[^<>]+\>/', $string);
+			}
+
+			/**
+			 * Encodes all HTML entities.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string  $string Any input string to encode.
+			 * @param boolean $double Double encode existing HTML entities?
+			 *
+			 * @return string String w/ HTML entities encoded.
+			 */
+			public function html_entities_encode($string, $double = FALSE)
+			{
+				if(!($string = trim((string)$string)))
+					return $string; // Not possible.
+
+				$decode_flags = ENT_QUOTES;
+
+				if(defined('ENT_HTML5')) // PHP 5.4+ only.
+					$decode_flags |= ENT_HTML5;
+				else $decode_flags |= ENT_HTML401;
+
+				$string = wp_check_invalid_utf8($string);
+
+				return htmlentities($string, $decode_flags, 'UTF-8', (boolean)$double);
+			}
+
+			/**
+			 * Decodes all HTML entities.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Any input string to decode.
+			 *
+			 * @return string String w/ HTML entities decoded.
+			 */
+			public function html_entities_decode($string)
+			{
+				if(!($string = trim((string)$string)))
+					return $string; // Not possible.
+
+				$decode_flags = ENT_QUOTES;
+
+				if(defined('ENT_HTML5')) // PHP 5.4+ only.
+					$decode_flags |= ENT_HTML5;
+				else $decode_flags |= ENT_HTML401;
+
+				$string = wp_check_invalid_utf8($string);
+
+				return html_entity_decode($string, $decode_flags, 'UTF-8');
+			}
+
+			/**
+			 * Convert plain text to HTML markup.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Input string to convert.
+			 *
+			 * @return string Plain text converted to HTML markup.
+			 */
+			public function text_to_html($string)
+			{
+				if(!($string = trim((string)$string)))
+					return $string; // Not possible.
+
+				$string = esc_html($string);
+				$string = $this->html_entities_encode($string);
+				$string = nl2br($this->n_eols($string));
+
+				$string = make_clickable($string);
+				$string = $this->trim_html($this->n_html_whitespace($string));
+
+				return $string; // HTML markup now.
+			}
+
+			/**
+			 * Convert HTML markup converted to plain text.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Input string to convert.
+			 * @param array  $args Any additional behavioral args.
+			 *
+			 * @return string HTML markup converted to plain text.
+			 */
+			public function html_to_text($string, array $args = array())
+			{
+				if(!($string = trim((string)$string)))
+					return $string; // Not possible.
+
+				$default_args = array(
+					'br2nl'                 => TRUE,
+
+					'strip_content_in_tags' => $this->invisible_tags,
+					'inject_eol_after_tags' => $this->block_tags,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$br2nl = (boolean)$args['br2nl']; // Allow line breaks?
+
+				$strip_content_in_tags            = (array)$args['strip_content_in_tags'];
+				$strip_content_in_tags_regex_frag = implode('|', $this->preg_quote_deep($strip_content_in_tags));
+
+				$inject_eol_after_tags            = (array)$args['inject_eol_after_tags'];
+				$inject_eol_after_tags_regex_frag = implode('|', $this->preg_quote_deep($inject_eol_after_tags));
+
+				$string = preg_replace('/\<('.$strip_content_in_tags_regex_frag.')(?:\>|\s[^>]*\>).*?\<\/\\1\>/is', '', $string);
+				$string = preg_replace('/\<\/(?:'.$inject_eol_after_tags_regex_frag.')\>/i', '${0}'."\n", $string);
+				$string = preg_replace('/\<(?:'.$inject_eol_after_tags_regex_frag.')(?:\/\s*\>|\s[^\/>]*\/\s*\>)/i', '${0}'."\n", $string);
+
+				$string = strip_tags($string, $br2nl ? '<br>' : '');
+				$string = $this->html_entities_decode($string);
+				$string = str_replace("\xC2\xA0", ' ', $string);
+
+				if($br2nl) // Allow line breaks in this case.
+				{
+					$string = preg_replace('/\<br(?:\>|\/\s*\>|\s[^\/>]*\/\s*\>)/', "\n", $string);
+					$string = $this->n_eols($string); // Normalize line breaks.
+					$string = preg_replace('/[ '."\t\x0B".']+/', ' ', $string);
+				}
+				else $string = preg_replace('/\s+/', ' ', $string); // One line only.
+
+				$string = trim($string); // Trim things up now.
+
+				return $string; // Plain text now.
+			}
+
+			/**
+			 * Convert HTML to rich text; w/ allowed tags only.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Input string to convert.
+			 * @param array  $args Any additional behavioral args.
+			 *
+			 * @return string HTML to rich text; w/ allowed tags only.
+			 */
+			public function html_to_rich_text($string, array $args = array())
+			{
+				if(!($string = trim((string)$string)))
+					return $string; // Not possible.
+
+				$default_args = array(
+					'br2nl'                 => TRUE,
+
+					'allowed_tags'          => array(
+						'a',
+						'strong', 'b',
+						'i', 'em',
+						'ul', 'ol', 'li',
+						'code', 'pre',
+						'q', 'blockquote',
+					),
+					'allowed_attributes'    => array(
+						'href',
+					),
+
+					'strip_content_in_tags' => $this->invisible_tags,
+					'inject_eol_after_tags' => $this->block_tags,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$br2nl = (boolean)$args['br2nl']; // Allow line breaks?
+
+				$allowed_tags = (array)$args['allowed_tags'];
+				if($br2nl) $allowed_tags[] = 'br'; // Allow `<br>` in this case.
+				$allowed_tags       = array_unique(array_map('strtolower', $allowed_tags));
+				$allowed_attributes = (array)$args['allowed_attributes'];
+
+				$strip_content_in_tags            = (array)$args['strip_content_in_tags'];
+				$strip_content_in_tags            = array_map('strtolower', $strip_content_in_tags);
+				$strip_content_in_tags            = array_diff($strip_content_in_tags, $allowed_tags);
+				$strip_content_in_tags_regex_frag = implode('|', $this->preg_quote_deep($strip_content_in_tags));
+
+				$inject_eol_after_tags            = (array)$args['inject_eol_after_tags'];
+				$inject_eol_after_tags            = array_map('strtolower', $inject_eol_after_tags);
+				$inject_eol_after_tags            = array_diff($inject_eol_after_tags, $allowed_tags);
+				$inject_eol_after_tags_regex_frag = implode('|', $this->preg_quote_deep($inject_eol_after_tags));
+
+				$string = preg_replace('/\<('.$strip_content_in_tags_regex_frag.')(?:\>|\s[^>]*\>).*?\<\/\\1\>/is', '', $string);
+				$string = preg_replace('/\<\/(?:'.$inject_eol_after_tags_regex_frag.')\>/i', '${0}'."\n", $string);
+				$string = preg_replace('/\<(?:'.$inject_eol_after_tags_regex_frag.')(?:\/\s*\>|\s[^\/>]*\/\s*\>)/i', '${0}'."\n", $string);
+
+				$string = strip_tags($string, $allowed_tags ? '<'.implode('><', $allowed_tags).'>' : '');
+				$string = $this->strip_html_attributes($string, compact('allowed_attributes'));
+				$string = force_balance_tags($string); // Force balanced HTML tags.
+
+				if($br2nl) // Allow line breaks in this case.
+				{
+					$string = preg_replace('/\<br(?:\>|\/\s*\>|\s[^\/>]*\/\s*\>)/', "\n", $string);
+					$string = $this->n_eols($string); // Normalize line breaks.
+					$string = preg_replace('/[ '."\t\x0B".']+/', ' ', $string);
+				}
+				else $string = preg_replace('/\s+/', ' ', $string); // One line only.
+
+				$string = $this->trim_html($this->n_html_whitespace($string));
+
+				return $string; // Rich text markup now.
+			}
+
+			/**
+			 * Strips HTML attributes.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Any input string to strip.
+			 * @param array  $args Any additional behavioral args.
+			 *
+			 * @return string String w/ HTML attributes stripped.
+			 */
+			public function strip_html_attributes($string, array $args = array())
+			{
+				$default_args = array(
+					'allowed_attributes' => array(),
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$allowed_attributes = // Force lowercase.
+					array_map('strtolower', (array)$args['allowed_attributes']);
+
+				$regex_tags  = '/(?P<open>\<[\w\-]+)(?P<attrs>[^>]+)(?P<close>\>)/i';
+				$regex_attrs = '/\s+(?P<attr>[\w\-]+)(?:\s*\=\s*(["\']).*?\\2|\s*\=[^\s]*)?/is';
+
+				return preg_replace_callback($regex_tags, function ($m) use ($allowed_attributes, $regex_attrs)
+				{
+					return $m['open'].preg_replace_callback($regex_attrs, function ($m) use ($allowed_attributes)
+					{
+						return in_array(strtolower($m['attr']), $allowed_attributes, TRUE) ? $m[0] : '';
+					}, $m['attrs']).$m['close']; // With modified attributes.
+
+				}, $string); // Removes attributes; leaving only those allowed explicitly.
+			}
+
+			/**
+			 * A very simple markdown parser.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Input string to convert.
+			 * @param array  $args Any additional behavioral args.
+			 *
+			 * @return string Markdown converted to HTML markup.
+			 */
+			public function markdown($string, array $args = array())
+			{
+				if(!($string = trim((string)$string)))
+					return $string; // Not possible.
+
+				$default_args = array(
+					'no_p' => FALSE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
+
+				$no_p = (boolean)$args['no_p'];
+
+				if(!class_exists('\\Parsedown')) // Need Parsedown class here.
+					require_once dirname(dirname(dirname(__FILE__))).'/submodules/parsedown/Parsedown.php';
+
+				if(is_null($parsedown = &$this->cache_key(__FUNCTION__, 'parsedown')))
+					/** @var $parsedown \Parsedown Reference for IDEs. */
+					$parsedown = new \Parsedown(); // Single instance.
+
+				$html = $parsedown->text($string);
+
+				if($no_p) // Remove `<p></p>` wrap?
+				{
+					$html = preg_replace('/^\<p\>/i', '', $html);
+					$html = preg_replace('/\<\/p\>$/i', '', $html);
+				}
+				return $html; // Gotta love Parsedown :-)
+			}
+
+			/**
+			 * A very simple markdown parser.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string See {@link markdown()}.
+			 * @param array  $args See {@link markdown()}.
+			 *
+			 * @return string See {@link markdown()}.
+			 */
+			public function markdown_no_p($string, array $args = array())
+			{
+				return $this->markdown($string, array_merge($args, array('no_p' => TRUE)));
+			}
+
+			/**
 			 * Get first name from a full name, user, or email address.
 			 *
 			 * @since 141111 First documented version.
@@ -596,256 +1137,72 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Clips a string to X chars.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string  $string See {@link clip_deep()}.
-			 * @param integer $max_length See {@link clip_deep()}.
-			 * @param boolean $force_ellipsis See {@link clip_deep()}.
-			 *
-			 * @return string See {@link clip_deep()}.
-			 */
-			public function clip($string, $max_length = 45, $force_ellipsis = FALSE)
-			{
-				return $this->clip_deep((string)$string, $max_length, $force_ellipsis);
-			}
-
-			/**
-			 * Clips string(s) to X chars deeply.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param mixed   $values Input string(s) to clip.
-			 * @param integer $max_length Defaults to a value of `45`.
-			 * @param boolean $force_ellipsis Defaults to a value of `FALSE`.
-			 *
-			 * @return string|array|object Clipped string(s).
-			 */
-			public function clip_deep($values, $max_length = 45, $force_ellipsis = FALSE)
-			{
-				if(is_array($values) || is_object($values))
-				{
-					foreach($values as $_key => &$_values)
-						$_values = $this->clip_deep($_values, $max_length, $force_ellipsis);
-					unset($_key, $_values); // Housekeeping.
-
-					return $values; // All done.
-				}
-				if(!($string = (string)$values))
-					return $string; // Empty.
-
-				$max_length = (integer)$max_length;
-				$max_length = $max_length < 4 ? 4 : $max_length;
-
-				$string = $this->to_text($string, array('br2nl' => FALSE));
-
-				if(strlen($string) > $max_length)
-					$string = (string)substr($string, 0, $max_length - 3).'...';
-
-				else if($force_ellipsis && strlen($string) + 3 > $max_length)
-					$string = (string)substr($string, 0, $max_length - 3).'...';
-
-				else $string .= $force_ellipsis ? '...' : '';
-
-				return $string; // Clipped.
-			}
-
-			/**
-			 * Mid-clips a string to X chars.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string  $string See {@link mid_clip_deep()}.
-			 * @param integer $max_length See {@link mid_clip_deep()}
-			 *
-			 * @return string See {@link mid_clip_deep()}
-			 */
-			public function mid_clip($string, $max_length = 45)
-			{
-				return $this->mid_clip_deep((string)$string, $max_length);
-			}
-
-			/**
-			 * Mid-clips string(s) to X chars deeply.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param mixed   $values Input string(s) to mid-clip.
-			 * @param integer $max_length Defaults to a value of `45`.
-			 *
-			 * @return string|array|object Mid-clipped string(s).
-			 */
-			public function mid_clip_deep($values, $max_length = 45)
-			{
-				if(is_array($values) || is_object($values))
-				{
-					foreach($values as $_key => &$_values)
-						$_values = $this->mid_clip_deep($_values, $max_length);
-					unset($_key, $_values); // Housekeeping.
-
-					return $values; // All done.
-				}
-				if(!($string = (string)$values))
-					return $string; // Empty.
-
-				$max_length = (integer)$max_length;
-				$max_length = $max_length < 4 ? 4 : $max_length;
-
-				$string = $this->to_text($string, array('br2nl' => FALSE));
-
-				if(strlen($string) <= $max_length)
-					return $string; // Nothing to do.
-
-				$full_string     = $string;
-				$half_max_length = floor($max_length / 2);
-
-				$first_clip = $half_max_length - 3;
-				$string     = ($first_clip >= 1) // Something?
-					? substr($full_string, 0, $first_clip).'...'
-					: '...'; // Ellipsis only.
-
-				$second_clip = strlen($full_string) - ($max_length - strlen($string));
-				$string .= ($second_clip >= 0 && $second_clip >= $first_clip)
-					? substr($full_string, $second_clip) : ''; // Nothing more.
-
-				return $string; // Mid-clipped.
-			}
-
-			/**
-			 * Is a string in HTML format?
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string $string Any input string to test here.
-			 *
-			 * @return boolean TRUE if string is HTML.
-			 */
-			public function is_html($string)
-			{
-				if(!$string || !is_string($string))
-					return FALSE; // Not possible.
-
-				return strpos($string, '<') !== FALSE && preg_match('/\<[^<>]+\>/', $string);
-			}
-
-			/**
-			 * Convert plain text to HTML markup.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string $string Input string to convert.
-			 *
-			 * @return string Plain text converted to HTML markup.
-			 */
-			public function to_html($string)
-			{
-				if(!($string = trim((string)$string)))
-					return $string; // Not possible.
-
-				return make_clickable(nl2br(esc_html($string)));
-			}
-
-			/**
-			 * Convert HTML markup converted to plain text.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string $string Input string to convert.
-			 * @param array  $args Any additional behavioral args.
-			 *
-			 * @return string HTML markup converted to plain text.
-			 */
-			public function to_text($string, array $args = array())
-			{
-				if(!($string = trim((string)$string)))
-					return $string; // Not possible.
-
-				$default_args = array(
-					'br2nl' => TRUE,
-				);
-				$args         = array_merge($default_args, $args);
-				$args         = array_intersect_key($args, $default_args);
-
-				$br2nl = (boolean)$args['br2nl'];
-
-				$text = strip_tags($string, $br2nl ? '<br>' : '');
-				$text = wp_specialchars_decode($text); // Decode entities.
-				$text = trim(preg_replace('/\s+/', ' ', $text));
-
-				if($br2nl) // Convert <br> to line break?
-					$text = preg_replace('/\<br[\s\/]*\>/', "\n", $text);
-
-				return $text; // Plain text now.
-			}
-
-			/**
-			 * A very simple markdown parser.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string $string Input string to convert.
-			 * @param array  $args Any additional behavioral args.
-			 *
-			 * @return string Markdown converted to HTML markup.
-			 */
-			public function markdown($string, array $args = array())
-			{
-				if(!($string = trim((string)$string)))
-					return $string; // Not possible.
-
-				$default_args = array(
-					'no_p' => FALSE,
-				);
-				$args         = array_merge($default_args, $args);
-				$args         = array_intersect_key($args, $default_args);
-
-				$no_p = (boolean)$args['no_p'];
-
-				if(!class_exists('\\Parsedown')) // Need Parsedown class here.
-					require_once dirname(dirname(dirname(__FILE__))).'/submodules/parsedown/Parsedown.php';
-
-				if(is_null($parsedown = &$this->cache_key(__FUNCTION__, 'parsedown')))
-					/** @var $parsedown \Parsedown Reference for IDEs. */
-					$parsedown = new \Parsedown(); // Single instance.
-
-				$html = $parsedown->text($string);
-
-				if($no_p) // Remove `<p></p>` wrap?
-				{
-					$html = preg_replace('/^\<p\>/i', '', $html);
-					$html = preg_replace('/\<\/p\>$/i', '', $html);
-				}
-				return $html; // Gotta love Parsedown :-)
-			}
-
-			/**
-			 * A very simple markdown parser.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string $string See {@link markdown()}.
-			 * @param array  $args See {@link markdown()}.
-			 *
-			 * @return string See {@link markdown()}.
-			 */
-			public function markdown_no_p($string, array $args = array())
-			{
-				return $this->markdown($string, array_merge($args, array('no_p' => TRUE)));
-			}
-
-			/**
 			 * HTML whitespace. Keys are actually regex patterns here.
 			 *
 			 * @var array HTML whitespace. Keys are actually regex patterns here.
 			 */
 			public $html_whitespace = array(
-				'\0\x0B'                  => "\0\x0B",
+				'\0'                      => "\0",
+				'\x0B'                    => "\x0B",
 				'\s'                      => "\r\n\t ",
+				'\xC2\xA0'                => "\xC2\xA0",
 				'&nbsp;'                  => '&nbsp;',
 				'\<br\>'                  => '<br>',
 				'\<br\s*\/\>'             => '<br/>',
 				'\<p\>(?:&nbsp;)*\<\/p\>' => '<p></p>'
+			);
+
+			/**
+			 * HTML5 invisible tags.
+			 *
+			 * @var array HTML5 invisible tags.
+			 */
+			public $invisible_tags = array(
+				'head',
+				'title',
+				'style',
+				'script',
+			);
+
+			/**
+			 * HTML5 block-level tags.
+			 *
+			 * @var array HTML5 block-level tags.
+			 */
+			public $block_tags = array(
+				'address',
+				'article',
+				'aside',
+				'audio',
+				'blockquote',
+				'canvas',
+				'dd',
+				'div',
+				'dl',
+				'fieldset',
+				'figcaption',
+				'figure',
+				'footer',
+				'form',
+				'h1',
+				'h2',
+				'h3',
+				'h4',
+				'h5',
+				'h6',
+				'header',
+				'hgroup',
+				'hr',
+				'noscript',
+				'ol',
+				'output',
+				'p',
+				'pre',
+				'section',
+				'table',
+				'tfoot',
+				'ul',
+				'video',
 			);
 		}
 	}

@@ -162,8 +162,12 @@ namespace comment_mail // Root namespace.
 						$note = __('Not applicable; `$sub->post_id` mismatch against `$comment->comment_post_ID`. This subscription may have been altered before processing began.', $this->plugin->text_domain);
 						break; // Break switch handler.
 					/*
-					 * These cover issues w/ the subject and/or message templates themselves.
+					 * These cover issues w/ headers, subject and/or message templates.
 					 */
+					case 'comment_notification_headers_empty':
+						$note = __('Not possible; comment notification headers empty. Unknown error on headers generation.', $this->plugin->text_domain);
+						break; // Break switch handler.
+
 					case 'comment_notification_subject_empty':
 						$note = __('Not possible; comment notification subject empty. Perhaps a missing template file/option. Please check your configuration.', $this->plugin->text_domain);
 						break; // Break switch handler.

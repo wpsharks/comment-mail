@@ -57,6 +57,9 @@ $sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $
 
 // A notification may contain one (or more) comments. Is this a digest?
 $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the notification.
+
+// Plugin is configured to allow replies via email? If so, this will be `TRUE`.
+$replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies_via_email_enable'];
 ?>
 	<h2 style="margin-top:0; font-family:serif;">
 		<?php if($is_digest): // Multiple comments/replies in this notification? ?>
@@ -95,13 +98,27 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
 	<ul>
 		<?php foreach($comments as $_comment): // Comments in this notification. ?>
 			<?php
-			$_comment_parent      = $_comment->comment_parent ? get_comment($_comment->comment_parent) : NULL;
-			$_comment_parent_url  = $_comment_parent ? get_comment_link($_comment_parent->comment_ID) : '';
+			// Parent comment, if applicable; i.e. if this comment is a reply to another.
+			$_comment_parent = $_comment->comment_parent ? get_comment($_comment->comment_parent) : NULL;
+
+			// Parent comment URL, if applicable.
+			$_comment_parent_url = $_comment_parent ? get_comment_link($_comment_parent->comment_ID) : '';
+
+			// A shorter clip of the full parent comment message body; in plain text.
 			$_comment_parent_clip = $_comment_parent ? $plugin->utils_markup->comment_content_mid_clip($_comment_parent, 'notification_parent') : '';
 
-			$_comment_url      = get_comment_link($_comment->comment_ID);
+			// URL to this comment; i.e. the one we're notifying about.
+			$_comment_url = get_comment_link($_comment->comment_ID);
+
+			// How long ago the comment was posted on the site (human readable).
 			$_comment_time_ago = $plugin->utils_date->approx_time_difference(strtotime($_comment->comment_date_gmt));
-			$_comment_clip     = $plugin->utils_markup->comment_content_clip($_comment, 'notification', TRUE);
+
+			// A shorter clip of the full comment message body; in plain text.
+			$_comment_clip = $plugin->utils_markup->comment_content_clip($_comment, 'notification', TRUE);
+
+			// Reply via email marker; if applicable. Only needed for digests, and only if replies via email are enabled currently.
+			// ~ Note: This marker is not necessary for single comment notifications. A `Reply-To:` header already handles single-comment notifications.
+			$_comment_rve_irt_marker = $plugin->utils_rve->irt_marker($_comment->comment_post_ID, $_comment->comment_ID); // e.g. `~rve#779-84`.
 			?>
 			<li>
 				<?php if($_comment_parent): // This is a reply to someone? ?>
@@ -135,6 +152,13 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
 									| <a href="<?php echo esc_attr($_comment_url); ?>">
 										<?php echo __('add reply', $plugin->text_domain); ?>
 									</a>
+									<?php if($replies_via_email_enable): ?>
+										<?php if($is_digest): // Marker only needed in digests. ?>
+											<small><em><?php echo sprintf(__('— or reply to this email &amp; start your message with: <code>%1$s</code>', $plugin->text_domain), esc_html($_comment_rve_irt_marker)); ?></em></small>
+										<?php else: // The `Reply-To:` field in the email will suffice in other cases; i.e. there is only one comment in this notification. ?>
+											<small><em><?php echo __('— or simply reply to this email', $plugin->text_domain); ?></em></small>
+										<?php endif; ?>
+									<?php endif; ?>
 								<?php endif; ?>
 							</p>
 						</li>
@@ -160,6 +184,13 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
 							| <a href="<?php echo esc_attr($_comment_url); ?>">
 								<?php echo __('add reply', $plugin->text_domain); ?>
 							</a>
+							<?php if($replies_via_email_enable): ?>
+								<?php if($is_digest): // Marker only needed in digests. ?>
+									<small><em><?php echo sprintf(__('— or reply to this email &amp; start your message with: <code>%1$s</code>', $plugin->text_domain), esc_html($_comment_rve_irt_marker)); ?></em></small>
+								<?php else: // The `Reply-To:` field in the email will suffice in other cases; i.e. there is only one comment in this notification. ?>
+									<small><em><?php echo __('— or simply reply to this email', $plugin->text_domain); ?></em></small>
+								<?php endif; ?>
+							<?php endif; ?>
 						<?php endif; ?>
 					</p>
 

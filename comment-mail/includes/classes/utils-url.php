@@ -139,7 +139,7 @@ namespace comment_mail // Root namespace.
 			{
 				if(is_multisite()) // Multisite network?
 				{
-					global $current_blog;
+					global $current_blog; // Current MS blog.
 
 					$host = rtrim($current_blog->domain, '/');
 					$path = trim($current_blog->path, '/');
@@ -147,6 +147,36 @@ namespace comment_mail // Root namespace.
 					return strtolower(trim($host.'/'.$path, '/'));
 				}
 				return strtolower($this->plugin->utils_url->current_host(TRUE));
+			}
+
+			/**
+			 * Current base/root host name; w/ multisite compat.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return string Current base/root host name; w/ multisite compat.
+			 *
+			 * @note We don't cache this, since a blog can get changed at runtime.
+			 */
+			public function current_host_base()
+			{
+				if(is_multisite()) // Multisite network?
+				{
+					global $current_blog; // Current MS blog.
+
+					$host = strtolower(rtrim($current_blog->domain, '/'));
+					if(defined('SUBDOMAIN_INSTALL') && SUBDOMAIN_INSTALL)
+						return $host; // Intentional sub-domain.
+				}
+				else $host = $this->current_host(); // Standard WP installs.
+
+				if(substr_count($host, '.') > 1) // Reduce to base/root host name.
+				{
+					$_parts = explode('.', $host); // e.g. `www.example.com` becomes `example.com`.
+					$host   = $_parts[count($_parts) - 2].'.'.$_parts[count($_parts) - 1];
+					unset($_parts); // Housekeeping.
+				}
+				return strtolower($host); // Base/root host name.
 			}
 
 			/**
@@ -1358,6 +1388,25 @@ namespace comment_mail // Root namespace.
 
 				if($include_nav_vars && ($nav_vars = $this->sub_manage_summary_nav_vars($include_nav_vars)))
 					$args[__NAMESPACE__]['manage']['summary_nav'] = $nav_vars;
+
+				return add_query_arg(urlencode_deep($args), $url);
+			}
+
+			/**
+			 * Webhook URL for replies via email; through Mandrill.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @return string URL w/ the given `$scheme`.
+			 */
+			public function rve_mandrill_webhook_url($scheme = NULL)
+			{
+				$url  = home_url('/', $scheme);
+				$key  = rve_mandrill::key(); // Webhook key.
+				$args = array(__NAMESPACE__ => array('rve_mandrill' => $key));
 
 				return add_query_arg(urlencode_deep($args), $url);
 			}
