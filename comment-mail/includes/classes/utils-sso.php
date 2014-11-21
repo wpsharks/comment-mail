@@ -61,14 +61,18 @@ namespace comment_mail // Root namespace.
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$redirect_to = trim((string)$args['redirect_to']);
+				if(!($redirect_to = trim((string)$args['redirect_to'])))
+					$redirect_to = home_url('/'); // Default location.
+
 				$user_exists = $this->user_exists($service, $sso_id, $args);
 
 				if($user_exists) // Log them in.
-					$this->auto_login($service, $sso_id, array_merge($args, array('no_cache' => FALSE)));
-				else $this->auto_register_login($service, $sso_id, array_merge($args, array('no_cache' => FALSE)));
+					$auto_success = $this->auto_login($service, $sso_id, array_merge($args, array('no_cache' => FALSE)));
+				else $auto_success = $this->auto_register_login($service, $sso_id, array_merge($args, array('no_cache' => FALSE)));
 
-				return (boolean)wp_redirect($redirect_to);
+				wp_safe_redirect($redirect_to); // Require safe host to prevent offsite redirections.
+
+				return $auto_success && $redirect_to ? TRUE : FALSE;
 			}
 
 			/**
@@ -240,6 +244,8 @@ namespace comment_mail // Root namespace.
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
+
+				$action_url = $this->plugin->utils_url->current();
 
 				if(!($fname = trim((string)$request_args['fname'])))
 					$fname = trim((string)$args['fname']);

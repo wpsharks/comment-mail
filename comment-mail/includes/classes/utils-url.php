@@ -1422,18 +1422,26 @@ namespace comment_mail // Root namespace.
 			 *    To request authorization, set this to `authorize`.
 			 *    To receive a callback, set this to `callback`.
 			 *
+			 * @param string      $redirect_to The underlying URL that a user is trying to access.
+			 *    If empty, this defaults to the current URL.
+			 *
 			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
 			 *    See {@link set_scheme()} method for further details.
 			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
-			public function sso_action_url($service, $action = 'authorize', $scheme = NULL)
+			public function sso_action_url($service, $action = '', $redirect_to = '', $scheme = NULL)
 			{
 				$service = trim((string)$service);
-				$action  = trim((string)$action);
+
+				if(!($action = trim((string)$action)))
+					$action = 'authorize';
+
+				if(!($redirect_to = trim((string)$redirect_to)))
+					$redirect_to = $this->current();
 
 				$url  = home_url('/', $scheme);
-				$args = array(__NAMESPACE__ => array('sso' => array('service' => $service, 'action' => $action)));
+				$args = array(__NAMESPACE__ => array('sso' => compact('service', 'action', 'redirect_to')));
 
 				return add_query_arg(urlencode_deep($args), $url);
 			}

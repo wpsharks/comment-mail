@@ -18,85 +18,8 @@ namespace comment_mail // Root namespace.
 		 *
 		 * @since 141111 First documented version.
 		 */
-		class sso_twitter extends abs_base
+		class sso_twitter extends sso_service_base
 		{
-			/**
-			 * @var array Incoming request args.
-			 *
-			 * @since 141111 First documented version.
-			 */
-			protected $request_args;
-
-			/**
-			 * @var sso_storage Storage class instance.
-			 *
-			 * @since 141111 First documented version.
-			 */
-			protected $storage;
-
-			/**
-			 * Class constructor.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param array $request_args Incoming request args.
-			 */
-			public function __construct(array $request_args)
-			{
-				parent::__construct();
-
-				$default_request_args = array(
-					'service'        => NULL,
-					'action'         => NULL,
-
-					'oauth_token'    => NULL,
-					'oauth_verifier' => NULL,
-
-					'fname'          => NULL,
-					'lname'          => NULL,
-					'email'          => NULL,
-				);
-				$this->request_args   = array_merge($default_request_args, $request_args);
-				$this->request_args   = array_intersect_key($this->request_args, $default_request_args);
-
-				foreach($this->request_args as $_key => &$_value)
-					if(isset($_value)) $_value = trim((string)$_value);
-				unset($_key, $_value); // Housekeeping.
-
-				$this->storage = new sso_storage();
-
-				$this->maybe_handle();
-			}
-
-			/**
-			 * Handle SSO actions.
-			 *
-			 * @since 141111 First documented version.
-			 */
-			protected function maybe_handle()
-			{
-				if(!$this->plugin->options['enable'])
-					return; // Disabled currently.
-
-				if(!$this->plugin->options['new_subs_enable'])
-					return; // Disabled currently.
-
-				if(!$this->options['sso_enable'])
-					return; // Disabled currently.
-
-				if(!$this->options['sso_twitter_key'] || !$this->options['sso_twitter_secret'])
-					return; // Not configured properly.
-
-				if($this->request_args['service'] !== 'twitter')
-					return; // Not applicable.
-
-				if($this->request_args['action'] === 'authorize')
-					$this->maybe_redirect_to_authorize();
-
-				else if($this->request_args['action'] === 'callback')
-					$this->maybe_handle_callback();
-			}
-
 			/**
 			 * Handle SSO authorization redirection.
 			 *
@@ -108,15 +31,15 @@ namespace comment_mail // Root namespace.
 				{
 					$service_factory = new \OAuth\ServiceFactory();
 					$credentials     = new \OAuth\Common\Consumer\Credentials(
-						$this->plugin->options['sso_twitter_key'],
-						$this->plugin->options['sso_twitter_secret'],
-						$this->plugin->utils_url->sso_action_url('twitter', 'callback')
+						$this->plugin->options['sso_'.$this->service.'_key'],
+						$this->plugin->options['sso_'.$this->service.'_secret'],
+						$this->plugin->utils_url->sso_action_url($this->service, 'callback', $this->request_args['redirect_to'])
 					);
-					$twitter         = $service_factory->createService('twitter', $credentials, $this->storage);
-					/** @var $twitter \OAuth\OAuth1\Service\Twitter */
+					$service         = $service_factory->createService($this->service, $credentials, $this->storage);
+					/** @var $service \OAuth\OAuth1\Service\Twitter */
 
-					if(($token = $twitter->requestRequestToken()))
-						if(($url = $twitter->getAuthorizationUri(array('oauth_token' => $token->getRequestToken()))))
+					if(($token = $service->requestRequestToken()))
+						if(($url = $service->getAuthorizationUri(array('oauth_token' => $token->getRequestToken()))))
 							wp_redirect($url).exit();
 
 					throw new \exception(__('Failed to generate authorization URL.', $this->plugin->text_domain));
@@ -141,29 +64,44 @@ namespace comment_mail // Root namespace.
 				{
 					$service_factory = new \OAuth\ServiceFactory();
 					$credentials     = new \OAuth\Common\Consumer\Credentials(
-						$this->plugin->options['sso_twitter_key'],
-						$this->plugin->options['sso_twitter_secret'],
+						$this->plugin->options['sso_'.$this->service.'_key'],
+						$this->plugin->options['sso_'.$this->service.'_secret'],
 						$this->plugin->utils_url->current()
 					);
-					$twitter         = $service_factory->createService('twitter', $credentials, $this->storage);
-					/** @var $twitter \OAuth\OAuth1\Service\Twitter */
+					$service         = $service_factory->createService($this->service, $credentials, $this->storage);
+					/** @var $service \OAuth\OAuth1\Service\Twitter */
 
-					$twitter->requestAccessToken(
+					$service->requestAccessToken(
 						$this->request_args['oauth_token'],
 						$this->request_args['oauth_verifier'],
-						$this->storage->retrieveAccessToken('twitter')->getRequestTokenSecret()
+						$this->storage->retrieveAccessToken($this->service)->getRequestTokenSecret()
 					);
-					if(!is_object($twitter_user = json_decode($twitter->request('account/verify_credentials.json'))))
-						throw new \exception(__('Failed to verify credentials.', $this->plugin->text_domain));
+					# Acquire and validation data received from this service.
 
-					$process_redirect_args = array(
-						'fname'       => $fname,
-						'lname'       => $lname,
-						'email'       => $email,
+					if(!is_object($service_user = json_decode($service->request('account/verify_credentials.json'))))
+						throw new \exception(__('Failed to verify user.', $this->plugin->text_domain));
 
-						'redirect_to' => '',
-					);
-					$this->plugin->utils_sso->process_redirect('twitter', $twitter_user->id_str, $process_redirect_args);
+					if(!isset($service_user->id_str, $service_user->name) || empty($service_user->id_str))
+						throw new \exception(__('Failed to obtain user.', $this->plugin->text_domain));
+
+					if(!($fname = $this->request_args['fname']))
+						$fname = $this->plugin->utils_string->first_name($service_user->name, $this->request_args['email']);
+
+					if(!($lname = $this->request_args['lname']))
+						$lname = $this->plugin->utils_string->last_name($service_user->name, $this->request_args['email']);
+
+					$email = $this->request_args['email']; // Must come from request args.
+
+					if(!$fname || !$email) exit($this->plugin->utils_sso->request_completion());
+
+					# Process and perform redirection.
+
+					$sso_id                = $service_user->id_str;
+					$redirect_to           = $this->request_args['redirect_to'];
+					$process_redirect_args = compact('fname', 'lname', 'email', 'redirect_to');
+
+					if(!$this->plugin->utils_sso->process_redirect($this->service, $sso_id, $process_redirect_args))
+						throw new \exception(__('Failed to redirect user.', $this->plugin->text_domain));
 				}
 				catch(\exception $exception)
 				{
