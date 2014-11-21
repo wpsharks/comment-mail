@@ -59,6 +59,10 @@ namespace comment_mail // Root namespace.
 				$this->request_args   = array_merge($default_request_args, $request_args);
 				$this->request_args   = array_intersect_key($this->request_args, $default_request_args);
 
+				foreach($this->request_args as $_key => &$_value)
+					if(isset($_value)) $_value = trim((string)$_value);
+				unset($_key, $_value); // Housekeeping.
+
 				$this->storage = new sso_storage();
 
 				$this->maybe_handle();
@@ -149,8 +153,17 @@ namespace comment_mail // Root namespace.
 						$this->request_args['oauth_verifier'],
 						$this->storage->retrieveAccessToken('twitter')->getRequestTokenSecret()
 					);
-					$credentials = json_decode($twitter->request('account/verify_credentials.json'));
-					// @TODO Do something w/ the credentials.
+					if(!is_object($twitter_user = json_decode($twitter->request('account/verify_credentials.json'))))
+						throw new \exception(__('Failed to verify credentials.', $this->plugin->text_domain));
+
+					$process_redirect_args = array(
+						'fname'       => $fname,
+						'lname'       => $lname,
+						'email'       => $email,
+
+						'redirect_to' => '',
+					);
+					$this->plugin->utils_sso->process_redirect('twitter', $twitter_user->id_str, $process_redirect_args);
 				}
 				catch(\exception $exception)
 				{
