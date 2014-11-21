@@ -186,13 +186,15 @@ namespace comment_mail // Root namespace.
 				if(!in_array($request_args['type'], array('subs', 'stcr', 'ops'), TRUE))
 					return; // Invalid import type.
 
+				if(!class_exists($class = '\\'.__NAMESPACE__.'\\import_'.$request_args['type']))
+					return; // Invalid import type.
+
 				if(!current_user_can($this->plugin->cap))
 					return; // Unauthenticated; ignore.
 
 				if(!empty($_FILES[__NAMESPACE__]['tmp_name']['import']['data_file']))
 					$request_args['data_file'] = $_FILES[__NAMESPACE__]['tmp_name']['import']['data_file'];
 
-				$class    = '\\'.__NAMESPACE__.'\\import_'.$request_args['type'];
 				$importer = new $class($request_args); // Instantiate.
 			}
 
@@ -213,10 +215,12 @@ namespace comment_mail // Root namespace.
 				if(!in_array($request_args['type'], array('subs', 'ops'), TRUE))
 					return; // Invalid import type.
 
+				if(!class_exists($class = '\\'.__NAMESPACE__.'\\export_'.$request_args['type']))
+					return; // Invalid import type.
+
 				if(!current_user_can($this->plugin->cap))
 					return; // Unauthenticated; ignore.
 
-				$class    = '\\'.__NAMESPACE__.'\\export_'.$request_args['type'];
 				$exporter = new $class($request_args); // Instantiate.
 			}
 

@@ -38,7 +38,7 @@ namespace comment_mail // Root namespace.
 
 				$this->valid_actions
 					= array(
-					'sso_twitter',
+					'sso',
 				);
 				$this->maybe_handle();
 			}
@@ -56,24 +56,38 @@ namespace comment_mail // Root namespace.
 				if(empty($_REQUEST[__NAMESPACE__]))
 					return; // Not applicable.
 
+				$cb_r_args = array(); // Initialize callback request args.
+				$_r        = $this->plugin->utils_string->trim_strip_deep($_REQUEST);
+
+				foreach(array('oauth_token', 'oauth_verifier') as $_cb_r_arg_key)
+					if(isset($_r[$_cb_r_arg_key])) $cb_r_args[$_cb_r_arg_key] = $_r[$_cb_r_arg_key];
+				unset($_cb_r_arg_key); // Housekeeping.
+
 				foreach((array)$_REQUEST[__NAMESPACE__] as $_action => $_request_args)
-					if($_action && in_array($_action, $this->valid_actions, TRUE))
-						$this->{$_action}($this->plugin->utils_string->trim_strip_deep($_request_args));
+					if($_action && in_array($_action, $this->valid_actions, TRUE) && is_array($_request_args))
+						$this->{$_action}(array_merge($cb_r_args, $this->plugin->utils_string->trim_strip_deep($_request_args)));
 				unset($_action, $_request_args); // Housekeeping.
 			}
 
 			/**
-			 * SSO actions for Twitter.
+			 * SSO actions for various services.
 			 *
 			 * @since 141111 First documented version.
 			 *
 			 * @param mixed $request_args Input argument(s).
 			 */
-			protected function sso_twitter($request_args)
+			protected function sso(array $request_args)
 			{
-				$key = trim((string)$request_args);
+				if(empty($request_args['service']))
+					return; // Empty service identifier.
 
-				new sso_twitter($key); // @TODO
+				if(!in_array($request_args['service'], array('twitter', 'facebook', 'google', 'linkedin'), TRUE))
+					return; // Invalid import type.
+
+				if(!class_exists($class = '\\'.__NAMESPACE__.'\\sso_'.$request_args['service']))
+					return; // Invalid service identifier.
+
+				new $class($request_args);
 
 				exit(); // Stop; always.
 			}
