@@ -46,11 +46,15 @@ namespace comment_mail // Root namespace.
 				parent::__construct();
 
 				$default_request_args = array(
-					'service'        => '',
-					'action'         => '',
+					'service'        => NULL,
+					'action'         => NULL,
 
-					'oauth_token'    => '',
-					'oauth_verifier' => '',
+					'oauth_token'    => NULL,
+					'oauth_verifier' => NULL,
+
+					'fname'          => NULL,
+					'lname'          => NULL,
+					'email'          => NULL,
 				);
 				$this->request_args   = array_merge($default_request_args, $request_args);
 				$this->request_args   = array_intersect_key($this->request_args, $default_request_args);
