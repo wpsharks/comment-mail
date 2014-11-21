@@ -28,6 +28,13 @@ namespace comment_mail // Root namespace.
 			protected $request_args;
 
 			/**
+			 * @var sso_storage Storage class instance.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $storage;
+
+			/**
 			 * Class constructor.
 			 *
 			 * @since 141111 First documented version.
@@ -39,12 +46,16 @@ namespace comment_mail // Root namespace.
 				parent::__construct();
 
 				$default_request_args = array(
-					'go'             => '',
+					'service'        => '',
+					'action'         => '',
+
 					'oauth_token'    => '',
 					'oauth_verifier' => '',
 				);
 				$this->request_args   = array_merge($default_request_args, $request_args);
 				$this->request_args   = array_intersect_key($this->request_args, $default_request_args);
+
+				$this->storage = new sso_storage();
 
 				$this->maybe_handle();
 			}
@@ -68,45 +79,79 @@ namespace comment_mail // Root namespace.
 				if(!$this->options['sso_twitter_key'] || !$this->options['sso_twitter_secret'])
 					return; // Not configured properly.
 
-				if($this->request_args['go'])
-					$this->maybe_redirect();
+				if($this->request_args['service'] !== 'twitter')
+					return; // Not applicable.
 
-				else if($this->request_args['oauth_token'] && $this->request_args['oauth_verifier'])
-					$this->maybe_do_sso();
+				if($this->request_args['action'] === 'authorize')
+					$this->maybe_redirect_to_authorize();
+
+				else if($this->request_args['action'] === 'callback')
+					$this->maybe_handle_callback();
 			}
 
 			/**
-			 * Handle SSO authorization redirection. @TODO
+			 * Handle SSO authorization redirection.
 			 *
 			 * @since 141111 First documented version.
 			 */
-			protected function maybe_redirect()
+			protected function maybe_redirect_to_authorize()
 			{
-				$service_factory = new \OAuth\ServiceFactory();
-				$credentials     = new \OAuth\Common\Consumer\Credentials(
-					$this->plugin->options['sso_twitter_key'],
-					$this->plugin->options['sso_twitter_secret'],
-					$this->plugin->utils_url->current()
-				);
-				$storage         = new sso_storage(); // Custom storage; via transients.
-				$twitter         = $service_factory->createService('twitter', $credentials, $storage);
+				try // Catch exceptions generated here and log them for debugging.
+				{
+					$service_factory = new \OAuth\ServiceFactory();
+					$credentials     = new \OAuth\Common\Consumer\Credentials(
+						$this->plugin->options['sso_twitter_key'],
+						$this->plugin->options['sso_twitter_secret'],
+						$this->plugin->utils_url->sso_action_url('twitter', 'callback')
+					);
+					$twitter         = $service_factory->createService('twitter', $credentials, $this->storage);
+					/** @var $twitter \OAuth\OAuth1\Service\Twitter */
+
+					if(($token = $twitter->requestRequestToken()))
+						if(($url = $twitter->getAuthorizationUri(array('oauth_token' => $token->getRequestToken()))))
+							wp_redirect($url).exit();
+
+					throw new \exception(__('Failed to generate authorization URL.', $this->plugin->text_domain));
+				}
+				catch(\exception $exception)
+				{
+					$this->plugin->utils_log->maybe_debug($exception);
+				}
 			}
 
 			/**
-			 * Handle SSO; i.e. account generation or login. @TODO
+			 * Handle SSO; i.e. account generation or login.
 			 *
 			 * @since 141111 First documented version.
 			 */
-			protected function maybe_do_sso()
+			protected function maybe_handle_callback()
 			{
-				$service_factory = new \OAuth\ServiceFactory();
-				$credentials     = new \OAuth\Common\Consumer\Credentials(
-					$this->plugin->options['sso_twitter_key'],
-					$this->plugin->options['sso_twitter_secret'],
-					$this->plugin->utils_url->current()
-				);
-				$storage         = new sso_storage(); // Custom storage; via transients.
-				$twitter         = $service_factory->createService('twitter', $credentials, $storage);
+				if(!$this->request_args['oauth_token'] || !$this->request_args['oauth_verifier'])
+					return; // Not applicable; i.e. no data from service.
+
+				try // Catch exceptions generated here and log them for debugging.
+				{
+					$service_factory = new \OAuth\ServiceFactory();
+					$credentials     = new \OAuth\Common\Consumer\Credentials(
+						$this->plugin->options['sso_twitter_key'],
+						$this->plugin->options['sso_twitter_secret'],
+						$this->plugin->utils_url->current()
+					);
+					$twitter         = $service_factory->createService('twitter', $credentials, $this->storage);
+					/** @var $twitter \OAuth\OAuth1\Service\Twitter */
+
+					$twitter->requestAccessToken(
+						$this->request_args['oauth_token'],
+						$this->request_args['oauth_verifier'],
+						$this->storage->retrieveAccessToken('twitter')->getRequestTokenSecret()
+					);
+					$credentials = json_decode($twitter->request('account/verify_credentials.json'));
+					// @TODO Do something w/ the credentials.
+				}
+				catch(\exception $exception)
+				{
+					$this->plugin->utils_log->maybe_debug($exception);
+				}
 			}
 		}
 	}

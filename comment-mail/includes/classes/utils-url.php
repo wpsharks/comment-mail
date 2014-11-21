@@ -1410,6 +1410,33 @@ namespace comment_mail // Root namespace.
 
 				return add_query_arg(urlencode_deep($args), $url);
 			}
+
+			/**
+			 * URL for an SSO action handler.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string      $service SSO service integration slug.
+			 *
+			 * @param string      $action A particular action; defaults to `authorize`.
+			 *    To request authorization, set this to `authorize`.
+			 *    To receive a callback, set this to `callback`.
+			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @return string URL w/ the given `$scheme`.
+			 */
+			public function sso_action_url($service, $action = 'authorize', $scheme = NULL)
+			{
+				$service = trim((string)$service);
+				$action  = trim((string)$action);
+
+				$url  = home_url('/', $scheme);
+				$args = array(__NAMESPACE__ => array('sso' => array('service' => $service, 'action' => $action)));
+
+				return add_query_arg(urlencode_deep($args), $url);
+			}
 		}
 	}
 }

@@ -86,14 +86,21 @@ namespace comment_mail // Root namespace.
 			 */
 			public function hasAccessToken($service)
 			{
+				$service = trim(strtolower((string)$service));
+
 				return !empty($this->data['tokens'][$service]);
 			}
 
 			/**
 			 * {@inheritDoc}
+			 *
+			 * @return \OAuth\oAuth1\Token\StdOAuth1Token
+			 *    |\OAuth\oAuth2\Token\StdOAuth2Token
 			 */
 			public function retrieveAccessToken($service)
 			{
+				$service = trim(strtolower((string)$service));
+
 				if($this->hasAccessToken($service))
 					return unserialize($this->data['tokens'][$service]);
 
@@ -105,6 +112,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function storeAccessToken($service, TokenInterface $token)
 			{
+				$service = trim(strtolower((string)$service));
+
 				$this->data['tokens'][$service] = serialize($token);
 				set_transient($this->transient, $this->data, $this->ttl);
 
@@ -116,6 +125,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function clearToken($service)
 			{
+				$service = trim(strtolower((string)$service));
+
 				unset($this->data['tokens'][$service]);
 				set_transient($this->transient, $this->data, $this->ttl);
 
@@ -138,6 +149,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function hasAuthorizationState($service)
 			{
+				$service = trim(strtolower((string)$service));
+
 				return !empty($this->data['states'][$service]);
 			}
 
@@ -146,6 +159,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function retrieveAuthorizationState($service)
 			{
+				$service = trim(strtolower((string)$service));
+
 				if($this->hasAuthorizationState($service))
 					return unserialize($this->data['states'][$service]);
 
@@ -157,6 +172,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function storeAuthorizationState($service, $state)
 			{
+				$service = trim(strtolower((string)$service));
+
 				$this->data['states'][$service] = serialize($state);
 				set_transient($this->transient, $this->data, $this->ttl);
 
@@ -168,6 +185,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function clearAuthorizationState($service)
 			{
+				$service = trim(strtolower((string)$service));
+
 				unset($this->data['states'][$service]);
 				set_transient($this->transient, $this->data, $this->ttl);
 
