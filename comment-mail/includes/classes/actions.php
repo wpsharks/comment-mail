@@ -43,6 +43,22 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Single sign-on actions.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected function maybe_do_sso_actions()
+			{
+				if(is_admin())
+					return; // Not applicable.
+
+				if(empty($_REQUEST[__NAMESPACE__]))
+					return; // Nothing to do.
+
+				new sso_actions();
+			}
+
+			/**
 			 * Subscriber actions.
 			 *
 			 * @since 141111 First documented version.

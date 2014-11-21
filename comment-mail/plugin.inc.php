@@ -488,6 +488,14 @@ namespace comment_mail
 					'comment_select_options_enable'                                        => '1', // `0|1`; enable?
 					'max_select_options'                                                   => '2000', // Max options.
 
+					/* Related to SSO and service integrations. */
+
+					'sso_enable'                                                           => '0', // `0|1`; enable?
+
+					'sso_twitter_key'                                                      => '86nVQVn7hSAxaQyjsZicGEdBW',
+					'sso_twitter_secret'                                                   => 'ehJvAYxNNOyPQU2BukzJZ1TsTBgVty1gSTfeHwGkcXXtHjeo6n',
+					// See: <https://apps.twitter.com/app/new>
+
 					/* Related to branding.
 					~ See: <https://wordpress.org/plugins/about/guidelines/>
 					#10. The plugin must NOT embed external links on the public site (like a "powered by" link) without
