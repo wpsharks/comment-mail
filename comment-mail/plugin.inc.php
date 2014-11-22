@@ -493,13 +493,21 @@ namespace comment_mail
 
 					'sso_enable'                                                           => '0', // `0|1`; enable?
 
-					'sso_twitter_key'                                                      => '86nVQVn7hSAxaQyjsZicGEdBW',
-					'sso_twitter_secret'                                                   => 'ehJvAYxNNOyPQU2BukzJZ1TsTBgVty1gSTfeHwGkcXXtHjeo6n',
+					'sso_twitter_key'                                                      => '',
+					'sso_twitter_secret'                                                   => '',
 					// See: <https://apps.twitter.com/app/new>
 
-					'sso_facebook_key'                                                     => '86nVQVn7hSAxaQyjsZicGEdBW',
-					'sso_facebook_secret'                                                  => 'ehJvAYxNNOyPQU2BukzJZ1TsTBgVty1gSTfeHwGkcXXtHjeo6n',
-					// See: <https://apps.twitter.com/app/new>
+					'sso_facebook_key'                                                     => '',
+					'sso_facebook_secret'                                                  => '',
+					// See: <https://developers.facebook.com/quickstarts/?platform=web>
+
+					'sso_google_key'                                                       => '',
+					'sso_google_secret'                                                    => '',
+					// See: <>
+
+					'sso_linkedin_key'                                                     => '',
+					'sso_linkedin_secret'                                                  => '',
+					// See: <>
 
 					/* Related to branding.
 					~ See: <https://wordpress.org/plugins/about/guidelines/>
