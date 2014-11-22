@@ -503,7 +503,7 @@ namespace comment_mail
 
 					'sso_google_key'                                                       => '',
 					'sso_google_secret'                                                    => '',
-					// See: <>
+					// See: <https://developers.google.com/accounts/docs/OpenIDConnect#getcredentials>
 
 					'sso_linkedin_key'                                                     => '',
 					'sso_linkedin_secret'                                                  => '',
