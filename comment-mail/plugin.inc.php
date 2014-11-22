@@ -497,6 +497,10 @@ namespace comment_mail
 					'sso_twitter_secret'                                                   => 'ehJvAYxNNOyPQU2BukzJZ1TsTBgVty1gSTfeHwGkcXXtHjeo6n',
 					// See: <https://apps.twitter.com/app/new>
 
+					'sso_facebook_key'                                                     => '86nVQVn7hSAxaQyjsZicGEdBW',
+					'sso_facebook_secret'                                                  => 'ehJvAYxNNOyPQU2BukzJZ1TsTBgVty1gSTfeHwGkcXXtHjeo6n',
+					// See: <https://apps.twitter.com/app/new>
+
 					/* Related to branding.
 					~ See: <https://wordpress.org/plugins/about/guidelines/>
 					#10. The plugin must NOT embed external links on the public site (like a "powered by" link) without
