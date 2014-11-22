@@ -58,6 +58,8 @@ echo str_replace('%%title%%', __('Complete Registration', $plugin->text_domain),
 
 		<?php endif; // END: error/validation display. ?>
 
+		<?php // @TODO Test and complete this template. ?>
+
 	</div>
 
 <?php echo $site_footer; ?>

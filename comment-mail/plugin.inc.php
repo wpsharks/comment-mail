@@ -609,6 +609,8 @@ namespace comment_mail
 
 				add_action('add_meta_boxes', array($this, 'add_meta_boxes'), 10);
 
+				// @TODO Add hooks that will display SSO links in comment form; when applicable.
+
 				/*
 				 * Setup CRON-related hooks.
 				 */
