@@ -62,6 +62,7 @@ namespace comment_mail // Root namespace.
 
 					'oauth_token'    => NULL,
 					'oauth_verifier' => NULL,
+					'code'           => NULL,
 
 					'fname'          => NULL,
 					'lname'          => NULL,
