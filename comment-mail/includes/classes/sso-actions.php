@@ -59,7 +59,7 @@ namespace comment_mail // Root namespace.
 				$cb_r_args = array(); // Initialize callback request args.
 				$_r        = $this->plugin->utils_string->trim_strip_deep($_REQUEST);
 
-				foreach(array('oauth_token', 'oauth_verifier', 'code') as $_cb_r_arg_key)
+				foreach(array('oauth_token', 'oauth_verifier', 'code', 'state') as $_cb_r_arg_key)
 					if(isset($_r[$_cb_r_arg_key])) $cb_r_args[$_cb_r_arg_key] = $_r[$_cb_r_arg_key];
 				unset($_cb_r_arg_key); // Housekeeping.
 

@@ -93,8 +93,18 @@ namespace comment_mail // Root namespace.
 					if(!is_object($service_user = json_decode($service->request('https://www.googleapis.com/oauth2/v1/userinfo'))))
 						throw new \exception(__('Failed to verify user.', $this->plugin->text_domain));
 
-					if(!isset($service_user->sub, $service_user->name, $service_user->given_name, $service_user->email) || empty($service_user->sub))
+					if(empty($service_user->sub)) // Must have a unique ID reference.
 						throw new \exception(__('Failed to obtain user.', $this->plugin->text_domain));
+
+					foreach(array('name', 'given_name', 'email') as $_prop)
+					{
+						if(!isset($service_user->{$_prop}))
+							$service_user->{$_prop} = '';
+
+						if(strcasecmp($service_user->{$_prop}, 'private') === 0)
+							$service_user->{$_prop} = ''; // If `private`; empty.
+					}
+					unset($_prop); // Just a little housekeeping.
 
 					if(!($fname = $this->request_args['fname']))
 						$fname = $this->plugin->utils_string->first_name(
@@ -115,7 +125,7 @@ namespace comment_mail // Root namespace.
 					}
 					# Process and perform redirection.
 
-					$sso_id                = (string)$service_user->id;
+					$sso_id                = (string)$service_user->sub;
 					$process_redirect_args = compact('fname', 'lname', 'email', 'redirect_to');
 
 					if(!$this->plugin->utils_sso->process_redirect($this->service, $sso_id, $process_redirect_args))

@@ -93,8 +93,18 @@ namespace comment_mail // Root namespace.
 					if(!is_object($service_user = json_decode($service->request('/me'))))
 						throw new \exception(__('Failed to verify user.', $this->plugin->text_domain));
 
-					if(!isset($service_user->id, $service_user->first_name, $service_user->last_name, $service_user->name) || empty($service_user->id))
+					if(empty($service_user->id)) // Must have a unique ID reference.
 						throw new \exception(__('Failed to obtain user.', $this->plugin->text_domain));
+
+					foreach(array('first_name', 'last_name', 'name') as $_prop)
+					{
+						if(!isset($service_user->{$_prop}))
+							$service_user->{$_prop} = '';
+
+						if(strcasecmp($service_user->{$_prop}, 'private') === 0)
+							$service_user->{$_prop} = ''; // If `private`; empty.
+					}
+					unset($_prop); // Just a little housekeeping.
 
 					if(!($fname = $this->request_args['fname']))
 						$fname = $this->plugin->utils_string->first_name(

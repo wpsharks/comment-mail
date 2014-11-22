@@ -507,7 +507,7 @@ namespace comment_mail
 
 					'sso_linkedin_key'                                                     => '',
 					'sso_linkedin_secret'                                                  => '',
-					// See: <>
+					// See: <https://www.linkedin.com/secure/developer?newapp=>
 
 					/* Related to branding.
 					~ See: <https://wordpress.org/plugins/about/guidelines/>
