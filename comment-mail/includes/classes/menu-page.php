@@ -552,7 +552,7 @@ namespace comment_mail // Root namespace.
 							               '1' => __('Yes, automatically auto-confirm everyone; i.e. never ask for email confirmation', $this->plugin->text_domain),
 						               ),
 						               'notes_after'     => '<div class="pmp-if-enabled-show">'.
-						                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('When Auto-Confirm Everyone is enabled (<span class="pmp-note pmp-warning">warning</span>):', $this->plugin->text_domain).'</p>'.
+						                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('<span class="pmp-note pmp-warning" style="padding:0 .25em 0 .25em;">WARNING</span> — when Auto-Confirm Everyone is enabled:', $this->plugin->text_domain).'</p>'.
 						                                    '   <ul class="pmp-list-items">'.
 						                                    '      <li>'.sprintf(__('Nobody will be required to confirm a subscription. For instance, when someone leaves a comment and chooses to be subscribed (with whatever email address they\'ve entered), that email address will be added to the list w/o getting confirmation from the real owner of that address. This scenario changes slightly if you %1$s before leaving a comment, via WordPress Discussion Settings. If that\'s the case, then depending on the way your users register (i.e. if they are required to verify their email address in some way), this option might be feasible. That said, in 99%% of all cases this option is NOT recommended. If you enable auto-confirmation for everyone, please take extreme caution.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor(admin_url('/options-discussion.php'), __('require users to be logged-in', $this->plugin->text_domain))).'</li>'.
 						                                    '      <li>'.sprintf(__('In addition to security issues associated w/ auto-confirming everyone automatically; if you enable this behavior it will also have the negative side-effect of making it slightly more difficult for users to view a summary of their existing subscriptions; i.e. they won\'t get an encrypted <code>%2$s</code> cookie right away via email confirmation, as would normally occur. This is how %1$s identifies a user when they are not currently logged into the site (typical w/ commenters). Therefore, if Auto-Confirm Everyone is enabled, the only way users can view a summary of their subscriptions, is if:', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html(__NAMESPACE__.'_sub_email')).
@@ -606,7 +606,8 @@ namespace comment_mail // Root namespace.
 						                'notes_before'    => '<p><em>'.__('Please do a review of your theme and all plugins before answering yes to this question.', $this->plugin->text_domain).'</em></p>',
 						                'notes_after'     => '<p>'.sprintf(__('If %1$s sees that a user is currently logged into the site as a real user (i.e. not <em>just</em> a commenter); it can detect the current user\'s email address w/o needing the encrypted <code>%2$s</code> cookie that is normally set via email confirmation. However, in order for this to occur, this option must be set to <code>Yes</code>; i.e. %1$s needs to know that it can trust the email address associated w/ each user account within WordPress before it will read an email address from <code>wp_users</code> table.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html(__NAMESPACE__.'_sub_email')).'</p>'.
 						                                     '<p class="pmp-note pmp-warning">'.sprintf(__('<strong>Warning:</strong> Please be cautious about how you answer this question. Do all of your users <em>really</em> register and confirm their email address before being allowed to log in? If a user updates their profile, is an email change-of-address always confirmed too? Some themes/plugins make it possible for registration/updates to occur <em>without</em> doing so. If that\'s the case, you should answer <code>No</code> here (default behavior), and just let the encrypted <code>%2$s</code> cookie do it\'s thing. That\'s what it\'s there for <i class="fa fa-smile-o"></i>', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html(__NAMESPACE__.'_sub_email')).'</p>'.
-						                                     '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> Your answer here does not enable or disable auto-confirmation in any way. It\'s simply a flag that is used by %1$s (internally), to help it make the most logical (safest) decision under certain scenarios that are impacted by the email address of the current user. It\'s important to realize that no matter what you answer here, %1$s will still be fully functional. You can only go wrong by saying <code>Yes</code> when in fact your users do NOT always confirm their email. <strong>If in doubt, please answer <code>No</code> (default behavior)</strong>.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'
+						                                     '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> Your answer here does not enable or disable auto-confirmation in any way. It\'s simply a flag that is used by %1$s (internally), to help it make the most logical (safest) decision under certain scenarios that are impacted by the email address of the current user. It\'s important to realize that no matter what you answer here, %1$s will still be fully functional. You can only go wrong by saying <code>Yes</code> when in fact your users do NOT always confirm their email. <strong>If in doubt, please answer <code>No</code> (default behavior)</strong>.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'.
+						                                     '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> If you enable SSO "Single Sign-on" (another %1$s feature), then this setting is ignored; i.e. enabling SSO is an automatic flag which tells %1$s that all WP users do NOT confirm their email address in every scenario.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'
 					                )).
 				                ' </tbody>'.
 				                '</table>';
@@ -1024,6 +1025,195 @@ namespace comment_mail // Root namespace.
 				                '</div>';
 
 				echo $this->panel(__('Replies via Email (RVE Handler)', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table style="margin-bottom:0;">'.
+				               '  <tbody>'.
+				               $form_fields->select_row(
+					               array(
+						               'label'           => __('Enable Single Sign-on (SSO)?', $this->plugin->text_domain),
+						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						               'field_class'     => 'pmp-if-change', // JS change handler.
+						               'name'            => 'sso_enable',
+						               'current_value'   => $current_value_for('sso_enable'),
+						               'allow_arbitrary' => FALSE, // Must be one of these.
+						               'options'         => array(
+							               '0' => __('No, disable Single Sign-on (SSO)', $this->plugin->text_domain),
+							               '1' => __('Yes, enable Single Sign-on (recommended)', $this->plugin->text_domain),
+						               ),
+						               'notes_after'     => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-services.png')).'" class="pmp-right" />'.
+						                                    __('As a convenience, SSO allows commenters to login with a popular social network account; e.g. Twitter, Facebook, Google, LinkedIn. <span class="pmp-hilite">This feature is highly recommended, but disabled by default</span>; since it requires some work on your part to set things up properly. <strong>Note:</strong> when a visitor logs in through an SSO service provider, an account is automatically created for them in WordPress (if one does not exist already). These auto-generated WordPress accounts are created using details verified by the SSO service provider; i.e. first name, last name, email address — as provided by Twitter, Facebook, etc.', $this->plugin->text_domain).'</p>'.
+						                                    '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> SSO is only applicable when your WordPress Discussion Settings %1$s before posting a comment.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor(admin_url('/options-discussion.php'), __('require users to be logged-in', $this->plugin->text_domain))).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				$_panel_body .= '<div class="pmp-if-enabled-show pmp-if-nest"><hr />'.
+
+				                ' <p class="pmp-note pmp-notice" style="font-size:90%;">'.sprintf(__('In order for SSO to work (i.e. for login links to appear atop your comment form); you will need to create an oAuth App Key/Secret for each service that you\'d like to enable, and then enter those details below. Any of the services that you leave empty will simply not be offered as an SSO option to commenters. Please take a look at %1$s ~ intended for intermediate and/or advanced site owners.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys', __('this wiki article for detailed instructions', $this->plugin->text_domain))).'</p>'.
+
+				                ' <hr />'.
+
+				                ' <table>'.
+				                '    <tbody>'.
+				                $form_fields->input_row(
+					                array(
+						                'label'         => __('Twitter&reg; oAuth App Key:', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g. kyczbsh6nnwtzrkm882kh7jf8', $this->plugin->text_domain),
+						                'name'          => 'sso_twitter_key',
+						                'current_value' => $current_value_for('sso_twitter_key'),
+						                'notes_after'   => '<p>'.__('', $this->plugin->text_domain).'</p>',
+					                )).
+				                '    </tbody>'.
+				                ' </table>'.
+
+				                ' <table>'.
+				                '    <tbody>'.
+				                $form_fields->input_row(
+					                array(
+						                'type'          => 'password',
+						                'label'         => __('Twitter&reg; oAuth App Secret:', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g. gznuef64twbku3qpcdyx8jtfgcyccxsup8yu5gb95f493maf79', $this->plugin->text_domain),
+						                'name'          => 'sso_twitter_secret',
+						                'current_value' => $current_value_for('sso_twitter_secret'),
+						                'notes_after'   => '<p>'.__('', $this->plugin->text_domain).'</p>',
+					                )).
+				                '    </tbody>'.
+				                ' </table>'.
+
+				                ' <hr />'.
+
+				                ' <table>'.
+				                '    <tbody>'.
+				                $form_fields->input_row(
+					                array(
+						                'label'         => __('Facebook&reg; oAuth App Key:', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g. 87df9vcu8njzrrnrgy2u2k2cj', $this->plugin->text_domain),
+						                'name'          => 'sso_facebook_key',
+						                'current_value' => $current_value_for('sso_facebook_key'),
+						                'notes_after'   => '<p>'.__('', $this->plugin->text_domain).'</p>',
+					                )).
+				                '    </tbody>'.
+				                ' </table>'.
+
+				                ' <table>'.
+				                '    <tbody>'.
+				                $form_fields->input_row(
+					                array(
+						                'type'          => 'password',
+						                'label'         => __('Facebook&reg; oAuth App Secret:', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g. pqs4vyjmw6rqt23knuajftuv7xxxgxtdwvuajnq7cj5a5ak22j', $this->plugin->text_domain),
+						                'name'          => 'sso_facebook_secret',
+						                'current_value' => $current_value_for('sso_facebook_secret'),
+						                'notes_after'   => '<p>'.__('', $this->plugin->text_domain).'</p>',
+					                )).
+				                '    </tbody>'.
+				                ' </table>'.
+
+				                ' <hr />'.
+
+				                ' <table>'.
+				                '    <tbody>'.
+				                $form_fields->input_row(
+					                array(
+						                'label'         => __('Google&reg; oAuth App Key:', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g. qda788ac23s4m4utvqgkauwhf', $this->plugin->text_domain),
+						                'name'          => 'sso_google_key',
+						                'current_value' => $current_value_for('sso_google_key'),
+						                'notes_after'   => '<p>'.__('', $this->plugin->text_domain).'</p>',
+					                )).
+				                '    </tbody>'.
+				                ' </table>'.
+
+				                ' <table>'.
+				                '    <tbody>'.
+				                $form_fields->input_row(
+					                array(
+						                'type'          => 'password',
+						                'label'         => __('Google&reg; oAuth App Secret:', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g. djx4zsdyh4grkuw8qpkg382fr8uujmsahfj8x4b8aun437hye2', $this->plugin->text_domain),
+						                'name'          => 'sso_google_secret',
+						                'current_value' => $current_value_for('sso_google_secret'),
+						                'notes_after'   => '<p>'.__('', $this->plugin->text_domain).'</p>',
+					                )).
+				                '    </tbody>'.
+				                ' </table>'.
+
+				                ' <hr />'.
+
+				                ' <table>'.
+				                '    <tbody>'.
+				                $form_fields->input_row(
+					                array(
+						                'label'         => __('LinkedIn&reg; oAuth App Key:', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g. swf73zuj2puaug9e5a4ytpcg7', $this->plugin->text_domain),
+						                'name'          => 'sso_linkedin_key',
+						                'current_value' => $current_value_for('sso_linkedin_key'),
+						                'notes_after'   => '<p>'.__('', $this->plugin->text_domain).'</p>',
+					                )).
+				                '    </tbody>'.
+				                ' </table>'.
+
+				                ' <table>'.
+				                '    <tbody>'.
+				                $form_fields->input_row(
+					                array(
+						                'type'          => 'password',
+						                'label'         => __('LinkedIn&reg; oAuth App Secret:', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g. dtqvgh8qjkne4nhry7w56bzk86dcqr7racy5evmhegpt9gw9c4', $this->plugin->text_domain),
+						                'name'          => 'sso_linkedin_secret',
+						                'current_value' => $current_value_for('sso_linkedin_secret'),
+						                'notes_after'   => '<p>'.__('', $this->plugin->text_domain).'</p>',
+					                )).
+				                '    </tbody>'.
+				                ' </table>'.
+
+				                ' <hr />'.
+
+				                ' <table style="margin-bottom:0;">'.
+				                '    <tbody>'.
+				                $form_fields->select_row(
+					                array(
+						                'label'           => __('Enable Comment Form SSO Options Template?', $this->plugin->text_domain),
+						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						                'field_class'     => 'pmp-if-change', // JS change handler.
+						                'name'            => 'comment_form_sso_template_enable',
+						                'current_value'   => $current_value_for('comment_form_sso_template_enable'),
+						                'allow_arbitrary' => FALSE, // Must be one of these.
+						                'options'         => array(
+							                '1' => __('Yes, use built-in template system (recommended)', $this->plugin->text_domain),
+							                '0' => __('No, disable built-in template system; I have a deep theme integration of my own', $this->plugin->text_domain),
+						                ),
+						                'notes_after'     => '<p>'.__('The built-in template system is quite flexible already; you can even customize the default template yourself if you want to (as seen below). Therefore, it is not recommended that you disable the default template system. This option only exists for very advanced users; i.e. those who prefer to disable the template completely in favor of their own custom implementation. If you disable the built-in template, you\'ll need to integrate HTML markup of your own into the proper location of your theme.', $this->plugin->text_domain).'</p>',
+					                )).
+				                '    </tbody>'.
+				                ' </table>'.
+
+				                ' <div class="pmp-if-enabled-show pmp-if-in-nest"><hr />'.
+				                '    <table>'.
+				                '       <tbody>'.
+				                $form_fields->textarea_row(
+					                array(
+						                'label'         => __('Comment Form SSO Options Template', $this->plugin->text_domain),
+						                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						                'cm_mode'       => 'application/x-httpd-php', 'cm_height' => 250,
+						                'name'          => 'template__site__comment_form__sso_ops',
+						                'current_value' => $current_value_for('template__site__comment_form__sso_ops'),
+						                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sub-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
+						                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>'.
+						                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					                )).
+				                '       </tbody>'. // @TODO update the screenshot for the default SSO options template.
+				                '    </table>'.
+				                ' </div>'.
+
+				                '</div>';
+
+				echo $this->panel(__('Single Sign-on Integration (SSO)', $this->plugin->text_domain), $_panel_body, array());
 
 				unset($_panel_body); // Housekeeping.
 
@@ -2311,7 +2501,7 @@ namespace comment_mail // Root namespace.
 				/* ----------------------------------------------------------------------------------------- */
 
 				echo '         <h2 class="pmp-section-heading">'.
-				     '            '.__('Comment Form Templates', $this->plugin->text_domain).
+				     '            '.__('Subscription Option Templates', $this->plugin->text_domain).
 				     '            <small>'.__('Provides options that allow commenters to subscribe &amp; receive notifications.', $this->plugin->text_domain).'</small>'.
 				     '         </h2>';
 
@@ -2354,6 +2544,55 @@ namespace comment_mail // Root namespace.
 				               '</table>';
 
 				echo $this->panel(__('Comment Form Scripts for Subscr. Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '         <h2 class="pmp-section-heading">'.
+				     '            '.__('Single Sign-on Templates', $this->plugin->text_domain).
+				     '            <small>'.__('Provides options that allow commenters to login w/ popular social network accounts.', $this->plugin->text_domain).'</small>'.
+				     '         </h2>';
+
+				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('Comment Form SSO Options Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__site__comment_form__sso_ops',
+						               'current_value' => $current_value_for('template__site__comment_form__sso_ops'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Comment Form SSO Options (Login Links)', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->textarea_row(
+					               array(
+						               'label'         => __('SSO Registration Completion Template', $this->plugin->text_domain),
+						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+						               'cm_mode'       => 'application/x-httpd-php',
+						               'name'          => 'template__site__sso_actions__complete',
+						               'current_value' => $current_value_for('template__site__sso_actions__complete'),
+						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Single Sign-on Registration Completion', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
 
 				unset($_panel_body); // Housekeeping.
 

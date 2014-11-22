@@ -9,6 +9,12 @@ namespace comment_mail;
  * @var string $site_header Parsed site header template.
  * @var string $site_footer Parsed site footer template.
  *
+ * @var string $action_url Form action URL.
+ *
+ * @var string $fname Current value for the first name field.
+ * @var string $lname Current value for the last name field.
+ * @var string $email Current value for the email address field.
+ *
  * @var array  $error_codes An array of any/all error codes.
  *
  * -------------------------------------------------------------------
@@ -59,6 +65,10 @@ echo str_replace('%%title%%', __('Complete Registration', $plugin->text_domain),
 		<?php endif; // END: error/validation display. ?>
 
 		<?php // @TODO Test and complete this template. ?>
+
+		<form action="<?php echo esc_attr($action_url); ?>" method="POST">
+
+		</form>
 
 	</div>
 

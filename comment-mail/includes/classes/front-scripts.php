@@ -49,7 +49,7 @@ namespace comment_mail // Root namespace.
 					if(!$this->plugin->options['comment_form_template_enable'])
 						return; // Nothing to do here.
 
-				if(!is_singular()) // Only need this for comment forms.
+				if(!is_singular() || !comments_open())
 					return; // Not applicable.
 
 				wp_enqueue_script('jquery'); // Need jQuery.

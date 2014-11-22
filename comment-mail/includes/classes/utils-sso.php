@@ -31,6 +31,23 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Currently supported services.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return array Currently supported services.
+			 */
+			public function services()
+			{
+				return array(
+					'twitter',
+					'facebook',
+					'google',
+					'linkedin',
+				);
+			}
+
+			/**
 			 * Processes SSO and redirects.
 			 *
 			 * @since 141111 First documented version.

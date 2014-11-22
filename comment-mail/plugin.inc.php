@@ -356,6 +356,27 @@ namespace comment_mail
 					'comment_form_default_sub_type_option'                                 => 'comment', // ``, `comment` or `comments`.
 					'comment_form_default_sub_deliver_option'                              => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
 
+					/* Related to SSO and service integrations. */
+
+					'sso_enable'                                                           => '0', // `0|1`; enable?
+					'comment_form_sso_template_enable'                                     => '1', // `0|1`; enable?
+
+					'sso_twitter_key'                                                      => '',
+					'sso_twitter_secret'                                                   => '',
+					// See: <https://apps.twitter.com/app/new>
+
+					'sso_facebook_key'                                                     => '',
+					'sso_facebook_secret'                                                  => '',
+					// See: <https://developers.facebook.com/quickstarts/?platform=web>
+
+					'sso_google_key'                                                       => '',
+					'sso_google_secret'                                                    => '',
+					// See: <https://developers.google.com/accounts/docs/OpenIDConnect#getcredentials>
+
+					'sso_linkedin_key'                                                     => '',
+					'sso_linkedin_secret'                                                  => '',
+					// See: <https://www.linkedin.com/secure/developer?newapp=>
+
 					/* Related to CAN-SPAM compliance. */
 
 					'can_spam_postmaster'                                                  => get_bloginfo('admin_email'),
@@ -489,26 +510,6 @@ namespace comment_mail
 					'comment_select_options_enable'                                        => '1', // `0|1`; enable?
 					'max_select_options'                                                   => '2000', // Max options.
 
-					/* Related to SSO and service integrations. */
-
-					'sso_enable'                                                           => '0', // `0|1`; enable?
-
-					'sso_twitter_key'                                                      => '',
-					'sso_twitter_secret'                                                   => '',
-					// See: <https://apps.twitter.com/app/new>
-
-					'sso_facebook_key'                                                     => '',
-					'sso_facebook_secret'                                                  => '',
-					// See: <https://developers.facebook.com/quickstarts/?platform=web>
-
-					'sso_google_key'                                                       => '',
-					'sso_google_secret'                                                    => '',
-					// See: <https://developers.google.com/accounts/docs/OpenIDConnect#getcredentials>
-
-					'sso_linkedin_key'                                                     => '',
-					'sso_linkedin_secret'                                                  => '',
-					// See: <https://www.linkedin.com/secure/developer?newapp=>
-
 					/* Related to branding.
 					~ See: <https://wordpress.org/plugins/about/guidelines/>
 					#10. The plugin must NOT embed external links on the public site (like a "powered by" link) without
@@ -527,8 +528,12 @@ namespace comment_mail
 					'template__site__site_footer_easy'                                     => '', // HTML/PHP code.
 					'template__site__site_footer'                                          => '', // HTML/PHP code.
 
+					'template__site__comment_form__sso_ops'                                => '', // HTML/PHP code.
+
 					'template__site__comment_form__sub_ops'                                => '', // HTML/PHP code.
 					'template__site__comment_form__sub_op_scripts'                         => '', // HTML/PHP code.
+
+					'template__site__sso_actions__complete'                                => '', // HTML/PHP code.
 
 					'template__site__sub_actions__confirmed'                               => '', // HTML/PHP code.
 					'template__site__sub_actions__unsubscribed'                            => '', // HTML/PHP code.
@@ -593,6 +598,9 @@ namespace comment_mail
 				add_action('transition_post_status', array($this, 'post_status'), 10, 3);
 				add_action('before_delete_post', array($this, 'post_delete'), 10, 1);
 
+				add_action('comment_form_must_log_in_after', array($this, 'comment_form_must_log_in_after'), 5, 0);
+				add_action('comment_form_top', array($this, 'comment_form_must_log_in_after'), 5, 0); // Secondary fallback.
+
 				add_filter('comment_form_field_comment', array($this, 'comment_form_filter_append'), 5, 1);
 				add_action('comment_form', array($this, 'comment_form'), 5, 0); // Secondary fallback.
 
@@ -608,8 +616,6 @@ namespace comment_mail
 				add_action('remove_user_from_blog', array($this, 'user_delete'), 10, 2);
 
 				add_action('add_meta_boxes', array($this, 'add_meta_boxes'), 10);
-
-				// @TODO Add hooks that will display SSO links in comment form; when applicable.
 
 				/*
 				 * Setup CRON-related hooks.
@@ -1766,6 +1772,25 @@ namespace comment_mail
 					return; // Nothing to do.
 
 				new comment_shortlink_redirect();
+			}
+
+			/**
+			 * Comment form SSO integration.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @attaches-to `comment_form_must_log_in_after` filter.
+			 * @attaches-to `comment_form_top` as a secondary fallback.
+			 */
+			public function comment_form_must_log_in_after()
+			{
+				if(!is_null($fired = &$this->static_key(__FUNCTION__)))
+					return; // We only handle this for a single hook.
+				// The first hook to fire this will win automatically.
+
+				$fired = TRUE; // Flag as `TRUE` now.
+
+				new comment_form_sso();
 			}
 
 			/**

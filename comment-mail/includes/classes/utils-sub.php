@@ -1032,6 +1032,8 @@ namespace comment_mail // Root namespace.
 			 *
 			 *    All of that said, if `$sub_user_id` > `0` (and `all_wp_users_confirm_email=1`), we can safely continue
 			 *    w/o the additional check against the current plugin options; since the user ID can be matched up properly in that case.
+			 *
+			 *    Note: If SSO is enabled, `all_wp_users_confirm_email` is ignored; since SSO allows for unconfirmed email addresses.
 			 */
 			public function can_auto_confirm(array $args)
 			{
@@ -1089,14 +1091,14 @@ namespace comment_mail // Root namespace.
 				       " AND `user_id` = '".esc_sql($sub_user_id)."'". // Must match user ID.
 				       " AND `email` = '".esc_sql($sub_email)."'". // Must match email address.
 
-				       ($sub_user_id <= 0 || !$this->plugin->options['all_wp_users_confirm_email']
+				       ($sub_user_id <= 0 || !$this->plugin->options['all_wp_users_confirm_email'] || $this->plugin->options['sso_enable']
 					       ? " AND (`insertion_ip` = '".esc_sql($sub_last_ip)."' OR `last_ip` = '".esc_sql($sub_last_ip)."')".
 					         " AND '".esc_sql($sub_last_ip)."' != ''" // The IP that we're checking cannot be empty.
 					       : ''). // Exclude otherwise; we have a good user ID we can check in this case.
 
 				       " AND `status` = 'subscribed' LIMIT 1"; // One to check.
 
-				if(($sub_user_id > 0 && $this->plugin->options['all_wp_users_confirm_email'])
+				if(($sub_user_id > 0 && $this->plugin->options['all_wp_users_confirm_email'] && !$this->plugin->options['sso_enable'])
 				   || ($sub_last_ip && $this->plugin->options['auto_confirm_if_already_subscribed_u0ip_enable'])
 				)
 					if((boolean)$this->plugin->utils_db->wp->get_var($sql))

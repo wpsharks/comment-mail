@@ -81,7 +81,7 @@ namespace comment_mail // Root namespace.
 				if(empty($request_args['service']))
 					return; // Empty service identifier.
 
-				if(!in_array($request_args['service'], array('twitter', 'facebook', 'google', 'linkedin'), TRUE))
+				if(!in_array($request_args['service'], $this->plugin->utils_sso->services(), TRUE))
 					return; // Invalid import type.
 
 				if(!class_exists($class = '\\'.__NAMESPACE__.'\\sso_'.$request_args['service']))
