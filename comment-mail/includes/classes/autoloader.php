@@ -64,6 +64,15 @@ namespace comment_mail // Root namespace.
 					return; // Already registered autoloader.
 
 				spl_autoload_register(array($this, 'autoload'));
+
+				$oauth_src_dir = dirname(dirname(dirname(__FILE__))).'/submodules/php-oauth-lib/src';
+
+				if(!class_exists('\OAuth\Common\AutoLoader')) // Already loaded by another plugin?
+					require_once $oauth_src_dir.'/OAuth/Common/AutoLoader.php';
+
+				$oauth_autoloader = new \OAuth\Common\AutoLoader('OAuth', $oauth_src_dir);
+				$oauth_autoloader->register(); // Register oAuth autoloader too.
+
 				$registered = TRUE; // Flag as complete.
 			}
 		}

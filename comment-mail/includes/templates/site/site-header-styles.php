@@ -93,11 +93,11 @@ namespace comment_mail;
 	}
 	header img.icon-bubbles
 	{
-		top      : 5px;
-		right    : 110px;
+		right    : 0;
+		top      : 8px;
 		position : absolute;
 
-		width    : 175px;
+		width    : 150px;
 		height   : auto;
 	}
 	@media (max-width : 991px)
@@ -120,6 +120,50 @@ namespace comment_mail;
 		position : relative;
 	}
 	/*
+	Form tables.
+	*/
+	.table-form table
+	{
+		width : 100%;
+	}
+	.table-form table th
+	{
+		vertical-align : top;
+		width          : 250px;
+	}
+	.table-form table td
+	{
+		padding : 0 0 1em 1em;
+	}
+	.table-form table .description,
+	.table-form table .notes
+	{
+		opacity    : 0.75;
+		font-style : italic;
+	}
+	.table-form table .notes-before
+	{
+		margin-bottom : .25em;
+	}
+	.table-form table .notes-after
+	{
+		margin-top : .25em;
+	}
+	.table-form input[type='submit']
+	{
+		width : 100%;
+	}
+	@media (max-width : 991px)
+	{
+		.table-form table th,
+		.table-form table td
+		{
+			padding-top : 0;
+			width       : 100%;
+			display     : block;
+		}
+	}
+	/*
 	Subscription summary styles.
 	*/
 	.manage-summary .subs-table a
@@ -138,50 +182,6 @@ namespace comment_mail;
 	.manage-summary .subs-table tr .hover-links .text-muted
 	{
 		opacity : 0.5;
-	}
-	/*
-	Subscription add/edit form styles.
-	*/
-	.manage-sub-form form table
-	{
-		width : 100%;
-	}
-	.manage-sub-form form th
-	{
-		vertical-align : top;
-		width          : 250px;
-	}
-	.manage-sub-form form table td
-	{
-		padding : 0 0 1em 1em;
-	}
-	.manage-sub-form form table .description,
-	.manage-sub-form form table .notes
-	{
-		opacity    : 0.75;
-		font-style : italic;
-	}
-	.manage-sub-form form table .notes-before
-	{
-		margin-bottom : .25em;
-	}
-	.manage-sub-form form table .notes-after
-	{
-		margin-top : .25em;
-	}
-	.manage-sub-form form input[type='submit']
-	{
-		width : 100%;
-	}
-	@media (max-width : 991px)
-	{
-		.manage-sub-form form table th,
-		.manage-sub-form form table td
-		{
-			padding-top : 0;
-			width       : 100%;
-			display     : block;
-		}
 	}
 	/*
 	Footer styles.

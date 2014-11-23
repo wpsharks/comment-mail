@@ -246,6 +246,8 @@ namespace comment_mail // Root namespace.
 			 * @since 141111 First documented version.
 			 *
 			 * @return string Hidden inputs needed for form processing.
+			 *
+			 * @TODO Add an nonce to these fields.
 			 */
 			public function hidden_inputs()
 			{

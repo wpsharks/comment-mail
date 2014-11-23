@@ -29,15 +29,16 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
-				$this->maybe_enqueue_comment_form_scripts();
+				$this->maybe_enqueue_comment_form_sso_scripts();
+				$this->maybe_enqueue_comment_form_sub_scripts();
 			}
 
 			/**
-			 * Enqueue front-side scripts for comment form.
+			 * Enqueue front-side scripts for comment form SSO.
 			 *
 			 * @since 141111 First documented version.
 			 */
-			protected function maybe_enqueue_comment_form_scripts()
+			protected function maybe_enqueue_comment_form_sso_scripts()
 			{
 				if(!$this->plugin->options['enable'])
 					return; // Nothing to do.
@@ -45,11 +46,44 @@ namespace comment_mail // Root namespace.
 				if(!$this->plugin->options['new_subs_enable'])
 					return; // Nothing to do.
 
-				if(!$this->plugin->options['comment_form_scripts_enable'])
-					if(!$this->plugin->options['comment_form_template_enable'])
+				if(!$this->plugin->options['sso_enable'])
+					return; // Disabled currently.
+
+				if(!$this->plugin->options['comment_form_sso_scripts_enable'])
+					if(!$this->plugin->options['comment_form_sso_template_enable'])
 						return; // Nothing to do here.
 
-				if(!is_singular()) // Only need this for comment forms.
+				if(!is_singular() || !comments_open())
+					return; // Not applicable.
+
+				wp_enqueue_script('jquery'); // Need jQuery.
+
+				add_action('wp_footer', function ()
+				{
+					$template = new template('site/comment-form/sso-op-scripts.php');
+					echo $template->parse(); // Inline `<script></script>`.
+
+				}, PHP_INT_MAX - 10); // Very low priority; after footer scripts!
+			}
+
+			/**
+			 * Enqueue front-side scripts for comment form subs.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected function maybe_enqueue_comment_form_sub_scripts()
+			{
+				if(!$this->plugin->options['enable'])
+					return; // Nothing to do.
+
+				if(!$this->plugin->options['new_subs_enable'])
+					return; // Nothing to do.
+
+				if(!$this->plugin->options['comment_form_sub_scripts_enable'])
+					if(!$this->plugin->options['comment_form_sub_template_enable'])
+						return; // Nothing to do here.
+
+				if(!is_singular() || !comments_open())
 					return; // Not applicable.
 
 				wp_enqueue_script('jquery'); // Need jQuery.

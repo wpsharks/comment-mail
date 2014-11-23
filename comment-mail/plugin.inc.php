@@ -36,6 +36,7 @@ namespace comment_mail
 		 * @property-read utils_queue           $utils_queue
 		 * @property-read utils_queue_event_log $utils_queue_event_log
 		 * @property-read utils_rve             $utils_rve
+		 * @property-read utils_sso             $utils_sso
 		 * @property-read utils_string          $utils_string
 		 * @property-read utils_sub             $utils_sub
 		 * @property-read utils_sub_event_log   $utils_sub_event_log
@@ -337,23 +338,46 @@ namespace comment_mail
 					 * accepting new subscriptions if they so desire; i.e. by setting `new_subs_enable=0`.
 					 *
 					 * --------------------------------------------------------------------------------------
-					 * The `comment_form_template_enable` option can be turned off if the site owner would like to
+					 * The `comment_form_sub_template_enable` option can be turned off if the site owner would like to
 					 * implement their own HTML markup for comment subscription options; instead of the built-in template.
 					 *
-					 * The `comment_form_scripts_enable` option can be turned off if the site owner has decided not to use
+					 * The `comment_form_sub_scripts_enable` option can be turned off if the site owner has decided not to use
 					 * the default HTML markup for comment subscription options; i.e. they might not need JavaScript in this case.
-					 *    Note that `comment_form_template_enable` must also be disabled for this option to actually work;
+					 *    Note that `comment_form_sub_template_enable` must also be disabled for this option to actually work;
 					 *    i.e. the default comment form template relies on this; so IT must be off to turn this off.
 					 */
 					'enable'                                                               => '1', // `0|1`; enable?
 					'new_subs_enable'                                                      => '1', // `0|1`; enable?
 					'queue_processing_enable'                                              => '1', // `0|1`; enable?
 
-					'comment_form_template_enable'                                         => '1', // `0|1`; enable?
-					'comment_form_scripts_enable'                                          => '1', // `0|1`; enable?
+					'comment_form_sub_template_enable'                                     => '1', // `0|1`; enable?
+					'comment_form_sub_scripts_enable'                                      => '1', // `0|1`; enable?
 
 					'comment_form_default_sub_type_option'                                 => 'comment', // ``, `comment` or `comments`.
 					'comment_form_default_sub_deliver_option'                              => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
+
+					/* Related to SSO and service integrations. */
+
+					'sso_enable'                                                           => '0', // `0|1`; enable?
+
+					'comment_form_sso_template_enable'                                     => '1', // `0|1`; enable?
+					'comment_form_sso_scripts_enable'                                      => '1', // `0|1`; enable?
+
+					'sso_twitter_key'                                                      => '',
+					'sso_twitter_secret'                                                   => '',
+					// See: <https://apps.twitter.com/app/new>
+
+					'sso_facebook_key'                                                     => '',
+					'sso_facebook_secret'                                                  => '',
+					// See: <https://developers.facebook.com/quickstarts/?platform=web>
+
+					'sso_google_key'                                                       => '',
+					'sso_google_secret'                                                    => '',
+					// See: <https://developers.google.com/accounts/docs/OpenIDConnect#getcredentials>
+
+					'sso_linkedin_key'                                                     => '',
+					'sso_linkedin_secret'                                                  => '',
+					// See: <https://www.linkedin.com/secure/developer?newapp=>
 
 					/* Related to CAN-SPAM compliance. */
 
@@ -506,6 +530,10 @@ namespace comment_mail
 					'template__site__site_footer_easy'                                     => '', // HTML/PHP code.
 					'template__site__site_footer'                                          => '', // HTML/PHP code.
 
+					'template__site__comment_form__sso_ops'                                => '', // HTML/PHP code.
+					'template__site__comment_form__sso_op_scripts'                         => '', // HTML/PHP code.
+					'template__site__sso_actions__complete'                                => '', // HTML/PHP code.
+
 					'template__site__comment_form__sub_ops'                                => '', // HTML/PHP code.
 					'template__site__comment_form__sub_op_scripts'                         => '', // HTML/PHP code.
 
@@ -571,6 +599,9 @@ namespace comment_mail
 
 				add_action('transition_post_status', array($this, 'post_status'), 10, 3);
 				add_action('before_delete_post', array($this, 'post_delete'), 10, 1);
+
+				add_action('comment_form_must_log_in_after', array($this, 'comment_form_must_log_in_after'), 5, 0);
+				add_action('comment_form_top', array($this, 'comment_form_must_log_in_after'), 5, 0); // Secondary fallback.
 
 				add_filter('comment_form_field_comment', array($this, 'comment_form_filter_append'), 5, 1);
 				add_action('comment_form', array($this, 'comment_form'), 5, 0); // Secondary fallback.
@@ -1746,6 +1777,25 @@ namespace comment_mail
 			}
 
 			/**
+			 * Comment form SSO integration.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @attaches-to `comment_form_must_log_in_after` filter.
+			 * @attaches-to `comment_form_top` as a secondary fallback.
+			 */
+			public function comment_form_must_log_in_after()
+			{
+				if(!is_null($fired = &$this->static_key(__FUNCTION__)))
+					return; // We only handle this for a single hook.
+				// The first hook to fire this will win automatically.
+
+				$fired = TRUE; // Flag as `TRUE` now.
+
+				new comment_form_login();
+			}
+
+			/**
 			 * Comment form handler; via filter.
 			 *
 			 * @since 141111 First documented version.
@@ -1767,7 +1817,7 @@ namespace comment_mail
 					$fired = TRUE; // Flag as `TRUE` now.
 
 					ob_start(); // Output buffer.
-					new comment_form();
+					new comment_form_after();
 					$value .= ob_get_clean();
 				}
 				return $value;
@@ -1788,7 +1838,7 @@ namespace comment_mail
 
 				$fired = TRUE; // Flag as `TRUE` now.
 
-				new comment_form();
+				new comment_form_after();
 			}
 
 			/**
