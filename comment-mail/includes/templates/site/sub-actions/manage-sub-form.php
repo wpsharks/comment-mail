@@ -13,7 +13,7 @@ namespace comment_mail;
  * @var string         $sub_key Current subscription key; if editing.
  * @var \stdClass|null $sub Subscription object data; if editing.
  *
- * @var form_fields    $form_fields Form fields class.
+ * @var form_fields    $form_fields Form fields class instance.
  * @var callable       $current_value_for Current value for a form field.
  * @var callable       $hidden_inputs Hidden input fields needed by form.
  *
@@ -183,7 +183,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 
 			<hr />
 
-			<form method="post" enctype="multipart/form-data" novalidate="novalidate">
+			<form method="post" enctype="multipart/form-data" novalidate="novalidate" class="table-form">
 				<table>
 					<tbody>
 

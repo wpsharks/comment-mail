@@ -57,7 +57,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Class constructor.
+			 * Is the current user?
 			 *
 			 * @since 141111 First documented version.
 			 *
@@ -79,6 +79,36 @@ namespace comment_mail // Root namespace.
 
 				return ($user_id || ($user_id === 0 && $allow_0))
 				       && get_current_user_id() === $user_id;
+			}
+
+			/**
+			 * Email exists on this blog?
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string  $email The email address to check.
+			 * @param boolean $no_cache Refresh a previously cached value?
+			 *
+			 * @return boolean `TRUE` if `$email` exists on current blog.
+			 */
+			public function email_exists_on_blog($email, $no_cache = FALSE)
+			{
+				if(!($email = trim(strtolower((string)$email))))
+					return FALSE; // Not possible.
+
+				$blog_id    = get_current_blog_id();
+				$cache_keys = compact('email', 'blog_id');
+
+				if(!is_null($exists = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
+					return $exists; // Already cached this.
+
+				if(!($user_id = email_exists($email)))
+					return ($exists = FALSE); // Not on any blog.
+
+				if(!($user = new \WP_User($user_id)) || !$user->exists())
+					return ($exists = FALSE); // Not on any blog.
+
+				return ($exists = !is_multisite() || !empty($user->roles));
 			}
 		}
 	}

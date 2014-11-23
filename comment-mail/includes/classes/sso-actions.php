@@ -28,6 +28,18 @@ namespace comment_mail // Root namespace.
 			protected $valid_actions;
 
 			/**
+			 * @var array Valid services.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			public static $valid_services = array(
+				'twitter',
+				'facebook',
+				'google',
+				'linkedin',
+			);
+
+			/**
 			 * Class constructor.
 			 *
 			 * @since 141111 First documented version.
@@ -59,7 +71,7 @@ namespace comment_mail // Root namespace.
 				$cb_r_args = array(); // Initialize callback request args.
 				$_r        = $this->plugin->utils_string->trim_strip_deep($_REQUEST);
 
-				foreach(array('oauth_token', 'oauth_verifier', 'code', 'state') as $_cb_r_arg_key)
+				foreach(array('oauth_token', 'oauth_verifier', 'oauth_problem', 'code', 'state') as $_cb_r_arg_key)
 					if(isset($_r[$_cb_r_arg_key])) $cb_r_args[$_cb_r_arg_key] = $_r[$_cb_r_arg_key];
 				unset($_cb_r_arg_key); // Housekeeping.
 
@@ -81,7 +93,7 @@ namespace comment_mail // Root namespace.
 				if(empty($request_args['service']))
 					return; // Empty service identifier.
 
-				if(!in_array($request_args['service'], $this->plugin->utils_sso->services(), TRUE))
+				if(!in_array($request_args['service'], static::$valid_services, TRUE))
 					return; // Invalid import type.
 
 				if(!class_exists($class = '\\'.__NAMESPACE__.'\\sso_'.$request_args['service']))

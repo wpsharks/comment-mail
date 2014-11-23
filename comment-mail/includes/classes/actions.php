@@ -37,6 +37,7 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
+				$this->maybe_do_sso_actions();
 				$this->maybe_do_sub_actions();
 				$this->maybe_do_webhook_actions();
 				$this->maybe_do_menu_page_actions();

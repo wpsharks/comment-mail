@@ -1,6 +1,6 @@
 <?php
 /**
- * Comment Form
+ * Comment Form After
  *
  * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
@@ -11,14 +11,14 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\comment_form'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\comment_form_after'))
 	{
 		/**
-		 * Comment Form
+		 * Comment Form After
 		 *
 		 * @since 141111 First documented version.
 		 */
-		class comment_form extends abs_base
+		class comment_form_after extends abs_base
 		{
 			/**
 			 * Class constructor.
@@ -45,7 +45,7 @@ namespace comment_mail // Root namespace.
 				if(!$this->plugin->options['new_subs_enable'])
 					return; // Disabled currently.
 
-				if(!$this->plugin->options['comment_form_template_enable'])
+				if(!$this->plugin->options['comment_form_sub_template_enable'])
 					return; // Disabled currently.
 
 				if(empty($GLOBALS['post']) || !($GLOBALS['post'] instanceof \WP_Post))

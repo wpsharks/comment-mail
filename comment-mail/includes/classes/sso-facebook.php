@@ -37,29 +37,24 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 */
-			protected function maybe_redirect_to_authorize()
+			protected function maybe_handle_authorize()
 			{
-				try // Catch exceptions generated here and log them for debugging.
+				try // Catch exceptions and log them for debugging.
 				{
-					$redirect_to = $this->request_args['redirect_to'];
-
 					$service_factory = new \OAuth\ServiceFactory();
 					$credentials     = new \OAuth\Common\Consumer\Credentials(
 						$this->plugin->options['sso_'.$this->service.'_key'],
 						$this->plugin->options['sso_'.$this->service.'_secret'],
-						$this->plugin->utils_url->sso_action_url($this->service, 'callback', $redirect_to)
+						$this->plugin->utils_url->sso_action_url($this->service, 'callback')
 					);
-					$service         = $service_factory->createService($this->service, $credentials, $this->storage);
 					/** @var $service \OAuth\OAuth2\Service\Facebook */
+					$service = $service_factory->createService($this->service, $credentials, $this->storage, array('email'));
 
-					if(($url = $service->getAuthorizationUri()))
-						wp_redirect($url).exit(); // Redirect to service and request authorization.
-
-					throw new \exception(__('Failed to acquire authorization URL.', $this->plugin->text_domain));
+					$this->process_authorization_redirect($service->getAuthorizationUri());
 				}
 				catch(\exception $exception) // Log for debugging.
 				{
-					$this->plugin->utils_log->maybe_debug($exception);
+					$this->process_exception($exception);
 				}
 			}
 
@@ -70,33 +65,33 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_handle_callback()
 			{
-				if(!$this->request_args['code'])
-					return; // Not applicable; i.e. no data from service.
-
-				try // Catch exceptions generated here and log them for debugging.
+				try // Catch exceptions and log them for debugging.
 				{
-					$redirect_to = $this->request_args['redirect_to'];
+					if(!$this->request_args['code']) // Must have this.
+						throw new \exception(__('Missing oAuth code.', $this->plugin->text_domain));
 
 					$service_factory = new \OAuth\ServiceFactory();
 					$credentials     = new \OAuth\Common\Consumer\Credentials(
 						$this->plugin->options['sso_'.$this->service.'_key'],
 						$this->plugin->options['sso_'.$this->service.'_secret'],
-						$this->plugin->utils_url->sso_action_url($this->service, 'callback', $redirect_to)
+						$this->plugin->utils_url->sso_action_url($this->service, 'callback')
 					);
-					$service         = $service_factory->createService($this->service, $credentials, $this->storage);
 					/** @var $service \OAuth\OAuth2\Service\Facebook */
+					$service = $service_factory->createService($this->service, $credentials, $this->storage, array('email'));
 
-					$token = $service->requestAccessToken($this->request_args['code']);
+					# Request access token via oAuth API provided by this service.
+
+					$service->requestAccessToken($this->request_args['code']);
 
 					# Acquire and validate data received from this service.
 
 					if(!is_object($service_user = json_decode($service->request('/me'))))
-						throw new \exception(__('Failed to verify user.', $this->plugin->text_domain));
+						throw new \exception(__('Failed to acquire user.', $this->plugin->text_domain));
 
-					if(empty($service_user->id)) // Must have a unique ID reference.
+					if(empty($service_user->id) || !($sso_id = (string)$service_user->id))
 						throw new \exception(__('Failed to obtain user.', $this->plugin->text_domain));
 
-					foreach(array('first_name', 'last_name', 'name') as $_prop)
+					foreach(array('first_name', 'last_name', 'name', 'email') as $_prop)
 					{
 						if(!isset($service_user->{$_prop}))
 							$service_user->{$_prop} = '';
@@ -112,30 +107,16 @@ namespace comment_mail // Root namespace.
 							$this->coalesce($this->request_args['email'], $service_user->email)
 						);
 					if(!($lname = $this->request_args['lname']))
-						$lname = $this->plugin->utils_string->last_name(
-							$this->coalesce($service_user->last_name, $service_user->name),
-							$this->coalesce($this->request_args['email'], $service_user->email)
-						);
+						$lname = $service_user->last_name; // Try this next; obviously.
+					if(!$lname) $lname = $this->plugin->utils_string->last_name($service_user->name);
+
 					$email = $this->coalesce($this->request_args['email'], $service_user->email);
 
-					if(!$fname || !$email) // Do we have minimum requirements?
-					{
-						$request_completion_args = compact('fname', 'lname', 'email');
-						exit($this->plugin->utils_sso->request_completion($this->request_args, $request_completion_args));
-					}
-					# Process and perform redirection.
-
-					$sso_id                = (string)$service_user->id;
-					$process_redirect_args = compact('fname', 'lname', 'email', 'redirect_to');
-
-					if(!$this->plugin->utils_sso->process_redirect($this->service, $sso_id, $process_redirect_args))
-						throw new \exception(__('Failed to redirect user.', $this->plugin->text_domain));
-
-					exit; // Always stop here; assuming a redirection success in this case.
+					$this->process_callback_complete_redirect(compact('sso_id', 'fname', 'lname', 'email'));
 				}
 				catch(\exception $exception) // Log for debugging.
 				{
-					$this->plugin->utils_log->maybe_debug($exception);
+					$this->process_exception($exception);
 				}
 			}
 		}

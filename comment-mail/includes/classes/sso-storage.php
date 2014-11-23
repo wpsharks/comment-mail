@@ -59,6 +59,10 @@ namespace comment_mail // Root namespace.
 			 */
 			protected $data;
 
+			/*
+			 * Constructor.
+			 */
+
 			/**
 			 * Class constructor.
 			 *
@@ -80,6 +84,10 @@ namespace comment_mail // Root namespace.
 				if(!($this->data = get_transient($this->transient)))
 					$this->data = array(); // Initialize.
 			}
+
+			/*
+			 * Access tokens.
+			 */
 
 			/**
 			 * {@inheritDoc}
@@ -104,7 +112,7 @@ namespace comment_mail // Root namespace.
 				if($this->hasAccessToken($service))
 					return unserialize($this->data['tokens'][$service]);
 
-				throw new TokenNotFoundException(__('Token not found.', $this->plugin->name));
+				throw new TokenNotFoundException(__('Token not found.', $this->plugin->text_domain));
 			}
 
 			/**
@@ -144,6 +152,10 @@ namespace comment_mail // Root namespace.
 				return $this; // Allow chaining.
 			}
 
+			/*
+			 * Authorization states.
+			 */
+
 			/**
 			 * {@inheritDoc}
 			 */
@@ -164,7 +176,7 @@ namespace comment_mail // Root namespace.
 				if($this->hasAuthorizationState($service))
 					return unserialize($this->data['states'][$service]);
 
-				throw new AuthorizationStateNotFoundException(__('State not found.', $this->plugin->name));
+				throw new AuthorizationStateNotFoundException(__('State not found.', $this->plugin->text_domain));
 			}
 
 			/**
@@ -199,6 +211,70 @@ namespace comment_mail // Root namespace.
 			public function clearAllAuthorizationStates()
 			{
 				unset($this->data['states']);
+				set_transient($this->transient, $this->data, $this->ttl);
+
+				return $this; // Allow chaining.
+			}
+
+			/*
+			 * Extras; custom implementation.
+			 */
+
+			/**
+			 * {@inheritDoc}
+			 */
+			public function hasExtra($service)
+			{
+				$service = trim(strtolower((string)$service));
+
+				return !empty($this->data['extras'][$service]);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			public function retrieveExtra($service)
+			{
+				$service = trim(strtolower((string)$service));
+
+				if($this->hasExtra($service))
+					return unserialize($this->data['extras'][$service]);
+
+				throw new \Exception(__('Extra data not found.', $this->plugin->text_domain));
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			public function storeExtra($service, $extra)
+			{
+				$service = trim(strtolower((string)$service));
+
+				$this->data['extras'][$service] = serialize($extra);
+				set_transient($this->transient, $this->data, $this->ttl);
+
+				return $this; // Allow chaining.
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			public function clearExtra($service)
+			{
+				$service = trim(strtolower((string)$service));
+
+				unset($this->data['extras'][$service]);
+				set_transient($this->transient, $this->data, $this->ttl);
+
+				return $this; // Allow chaining.
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			public function clearAllExtras()
+			{
+				unset($this->data['extras']);
 				set_transient($this->transient, $this->data, $this->ttl);
 
 				return $this; // Allow chaining.

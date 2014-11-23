@@ -37,30 +37,25 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 */
-			protected function maybe_redirect_to_authorize()
+			protected function maybe_handle_authorize()
 			{
-				try // Catch exceptions generated here and log them for debugging.
+				try // Catch exceptions and log them for debugging.
 				{
-					$redirect_to = $this->request_args['redirect_to'];
-
 					$service_factory = new \OAuth\ServiceFactory();
 					$credentials     = new \OAuth\Common\Consumer\Credentials(
 						$this->plugin->options['sso_'.$this->service.'_key'],
 						$this->plugin->options['sso_'.$this->service.'_secret'],
-						$this->plugin->utils_url->sso_action_url($this->service, 'callback', $redirect_to)
+						$this->plugin->utils_url->sso_action_url($this->service, 'callback')
 					);
-					$service         = $service_factory->createService($this->service, $credentials, $this->storage);
 					/** @var $service \OAuth\OAuth1\Service\Twitter */
+					$service = $service_factory->createService($this->service, $credentials, $this->storage);
 
-					if(($token = $service->requestRequestToken())) // Must obtain from Twitter.
-						if(($url = $service->getAuthorizationUri(array('oauth_token' => $token->getRequestToken()))))
-							wp_redirect($url).exit(); // Redirect to service and request authorization.
-
-					throw new \exception(__('Failed to acquire authorization URL.', $this->plugin->text_domain));
+					$token = $service->requestRequestToken()->getRequestToken(); // oAuth 1.0 requires a request token.
+					$this->process_authorization_redirect($service->getAuthorizationUri(array('oauth_token' => $token)));
 				}
 				catch(\exception $exception) // Log for debugging.
 				{
-					$this->plugin->utils_log->maybe_debug($exception);
+					$this->process_exception($exception);
 				}
 			}
 
@@ -71,32 +66,30 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_handle_callback()
 			{
-				if(!$this->request_args['oauth_token'] || !$this->request_args['oauth_verifier'])
-					return; // Not applicable; i.e. no data from service.
-
-				try // Catch exceptions generated here and log them for debugging.
+				try // Catch exceptions and log them for debugging.
 				{
-					$redirect_to = $this->request_args['redirect_to'];
+					if(!$this->request_args['oauth_token'] || !$this->request_args['oauth_verifier'])
+						throw new \exception(__('Missing oAuth token/verifier.', $this->plugin->text_domain));
 
 					$service_factory = new \OAuth\ServiceFactory();
 					$credentials     = new \OAuth\Common\Consumer\Credentials(
 						$this->plugin->options['sso_'.$this->service.'_key'],
 						$this->plugin->options['sso_'.$this->service.'_secret'],
-						$this->plugin->utils_url->sso_action_url($this->service, 'callback', $redirect_to)
+						$this->plugin->utils_url->sso_action_url($this->service, 'callback')
 					);
-					$service         = $service_factory->createService($this->service, $credentials, $this->storage);
 					/** @var $service \OAuth\OAuth1\Service\Twitter */
+					$service = $service_factory->createService($this->service, $credentials, $this->storage);
 
-					$token = $service->requestAccessToken(
-						$this->request_args['oauth_token'], $this->request_args['oauth_verifier'],
-						$this->storage->retrieveAccessToken($this->service)->getRequestTokenSecret()
-					);
+					# Request access token via oAuth API provided by this service.
+
+					$service->requestAccessToken($this->request_args['oauth_token'], $this->request_args['oauth_verifier']);
+
 					# Acquire and validate data received from this service.
 
 					if(!is_object($service_user = json_decode($service->request('account/verify_credentials.json'))))
-						throw new \exception(__('Failed to verify user.', $this->plugin->text_domain));
+						throw new \exception(__('Failed to acquire user.', $this->plugin->text_domain));
 
-					if(empty($service_user->id)) // Must have a unique ID reference.
+					if(empty($service_user->id) || !($sso_id = (string)$service_user->id))
 						throw new \exception(__('Failed to obtain user.', $this->plugin->text_domain));
 
 					foreach(array('name', 'screen_name') as $_prop)
@@ -115,30 +108,16 @@ namespace comment_mail // Root namespace.
 							$this->request_args['email'] // Twitter does not provide this.
 						);
 					if(!($lname = $this->request_args['lname']))
-						$lname = $this->plugin->utils_string->last_name(
-							$this->coalesce($service_user->name, $service_user->screen_name),
-							$this->request_args['email'] // Twitter does not provide this.
-						);
+						$lname = $this->plugin->utils_string->last_name($service_user->name);
+					if(!$lname) $lname = $this->plugin->utils_string->last_name($service_user->screen_name);
+
 					$email = $this->request_args['email']; // From request args only.
 
-					if(!$fname || !$email) // Do we have minimum requirements?
-					{
-						$request_completion_args = compact('fname', 'lname', 'email');
-						exit($this->plugin->utils_sso->request_completion($this->request_args, $request_completion_args));
-					}
-					# Process and perform redirection.
-
-					$sso_id                = (string)$service_user->id;
-					$process_redirect_args = compact('fname', 'lname', 'email', 'redirect_to');
-
-					if(!$this->plugin->utils_sso->process_redirect($this->service, $sso_id, $process_redirect_args))
-						throw new \exception(__('Failed to redirect user.', $this->plugin->text_domain));
-
-					exit; // Always stop here; assuming a redirection success in this case.
+					$this->process_callback_complete_redirect(compact('sso_id', 'fname', 'lname', 'email'));
 				}
 				catch(\exception $exception) // Log for debugging.
 				{
-					$this->plugin->utils_log->maybe_debug($exception);
+					$this->process_exception($exception);
 				}
 			}
 		}
