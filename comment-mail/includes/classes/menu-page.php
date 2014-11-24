@@ -1045,7 +1045,7 @@ namespace comment_mail // Root namespace.
 							               '1' => __('Yes, enable Single Sign-on (recommended)', $this->plugin->text_domain),
 						               ),
 						               'notes_after'     => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-services.png')).'" class="pmp-right" />'.
-						                                    sprintf(__('As a convenience, SSO allows commenters to login with a popular social network account; e.g. Twitter, Facebook, Google, LinkedIn. <span class="pmp-hilite">This feature is highly recommended, but disabled by default</span>; since it requires some work on your part to set things up properly. Detailed instructions are provided %1$s. When a visitor logs in through an SSO service provider, an account is automatically created for them in WordPress (if one does not exist already). These auto-generated WordPress accounts are created using details obtained from an SSO service provider. Such as first name, last name, email address. SSO users receive a default Role; i.e. whatever the default Role is for your site. Normally the %2$s, but you can change this from your %3$s on standard WP installs. WP Multisite Network installs always use the %2$s. An account created in this way (via SSO) can be logged into like any other WP account, but it will also be connected to the underlying SSO service too. Meaning, a user may continue to log into the site in the future w/ the SSO, or they can choose to log in like you do; via <code>%4$s</code>.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys', __('here', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Roles_and_Capabilities#Subscriber', __('Subscriber Role', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor(admin_url('/options-general.php'), __('WP General Settings', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor(wp_login_url(), __('wp-login.php', $this->plugin->text_domain))).'</p>',
+						                                    sprintf(__('As a convenience, SSO allows commenters to login with a popular social network account; e.g. Twitter, Facebook, Google, LinkedIn. <span class="pmp-hilite">This feature is highly recommended, but disabled by default</span>; since it requires some work on your part to set things up properly. Detailed instructions are provided %1$s. When a visitor logs in through an SSO service provider, an account is automatically created for them in WordPress (if one does not exist already). These auto-generated WordPress accounts are created using details obtained from an SSO service provider. Such as first name, last name, email address. SSO users receive a default Role; i.e. whatever the default Role is for your site. Normally the %2$s, but you can change this from your %3$s on standard WP installs. WP Multisite Network installs always use the %2$s. An account created in this way (via SSO) could be logged into like any other WP account (technically), but it will also be connected to the underlying SSO service too. Meaning, a user may simply log into your site in the future w/ the SSO. They won\'t ever need a username/password that is specific to your site.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys', __('here', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Roles_and_Capabilities#Subscriber', __('Subscriber Role', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor(admin_url('/options-general.php'), __('WP General Settings', $this->plugin->text_domain))).'</p>',
 					               )).
 				               '  </tbody>'.
 				               '</table>';
@@ -1068,7 +1068,7 @@ namespace comment_mail // Root namespace.
 				                '          <tbody>'.
 				                $form_fields->input_row(
 					                array(
-						                'label'         => __('Twitter oAuth Consumer Key:', $this->plugin->text_domain),
+						                'label'         => sprintf(__('Twitter oAuth Consumer Key: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys#twitter', __('instructions', $this->plugin->text_domain))),
 						                'placeholder'   => __('e.g. kyczbsh6nnwtzrkm882kh7jf8', $this->plugin->text_domain),
 						                'name'          => 'sso_twitter_key',
 						                'current_value' => $current_value_for('sso_twitter_key'),
@@ -1096,7 +1096,7 @@ namespace comment_mail // Root namespace.
 				                '          <tbody>'.
 				                $form_fields->input_row(
 					                array(
-						                'label'         => __('Facebook oAuth App ID:', $this->plugin->text_domain),
+						                'label'         => sprintf(__('Facebook oAuth App ID: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys#facebook', __('instructions', $this->plugin->text_domain))),
 						                'placeholder'   => __('e.g. 87df9vcu8njzrrnrgy2u2k2cj', $this->plugin->text_domain),
 						                'name'          => 'sso_facebook_key',
 						                'current_value' => $current_value_for('sso_facebook_key'),
@@ -1124,7 +1124,7 @@ namespace comment_mail // Root namespace.
 				                '          <tbody>'.
 				                $form_fields->input_row(
 					                array(
-						                'label'         => __('Google oAuth Client ID:', $this->plugin->text_domain),
+						                'label'         => sprintf(__('Google oAuth Client ID: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys#google', __('instructions', $this->plugin->text_domain))),
 						                'placeholder'   => __('e.g. qda788ac23s4m4utvqgkauwhf.apps.googleusercontent.com', $this->plugin->text_domain),
 						                'name'          => 'sso_google_key',
 						                'current_value' => $current_value_for('sso_google_key'),
@@ -1152,7 +1152,7 @@ namespace comment_mail // Root namespace.
 				                '          <tbody>'.
 				                $form_fields->input_row(
 					                array(
-						                'label'         => __('LinkedIn oAuth Consumer Key:', $this->plugin->text_domain),
+						                'label'         => sprintf(__('LinkedIn oAuth API/Consumer Key: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys#linkedin', __('instructions', $this->plugin->text_domain))),
 						                'placeholder'   => __('e.g. swf73zuj2puaug9e5a4ytpcg7', $this->plugin->text_domain),
 						                'name'          => 'sso_linkedin_key',
 						                'current_value' => $current_value_for('sso_linkedin_key'),
@@ -1166,7 +1166,7 @@ namespace comment_mail // Root namespace.
 				                $form_fields->input_row(
 					                array(
 						                'type'          => 'password',
-						                'label'         => __('LinkedIn oAuth Consumer Secret:', $this->plugin->text_domain),
+						                'label'         => __('LinkedIn oAuth API/Consumer Secret:', $this->plugin->text_domain),
 						                'placeholder'   => __('e.g. dtqvgh8qjkne4nhry7w56bzk86dcqr7racy5evmhegpt9gw9c4', $this->plugin->text_domain),
 						                'name'          => 'sso_linkedin_secret',
 						                'current_value' => $current_value_for('sso_linkedin_secret'),
