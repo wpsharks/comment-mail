@@ -1165,71 +1165,97 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Current `sub_email`, `sub_type`, `sub_deliver` for a specific post ID.
+			 * Latest info for current email.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @param integer $post_id Post ID to check here.
-			 * @param boolean $use_comment_form_defaults Use comment form defaults?
-			 *    This defaults to a `FALSE` value. Comment forms should set this to `TRUE` please.
+			 * @param array $args Specs/behavioral args.
 			 *
-			 * @param boolean $no_cache Disallow a previously cached value?
-			 *
-			 * @return \stdClass Current `sub_email`, `sub_type`, `sub_deliver` for a specific post ID.
+			 * @return \stdClass Latest info for current email.
 			 *    If values cannot be filled, we return a set of default values.
 			 */
-			public function current_email_type_deliver_for($post_id, $use_comment_form_defaults = FALSE, $no_cache = FALSE)
+			public function current_email_latest_info(array $args = array())
 			{
-				$post_id                   = (integer)$post_id;
-				$sub_email                 = $this->current_email();
-				$use_comment_form_defaults = (boolean)$use_comment_form_defaults;
+				$sub_email = $this->current_email();
 
-				$default_sub_type    = 'comment';
-				$default_sub_deliver = 'asap';
+				$default_args = array(
+					'post_id'               => NULL,
+					'comment_form_defaults' => FALSE,
+					'no_cache'              => FALSE,
+				);
+				$args         = array_merge($default_args, $args);
+				$args         = array_intersect_key($args, $default_args);
 
-				if($use_comment_form_defaults) // Note: this CAN be empty.
+				$post_id               = $this->isset_or($args['post_id'], NULL, 'integer');
+				$comment_form_defaults = (boolean)$args['comment_form_defaults'];
+				$no_cache              = (boolean)$args['no_cache'];
+
+				$default_sub_type = 'comment'; // Default :-)
+				if($comment_form_defaults) // Sub type CAN be empty.
 					$default_sub_type = $this->plugin->options['comment_form_default_sub_type_option'];
 
-				if($use_comment_form_defaults) // This can never be empty.
+				$default_sub_deliver = 'asap'; // Default :-)
+				if($comment_form_defaults) // Deliver option is never empty.
 					$default_sub_deliver = $this->plugin->options['comment_form_default_sub_deliver_option'];
 
-				$email_type_deliver_defaults = (object)array(
-					'sub_email'   => $sub_email,
-					'sub_type'    => $default_sub_type, // CAN be empty.
-					'sub_deliver' => $default_sub_deliver,
+				$default_info = (object)array(
+					'ID'                => 0,
+					'key'               => '',
+
+					'user_id'           => 0,
+					'post_id'           => 0,
+					'comment_id'        => 0,
+
+					'type'              => $default_sub_type, // CAN be empty.
+					'deliver'           => $default_sub_deliver,
+
+					'fname'             => '',
+					'lname'             => '',
+					'email'             => $sub_email,
+
+					'insertion_ip'      => '',
+					'insertion_region'  => '',
+					'insertion_country' => '',
+
+					'last_ip'           => '',
+					'last_region'       => '',
+					'last_country'      => '',
+
+					'status'            => '',
+
+					'insertion_time'    => 0,
+					'last_update_time'  => 0,
 				);
-				if(!$post_id || !$sub_email) // Not possible?
-					return $email_type_deliver_defaults;
+				if(!$sub_email || (isset($post_id) && $post_id <= 0))
+					return $default_info; // Not possible.
 
-				$cache_keys = compact('post_id', 'sub_email', 'use_comment_form_defaults');
+				$cache_keys = compact('sub_email', 'post_id', 'comment_form_defaults');
 
-				if(!is_null($email_type_deliver = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
-					return $email_type_deliver; // Already cached this.
+				if(!is_null($info = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
+					return $info; // Already cached this.
 
-				$sql = "SELECT `comment_id`, `deliver` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
+				$sql = "SELECT * FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
-				       " WHERE `post_id` = '".esc_sql($post_id)."'".
-				       " AND `email` = '".esc_sql($sub_email)."'".
-				       " AND `status` = 'subscribed'".
+				       " WHERE `email` = '".esc_sql($sub_email)."'".
+
+				       ($post_id // For a specific post ID?
+					       ? " AND `post_id` = '".esc_sql($post_id)."'" : '').
+
+				       " AND `status` = 'subscribed'". // Subscribed only.
 
 				       " ORDER BY `comment_id` ASC, `last_update_time` DESC".
 
 				       " LIMIT 1"; // Only need last one; give precedence to `comment_id=0`.
 
 				if(($results = $this->plugin->utils_db->wp->get_results($sql)))
-					// Note: if we have results at all, we can make a decision here.
 				{
-					$results     = $this->plugin->utils_db->typify_deep($results);
-					$sub_type    = $results[0]->comment_id <= 0 ? 'comments' : 'comment';
-					$sub_deliver = $results[0]->deliver ? $results[0]->deliver : 'asap';
+					$results    = $this->plugin->utils_db->typify_deep($results);
+					$info       = $results[0]; // Expecting one result only here.
+					$info->type = $info->comment_id <= 0 ? 'comments' : 'comment';
 
-					return ($email_type_deliver = (object)array(
-						'sub_email'   => $sub_email,
-						'sub_type'    => $sub_type,
-						'sub_deliver' => $sub_deliver,
-					));
+					return $info; // \stdClass object properties.
 				}
-				return ($email_type_deliver = $email_type_deliver_defaults);
+				return ($info = $default_info);
 			}
 
 			/**

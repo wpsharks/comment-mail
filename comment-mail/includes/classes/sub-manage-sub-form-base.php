@@ -237,6 +237,14 @@ namespace comment_mail // Root namespace.
 				if($this->is_edit && isset($this->sub->{$key_prop}))
 					return trim((string)$this->sub->{$key_prop});
 
+				if(is_null($current_email_latest_info = &$this->cache_key(__FUNCTION__, 'current_email_latest_info')))
+					$current_email_latest_info = $this->plugin->utils_sub->current_email_latest_info();
+
+				if(!$this->is_edit && !static::$processing && in_array($key_prop, array('fname', 'lname', 'email'), TRUE))
+					// We can try to autofill fname, lname, email for new subscriptions.
+					if(!empty($current_email_latest_info->{$key_prop}))
+						return trim((string)$current_email_latest_info->{$key_prop});
+
 				return NULL; // Default value.
 			}
 

@@ -1316,15 +1316,21 @@ namespace comment_mail // Root namespace.
 			 *    Use a non-empty array to add new nav vars; `TRUE` to simply include existing nav vars.
 			 *    See also {@link sub_manage_summary_nav_vars()} for additional details.
 			 *
+			 * @param array         $prefill Any prefill variables; e.g. `post_id`, `comment_id`.
+			 *
 			 * @return string URL w/ the given `$scheme`.
 			 */
-			public function sub_manage_sub_new_url($scheme = NULL, $include_nav_vars = NULL)
+			public function sub_manage_sub_new_url($scheme = NULL, $include_nav_vars = NULL, array $prefill = array())
 			{
 				$url  = home_url('/', $scheme);
 				$args = array(__NAMESPACE__ => array('manage' => array('sub_new' => '0')));
 
 				if($include_nav_vars && ($nav_vars = $this->sub_manage_summary_nav_vars($include_nav_vars)))
 					$args[__NAMESPACE__]['manage']['summary_nav'] = $nav_vars;
+
+				foreach($prefill as $_key => $_value)
+					$args[__NAMESPACE__]['manage']['sub_form'][$_key] = $_value;
+				unset($_key, $_value); // Housekeeping.
 
 				return add_query_arg(urlencode_deep($args), $url);
 			}

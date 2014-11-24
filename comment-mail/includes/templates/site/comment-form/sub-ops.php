@@ -29,6 +29,8 @@ namespace comment_mail;
  * @var string    $sub_summary_url A URL leading the subscription summary page (i.e. the My Subscriptions page).
  *    A link to the summary page (i.e. the My Subscriptions page) should not be displayed if `$sub_email` is empty.
  *
+ * @var string    $sub_new_url A URL leading to the "Add Subscription" page. This allows a visitor to subscribe w/o commenting even.
+ *
  * @var string    $inline_icon_svg Inline SVG icon that inherits the color and width of it's container automatically.
  *    Note, this is a scalable vector graphic that will look great at any size >= 16x16 pixels.
  *
@@ -59,11 +61,12 @@ namespace comment_mail;
 		<option value="weekly"<?php selected('weekly', $current->sub_deliver); ?>><?php echo __('weekly digest', $plugin->text_domain); ?></option>
 	</select>
 
-	<?php if($current->sub_email): // TIP: this is optional. If you exclude this, subscribers can still view their summary via emails they receive. ?>
-		<div class="cso-links">
-			&nbsp;&#42774;&nbsp; <a href="<?php echo esc_attr($sub_summary_url); ?>" target="_blank" class="cso-link-summary"><?php echo __('Manage My Comment Subscriptions', $plugin->text_domain); ?></a>
-		</div>
-	<?php endif; ?>
+	<div class="cso-links">
+		<span class="cso-link-new"><?php echo sprintf(__('Or, you can <a href="%1$s" target="_blank">subscribe without commenting</a>.', $plugin->text_domain), esc_attr($sub_new_url)); ?></span>
+		<?php if($current->sub_email): // TIP: this is optional. If you exclude this, subscribers can still view their summary via emails they receive. ?>
+			<span class="cso-link-summary">~ <a href="<?php echo esc_attr($sub_summary_url); ?>" target="_blank"><?php echo __('manage my subscriptions', $plugin->text_domain); ?></a></span>
+		<?php endif; ?>
+	</div>
 
 </div>
 
@@ -99,9 +102,14 @@ namespace comment_mail;
 	}
 	.comment-sub-ops .cso-links
 	{
-		font-size      : 80%;
-		text-transform : lowercase;
-		margin         : 0 0 0 .5em;
-		clear          : both;
+		font-size   : 80%;
+		line-height : 1.5em;
+		margin      : 0 0 0 .5em;
+		clear       : both;
+	}
+	.comment-sub-ops .cso-links .cso-link-summary
+	{
+		display     : block;
+		line-height : 1em;
 	}
 </style>

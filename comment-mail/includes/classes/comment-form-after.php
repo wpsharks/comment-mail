@@ -53,11 +53,19 @@ namespace comment_mail // Root namespace.
 
 				$post_id = $GLOBALS['post']->ID; // Current post ID.
 
-				$current // Object w/ `sub_email`, `sub_type`, `sub_deliver`; for this post ID.
-					= $this->plugin->utils_sub->current_email_type_deliver_for($post_id, TRUE);
+				$current_info = // Current info; for this post ID.
+					$this->plugin->utils_sub->current_email_latest_info(
+						array('post_id' => $post_id, 'comment_form_defaults' => TRUE)
+					);
+				$current      = (object)array(
+					'sub_email'   => $current_info->email,
+					'sub_type'    => $current_info->type,
+					'sub_deliver' => $current_info->deliver,
+				);
+				unset($current_info); // Ditch this now.
 
 				$sub_email   = $current->sub_email;
-				$sub_type    = $current->sub_type; // Note: this can be empty.
+				$sub_type    = $current->sub_type;
 				$sub_deliver = $current->sub_deliver;
 
 				$sub_type_id   = str_replace('_', '-', __NAMESPACE__.'_sub_type');
@@ -67,6 +75,7 @@ namespace comment_mail // Root namespace.
 				$sub_deliver_name = __NAMESPACE__.'_sub_deliver';
 
 				$sub_summary_url = $this->plugin->utils_url->sub_manage_summary_url();
+				$sub_new_url     = $this->plugin->utils_url->sub_manage_sub_new_url(NULL, NULL, compact('post_id'));
 				$inline_icon_svg = $this->plugin->utils_fs->inline_icon_svg();
 
 				$template_vars = get_defined_vars(); // Everything above.
