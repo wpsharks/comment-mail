@@ -1,6 +1,6 @@
 <?php
 /**
- * Comment Form Login
+ * Login Form After
  *
  * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
@@ -11,14 +11,14 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\comment_form_login'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\login_form_after'))
 	{
 		/**
-		 * Comment Form Login
+		 * Login Form After
 		 *
 		 * @since 141111 First documented version.
 		 */
-		class comment_form_login extends abs_base
+		class login_form_after extends abs_base
 		{
 			/**
 			 * Class constructor.
@@ -42,11 +42,8 @@ namespace comment_mail // Root namespace.
 				if(!$this->plugin->options['sso_enable'])
 					return; // Disabled currently.
 
-				if(!$this->plugin->options['comment_form_sso_template_enable'])
+				if(!$this->plugin->options['login_form_sso_template_enable'])
 					return; // Disabled currently.
-
-				if(!get_option('comment_registration') || is_user_logged_in())
-					return; // Not applicable; i.e. unnecessary.
 
 				foreach(($sso_services = sso_actions::$valid_services) as $_key => $_service)
 					if(!$this->plugin->options['sso_'.$_service.'_key'] || !$this->plugin->options['sso_'.$_service.'_secret'])
@@ -56,7 +53,7 @@ namespace comment_mail // Root namespace.
 				if(!$sso_services) return; // No configured services.
 
 				$template_vars = get_defined_vars(); // Everything above.
-				$template      = new template('site/comment-form/sso-ops.php');
+				$template      = new template('site/login-form/sso-ops.php');
 
 				echo $template->parse($template_vars);
 			}

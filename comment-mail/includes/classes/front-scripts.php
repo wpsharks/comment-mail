@@ -29,8 +29,36 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
+				$this->maybe_enqueue_login_form_sso_scripts();
 				$this->maybe_enqueue_comment_form_sso_scripts();
 				$this->maybe_enqueue_comment_form_sub_scripts();
+			}
+
+			/**
+			 * Enqueue front-side scripts for login form SSO.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected function maybe_enqueue_login_form_sso_scripts()
+			{
+				if(!$this->plugin->options['sso_enable'])
+					return; // Disabled currently.
+
+				if(!$this->plugin->options['login_form_sso_scripts_enable'])
+					if(!$this->plugin->options['login_form_sso_template_enable'])
+						return; // Nothing to do here.
+
+				if(!preg_match('/\/wp\-login\.php(?:[?&#]|$)/', $this->plugin->utils_url->current_uri()))
+					return; // Not applicable.
+
+				wp_enqueue_script('jquery'); // Need jQuery.
+
+				add_action('login_footer', function ()
+				{
+					$template = new template('site/login-form/sso-op-scripts.php');
+					echo $template->parse(); // Inline `<script></script>`.
+
+				}, PHP_INT_MAX - 10); // Very low priority; after footer scripts!
 			}
 
 			/**
@@ -40,12 +68,6 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_enqueue_comment_form_sso_scripts()
 			{
-				if(!$this->plugin->options['enable'])
-					return; // Nothing to do.
-
-				if(!$this->plugin->options['new_subs_enable'])
-					return; // Nothing to do.
-
 				if(!$this->plugin->options['sso_enable'])
 					return; // Disabled currently.
 

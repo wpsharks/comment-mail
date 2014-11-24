@@ -56,6 +56,10 @@ echo str_replace('%%title%%', __('Complete Registration', $plugin->text_domain),
 						<li>
 							<i class="fa fa-warning fa-fw"></i> <?php switch($_error_code)
 							{
+								case 'users_cannot_register':
+									echo __('Sorry, not accepting new users at this time. Please try again later.', $plugin->text_domain);
+									break; // Break switch handler.
+
 								case 'missing_fname':
 									echo __('Missing first name; please try again.', $plugin->text_domain);
 									break; // Break switch handler.

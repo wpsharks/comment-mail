@@ -363,6 +363,9 @@ namespace comment_mail
 					'comment_form_sso_template_enable'                                     => '1', // `0|1`; enable?
 					'comment_form_sso_scripts_enable'                                      => '1', // `0|1`; enable?
 
+					'login_form_sso_template_enable'                                       => '1', // `0|1`; enable?
+					'login_form_sso_scripts_enable'                                        => '1', // `0|1`; enable?
+
 					'sso_twitter_key'                                                      => '',
 					'sso_twitter_secret'                                                   => '',
 					// See: <https://apps.twitter.com/app/new>
@@ -532,6 +535,10 @@ namespace comment_mail
 
 					'template__site__comment_form__sso_ops'                                => '', // HTML/PHP code.
 					'template__site__comment_form__sso_op_scripts'                         => '', // HTML/PHP code.
+
+					'template__site__login_form__sso_ops'                                  => '', // HTML/PHP code.
+					'template__site__login_form__sso_op_scripts'                           => '', // HTML/PHP code.
+
 					'template__site__sso_actions__complete'                                => '', // HTML/PHP code.
 
 					'template__site__comment_form__sub_ops'                                => '', // HTML/PHP code.
@@ -596,6 +603,9 @@ namespace comment_mail
 				add_action('init', array($this, 'comment_shortlink_redirect'), -11);
 
 				add_action('wp_print_scripts', array($this, 'enqueue_front_scripts'), 10);
+
+				add_action('login_form', array($this, 'login_form'), 5, 0); // Ideal choice.
+				add_action('login_footer', array($this, 'login_form'), 5, 0); // Secondary fallback.
 
 				add_action('transition_post_status', array($this, 'post_status'), 10, 3);
 				add_action('before_delete_post', array($this, 'post_delete'), 10, 1);
@@ -1691,6 +1701,29 @@ namespace comment_mail
 			}
 
 			/*
+			 * Login-Related Methods
+			 */
+
+			/**
+			 * Login form integration.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @attaches-to `login_form` hook.
+			 * @attaches-to `login_footer` as a secondary fallback.
+			 */
+			public function login_form()
+			{
+				if(!is_null($fired = &$this->static_key(__FUNCTION__)))
+					return; // We only handle this for a single hook.
+				// The first hook to fire this will win automatically.
+
+				$fired = TRUE; // Flag as `TRUE` now.
+
+				new login_form_after();
+			}
+
+			/*
 			 * Post-Related Methods
 			 */
 
@@ -1777,11 +1810,11 @@ namespace comment_mail
 			}
 
 			/**
-			 * Comment form SSO integration.
+			 * Comment form login integration.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @attaches-to `comment_form_must_log_in_after` filter.
+			 * @attaches-to `comment_form_must_log_in_after` hook.
 			 * @attaches-to `comment_form_top` as a secondary fallback.
 			 */
 			public function comment_form_must_log_in_after()
@@ -1796,7 +1829,7 @@ namespace comment_mail
 			}
 
 			/**
-			 * Comment form handler; via filter.
+			 * Comment form integration; via filter.
 			 *
 			 * @since 141111 First documented version.
 			 *
@@ -1824,7 +1857,7 @@ namespace comment_mail
 			}
 
 			/**
-			 * Comment form handler.
+			 * Comment form integration.
 			 *
 			 * @since 141111 First documented version.
 			 *
