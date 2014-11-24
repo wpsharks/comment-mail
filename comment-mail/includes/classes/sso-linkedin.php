@@ -68,7 +68,7 @@ namespace comment_mail // Root namespace.
 				try // Catch exceptions and log them for debugging.
 				{
 					if($this->request_args['oauth_problem'] === 'user_refused')
-						$this->process_callback_complete_redirect();
+						throw new \exception(__('Missing oAuth code; user refusal.', $this->plugin->text_domain));
 
 					if(!$this->request_args['code']) // Must have this.
 						throw new \exception(__('Missing oAuth code.', $this->plugin->text_domain));
