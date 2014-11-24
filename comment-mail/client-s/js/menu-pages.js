@@ -50,6 +50,19 @@
 		 Plugin-specific JS for any menu page area of the dashboard.
 		 ------------------------------------------------------------------------------------------------------------ */
 
+		$menuPageArea.find('.pmp-tabs > a').on('click', function(e)
+		{
+			e.preventDefault(), e.stopImmediatePropagation();
+
+			var $this = $(this),
+				$tabs = $this.parent().find('> a'),
+				$tabPanesDiv = $this.parent().next('.pmp-tab-panes'),
+				$tabPanes = $tabPanesDiv.children(), // All tab panes.
+				$targetTabPane = $tabPanesDiv.find('> ' + $this.data('target'));
+
+			$tabs.add($tabPanes).removeClass('pmp-active'), $tabPanes.hide(),
+				$this.add($targetTabPane).addClass('pmp-active'), $targetTabPane.show();
+		});
 		$menuPageArea.find('[data-pmp-action]').on('click', function(e)
 		{
 			e.preventDefault(), e.stopImmediatePropagation();

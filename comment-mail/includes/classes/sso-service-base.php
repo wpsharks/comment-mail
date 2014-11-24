@@ -134,12 +134,6 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_handle()
 			{
-				if(!$this->plugin->options['enable'])
-					return; // Disabled currently.
-
-				if(!$this->plugin->options['new_subs_enable'])
-					return; // Disabled currently.
-
 				if(!$this->plugin->options['sso_enable'])
 					return; // Disabled currently.
 
@@ -267,6 +261,8 @@ namespace comment_mail // Root namespace.
 						// If the user exists, we can skip this validation entirely;
 						//    i.e. if they exist, we simply log them in.
 						if(!$sso_id // Hmm, the SSO ID is missing?
+
+						   || !$this->plugin->utils_user->can_register()
 
 						   || ($this->request_args['action'] !== 'callback'
 						       && !wp_verify_nonce($_wpnonce, __NAMESPACE__.'_sso_complete'))

@@ -202,6 +202,57 @@ A menu page area ~ postboxes.
 	content : '\f140';
 }
 /*
+A menu page area ~ tabs.
+*/
+.comment-mail-menu-page-area .pmp-tabs
+{
+	margin-bottom : 1em;
+	border-bottom : 1px solid #3F3F3F;
+}
+.comment-mail-menu-page-area .pmp-tabs > a
+{
+	display                 : inline-block;
+	margin                  : 0 0 0 .5em;
+	padding                 : .25em .5em .25em .5em;
+
+	border                  : 1px solid transparent;
+	border-width            : 1px 1px 0 1px;
+	border-top-left-radius  : 5px;
+	border-top-right-radius : 5px;
+
+	text-decoration         : none;
+	opacity                 : 0.5;
+
+	position                : relative;
+	bottom                  : -1px;
+
+	outline                 : none;
+	box-shadow              : none;
+
+	cursor                  : pointer;
+	-webkit-user-select     : none;
+	-moz-user-select        : none;
+	user-select             : none;
+}
+.comment-mail-menu-page-area .pmp-tabs > a:hover,
+.comment-mail-menu-page-area .pmp-tabs > a.pmp-active
+{
+	opacity : 1;
+}
+.comment-mail-menu-page-area .pmp-tabs > a.pmp-active
+{
+	background   : #FFFFFF;
+	border-color : #3F3F3F;
+}
+.comment-mail-menu-page-area .pmp-tab-panes > *
+{
+	display : none;
+}
+.comment-mail-menu-page-area .pmp-tab-panes > *.pmp-active
+{
+	display : block;
+}
+/*
 A menu page area ~ utilities.
 */
 .comment-mail-menu-page-area .pmp-left

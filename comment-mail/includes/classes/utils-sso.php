@@ -104,6 +104,9 @@ namespace comment_mail // Root namespace.
 				if($user_exists) // If so, just log them in now.
 					return $this->auto_login($service, $sso_id, $args_no_cache_false);
 
+				if(!$this->plugin->utils_user->can_register())
+					return FALSE; // Not possible.
+
 				$fname = trim((string)$args['fname']);
 				$lname = trim((string)$args['lname']);
 				$email = trim((string)$args['email']);
@@ -278,6 +281,9 @@ namespace comment_mail // Root namespace.
 
 				if($action === 'complete') // Processing completion?
 				{
+					if(!$this->plugin->utils_user->can_register())
+						$error_codes[] = 'users_cannot_register';
+
 					if(!$service) // Service is missing?
 						$error_codes[] = 'missing_service';
 
@@ -303,6 +309,9 @@ namespace comment_mail // Root namespace.
 					// Note: only occurs if an account exists w/ a different underlying SSO ID.
 					// Otherwise, for existing accounts w/ a matching SSO ID, we automatically log them in.
 				{
+					if(!$this->plugin->utils_user->can_register())
+						$error_codes[] = 'users_cannot_register';
+
 					if($email && $this->plugin->utils_user->email_exists_on_blog($email))
 						$error_codes[] = 'email_exists'; // Exists on this blog already.
 				}

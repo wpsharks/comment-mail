@@ -110,6 +110,21 @@ namespace comment_mail // Root namespace.
 
 				return ($exists = !is_multisite() || !empty($user->roles));
 			}
+
+			/**
+			 * Can users register?
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return boolean `TRUE` if users can register on the current blog.
+			 */
+			public function can_register()
+			{
+				if(is_multisite()) // Check network options for this.
+					return in_array(get_site_option('registration'), array('all', 'user'), TRUE);
+
+				return (boolean)get_option('users_can_register');
+			}
 		}
 	}
 }
