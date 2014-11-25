@@ -643,16 +643,16 @@ Menu page heading styles.
 }
 .comment-mail-menu-page .pmp-heading img.pmp-logo-icon
 {
-	margin-left : 10px;
-	width       : 300px;
+	width  : 400px;
+	margin : 0 0 1em .5em;
 }
 .comment-mail-menu-page .pmp-heading .pmp-heading-links a
 {
 	text-decoration : none;
 	text-align      : center;
 	display         : inline-block;
-	margin          : 1em 0 0 0;
 
+	margin          : 0;
 	border-radius   : 4px;
 	background      : transparent;
 	padding         : .25em .5em .25em .5em;

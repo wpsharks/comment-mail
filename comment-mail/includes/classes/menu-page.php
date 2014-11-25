@@ -1553,38 +1553,18 @@ namespace comment_mail // Root namespace.
 
 				$_panel_body = '<table>'.
 				               '  <tbody>'.
-				               $form_fields->select_row(
+				               $form_fields->input_row(
 					               array(
-						               'label'           => sprintf(__('Display %1$s&trade; Logo at the Top of Admin Pages?', $this->plugin->text_domain), esc_html($this->plugin->name)),
-						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						               'name'            => 'menu_pages_logo_icon_enable',
-						               'current_value'   => $current_value_for('menu_pages_logo_icon_enable'),
-						               'allow_arbitrary' => FALSE,
-						               'options'         => array(
-							               '1' => sprintf(__('Yes, enable logo in back-end administrative areas for %1$s&trade;', $this->plugin->text_domain), esc_html($this->plugin->name)),
-							               '0' => sprintf(__('No, disable logo in back-end administrative areas for %1$s&trade;', $this->plugin->text_domain), esc_html($this->plugin->name)),
-						               ),
-						               'notes_after'     => '<p>'.sprintf(__('Disabling the logo in back-end administrative areas does not impact any functionality; it\'s simply a personal preference.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+						               'type'          => 'number',
+						               'label'         => __('"My Subscriptions" Summary; Max Subscriptions Per Page', $this->plugin->text_domain),
+						               'placeholder'   => __('e.g. 25', $this->plugin->text_domain),
+						               'name'          => 'sub_manage_summary_max_limit',
+						               'current_value' => $current_value_for('sub_manage_summary_max_limit'),
+						               'other_attrs'   => 'min="1" max="1000"',
+						               'notes_after'   => '<p>'.sprintf(__('On the front-end of %1$s, the "My Subscriptions" summary page will list all of the subscriptions currently associated with a subscriber\'s email address. This controls the maximum number of subscriptions to list per page. Minimum value is <code>1</code> subscription per page. Maximum value is <code>1000</code> subscriptions per page. The recommended setting is <code>25</code> subscriptions per page. Based on your setting here; if there are too many to display on a single page, pagination links will appear automatically.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
 					               )).
 				               '  </tbody>'.
 				               '</table>';
-
-				$_panel_body .= '<hr />';
-
-				$_panel_body .= '<table>'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'number',
-						                'label'         => __('"My Subscriptions" Summary; Max Subscriptions Per Page', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. 25', $this->plugin->text_domain),
-						                'name'          => 'sub_manage_summary_max_limit',
-						                'current_value' => $current_value_for('sub_manage_summary_max_limit'),
-						                'other_attrs'   => 'min="1" max="1000"',
-						                'notes_after'   => '<p>'.sprintf(__('On the front-end of %1$s, the "My Subscriptions" summary page will list all of the subscriptions currently associated with a subscriber\'s email address. This controls the maximum number of subscriptions to list per page. Minimum value is <code>1</code> subscription per page. Maximum value is <code>1000</code> subscriptions per page. The recommended setting is <code>25</code> subscriptions per page. Based on your setting here; if there are too many to display on a single page, pagination links will appear automatically.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
-					                )).
-				                '  </tbody>'.
-				                '</table>';
 
 				$_panel_body .= '<hr />';
 
@@ -1680,6 +1660,26 @@ namespace comment_mail // Root namespace.
 					                )).
 				                '  </tbody>'.
 				                '</table>';
+
+				$_panel_body .= '<hr />';
+
+				$_panel_body .= '<table>'.
+				               '  <tbody>'.
+				               $form_fields->select_row(
+					               array(
+						               'label'           => sprintf(__('Display %1$s&trade; Logo in Admin Area?', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						               'name'            => 'menu_pages_logo_icon_enable',
+						               'current_value'   => $current_value_for('menu_pages_logo_icon_enable'),
+						               'allow_arbitrary' => FALSE,
+						               'options'         => array(
+							               '1' => sprintf(__('Yes, enable logo in back-end administrative areas for %1$s&trade;', $this->plugin->text_domain), esc_html($this->plugin->name)),
+							               '0' => sprintf(__('No, disable logo in back-end administrative areas for %1$s&trade;', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						               ),
+						               'notes_after'     => '<p>'.sprintf(__('Enabling/disabling the logo in back-end areas does not impact any functionality; it\'s simply a personal preference.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
 
 				echo $this->panel(__('Misc. UI-Related Settings', $this->plugin->text_domain), $_panel_body, array());
 
@@ -3341,7 +3341,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string The heading for this menu page.
 			 */
-			protected function heading($title, $logo_icon)
+			protected function heading($title, $logo_icon = '')
 			{
 				$title     = (string)$title;
 				$logo_icon = (string)$logo_icon;
@@ -3349,7 +3349,7 @@ namespace comment_mail // Root namespace.
 
 				$heading .= '<div class="pmp-heading">'."\n";
 
-				if($this->plugin->options['menu_pages_logo_icon_enable'])
+				if($logo_icon && $this->plugin->options['menu_pages_logo_icon_enable'])
 					$heading .= '  <img class="pmp-logo-icon" src="'.$this->plugin->utils_url->to('/client-s/images/'.$logo_icon).'" alt="'.esc_attr($title).'" />'."\n";
 
 				$heading .= '  <div class="pmp-heading-links">'."\n";
@@ -3373,6 +3373,8 @@ namespace comment_mail // Root namespace.
 				            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_site_templates') ? ' class="pmp-active"' : '').'>'.
 				            '<i class="fa fa-code"></i> '.__('Site Templates', $this->plugin->text_domain).'</a>'."\n";
 
+				$heading .= '     <a href="#" data-pmp-action="'.esc_attr($this->plugin->utils_url->restore_default_options()).'" data-pmp-confirmation="'.esc_attr(__('Restore default plugin options? You will lose all of your current settings! Are you absolutely sure?', $this->plugin->text_domain)).'"><i class="fa fa-ambulance"></i> '.__('Restore Default Options', $this->plugin->text_domain).'</a>'."\n";
+
 				if(!$this->plugin->is_pro) // Display pro preview/upgrade related links?
 				{
 					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->pro_preview()).'"'.
@@ -3381,8 +3383,8 @@ namespace comment_mail // Root namespace.
 
 					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->product_page()).'" target="_blank"><i class="fa fa-heart-o"></i> '.__('Pro Upgrade', $this->plugin->text_domain).'</a>'."\n";
 				}
-				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->subscribe_page()).'" target="_blank"><i class="fa fa-envelope"></i> '.__('Newsletter (Subscribe)', $this->plugin->text_domain).'</a>'."\n";
-				$heading .= '     <a href="#" data-pmp-action="'.esc_attr($this->plugin->utils_url->restore_default_options()).'" data-pmp-confirmation="'.esc_attr(__('Restore default plugin options? You will lose all of your current settings! Are you absolutely sure?', $this->plugin->text_domain)).'"><i class="fa fa-ambulance"></i> '.__('Restore Default Options', $this->plugin->text_domain).'</a>'."\n";
+				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->subscribe_page()).'" target="_blank"><i class="fa fa-envelope-o"></i> '.__('Newsletter (Subscribe)', $this->plugin->text_domain).'</a>'."\n";
+				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->product_page()).'" target="_blank"><i class="wsi wsi-comment-mail"></i> '.esc_html($this->plugin->site_name).'</a>'."\n";
 
 				$heading .= '  </div>'."\n";
 

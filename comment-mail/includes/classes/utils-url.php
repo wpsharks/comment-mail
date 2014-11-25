@@ -813,8 +813,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function product_page($scheme = NULL)
 			{
-				if(!empty($this->plugin->product_page))
-					$url = $this->plugin->product_page; // Provided by plugin class?
+				if(!empty($this->plugin->product_url))
+					$url = $this->plugin->product_url; // Provided by plugin class?
 				else $url = 'http://www.websharks-inc.com/product/'.urlencode($this->plugin->slug).'/';
 
 				return isset($scheme) ? $this->set_scheme($url, $scheme) : $url;
@@ -832,8 +832,8 @@ namespace comment_mail // Root namespace.
 			 */
 			public function subscribe_page($scheme = NULL)
 			{
-				if(!empty($this->plugin->subscribe_page))
-					$url = $this->plugin->subscribe_page; // Provided by plugin class?
+				if(!empty($this->plugin->subscribe_url))
+					$url = $this->plugin->subscribe_url; // Provided by plugin class?
 				else $url = 'http://www.websharks-inc.com/r/'.urlencode($this->plugin->slug).'-subscribe/';
 
 				return isset($scheme) ? $this->set_scheme($url, $scheme) : $url;

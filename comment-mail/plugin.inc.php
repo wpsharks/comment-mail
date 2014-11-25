@@ -79,13 +79,22 @@ namespace comment_mail
 			public $short_name = 'CM';
 
 			/**
+			 * Plugin name.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @var string Plugin name.
+			 */
+			public $site_name = 'Comment-Mail.com';
+
+			/**
 			 * Plugin product page URL.
 			 *
 			 * @since 141111 First documented version.
 			 *
 			 * @var string Plugin product page URL.
 			 */
-			public $product_page = 'http://comment-mail.com';
+			public $product_url = 'http://comment-mail.com';
 
 			/**
 			 * Used by the plugin's uninstall handler.
@@ -485,6 +494,11 @@ namespace comment_mail
 					'sub_event_log_expiration_time'                                        => '', // `strtotime()` compatible.
 					'queue_event_log_expiration_time'                                      => '', // `strtotime()` compatible.
 
+					/* Related to IP tracking. */
+
+					'prioritize_remote_addr'                                               => '0', // `0|1`; enable?
+					'geo_location_tracking_enable'                                         => '0', // `0|1`; enable?
+
 					/* Related to meta boxes. */
 
 					'excluded_meta_box_post_types'                                         => 'link,comment,revision,attachment,nav_menu_item,snippet,redirect',
@@ -494,29 +508,24 @@ namespace comment_mail
 					'comment_notification_parent_content_clip_max_chars'                   => '100', // Max chars to include in notifications.
 					'comment_notification_content_clip_max_chars'                          => '200', // Max chars to include in notifications.
 
-					/* Related to menu pages; i.e. logo display. */
-
-					'menu_pages_logo_icon_enable'                                          => '1', // Display logo/icon on menu pages?
-
 					/* Related to subscription summary. */
 
 					'sub_manage_summary_max_limit'                                         => '25', // Subscriptions per page.
 
-					/* Related to IP tracking. */
-
-					'prioritize_remote_addr'                                               => '0', // `0|1`; enable?
-					'geo_location_tracking_enable'                                         => '0', // `0|1`; enable?
-
 					/* Related to select options. */
 
-					'user_select_options_enable'                                           => '1', // `0|1`; enable?
 					'post_select_options_enable'                                           => '1', // `0|1`; enable?
 					'post_select_options_media_enable'                                     => '0', // `0|1`; enable?
 					'comment_select_options_enable'                                        => '1', // `0|1`; enable?
+					'user_select_options_enable'                                           => '1', // `0|1`; enable?
 					'max_select_options'                                                   => '2000', // Max options.
 
-					/* Related to branding.
-					~ See: <https://wordpress.org/plugins/about/guidelines/>
+					/* Related to menu pages; i.e. logo display. */
+
+					'menu_pages_logo_icon_enable'                                          => '0', // `0|1`; display?
+
+					/* Related to branding; i.e. powered by Comment Mail™ notes.
+					~ IMPORTANT: please see <https://wordpress.org/plugins/about/guidelines/>
 					#10. The plugin must NOT embed external links on the public site (like a "powered by" link) without
 					explicitly asking the user's permission. Any such options in the plugin must default to NOT show the link. */
 
