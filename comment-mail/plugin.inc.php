@@ -539,7 +539,7 @@ namespace comment_mail
 					'template__site__site_header_scripts'                                  => '', // HTML/PHP code.
 					'template__site__site_header_tag'                                      => '', // HTML/PHP code.
 
-					'template__site__site_footer_tag'                                     => '', // HTML/PHP code.
+					'template__site__site_footer_tag'                                      => '', // HTML/PHP code.
 					'template__site__site_footer'                                          => '', // HTML/PHP code.
 
 					'template__site__comment_form__sso_ops'                                => '', // HTML/PHP code.
@@ -565,9 +565,9 @@ namespace comment_mail
 					'template__email__email_header'                                        => '', // HTML/PHP code.
 					'template__email__email_header_styles'                                 => '', // HTML/PHP code.
 					'template__email__email_header_scripts'                                => '', // HTML/PHP code.
-					'template__email__email_header_tag'                                   => '', // HTML/PHP code.
+					'template__email__email_header_tag'                                    => '', // HTML/PHP code.
 
-					'template__email__email_footer_tag'                                   => '', // HTML/PHP code.
+					'template__email__email_footer_tag'                                    => '', // HTML/PHP code.
 					'template__email__email_footer'                                        => '', // HTML/PHP code.
 
 					'template__email__sub_confirmation__subject'                           => '', // HTML/PHP code.
@@ -1041,10 +1041,11 @@ namespace comment_mail
 
 				$_menu_title                          = $this->name;
 				$_page_title                          = $this->name.'&trade;';
-				$this->menu_page_hooks[__NAMESPACE__] = add_menu_page($_page_title, $_menu_title, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'), 'data:image/svg+xml;base64,'.base64_encode($icon), '25.1');
+				$_menu_position                       = apply_filters(__METHOD__.'_position', '25.00001');
+				$this->menu_page_hooks[__NAMESPACE__] = add_menu_page($_page_title, $_menu_title, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'), 'data:image/svg+xml;base64,'.base64_encode($icon), $_menu_position);
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__], array($this, 'menu_page_options_screen'));
 
-				unset($_menu_title, $_page_title, $_page_parent); // Housekeeping.
+				unset($_menu_title, $_page_title, $_menu_position); // Housekeeping.
 
 				/* ----------------------------------------- */
 
@@ -1052,28 +1053,28 @@ namespace comment_mail
 				$_page_title = $this->name.'&trade; &#10609; '.__('Config. Options', $this->text_domain);
 				add_submenu_page(__NAMESPACE__, $_page_title, $_menu_title, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
 
-				$_menu_title                                           = // Visible on access only.
+				$_menu_title                                           = // Visible on-demand only.
 					'<small><em>'.$child_branch_indent.__('Import/Export', $this->text_domain).'</em></small>';
 				$_page_title                                           = $this->name.'&trade; &#10609; '.__('Import/Export', $this->text_domain);
-				$_page_parent                                          = $current_menu_page === __NAMESPACE__.'_import_export' ? __NAMESPACE__ : NULL;
-				$this->menu_page_hooks[__NAMESPACE__.'_import_export'] = add_submenu_page($_page_parent, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_import_export', array($this, 'menu_page_import_export'));
+				$_menu_parent                                          = $current_menu_page === __NAMESPACE__.'_import_export' ? __NAMESPACE__ : NULL;
+				$this->menu_page_hooks[__NAMESPACE__.'_import_export'] = add_submenu_page($_menu_parent, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_import_export', array($this, 'menu_page_import_export'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_import_export'], array($this, 'menu_page_import_export_screen'));
 
-				$_menu_title                                             = // Visible on access only.
+				$_menu_title                                             = // Visible on-demand only.
 					'<small><em>'.$child_branch_indent.__('Email Templates', $this->text_domain).'</em></small>';
 				$_page_title                                             = $this->name.'&trade; &#10609; '.__('Email Templates', $this->text_domain);
-				$_page_parent                                            = $current_menu_page === __NAMESPACE__.'_email_templates' ? __NAMESPACE__ : NULL;
-				$this->menu_page_hooks[__NAMESPACE__.'_email_templates'] = add_submenu_page($_page_parent, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_email_templates', array($this, 'menu_page_email_templates'));
+				$_menu_parent                                            = $current_menu_page === __NAMESPACE__.'_email_templates' ? __NAMESPACE__ : NULL;
+				$this->menu_page_hooks[__NAMESPACE__.'_email_templates'] = add_submenu_page($_menu_parent, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_email_templates', array($this, 'menu_page_email_templates'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_email_templates'], array($this, 'menu_page_email_templates_screen'));
 
-				$_menu_title                                            = // Visible on access only.
+				$_menu_title                                            = // Visible on-demand only.
 					'<small><em>'.$child_branch_indent.__('Site Templates', $this->text_domain).'</em></small>';
 				$_page_title                                            = $this->name.'&trade; &#10609; '.__('Site Templates', $this->text_domain);
-				$_page_parent                                           = $current_menu_page === __NAMESPACE__.'_site_templates' ? __NAMESPACE__ : NULL;
-				$this->menu_page_hooks[__NAMESPACE__.'_site_templates'] = add_submenu_page($_page_parent, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_site_templates', array($this, 'menu_page_site_templates'));
+				$_menu_parent                                           = $current_menu_page === __NAMESPACE__.'_site_templates' ? __NAMESPACE__ : NULL;
+				$this->menu_page_hooks[__NAMESPACE__.'_site_templates'] = add_submenu_page($_menu_parent, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_site_templates', array($this, 'menu_page_site_templates'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_site_templates'], array($this, 'menu_page_site_templates_screen'));
 
-				unset($_menu_title, $_page_title, $_page_parent); // Housekeeping.
+				unset($_menu_title, $_page_title, $_menu_parent); // Housekeeping.
 
 				/* ----------------------------------------- */
 
@@ -1087,7 +1088,7 @@ namespace comment_mail
 				$this->menu_page_hooks[__NAMESPACE__.'_sub_event_log'] = add_submenu_page(__NAMESPACE__, $_page_title, $_menu_title, $this->manage_cap, __NAMESPACE__.'_sub_event_log', array($this, 'menu_page_sub_event_log'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_sub_event_log'], array($this, 'menu_page_sub_event_log_screen'));
 
-				unset($_menu_title, $_page_title, $_page_parent); // Housekeeping.
+				unset($_menu_title, $_page_title); // Housekeeping.
 
 				/* ----------------------------------------- */
 
@@ -1101,7 +1102,7 @@ namespace comment_mail
 				$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'] = add_submenu_page(__NAMESPACE__, $_page_title, $_menu_title, $this->manage_cap, __NAMESPACE__.'_queue_event_log', array($this, 'menu_page_queue_event_log'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'], array($this, 'menu_page_queue_event_log_screen'));
 
-				unset($_menu_title, $_page_title, $_page_parent); // Housekeeping.
+				unset($_menu_title, $_page_title); // Housekeeping.
 
 				/* ----------------------------------------- */
 
@@ -1110,7 +1111,7 @@ namespace comment_mail
 				$this->menu_page_hooks[__NAMESPACE__.'_stats'] = add_submenu_page(__NAMESPACE__, $_page_title, $_menu_title, $this->manage_cap, __NAMESPACE__.'_stats', array($this, 'menu_page_stats'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_stats'], array($this, 'menu_page_stats_screen'));
 
-				unset($_menu_title, $_page_title, $_page_parent); // Housekeeping.
+				unset($_menu_title, $_page_title); // Housekeeping.
 			}
 
 			/**

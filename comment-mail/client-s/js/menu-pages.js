@@ -79,15 +79,9 @@
 				                format        : 'M j, Y H:i',
 				                i18n          : i18n.dateTimePickerI18n
 			                });
-		$menuPageArea.find('[data-toggle~="other"]').on('click', function(e)
-		{
-			e.preventDefault(), e.stopImmediatePropagation();
-
-			$($(this).data('other')).toggle();
-		});
 		$menuPageArea.find('[data-toggle~="select-all"]').on('click', function()
 		{
-			$(this).select();
+			$(this).select(); // jQuery makes this easy for us.
 		});
 		/* ------------------------------------------------------------------------------------------------------------
 		 JS for an actual/standard plugin menu page; e.g. options.
@@ -113,6 +107,15 @@
 		{
 			$.each(codeMirrors, function(i, codeMirror){ codeMirror.refresh(); });
 		};
+		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+		$menuPage.find('[data-toggle~="other"]').on('click', function(e)
+		{
+			e.preventDefault(), e.stopImmediatePropagation();
+
+			$($(this).data('other')).toggle(), // Toggle another.
+				refreshCodeMirrors(); // Refresh CodeMirrors also.
+		});
 		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 		$menuPage.find('.pmp-panels-open').on('click', function()
