@@ -14,7 +14,7 @@ namespace comment_mail;
  *    This is a partial header template, incorporated into this full template file;
  *    i.e. a simpler fragment that fits into this larger picture here.
  *
- * @var string $email_header_easy Parsed easy header template file.
+ * @var string $email_header_tag Parsed <header> tag template file.
  *    This is a partial header template, incorporated into this full template file;
  *    i.e. a simpler fragment that fits into this larger picture here.
  *
@@ -50,4 +50,4 @@ namespace comment_mail;
 	</head>
 	<body>
 		<?php if(isset($email_rve_end_divider)) echo $email_rve_end_divider; ?>
-		<?php echo $email_header_easy; ?>
+		<?php echo $email_header_tag; ?>

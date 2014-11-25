@@ -14,7 +14,7 @@ namespace comment_mail;
  *    This is a partial header template, incorporated into this full template file;
  *    i.e. a simpler fragment that fits into this larger picture here.
  *
- * @var string $site_header_easy Parsed easy header template file.
+ * @var string $site_header_tag Parsed <header> tag template file.
  *    This is a partial header template, incorporated into this full template file;
  *    i.e. a simpler fragment that fits into this larger picture here.
  *
@@ -47,7 +47,7 @@ namespace comment_mail;
 <div id="wrapper" class="wrapper" role="main">
 	<div id="container" class="container">
 
-		<?php echo $site_header_easy; ?>
+		<?php echo $site_header_tag; ?>
 
 		<div id="inner-wrapper" class="inner-wrapper panel panel-default">
 			<div class="panel-body">

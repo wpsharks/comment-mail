@@ -537,9 +537,9 @@ namespace comment_mail
 					'template__site__site_header'                                          => '', // HTML/PHP code.
 					'template__site__site_header_styles'                                   => '', // HTML/PHP code.
 					'template__site__site_header_scripts'                                  => '', // HTML/PHP code.
-					'template__site__site_header_easy'                                     => '', // HTML/PHP code.
+					'template__site__site_header_tag'                                      => '', // HTML/PHP code.
 
-					'template__site__site_footer_easy'                                     => '', // HTML/PHP code.
+					'template__site__site_footer_tag'                                     => '', // HTML/PHP code.
 					'template__site__site_footer'                                          => '', // HTML/PHP code.
 
 					'template__site__comment_form__sso_ops'                                => '', // HTML/PHP code.
@@ -565,9 +565,9 @@ namespace comment_mail
 					'template__email__email_header'                                        => '', // HTML/PHP code.
 					'template__email__email_header_styles'                                 => '', // HTML/PHP code.
 					'template__email__email_header_scripts'                                => '', // HTML/PHP code.
-					'template__email__email_header_easy'                                   => '', // HTML/PHP code.
+					'template__email__email_header_tag'                                   => '', // HTML/PHP code.
 
-					'template__email__email_footer_easy'                                   => '', // HTML/PHP code.
+					'template__email__email_footer_tag'                                   => '', // HTML/PHP code.
 					'template__email__email_footer'                                        => '', // HTML/PHP code.
 
 					'template__email__sub_confirmation__subject'                           => '', // HTML/PHP code.

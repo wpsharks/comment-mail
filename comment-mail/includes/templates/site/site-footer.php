@@ -6,7 +6,7 @@ namespace comment_mail;
  *
  * Other variables made available in this template file:
  *
- * @var string $site_footer_easy Parsed easy footer template file.
+ * @var string $site_footer_tag Parsed <footer> tag template file.
  *    This is a partial footer template, incorporated into this full template file;
  *    i.e. a simpler fragment that fits into this larger picture here.
  *
@@ -26,7 +26,7 @@ namespace comment_mail;
 					</div> <!-- Close panel body. -->
 				</div> <!-- Close panel/inner wrapper. -->
 
-				<?php echo $site_footer_easy; ?>
+				<?php echo $site_footer_tag; ?>
 
 			</div> <!-- Close container. -->
 		</div> <!-- Close wrapper. -->

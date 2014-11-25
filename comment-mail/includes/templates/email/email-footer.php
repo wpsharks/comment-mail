@@ -6,7 +6,7 @@ namespace comment_mail;
  *
  * Other variables made available in this template file:
  *
- * @var string $email_footer_easy Parsed easy footer template file.
+ * @var string $email_footer_tag Parsed <footer> tag template file.
  *    This is a partial footer template, incorporated into this full template file;
  *    i.e. a simpler fragment that fits into this larger picture here.
  *
@@ -23,7 +23,7 @@ namespace comment_mail;
  *    you may also use any WordPress functions that you like.
  */
 ?>
-<?php echo $email_footer_easy; ?>
+<?php echo $email_footer_tag; ?>
 
 <hr style="margin-top:10em;" />
 
