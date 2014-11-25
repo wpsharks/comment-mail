@@ -280,6 +280,13 @@ A menu page area ~ utilities.
 	background    : #FFFBB2 !important;
 	padding       : .25em .5em .25em .5em !important;
 }
+.comment-mail-menu-page-area .pmp-dotted-link
+{
+	text-decoration : none !important;
+	cursor          : pointer !important;
+	border          : 1px dotted !important;
+	border-width    : 0 0 1px 0 !important;
+}
 .comment-mail-menu-page-area .pmp-blink
 {
 	animation         : pmp-blink .5s steps(5, start) infinite !important;
@@ -327,9 +334,11 @@ Menu page styles.
 	color : #346098;
 }
 .comment-mail-menu-page a:hover,
+.comment-mail-menu-page a:focus,
 .comment-mail-menu-page a:active
 {
-	color : #307D27;
+	color      : #307D27;
+	box-shadow : none;
 }
 .comment-mail-menu-page p,
 .comment-mail-menu-page pre,

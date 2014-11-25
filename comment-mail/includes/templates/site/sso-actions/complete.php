@@ -40,7 +40,7 @@ echo str_replace('%%title%%', __('Complete Registration', $plugin->text_domain),
 	<div class="complete">
 
 		<h2 style="margin-top:0;">
-			<?php echo __('Please Take a Moment to Complete Registration', $plugin->text_domain); ?>
+			<?php echo __('Please Complete Registration', $plugin->text_domain); ?>
 		</h2>
 
 		<hr />

@@ -1175,13 +1175,22 @@ namespace comment_mail // Root namespace.
 				                '       </table>'.
 				                '    </div>'.
 
+				                ' </div>'. // End: tab panes.
+
+				                ' <hr />'. // Begin other advanced (optional) settings.
+
+				                ' <div style="margin-top:1em;">'.
+				                '     <i class="fa fa-caret-down"></i>'.
+				                '     <a href="#" data-toggle="other" data-other=".pmp-other-sso-settings" class="pmp-dotted-link">'.
+				                '    '.__('click to toggle other advanced (optional) SSO settings', $this->plugin->text_domain).'</a>'.
 				                ' </div>'.
 
-				                ' <hr />'.
+				                ' <div class="pmp-other-sso-settings" style="display:none;"><hr />'.
 
-				                ' <div class="pmp-if-nest">'.
-				                '    <table style="margin-bottom:0;">'.
-				                '       <tbody>'.
+				                '    <div class="pmp-if-nest">'.
+
+				                '       <table style="margin-bottom:0;">'.
+				                '          <tbody>'.
 				                $form_fields->select_row(
 					                array(
 						                'label'           => __('Enable Comment Form SSO Options Template?', $this->plugin->text_domain),
@@ -1196,12 +1205,12 @@ namespace comment_mail // Root namespace.
 						                ),
 						                'notes_after'     => '<p>'.__('The built-in template system is quite flexible already; you can even customize the default template yourself if you want to (as seen below). Therefore, it is not recommended that you disable the default template system. This option only exists for very advanced users; i.e. those who prefer to disable the template completely in favor of their own custom implementation. If you disable the built-in template, you\'ll need to integrate HTML markup of your own into the proper location of your theme.', $this->plugin->text_domain).'</p>',
 					                )).
-				                '       </tbody>'.
-				                '    </table>'.
+				                '          </tbody>'.
+				                '       </table>'.
 
-				                '    <div class="pmp-if-disabled-show pmp-if-in-nest">'.
-				                '       <table style="margin-bottom:0;">'.
-				                '          <tbody>'.
+				                '       <div class="pmp-if-disabled-show pmp-if-in-nest">'.
+				                '          <table style="margin-bottom:0;">'.
+				                '             <tbody>'.
 				                $form_fields->select_row(
 					                array(
 						                'label'           => __('Also Disable Scripts Associated w/ Comment Form SSO Options?', $this->plugin->text_domain),
@@ -1215,13 +1224,13 @@ namespace comment_mail // Root namespace.
 						                ),
 						                'notes_after'     => '<p>'.__('For advanced use only. If you disable the built-in template system, you may also want to disable the built-in JavaScript associated w/ this template.', $this->plugin->text_domain).'</p>',
 					                )).
-				                '          </tbody>'.
-				                '       </table>'.
-				                '    </div>'.
+				                '             </tbody>'.
+				                '          </table>'.
+				                '       </div>'.
 
-				                '    <div class="pmp-if-enabled-show pmp-if-in-nest">'.
-				                '       <table>'.
-				                '          <tbody>'.
+				                '       <div class="pmp-if-enabled-show pmp-if-in-nest">'.
+				                '          <table>'.
+				                '             <tbody>'.
 				                $form_fields->textarea_row(
 					                array(
 						                'label'         => __('Comment Form SSO Options Template', $this->plugin->text_domain),
@@ -1234,16 +1243,16 @@ namespace comment_mail // Root namespace.
 						                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>'.
 						                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 					                )).
-				                '          </tbody>'.
-				                '       </table>'.
+				                '             </tbody>'.
+				                '          </table>'.
+				                '       </div>'.
 				                '    </div>'.
-				                ' </div>'.
 
-				                ' <hr />'.
+				                '    <hr />'.
 
-				                ' <div class="pmp-if-nest">'.
-				                '    <table style="margin-bottom:0;">'.
-				                '       <tbody>'.
+				                '    <div class="pmp-if-nest">'.
+				                '       <table style="margin-bottom:0;">'.
+				                '          <tbody>'.
 				                $form_fields->select_row(
 					                array(
 						                'label'           => __('Enable Login Form SSO Options Template?', $this->plugin->text_domain),
@@ -1258,12 +1267,12 @@ namespace comment_mail // Root namespace.
 						                ),
 						                'notes_after'     => '<p>'.__('The built-in template system is quite flexible already; you can even customize the default template yourself if you want to (as seen below). Therefore, it is not recommended that you disable the default template system. This option only exists for very advanced users; i.e. those who prefer to disable the template completely in favor of their own custom implementation. If you disable the built-in template, you\'ll need to integrate HTML markup of your own into the proper location of your theme.', $this->plugin->text_domain).'</p>',
 					                )).
-				                '       </tbody>'.
-				                '    </table>'.
+				                '          </tbody>'.
+				                '       </table>'.
 
-				                '    <div class="pmp-if-disabled-show pmp-if-in-nest">'.
-				                '       <table style="margin-bottom:0;">'.
-				                '          <tbody>'.
+				                '       <div class="pmp-if-disabled-show pmp-if-in-nest">'.
+				                '          <table style="margin-bottom:0;">'.
+				                '             <tbody>'.
 				                $form_fields->select_row(
 					                array(
 						                'label'           => __('Also Disable Scripts Associated w/ Login Form SSO Options?', $this->plugin->text_domain),
@@ -1277,13 +1286,13 @@ namespace comment_mail // Root namespace.
 						                ),
 						                'notes_after'     => '<p>'.__('For advanced use only. If you disable the built-in template system, you may also want to disable the built-in JavaScript associated w/ this template.', $this->plugin->text_domain).'</p>',
 					                )).
-				                '          </tbody>'.
-				                '       </table>'.
-				                '    </div>'.
+				                '             </tbody>'.
+				                '          </table>'.
+				                '       </div>'.
 
-				                '    <div class="pmp-if-enabled-show pmp-if-in-nest">'.
-				                '       <table>'.
-				                '          <tbody>'.
+				                '       <div class="pmp-if-enabled-show pmp-if-in-nest">'.
+				                '          <table>'.
+				                '             <tbody>'.
 				                $form_fields->textarea_row(
 					                array(
 						                'label'         => __('Login Form SSO Options Template', $this->plugin->text_domain),
@@ -1296,12 +1305,15 @@ namespace comment_mail // Root namespace.
 						                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>'.
 						                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 					                )).
-				                '          </tbody>'.
-				                '       </table>'.
-				                '    </div>'.
-				                ' </div>'.
+				                '             </tbody>'.
+				                '          </table>'.
+				                '       </div>'.
 
-				                '</div>';
+				                '    </div>'. // END: if nest.
+
+				                ' </div>'. // END: toggled advanced (optional) settings.
+
+				                '</div>'; // END: if nest.
 
 				echo $this->panel(__('Single Sign-on Integration (SSO)', $this->plugin->text_domain), $_panel_body, array());
 
