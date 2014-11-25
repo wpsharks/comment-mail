@@ -37,7 +37,7 @@ namespace comment_mail;
 <?php // Sets document <title> tag via `%%title%%` replacement code in header.
 echo str_replace('%%title%%', __('Complete Registration', $plugin->text_domain), $site_header); ?>
 
-	<div class="complete">
+	<div class="sso-complete">
 
 		<h2 style="margin-top:0;">
 			<?php echo __('Please Complete Registration', $plugin->text_domain); ?>
@@ -58,6 +58,7 @@ echo str_replace('%%title%%', __('Complete Registration', $plugin->text_domain),
 							{
 								case 'users_cannot_register':
 									echo __('Sorry, not accepting new users at this time. Please try again later.', $plugin->text_domain);
+									// This will only occur if you forget to enable "anyone can register" in your WP General Settings.
 									break; // Break switch handler.
 
 								case 'missing_fname':
