@@ -2894,13 +2894,15 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function stats_()
 			{
-				$_this             = $this;
-				$timezone          = $this->plugin->utils_date->i18n('T');
-				$current_value_for = function ($key) use ($_this)
+				$_this                = $this;
+				$timezone             = $this->plugin->utils_date->i18n('T');
+				$current_value_for    = function ($key) use ($_this)
 				{
 					return isset($_REQUEST[__NAMESPACE__]['stats'][$key])
 						? trim(stripslashes((string)$_REQUEST[__NAMESPACE__]['stats'][$key])) : NULL;
 				};
+				$current_postbox_view = $current_value_for('view'); // Current statistical view.
+
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-stats '.$this->plugin->slug.'-menu-page-area wrap').'">'."\n";
 
 				echo '   <h2>'.sprintf(__('%1$s&trade; &raquo; Statistics/Charts', $this->plugin->text_domain), esc_html($this->plugin->name)).' <i class="fa fa-bar-chart"></i></h2>'."\n";
@@ -3016,10 +3018,10 @@ namespace comment_mail // Root namespace.
 								),
 							)),
 					),
-					array('auto_chart' => $current_value_for('view') === $_postbox_view));
+					array('auto_chart' => $current_postbox_view === $_postbox_view));
 
 				echo $this->postbox(__('Subscriptions Overview', $this->plugin->text_domain), $_postbox_body,
-				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => $current_value_for('view') === $_postbox_view));
+				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => !$current_postbox_view || $current_postbox_view === $_postbox_view));
 
 				unset($_postbox_view, $_postbox_body); // Housekeeping.
 
@@ -3127,10 +3129,10 @@ namespace comment_mail // Root namespace.
 								),
 							)),
 					),
-					array('auto_chart' => $current_value_for('view') === $_postbox_view));
+					array('auto_chart' => $current_postbox_view === $_postbox_view));
 
 				echo $this->postbox(__('Subscriptions by Post ID', $this->plugin->text_domain), $_postbox_body,
-				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => $current_value_for('view') === $_postbox_view));
+				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => !$current_postbox_view || $current_postbox_view === $_postbox_view));
 
 				unset($_postbox_view, $_postbox_body); // Housekeeping.
 
@@ -3209,10 +3211,10 @@ namespace comment_mail // Root namespace.
 								),
 							)),
 					),
-					array('auto_chart' => $current_value_for('view') === $_postbox_view));
+					array('auto_chart' => $current_postbox_view === $_postbox_view));
 
 				echo $this->postbox(__('Queued Notifications Overview', $this->plugin->text_domain), $_postbox_body,
-				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => $current_value_for('view') === $_postbox_view));
+				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => !$current_postbox_view || $current_postbox_view === $_postbox_view));
 
 				unset($_postbox_view, $_postbox_body); // Housekeeping.
 
@@ -3302,10 +3304,10 @@ namespace comment_mail // Root namespace.
 								),
 							)),
 					),
-					array('auto_chart' => $current_value_for('view') === $_postbox_view));
+					array('auto_chart' => $current_postbox_view === $_postbox_view));
 
 				echo $this->postbox(__('Queued Notifications by Post ID', $this->plugin->text_domain), $_postbox_body,
-				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => $current_value_for('view') === $_postbox_view));
+				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => !$current_postbox_view || $current_postbox_view === $_postbox_view));
 
 				unset($_postbox_view, $_postbox_body); // Housekeeping.
 

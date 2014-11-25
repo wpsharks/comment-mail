@@ -356,7 +356,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function main_menu_page_only($scheme = 'admin')
 			{
-				$url = admin_url('/edit-comments.php');
+				$url = admin_url('/admin.php');
 
 				return $this->page_only(__NAMESPACE__, $url, $scheme);
 			}
@@ -393,7 +393,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function subs_menu_page_only($scheme = 'admin')
 			{
-				$url = admin_url('/edit-comments.php');
+				$url = admin_url('/admin.php');
 
 				return $this->page_only(__NAMESPACE__.'_subs', $url, $scheme);
 			}
@@ -410,7 +410,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function sub_event_log_menu_page_only($scheme = 'admin')
 			{
-				$url = admin_url('/edit-comments.php');
+				$url = admin_url('/admin.php');
 
 				return $this->page_only(__NAMESPACE__.'_sub_event_log', $url, $scheme);
 			}
@@ -427,7 +427,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function queue_menu_page_only($scheme = 'admin')
 			{
-				$url = admin_url('/edit-comments.php');
+				$url = admin_url('/admin.php');
 
 				return $this->page_only(__NAMESPACE__.'_queue', $url, $scheme);
 			}
@@ -444,7 +444,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function queue_event_log_menu_page_only($scheme = 'admin')
 			{
-				$url = admin_url('/edit-comments.php');
+				$url = admin_url('/admin.php');
 
 				return $this->page_only(__NAMESPACE__.'_queue_event_log', $url, $scheme);
 			}
@@ -461,7 +461,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function stats_menu_page_only($scheme = 'admin')
 			{
-				$url = admin_url('/edit-comments.php');
+				$url = admin_url('/admin.php');
 
 				return $this->page_only(__NAMESPACE__.'_stats', $url, $scheme);
 			}
@@ -478,7 +478,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function import_export_menu_page_only($scheme = 'admin')
 			{
-				$url = admin_url('/edit-comments.php');
+				$url = admin_url('/admin.php');
 
 				return $this->page_only(__NAMESPACE__.'_import_export', $url, $scheme);
 			}
@@ -495,7 +495,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function email_templates_menu_page_only($scheme = 'admin')
 			{
-				$url = admin_url('/edit-comments.php');
+				$url = admin_url('/admin.php');
 
 				return $this->page_only(__NAMESPACE__.'_email_templates', $url, $scheme);
 			}
@@ -512,7 +512,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function site_templates_menu_page_only($scheme = 'admin')
 			{
-				$url = admin_url('/edit-comments.php');
+				$url = admin_url('/admin.php');
 
 				return $this->page_only(__NAMESPACE__.'_site_templates', $url, $scheme);
 			}
