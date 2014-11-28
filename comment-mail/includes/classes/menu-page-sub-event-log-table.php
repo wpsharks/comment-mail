@@ -316,7 +316,6 @@ namespace comment_mail // Root namespace.
 					$this->set_items($results = $this->plugin->utils_db->typify_deep($results));
 					$this->set_total_items_available((integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()"));
 
-					$this->prepare_items_merge_sub_type_property(); // Merge property.
 					$this->prepare_items_merge_sub_properties(); // Merge additional properties.
 					$this->prepare_items_merge_user_properties(); // Merge additional properties.
 					$this->prepare_items_merge_post_properties(); // Merge additional properties.

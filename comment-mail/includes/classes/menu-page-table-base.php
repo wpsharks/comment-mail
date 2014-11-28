@@ -421,26 +421,6 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string HTML markup for this table column.
 			 */
-			protected function column_sub_type(\stdClass $item)
-			{
-				if(!isset($item->sub_type))
-					return '—'; // Not possible.
-
-				if(!$item->sub_type)
-					return '—'; // Not possible.
-
-				return esc_html($this->plugin->utils_i18n->sub_type_label($item->sub_type));
-			}
-
-			/**
-			 * Table column handler.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param \stdClass $item Item object; i.e. a row from the DB.
-			 *
-			 * @return string HTML markup for this table column.
-			 */
 			protected function column_sub_id(\stdClass $item)
 			{
 				if(!isset($item->sub_id))
@@ -668,8 +648,8 @@ namespace comment_mail // Root namespace.
 				if(!isset($item->comment_id))
 					return '—'; // Not possible.
 
-				if(!$item->comment_id)
-					return '— all —'; // All of them.
+				if(!$item->comment_id) // `0` implies all comments.
+					return __('all comments', $this->plugin->text_domain);
 
 				$id_only = '<i class="fa fa-comment"></i>'. // If it's all we can do.
 				           ' <span style="font-weight:bold;">ID #'.esc_html($item->comment_id).'</span>';
@@ -1183,7 +1163,6 @@ namespace comment_mail // Root namespace.
 				$this->set_items(array()); // `$this->items` = an array of \stdClass objects.
 				$this->set_total_items_available((integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()"));
 
-				$this->prepare_items_merge_sub_type_property();
 				$this->prepare_items_merge_sub_properties();
 				$this->prepare_items_merge_user_properties();
 				$this->prepare_items_merge_post_properties();
@@ -1305,31 +1284,6 @@ namespace comment_mail // Root namespace.
 			/*
 			 * Protected query-related helpers.
 			 */
-
-			/**
-			 * Assists w/ DB query; i.e. item preparations.
-			 *
-			 * @since 141111 First documented version.
-			 */
-			protected function prepare_items_merge_sub_type_property()
-			{
-				foreach($this->items as $_item)
-				{
-					$_item->sub_type = NULL; // Initialize.
-
-					if(!isset($_item->post_id, $_item->comment_id))
-						continue; // Not possible.
-
-					if($_item->post_id && !$_item->comment_id)
-						$_item->sub_type = 'comments';
-
-					else if($_item->post_id && $_item->comment_id)
-						$_item->sub_type = 'comment';
-				}
-				unset($_item); // Housekeeping.
-
-				$this->items = $this->plugin->utils_db->typify_deep($this->items);
-			}
 
 			/**
 			 * Assists w/ DB query; i.e. item preparations.
