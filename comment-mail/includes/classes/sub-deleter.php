@@ -56,6 +56,13 @@ namespace comment_mail // Root namespace.
 			protected $oby_sub_id;
 
 			/**
+			 * @var integer Sub ID that did an overwrite; did a replace?
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $oby_sub_id_did_replace;
+
+			/**
 			 * @var boolean Purging?
 			 *
 			 * @since 141111 First documented version.
@@ -84,11 +91,11 @@ namespace comment_mail // Root namespace.
 			protected $user_initiated;
 
 			/**
-			 * @var string Event type.
+			 * @var string Event taking place.
 			 *
 			 * @since 141111 First documented version.
 			 */
-			protected $event_type;
+			protected $event;
 
 			/**
 			 * @var boolean Deleted?
@@ -113,17 +120,18 @@ namespace comment_mail // Root namespace.
 				$this->sub = $this->plugin->utils_sub->get($sub_id);
 
 				$defaults_args = array(
-					'last_ip'        => '',
-					'last_region'    => '',
-					'last_country'   => '',
+					'last_ip'                => '',
+					'last_region'            => '',
+					'last_country'           => '',
 
-					'oby_sub_id'     => 0,
-					'purging'        => FALSE,
-					'cleaning'       => FALSE,
+					'oby_sub_id'             => 0,
+					'oby_sub_id_did_replace' => FALSE,
+					'purging'                => FALSE,
+					'cleaning'               => FALSE,
 
-					'process_events' => TRUE,
+					'process_events'         => TRUE,
 
-					'user_initiated' => FALSE,
+					'user_initiated'         => FALSE,
 				);
 				$args          = array_merge($defaults_args, $args);
 				$args          = array_intersect_key($args, $defaults_args);
@@ -132,9 +140,10 @@ namespace comment_mail // Root namespace.
 				$this->last_region  = trim((string)$args['last_region']);
 				$this->last_country = trim((string)$args['last_country']);
 
-				$this->oby_sub_id = (integer)$args['oby_sub_id'];
-				$this->purging    = (boolean)$args['purging'];
-				$this->cleaning   = (boolean)$args['cleaning'];
+				$this->oby_sub_id             = (integer)$args['oby_sub_id'];
+				$this->oby_sub_id_did_replace = (boolean)$args['oby_sub_id_did_replace'];
+				$this->purging                = (boolean)$args['purging'];
+				$this->cleaning               = (boolean)$args['cleaning'];
 
 				$this->process_events = (boolean)$args['process_events'];
 
@@ -165,20 +174,22 @@ namespace comment_mail // Root namespace.
 					$this->purging = FALSE;
 
 				if($this->purging || $this->cleaning)
-					$this->oby_sub_id = 0;
-
+				{
+					$this->oby_sub_id             = 0;
+					$this->oby_sub_id_did_replace = FALSE;
+				}
 				# Define the event type based on args.
 
 				if($this->oby_sub_id)
-					$this->event_type = 'overwritten';
+					$this->event = 'overwritten';
 
 				else if($this->purging)
-					$this->event_type = 'purged';
+					$this->event = 'purged';
 
 				else if($this->cleaning)
-					$this->event_type = 'cleaned';
+					$this->event = 'cleaned';
 
-				else $this->event_type = 'deleted';
+				else $this->event = 'deleted';
 
 				# Perform deletion event type.
 
@@ -217,9 +228,7 @@ namespace comment_mail // Root namespace.
 
 				if(($this->deleted = $this->plugin->utils_db->wp->query($sql)) === FALSE)
 					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
-
-				if(!($this->deleted = (boolean)$this->deleted))
-					return; // Nothing more to do here.
+				$this->deleted = (boolean)$this->deleted; // Convert to boolean now.
 
 				$this->sub->status = 'deleted'; // Obj. properties.
 				if($this->last_ip) $this->sub->last_ip = $this->last_ip;
@@ -230,13 +239,14 @@ namespace comment_mail // Root namespace.
 				$this->plugin->utils_sub->nullify_cache(array($this->sub->ID, $this->sub->key));
 
 				if($this->process_events) // Processing events?
-				{
-					new sub_event_log_inserter(array_merge((array)$this->sub, array(
-						'event'          => $this->event_type,
-						'oby_sub_id'     => $this->oby_sub_id,
-						'user_initiated' => $this->user_initiated,
-					)), $sub_before); // Log event data.
-				}
+					if($this->deleted || ($this->event === 'overwritten' && $this->oby_sub_id && $this->oby_sub_id_did_replace))
+					{
+						new sub_event_log_inserter(array_merge((array)$this->sub, array(
+							'event'          => $this->event,
+							'oby_sub_id'     => $this->oby_sub_id,
+							'user_initiated' => $this->user_initiated,
+						)), $sub_before); // Log event data.
+					}
 			}
 		}
 	}

@@ -53,6 +53,13 @@ namespace comment_mail // Root namespace.
 			protected $inserted;
 
 			/**
+			 * @var boolean Did we replace?
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $replaced;
+
+			/**
 			 * @var integer Insertion ID.
 			 *
 			 * @since 141111 First documented version.
@@ -316,6 +323,7 @@ namespace comment_mail // Root namespace.
 
 				$this->is_insert = !isset($this->data['ID']);
 				$this->inserted  = FALSE; // Initialize.
+				$this->replaced  = FALSE; // Initialize.
 				$this->insert_id = 0; // Initialize.
 
 				/* Related to updates. */
@@ -476,6 +484,18 @@ namespace comment_mail // Root namespace.
 			public function did_insert()
 			{
 				return $this->inserted;
+			}
+
+			/**
+			 * Insert caused a replace?
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return boolean Did we replace?
+			 */
+			public function did_replace()
+			{
+				return $this->replaced;
 			}
 
 			/**
@@ -664,13 +684,14 @@ namespace comment_mail // Root namespace.
 				$data_to_insert = $this->plugin->utils_array->remove_nulls($this->data);
 				unset($data_to_insert['ID']); // We never want to insert an ID.
 
-				if($this->plugin->utils_db->wp->replace($table, $data_to_insert) === FALSE)
-					throw new \exception(__('Insertion failure.', $this->plugin->text_domain));
+				if(($insert_replace = $this->plugin->utils_db->wp->replace($table, $data_to_insert)) === FALSE)
+					throw new \exception(__('Insert/replace failure.', $this->plugin->text_domain));
 
 				if(!($this->insert_id = (integer)$this->plugin->utils_db->wp->insert_id))
-					throw new \exception(__('Insertion failure.', $this->plugin->text_domain));
+					throw new \exception(__('Insert/replace failure.', $this->plugin->text_domain));
 
-				$this->inserted = TRUE; // Flag as `TRUE` now; i.e. the insertion was a success.
+				$this->inserted = TRUE; // Flag as `TRUE` now; i.e. the Insert/replace was a success.
+				if($insert_replace > 1) $this->replaced = TRUE; // Modified more than a single row?
 
 				$this->overwrite_duplicate_key_ids_after_insert(); // Before nullifying cache.
 
@@ -879,8 +900,9 @@ namespace comment_mail // Root namespace.
 
 				$this->plugin->utils_sub->bulk_delete(
 					$this->duplicate_key_ids, array(
-						'oby_sub_id'     => $this->insert_id,
-						'process_events' => $this->process_events,
+						'oby_sub_id'             => $this->insert_id,
+						'oby_sub_id_did_replace' => $this->replaced,
+						'process_events'         => $this->process_events,
 					));
 			}
 
