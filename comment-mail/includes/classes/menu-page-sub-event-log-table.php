@@ -230,6 +230,23 @@ namespace comment_mail // Root namespace.
 				return $id_info.$this->row_actions($row_actions);
 			}
 
+			/**
+			 * Table column handler.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_event(\stdClass $item)
+			{
+				if($item->event !== 'overwritten')
+					return esc_html((string)$item->event);
+
+				// @TODO Work out a description for why it was overwritten here.
+			}
+
 			/*
 			 * Public query-related methods.
 			 */
