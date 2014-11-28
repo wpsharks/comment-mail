@@ -244,7 +244,8 @@ namespace comment_mail // Root namespace.
 				if($item->event !== 'overwritten')
 					return esc_html((string)$item->event);
 
-				// @TODO Work out a description for why it was overwritten here.
+				return esc_html($item->event).'<br />'. // + reason why.
+				       $this->plugin->utils_event->sub_overwritten_reason($item);
 			}
 
 			/*

@@ -396,7 +396,7 @@ namespace comment_mail // Root namespace.
 			 *    - `dby_queue_id` digested?
 			 *    - `logged` logged?
 			 *
-			 * @see utils_event::queue_note_code()
+			 * @see utils_event::queue_note_code_desc()
 			 */
 			protected function validated_entry_props(\stdClass $entry)
 			{
@@ -552,7 +552,7 @@ namespace comment_mail // Root namespace.
 			 *    - `dby_queue_id` digested?
 			 *    - `logged` logged?
 			 *
-			 * @see utils_event::queue_note_code()
+			 * @see utils_event::queue_note_code_desc()
 			 */
 			protected function entry_props($event = '',
 			                               $note_code = '',

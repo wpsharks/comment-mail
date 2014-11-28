@@ -757,7 +757,7 @@ namespace comment_mail // Root namespace.
 				if(!$item->note_code)
 					return '—'; // Not applicable.
 
-				$note = $this->plugin->utils_event->queue_note_code($item->note_code);
+				$note = $this->plugin->utils_event->queue_note_code_desc($item->note_code);
 				$note = $this->plugin->utils_string->markdown_no_p($note); // HTML markup.
 
 				return $note; // HTML markup via simple MD parsing.

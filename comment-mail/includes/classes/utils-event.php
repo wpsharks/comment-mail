@@ -41,7 +41,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @see queue_processor::log_entry()
 			 */
-			public function queue_note_code($note_code)
+			public function queue_note_code_desc($note_code)
 			{
 				switch(strtolower(trim((string)$note_code)))
 				{
@@ -189,6 +189,21 @@ namespace comment_mail // Root namespace.
 						break; // Break switch handler.
 				}
 				return $note; // Code translated to description.
+			}
+
+			/**
+			 * Sub event log; determine `overwritten` reason.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param \stdClass $row A sub event log entry row from the DB.
+			 *
+			 * @return string The reason (human readable) why the overwrite occurred.
+			 */
+			public function sub_overwritten_reason(\stdClass $row)
+			{
+				return '';
+				// @TODO Work out a description for why it was overwritten here.
 			}
 		}
 	}
