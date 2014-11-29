@@ -2979,6 +2979,35 @@ namespace comment_mail // Root namespace.
 				);
 				$_form_fields     = new form_fields($_form_field_args);
 
+				$_postbox_chart_type_options = array(
+					'@optgroup_open_subscr_totals'                  => __('Subscr. Totals', $this->plugin->text_domain),
+					'event_subscribed_totals'                       => __('Total Subscriptions', $this->plugin->text_domain),
+					'@optgroup_close_subscr_totals'                 => '', // Close this group.
+
+					'@optgroup_open_subscr_totals_post_popularity'  => __('Post Popularity', $this->plugin->text_domain),
+					'event_subscribed_most_popular_posts'           => __('Most Popular Posts', $this->plugin->text_domain),
+					'event_subscribed_least_popular_posts'          => __('Least Popular Posts', $this->plugin->text_domain),
+					'@optgroup_close_subscr_totals_post_popularity' => '', // Close this group.
+
+					'@optgroup_open_subscr_totals_geo_popularity'   => __('Geographic Popularity', $this->plugin->text_domain),
+					'event_subscribed_audience_by_geo_country'      => __('Audience by Country', $this->plugin->text_domain),
+					'event_subscribed_audience_by_geo_us_region'    => __('Audience by US Region', $this->plugin->text_domain),
+					'event_subscribed_audience_by_geo_ca_region'    => __('Audience by CA Region', $this->plugin->text_domain),
+					'@optgroup_close_subscr_totals_geo_popularity'  => '', // Close this group.
+
+					'@optgroup_open_status_change_percentages'      => __('Status Change Percentages', $this->plugin->text_domain),
+					'event_confirmation_percentages'                => __('Confirmation Percentages', $this->plugin->text_domain),
+					'event_suspension_percentages'                  => __('Suspension Percentages', $this->plugin->text_domain),
+					'event_unsubscribe_percentages'                 => __('Unsubscribe Percentages', $this->plugin->text_domain),
+					'@optgroup_close_status_change_percentages'     => '', // Close this group.
+				);
+				if(!$this->plugin->options['geo_location_tracking_enable'])
+					unset($_postbox_chart_type_options['@optgroup_open_subscr_totals_geo_popularity'],
+						$_postbox_chart_type_options['event_subscribed_audience_by_geo_country'],
+						$_postbox_chart_type_options['event_subscribed_audience_by_geo_us_region'],
+						$_postbox_chart_type_options['event_subscribed_audience_by_geo_ca_region'],
+						$_postbox_chart_type_options['@optgroup_close_subscr_totals_geo_popularity']);
+
 				$_postbox_body = $this->stats_view(
 					$_postbox_view,
 					array(
@@ -2994,28 +3023,7 @@ namespace comment_mail // Root namespace.
 								'name'            => 'type',
 								'current_value'   => $this->coalesce($current_value_for('type'), 'event_confirmation_percentages'),
 								'allow_arbitrary' => FALSE,
-								'options'         => array(
-									'@optgroup_open_subscr_totals'                  => __('Subscr. Totals', $this->plugin->text_domain),
-									'event_subscribed_totals'                       => __('Total Subscriptions', $this->plugin->text_domain),
-									'@optgroup_close_subscr_totals'                 => '', // Close this group.
-
-									'@optgroup_open_subscr_totals_post_popularity'  => __('Post Popularity', $this->plugin->text_domain),
-									'event_subscribed_most_popular_posts'           => __('Most Popular Posts', $this->plugin->text_domain),
-									'event_subscribed_least_popular_posts'          => __('Least Popular Posts', $this->plugin->text_domain),
-									'@optgroup_close_subscr_totals_post_popularity' => '', // Close this group.
-
-									'@optgroup_open_subscr_totals_geo_popularity'   => __('Geographic Popularity', $this->plugin->text_domain),
-									'event_subscribed_audience_by_geo_country'      => __('Audience by Country', $this->plugin->text_domain),
-									'event_subscribed_audience_by_geo_us_region'    => __('Audience by US Region', $this->plugin->text_domain),
-									'event_subscribed_audience_by_geo_ca_region'    => __('Audience by CA Region', $this->plugin->text_domain),
-									'@optgroup_close_subscr_totals_geo_popularity'  => '', // Close this group.
-
-									'@optgroup_open_status_change_percentages'      => __('Status Change Percentages', $this->plugin->text_domain),
-									'event_confirmation_percentages'                => __('Confirmation Percentages', $this->plugin->text_domain),
-									'event_suspension_percentages'                  => __('Suspension Percentages', $this->plugin->text_domain),
-									'event_unsubscribe_percentages'                 => __('Unsubscribe Percentages', $this->plugin->text_domain),
-									'@optgroup_close_status_change_percentages'     => '', // Close this group.
-								),
+								'options'         => $_postbox_chart_type_options,
 							)),
 						array('row'      => $_form_fields->select_row(
 							array(
@@ -3029,7 +3037,6 @@ namespace comment_mail // Root namespace.
 									'systematics' => __('Systematics (i.e. Show User-Initiated Events Only)', $this->plugin->text_domain),
 								),
 							)), 'colspan' => 3, 'ends_row' => TRUE),
-
 						$_form_fields->input_row(
 							array(
 								'label'         => sprintf(__('From Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
@@ -3067,7 +3074,7 @@ namespace comment_mail // Root namespace.
 				echo $this->postbox(__('Subscriptions Overview', $this->plugin->text_domain), $_postbox_body,
 				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => !$current_postbox_view || $current_postbox_view === $_postbox_view));
 
-				unset($_postbox_view, $_postbox_body); // Housekeeping.
+				unset($_postbox_view, $_postbox_chart_type_options, $_postbox_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -3079,6 +3086,30 @@ namespace comment_mail // Root namespace.
 					'class_prefix'   => 'pmp-stats-form-',
 				);
 				$_form_fields     = new form_fields($_form_field_args);
+
+				$_postbox_chart_type_options = array(
+					'@optgroup_open_subscr_totals'                 => __('Subscr. Totals', $this->plugin->text_domain),
+					'event_subscribed_totals'                      => __('Total Subscriptions (for Post ID)', $this->plugin->text_domain),
+					'@optgroup_close_subscr_totals'                => '', // Close this group.
+
+					'@optgroup_open_subscr_totals_geo_popularity'  => __('Geographic Popularity', $this->plugin->text_domain),
+					'event_subscribed_audience_by_geo_country'     => __('Audience by Country (for Post ID)', $this->plugin->text_domain),
+					'event_subscribed_audience_by_geo_us_region'   => __('Audience by US Region (for Post ID)', $this->plugin->text_domain),
+					'event_subscribed_audience_by_geo_ca_region'   => __('Audience by CA Region (for Post ID)', $this->plugin->text_domain),
+					'@optgroup_close_subscr_totals_geo_popularity' => '', // Close this group.
+
+					'@optgroup_open_status_change_percentages'     => __('Status Change Percentages', $this->plugin->text_domain),
+					'event_confirmation_percentages'               => __('Confirmation Percentages (for Post ID)', $this->plugin->text_domain),
+					'event_suspension_percentages'                 => __('Suspension Percentages (for Post ID)', $this->plugin->text_domain),
+					'event_unsubscribe_percentages'                => __('Unsubscribe Percentages (for Post ID)', $this->plugin->text_domain),
+					'@optgroup_close_status_change_percentages'    => '', // Close this group.
+				);
+				if(!$this->plugin->options['geo_location_tracking_enable'])
+					unset($_postbox_chart_type_options['@optgroup_open_subscr_totals_geo_popularity'],
+						$_postbox_chart_type_options['event_subscribed_audience_by_geo_country'],
+						$_postbox_chart_type_options['event_subscribed_audience_by_geo_us_region'],
+						$_postbox_chart_type_options['event_subscribed_audience_by_geo_ca_region'],
+						$_postbox_chart_type_options['@optgroup_close_subscr_totals_geo_popularity']);
 
 				$_postbox_body = $this->stats_view(
 					$_postbox_view,
@@ -3095,23 +3126,7 @@ namespace comment_mail // Root namespace.
 								'name'            => 'type',
 								'current_value'   => $this->coalesce($current_value_for('type'), 'event_confirmation_percentages'),
 								'allow_arbitrary' => FALSE,
-								'options'         => array(
-									'@optgroup_open_subscr_totals'                 => __('Subscr. Totals', $this->plugin->text_domain),
-									'event_subscribed_totals'                      => __('Total Subscriptions (for Post ID)', $this->plugin->text_domain),
-									'@optgroup_close_subscr_totals'                => '', // Close this group.
-
-									'@optgroup_open_subscr_totals_geo_popularity'  => __('Geographic Popularity', $this->plugin->text_domain),
-									'event_subscribed_audience_by_geo_country'     => __('Audience by Country (for Post ID)', $this->plugin->text_domain),
-									'event_subscribed_audience_by_geo_us_region'   => __('Audience by US Region (for Post ID)', $this->plugin->text_domain),
-									'event_subscribed_audience_by_geo_ca_region'   => __('Audience by CA Region (for Post ID)', $this->plugin->text_domain),
-									'@optgroup_close_subscr_totals_geo_popularity' => '', // Close this group.
-
-									'@optgroup_open_status_change_percentages'     => __('Status Change Percentages', $this->plugin->text_domain),
-									'event_confirmation_percentages'               => __('Confirmation Percentages (for Post ID)', $this->plugin->text_domain),
-									'event_suspension_percentages'                 => __('Suspension Percentages (for Post ID)', $this->plugin->text_domain),
-									'event_unsubscribe_percentages'                => __('Unsubscribe Percentages (for Post ID)', $this->plugin->text_domain),
-									'@optgroup_close_status_change_percentages'    => '', // Close this group.
-								),
+								'options'         => $_postbox_chart_type_options,
 							)),
 						$_form_fields->select_row(
 							array(
@@ -3140,7 +3155,6 @@ namespace comment_mail // Root namespace.
 									'systematics' => __('Systematics (i.e. Show User-Initiated Events Only)', $this->plugin->text_domain),
 								),
 							)), 'colspan' => 2, 'ends_row' => TRUE),
-
 						$_form_fields->input_row(
 							array(
 								'label'         => sprintf(__('From Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
@@ -3178,7 +3192,7 @@ namespace comment_mail // Root namespace.
 				echo $this->postbox(__('Subscriptions by Post ID', $this->plugin->text_domain), $_postbox_body,
 				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => !$current_postbox_view || $current_postbox_view === $_postbox_view));
 
-				unset($_postbox_view, $_postbox_body); // Housekeeping.
+				unset($_postbox_view, $_postbox_chart_type_options, $_postbox_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -3195,7 +3209,18 @@ namespace comment_mail // Root namespace.
 				);
 				$_form_fields     = new form_fields($_form_field_args);
 
-				$_postbox_body = $this->stats_view(
+				$_postbox_chart_type_options = array(
+					'@optgroup_open_queued_notification_totals'          => __('Processed Notification Totals', $this->plugin->text_domain),
+					'event_processed_totals'                             => __('Total Processed Notifications', $this->plugin->text_domain),
+					'@optgroup_close_queued_notification_totals'         => '', // Close this group.
+
+					'@optgroup_open_processed_notification_percentages'  => __('Processed Notification Percentages', $this->plugin->text_domain),
+					'event_processed_percentages'                        => __('Processed Percentages', $this->plugin->text_domain),
+					'event_notified_percentages'                         => __('Notified Percentages', $this->plugin->text_domain),
+					'event_invalidated_percentages'                      => __('Invalidated Percentages', $this->plugin->text_domain),
+					'@optgroup_close_processed_notification_percentages' => '', // Close this group.
+				);
+				$_postbox_body               = $this->stats_view(
 					$_postbox_view,
 					array(
 						array('hidden_input' => $_form_fields->hidden_input(
@@ -3210,19 +3235,8 @@ namespace comment_mail // Root namespace.
 								'name'            => 'type',
 								'current_value'   => $this->coalesce($current_value_for('type'), 'event_queued_notification_processed_percentages'),
 								'allow_arbitrary' => FALSE,
-								'options'         => array(
-									'@optgroup_open_queued_notification_totals'          => __('Processed Notification Totals', $this->plugin->text_domain),
-									'event_processed_totals'                             => __('Total Processed Notifications', $this->plugin->text_domain),
-									'@optgroup_close_queued_notification_totals'         => '', // Close this group.
-
-									'@optgroup_open_processed_notification_percentages'  => __('Processed Notification Percentages', $this->plugin->text_domain),
-									'event_processed_percentages'                        => __('Processed Percentages', $this->plugin->text_domain),
-									'event_notified_percentages'                         => __('Notified Percentages', $this->plugin->text_domain),
-									'event_invalidated_percentages'                      => __('Invalidated Percentages', $this->plugin->text_domain),
-									'@optgroup_close_processed_notification_percentages' => '', // Close this group.
-								),
+								'options'         => $_postbox_chart_type_options,
 							)), 'colspan' => 4, 'ends_row' => TRUE),
-
 						$_form_fields->input_row(
 							array(
 								'label'         => sprintf(__('From Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
@@ -3260,7 +3274,7 @@ namespace comment_mail // Root namespace.
 				echo $this->postbox(__('Queued Notifications Overview', $this->plugin->text_domain), $_postbox_body,
 				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => !$current_postbox_view || $current_postbox_view === $_postbox_view));
 
-				unset($_postbox_view, $_postbox_body); // Housekeeping.
+				unset($_postbox_view, $_postbox_chart_type_options, $_postbox_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -3273,7 +3287,18 @@ namespace comment_mail // Root namespace.
 				);
 				$_form_fields     = new form_fields($_form_field_args);
 
-				$_postbox_body = $this->stats_view(
+				$_postbox_chart_type_options = array(
+					'@optgroup_open_queued_notification_totals'          => __('Processed Notification Totals', $this->plugin->text_domain),
+					'event_processed_totals'                             => __('Total Processed Notifications (for Post ID)', $this->plugin->text_domain),
+					'@optgroup_close_queued_notification_totals'         => '', // Close this group.
+
+					'@optgroup_open_processed_notification_percentages'  => __('Processed Notification Percentages', $this->plugin->text_domain),
+					'event_processed_percentages'                        => __('Processed Percentages (for Post ID)', $this->plugin->text_domain),
+					'event_notified_percentages'                         => __('Notified Percentages (for Post ID)', $this->plugin->text_domain),
+					'event_invalidated_percentages'                      => __('Invalidated Percentages (for Post ID)', $this->plugin->text_domain),
+					'@optgroup_close_processed_notification_percentages' => '', // Close this group.
+				);
+				$_postbox_body               = $this->stats_view(
 					$_postbox_view,
 					array(
 						array('hidden_input' => $_form_fields->hidden_input(
@@ -3288,17 +3313,7 @@ namespace comment_mail // Root namespace.
 								'name'            => 'type',
 								'current_value'   => $this->coalesce($current_value_for('type'), 'event_queued_notification_processed_percentages'),
 								'allow_arbitrary' => FALSE,
-								'options'         => array(
-									'@optgroup_open_queued_notification_totals'          => __('Processed Notification Totals', $this->plugin->text_domain),
-									'event_processed_totals'                             => __('Total Processed Notifications (for Post ID)', $this->plugin->text_domain),
-									'@optgroup_close_queued_notification_totals'         => '', // Close this group.
-
-									'@optgroup_open_processed_notification_percentages'  => __('Processed Notification Percentages', $this->plugin->text_domain),
-									'event_processed_percentages'                        => __('Processed Percentages (for Post ID)', $this->plugin->text_domain),
-									'event_notified_percentages'                         => __('Notified Percentages (for Post ID)', $this->plugin->text_domain),
-									'event_invalidated_percentages'                      => __('Invalidated Percentages (for Post ID)', $this->plugin->text_domain),
-									'@optgroup_close_processed_notification_percentages' => '', // Close this group.
-								),
+								'options'         => $_postbox_chart_type_options,
 							)),
 						array('row'      => $_form_fields->select_row(
 							array(
@@ -3315,7 +3330,6 @@ namespace comment_mail // Root namespace.
 									'other_attrs'              => 'min="1" max="18446744073709551615"',
 								),
 							)), 'colspan' => 3, 'ends_row' => TRUE),
-
 						$_form_fields->input_row(
 							array(
 								'label'         => sprintf(__('From Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
@@ -3353,7 +3367,7 @@ namespace comment_mail // Root namespace.
 				echo $this->postbox(__('Queued Notifications by Post ID', $this->plugin->text_domain), $_postbox_body,
 				                    array('icon' => '<i class="fa fa-bar-chart"></i>', 'open' => !$current_postbox_view || $current_postbox_view === $_postbox_view));
 
-				unset($_postbox_view, $_postbox_body); // Housekeeping.
+				unset($_postbox_view, $_postbox_chart_type_options, $_postbox_body); // Housekeeping.
 
 				/* ----------------------------------------------------------------------------------------- */
 
