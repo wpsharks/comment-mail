@@ -202,8 +202,19 @@ namespace comment_mail // Root namespace.
 			 */
 			public function sub_overwritten_reason(\stdClass $row)
 			{
-				return '';
-				// @TODO Work out a description for why it was overwritten here.
+				$reason = '<h3 style="margin-top:0;">'.sprintf(__('Subscr. ID #%1$s was overwritten by Subscr. ID #%2$s.', $this->plugin->text_domain), $row->sub_id, $row->oby_sub_id).'</h3>'.
+				          '<p>'.__('An overwrite occurs automatically whenever a subscription is a duplicate (or in conflict) with another.', $this->plugin->text_domain).
+				          ' '.sprintf(__('Nothing to be alarmed about. It\'s common for this to occur from time-to-time. It\'s %1$s&trade; doing it\'s job to prevent duplicate and/or conflicting subscriptions.', $this->plugin->text_domain), $this->plugin->name).'</p>'.
+
+				          '<i class="fa fa-question-circle fa-5x pmp-right"></i>'.
+				          '<p style="font-weight:bold;">'.__('Here are a few examples of why an overwrite may occur:', $this->plugin->text_domain).'</p>'.
+				          '<ul class="pmp-list-items" style="margin-bottom:0;">'.
+				          ' <li>'.__('Same email, same post ID, same comment ID. For instance, if a new subscription is created (or an existing subscription is updated), where it becomes an exact duplicate of another; the subscription being created/updated will take precedence.', $this->plugin->text_domain).'</li>'.
+				          ' <li>'.__('Same email, same post ID, comment ID indicates a specific comment. In this case, if there is an existing subscription that is for all comments on the post; adding a new one where the comment ID is specific, overwrites a previous subscription that was for the entire post; implying that the underlying subscriber wants notifications regarding a specific comment, not all comments anymore.', $this->plugin->text_domain).'</li>'.
+				          ' <li>'.__('Same email, same post ID, comment ID is not specific. Same as the previous example, but in reverse. If a subscription is created (or an existing subscription is updated), where it will now cover all comments on the post; any others that were for specific comments on the same post, will be overwritten to avoid duplicate emails.', $this->plugin->text_domain).'</li>'.
+				          '</ul>';
+
+				return '<a href="#" class="pmp-q-link" data-toggle="alert" data-alert="'.esc_attr($reason).'">[?]</a>';
 			}
 		}
 	}

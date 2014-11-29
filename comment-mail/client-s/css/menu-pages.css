@@ -202,6 +202,44 @@ A menu page area ~ postboxes.
 	content : '\f140';
 }
 /*
+A menu page area ~ alert box.
+*/
+.comment-mail-menu-page-area .pmp-modal-dialog
+{
+	top           : 100px;
+	left          : 50%;
+	position      : fixed;
+	z-index       : 1;
+
+	width         : 50%;
+	margin-left   : -25%;
+
+	background    : #FFFFFF;
+	border        : 1px solid #888888;
+	padding       : 1.5em;
+
+	max-height    : 400px;
+	overflow-y    : auto;
+
+	border-radius : 4px;
+	box-shadow    : 0 0 20px 2px rgba(0, 0, 0, 0.2);
+}
+.comment-mail-menu-page-area .pmp-modal-dialog .pmp-modal-dialog-close
+{
+	font-size       : 150%;
+	font-style      : normal;
+
+	float           : right;
+	margin          : 0 0 2em 2em;
+
+	cursor          : pointer;
+	text-decoration : none;
+}
+.comment-mail-menu-page-area .pmp-modal-dialog .pmp-modal-dialog-close::before
+{
+	content : '\2716';
+}
+/*
 A menu page area ~ tabs.
 */
 .comment-mail-menu-page-area .pmp-tabs
@@ -286,6 +324,24 @@ A menu page area ~ utilities.
 	cursor          : pointer !important;
 	border          : 1px dotted !important;
 	border-width    : 0 0 1px 0 !important;
+}
+.comment-mail-menu-page-area .pmp-q-link
+{
+	text-decoration : none;
+	letter-spacing  : .1em;
+}
+.comment-mail-menu-page-area .pmp-child-branch
+{
+	margin-left : .25em;
+	display     : inline-block;
+
+	font-weight : normal;
+	font-style  : normal;
+	opacity     : 0.2;
+}
+.comment-mail-menu-page-area .pmp-child-branch::before
+{
+	content : '\A716';
 }
 .comment-mail-menu-page-area .pmp-blink
 {

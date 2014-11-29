@@ -83,6 +83,21 @@
 		{
 			$(this).select(); // jQuery makes this easy for us.
 		});
+		$menuPageArea.find('[data-toggle~="alert"]').on('click', function(e)
+		{
+			e.preventDefault(), e.stopImmediatePropagation();
+
+			var $this = $(this), alertMarkup = $this.data('alert'),
+				$modalDialog = $('<div class="pmp-modal-dialog">' +
+				                 '<a class="pmp-modal-dialog-close"></a>' +
+				                 '   ' + alertMarkup +
+				                 '</div>');
+			$this.after($modalDialog), $modalDialog.find('> .pmp-modal-dialog-close').on('click', function(e)
+			{
+				e.preventDefault(), e.stopImmediatePropagation(),
+					$(this).closest('.pmp-modal-dialog').remove();
+			});
+		});
 		/* ------------------------------------------------------------------------------------------------------------
 		 JS for an actual/standard plugin menu page; e.g. options.
 		 ------------------------------------------------------------------------------------------------------------ */

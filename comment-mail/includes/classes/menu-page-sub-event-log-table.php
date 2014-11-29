@@ -241,11 +241,20 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function column_event(\stdClass $item)
 			{
-				if($item->event !== 'overwritten')
+				if($item->event !== 'overwritten' || !$item->oby_sub_id)
 					return esc_html((string)$item->event);
 
-				return esc_html($item->event).'<br />'. // + reason why.
-				       $this->plugin->utils_event->sub_overwritten_reason($item);
+				if(!empty($this->merged_result_sets['subs'][$item->oby_sub_id]))
+				{
+					$edit_url     = $this->plugin->utils_url->edit_sub_short($item->oby_sub_id);
+					$oby_sub_info = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
+					                ' <span>ID <a href="'.esc_attr($edit_url).'" title="'.esc_attr($item->oby_sub_key).'">#'.esc_html($item->oby_sub_id).'</a></span>';
+				}
+				else $oby_sub_info = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
+				                     ' <span>ID #'.esc_html($item->oby_sub_id).'</span>';
+
+				return esc_html($item->event).' '.$this->plugin->utils_event->sub_overwritten_reason($item).'<br />'.
+				       '<i class="pmp-child-branch"></i> '.__('by', $this->plugin->text_domain).' '.$oby_sub_info;
 			}
 
 			/*
