@@ -192,29 +192,202 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Sub event log; determine `overwritten` reason.
+			 * Sub event log; provide inserted details.
 			 *
 			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $row A sub event log entry row from the DB.
 			 *
-			 * @return string The reason (human readable) why the overwrite occurred.
+			 * @return string Details about why an insertion occurs; in the form of a `[?]` link.
 			 */
-			public function sub_overwritten_reason(\stdClass $row)
+			public function sub_inserted_q_link(\stdClass $row)
 			{
-				$reason = '<h3 style="margin-top:0;">'.sprintf(__('Subscr. ID #%1$s was overwritten by Subscr. ID #%2$s.', $this->plugin->text_domain), $row->sub_id, $row->oby_sub_id).'</h3>'.
-				          '<p>'.__('An overwrite occurs automatically whenever a subscription is a duplicate (or in conflict) with another.', $this->plugin->text_domain).
-				          ' '.sprintf(__('Nothing to be alarmed about. It\'s common for this to occur from time-to-time. It\'s %1$s&trade; doing it\'s job to prevent duplicate and/or conflicting subscriptions.', $this->plugin->text_domain), $this->plugin->name).'</p>'.
+				$details = '<h3 style="margin-top:0;">'.sprintf(__('Subscr. ID #%1$s was inserted %2$s', $this->plugin->text_domain), esc_html($row->sub_id), esc_html($this->plugin->utils_date->i18n('M j, Y g:i a', $row->time))).'</h3>'.
 
-				          '<i class="fa fa-question-circle fa-5x pmp-right"></i>'.
-				          '<p style="font-weight:bold;">'.__('Here are a few examples of why an overwrite may occur:', $this->plugin->text_domain).'</p>'.
-				          '<ul class="pmp-list-items" style="margin-bottom:0;">'.
-				          ' <li>'.__('Same email, same post ID, same comment ID. For instance, if a new subscription is created (or an existing subscription is updated), where it becomes an exact duplicate of another; the subscription being created/updated will take precedence.', $this->plugin->text_domain).'</li>'.
-				          ' <li>'.__('Same email, same post ID, comment ID indicates a specific comment. In this case, if there is an existing subscription that is for all comments on the post; adding a new one where the comment ID is specific, overwrites a previous subscription that was for the entire post; implying that the underlying subscriber wants notifications regarding a specific comment, not all comments anymore.', $this->plugin->text_domain).'</li>'.
-				          ' <li>'.__('Same email, same post ID, comment ID is not specific. Same as the previous example, but in reverse. If a subscription is created (or an existing subscription is updated), where it will now cover all comments on the post; any others that were for specific comments on the same post, will be overwritten to avoid duplicate emails.', $this->plugin->text_domain).'</li>'.
-				          '</ul>';
+				           '<i class="fa fa-info-circle fa-5x pmp-right"></i>'.
+				           '<p style="margin-bottom:0;">'.__('An insertion occurs whenever a new subscription is added to the database.', $this->plugin->text_domain).'</p>';
 
-				return '<a href="#" class="pmp-q-link" data-toggle="alert" data-alert="'.esc_attr($reason).'">[?]</a>';
+				return '<a href="#" class="pmp-q-link" data-toggle="alert" data-alert="'.esc_attr($details).'">'.__('[?]', $this->plugin->text_domain).'</a>';
+			}
+
+			/**
+			 * Sub event log; provide a summary of updates.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param \stdClass $row A sub event log entry row from the DB.
+			 *
+			 * @return string Summary of the updates that occured in this event.
+			 */
+			public function sub_updated_summary(\stdClass $row)
+			{
+				if(is_null($keys = &$this->cache_key(__FUNCTION__, 'keys')))
+					$keys = array(
+						'key'        => __('Subscr. Key', $this->plugin->text_domain),
+
+						'user_id'    => __('WP User ID', $this->plugin->text_domain),
+						'post_id'    => __('Post ID', $this->plugin->text_domain),
+						'comment_id' => __('Comment ID', $this->plugin->text_domain),
+
+						'status'     => __('Status', $this->plugin->text_domain),
+						'deliver'    => __('Delivery', $this->plugin->text_domain),
+
+						'fname'      => __('First Name', $this->plugin->text_domain),
+						'lname'      => __('Last Name', $this->plugin->text_domain),
+						'email'      => __('Email Address', $this->plugin->text_domain),
+
+						'ip'         => __('IP Address', $this->plugin->text_domain),
+						'region'     => __('IP Region', $this->plugin->text_domain),
+						'country'    => __('IP Country', $this->plugin->text_domain),
+					);
+				$change_counter = 1; // Initialize; last update time always changes.
+
+				foreach($keys as $_key => $_label)
+					if(isset($row->{$_key}, $row->{$_key.'_before'}))
+						if($row->{$_key} !== $row->{$_key.'_before'})
+							$change_counter++; // Increment change counter.
+				unset($_key, $_label); // Housekeeping.
+
+				return '<span>'.sprintf(_n('%1$s change', '%1$s changes', $change_counter, $this->plugin->text_domain), esc_html($change_counter)).'</span>';
+			}
+
+			/**
+			 * Sub event log; provide a dynamic changelog for updates.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param \stdClass $row A sub event log entry row from the DB.
+			 *
+			 * @return string Dynamic changelog for updates; in the form of a `[?]` link.
+			 */
+			public function sub_updated_q_link(\stdClass $row)
+			{
+				if(is_null($keys = &$this->cache_key(__FUNCTION__, 'keys')))
+					$keys = array(
+						'key'        => __('Subscr. Key', $this->plugin->text_domain),
+
+						'user_id'    => __('WP User ID', $this->plugin->text_domain),
+						'post_id'    => __('Post ID', $this->plugin->text_domain),
+						'comment_id' => __('Comment ID', $this->plugin->text_domain),
+
+						'status'     => __('Status', $this->plugin->text_domain),
+						'deliver'    => __('Delivery', $this->plugin->text_domain),
+
+						'fname'      => __('First Name', $this->plugin->text_domain),
+						'lname'      => __('Last Name', $this->plugin->text_domain),
+						'email'      => __('Email Address', $this->plugin->text_domain),
+
+						'ip'         => __('IP Address', $this->plugin->text_domain),
+						'region'     => __('IP Region', $this->plugin->text_domain),
+						'country'    => __('IP Country', $this->plugin->text_domain),
+					);
+				$change_lis = array(); // Initialize.
+
+				foreach($keys as $_key => $_label)
+					if(isset($row->{$_key}, $row->{$_key.'_before'}))
+						if($row->{$_key} !== $row->{$_key.'_before'})
+							$change_lis[] = '<li>'. // Details what was changed, and what it was changed to.
+							                ' '.sprintf(__('%1$s was changed from <code>%2$s</code> to: <code>%3$s</code>', $this->plugin->text_domain), esc_html($_label), esc_html($row->{$_key.'_before'}), esc_html($row->{$_key})).
+							                '</li>';
+				unset($_key, $_label); // Housekeeping.
+
+				$change_lis[] = '<li>'. // Show this to avoid an empty set of results in cases where nothing else changed at all.
+				                ' '.sprintf(__('%1$s was changed to: <code>%2$s</code>', $this->plugin->text_domain), esc_html(__('Last Update Time', $this->plugin->text_domain)), esc_html($this->plugin->utils_date->i18n('M j, Y g:i a', $row->time))).
+				                '</li>';
+
+				$changelog = '<h3 style="margin-top:0;">'.sprintf(__('Subscr. ID #%1$s was updated %2$s', $this->plugin->text_domain), esc_html($row->sub_id), esc_html($this->plugin->utils_date->i18n('M j, Y g:i a', $row->time))).'</h3>'.
+
+				             '<i class="fa fa-info-circle fa-5x pmp-right"></i>'.
+				             '<p style="font-weight:bold;">'._n('The following change occurred:', 'The following changes occurred:', count($change_lis), $this->plugin->text_domain).'</p>'.
+				             '<ul class="pmp-list-items" style="margin-bottom:0;">'.
+				             ' '.implode('', $change_lis).
+				             '</ul>';
+
+				return '<a href="#" class="pmp-q-link" data-toggle="alert" data-alert="'.esc_attr($changelog).'">'.__('[?]', $this->plugin->text_domain).'</a>';
+			}
+
+			/**
+			 * Sub event log; provide overwritten details.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param \stdClass $row A sub event log entry row from the DB.
+			 *
+			 * @return string Details about why an overwrite may occur from time-to-time; in the form of a `[?]` link.
+			 */
+			public function sub_overwritten_q_link(\stdClass $row)
+			{
+				$details = '<h3 style="margin-top:0;">'.sprintf(__('Subscr. ID #%1$s was overwritten by Subscr. ID #%2$s', $this->plugin->text_domain), esc_html($row->sub_id), esc_html($row->oby_sub_id)).'</h3>'.
+				           '<p>'.__('An overwrite occurs automatically whenever a subscription is a duplicate (or in conflict) with another.', $this->plugin->text_domain).
+				           ' '.sprintf(__('Nothing to be alarmed about. It\'s common for this to occur from time-to-time. It\'s %1$s&trade; doing it\'s job to prevent duplicate and/or conflicting subscriptions.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'.
+
+				           '<i class="fa fa-info-circle fa-5x pmp-right"></i>'.
+				           '<p style="font-weight:bold;">'.__('Here are a few examples of why an overwrite may occur:', $this->plugin->text_domain).'</p>'.
+				           '<ul class="pmp-list-items" style="margin-bottom:0;">'.
+				           ' <li>'.__('Same email, same post ID, same comment ID. For instance, if a new subscription is created (or an existing subscription is updated), where it becomes an exact duplicate of another; the subscription being created/updated will take precedence.', $this->plugin->text_domain).'</li>'.
+				           ' <li>'.__('Same email, same post ID, comment ID indicates a specific comment. In this case, if there is an existing subscription that is for all comments on the post; adding a new one where the comment ID is specific, overwrites a previous subscription that was for the entire post; implying that the underlying subscriber wants notifications regarding a specific comment, not all comments anymore.', $this->plugin->text_domain).'</li>'.
+				           ' <li>'.__('Same email, same post ID, comment ID is not specific. Same as the previous example, but in reverse. If a subscription is created (or an existing subscription is updated), where it will now cover all comments on the post; any others that were for specific comments on the same post, will be overwritten to avoid duplicate emails.', $this->plugin->text_domain).'</li>'.
+				           '</ul>';
+
+				return '<a href="#" class="pmp-q-link" data-toggle="alert" data-alert="'.esc_attr($details).'">'.__('[?]', $this->plugin->text_domain).'</a>';
+			}
+
+			/**
+			 * Sub event log; provide purged details.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param \stdClass $row A sub event log entry row from the DB.
+			 *
+			 * @return string Details about why a purge occurs; in the form of a `[?]` link.
+			 */
+			public function sub_purged_q_link(\stdClass $row)
+			{
+				$details = '<h3 style="margin-top:0;">'.sprintf(__('Subscr. ID #%1$s was purged %2$s', $this->plugin->text_domain), esc_html($row->sub_id), esc_html($this->plugin->utils_date->i18n('M j, Y g:i a', $row->time))).'</h3>'.
+
+				           '<i class="fa fa-info-circle fa-5x pmp-right"></i>'.
+				           '<p style="margin-bottom:0;">'.__('A purge occurs automatically whenever data connected to a subscription is deleted or becomes invalid. For example, if a subscription is connected to a post or comment ID that is later deleted, any subscriptions connected that post or comment ID will be purged automatically. The same would be true if a subscription was connected to a specific WordPress user ID. If the user is deleted, so are all of their subscriptions.', $this->plugin->text_domain).'</p>';
+
+				return '<a href="#" class="pmp-q-link" data-toggle="alert" data-alert="'.esc_attr($details).'">'.__('[?]', $this->plugin->text_domain).'</a>';
+			}
+
+			/**
+			 * Sub event log; provide cleaned details.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param \stdClass $row A sub event log entry row from the DB.
+			 *
+			 * @return string Details about why a cleaning occurs; in the form of a `[?]` link.
+			 */
+			public function sub_cleaned_q_link(\stdClass $row)
+			{
+				$details = '<h3 style="margin-top:0;">'.sprintf(__('Subscr. ID #%1$s was cleaned %2$s', $this->plugin->text_domain), esc_html($row->sub_id), esc_html($this->plugin->utils_date->i18n('M j, Y g:i a', $row->time))).'</h3>'.
+
+				           '<i class="fa fa-info-circle fa-5x pmp-right"></i>'.
+				           '<p>'.__('A cleaning occurs automatically whenever data connected to a subscription becomes corrupted, or when an expiration time is reached, as established by your config. options. For instance, if you configure an expiration time of <code>60 days</code> for unconfirmed or trashed subscriptions, once a subscription goes unconfirmed, or is left in the trash for <code>60 days</code> it will be cleaned automatically; i.e. deleted from the database.', $this->plugin->text_domain).'</p>'.
+				           '<p style="margin-bottom:0;">'.sprintf(__('In terms of data corruption, a cleaning may also occur when you have a subscription connected to a nonexistent WP user ID. %1$s will periodically scan the database for invalid data sequences and clean those up to avoid clutter and/or confusion.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>';
+
+				return '<a href="#" class="pmp-q-link" data-toggle="alert" data-alert="'.esc_attr($details).'">'.__('[?]', $this->plugin->text_domain).'</a>';
+			}
+
+			/**
+			 * Sub event log; provide deleted details.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param \stdClass $row A sub event log entry row from the DB.
+			 *
+			 * @return string Details about why a deletion occurs; in the form of a `[?]` link.
+			 */
+			public function sub_deleted_q_link(\stdClass $row)
+			{
+				$details = '<h3 style="margin-top:0;">'.sprintf(__('Subscr. ID #%1$s was deleted %2$s', $this->plugin->text_domain), esc_html($row->sub_id), esc_html($this->plugin->utils_date->i18n('M j, Y g:i a', $row->time))).'</h3>'.
+
+				           '<i class="fa fa-info-circle fa-5x pmp-right"></i>'.
+				           '<p style="margin-bottom:0;">'.__('Deletions occur as a result of you manually deleting a subscription, or in response to a subscription being unsubscribed; i.e. an end-user chooses to unsubscribe, and they click a link to remove themselves from the mailing list.', $this->plugin->text_domain).'</p>';
+
+				return '<a href="#" class="pmp-q-link" data-toggle="alert" data-alert="'.esc_attr($details).'">'.__('[?]', $this->plugin->text_domain).'</a>';
 			}
 		}
 	}

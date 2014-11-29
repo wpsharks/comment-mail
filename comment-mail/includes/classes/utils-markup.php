@@ -507,7 +507,7 @@ namespace comment_mail // Root namespace.
 					$options .= '<option value="'.esc_attr($_comment->comment_ID).'"'.$_selected.'>'.
 					            '  '.esc_html(__('Comment', $this->plugin->text_domain).' ID #'.$_comment->comment_ID.
 					                          ($_comment->comment_author ? ' :: '.__('by', $this->plugin->text_domain).' "'.$_comment->comment_author.'"'.($display_emails ? ' <'.$_comment->comment_author_email.'>' : '') : '').
-					                          ' :: '.$this->plugin->utils_date->i18n('M j, Y, g:i a', strtotime($_comment->comment_date_gmt))).
+					                          ' :: '.$this->plugin->utils_date->i18n('M j, Y g:i a', strtotime($_comment->comment_date_gmt))).
 					            '</option>';
 				}
 				unset($_comment, $_selected); // Just a little housekeeping.

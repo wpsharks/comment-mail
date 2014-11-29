@@ -59,35 +59,51 @@ namespace comment_mail // Root namespace.
 				$plugin = plugin(); // Plugin class instance.
 
 				return array(
-					'cb'             => '1', // Include checkboxes.
-					'ID'             => __('Entry', $plugin->text_domain),
+					'cb'                => '1', // Include checkboxes.
+					'ID'                => __('Entry', $plugin->text_domain),
 
-					'sub_id'         => __('Subscr. ID', $plugin->text_domain),
-					'key'            => __('Subscr. Key', $plugin->text_domain),
+					'time'              => __('Time', $plugin->text_domain),
+					'sub_id'            => __('Subscr. ID', $plugin->text_domain),
 
-					'user_id'        => __('WP User ID', $plugin->text_domain),
+					'event'             => __('Event', $plugin->text_domain),
+					'oby_sub_id'        => __('Overwritten By', $plugin->text_domain),
+					'user_initiated'    => __('User Initiated', $plugin->text_domain),
 
-					'event'          => __('Event', $plugin->text_domain),
-					'time'           => __('Time', $plugin->text_domain),
-					'user_initiated' => __('User Initiated', $plugin->text_domain),
+					'key_before'        => __('Subscr. Key Before', $plugin->text_domain),
+					'key'               => __('Subscr. Key After', $plugin->text_domain),
 
-					'oby_sub_id'     => __('Overwritten By', $plugin->text_domain),
+					'user_id_before'    => __('WP User ID Before', $plugin->text_domain),
+					'user_id'           => __('WP User ID After', $plugin->text_domain),
 
-					'status_before'  => __('Status Before', $plugin->text_domain),
-					'status'         => __('Status After', $plugin->text_domain),
+					'post_id_before'    => __('Post ID Before', $plugin->text_domain),
+					'post_id'           => __('Post ID After', $plugin->text_domain),
 
-					'post_id'        => __('Subscr. to Post ID', $plugin->text_domain),
-					'comment_id'     => __('Subscr. to Comment ID', $plugin->text_domain),
+					'comment_id_before' => __('Comment ID Before', $plugin->text_domain),
+					'comment_id'        => __('Comment ID After', $plugin->text_domain),
 
-					'deliver'        => __('Delivery', $plugin->text_domain),
+					'status_before'     => __('Status Before', $plugin->text_domain),
+					'status'            => __('Status After', $plugin->text_domain),
 
-					'fname'          => __('First Name', $plugin->text_domain),
-					'lname'          => __('Last Name', $plugin->text_domain),
-					'email'          => __('Email', $plugin->text_domain),
+					'deliver_before'    => __('Delivery Before', $plugin->text_domain),
+					'deliver'           => __('Delivery After', $plugin->text_domain),
 
-					'ip'             => __('IP Address', $plugin->text_domain),
-					'region'         => __('IP Region', $plugin->text_domain),
-					'country'        => __('IP Country', $plugin->text_domain),
+					'fname_before'      => __('First Name Before', $plugin->text_domain),
+					'fname'             => __('First Name After', $plugin->text_domain),
+
+					'lname_before'      => __('Last Name Before', $plugin->text_domain),
+					'lname'             => __('Last Name After', $plugin->text_domain),
+
+					'email_before'      => __('Email Before', $plugin->text_domain),
+					'email'             => __('Email After', $plugin->text_domain),
+
+					'ip_before'         => __('IP Address Before', $plugin->text_domain),
+					'ip'                => __('IP Address After', $plugin->text_domain),
+
+					'region_before'     => __('IP Region Before', $plugin->text_domain),
+					'region'            => __('IP Region After', $plugin->text_domain),
+
+					'country_before'    => __('IP Country Before', $plugin->text_domain),
+					'country'           => __('IP Country After', $plugin->text_domain),
 				);
 			}
 
@@ -101,25 +117,40 @@ namespace comment_mail // Root namespace.
 			public static function get_hidden_columns_()
 			{
 				return array(
-					'key',
-
-					'user_id',
-
+					'oby_sub_id',
 					'user_initiated',
 
-					'oby_sub_id',
+					'key_before',
+					'key',
 
+					'user_id_before',
+					'user_id',
+
+					'post_id_before',
 					'post_id',
+
+					'comment_id_before',
 					'comment_id',
 
+					'deliver_before',
 					'deliver',
 
+					'fname_before',
 					'fname',
+
+					'lname_before',
 					'lname',
+
+					'email_before',
 					'email',
 
+					'ip_before',
 					'ip',
+
+					'region_before',
 					'region',
+
+					'country_before',
 					'country',
 				);
 			}
@@ -241,20 +272,46 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function column_event(\stdClass $item)
 			{
-				if($item->event !== 'overwritten' || !$item->oby_sub_id)
-					return esc_html((string)$item->event);
+				$event_label = $this->plugin->utils_i18n->event_label($item->event);
 
-				if(!empty($this->merged_result_sets['subs'][$item->oby_sub_id]))
+				switch($item->event) // Based on the type of event that took place.
 				{
-					$edit_url     = $this->plugin->utils_url->edit_sub_short($item->oby_sub_id);
-					$oby_sub_info = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
-					                ' <span>ID <a href="'.esc_attr($edit_url).'" title="'.esc_attr($item->oby_sub_key).'">#'.esc_html($item->oby_sub_id).'</a></span>';
-				}
-				else $oby_sub_info = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
-				                     ' <span>ID #'.esc_html($item->oby_sub_id).'</span>';
+					case 'inserted': // Subscription was inserted in this case.
 
-				return esc_html($item->event).' '.$this->plugin->utils_event->sub_overwritten_reason($item).'<br />'.
-				       '<i class="pmp-child-branch"></i> '.__('by', $this->plugin->text_domain).' '.$oby_sub_info;
+						return esc_html($event_label).' '.$this->plugin->utils_event->sub_inserted_q_link($item);
+
+					case 'updated': // Subscription was updated in this case.
+
+						return esc_html($event_label).' '.$this->plugin->utils_event->sub_updated_q_link($item).'<br />'.
+						       '<i class="pmp-child-branch"></i> '.$this->plugin->utils_event->sub_updated_summary($item);
+
+					case 'overwritten': // Overwritten by another?
+
+						if($item->oby_sub_id && !empty($this->merged_result_sets['subs'][$item->oby_sub_id]))
+						{
+							$edit_url     = $this->plugin->utils_url->edit_sub_short($item->oby_sub_id);
+							$oby_sub_info = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
+							                ' <span>ID <a href="'.esc_attr($edit_url).'" title="'.esc_attr($item->oby_sub_key).'">#'.esc_html($item->oby_sub_id).'</a></span>';
+						}
+						else $oby_sub_info = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
+						                     ' <span>ID #'.esc_html($item->oby_sub_id).'</span>';
+
+						return esc_html($event_label).' '.$this->plugin->utils_event->sub_overwritten_q_link($item).'<br />'.
+						       '<i class="pmp-child-branch"></i> '.__('by', $this->plugin->text_domain).' '.$oby_sub_info;
+
+					case 'purged': // Subscription was purged in this case.
+
+						return esc_html($event_label).' '.$this->plugin->utils_event->sub_purged_q_link($item);
+
+					case 'cleaned': // Subscription was cleaned in this case.
+
+						return esc_html($event_label).' '.$this->plugin->utils_event->sub_cleaned_q_link($item);
+
+					case 'deleted': // Subscription was deleted in this case.
+
+						return esc_html($event_label).' '.$this->plugin->utils_event->sub_deleted_q_link($item);
+				}
+				return esc_html($event_label); // Default case handler.
 			}
 
 			/*

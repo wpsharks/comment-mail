@@ -88,15 +88,18 @@
 			e.preventDefault(), e.stopImmediatePropagation();
 
 			var $this = $(this), alertMarkup = $this.data('alert'),
+				$modalDialogOverlay = $('<div class="pmp-modal-dialog-overlay"></div>'),
 				$modalDialog = $('<div class="pmp-modal-dialog">' +
-				                 '<a class="pmp-modal-dialog-close"></a>' +
+				                 '   <a class="pmp-modal-dialog-close"></a>' +
 				                 '   ' + alertMarkup +
 				                 '</div>');
-			$this.after($modalDialog), $modalDialog.find('> .pmp-modal-dialog-close').on('click', function(e)
-			{
-				e.preventDefault(), e.stopImmediatePropagation(),
-					$(this).closest('.pmp-modal-dialog').remove();
-			});
+			$this.after($modalDialogOverlay).after($modalDialog),
+				$modalDialogOverlay.add($modalDialog.find('> .pmp-modal-dialog-close')).on('click', function(e)
+				{
+					e.preventDefault(), e.stopImmediatePropagation(),
+						$menuPageArea.find('.pmp-modal-dialog').remove(),
+						$menuPageArea.find('.pmp-modal-dialog-overlay').remove();
+				});
 		});
 		/* ------------------------------------------------------------------------------------------------------------
 		 JS for an actual/standard plugin menu page; e.g. options.

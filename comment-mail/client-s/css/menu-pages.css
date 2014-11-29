@@ -204,12 +204,25 @@ A menu page area ~ postboxes.
 /*
 A menu page area ~ alert box.
 */
+.comment-mail-menu-page-area .pmp-modal-dialog-overlay
+{
+	top        : 0;
+	left       : 0;
+	z-index    : 1;
+	position   : fixed;
+
+	width      : 100%;
+	height     : 100%;
+	background : rgba(0, 0, 0, 0.5);
+
+	cursor     : pointer;
+}
 .comment-mail-menu-page-area .pmp-modal-dialog
 {
 	top           : 100px;
 	left          : 50%;
 	position      : fixed;
-	z-index       : 1;
+	z-index       : 2;
 
 	width         : 50%;
 	margin-left   : -25%;
@@ -1024,6 +1037,9 @@ Menu page table columns; i.e. media queries.
 	.comment-mail-menu-page-sub-event-log tr > *.column-user_id,
 	.comment-mail-menu-page-sub-event-log tr > *.column-post_id,
 	.comment-mail-menu-page-sub-event-log tr > *.column-comment_id,
+	.comment-mail-menu-page-sub-event-log tr > *.column-user_id_before,
+	.comment-mail-menu-page-sub-event-log tr > *.column-post_id_before,
+	.comment-mail-menu-page-sub-event-log tr > *.column-comment_id_before,
 		/**/
 	.comment-mail-menu-page-queue tr > *.column-sub_id,
 	.comment-mail-menu-page-queue tr > *.column-user_id,
@@ -1052,6 +1068,9 @@ Menu page table columns; i.e. media queries.
 	.comment-mail-menu-page-sub-event-log tr > *.column-user_id,
 	.comment-mail-menu-page-sub-event-log tr > *.column-post_id,
 	.comment-mail-menu-page-sub-event-log tr > *.column-comment_id,
+	.comment-mail-menu-page-sub-event-log tr > *.column-user_id_before,
+	.comment-mail-menu-page-sub-event-log tr > *.column-post_id_before,
+	.comment-mail-menu-page-sub-event-log tr > *.column-comment_id_before,
 		/**/
 	.comment-mail-menu-page-queue tr > *.column-sub_id,
 	.comment-mail-menu-page-queue tr > *.column-user_id,
@@ -1080,6 +1099,9 @@ Menu page table columns; i.e. media queries.
 	.comment-mail-menu-page-sub-event-log tr > *.column-user_id,
 	.comment-mail-menu-page-sub-event-log tr > *.column-post_id,
 	.comment-mail-menu-page-sub-event-log tr > *.column-comment_id,
+	.comment-mail-menu-page-sub-event-log tr > *.column-user_id_before,
+	.comment-mail-menu-page-sub-event-log tr > *.column-post_id_before,
+	.comment-mail-menu-page-sub-event-log tr > *.column-comment_id_before,
 		/**/
 	.comment-mail-menu-page-queue tr > *.column-sub_id,
 	.comment-mail-menu-page-queue tr > *.column-user_id,
