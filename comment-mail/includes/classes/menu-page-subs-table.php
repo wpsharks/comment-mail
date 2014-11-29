@@ -214,10 +214,12 @@ namespace comment_mail // Root namespace.
 			 * @since 141111 First documented version.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 * @param string    $prefix Prefix for data associated w/ the key. Defaults to ``.
+			 * @param string    $key A particular key to return. Defaults to `email`
 			 *
 			 * @return string HTML markup for this table column.
 			 */
-			protected function column_email(\stdClass $item)
+			protected function column_email(\stdClass $item, $prefix = '', $key = 'email')
 			{
 				$name_email_args = array(
 					'separator'   => '<br />',
