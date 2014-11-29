@@ -58,7 +58,7 @@ namespace comment_mail // Root namespace.
 			{
 				$plugin = plugin(); // Plugin class instance.
 
-				return array(
+				$columns = array(
 					'cb'                => '1', // Include checkboxes.
 
 					'email'             => __('Subscriber Email', $plugin->text_domain),
@@ -86,6 +86,12 @@ namespace comment_mail // Root namespace.
 					'key'               => __('Key', $plugin->text_domain),
 					'ID'                => __('ID', $plugin->text_domain),
 				);
+				if(!$plugin->options['geo_location_tracking_enable']) foreach($columns as $_key => $_column)
+					if(in_array($_key, array('insertion_region', 'insertion_country', 'last_region', 'last_country'), TRUE))
+						unset($columns[$_key]); // Ditch this column by key.
+				unset($_key, $_column); // Housekeeping.
+
+				return $columns; // Associative array.
 			}
 
 			/**
@@ -97,7 +103,9 @@ namespace comment_mail // Root namespace.
 			 */
 			public static function get_hidden_columns_()
 			{
-				return array(
+				$plugin = plugin(); // Plugin class instance.
+
+				$columns = array(
 					'fname',
 					'lname',
 
@@ -118,6 +126,12 @@ namespace comment_mail // Root namespace.
 					'key',
 					'ID',
 				);
+				if(!$plugin->options['geo_location_tracking_enable']) foreach($columns as $_key => $_column)
+					if(in_array($_column, array('insertion_region', 'insertion_country', 'last_region', 'last_country'), TRUE))
+						unset($columns[$_key]); // Ditch this column by key.
+				unset($_key, $_column); // Housekeeping.
+
+				return array_values($columns);
 			}
 
 			/**

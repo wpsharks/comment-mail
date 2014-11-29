@@ -58,7 +58,7 @@ namespace comment_mail // Root namespace.
 			{
 				$plugin = plugin(); // Plugin class instance.
 
-				return array(
+				$columns = array(
 					'cb'                => '1', // Include checkboxes.
 					'ID'                => __('Entry', $plugin->text_domain),
 
@@ -105,6 +105,12 @@ namespace comment_mail // Root namespace.
 					'country_before'    => __('IP Country Before', $plugin->text_domain),
 					'country'           => __('IP Country After', $plugin->text_domain),
 				);
+				if(!$plugin->options['geo_location_tracking_enable']) foreach($columns as $_key => $_column)
+					if(in_array($_key, array('region_before', 'region', 'country_before', 'country'), TRUE))
+						unset($columns[$_key]); // Ditch this column by key.
+				unset($_key, $_column); // Housekeeping.
+
+				return $columns; // Associative array.
 			}
 
 			/**
@@ -116,7 +122,9 @@ namespace comment_mail // Root namespace.
 			 */
 			public static function get_hidden_columns_()
 			{
-				return array(
+				$plugin = plugin(); // Plugin class instance.
+
+				$columns = array(
 					'oby_sub_id',
 					'user_initiated',
 
@@ -153,6 +161,12 @@ namespace comment_mail // Root namespace.
 					'country_before',
 					'country',
 				);
+				if(!$plugin->options['geo_location_tracking_enable']) foreach($columns as $_key => $_column)
+					if(in_array($_column, array('region_before', 'region', 'country_before', 'country'), TRUE))
+						unset($columns[$_key]); // Ditch this column by key.
+				unset($_key, $_column); // Housekeeping.
+
+				return array_values($columns);
 			}
 
 			/**
