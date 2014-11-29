@@ -738,11 +738,11 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 * @param string    $prefix Prefix for data associated w/ the key. Defaults to ``.
-			 * @param string    $key A particular key to return. Defaults to `deliver`.
+			 * @param string    $key A particular key to return. Defaults to `email`.
 			 *
 			 * @return string HTML markup for this table column.
 			 */
-			protected function column_deliver(\stdClass $item, $prefix = '', $key = 'deliver')
+			protected function column_email(\stdClass $item, $prefix = '', $key = 'email')
 			{
 				if(!isset($item->{$key}))
 					return '—'; // Not possible.
@@ -750,7 +750,11 @@ namespace comment_mail // Root namespace.
 				if(!$item->{$key})
 					return '—'; // Not possible.
 
-				return esc_html($this->plugin->utils_i18n->deliver_label($item->{$key}));
+				$name_email_args = array(
+					'anchor_to'   => 'search',
+					'email_style' => 'font-weight:normal;',
+				);
+				return $this->plugin->utils_markup->name_email('', $item->{$key}, $name_email_args);
 			}
 
 			/**
@@ -762,9 +766,9 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string HTML markup for this table column.
 			 */
-			protected function column_deliver_before(\stdClass $item)
+			protected function column_email_before(\stdClass $item)
 			{
-				return $this->column_deliver($item, '', 'deliver_before');
+				return $this->column_email($item, '', 'email_before');
 			}
 
 			/**
@@ -810,22 +814,19 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @param \stdClass $item Item object; i.e. a row from the DB.
 			 * @param string    $prefix Prefix for data associated w/ the key. Defaults to ``.
-			 * @param string    $key A particular key to return. Defaults to `note_code`.
+			 * @param string    $key A particular key to return. Defaults to `deliver`.
 			 *
 			 * @return string HTML markup for this table column.
 			 */
-			protected function column_note_code(\stdClass $item, $prefix = '', $key = 'note_code')
+			protected function column_deliver(\stdClass $item, $prefix = '', $key = 'deliver')
 			{
 				if(!isset($item->{$key}))
 					return '—'; // Not possible.
 
 				if(!$item->{$key})
-					return '—'; // Not applicable.
+					return '—'; // Not possible.
 
-				$note = $this->plugin->utils_event->queue_note_code_desc($item->{$key});
-				$note = $this->plugin->utils_string->markdown_no_p($note); // HTML markup.
-
-				return $note; // HTML markup via simple MD parsing.
+				return esc_html($this->plugin->utils_i18n->deliver_label($item->{$key}));
 			}
 
 			/**
@@ -837,9 +838,9 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string HTML markup for this table column.
 			 */
-			protected function column_note_code_before(\stdClass $item)
+			protected function column_deliver_before(\stdClass $item)
 			{
-				return $this->column_note_code($item, '', 'note_code_before');
+				return $this->column_deliver($item, '', 'deliver_before');
 			}
 
 			/**

@@ -31,6 +31,55 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Queue event log; provide notified details.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param \stdClass $row A queue event log entry row from the DB.
+			 *
+			 * @return string Details about why a notified event occurs; in the form of a `[?]` link.
+			 */
+			public function queue_notified_q_link(\stdClass $row)
+			{
+				$details = '<h3 style="margin-top:0;">'.sprintf(__('Queue Entry ID #%1$s was processed (notified) successfully on %2$s', $this->plugin->text_domain), esc_html($row->queue_id), esc_html($this->plugin->utils_date->i18n('M j, Y g:i a', $row->time))).'</h3>'.
+
+				           '<i class="fa fa-info-circle fa-5x pmp-right"></i>'.
+				           '<p>'.__('When a queue entry is processed (notified) it means that an email notification was sent successfully; i.e. the subscriber was sent an email with details about a new reply on a specific post (or comment) they subscribed to.', $this->plugin->text_domain).'</p>'.
+				           '<p style="font-weight:bold;">'.__('This email notification was sent to:', $this->plugin->text_domain).'</p>'.
+				           '<ul style="margin-bottom:0;">'.
+				           ' <li><code>'.esc_html($row->email).'</code></li>'.
+				           '</ul>';
+
+				return '<a href="#" class="pmp-q-link" data-toggle="alert" data-alert="'.esc_attr($details).'">'.__('[?]', $this->plugin->text_domain).'</a>';
+			}
+
+			/**
+			 * Queue event log; provide invalidated details.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param \stdClass $row A queue event log entry row from the DB.
+			 *
+			 * @return string Details about why an invalidated event occurs; in the form of a `[?]` link.
+			 */
+			public function queue_invalidated_q_link(\stdClass $row)
+			{
+				$note = $this->plugin->utils_event->queue_note_code_desc($row->note_code);
+				$note = $this->plugin->utils_string->markdown_no_p($note);
+
+				$details = '<h3 style="margin-top:0;">'.sprintf(__('Queue Entry ID #%1$s was invalidated %2$s', $this->plugin->text_domain), esc_html($row->queue_id), esc_html($this->plugin->utils_date->i18n('M j, Y g:i a', $row->time))).'</h3>'.
+
+				           '<i class="fa fa-info-circle fa-5x pmp-right"></i>'.
+				           '<p>'.__('An invalidation occurs whenever there is an unexpected scenario encountered during queue processing. This happens from time-to-time; i.e. it\'s usually not something to be alarmed about. For example, an invalidation may occur because you deleted a post, or comment, before a notification (already in the queue) was actually processed. It\'s not possible to send a notification regarding a post/comment that no longer exists, so an invalidation is actually a good thing in case like this. That\'s just one example, but it gives an idea of what can cause an invalidation.', $this->plugin->text_domain).'</p>'.
+				           '<p style="font-weight:bold;">'.__('This particular invalidation occured because:', $this->plugin->text_domain).'</p>'.
+				           '<ul class="pmp-list-items" style="margin-bottom:0;">'.
+				           ' <li><code>'.esc_html($row->note_code).'</code> — '.$note.'</li>'.
+				           '</ul>';
+
+				return '<a href="#" class="pmp-q-link" data-toggle="alert" data-alert="'.esc_attr($details).'">'.__('[?]', $this->plugin->text_domain).'</a>';
+			}
+
+			/**
 			 * Queue event log; note code to full description.
 			 *
 			 * @since 141111 First documented version.

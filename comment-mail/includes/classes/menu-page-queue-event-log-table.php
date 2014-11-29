@@ -58,14 +58,12 @@ namespace comment_mail // Root namespace.
 			{
 				$plugin = plugin(); // Plugin class instance.
 
-				return array(
+				$columns = array(
 					'cb'                => '1', // Include checkboxes.
 					'ID'                => __('Entry', $plugin->text_domain),
 
 					'time'              => __('Time', $plugin->text_domain),
-
 					'event'             => __('Event', $plugin->text_domain),
-					'note_code'         => __('Note', $plugin->text_domain),
 
 					'queue_id'          => __('Queue ID', $plugin->text_domain),
 					'dby_queue_id'      => __('Digested by Queue ID', $plugin->text_domain),
@@ -87,6 +85,12 @@ namespace comment_mail // Root namespace.
 
 					'status'            => __('Subscr. Status', $plugin->text_domain),
 				);
+				if(!$plugin->options['geo_location_tracking_enable']) foreach($columns as $_key => $_column)
+					if(in_array($_key, array('region', 'country'), TRUE))
+						unset($columns[$_key]); // Ditch this column by key.
+				unset($_key, $_column); // Housekeeping.
+
+				return $columns; // Associative array.
 			}
 
 			/**
@@ -98,9 +102,9 @@ namespace comment_mail // Root namespace.
 			 */
 			public static function get_hidden_columns_()
 			{
-				return array(
-					'note_code',
+				$plugin = plugin(); // Plugin class instance.
 
+				$columns = array(
 					'queue_id',
 					'dby_queue_id',
 
@@ -119,6 +123,12 @@ namespace comment_mail // Root namespace.
 
 					'status',
 				);
+				if(!$plugin->options['geo_location_tracking_enable']) foreach($columns as $_key => $_column)
+					if(in_array($_column, array('region', 'country'), TRUE))
+						unset($columns[$_key]); // Ditch this column by key.
+				unset($_key, $_column); // Housekeeping.
+
+				return array_values($columns);
 			}
 
 			/**
@@ -215,6 +225,38 @@ namespace comment_mail // Root namespace.
 					            '</a>',
 				);
 				return $id_info.$this->row_actions($row_actions);
+			}
+
+			/**
+			 * Table column handler.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param \stdClass $item Item object; i.e. a row from the DB.
+			 *
+			 * @return string HTML markup for this table column.
+			 */
+			protected function column_event(\stdClass $item)
+			{
+				$event_label = $this->plugin->utils_i18n->event_label($item->event);
+
+				switch($item->event) // Based on the type of event that took place.
+				{
+					case 'notified': // Queue entry was notified in this case.
+
+						$name_email_args = array(
+							'anchor_to'   => 'search',
+							'email_style' => 'font-weight:normal;',
+						);
+						return esc_html($event_label).' '.$this->plugin->utils_event->queue_notified_q_link($item).'<br />'.
+						       $this->plugin->utils_markup->name_email('', $item->email, $name_email_args);
+
+					case 'invalidated': // Queue entry was invalidated in this case.
+
+						return esc_html($event_label).' '.$this->plugin->utils_event->queue_invalidated_q_link($item).'<br />'.
+						       '<code style="font-size:90%;">'.esc_html($item->note_code).'</code>';
+				}
+				return esc_html($event_label); // Default case handler.
 			}
 
 			/*
