@@ -158,18 +158,21 @@ namespace comment_mail // Root namespace.
 						'name'        => 'insertion_ip', 'required' => FALSE, 'maxlength' => 39, 'current_value' => $this->current_value_for('insertion_ip'),
 						'notes_after' => __('If empty, this is filled automatically when a subscriber confirms or updates their subscription.', $this->plugin->text_domain),
 					));
-				echo $this->form_fields->input_row(
-					array(
-						'label'       => __('<i class="fa fa-fw fa-map-marker"></i> IP Region Code', $this->plugin->text_domain),
-						'name'        => 'insertion_region', 'required' => FALSE, 'maxlength' => 2, 'current_value' => $this->current_value_for('insertion_region'),
-						'notes_after' => sprintf(__('If empty, this is filled automatically when a subscriber confirms or updates their subscription. Here is a map of all %1$s; found in the second column of the CSV file.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://www.maxmind.com/download/geoip/misc/region_codes.csv', __('Region Codes', $this->plugin->text_domain))),
-					));
-				echo $this->form_fields->input_row(
-					array(
-						'label'       => __('<i class="fa fa-fw fa-globe"></i> IP Country Code', $this->plugin->text_domain),
-						'name'        => 'insertion_country', 'required' => FALSE, 'maxlength' => 2, 'current_value' => $this->current_value_for('insertion_country'),
-						'notes_after' => sprintf(__('If empty, this is filled automatically when a subscriber confirms or updates their subscription. Here is a map of all %1$s; found in the first column of the CSV file.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://www.maxmind.com/download/geoip/misc/region_codes.csv', __('Country Codes', $this->plugin->text_domain))),
-					));
+				if($this->plugin->options['geo_location_tracking_enable'])
+				{
+					echo $this->form_fields->input_row(
+						array(
+							'label'       => __('<i class="fa fa-fw fa-map-marker"></i> IP Region Code', $this->plugin->text_domain),
+							'name'        => 'insertion_region', 'required' => FALSE, 'maxlength' => 2, 'current_value' => $this->current_value_for('insertion_region'),
+							'notes_after' => sprintf(__('If empty, this is filled automatically when a subscriber confirms or updates their subscription. Here is a map of all %1$s; found in the second column of the CSV file.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://www.maxmind.com/download/geoip/misc/region_codes.csv', __('Region Codes', $this->plugin->text_domain))),
+						));
+					echo $this->form_fields->input_row(
+						array(
+							'label'       => __('<i class="fa fa-fw fa-globe"></i> IP Country Code', $this->plugin->text_domain),
+							'name'        => 'insertion_country', 'required' => FALSE, 'maxlength' => 2, 'current_value' => $this->current_value_for('insertion_country'),
+							'notes_after' => sprintf(__('If empty, this is filled automatically when a subscriber confirms or updates their subscription. Here is a map of all %1$s; found in the first column of the CSV file.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://www.maxmind.com/download/geoip/misc/region_codes.csv', __('Country Codes', $this->plugin->text_domain))),
+						));
+				}
 				/* -------------------------------------------------------------------- */
 				echo $this->form_fields->horizontal_line_row(/* -------------------------------------------------------------------- */);
 				/* -------------------------------------------------------------------- */
