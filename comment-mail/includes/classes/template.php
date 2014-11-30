@@ -21,18 +21,18 @@ namespace comment_mail // Root namespace.
 		class template extends abs_base
 		{
 			/**
+			 * @var string Type of template.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $type;
+
+			/**
 			 * @var string Template file.
 			 *
 			 * @since 141111 First documented version.
 			 */
 			protected $file;
-
-			/**
-			 * @var string Template file option key.
-			 *
-			 * @since 141111 First documented version.
-			 */
-			protected $file_option_key;
 
 			/**
 			 * @var boolean Force default template?
@@ -53,30 +53,34 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @param string  $file Template file.
-			 * @param boolean $force_default Force default template?
+			 * @param string      $file Template file.
+			 *
+			 * @param string|null $type Template type. Defaults to an empty string.
+			 *    An empty string (or `NULL`) indicates the currently configured type.
+			 *
+			 * @param boolean     $force_default Force default template?
 			 *
 			 * @throws \exception If `$file` is empty.
 			 */
-			public function __construct($file, $force_default = FALSE)
+			public function __construct($file, $type = '', $force_default = FALSE)
 			{
 				parent::__construct();
 
-				$this->file = (string)$file;
+				if($type) // Use a specific type?
+					$this->type = trim(strtolower((string)$type));
+				if(!$this->type) $this->type = $this->plugin->options['template_type'];
+
+				if(!$this->type) // Empty type property?
+					throw new \exception(__('Empty type.', $this->plugin->text_domain));
+
+				$this->file = (string)$file; // Initialize.
 				$this->file = $this->plugin->utils_string->trim_deep($this->file, '', '/');
 				$this->file = $this->plugin->utils_fs->n_seps($this->file);
 
 				if(!$this->file) // Empty file property?
-					throw new \exception(__('Empty file property.', $this->plugin->text_domain));
-
-				$this->file_option_key = $this->file; // Initialize.
-				$this->file_option_key = preg_replace('/\.php$/i', '', $this->file_option_key);
-				$this->file_option_key = str_replace('/', '__', $this->file_option_key);
-				$this->file_option_key = str_replace('-', '_', $this->file_option_key);
-				$this->file_option_key = 'template__'.$this->file_option_key;
+					throw new \exception(__('Empty file.', $this->plugin->text_domain));
 
 				$this->force_default = (boolean)$force_default;
-
 				$this->file_contents = $this->get_file_contents();
 			}
 
@@ -236,11 +240,11 @@ namespace comment_mail // Root namespace.
 				check_theme_dirs: // Target point.
 
 				$dirs = array(); // Initialize.
-				// e.g. `wp-content/themes/[theme]/[plugin slug]`.
-				// e.g. `wp-content/themes/[theme]/[plugin slug]/site/comment-form/subscription-ops.php`.
-				// e.g. `wp-content/themes/[theme]/[plugin slug]/email/confirmation-request-message.php`.
-				$dirs[] = get_stylesheet_directory().'/'.$this->plugin->slug;
-				$dirs[] = get_template_directory().'/'.$this->plugin->slug;
+				// e.g. `wp-content/themes/[theme]/[plugin slug]/type-a`.
+				// e.g. `wp-content/themes/[theme]/[plugin slug]/type-a/site/comment-form/subscription-ops.php`.
+				// e.g. `wp-content/themes/[theme]/[plugin slug]/type-a/email/confirmation-request-message.php`.
+				$dirs[] = get_stylesheet_directory().'/'.$this->plugin->slug.'/type-'.$this->type;
+				$dirs[] = get_template_directory().'/'.$this->plugin->slug.'/type-'.$this->type;
 
 				foreach($dirs as $_dir /* In order of precedence. */)
 					// Note: don't check `filesize()` here; templates CAN be empty.
@@ -250,18 +254,18 @@ namespace comment_mail // Root namespace.
 
 				check_option_key: // Target point.
 
-				// e.g. `site/comment-form/sub-ops.php`.
-				// e.g. `email/confirmation-request-message.php`.
-				// becomes: `template__site__comment_form__sub_ops`.
-				// becomes: `template__email__confirmation_request_message`.
-				if(!empty($this->plugin->options[$this->file_option_key]))
-					return $this->plugin->options[$this->file_option_key];
+				// e.g. type `a` for `site/comment-form/sub-ops.php`.
+				// becomes: `template__type_a__site__comment_form__sub_ops`.
+				$option_key = static::data_option_key(array('type' => $this->type, 'file' => $this->file));
+
+				if(!empty($this->plugin->options[$option_key]))
+					return $this->plugin->options[$option_key];
 
 				default_template: // Target point; default template.
 
 				// Default template directory.
 				$dirs   = array(); // Initialize.
-				$dirs[] = dirname(dirname(__FILE__)).'/templates';
+				$dirs[] = dirname(dirname(__FILE__)).'/templates/type-'.$this->type;
 
 				foreach($dirs as $_dir /* In order of precedence. */)
 					// Note: don't check `filesize()` here; templates CAN be empty.
@@ -269,27 +273,73 @@ namespace comment_mail // Root namespace.
 						return file_get_contents($_dir.'/'.$this->file);
 				unset($_dir); // Housekeeping.
 
-				throw new \exception(sprintf(__('Missing template for: `%1$s`.', $this->plugin->text_domain), $this->file));
+				throw new \exception(sprintf(__('Missing template: `%1$s/%2$s`.', $this->plugin->text_domain), $this->type, $this->file));
 			}
 
 			/**
-			 * Transforms an option key into a file path.
+			 * Transforms an option key into a type & file path.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @param string $file_option_key Option key.
+			 * @param string $option_key Template option key.
 			 *
-			 * @return string Relative file path matching the input option key.
+			 * @return \stdClass Object w/ two properties: `type` and `file`.
 			 */
-			public static function option_key_to_file($file_option_key)
+			public static function option_key_data($option_key)
 			{
-				$file = $file_option_key; // Initialize.
+				$plugin = plugin();
 
-				$file = preg_replace('/^template__/', '', $file);
-				$file = str_replace('__', '/', $file);
-				$file = str_replace('_', '-', $file);
+				$type       = $file = ''; // Initialize.
+				$option_key = trim(strtolower((string)$option_key));
 
-				return $file.'.php'; // Relative file path.
+				if(preg_match('/^template__type_(?P<type>.+?)__/', '', $option_key, $_m))
+					$type = trim(strtolower((string)$_m['type'])); // Key has type?
+				if(!$type) $type = $plugin->options['template_type'];
+				unset($_m); // Just a little housekeeping.
+
+				$file = $option_key; // Initialize.
+				$file = preg_replace('/^template__type_.+?__/', '', $file);
+				$file = str_replace('_', '-', str_replace('__', '/', $file));
+				$file .= '.php'; // Add `.php` extension also.
+				$file = $plugin->utils_string->trim_deep($file, '', '/');
+				$file = $plugin->utils_fs->n_seps($file);
+
+				return (object)compact('type', 'file');
+			}
+
+			/**
+			 * Transforms option data (type/file) into a plugin option key.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param \stdClass|array Two properties: `type`, `file`.
+			 *
+			 * @return string The plugin option key for the given template data.
+			 */
+			public static function data_option_key($data)
+			{
+				$plugin = plugin();
+
+				$type = $file = ''; // Initialize.
+				if(is_array($data)) $data = (object)$data;
+				if(!is_object($data)) $data = new \stdClass;
+
+				if(!empty($data->type)) // Specific type?
+					$type = trim(strtolower((string)$data->type));
+				if(!$type) $type = $plugin->options['template_type'];
+
+				if(!empty($data->file)) // In case it is empty.
+					$file = trim(strtolower((string)$data->file));
+				$file = $plugin->utils_string->trim_deep($file, '', '/');
+				$file = $plugin->utils_fs->n_seps($file);
+
+				$option_key = $file; // Initialize.
+				$option_key = preg_replace('/\.php$/i', '', $option_key);
+				$option_key = str_replace('/', '__', $option_key);
+				$option_key = str_replace('-', '_', $option_key);
+				$option_key = 'template__type_'.$type.'__'.$option_key;
+
+				return $option_key; // Plugin option key.
 			}
 		}
 	}
