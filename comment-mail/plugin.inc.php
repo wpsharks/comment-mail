@@ -1202,7 +1202,7 @@ namespace comment_mail
 				) return; // Not applicable.
 
 				add_screen_option('per_page', array(
-					'default' => '50', // Default items per page.
+					'default' => '20', // Default items per page.
 					'label'   => __('Per Page', $this->text_domain),
 					'option'  => __NAMESPACE__.'_subs_per_page',
 				));
@@ -1249,7 +1249,7 @@ namespace comment_mail
 				) return; // Not applicable.
 
 				add_screen_option('per_page', array(
-					'default' => '50', // Default items per page.
+					'default' => '20', // Default items per page.
 					'label'   => __('Per Page', $this->text_domain),
 					'option'  => __NAMESPACE__.'_sub_event_log_entries_per_page',
 				));
@@ -1295,7 +1295,7 @@ namespace comment_mail
 				) return; // Not applicable.
 
 				add_screen_option('per_page', array(
-					'default' => '50', // Default items per page.
+					'default' => '20', // Default items per page.
 					'label'   => __('Per Page', $this->text_domain),
 					'option'  => __NAMESPACE__.'_queued_notifications_per_page',
 				));
@@ -1341,7 +1341,7 @@ namespace comment_mail
 				) return; // Not applicable.
 
 				add_screen_option('per_page', array(
-					'default' => '50', // Default items per page.
+					'default' => '20', // Default items per page.
 					'label'   => __('Per Page', $this->text_domain),
 					'option'  => __NAMESPACE__.'_queue_event_log_entries_per_page',
 				));
