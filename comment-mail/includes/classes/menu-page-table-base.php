@@ -456,11 +456,11 @@ namespace comment_mail // Root namespace.
 				$name_email_args = array(
 					'separator'   => '<br />',
 					'anchor_to'   => 'search',
+					'name_style'  => 'font-weight:bold;',
 					'email_style' => 'font-weight:bold;',
 				);
 				$name            = $item->{$prefix.'fname'}.' '.$item->{$prefix.'lname'};
 				$sub_info        = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
-				                   ' <span style="font-weight:bold;" title="'.esc_attr($item->{$prefix.'key'}).'">ID #'.esc_html($item->{$key}).'</span>'.
 				                   ' '.$this->plugin->utils_markup->name_email($name, $item->{$prefix.'email'}, $name_email_args);
 
 				$edit_url = $this->plugin->utils_url->edit_sub_short($item->{$key});
@@ -541,10 +541,10 @@ namespace comment_mail // Root namespace.
 				$name_email_args = array(
 					'separator'   => '<br />',
 					'anchor_to'   => 'search',
+					'name_style'  => 'font-weight:normal;',
 					'email_style' => 'font-weight:normal;',
 				);
-				$user_info       = '<i class="fa fa-user"></i>'. // e.g. ♙ ID "Name" <email>; w/ username in hover title.
-				                   ' <span style="font-weight:bold;" title="'.esc_attr($item->{$prefix.'login'}).'">ID #'.esc_html($item->{$key}).'</span>'.
+				$user_info       = '<i class="fa fa-user"></i>'. // e.g. ♙ "Name" <email>
 				                   ' '.$this->plugin->utils_markup->name_email($item->{$prefix.'display_name'}, $item->{$prefix.'email'}, $name_email_args);
 
 				$edit_url = $this->plugin->utils_url->edit_user_short($item->{$key});
@@ -612,9 +612,7 @@ namespace comment_mail // Root namespace.
 				$post_info = $this->plugin->utils_markup->subs_count($item->{$key}, $post_total_subs).
 				             $this->plugin->utils_markup->comment_count($item->{$key}, $post_total_comments).
 				             '<i class="fa fa-thumb-tack"></i>'. // Start w/ a thumb tack icon; works w/ any post type.
-				             ' <span style="font-weight:bold;">'.esc_html($post_type_label).' ID #'.esc_html($item->{$key}).'</span>'.
-				             ' <span style="font-style:italic;">('.__('comments', $this->plugin->text_domain).' '.esc_html($post_comments_status).')</span><br />'.
-				             '<span title="'.esc_attr($post_date).'">&ldquo;'.esc_html($post_title_clip).'&rdquo;</span>';
+				             ' ' . '<span title="'.esc_attr($post_date).'">'.esc_html($post_title_clip).'</span>';
 
 				$post_view_url    = $this->plugin->utils_url->post_short($item->{$key});
 				$post_edit_url    = $this->plugin->utils_url->post_edit_short($item->{$key});
@@ -668,6 +666,7 @@ namespace comment_mail // Root namespace.
 
 				$name_email_args   = array(
 					'anchor_to'   => 'search',
+					'name_style' => 'font-weight:bold;',
 					'email_style' => 'font-weight:normal;',
 				);
 				$comment_date_time = $this->plugin->utils_date->i18n('M j, Y g:i a', strtotime($item->{$prefix.'date_gmt'}));
@@ -675,9 +674,6 @@ namespace comment_mail // Root namespace.
 				$comment_status    = $this->plugin->utils_i18n->status_label($this->plugin->utils_db->comment_status__($item->{$prefix.'approved'}));
 
 				$comment_info = '<i class="fa fa-comment"></i>'. // Start w/ a comment bubble icon.
-				                ' <span style="font-weight:bold;">'.esc_html(__('Comment', $this->plugin->text_domain)).' ID #'.esc_html($item->{$key}).'</span>'.
-				                ' <span style="font-style:italic;">('.esc_html($comment_status).')</span><br />'.
-				                '<span style="font-style:italic;">'.__('by:', $this->plugin->text_domain).'</span>'.
 				                ' '.$this->plugin->utils_markup->name_email($item->{$prefix.'author'}, $item->{$prefix.'author_email'}, $name_email_args);
 
 				$comment_view_url    = $this->plugin->utils_url->comment_short($item->{$key});
@@ -1936,7 +1932,6 @@ namespace comment_mail // Root namespace.
 
 					$sub_lis[$_sub->ID] = '<li>'. // [icon] ID "Name" <email> [edit].
 					                      '<i class="'.esc_attr('wsi-'.$this->plugin->slug).'"></i>'.
-					                      ' <span style="font-weight:bold;" title="'.esc_attr($_sub->key).'">ID #'.esc_html($_sub->ID).'</span>'.
 					                      ' '.$this->plugin->utils_markup->name_email($_sub_name, $_sub->email, $_name_email_args).
 					                      ($_sub_edit_link // Only if they can edit the subscription ID; else this will be empty.
 						                      ? ' [<a href="'.esc_attr($_sub_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
@@ -1977,8 +1972,7 @@ namespace comment_mail // Root namespace.
 					$_user_edit_link  = get_edit_user_link($_user->ID);
 
 					$user_lis[$_user->ID] = '<li>'. // [icon] ID "Name" <email> [edit].
-					                        '<i class="fa fa-user"></i>'. // e.g. [icon] ID "Name" <email>; w/ key in hover title.
-					                        ' <span style="font-weight:bold;" title="'.esc_attr($_user->user_login).'">ID #'.esc_html($_user->ID).'</span>'.
+					                        '<i class="fa fa-user"></i>'. // e.g. [icon] "Name" <email>
 					                        ' '.$this->plugin->utils_markup->name_email($_user->display_name, $_user->user_email, $_name_email_args).
 					                        ($_user_edit_link // Only if they can edit the user ID; else this will be empty.
 						                        ? ' [<a href="'.esc_attr($_user_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
@@ -2001,9 +1995,7 @@ namespace comment_mail // Root namespace.
 					$_post_title_clip = $this->plugin->utils_string->mid_clip($_post->post_title);
 					$_post_type_label = $_post_type->labels->singular_name;
 
-					$post_lis[$_post->ID] = '<li>'. // Type ID: <title> [edit].
-					                        '  <span style="font-weight:bold;">'.esc_html($_post_type_label).'</span>'.
-					                        '  <span style="font-weight:bold;">ID #'.esc_html($_post->ID).':</span>'.
+					$post_lis[$_post->ID] = '<li>'. // <title> [edit].
 					                        '  &ldquo;<a href="'.esc_attr($_post_permalink).'" target="_blank">'.esc_html($_post_title_clip).'</a>&rdquo;'.
 					                        ($_post_edit_link // Only if they can edit the post ID; else this will be empty.
 						                        ? ' [<a href="'.esc_attr($_post_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
@@ -2038,9 +2030,7 @@ namespace comment_mail // Root namespace.
 					$_comment_edit_link    = get_edit_comment_link($_comment->comment_ID);
 					$_comment_content_clip = $this->plugin->utils_string->clip($_comment->comment_content, 100);
 
-					$comment_lis[$_comment->comment_ID] = '<li>'. // Type ID: <title> [edit].
-					                                      '   <span style="font-weight:normal;">'.esc_html($_post_type_label).'</span>'.
-					                                      '   <span style="font-weight:normal;">ID #'.esc_html($_post->ID).':</span>'.
+					$comment_lis[$_comment->comment_ID] = '<li>'. // <title> [edit].
 					                                      '   &ldquo;<a href="'.esc_attr($_post_permalink).'" target="_blank">'.esc_html($_post_title_clip).'</a>&rdquo;'.
 					                                      ($_post_edit_link // Only if they can edit the post ID; else this will be empty.
 						                                      ? ' [<a href="'.esc_attr($_post_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
