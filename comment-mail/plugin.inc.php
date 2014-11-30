@@ -858,7 +858,8 @@ namespace comment_mail
 				// Meta boxes use an SVG graphic.
 				$icon = $this->utils_fs->inline_icon_svg();
 
-				add_meta_box(__NAMESPACE__.'_small', $icon.' '.$this->name.'&trade;', array($this, 'post_small_meta_box'), $post_type, 'side', 'high');
+				if(!$this->utils_env->is_menu_page('post-new.php'))
+					add_meta_box(__NAMESPACE__.'_small', $icon.' '.$this->name.'&trade;', array($this, 'post_small_meta_box'), $post_type, 'side', 'high');
 
 				// @TODO disabling this for now.
 				//add_meta_box(__NAMESPACE__.'_large', $icon.' '.$this->name.'&trade; '.__('Subscriptions', $this->text_domain),
