@@ -457,7 +457,7 @@ namespace comment_mail // Root namespace.
 					'separator'   => '<br />',
 					'anchor_to'   => 'search',
 					'name_style'  => 'font-weight:bold;',
-					'email_style' => 'font-weight:bold;',
+					'email_style' => 'font-weight:normal;',
 				);
 				$name            = $item->{$prefix.'fname'}.' '.$item->{$prefix.'lname'};
 				$sub_info        = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
@@ -1925,7 +1925,8 @@ namespace comment_mail // Root namespace.
 
 					$_name_email_args = array(
 						'anchor_to'   => 'search',
-						'email_style' => 'font-weight:bold;',
+						'name_style'  => 'font-weight:bold;',
+						'email_style' => 'font-weight:normal;',
 					);
 					$_sub_name        = $_sub->fname.' '.$_sub->lname; // Concatenate.
 					$_sub_edit_link   = $this->plugin->utils_url->edit_sub_short($_sub->ID);
@@ -1967,6 +1968,7 @@ namespace comment_mail // Root namespace.
 
 					$_name_email_args = array(
 						'anchor_to'   => 'search',
+						'name_style'  => 'font-weight:bold;',
 						'email_style' => 'font-weight:normal;',
 					);
 					$_user_edit_link  = get_edit_user_link($_user->ID);
@@ -2019,6 +2021,7 @@ namespace comment_mail // Root namespace.
 
 					$_name_email_args = array(
 						'anchor_to'   => 'search',
+						'name_style' => 'font-weight:bold;',
 						'email_style' => 'font-weight:normal;',
 					);
 					$_post_permalink  = get_permalink($_post->ID);
