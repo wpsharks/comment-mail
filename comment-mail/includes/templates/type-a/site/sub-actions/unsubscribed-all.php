@@ -2,16 +2,17 @@
 namespace comment_mail;
 
 /**
- * @var plugin $plugin Plugin class.
+ * @var plugin   $plugin Plugin class.
+ * @var template $template Template class.
  *
  * Other variables made available in this template file:
  *
- * @var string $site_header Parsed site header template.
- * @var string $site_footer Parsed site footer template.
+ * @var string   $site_header Parsed site header template.
+ * @var string   $site_footer Parsed site footer template.
  *
- * @var string $sub_email The email address unsubscribed completely.
+ * @var string   $sub_email The email address unsubscribed completely.
  *
- * @var array  $error_codes An array of any/all error codes.
+ * @var array    $error_codes An array of any/all error codes.
  *
  * -------------------------------------------------------------------
  * @note In addition to plugin-specific variables & functionality,

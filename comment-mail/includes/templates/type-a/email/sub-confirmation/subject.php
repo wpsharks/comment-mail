@@ -3,6 +3,7 @@ namespace comment_mail;
 
 /**
  * @var plugin         $plugin Plugin class.
+ * @var template       $template Template class.
  *
  * Other variables made available in this template file:
  *

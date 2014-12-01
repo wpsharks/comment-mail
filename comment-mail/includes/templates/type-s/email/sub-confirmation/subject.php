@@ -3,6 +3,7 @@ namespace comment_mail;
 
 /**
  * @var plugin         $plugin Plugin class.
+ * @var template       $template Template class.
  *
  * Other variables made available in this template file:
  *
@@ -22,8 +23,6 @@ namespace comment_mail;
  *    you may also use any WordPress functions that you like.
  */
 ?>
-<?php echo __('Confirm subscription', $plugin->text_domain); ?>
-
 <?php
 /*
  * Here we define a few more variables of our own.
@@ -39,11 +38,22 @@ $subscribed_to_own_comment = $sub_comment && strcasecmp($sub_comment->comment_au
 <?php if($sub_comment): // Subscribed to a specific comment? ?>
 
 	<?php if($subscribed_to_own_comment): ?>
-		<?php echo sprintf(__('to your comment on “%1$s”', $plugin->text_domain), $sub_post_title_clip); ?>
+		<?php echo $template->snippet(
+			'subject-own-sub-comment.php', array(
+				'[sub_comment_id]'      => $sub_comment->comment_ID,
+				'[sub_post_title_clip]' => $sub_post_title_clip,
+			)); ?>
 	<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
-		<?php echo sprintf(__('to comment ID #%1$s on “%2$s”', $plugin->text_domain), $sub_comment->comment_ID, $sub_post_title_clip); ?>
+		<?php echo $template->snippet(
+			'subject-sub-comment.php', array(
+				'[sub_comment_id]'      => $sub_comment->comment_ID,
+				'[sub_post_title_clip]' => $sub_post_title_clip,
+			)); ?>
 	<?php endif; ?>
 
 <?php else: // All comments/replies to this post. ?>
-	<?php echo sprintf(__('to “%1$s”', $plugin->text_domain), $sub_post_title_clip); ?>
+	<?php echo $template->snippet(
+		'subject-default.php', array(
+			'[sub_post_title_clip]' => $sub_post_title_clip,
+		)); ?>
 <?php endif; ?>

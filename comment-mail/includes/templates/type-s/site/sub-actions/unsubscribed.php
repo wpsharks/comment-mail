@@ -3,6 +3,7 @@ namespace comment_mail;
 
 /**
  * @var plugin         $plugin Plugin class.
+ * @var template       $template Template class.
  *
  * Other variables made available in this template file:
  *
@@ -117,9 +118,9 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 
 			<div class="alert alert-danger text-center pull-right" style="margin:1em 1em 1em 1em;">
 				<a class="text-danger" href="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
-					data-action="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
-					data-confirmation="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address? Are you absolutely sure?', $plugin->text_domain); ?>"
-					title="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address?', $plugin->text_domain); ?>">
+				   data-action="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
+				   data-confirmation="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address? Are you absolutely sure?', $plugin->text_domain); ?>"
+				   title="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address?', $plugin->text_domain); ?>">
 					<i class="fa fa-times-circle"></i> <?php echo __('Unsubscribe All?', $plugin->text_domain); ?>
 				</a>
 			</div>
@@ -144,7 +145,8 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 					&ldquo;<a href="<?php echo esc_attr($sub_comment_url); ?>"><?php echo esc_html($sub_post_title_clip); ?></a>&rdquo;
 				<?php elseif($sub_post && $sub_post_comments_url && $sub_post_title_clip): // Unsubscribing from all comments/replies. ?>
 					&ldquo;<a href="<?php echo esc_attr($sub_post_comments_url); ?>"><?php echo esc_html($sub_post_title_clip); ?></a>&rdquo;
-				<?php else: // Unsubscribing from all comments/replies; this is a fallback w/ just the `$sub->post_id`. ?>
+				<?php
+				else: // Unsubscribing from all comments/replies; this is a fallback w/ just the `$sub->post_id`. ?>
 					&ldquo;<?php echo sprintf(__('Post ID #<code>%1$s</code>', $plugin->text_domain), esc_html($sub->post_id)); ?>&rdquo;
 				<?php endif; ?>
 			</h4>

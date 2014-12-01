@@ -2,11 +2,12 @@
 namespace comment_mail;
 
 /**
- * @var plugin $plugin Plugin class.
+ * @var plugin   $plugin Plugin class.
+ * @var template $template Template class.
  *
  * Other variables made available in this template file:
  *
- * @var array  $sso_services An array of all "configured" SSO service identifiers.
+ * @var array    $sso_services An array of all "configured" SSO service identifiers.
  *    e.g. `twitter`, `facebook`, `google`, `linkedin`; if one or more of these are configured by the site owner.
  *    Services are "configured" when they have been given an oAuth key/secret in plugin options.
  *
@@ -72,7 +73,7 @@ namespace comment_mail;
 		background-position : 0 -2em;
 	}
 	<?php foreach($sso_services as $_sso_service): ?>
-		<?php echo '.comment-sso-ops .csso-link.csso-'.esc_html($_sso_service).
-		' { background-image : url("'.esc_url($plugin->utils_url->to('/client-s/images/sso-'.$_sso_service.'.png')).'"); }'."\n"; ?>
+	<?php echo '.comment-sso-ops .csso-link.csso-'.esc_html($_sso_service).
+	' { background-image : url("'.esc_url($plugin->utils_url->to('/client-s/images/sso-'.$_sso_service.'.png')).'"); }'."\n"; ?>
 	<?php endforeach; ?>
 </style>

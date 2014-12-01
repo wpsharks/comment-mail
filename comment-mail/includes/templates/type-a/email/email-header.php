@@ -2,26 +2,27 @@
 namespace comment_mail;
 
 /**
- * @var plugin $plugin Plugin class.
+ * @var plugin      $plugin Plugin class.
+ * @var template    $template Template class.
  *
  * Other variables made available in this template file:
  *
- * @var string $email_header_styles Parsed header `<style>` template file.
+ * @var string      $email_header_styles Parsed header `<style>` template file.
  *    This is a partial header template, incorporated into this full template file;
  *    i.e. a simpler fragment that fits into this larger picture here.
  *
- * @var string $email_header_scripts Parsed header `<script>` template file.
+ * @var string      $email_header_scripts Parsed header `<script>` template file.
  *    This is a partial header template, incorporated into this full template file;
  *    i.e. a simpler fragment that fits into this larger picture here.
  *
- * @var string $email_header_tag Parsed <header> tag template file.
+ * @var string      $email_header_tag Parsed <header> tag template file.
  *    This is a partial header template, incorporated into this full template file;
  *    i.e. a simpler fragment that fits into this larger picture here.
  *
  * @note The `%%title%%` replacement code should remain as-is.
  *    It is replaced by other templates using this header.
  *
- * @var string $template_file Relative path to the current template file.
+ * @var string      $template_file Relative path to the current template file.
  *
  * @note This file is automatically included as a child of other templates.
  *    Therefore, this template will ALSO receive any variable(s) passed to the parent template file,

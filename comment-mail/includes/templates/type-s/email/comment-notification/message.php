@@ -3,6 +3,7 @@ namespace comment_mail;
 
 /**
  * @var plugin         $plugin Plugin class.
+ * @var template       $template Template class.
  *
  * Other variables made available in this template file:
  *
@@ -61,39 +62,62 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
 // Plugin is configured to allow replies via email? If so, this will be `TRUE`.
 $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies_via_email_enable'];
 ?>
-	<h2 style="margin-top:0; font-family:serif;">
-		<?php if($is_digest): // Multiple comments/replies in this notification? ?>
+	<?php if($is_digest): // Multiple comments/replies in this notification? ?>
 
-			<?php if($sub_comment): // Subscribed to a specific comment? ?>
-
-				<?php if($subscribed_to_own_comment): ?>
-					<?php echo sprintf(__('New Replies to <a href="%1$s">your Comment</a> on &ldquo;%2$s&rdquo;', $plugin->text_domain), esc_attr($sub_comment_url), esc_html($sub_post_title_clip)); ?>
-				<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
-					<?php echo sprintf(__('New Replies to <a href="%1$s">Comment ID #%2$s</a> on &ldquo;%3$s&rdquo;', $plugin->text_domain), esc_attr($sub_comment_url), esc_html($sub_comment->comment_ID), esc_html($sub_post_title_clip)); ?>
-				<?php endif; ?>
-
-			<?php else: // All comments/replies on this post. ?>
-				<?php echo sprintf(__('New Comments on &ldquo;<a href="%1$s">%2$s</a>&rdquo;', $plugin->text_domain), esc_attr($sub_post_comments_url), esc_html($sub_post_title_clip)); ?>
+		<?php if($sub_comment): // Subscribed to a specific comment? ?>
+			<?php if($subscribed_to_own_comment): ?>
+				<?php echo $template->snippet(
+					'message-own-sub-comment-heading-digest.php', array(
+						'[sub_comment_url]'     => esc_attr($sub_comment_url),
+						'[sub_comment_id]'      => esc_html($sub_comment->comment_ID),
+						'[sub_post_title_clip]' => esc_html($sub_post_title_clip),
+					)); ?>
+			<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
+				<?php echo $template->snippet(
+					'message-sub-comment-heading-digest.php', array(
+						'[sub_comment_url]'     => esc_attr($sub_comment_url),
+						'[sub_comment_id]'      => esc_html($sub_comment->comment_ID),
+						'[sub_post_title_clip]' => esc_html($sub_post_title_clip),
+					)); ?>
 			<?php endif; ?>
 
-		<?php else: // There's just a single comment/reply in this notification. ?>
-
-			<?php if($sub_comment): // Subscribed to a specific comment? ?>
-
-				<?php if($subscribed_to_own_comment): ?>
-					<?php echo sprintf(__('New Reply to <a href="%1$s">your Comment</a> on &ldquo;%2$s&rdquo;', $plugin->text_domain), esc_attr($sub_comment_url), esc_html($sub_post_title_clip)); ?>
-				<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
-					<?php echo sprintf(__('New Reply to <a href="%1$s">Comment ID #%2$s</a> on &ldquo;%3$s&rdquo;', $plugin->text_domain), esc_attr($sub_comment_url), esc_html($sub_comment->comment_ID), esc_html($sub_post_title_clip)); ?>
-				<?php endif; ?>
-
-			<?php else: // All comments/replies on this post ID. ?>
-				<?php echo sprintf(__('New Comment on &ldquo;<a href="%1$s">%2$s</a>&rdquo;', $plugin->text_domain), esc_attr($sub_post_comments_url), esc_html($sub_post_title_clip)); ?>
-			<?php endif; ?>
-
+		<?php else: // All comments/replies on this post. ?>
+			<?php echo $template->snippet(
+				'message-default-heading-digest.php', array(
+					'[sub_post_comments_url]' => esc_attr($sub_post_comments_url),
+					'[sub_post_title_clip]'   => esc_html($sub_post_title_clip),
+				)); ?>
 		<?php endif; ?>
-	</h2>
 
-	<hr />
+	<?php else: // There's just a single comment/reply in this notification. ?>
+
+		<?php if($sub_comment): // Subscribed to a specific comment? ?>
+
+			<?php if($subscribed_to_own_comment): ?>
+				<?php echo $template->snippet(
+					'message-own-sub-comment-heading.php', array(
+						'[sub_comment_url]'     => esc_attr($sub_comment_url),
+						'[sub_comment_id]'      => esc_html($sub_comment->comment_ID),
+						'[sub_post_title_clip]' => esc_html($sub_post_title_clip),
+					)); ?>
+			<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
+				<?php echo $template->snippet(
+					'message-sub-comment-heading.php', array(
+						'[sub_comment_url]'     => esc_attr($sub_comment_url),
+						'[sub_comment_id]'      => esc_html($sub_comment->comment_ID),
+						'[sub_post_title_clip]' => esc_html($sub_post_title_clip),
+					)); ?>
+			<?php endif; ?>
+
+		<?php else: // All comments/replies on this post ID. ?>
+			<?php echo $template->snippet(
+				'message-default-heading-digest.php', array(
+					'[sub_post_comments_url]' => esc_attr($sub_post_comments_url),
+					'[sub_post_title_clip]'   => esc_html($sub_post_title_clip),
+				)); ?>
+		<?php endif; ?>
+
+	<?php endif; ?>
 
 	<ul>
 		<?php foreach($comments as $_comment): // Comments in this notification. ?>
@@ -123,27 +147,25 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
 			<li>
 				<?php if($_comment_parent): // This is a reply to someone? ?>
 
-					<p style="margin-bottom:0;">
-						<?php echo sprintf(__('In response to comment ID <a href="%1$s">#%2$s</a>', $plugin->text_domain), esc_attr($_comment_parent_url), esc_html($_comment_parent->comment_ID)); ?>
-						<?php if($_comment_parent->comment_author): ?>
-							<?php echo sprintf(__('— posted by %1$s', $plugin->text_domain), esc_html($_comment_parent->comment_author)); ?>
-						<?php endif; ?>
-					</p>
-					<p style="font-style:italic; font-size:90%; margin-top:0;">
-						<?php echo esc_html($_comment_parent_clip); ?>
-					</p>
+					<?php echo $template->snippet(
+						'message-in-response-to.php', array(
+							'[comment_parent_url]'       => esc_attr($_comment_parent_url),
+							'[comment_parent_id]'        => esc_html($_comment_parent->comment_ID),
+							'[comment_parent_author]'    => esc_html($_comment_parent->comment_author),
+							'[comment_parent_posted_by]' => $_comment_parent->comment_author ? ' '.sprintf(__('— posted by %1$s', $plugin->text_domain), esc_html($_comment_parent->comment_author)) : '',
+							'[comment_parent_clip]'      => esc_html($_comment_parent_clip),
+						)); ?>
 					<ul>
 						<li>
-							<p style="font-size:110%; font-weight:bold;">
-								<?php if($_comment->comment_author): ?>
-									<?php echo sprintf(__('%1$s added this reply %2$s.', $plugin->text_domain), esc_html($_comment->comment_author), esc_html($_comment_time_ago)); ?>
-								<?php else: // The site is not collecting comment author names. ?>
-									<?php echo sprintf(__('This reply was posted %1$s.', $plugin->text_domain), esc_html($_comment_time_ago)); ?>
-								<?php endif; ?>
-							</p>
-							<p style="font-size:130%; font-family:serif; max-width:800px;">
-								<?php echo esc_html($_comment_clip); ?>
-							</p>
+							<?php echo $template->snippet(
+								'message-reply-from.php', array(
+									'[comment_url]'       => esc_attr($_comment_url),
+									'[comment_id]'        => esc_html($_comment->comment_ID),
+									'[comment_time_ago]'  => esc_html($_comment_time_ago),
+									'[comment_author]'    => esc_html($_comment->comment_author),
+									'[comment_posted_by]' => $_comment->comment_author ? ' '.sprintf(__('— by %1$s', $plugin->text_domain), esc_html($_comment->comment_author)) : '',
+									'[comment_clip]'      => esc_html($_comment_clip),
+								)); ?>
 							<p style="margin-bottom:0;">
 								<a href="<?php echo esc_attr($_comment_url); ?>">
 									<?php echo __('continue reading', $plugin->text_domain); ?>
@@ -166,16 +188,15 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
 
 				<?php else: // A new comment; i.e. not a reply to someone. ?>
 
-					<p style="font-size:110%; font-weight:bold;">
-						<?php if($_comment->comment_author): ?>
-							<?php echo sprintf(__('%1$s left this comment %2$s.', $plugin->text_domain), esc_html($_comment->comment_author), esc_html($_comment_time_ago)); ?>
-						<?php else: // The site is not collecting comment author names. ?>
-							<?php echo sprintf(__('This comment was posted %1$s.', $plugin->text_domain), esc_html($_comment_time_ago)); ?>
-						<?php endif; ?>
-					</p>
-					<p style="font-size:130%; font-family:serif; max-width:800px;">
-						<?php echo esc_html($_comment_clip); ?>
-					</p>
+					<?php echo $template->snippet(
+						'message-comment-from.php', array(
+							'[comment_url]'       => esc_attr($_comment_url),
+							'[comment_id]'        => esc_html($_comment->comment_ID),
+							'[comment_time_ago]'  => esc_html($_comment_time_ago),
+							'[comment_author]'    => esc_html($_comment->comment_author),
+							'[comment_posted_by]' => $_comment->comment_author ? ' '.sprintf(__('— by %1$s', $plugin->text_domain), esc_html($_comment->comment_author)) : '',
+							'[comment_clip]'      => esc_html($_comment_clip),
+						)); ?>
 					<p style="margin-bottom:0;">
 						<a href="<?php echo esc_attr($_comment_url); ?>">
 							<?php echo __('continue reading', $plugin->text_domain); ?>

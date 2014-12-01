@@ -3,6 +3,7 @@ namespace comment_mail;
 
 /**
  * @var plugin         $plugin Plugin class.
+ * @var template       $template Template class.
  *
  * Other variables made available in this template file:
  *
@@ -44,13 +45,24 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
 	<?php if($sub_comment): // Subscribed to a specific comment? ?>
 
 		<?php if($subscribed_to_own_comment): ?>
-			<?php echo sprintf(__('New Replies to your Comment on “%1$s”', $plugin->text_domain), $sub_post_title_clip); ?>
+			<?php echo $template->snippet(
+				'subject-own-sub-comment-digest.php', array(
+					'[sub_comment_id]'      => $sub_comment->comment_ID,
+					'[sub_post_title_clip]' => $sub_post_title_clip,
+				)); ?>
 		<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
-			<?php echo sprintf(__('New Replies to Comment ID #%1$s on “%2$s”', $plugin->text_domain), $sub_comment->comment_ID, $sub_post_title_clip); ?>
+			<?php echo $template->snippet(
+				'subject-sub-comment-digest.php', array(
+					'[sub_comment_id]'      => $sub_comment->comment_ID,
+					'[sub_post_title_clip]' => $sub_post_title_clip,
+				)); ?>
 		<?php endif; ?>
 
 	<?php else: // All comments/replies on this post ID. ?>
-		<?php echo sprintf(__('New Comments on “%1$s”', $plugin->text_domain), $sub_post_title_clip); ?>
+		<?php echo $template->snippet(
+			'subject-default-digest.php', array(
+				'[sub_post_title_clip]' => $sub_post_title_clip,
+			)); ?>
 	<?php endif; ?>
 
 <?php else: // There's just a single comment/reply in this notification. ?>
@@ -58,13 +70,24 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
 	<?php if($sub_comment): // Subscribed to a specific comment? ?>
 
 		<?php if($subscribed_to_own_comment): ?>
-			<?php echo sprintf(__('New Reply to your Comment on “%1$s”', $plugin->text_domain), $sub_post_title_clip); ?>
+			<?php echo $template->snippet(
+				'subject-own-sub-comment.php', array(
+					'[sub_comment_id]'      => $sub_comment->comment_ID,
+					'[sub_post_title_clip]' => $sub_post_title_clip,
+				)); ?>
 		<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
-			<?php echo sprintf(__('New Reply to Comment ID #%1$s on “%2$s”', $plugin->text_domain), $sub_comment->comment_ID, $sub_post_title_clip); ?>
+			<?php echo $template->snippet(
+				'subject-sub-comment.php', array(
+					'[sub_comment_id]'      => $sub_comment->comment_ID,
+					'[sub_post_title_clip]' => $sub_post_title_clip,
+				)); ?>
 		<?php endif; ?>
 
 	<?php else: // All comments/replies on this post ID. ?>
-		<?php echo sprintf(__('New Comment on “%1$s”', $plugin->text_domain), $sub_post_title_clip); ?>
+		<?php echo $template->snippet(
+			'subject-default.php', array(
+				'[sub_post_title_clip]' => $sub_post_title_clip,
+			)); ?>
 	<?php endif; ?>
 
 <?php endif; ?>

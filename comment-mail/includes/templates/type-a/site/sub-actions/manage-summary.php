@@ -3,6 +3,7 @@ namespace comment_mail;
 
 /**
  * @var plugin         $plugin Plugin class.
+ * @var template       $template Template class.
  *
  * Other variables made available in this template file:
  *
@@ -171,9 +172,9 @@ str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $
 					<i class="fa fa-plus-square text-success pull-right" style="margin-left:.5em;"></i>
 				</a>
 				<a href="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
-					data-action="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
-					data-confirmation="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address? Are you absolutely sure?', $plugin->text_domain); ?>"
-					title="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address?', $plugin->text_domain); ?>">
+				   data-action="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
+				   data-confirmation="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address? Are you absolutely sure?', $plugin->text_domain); ?>"
+				   title="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address?', $plugin->text_domain); ?>">
 					<i class="fa fa-times-circle text-danger pull-right"></i>
 				</a>
 				<?php echo __('My Comment Subscriptions', $plugin->text_domain); ?><br />
@@ -193,131 +194,131 @@ str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $
 			<div class="subs-table table-responsive">
 				<table class="table table-striped table-hover">
 					<thead>
-					<tr>
-						<th class="manage-summary-subscr-email">
-							<?php echo __('Email Address', $plugin->text_domain); ?>
-						</th>
-						<th class="manage-summary-subscr-to">
-							<?php echo __('Subscribed To', $plugin->text_domain); ?>
-						</th>
-						<th class="manage-summary-subscr-type">
-							<?php echo __('Type', $plugin->text_domain); ?>
-						</th>
-						<th class="manage-summary-subscr-status">
-							<?php echo __('Status', $plugin->text_domain); ?>
-						</th>
-						<th class="manage-summary-subscr-delivery-op">
-							<?php echo __('Deliver', $plugin->text_domain); ?>
-						</th>
-					</tr>
+						<tr>
+							<th class="manage-summary-subscr-email">
+								<?php echo __('Email Address', $plugin->text_domain); ?>
+							</th>
+							<th class="manage-summary-subscr-to">
+								<?php echo __('Subscribed To', $plugin->text_domain); ?>
+							</th>
+							<th class="manage-summary-subscr-type">
+								<?php echo __('Type', $plugin->text_domain); ?>
+							</th>
+							<th class="manage-summary-subscr-status">
+								<?php echo __('Status', $plugin->text_domain); ?>
+							</th>
+							<th class="manage-summary-subscr-delivery-op">
+								<?php echo __('Deliver', $plugin->text_domain); ?>
+							</th>
+						</tr>
 					</thead>
 					<tbody>
-					<?php foreach($subs as $_sub): ?>
-						<tr>
-							<td>
-								<?php
-								/*
-								 * Here we define a few more variables of our own, for each subscription we iterate.
-								 * All of this data is based on what's already provided in the array of `$subs`;
-								 *    ~ as documented at the top of this file.
-								 */
-								// Post they are subscribed to.
-								//    Note: you CANNOT rely on the post still existing!
-								//    Always be sure to provide a fallback w/ just the `$_sub->post_id`
-								//    in case you deleted this post since they subscribed to it.
-								$_sub_post              = get_post($_sub->post_id);
-								$_sub_post_url          = $_sub_post ? get_permalink($_sub_post->ID) : '';
-								$_sub_post_comments_url = $_sub_post ? get_comments_link($_sub_post->ID) : '';
-								$_sub_post_title_clip   = $_sub_post ? $plugin->utils_string->clip($_sub_post->post_title, 45) : '';
-								$_sub_post_type         = $_sub_post ? get_post_type_object($_sub_post->post_type) : NULL;
-								$_sub_post_type_label   = $_sub_post_type ? $_sub_post_type->labels->singular_name : '';
+						<?php foreach($subs as $_sub): ?>
+							<tr>
+								<td>
+									<?php
+									/*
+									 * Here we define a few more variables of our own, for each subscription we iterate.
+									 * All of this data is based on what's already provided in the array of `$subs`;
+									 *    ~ as documented at the top of this file.
+									 */
+									// Post they are subscribed to.
+									//    Note: you CANNOT rely on the post still existing!
+									//    Always be sure to provide a fallback w/ just the `$_sub->post_id`
+									//    in case you deleted this post since they subscribed to it.
+									$_sub_post              = get_post($_sub->post_id);
+									$_sub_post_url          = $_sub_post ? get_permalink($_sub_post->ID) : '';
+									$_sub_post_comments_url = $_sub_post ? get_comments_link($_sub_post->ID) : '';
+									$_sub_post_title_clip   = $_sub_post ? $plugin->utils_string->clip($_sub_post->post_title, 45) : '';
+									$_sub_post_type         = $_sub_post ? get_post_type_object($_sub_post->post_type) : NULL;
+									$_sub_post_type_label   = $_sub_post_type ? $_sub_post_type->labels->singular_name : '';
 
-								// Comment they are subscribed to; if applicable.
-								//    Note: you CANNOT rely on the comment still existing!
-								//    Always be sure to provide a fallback w/ just the `$_sub->comment_id`
-								//    in case you deleted this comment since they subscribed to it.
-								$_sub_comment            = $_sub->comment_id ? get_comment($_sub->comment_id) : NULL;
-								$_sub_comment_url        = $_sub_comment ? get_comment_link($_sub_comment->comment_ID) : '';
-								$_sub_comment_date_utc   = $_sub_comment ? $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', strtotime($_sub_comment->comment_date_gmt)) : '';
-								$_sub_comment_date_local = $_sub_comment ? $plugin->utils_date->i18n('M jS, Y @ g:i a T', strtotime($_sub_comment->comment_date_gmt)) : '';
-								$_sub_comment_time_ago   = $_sub_comment ? $plugin->utils_date->approx_time_difference(strtotime($_sub_comment->comment_date_gmt)) : '';
+									// Comment they are subscribed to; if applicable.
+									//    Note: you CANNOT rely on the comment still existing!
+									//    Always be sure to provide a fallback w/ just the `$_sub->comment_id`
+									//    in case you deleted this comment since they subscribed to it.
+									$_sub_comment            = $_sub->comment_id ? get_comment($_sub->comment_id) : NULL;
+									$_sub_comment_url        = $_sub_comment ? get_comment_link($_sub_comment->comment_ID) : '';
+									$_sub_comment_date_utc   = $_sub_comment ? $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', strtotime($_sub_comment->comment_date_gmt)) : '';
+									$_sub_comment_date_local = $_sub_comment ? $plugin->utils_date->i18n('M jS, Y @ g:i a T', strtotime($_sub_comment->comment_date_gmt)) : '';
+									$_sub_comment_time_ago   = $_sub_comment ? $plugin->utils_date->approx_time_difference(strtotime($_sub_comment->comment_date_gmt)) : '';
 
-								// URLs that allow for actions to be performed against the subscription.
-								$_sub_edit_url   = $plugin->utils_url->sub_manage_sub_edit_url($_sub->key, NULL, TRUE);
-								$_sub_delete_url = $plugin->utils_url->sub_manage_sub_delete_url($_sub->key, NULL, TRUE);
+									// URLs that allow for actions to be performed against the subscription.
+									$_sub_edit_url   = $plugin->utils_url->sub_manage_sub_edit_url($_sub->key, NULL, TRUE);
+									$_sub_delete_url = $plugin->utils_url->sub_manage_sub_delete_url($_sub->key, NULL, TRUE);
 
-								// Type of subscription; one of `comment` or `comments`.
-								$_sub_type = $_sub->comment_id ? 'comment' : 'comments';
+									// Type of subscription; one of `comment` or `comments`.
+									$_sub_type = $_sub->comment_id ? 'comment' : 'comments';
 
-								$_sub_name_email_args = array('anchor_to' => $_sub_edit_url);
-								// This is the subscriber's `"name" <email>` w/ HTML markup enhancements.
-								$_sub_name_email_markup = $plugin->utils_markup->name_email($_sub->fname.' '.$_sub->lname, $_sub->email, $_sub_name_email_args);
+									$_sub_name_email_args = array('anchor_to' => $_sub_edit_url);
+									// This is the subscriber's `"name" <email>` w/ HTML markup enhancements.
+									$_sub_name_email_markup = $plugin->utils_markup->name_email($_sub->fname.' '.$_sub->lname, $_sub->email, $_sub_name_email_args);
 
-								// Subscribed to their own comment?
-								$_subscribed_to_own_comment = $_sub_comment && in_array(strtolower($_sub_comment->comment_author_email), $sub_emails, TRUE);
-								?>
-								<i class="<?php echo esc_attr('wsi-'.$plugin->slug.'-one'); ?>"></i> <?php echo $_sub_name_email_markup; ?><br />
+									// Subscribed to their own comment?
+									$_subscribed_to_own_comment = $_sub_comment && in_array(strtolower($_sub_comment->comment_author_email), $sub_emails, TRUE);
+									?>
+									<i class="<?php echo esc_attr('wsi-'.$plugin->slug.'-one'); ?>"></i> <?php echo $_sub_name_email_markup; ?><br />
 
-								<div class="hover-links">
-									<a href="<?php echo esc_attr($_sub_edit_url); ?>"
-									   title="<?php echo esc_attr(__('Edit Subscription', $plugin->text_domain)); ?>"
-										><i class="fa fa-pencil-square-o"></i> <?php echo __('Edit Subscr.', $plugin->text_domain); ?></a>
+									<div class="hover-links">
+										<a href="<?php echo esc_attr($_sub_edit_url); ?>"
+										   title="<?php echo esc_attr(__('Edit Subscription', $plugin->text_domain)); ?>"
+											><i class="fa fa-pencil-square-o"></i> <?php echo __('Edit Subscr.', $plugin->text_domain); ?></a>
 
-									<span class="text-muted">|</span>
+										<span class="text-muted">|</span>
 
-									<a data-action="<?php echo esc_attr($_sub_delete_url); ?>" href="<?php echo esc_attr($_sub_delete_url); ?>"
-									   data-confirmation="<?php echo esc_attr(__('Delete subscription? Are you sure?', $plugin->text_domain)); ?>"
-									   title="<?php echo esc_attr(__('Delete Subscription', $plugin->text_domain)); ?>" class="text-danger"
-										><?php echo __('Delete', $plugin->text_domain); ?> <i class="fa fa-times-circle"></i></a>
-								</div>
-							</td>
-							<td>
-								<?php if($_sub_post && $_sub_post_type_label): ?>
-									<?php echo sprintf(__('%1$s ID <a href="%2$s">#<code>%3$s</code></a> <a href="%4$s">%5$s</a>', $plugin->text_domain), esc_html($_sub_post_type_label), esc_attr($_sub_post_url), esc_html($_sub_post->ID), esc_attr($_sub_post_comments_url), esc_html($_sub_post_title_clip)); ?>
-								<?php else: // Post no longer exists for whatever reason; display post ID only in this case. ?>
-									<?php echo sprintf(__('Post ID #<code>%1$s</code>', $plugin->text_domain), esc_html($_sub->post_id)); ?>
-								<?php endif; ?>
-
-								<?php if($_sub->comment_id): ?><br />
-									<i class="fa fa-level-up fa-rotate-90"></i>
-
-									<?php if($_sub_comment): ?>
-										<?php if($_subscribed_to_own_comment): ?>
-											<?php echo sprintf(__('Replies to <a href="%1$s">your comment</a>; ID <a href="%1$s">#<code>%2$s</code></a> posted %3$s', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_ID), esc_html($_sub_comment_time_ago)); ?>
-										<?php else: // It's not their own comment; i.e. it's by someone else. ?>
-											<?php echo sprintf(__('Replies to <a href="%1$s">comment ID #<code>%2$s</code></a> posted %3$s', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_ID), esc_html($_sub_comment_time_ago)); ?>
-										<?php endif; ?>
-										<?php if($_sub_comment->comment_author): ?>
-											<?php echo sprintf(__('by: <a href="%1$s">%2$s</a>', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_author)); ?>
-										<?php endif; ?>
-									<?php else: // Comment no longer exists for whatever reason; display comment ID only in this case. ?>
-										<?php echo sprintf(__('Comment ID #<code>%1$s</code>', $plugin->text_domain), esc_html($_sub->comment_id)); ?>
+										<a data-action="<?php echo esc_attr($_sub_delete_url); ?>" href="<?php echo esc_attr($_sub_delete_url); ?>"
+										   data-confirmation="<?php echo esc_attr(__('Delete subscription? Are you sure?', $plugin->text_domain)); ?>"
+										   title="<?php echo esc_attr(__('Delete Subscription', $plugin->text_domain)); ?>" class="text-danger"
+											><?php echo __('Delete', $plugin->text_domain); ?> <i class="fa fa-times-circle"></i></a>
+									</div>
+								</td>
+								<td>
+									<?php if($_sub_post && $_sub_post_type_label): ?>
+										<?php echo sprintf(__('%1$s ID <a href="%2$s">#<code>%3$s</code></a> <a href="%4$s">%5$s</a>', $plugin->text_domain), esc_html($_sub_post_type_label), esc_attr($_sub_post_url), esc_html($_sub_post->ID), esc_attr($_sub_post_comments_url), esc_html($_sub_post_title_clip)); ?>
+									<?php else: // Post no longer exists for whatever reason; display post ID only in this case. ?>
+										<?php echo sprintf(__('Post ID #<code>%1$s</code>', $plugin->text_domain), esc_html($_sub->post_id)); ?>
 									<?php endif; ?>
 
-								<?php endif; ?>
-							</td>
-							<td>
-								<?php echo esc_html($plugin->utils_i18n->sub_type_label($_sub_type)); ?>
-							</td>
-							<td>
-								<?php echo esc_html($plugin->utils_i18n->status_label($_sub->status)); ?>
-							</td>
-							<td>
-								<?php echo esc_html($plugin->utils_i18n->deliver_label($_sub->deliver)); ?>
-							</td>
-						</tr>
-					<?php endforeach; ?>
+									<?php if($_sub->comment_id): ?><br />
+										<i class="fa fa-level-up fa-rotate-90"></i>
+
+										<?php if($_sub_comment): ?>
+											<?php if($_subscribed_to_own_comment): ?>
+												<?php echo sprintf(__('Replies to <a href="%1$s">your comment</a>; ID <a href="%1$s">#<code>%2$s</code></a> posted %3$s', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_ID), esc_html($_sub_comment_time_ago)); ?>
+											<?php else: // It's not their own comment; i.e. it's by someone else. ?>
+												<?php echo sprintf(__('Replies to <a href="%1$s">comment ID #<code>%2$s</code></a> posted %3$s', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_ID), esc_html($_sub_comment_time_ago)); ?>
+											<?php endif; ?>
+											<?php if($_sub_comment->comment_author): ?>
+												<?php echo sprintf(__('by: <a href="%1$s">%2$s</a>', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_author)); ?>
+											<?php endif; ?>
+										<?php else: // Comment no longer exists for whatever reason; display comment ID only in this case. ?>
+											<?php echo sprintf(__('Comment ID #<code>%1$s</code>', $plugin->text_domain), esc_html($_sub->comment_id)); ?>
+										<?php endif; ?>
+
+									<?php endif; ?>
+								</td>
+								<td>
+									<?php echo esc_html($plugin->utils_i18n->sub_type_label($_sub_type)); ?>
+								</td>
+								<td>
+									<?php echo esc_html($plugin->utils_i18n->status_label($_sub->status)); ?>
+								</td>
+								<td>
+									<?php echo esc_html($plugin->utils_i18n->deliver_label($_sub->deliver)); ?>
+								</td>
+							</tr>
+						<?php endforeach; ?>
 					</tbody>
 				</table>
 			</div>
 
-			<?php if($pagination_vars->total_pages > 1): ?>
+			<?php if ($pagination_vars->total_pages > 1): ?>
 				<hr />
 				<div class="row subs-pagination">
 					<div class="col-md-3 text-left">
-							<span class="label label-default" style="font-size:110%; vertical-align:bottom;">
-								<?php echo sprintf(__('Page %1$s of %2$s', $plugin->text_domain), esc_html($pagination_vars->current_page), esc_html($pagination_vars->total_pages)); ?>
-							</span>
+								<span class="label label-default" style="font-size:110%; vertical-align:bottom;">
+									<?php echo sprintf(__('Page %1$s of %2$s', $plugin->text_domain), esc_html($pagination_vars->current_page), esc_html($pagination_vars->total_pages)); ?>
+								</span>
 					</div>
 					<div class="col-md-9 text-right">
 						<nav>

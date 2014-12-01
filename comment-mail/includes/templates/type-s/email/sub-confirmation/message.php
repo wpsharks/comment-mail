@@ -3,6 +3,7 @@ namespace comment_mail;
 
 /**
  * @var plugin         $plugin Plugin class.
+ * @var template       $template Template class.
  *
  * Other variables made available in this template file:
  *
@@ -56,26 +57,22 @@ $sub_last_ip = $sub->last_ip ? $sub->last_ip : __('unknown', $plugin->text_domai
 // Subscription last update time "ago"; e.g. `X [seconds/minutes/days/weeks/years] ago`.
 $sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $sub->last_update_time);
 ?>
-
-	<p style="font-family:serif; font-size:140%;">
-
-		<?php if($sub->fname): // We can call them by name? ?>
-			<?php echo esc_html(sprintf(__('%1$s, please', $plugin->text_domain), esc_html($sub->fname))); ?>
-		<?php else: echo __('Please', $plugin->text_domain); endif; ?>
-
-		<a href="<?php echo esc_attr($sub_confirm_url); ?>">
-			<strong><?php echo __('click here to confirm', $plugin->text_domain); ?></strong>
-		</a>
-
-		<?php echo __('your subscription.', $plugin->text_domain); ?>
-
-	</p>
+	<?php echo $template->snippet(
+		'message-heading.php', array(
+			'[sub_fname]'       => esc_html($sub->fname),
+			'[sub_confirm_url]' => esc_attr($sub_confirm_url),
+		)); ?>
 
 	<p style="margin-left:1em;">
 
 		<?php if($sub_comment): // Subscribing to a specific comment? ?>
 
 			<?php if($subscribed_to_own_comment): ?>
+				<?php echo $template->snippet(
+					'message-heading.php', array(
+						'[sub_fname]'       => esc_html($sub->fname),
+						'[sub_confirm_url]' => esc_attr($sub_confirm_url),
+					)); ?>
 				<?php echo sprintf(__('You\'ll be notified about replies to <a href="%1$s">your comment</a>; on:', $plugin->text_domain), esc_html($sub_comment_url)); ?>
 			<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
 				<?php echo sprintf(__('You\'ll be notified about replies to <a href="%1$s">comment ID #%2$s</a>; on:', $plugin->text_domain), esc_html($sub_comment_url), esc_html($sub_comment->comment_ID)); ?>

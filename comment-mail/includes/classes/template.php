@@ -35,6 +35,13 @@ namespace comment_mail // Root namespace.
 			protected $file;
 
 			/**
+			 * @var string Snippet sub-directory.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $snippet_sub_dir;
+
+			/**
 			 * @var boolean Force default template?
 			 *
 			 * @since 141111 First documented version.
@@ -80,8 +87,9 @@ namespace comment_mail // Root namespace.
 				if(!$this->file) // Empty file property?
 					throw new \exception(__('Empty file.', $this->plugin->text_domain));
 
-				$this->force_default = (boolean)$force_default;
-				$this->file_contents = $this->get_file_contents();
+				$this->snippet_sub_dir = dirname($this->file).'/snippet';
+				$this->force_default   = (boolean)$force_default;
+				$this->file_contents   = $this->get_file_contents();
 			}
 
 			/**
@@ -109,9 +117,12 @@ namespace comment_mail // Root namespace.
 			{
 				$vars['plugin'] = plugin(); // Plugin class.
 
-				if(!isset($vars['template_file'])) // Don't override in site/email children.
-					$vars['template_file'] = $this->file; // Template file name.
-
+				if(!isset($vars['template']))
+					// Don't override in site/email children.
+				{
+					$vars['template']      = $this;
+					$vars['template_file'] = $this->file;
+				}
 				if(strpos($this->file, 'site/') === 0)
 					$vars = array_merge($vars, $this->site_vars($vars));
 
@@ -119,6 +130,33 @@ namespace comment_mail // Root namespace.
 					$vars = array_merge($vars, $this->email_vars($vars));
 
 				return trim($this->plugin->utils_php->evaluate($this->file_contents, $vars));
+			}
+
+			/**
+			 * Parse snippet file.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $file File path, relative to snippet sub-directory.
+			 * @param array  $shortcodes Optional array of shortcodes.
+			 *
+			 * @return string Parsed snippet file contents.
+			 */
+			public function snippet($file, array $shortcodes = array())
+			{
+				$file = (string)$file; // Force string.
+				$file = $this->plugin->utils_string->trim_deep($file, '', '/');
+				$file = $this->plugin->utils_fs->n_seps($file);
+
+				foreach($shortcodes as $_key => $_value)
+					if(!is_string($_value) || !preg_match('/^\[(?:[^\s\[\]]+?)\]$/', $_key))
+						unset($shortcodes[$_key]); // Invalid shortcode.
+				unset($_key, $_value); // Housekeeping.
+
+				$snippet = trim($this->snippet_file_contents($file));
+				$snippet = str_ireplace(array_keys($shortcodes), array_values($shortcodes), $snippet);
+
+				return $snippet; // With replacements having been performed.
 			}
 
 			/**
@@ -240,9 +278,7 @@ namespace comment_mail // Root namespace.
 				check_theme_dirs: // Target point.
 
 				$dirs = array(); // Initialize.
-				// e.g. `wp-content/themes/[theme]/[plugin slug]/type-a`.
-				// e.g. `wp-content/themes/[theme]/[plugin slug]/type-a/site/comment-form/subscription-ops.php`.
-				// e.g. `wp-content/themes/[theme]/[plugin slug]/type-a/email/confirmation-request-message.php`.
+				// e.g. `wp-content/themes/[theme]/[plugin slug]/type-a/[site/comment-form/file.php]`
 				$dirs[] = get_stylesheet_directory().'/'.$this->plugin->slug.'/type-'.$this->type;
 				$dirs[] = get_template_directory().'/'.$this->plugin->slug.'/type-'.$this->type;
 
@@ -254,8 +290,8 @@ namespace comment_mail // Root namespace.
 
 				check_option_key: // Target point.
 
-				// e.g. type `a` for `site/comment-form/sub-ops.php`.
-				// becomes: `template__type_a__site__comment_form__sub_ops`.
+				// e.g. type `a` for `site/comment-form/file.php`.
+				// becomes: `template__type_a__site__comment_form__file`.
 				$option_key = static::data_option_key(array('type' => $this->type, 'file' => $this->file));
 
 				if(!empty($this->plugin->options[$option_key]))
@@ -274,6 +310,59 @@ namespace comment_mail // Root namespace.
 				unset($_dir); // Housekeeping.
 
 				throw new \exception(sprintf(__('Missing template: `%1$s/%2$s`.', $this->plugin->text_domain), $this->type, $this->file));
+			}
+
+			/**
+			 * Snippet file contents.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $file File path, relative to snippet sub-directory.
+			 *
+			 * @return string Snippet file contents; for the requested snippet.
+			 *
+			 * @throws \exception If unable to locate the snippet.
+			 */
+			public function snippet_file_contents($file)
+			{
+				if($this->force_default)
+					goto default_snippet;
+
+				check_theme_dirs: // Target point.
+
+				$dirs = array(); // Initialize.
+				// e.g. `wp-content/themes/[theme]/[plugin slug]/type-a/[site/comment-form/snippet/file.php]`
+				$dirs[] = get_stylesheet_directory().'/'.$this->plugin->slug.'/type-'.$this->type.'/'.$this->snippet_sub_dir;
+				$dirs[] = get_template_directory().'/'.$this->plugin->slug.'/type-'.$this->type.'/'.$this->snippet_sub_dir;
+
+				foreach($dirs as $_dir /* In order of precedence. */)
+					// Note: don't check `filesize()` here; snippets CAN be empty.
+					if(is_file($_dir.'/'.$file) && is_readable($_dir.'/'.$file))
+						return file_get_contents($_dir.'/'.$file);
+				unset($_dir); // Housekeeping.
+
+				check_option_key: // Target point.
+
+				// e.g. type `a` for `site/comment-form/snippet/file.php`.
+				// becomes: `template__type_a__site__comment_form__snipppet__file`.
+				$option_key = static::data_option_key(array('type' => $this->type, 'file' => $this->snippet_sub_dir.'/'.$file));
+
+				if(!empty($this->plugin->options[$option_key]))
+					return $this->plugin->options[$option_key];
+
+				default_snippet: // Target point; default snippet.
+
+				// Default snippet directory.
+				$dirs   = array(); // Initialize.
+				$dirs[] = dirname(dirname(__FILE__)).'/templates/type-'.$this->type.'/'.$this->snippet_sub_dir;
+
+				foreach($dirs as $_dir /* In order of precedence. */)
+					// Note: don't check `filesize()` here; templates CAN be empty.
+					if(is_file($_dir.'/'.$file) && is_readable($_dir.'/'.$file))
+						return file_get_contents($_dir.'/'.$file);
+				unset($_dir); // Housekeeping.
+
+				throw new \exception(sprintf(__('Missing snippet: `%1$s/%2$s`.', $this->plugin->text_domain), $this->type, $this->snippet_sub_dir.'/'.$file));
 			}
 
 			/**

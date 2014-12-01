@@ -3,6 +3,7 @@ namespace comment_mail;
 
 /**
  * @var plugin         $plugin Plugin class.
+ * @var template       $template Template class.
  *
  * Other variables made available in this template file:
  *
@@ -57,7 +58,7 @@ $sub_last_ip = $sub->last_ip ? $sub->last_ip : __('unknown', $plugin->text_domai
 $sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $sub->last_update_time);
 ?>
 
-	<p style="font-family:serif; font-size:140%;">
+	<h2 style="margin-top:0; font-weight:normal; font-family:serif;">
 
 		<?php if($sub->fname): // We can call them by name? ?>
 			<?php echo esc_html(sprintf(__('%1$s, please', $plugin->text_domain), esc_html($sub->fname))); ?>
@@ -69,7 +70,9 @@ $sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $
 
 		<?php echo __('your subscription.', $plugin->text_domain); ?>
 
-	</p>
+	</h2>
+
+	<hr />
 
 	<p style="margin-left:1em;">
 
