@@ -164,7 +164,7 @@ namespace comment_mail // Root namespace.
 				$this->events_regex      = '/\bevents?\:\:(?P<events>[^\s]+)/i';
 
 				$this->and_regex = '/(?:^|\s+)\+(?:\s+|$)/i';
-				// Must NOT conflict with SQL: <http://bit.ly/1tNam85>
+				// Must NOT conflict with SQL: <http://dev.mysql.com/doc/refman/5.5/en/fulltext-boolean.html>
 
 				$this->merged_result_sets = array(); // Initialize.
 
