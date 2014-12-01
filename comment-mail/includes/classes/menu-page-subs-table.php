@@ -61,13 +61,13 @@ namespace comment_mail // Root namespace.
 				$columns = array(
 					'cb'                => '1', // Include checkboxes.
 
-					'email'             => __('Subscriber Email', $plugin->text_domain),
+					'email'             => __('Subscriber', $plugin->text_domain),
 					'fname'             => __('First Name', $plugin->text_domain),
 					'lname'             => __('Last Name', $plugin->text_domain),
 
 					'user_id'           => __('WP User ID', $plugin->text_domain),
-					'post_id'           => __('Subscr. to Post ID', $plugin->text_domain),
-					'comment_id'        => __('Subscr. to Comment ID', $plugin->text_domain),
+					'post_id'           => __('Post', $plugin->text_domain),
+					'comment_id'        => __('Comment', $plugin->text_domain),
 
 					'deliver'           => __('Delivery', $plugin->text_domain),
 					'status'            => __('Status', $plugin->text_domain),
@@ -224,11 +224,11 @@ namespace comment_mail // Root namespace.
 				$name_email_args = array(
 					'separator'   => '<br />',
 					'anchor_to'   => 'search',
-					'email_style' => 'font-weight:bold;',
+					'name_style'  => 'font-weight:bold;',
+					'email_style'  => 'font-weight:normal;',
 				);
 				$name            = $item->fname.' '.$item->lname; // Concatenate.
 				$email_info      = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
-				                   ' <span style="font-weight:bold;" title="'.esc_attr($item->key).'">ID #'.esc_html($item->ID).'</span>'.
 				                   ' '.$this->plugin->utils_markup->name_email($name, $item->email, $name_email_args);
 
 				$edit_url      = $this->plugin->utils_url->edit_sub_short($item->ID);

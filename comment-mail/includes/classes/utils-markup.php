@@ -113,7 +113,7 @@ namespace comment_mail // Root namespace.
 				$email_clip = $email ? $this->plugin->utils_string->mid_clip($email) : '';
 
 				$name_email_attr_value = ($name ? '"'.$name.'"' : '').($name && $email ? ' ' : '').($email ? '<'.$email.'>' : '');
-				$name_span_tag         = $name ? '<span style="'.esc_attr($name_style).'">"'.esc_html($name_clip).'"</span>' : '';
+				$name_span_tag         = $name ? '<span style="'.esc_attr($name_style).'">'.esc_html($name_clip).'</span>' : '';
 
 				if($anchor_to === 'search' && $email) // Back-end search?
 					$anchor_search_url = $this->plugin->utils_url->search_subs_short('sub_email:'.$email);
