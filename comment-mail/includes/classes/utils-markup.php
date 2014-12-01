@@ -90,7 +90,6 @@ namespace comment_mail // Root namespace.
 					'anchor_to'              => 'mailto',
 					// `mailto|search|summary|[custom URL]`.
 					'anchor_target'          => '',
-					'anchor_edit_sub_id'     => '',
 					'anchor_summary_sub_key' => '',
 				);
 				$args         = array_merge($default_args, $args);
