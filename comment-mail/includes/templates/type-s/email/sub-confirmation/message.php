@@ -63,40 +63,13 @@ $sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $
 			'[sub_confirm_url]' => esc_attr($sub_confirm_url),
 		)); ?>
 
-	<p style="margin-left:1em;">
-
-		<?php if($sub_comment): // Subscribing to a specific comment? ?>
-
-			<?php if($subscribed_to_own_comment): ?>
-				<?php echo $template->snippet(
-					'message-heading.php', array(
-						'[sub_fname]'       => esc_html($sub->fname),
-						'[sub_confirm_url]' => esc_attr($sub_confirm_url),
-					)); ?>
-				<?php echo sprintf(__('You\'ll be notified about replies to <a href="%1$s">your comment</a>; on:', $plugin->text_domain), esc_html($sub_comment_url)); ?>
-			<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
-				<?php echo sprintf(__('You\'ll be notified about replies to <a href="%1$s">comment ID #%2$s</a>; on:', $plugin->text_domain), esc_html($sub_comment_url), esc_html($sub_comment->comment_ID)); ?>
-			<?php endif; ?>
-
-		<?php else: // All comments/replies on this post. ?>
-			<?php echo __('You\'ll be notified about all comments/replies to:', $plugin->text_domain); ?>
-		<?php endif; ?><br />
-
-		<span style="font-size:120%;">
-			&ldquo;<?php echo esc_html($sub_post_title_clip); ?>&rdquo;
-		</span><br />
-
-		<?php if($sub_comment): // A specific comment? ?>
-			<a href="<?php echo esc_attr($sub_comment_url); ?>">
-				<?php echo esc_html($sub_comment_url); ?>
-			</a>
-		<?php else: // Subscribing to all comments/replies. ?>
-			<a href="<?php echo esc_attr($sub_post_comments_url); ?>">
-				<?php echo esc_html($sub_post_comments_url); ?>
-			</a>
-		<?php endif; ?>
-
-	</p>
+	<?php echo $template->snippet(
+		'message-body.php', array(
+			'[sub_comment_url]'       => esc_attr($sub_comment_url),
+			'[sub_comment_id]'        => esc_html($sub_comment->comment_ID),
+			'[sub_post_comments_url]' => esc_attr($sub_post_comments_url),
+			'[sub_post_title_clip]'   => esc_html($sub_post_title_clip),
+		)); ?>
 
 	<p style="color:#888888; font-style:italic; margin-left:1em;">
 		<?php echo __('Note: if you did not make this request, please ignore this email. You will only be subscribed if you confirm.', $plugin->text_domain); ?>
