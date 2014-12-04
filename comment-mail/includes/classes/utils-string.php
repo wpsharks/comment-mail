@@ -938,6 +938,39 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Strips PHP tags.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Input string to strip.
+			 *
+			 * @return string String w/ all PHP tags stripped away.
+			 */
+			public function strip_php_tags($string)
+			{
+				return preg_replace(
+					'/'. // Open regex; pattern delimiter.
+
+					'(?:'. // Any of these.
+
+					'\<\?php.*?\?\>'.
+					'|'.
+					'\<\?\=.*?\?\>'.
+					'|'.
+					'\<\?.*?\?\>'.
+					'|'.
+					'\<%.*?%\>'.
+					'|'.
+					'\<script\s+[^>]*?language\s*\=\s*(["\'])php\\1[^>]*\>.*?\<\s*\/\s*script\s*\>'.
+					'|'.
+					'\<script\s+[^>]*?language\s*\=\s*php[^>]*\>.*?\<\s*\/\s*script\s*\>'.
+
+					')'. // Close regex group.
+
+					'/is', '', (string)$string);
+			}
+
+			/**
 			 * A very simple markdown parser.
 			 *
 			 * @since 141111 First documented version.

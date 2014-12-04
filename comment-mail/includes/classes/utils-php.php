@@ -62,7 +62,7 @@ namespace comment_mail // Root namespace.
 			 * @since 141111 First documented version.
 			 *
 			 * @param string  $___string String (possibly containing PHP tags).
-			 *    If `$pure_php` is TRUE; this should NOT have PHP tags.
+			 *    If `$___no_tags` is TRUE; this should NOT have PHP tags.
 			 *
 			 * @param array   $___vars An array of variables to bring into the scope of evaluation.
 			 *    This is optional. It defaults to an empty array.

@@ -153,8 +153,10 @@ namespace comment_mail // Root namespace.
 						unset($shortcodes[$_key]); // Invalid shortcode.
 				unset($_key, $_value); // Housekeeping.
 
-				$snippet = trim($this->snippet_file_contents($file));
-				$snippet = str_ireplace(array_keys($shortcodes), array_values($shortcodes), $snippet);
+				$snippet    = trim($this->snippet_file_contents($file));
+				$scvc_conds = new scvc_conds($snippet, $shortcodes); // Conditionals.
+				$snippet    = $scvc_conds->parse(); // Makes [if variable] logic possible.
+				$snippet    = str_ireplace(array_keys($shortcodes), array_values($shortcodes), $snippet);
 
 				return $snippet; // With replacements having been performed.
 			}
