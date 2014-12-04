@@ -1603,7 +1603,7 @@ namespace comment_mail // Root namespace.
 						               'current_value'   => $current_value_for('template_type'),
 						               'allow_arbitrary' => FALSE,
 						               'options'         => array(
-							               's' => __('Simple snippet-based templates (default; easiest to work with)', $this->plugin->text_domain),
+							               's' => __('Simple shortcode templates (default; easiest to work with)', $this->plugin->text_domain),
 							               'a' => __('Advanced PHP-based templates (for developers and advanced site owners)', $this->plugin->text_domain),
 						               ),
 						               'notes_after'     => '<p>'.__('<strong>Note:</strong> If you change this setting, any template customizations that you\'ve made in one mode, will need to be done again for the new mode that you select; i.e. when this setting is changed, a new set of templates is loaded for the mode you select. You can always switch back though, and any changes that you made in the previous mode will be restored automatically.', $this->plugin->text_domain).'</p>'.

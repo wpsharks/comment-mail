@@ -142,7 +142,7 @@ namespace comment_mail // Root namespace.
 
 					' '.($template_type === 'a' // Provide an additional note; to help explain what just occured in this scenario.
 						? 'A new set of templates has been loaded below. This mode uses advanced PHP-based templates. Recommended for advanced customization.</i>'
-						: 'A new set of templates has been loaded below. This mode uses simple snippet-based templates. Easiest to work with <i class="fa fa-smile-o"></i>');
+						: 'A new set of templates has been loaded below. This mode uses simple shortcode templates. Easiest to work with <i class="fa fa-smile-o"></i>');
 
 				$this->plugin->enqueue_user_notice($notice_markup, array('transient' => TRUE));
 
