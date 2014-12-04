@@ -381,7 +381,7 @@ namespace comment_mail // Root namespace.
 						return file_get_contents($_dir.'/'.$file);
 				unset($_dir); // Housekeeping.
 
-				throw new \exception(sprintf(__('Missing snippet: `%1$s/%2$s`.', $this->plugin->text_domain), $this->type, $this->snippet_sub_dir.'/'.$file));
+				throw new \exception(sprintf(__('Missing snippet: `%1$s`.', $this->plugin->text_domain), 'type-'.$this->type.'/'.$this->snippet_sub_dir.'/'.$file));
 			}
 
 			/**
