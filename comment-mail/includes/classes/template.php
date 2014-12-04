@@ -137,7 +137,7 @@ namespace comment_mail // Root namespace.
 				if(strpos($this->file, 'email/') === 0)
 					$vars = array_merge($vars, $this->email_vars($vars));
 
-				$this->current_vars =& $vars; // Setup current variables.
+				$this->current_vars = &$vars; // Setup current variables.
 
 				return trim($this->plugin->utils_php->evaluate($this->file_contents, $vars));
 			}
