@@ -545,13 +545,13 @@ namespace comment_mail
 
 					'template_type'                                                                => 's', // `a|s`.
 
-					'template__type_a__site__site_header'                                          => '', // HTML/PHP code.
-					'template__type_a__site__site_header_styles'                                   => '', // HTML/PHP code.
-					'template__type_a__site__site_header_scripts'                                  => '', // HTML/PHP code.
-					'template__type_a__site__site_header_tag'                                      => '', // HTML/PHP code.
+					'template__type_a__site__header'                                               => '', // HTML/PHP code.
+					'template__type_a__site__header_styles'                                        => '', // HTML/PHP code.
+					'template__type_a__site__header_scripts'                                       => '', // HTML/PHP code.
+					'template__type_a__site__header_tag'                                           => '', // HTML/PHP code.
 
-					'template__type_a__site__site_footer_tag'                                      => '', // HTML/PHP code.
-					'template__type_a__site__site_footer'                                          => '', // HTML/PHP code.
+					'template__type_a__site__footer_tag'                                           => '', // HTML/PHP code.
+					'template__type_a__site__footer'                                               => '', // HTML/PHP code.
 
 					'template__type_a__site__comment_form__sso_ops'                                => '', // HTML/PHP code.
 					'template__type_a__site__comment_form__sso_op_scripts'                         => '', // HTML/PHP code.
@@ -573,13 +573,13 @@ namespace comment_mail
 
 					/* Template-related email templates. */
 
-					'template__type_a__email__email_header'                                        => '', // HTML/PHP code.
-					'template__type_a__email__email_header_styles'                                 => '', // HTML/PHP code.
-					'template__type_a__email__email_header_scripts'                                => '', // HTML/PHP code.
-					'template__type_a__email__email_header_tag'                                    => '', // HTML/PHP code.
+					'template__type_a__email__header'                                              => '', // HTML/PHP code.
+					'template__type_a__email__header_styles'                                       => '', // HTML/PHP code.
+					'template__type_a__email__header_scripts'                                      => '', // HTML/PHP code.
+					'template__type_a__email__header_tag'                                          => '', // HTML/PHP code.
 
-					'template__type_a__email__email_footer_tag'                                    => '', // HTML/PHP code.
-					'template__type_a__email__email_footer'                                        => '', // HTML/PHP code.
+					'template__type_a__email__footer_tag'                                          => '', // HTML/PHP code.
+					'template__type_a__email__footer'                                              => '', // HTML/PHP code.
 
 					'template__type_a__email__sub_confirmation__subject'                           => '', // HTML/PHP code.
 					'template__type_a__email__sub_confirmation__message'                           => '', // HTML/PHP code.

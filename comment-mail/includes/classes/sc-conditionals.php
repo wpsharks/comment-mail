@@ -1,6 +1,6 @@
 <?php
 /**
- * Shortcode; Var/Constant Conditionals
+ * Shortcode Conditionals
  *
  * @since 141111 First documented version.
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
@@ -11,14 +11,14 @@ namespace comment_mail // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	if(!class_exists('\\'.__NAMESPACE__.'\\scvc_conds'))
+	if(!class_exists('\\'.__NAMESPACE__.'\\sc_conditionals'))
 	{
 		/**
-		 * Shortcode; Var/Constant Conditionals
+		 * Shortcode Conditionals
 		 *
 		 * @since 141111 First documented version.
 		 */
-		class scvc_conds extends abs_base
+		class sc_conditionals extends abs_base
 		{
 			/**
 			 * @var string String we are working with.
@@ -200,7 +200,7 @@ namespace comment_mail // Root namespace.
 
 					'\['. // Opening shortcode bracket.
 
-					'(?P<end>else|endif|\/if)'. // Conditional end.
+					'(?P<end>else|endif|\/endif|\/if)'. // Ends.
 
 					'\]'. // Closing shortcode bracket.
 
@@ -208,14 +208,21 @@ namespace comment_mail // Root namespace.
 
 					function ($m) use ($_this)
 					{
-						$token = count($_this->tokens);
+						switch(($end = strtolower($m['end'])))
+						{
+							case 'else':
+								$end = 'else:';
+								break; // Break switch.
 
-						if(strcasecmp($m['end'], '/if') === 0)
-							$m['end'] = 'endif'; // Force PHP syntax.
+							case 'endif':
+							case '/endif';
+							case '/if';
+								$end = 'endif;';
+								break; // Break switch.
+						}
+						$token                 = count($_this->tokens);
+						$_this->tokens[$token] = '<?php '.$end.' ?>';
 
-						$_this->tokens[$token] = '<?php '.$m['end']. // e.g. `else`, `endif`.
-						                         (stripos($m['end'], 'end') === 0 ? ';' : ':').
-						                         ' ?>';
 						return '{token:'.$token.'}'; # e.g. {token:456}
 
 					}, $this->string);
@@ -256,7 +263,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function eval_expressions()
 			{
-				$this->string = $this->plugin->utils_php->evaluate($this->string, $this->vars);
+				$this->string = @$this->plugin->utils_php->evaluate($this->string, $this->vars);
 			}
 		}
 	}

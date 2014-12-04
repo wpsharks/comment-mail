@@ -141,13 +141,12 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 
 			<h4>
 				<i class="fa fa-thumb-tack"></i>
-				<?php if($sub_comment): // A specific comment? ?>
+				<?php if($sub_post && $sub_comment): // A specific comment? ?>
 					&ldquo;<a href="<?php echo esc_attr($sub_comment_url); ?>"><?php echo esc_html($sub_post_title_clip); ?></a>&rdquo;
-				<?php elseif($sub_post && $sub_post_comments_url && $sub_post_title_clip): // Unsubscribing from all comments/replies. ?>
+				<?php elseif($sub_post): // Unsubscribing from all comments/replies. ?>
 					&ldquo;<a href="<?php echo esc_attr($sub_post_comments_url); ?>"><?php echo esc_html($sub_post_title_clip); ?></a>&rdquo;
-				<?php
-				else: // Unsubscribing from all comments/replies; this is a fallback w/ just the `$sub->post_id`. ?>
-					&ldquo;<?php echo sprintf(__('Post ID #<code>%1$s</code>', $plugin->text_domain), esc_html($sub->post_id)); ?>&rdquo;
+				<?php else: // Unsubscribing from all comments/replies; fallback w/ just the `$sub->post_id`. ?>
+					<?php echo sprintf(__('Post ID #<code>%1$s</code>', $plugin->text_domain), esc_html($sub->post_id)); ?>
 				<?php endif; ?>
 			</h4>
 

@@ -40,37 +40,11 @@ $current_host_path = $plugin->utils_url->current_host_path();
 $can_spam_privacy_policy_url = $plugin->options['can_spam_privacy_policy_url'];
 ?>
 
-<footer class="center-block clearfix">
-	<div class="row">
-
-		<div class="col-md-6 text-left">
-
-			<?php if($template_file !== 'site/sub-actions/manage-summary.php'): ?>
-				<?php // Displays a link leading them back to their subscriptions; if not already there. ?>
-				<a href="<?php echo esc_attr($sub_summary_return_url); ?>">
-					<i class="fa fa-arrow-circle-left"></i> <?php echo __('My Comment Subscriptions', $plugin->text_domain); ?>
-				</a>
-				<span class="text-muted">|</span>
-			<?php endif; ?>
-
-			<a href="<?php echo esc_attr($home_url); ?>">
-				<i class="fa fa-home"></i> <?php echo sprintf(__('Return to "%1$s"', $plugin->text_domain), esc_html($blog_name_clip)); ?>
-			</a>
-
-			<?php if($can_spam_privacy_policy_url): ?>
-				<span class="text-muted">|</span>
-				<a href="<?php echo esc_attr($can_spam_privacy_policy_url); ?>">
-					<?php echo __('Privacy Policy', $plugin->text_domain); ?>
-				</a>
-			<?php endif; ?>
-
-		</div>
-
-		<div class="col-md-6 text-right">
-			<?php if($plugin->options['site_footer_powered_by_enable']): ?>
-				<?php echo $plugin->utils_markup->powered_by(); ?>
-			<?php endif; ?>
-		</div>
-
-	</div>
-</footer>
+<?php echo $template->snippet(
+	'footer-tag.php', array(
+		'[home_url]'                    => esc_attr($home_url),
+		'[blog_name_clip]'              => esc_html($blog_name_clip),
+		'[sub_summary_return_url]'      => esc_attr($sub_summary_return_url),
+		'[can_spam_privacy_policy_url]' => esc_attr($can_spam_privacy_policy_url),
+		'[powered_by]'                  => $plugin->options['site_footer_powered_by_enable'] ? $plugin->utils_markup->powered_by() : '',
+	)); ?>

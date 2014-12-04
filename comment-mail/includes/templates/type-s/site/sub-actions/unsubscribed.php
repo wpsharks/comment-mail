@@ -66,101 +66,74 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 
 		<?php else: // Unsubscribed successfully. ?>
 
-			<?php
-			/*
-			 * Here we define a few more variables of our own.
-			 * All based on what the template makes available to us;
-			 * ~ as documented at the top of this file.
-			 *
-			 * Note: you CANNOT rely on the post still existing!
-			 * Always be sure to provide a fallback w/ just the `$sub->post_id`
-			 *    in case you deleted this post since they subscribed to it.
-			 */
-			// URL to comments on the post they were subscribed to.
-			$sub_post_comments_url = $sub_post ? get_comments_link($sub_post->ID) : '';
+		<?php
+		/*
+		 * Here we define a few more variables of our own.
+		 * All based on what the template makes available to us;
+		 * ~ as documented at the top of this file.
+		 *
+		 * Note: you CANNOT rely on the post still existing!
+		 * Always be sure to provide a fallback w/ just the `$sub->post_id`
+		 *    in case you deleted this post since they subscribed to it.
+		 */
+		// URL to comments on the post they were subscribed to.
+		$sub_post_comments_url = $sub_post ? get_comments_link($sub_post->ID) : '';
 
-			// Are comments still open on this post?
-			$sub_post_comments_open = $sub_post ? comments_open($sub_post->ID) : FALSE;
+		// Are comments still open on this post?
+		$sub_post_comments_open = $sub_post ? comments_open($sub_post->ID) : FALSE;
 
-			// A shorter clip of the full post title.
-			$sub_post_title_clip = $sub_post ? $plugin->utils_string->clip($sub_post->post_title, 70) : '';
+		// A shorter clip of the full post title.
+		$sub_post_title_clip = $sub_post ? $plugin->utils_string->clip($sub_post->post_title, 70) : '';
 
-			// URL to comment they were subscribed to; if applicable.
-			$sub_comment_url = $sub_comment ? get_comment_link($sub_comment->comment_ID) : '';
+		// URL to comment they were subscribed to; if applicable.
+		$sub_comment_url = $sub_comment ? get_comment_link($sub_comment->comment_ID) : '';
 
-			// They were subscribed to their own comment?
-			$subscribed_to_own_comment = $sub_comment && strcasecmp($sub_comment->comment_author_email, $sub->email) === 0;
+		// They were subscribed to their own comment?
+		$subscribed_to_own_comment = $sub_comment && strcasecmp($sub_comment->comment_author_email, $sub->email) === 0;
 
-			// Former subscription delivery option label; i.e. a translated display of the option value.
-			$sub_deliver_label = $plugin->utils_i18n->deliver_label($sub->deliver);
+		// Former subscription delivery option label; i.e. a translated display of the option value.
+		$sub_deliver_label = $plugin->utils_i18n->deliver_label($sub->deliver);
 
-			// Subscriber's `"name" <email>` w/ HTML markup enhancements.
-			$sub_name_email_markup = $plugin->utils_markup->name_email($sub->fname.' '.$sub->lname, $sub->email);
+		// Subscriber's `"name" <email>` w/ HTML markup enhancements.
+		$sub_name_email_markup = $plugin->utils_markup->name_email($sub->fname.' '.$sub->lname, $sub->email);
 
-			// Subscriber's last known IP address.
-			$sub_last_ip = $sub->last_ip ? $sub->last_ip : __('unknown', $plugin->text_domain);
+		// Subscriber's last known IP address.
+		$sub_last_ip = $sub->last_ip ? $sub->last_ip : __('unknown', $plugin->text_domain);
 
-			// Subscription last update time "ago"; e.g. `X [seconds/minutes/days/weeks/years] ago`.
-			$sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $sub->last_update_time);
+		// Subscription last update time "ago"; e.g. `X [seconds/minutes/days/weeks/years] ago`.
+		$sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $sub->last_update_time);
 
-			// Unsubscribes (deletes) ALL subscriptions associated w/ their email address.
-			$sub_unsubscribe_all_url = $plugin->utils_url->sub_unsubscribe_all_url($sub->email);
+		// Unsubscribes (deletes) ALL subscriptions associated w/ their email address.
+		$sub_unsubscribe_all_url = $plugin->utils_url->sub_unsubscribe_all_url($sub->email);
 
-			// Subscription creation URL; i.e. so they can add a new subscription if they like.
-			$sub_new_url = $plugin->utils_url->sub_manage_sub_new_url();
-			?>
+		// Subscription creation URL; i.e. so they can add a new subscription if they like.
+		$sub_new_url = $plugin->utils_url->sub_manage_sub_new_url();
+		?>
 
-			<div class="alert alert-success" style="margin:0;">
-				<h4 style="margin:0;">
-					<i class="fa fa-check fa-fw"></i> <?php echo __('Unsubscribed successfully. Sorry to see you go!', $plugin->text_domain); ?>
-				</h4>
-			</div>
+		<?php echo $template->snippet(
+			'unsubscribed.php', array(
+				'sub_post'                  => $sub_post,
+				'sub_comment'               => $sub_comment,
+				'subscribed_to_own_comment' => $subscribed_to_own_comment,
 
-			<div class="alert alert-danger text-center pull-right" style="margin:1em 1em 1em 1em;">
-				<a class="text-danger" href="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
-				   data-action="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
-				   data-confirmation="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address? Are you absolutely sure?', $plugin->text_domain); ?>"
-				   title="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address?', $plugin->text_domain); ?>">
-					<i class="fa fa-times-circle"></i> <?php echo __('Unsubscribe All?', $plugin->text_domain); ?>
-				</a>
-			</div>
+				'[sub_fname]'               => esc_html($sub->fname),
+				'[sub_email]'               => esc_html($sub->email),
 
-			<h4>
-				<?php if($sub_comment): // Unsubscribed from a specific comment? ?>
+				'[sub_post_comments_url]'   => esc_attr($sub_post_comments_url),
+				'[sub_post_title_clip]'     => esc_html($sub_post_title_clip),
+				'[sub_post_id]'             => esc_html($sub_post ? $sub_post->ID : $sub->post_id),
 
-					<?php if($subscribed_to_own_comment): ?>
-						<?php echo sprintf(__('You\'ll no longer be notified about replies to <a href="%1$s">your comment</a>; on:', $plugin->text_domain), esc_html($sub_comment_url)); ?>
-					<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
-						<?php echo sprintf(__('You\'ll no longer be notified about replies to <a href="%1$s">comment ID #%2$s</a>; on:', $plugin->text_domain), esc_html($sub_comment_url), esc_html($sub_comment->comment_ID)); ?>
-					<?php endif; ?>
+				'[sub_comment_url]'         => esc_attr($sub_comment_url),
+				'[sub_comment_id]'          => esc_html($sub_comment ? $sub_comment->comment_ID : 0),
 
-				<?php else: // All comments/replies on this post. ?>
-					<?php echo __('You\'ll no longer be notified about comments/replies to:', $plugin->text_domain); ?>
-				<?php endif; ?>
-			</h4>
+				'[sub_unsubscribe_all_url]' => esc_attr($sub_unsubscribe_all_url),
+				'[sub_new_url]'             => esc_attr($sub_new_url),
+			)); ?>
 
-			<h4>
-				<i class="fa fa-thumb-tack"></i>
-				<?php if($sub_comment): // A specific comment? ?>
-					&ldquo;<a href="<?php echo esc_attr($sub_comment_url); ?>"><?php echo esc_html($sub_post_title_clip); ?></a>&rdquo;
-				<?php elseif($sub_post && $sub_post_comments_url && $sub_post_title_clip): // Unsubscribing from all comments/replies. ?>
-					&ldquo;<a href="<?php echo esc_attr($sub_post_comments_url); ?>"><?php echo esc_html($sub_post_title_clip); ?></a>&rdquo;
-				<?php
-				else: // Unsubscribing from all comments/replies; this is a fallback w/ just the `$sub->post_id`. ?>
-					&ldquo;<?php echo sprintf(__('Post ID #<code>%1$s</code>', $plugin->text_domain), esc_html($sub->post_id)); ?>&rdquo;
-				<?php endif; ?>
-			</h4>
-
-			<hr style="margin:0 0 1em 0;" />
-
-			<h5 style="font-style:italic; margin:0;">
-				<i class="fa fa-frown-o"></i> <?php echo sprintf(__('Too many emails? ~ Please feel free to <a href="%1$s">add a new/different subscription</a> if you like!', $plugin->text_domain), esc_attr($sub_new_url)); ?>
-			</h5>
-
-			<?php
-			/* Javascript used in this template.
-			 ------------------------------------------------------------------------------------------------------------------------ */
-			?>
+		<?php
+		/* Javascript used in this template.
+		 ------------------------------------------------------------------------------------------------------------------------ */
+		?>
 			<script type="text/javascript">
 				(function($) // Primary closure w/ jQuery; strict standards.
 				{

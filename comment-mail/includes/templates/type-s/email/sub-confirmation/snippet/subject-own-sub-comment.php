@@ -1,1 +1,0 @@
-Confirm subscription to your comment on “[sub_post_title_clip]”

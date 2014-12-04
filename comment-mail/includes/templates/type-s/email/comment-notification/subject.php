@@ -40,54 +40,14 @@ $subscribed_to_own_comment = $sub_comment && strcasecmp($sub_comment->comment_au
 // A notification may contain one (or more) comments. Is this a digest?
 $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the notification.
 ?>
-<?php if($is_digest): // Multiple comments/replies in this notification? ?>
 
-	<?php if($sub_comment): // Subscribed to a specific comment? ?>
+<?php echo $template->snippet(
+	'subject.php', array(
+		'is_digest'                 => $is_digest,
+		'sub_comment'               => $sub_comment,
+		'subscribed_to_own_comment' => $subscribed_to_own_comment,
 
-		<?php if($subscribed_to_own_comment): ?>
-			<?php echo $template->snippet(
-				'subject-own-sub-comment-digest.php', array(
-					'[sub_comment_id]'      => $sub_comment->comment_ID,
-					'[sub_post_title_clip]' => $sub_post_title_clip,
-				)); ?>
-		<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
-			<?php echo $template->snippet(
-				'subject-sub-comment-digest.php', array(
-					'[sub_comment_id]'      => $sub_comment->comment_ID,
-					'[sub_post_title_clip]' => $sub_post_title_clip,
-				)); ?>
-		<?php endif; ?>
+		'[sub_post_title_clip]'     => $sub_post_title_clip,
 
-	<?php else: // All comments/replies on this post ID. ?>
-		<?php echo $template->snippet(
-			'subject-default-digest.php', array(
-				'[sub_post_title_clip]' => $sub_post_title_clip,
-			)); ?>
-	<?php endif; ?>
-
-<?php else: // There's just a single comment/reply in this notification. ?>
-
-	<?php if($sub_comment): // Subscribed to a specific comment? ?>
-
-		<?php if($subscribed_to_own_comment): ?>
-			<?php echo $template->snippet(
-				'subject-own-sub-comment.php', array(
-					'[sub_comment_id]'      => $sub_comment->comment_ID,
-					'[sub_post_title_clip]' => $sub_post_title_clip,
-				)); ?>
-		<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
-			<?php echo $template->snippet(
-				'subject-sub-comment.php', array(
-					'[sub_comment_id]'      => $sub_comment->comment_ID,
-					'[sub_post_title_clip]' => $sub_post_title_clip,
-				)); ?>
-		<?php endif; ?>
-
-	<?php else: // All comments/replies on this post ID. ?>
-		<?php echo $template->snippet(
-			'subject-default.php', array(
-				'[sub_post_title_clip]' => $sub_post_title_clip,
-			)); ?>
-	<?php endif; ?>
-
-<?php endif; ?>
+		'[sub_comment_id]'          => $sub_comment ? $sub_comment->comment_ID : 0,
+	)); ?>

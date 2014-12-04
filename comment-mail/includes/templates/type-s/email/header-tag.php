@@ -20,5 +20,27 @@ namespace comment_mail;
  *    you may also use any WordPress functions that you like.
  */
 ?>
+<?php
+/*
+ * Here we define a few variables of our own.
+ */
+// Site home page URL; i.e. back to main site.
+$home_url = home_url('/'); // Multisite compatible.
 
-<footer></footer>
+// A clip of the blog's name; as configured in WordPress.
+$blog_name_clip = $plugin->utils_string->clip(get_bloginfo('name'));
+
+// Current `host[/path]` with support for multisite network child blogs.
+$current_host_path = $plugin->utils_url->current_host_path();
+
+// Icon URL; defaults to the plugin's icon image.
+$icon_bubbles_url = $plugin->utils_url->to('/client-s/images/icon-bubbles.png');
+?>
+
+<?php echo $template->snippet(
+	'header-tag.php', array(
+		'[home_url]'          => esc_attr($home_url),
+		'[blog_name_clip]'    => esc_html($blog_name_clip),
+		'[current_host_path]' => esc_html($current_host_path),
+		'[icon_bubbles_url]'  => esc_attr($icon_bubbles_url),
+	)); ?>

@@ -62,62 +62,18 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
 // Plugin is configured to allow replies via email? If so, this will be `TRUE`.
 $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies_via_email_enable'];
 ?>
-	<?php if($is_digest): // Multiple comments/replies in this notification? ?>
+<?php echo $template->snippet(
+	'message-heading.php', array(
+		'is_digest'                 => $is_digest,
+		'sub_comment'               => $sub_comment,
+		'subscribed_to_own_comment' => $subscribed_to_own_comment,
 
-		<?php if($sub_comment): // Subscribed to a specific comment? ?>
-			<?php if($subscribed_to_own_comment): ?>
-				<?php echo $template->snippet(
-					'message-own-sub-comment-heading-digest.php', array(
-						'[sub_comment_url]'     => esc_attr($sub_comment_url),
-						'[sub_comment_id]'      => esc_html($sub_comment->comment_ID),
-						'[sub_post_title_clip]' => esc_html($sub_post_title_clip),
-					)); ?>
-			<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
-				<?php echo $template->snippet(
-					'message-sub-comment-heading-digest.php', array(
-						'[sub_comment_url]'     => esc_attr($sub_comment_url),
-						'[sub_comment_id]'      => esc_html($sub_comment->comment_ID),
-						'[sub_post_title_clip]' => esc_html($sub_post_title_clip),
-					)); ?>
-			<?php endif; ?>
+		'[sub_post_comments_url]'   => esc_attr($sub_post_comments_url),
+		'[sub_post_title_clip]'     => esc_html($sub_post_title_clip),
 
-		<?php else: // All comments/replies on this post. ?>
-			<?php echo $template->snippet(
-				'message-default-heading-digest.php', array(
-					'[sub_post_comments_url]' => esc_attr($sub_post_comments_url),
-					'[sub_post_title_clip]'   => esc_html($sub_post_title_clip),
-				)); ?>
-		<?php endif; ?>
-
-	<?php else: // There's just a single comment/reply in this notification. ?>
-
-		<?php if($sub_comment): // Subscribed to a specific comment? ?>
-
-			<?php if($subscribed_to_own_comment): ?>
-				<?php echo $template->snippet(
-					'message-own-sub-comment-heading.php', array(
-						'[sub_comment_url]'     => esc_attr($sub_comment_url),
-						'[sub_comment_id]'      => esc_html($sub_comment->comment_ID),
-						'[sub_post_title_clip]' => esc_html($sub_post_title_clip),
-					)); ?>
-			<?php else: // The comment was not authored by this subscriber; i.e. it's not their own. ?>
-				<?php echo $template->snippet(
-					'message-sub-comment-heading.php', array(
-						'[sub_comment_url]'     => esc_attr($sub_comment_url),
-						'[sub_comment_id]'      => esc_html($sub_comment->comment_ID),
-						'[sub_post_title_clip]' => esc_html($sub_post_title_clip),
-					)); ?>
-			<?php endif; ?>
-
-		<?php else: // All comments/replies on this post ID. ?>
-			<?php echo $template->snippet(
-				'message-default-heading-digest.php', array(
-					'[sub_post_comments_url]' => esc_attr($sub_post_comments_url),
-					'[sub_post_title_clip]'   => esc_html($sub_post_title_clip),
-				)); ?>
-		<?php endif; ?>
-
-	<?php endif; ?>
+		'[sub_comment_url]'         => esc_attr($sub_comment_url),
+		'[sub_comment_id]'          => esc_html($sub_comment ? $sub_comment->comment_ID : 0),
+	)); ?>
 
 	<ul>
 		<?php foreach($comments as $_comment): // Comments in this notification. ?>
@@ -149,22 +105,20 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
 
 					<?php echo $template->snippet(
 						'message-in-response-to.php', array(
-							'[comment_parent_url]'       => esc_attr($_comment_parent_url),
-							'[comment_parent_id]'        => esc_html($_comment_parent->comment_ID),
-							'[comment_parent_author]'    => esc_html($_comment_parent->comment_author),
-							'[comment_parent_posted_by]' => $_comment_parent->comment_author ? ' '.sprintf(__('— posted by %1$s', $plugin->text_domain), esc_html($_comment_parent->comment_author)) : '',
-							'[comment_parent_clip]'      => esc_html($_comment_parent_clip),
+							'[comment_parent_url]'    => esc_attr($_comment_parent_url),
+							'[comment_parent_id]'     => esc_html($_comment_parent->comment_ID),
+							'[comment_parent_author]' => esc_html($_comment_parent->comment_author),
+							'[comment_parent_clip]'   => esc_html($_comment_parent_clip),
 						)); ?>
 					<ul>
 						<li>
 							<?php echo $template->snippet(
 								'message-reply-from.php', array(
-									'[comment_url]'       => esc_attr($_comment_url),
-									'[comment_id]'        => esc_html($_comment->comment_ID),
-									'[comment_time_ago]'  => esc_html($_comment_time_ago),
-									'[comment_author]'    => esc_html($_comment->comment_author),
-									'[comment_posted_by]' => $_comment->comment_author ? ' '.sprintf(__('— by %1$s', $plugin->text_domain), esc_html($_comment->comment_author)) : '',
-									'[comment_clip]'      => esc_html($_comment_clip),
+									'[comment_url]'      => esc_attr($_comment_url),
+									'[comment_id]'       => esc_html($_comment->comment_ID),
+									'[comment_time_ago]' => esc_html($_comment_time_ago),
+									'[comment_author]'   => esc_html($_comment->comment_author),
+									'[comment_clip]'     => esc_html($_comment_clip),
 								)); ?>
 							<p style="margin-bottom:0;">
 								<a href="<?php echo esc_attr($_comment_url); ?>">
@@ -190,12 +144,11 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
 
 					<?php echo $template->snippet(
 						'message-comment-from.php', array(
-							'[comment_url]'       => esc_attr($_comment_url),
-							'[comment_id]'        => esc_html($_comment->comment_ID),
-							'[comment_time_ago]'  => esc_html($_comment_time_ago),
-							'[comment_author]'    => esc_html($_comment->comment_author),
-							'[comment_posted_by]' => $_comment->comment_author ? ' '.sprintf(__('— by %1$s', $plugin->text_domain), esc_html($_comment->comment_author)) : '',
-							'[comment_clip]'      => esc_html($_comment_clip),
+							'[comment_url]'      => esc_attr($_comment_url),
+							'[comment_id]'       => esc_html($_comment->comment_ID),
+							'[comment_time_ago]' => esc_html($_comment_time_ago),
+							'[comment_author]'   => esc_html($_comment->comment_author),
+							'[comment_clip]'     => esc_html($_comment_clip),
 						)); ?>
 					<p style="margin-bottom:0;">
 						<a href="<?php echo esc_attr($_comment_url); ?>">

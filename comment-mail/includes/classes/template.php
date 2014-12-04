@@ -56,6 +56,13 @@ namespace comment_mail // Root namespace.
 			protected $file_contents;
 
 			/**
+			 * @var array Current vars.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $current_vars;
+
+			/**
 			 * Class constructor.
 			 *
 			 * @since 141111 First documented version.
@@ -90,6 +97,7 @@ namespace comment_mail // Root namespace.
 				$this->snippet_sub_dir = dirname($this->file).'/snippet';
 				$this->force_default   = (boolean)$force_default;
 				$this->file_contents   = $this->get_file_contents();
+				$this->current_vars    = array(); // Initialize.
 			}
 
 			/**
@@ -129,6 +137,8 @@ namespace comment_mail // Root namespace.
 				if(strpos($this->file, 'email/') === 0)
 					$vars = array_merge($vars, $this->email_vars($vars));
 
+				$this->current_vars =& $vars; // Setup current variables.
+
 				return trim($this->plugin->utils_php->evaluate($this->file_contents, $vars));
 			}
 
@@ -138,27 +148,34 @@ namespace comment_mail // Root namespace.
 			 * @since 141111 First documented version.
 			 *
 			 * @param string $file File path, relative to snippet sub-directory.
-			 * @param array  $shortcodes Optional array of shortcodes.
+			 * @param array  $shortcodes_vars Optional array shortcodes/variables.
 			 *
 			 * @return string Parsed snippet file contents.
 			 */
-			public function snippet($file, array $shortcodes = array())
+			public function snippet($file, array $shortcodes_vars = array())
 			{
 				$file = (string)$file; // Force string.
 				$file = $this->plugin->utils_string->trim_deep($file, '', '/');
 				$file = $this->plugin->utils_fs->n_seps($file);
 
-				foreach($shortcodes as $_key => $_value)
-					if(!is_string($_value) || !preg_match('/^\[(?:[^\s\[\]]+?)\]$/', $_key))
-						unset($shortcodes[$_key]); // Invalid shortcode.
+				$shortcodes_vars = // Merge w/ current vars.
+					array_merge($this->current_vars, $shortcodes_vars);
+				$shortcodes      = array(); // Initialize.
+
+				foreach($shortcodes_vars as $_key => $_value)
+					if(is_string($_key) && preg_match('/^\[(?:[^\s\[\]]+?)\]$/', $_key))
+						if(is_string($_value) || is_integer($_value) || is_float($_value))
+							$shortcodes[$_key] = (string)$_value;
 				unset($_key, $_value); // Housekeeping.
 
-				$snippet    = trim($this->snippet_file_contents($file));
-				$scvc_conds = new scvc_conds($snippet, $shortcodes); // Conditionals.
-				$snippet    = $scvc_conds->parse(); // Makes [if variable] logic possible.
-				$snippet    = str_ireplace(array_keys($shortcodes), array_values($shortcodes), $snippet);
+				$snippet = trim($this->snippet_file_contents($file));
 
-				return $snippet; // With replacements having been performed.
+				$sc_conditionals = new sc_conditionals($snippet, $shortcodes_vars);
+				$snippet         = $sc_conditionals->parse(); // Evaluates [if expression] logic.
+
+				$snippet = str_ireplace(array_keys($shortcodes), array_values($shortcodes), $snippet);
+
+				return $snippet; // Final snippet output.
 			}
 
 			/**
@@ -172,25 +189,25 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function site_vars(array $vars = array())
 			{
-				if(strpos($this->file, 'site/site-header') === 0)
+				if(strpos($this->file, 'site/header') === 0)
 					return array(); // Prevent infinite loop.
 
-				if(strpos($this->file, 'site/site-footer') === 0)
+				if(strpos($this->file, 'site/footer') === 0)
 					return array(); // Prevent infinite loop.
 
 				// All header-related templates.
 
 				if(is_null($site_header_template = &$this->cache_key(__FUNCTION__, 'site_header_template')))
-					$site_header_template = new template('site/site-header.php');
+					$site_header_template = new template('site/header.php');
 
 				if(is_null($site_header_styles_template = &$this->cache_key(__FUNCTION__, 'site_header_styles_template')))
-					$site_header_styles_template = new template('site/site-header-styles.php');
+					$site_header_styles_template = new template('site/header-styles.php');
 
 				if(is_null($site_header_scripts_template = &$this->cache_key(__FUNCTION__, 'site_header_scripts_template')))
-					$site_header_scripts_template = new template('site/site-header-scripts.php');
+					$site_header_scripts_template = new template('site/header-scripts.php');
 
 				if(is_null($site_header_tag_template = &$this->cache_key(__FUNCTION__, 'site_header_tag_template')))
-					$site_header_tag_template = new template('site/site-header-tag.php');
+					$site_header_tag_template = new template('site/header-tag.php');
 
 				$site_header_styles  = $site_header_styles_template->parse($vars);
 				$site_header_scripts = $site_header_scripts_template->parse($vars);
@@ -201,10 +218,10 @@ namespace comment_mail // Root namespace.
 				// All footer-related templates.
 
 				if(is_null($site_footer_tag_template = &$this->cache_key(__FUNCTION__, 'site_footer_tag_template')))
-					$site_footer_tag_template = new template('site/site-footer-tag.php');
+					$site_footer_tag_template = new template('site/footer-tag.php');
 
 				if(is_null($site_footer_template = &$this->cache_key(__FUNCTION__, 'site_footer_template')))
-					$site_footer_template = new template('site/site-footer.php');
+					$site_footer_template = new template('site/footer.php');
 
 				$site_footer_tag  = $site_footer_tag_template->parse($vars);
 				$site_footer_vars = compact('site_footer_tag'); // Only one for now.
@@ -224,25 +241,25 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function email_vars(array $vars = array())
 			{
-				if(strpos($this->file, 'email/email-header') === 0)
+				if(strpos($this->file, 'email/header') === 0)
 					return array(); // Prevent infinite loop.
 
-				if(strpos($this->file, 'email/email-footer') === 0)
+				if(strpos($this->file, 'email/footer') === 0)
 					return array(); // Prevent infinite loop.
 
 				// All header-related templates.
 
 				if(is_null($email_header_template = &$this->cache_key(__FUNCTION__, 'email_header_template')))
-					$email_header_template = new template('email/email-header.php');
+					$email_header_template = new template('email/header.php');
 
 				if(is_null($email_header_styles_template = &$this->cache_key(__FUNCTION__, 'email_header_styles_template')))
-					$email_header_styles_template = new template('email/email-header-styles.php');
+					$email_header_styles_template = new template('email/header-styles.php');
 
 				if(is_null($email_header_scripts_template = &$this->cache_key(__FUNCTION__, 'email_header_scripts_template')))
-					$email_header_scripts_template = new template('email/email-header-scripts.php');
+					$email_header_scripts_template = new template('email/header-scripts.php');
 
 				if(is_null($email_header_tag_template = &$this->cache_key(__FUNCTION__, 'email_header_tag_template')))
-					$email_header_tag_template = new template('email/email-header-tag.php');
+					$email_header_tag_template = new template('email/header-tag.php');
 
 				$email_header_styles  = $email_header_styles_template->parse($vars);
 				$email_header_scripts = $email_header_scripts_template->parse($vars);
@@ -253,10 +270,10 @@ namespace comment_mail // Root namespace.
 				// All footer-related templates.
 
 				if(is_null($email_footer_tag_template = &$this->cache_key(__FUNCTION__, 'email_footer_tag_template')))
-					$email_footer_tag_template = new template('email/email-footer-tag.php');
+					$email_footer_tag_template = new template('email/footer-tag.php');
 
 				if(is_null($email_footer_template = &$this->cache_key(__FUNCTION__, 'email_footer_template')))
-					$email_footer_template = new template('email/email-footer.php');
+					$email_footer_template = new template('email/footer.php');
 
 				$email_footer_tag  = $email_footer_tag_template->parse($vars);
 				$email_footer_vars = compact('email_footer_tag'); // Only one for now.
@@ -325,7 +342,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @throws \exception If unable to locate the snippet.
 			 */
-			public function snippet_file_contents($file)
+			protected function snippet_file_contents($file)
 			{
 				if($this->force_default)
 					goto default_snippet;
@@ -378,7 +395,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public static function option_key_data($option_key)
 			{
-				$plugin = plugin();
+				$plugin = plugin(); // Plugin class.
 
 				$type       = $file = ''; // Initialize.
 				$option_key = trim(strtolower((string)$option_key));
@@ -392,6 +409,7 @@ namespace comment_mail // Root namespace.
 				$file = preg_replace('/^template__type_.+?__/', '', $file);
 				$file = str_replace('_', '-', str_replace('__', '/', $file));
 				$file .= '.php'; // Add `.php` extension also.
+
 				$file = $plugin->utils_string->trim_deep($file, '', '/');
 				$file = $plugin->utils_fs->n_seps($file);
 
@@ -409,7 +427,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public static function data_option_key($data)
 			{
-				$plugin = plugin();
+				$plugin = plugin(); // Plugin class.
 
 				$type = $file = ''; // Initialize.
 				if(is_array($data)) $data = (object)$data;

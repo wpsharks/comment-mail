@@ -57,18 +57,21 @@ $sub_last_ip = $sub->last_ip ? $sub->last_ip : __('unknown', $plugin->text_domai
 // Subscription last update time "ago"; e.g. `X [seconds/minutes/days/weeks/years] ago`.
 $sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $sub->last_update_time);
 ?>
-	<?php echo $template->snippet(
-		'message-heading.php', array(
-			'[sub_fname]'       => esc_html($sub->fname),
-			'[sub_confirm_url]' => esc_attr($sub_confirm_url),
-		)); ?>
 
 	<?php echo $template->snippet(
-		'message-body.php', array(
-			'[sub_comment_url]'       => esc_attr($sub_comment_url),
-			'[sub_comment_id]'        => esc_html($sub_comment->comment_ID),
-			'[sub_post_comments_url]' => esc_attr($sub_post_comments_url),
-			'[sub_post_title_clip]'   => esc_html($sub_post_title_clip),
+		'message.php', array(
+			'sub_comment'               => $sub_comment,
+			'subscribed_to_own_comment' => $subscribed_to_own_comment,
+			'sub_post_comments_open'    => $sub_post_comments_open,
+
+			'[sub_fname]'               => esc_html($sub->fname),
+			'[sub_confirm_url]'         => esc_attr($sub_confirm_url),
+
+			'[sub_post_comments_url]'   => esc_attr($sub_post_comments_url),
+			'[sub_post_title_clip]'     => esc_html($sub_post_title_clip),
+
+			'[sub_comment_url]'         => esc_attr($sub_comment_url),
+			'[sub_comment_id]'          => esc_html($sub_comment ? $sub_comment->comment_ID : 0),
 		)); ?>
 
 	<p style="color:#888888; font-style:italic; margin-left:1em;">

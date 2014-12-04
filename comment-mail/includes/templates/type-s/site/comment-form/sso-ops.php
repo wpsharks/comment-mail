@@ -73,7 +73,7 @@ namespace comment_mail;
 		background-position : 0 -2em;
 	}
 	<?php foreach($sso_services as $_sso_service): ?>
-	<?php echo '.comment-sso-ops .csso-link.csso-'.esc_html($_sso_service).
-	' { background-image : url("'.esc_url($plugin->utils_url->to('/client-s/images/sso-'.$_sso_service.'.png')).'"); }'."\n"; ?>
+		<?php echo '.comment-sso-ops .csso-link.csso-'.esc_html($_sso_service).
+		' { background-image : url("'.esc_url($plugin->utils_url->to('/client-s/images/sso-'.$_sso_service.'.png')).'"); }'."\n"; ?>
 	<?php endforeach; ?>
 </style>

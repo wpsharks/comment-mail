@@ -30,6 +30,9 @@ $home_url = home_url('/'); // Multisite compatible.
 // A clip of the blog's name; as configured in WordPress.
 $blog_name_clip = $plugin->utils_string->clip(get_bloginfo('name'));
 
+// Summary return URL; w/ all summary navigation vars preserved.
+$sub_summary_return_url = $plugin->utils_url->sub_manage_summary_url(!empty($sub_key) ? $sub_key : '', NULL, TRUE);
+
 // Current `host[/path]` with support for multisite network child blogs.
 $current_host_path = $plugin->utils_url->current_host_path();
 
@@ -37,26 +40,10 @@ $current_host_path = $plugin->utils_url->current_host_path();
 $icon_bubbles_url = $plugin->utils_url->to('/client-s/images/icon-bubbles.png');
 ?>
 
-<header>
-	<table style="width:100%;">
-		<tbody>
-		<tr>
-			<td style="vertical-align:top;">
-				<h1 style="margin:0;">
-					<?php echo $blog_name_clip; ?><br />
-					<small style="color:#888888;">&nbsp;&#42774;&nbsp;
-						<a href="<?php echo esc_attr($home_url); ?>" style="color:#888888;">
-							<?php echo esc_html($current_host_path); ?>
-						</a>
-					</small>
-				</h1>
-			</td>
-			<td style="vertical-align:top; text-align:right;">
-				<img src="<?php echo esc_attr($icon_bubbles_url); ?>" style="width:100px; max-width:100%;" />
-			</td>
-		</tr>
-		</tbody>
-	</table>
-</header>
-
-<hr style="margin-bottom:2em;" />
+<?php echo $template->snippet(
+	'header-tag.php', array(
+		'[home_url]'          => esc_attr($home_url),
+		'[blog_name_clip]'    => esc_html($blog_name_clip),
+		'[current_host_path]' => esc_html($current_host_path),
+		'[icon_bubbles_url]'  => esc_attr($icon_bubbles_url),
+	)); ?>
