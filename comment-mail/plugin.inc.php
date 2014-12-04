@@ -550,6 +550,9 @@ namespace comment_mail
 					'template__type_s__site__snippet__header_tag'                                    => '', // HTML code.
 					'template__type_s__site__snippet__footer_tag'                                    => '', // HTML code.
 
+					'template__type_s__site__login_form__snippet__sso_ops'                           => '', // HTML code.
+
+					'template__type_s__site__comment_form__snippet__sso_ops'                         => '', // HTML code.
 					'template__type_s__site__comment_form__snippet__sub_ops'                         => '', // HTML code.
 
 					'template__type_s__site__sub_actions__snippet__confirmed'                        => '', // HTML code.
