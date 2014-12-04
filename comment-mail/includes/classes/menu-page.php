@@ -2096,79 +2096,13 @@ namespace comment_mail // Root namespace.
 					               '  <tbody>'.
 					               $form_fields->textarea_row(
 						               array(
-							               'label'         => __('Email Header Template', $this->plugin->text_domain),
-							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-							               'cm_mode'       => 'application/x-httpd-php',
-							               'name'          => 'template__type_s__email__header',
-							               'current_value' => $current_value_for('template__type_s__email__header'),
-							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template establishes the opening <code>&lt;html&gt;&lt;body&gt;</code> tags, and it pulls together a few other components; i.e. the Header Styles, Header Scripts, and Header Tag templates. These other components can be configured separately. For this reason, it is normally not necessary to edit this file. Instead, we suggest editing the "Email Header Tag" template. The choice is yours though.', $this->plugin->text_domain).'</p>',
-							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-						               )).
-					               '  </tbody>'.
-					               '</table>';
-
-					echo $this->panel(__('Email Header', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-					unset($_panel_body); // Housekeeping.
-
-					/* ----------------------------------------------------------------------------------------- */
-
-					$_panel_body = '<table>'.
-					               '  <tbody>'.
-					               $form_fields->textarea_row(
-						               array(
-							               'label'         => __('Email Header Styles Template', $this->plugin->text_domain),
-							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-							               'cm_mode'       => 'application/x-httpd-php',
-							               'name'          => 'template__type_s__email__header_styles',
-							               'current_value' => $current_value_for('template__type_s__email__header_styles'),
-							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template establishes just a few basic styles for email messages. If you modify the default set of email templates, it might be helpful to add a few new styles of your own here. That said, for emails, it is generally a good idea to use inline <code>style=""</code> attributes instead of a stylesheet. For some things it\'s OK, but for the most part, inline styles are better for emails; i.e. they are the most compatible across various email clients.', $this->plugin->text_domain).'</p>',
-							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-						               )).
-					               '  </tbody>'.
-					               '</table>';
-
-					echo $this->panel(__('Email Header Styles', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-					unset($_panel_body); // Housekeeping.
-
-					/* ----------------------------------------------------------------------------------------- */
-
-					$_panel_body = '<table>'.
-					               '  <tbody>'.
-					               $form_fields->textarea_row(
-						               array(
-							               'label'         => __('Email Header Scripts Template', $this->plugin->text_domain),
-							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-							               'cm_mode'       => 'application/x-httpd-php',
-							               'name'          => 'template__type_s__email__header_scripts',
-							               'current_value' => $current_value_for('template__type_s__email__header_scripts'),
-							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template only exists for the sake of being thorough. Using <code>&lt;script&gt;</code> tags in email messages is NOT recommended. They will mostly likely be excluded by popular email clients anyway. For this reason, you will find that this template comes empty by default.', $this->plugin->text_domain).'</p>',
-							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-						               )).
-					               '  </tbody>'.
-					               '</table>';
-
-					echo $this->panel(__('Email Header Scripts', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-					unset($_panel_body); // Housekeeping.
-
-					/* ----------------------------------------------------------------------------------------- */
-
-					$_panel_body = '<table>'.
-					               '  <tbody>'.
-					               $form_fields->textarea_row(
-						               array(
 							               'label'         => __('Email Header Tag Template', $this->plugin->text_domain),
 							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-							               'cm_mode'       => 'application/x-httpd-php',
-							               'name'          => 'template__type_s__email__header_tag',
-							               'current_value' => $current_value_for('template__type_s__email__header_tag'),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__snippet__header_tag',
+							               'current_value' => $current_value_for('template__type_s__email__snippet__header_tag'),
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template represents the meat of the email header design. If you would like to rebrand or enhance the default template, this is the file that we suggest you edit. This file contains the <code>&lt;header&gt;</code> tag, which is pulled together by the primary Email Header Template to create the full, final, complete HTML header markup. In other words, there is no reason to use <code>&lt;html&gt;&lt;body&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;header&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;header&gt;</code>; i.e. you can add any HTML that you like. As with all templates, you can also use PHP tags if necessary, and even WordPress functionality if you like.', $this->plugin->text_domain).'</p>',
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template represents the meat of the email header design. If you would like to rebrand or enhance email messages, this is the file that we suggest you edit. This file contains the <code>&lt;header&gt;</code> tag, which is pulled together into a full, final, and complete HTML document. In other words, there is no reason to use <code>&lt;html&gt;&lt;body&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;header&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;header&gt;</code>; i.e. you can add any HTML that you like.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 						               )).
 					               '  </tbody>'.
@@ -2186,39 +2120,17 @@ namespace comment_mail // Root namespace.
 						               array(
 							               'label'         => __('Email Footer Tag Template', $this->plugin->text_domain),
 							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-							               'cm_mode'       => 'application/x-httpd-php',
-							               'name'          => 'template__type_s__email__footer_tag',
-							               'current_value' => $current_value_for('template__type_s__email__footer_tag'),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__snippet__footer_tag',
+							               'current_value' => $current_value_for('template__type_s__email__snippet__footer_tag'),
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template is by far the easiest way to create a custom email footer design. If you would like to rebrand or enhance the default template, this is the file that we suggest you edit. This file contains the <code>&lt;footer&gt;</code> tag, which is pulled together by the primary Email Footer Template to create the full, final, complete HTML footer markup. In other words, there is no reason to use <code>&lt;/body&gt;&lt;/html&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;footer&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;footer&gt;</code>; i.e. you can add any HTML that you like. As with all templates, you can also use PHP tags if necessary, and even WordPress functionality if you like.', $this->plugin->text_domain).'</p>',
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template allows you to create a custom email footer design. If you would like to rebrand or enhance email messages, this is the file that we suggest you edit. This file contains the <code>&lt;footer&gt;</code> tag, which is pulled together into a full, final, and complete HTML document. In other words, there is no reason to use <code>&lt;/body&gt;&lt;/html&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;footer&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;footer&gt;</code>; i.e. you can add any HTML that you like.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 						               )).
 					               '  </tbody>'.
 					               '</table>';
 
 					echo $this->panel(__('Email Footer Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
-
-					unset($_panel_body); // Housekeeping.
-
-					/* ----------------------------------------------------------------------------------------- */
-
-					$_panel_body = '<table>'.
-					               '  <tbody>'.
-					               $form_fields->textarea_row(
-						               array(
-							               'label'         => __('Email Footer Template', $this->plugin->text_domain),
-							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-							               'cm_mode'       => 'application/x-httpd-php',
-							               'name'          => 'template__type_s__email__footer',
-							               'current_value' => $current_value_for('template__type_s__email__footer'),
-							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template deals with the closing <code>&lt;/body&gt;&lt;/html&gt;</code> tags. It also pulls together a few specific details from your config. options, in order to establish edit/unsubscribe links; along with a mailing address. These are needed for you to remain CAN-SPAM compliant. Please note, it is normally not necessary to edit this file. Instead, we suggest editing the "Email Footer Tag" template. The choice is yours though.', $this->plugin->text_domain).'</p>',
-							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-						               )).
-					               '  </tbody>'.
-					               '</table>';
-
-					echo $this->panel(__('Email Footer', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -2237,9 +2149,9 @@ namespace comment_mail // Root namespace.
 						               array(
 							               'label'         => __('Subscr. Confirmation Subject Line Template', $this->plugin->text_domain),
 							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-							               'cm_mode'       => 'application/x-httpd-php',
-							               'name'          => 'template__type_s__email__sub_confirmation__subject',
-							               'current_value' => $current_value_for('template__type_s__email__sub_confirmation__subject'),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__sub_confirmation__snippet__subject',
+							               'current_value' => $current_value_for('template__type_s__email__sub_confirmation__snippet__subject'),
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this is merely a subject line for email confirmation requests. Customize if you like, but not necessary. Note that extra whitespace in subject templates is stripped automatically at runtime. That\'s why this template is able to break things down into multiple lines. This is for clarity only. In the end, the email will always contain a one-line subject of course. Multiline subjects are unsupported by the vast majority of email clients anyway.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
@@ -2259,9 +2171,9 @@ namespace comment_mail // Root namespace.
 						               array(
 							               'label'         => __('Subscr. Confirmation Message Body Template', $this->plugin->text_domain),
 							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-							               'cm_mode'       => 'application/x-httpd-php',
-							               'name'          => 'template__type_s__email__sub_confirmation__message',
-							               'current_value' => $current_value_for('template__type_s__email__sub_confirmation__message'),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__sub_confirmation__snippet__message',
+							               'current_value' => $current_value_for('template__type_s__email__sub_confirmation__snippet__message'),
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the body of an email message that is sent to request a subscription confirmation. Note that it is not necessary to create a header/footer for this template. This template pulls together a global email header/footer design that have already been configured elsewhere; i.e. all you need here is the message body. You\'ll notice that the first line of the message body is a link that a user may click to complete confirmation. If you modify this template, it is suggested that you always keep this link at the top of the email. It is (by far) the most important element in this message. End users need a way to confirm their subscription.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
@@ -2288,9 +2200,9 @@ namespace comment_mail // Root namespace.
 						               array(
 							               'label'         => __('Comment Notification Subject Line Template', $this->plugin->text_domain),
 							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-							               'cm_mode'       => 'application/x-httpd-php',
-							               'name'          => 'template__type_s__email__comment_notification__subject',
-							               'current_value' => $current_value_for('template__type_s__email__comment_notification__subject'),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__comment_notification__snippet__subject',
+							               'current_value' => $current_value_for('template__type_s__email__comment_notification__snippet__subject'),
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this is merely a subject line for email notifications. Customize if you like, but not necessary. Note that extra whitespace in subject templates is stripped automatically at runtime. That\'s why this template is able to break things down into multiple lines. This is for clarity only. In the end, the email will always contain a one-line subject of course. Multiline subjects are unsupported by the vast majority of email clients anyway.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
@@ -2308,19 +2220,85 @@ namespace comment_mail // Root namespace.
 					               '  <tbody>'.
 					               $form_fields->textarea_row(
 						               array(
-							               'label'         => __('Comment Notification Message Body Template', $this->plugin->text_domain),
+							               'label'         => __('Comment Notification Message Heading Template', $this->plugin->text_domain),
 							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-							               'cm_mode'       => 'application/x-httpd-php',
-							               'name'          => 'template__type_s__email__comment_notification__message',
-							               'current_value' => $current_value_for('template__type_s__email__comment_notification__message'),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__comment_notification__snippet__message_heading',
+							               'current_value' => $current_value_for('template__type_s__email__comment_notification__snippet__message_heading'),
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the body of an email message that is sent to notify an end-user about one or more comments on your blog. Note that it is not necessary to create a header/footer for this template. This template pulls together a global email header/footer design that have already been configured elsewhere; i.e. all you need here is the message body. You\'ll notice that there are several PHP conditional tags in this template. An email notification can include one (or more) comments; i.e. some subscribers may choose to receive notifications in the form of a digest. This template has the job of dealing with either case; i.e. one comment in the notification, or more than one.', $this->plugin->text_domain).'</p>',
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the heading in an email message that is sent to notify an end-user about one or more comments on your blog. You\'ll notice that there are several conditional tags in this template. An email notification can include one (or more) comments; i.e. some subscribers may choose to receive notifications in the form of a digest. This template has the job of dealing with either case; i.e. one comment in the notification, or more than one.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 						               )).
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Comment Notification Message Body', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Comment Notification Message Heading', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Notification Message In-Response-To Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__comment_notification__snippet__message_in_response_to',
+							               'current_value' => $current_value_for('template__type_s__email__comment_notification__snippet__message_in_response_to'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the blurp that will appear before a comment that\'s a reply; i.e. not a new comment, but a response to someone. This helps to offer the reader some context when they receive the notification.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Comment Notification Message In-Response-To', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Notification Message Reply-From Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__comment_notification__snippet__message_reply_from',
+							               'current_value' => $current_value_for('template__type_s__email__comment_notification__snippet__message_reply_from'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the blurp that will appear for a comment that\'s a reply; i.e. not a new comment, but a response to someone. In the final email, this will come just after the In-Response-To template (as seen above).', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Comment Notification Message Reply-From', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Notification Message Comment-From Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__comment_notification__snippet__message_comment_from',
+							               'current_value' => $current_value_for('template__type_s__email__comment_notification__snippet__message_comment_from'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the blurp that will appear for a new comment; i.e. one that\'s not a reply, but a new top-level comment.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Comment Notification Message Comment-From', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
 
 					unset($_panel_body); // Housekeeping.
 				}
