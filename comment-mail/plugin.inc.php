@@ -541,11 +541,11 @@ namespace comment_mail
 					'email_footer_powered_by_enable'                                                 => '0', // `0|1`; enable?
 					'site_footer_powered_by_enable'                                                  => '0', // `0|1`; enable?
 
-					/* Template-related site templates. */
+					/* Template-related config. options. */
 
 					'template_type'                                                                  => 's', // `a|s`.
 
-					# Simple snippet-based templates.
+					# Simple snippet-based templates for the site.
 
 					'template__type_s__site__snippet__header_tag'                                    => '', // HTML code.
 					'template__type_s__site__snippet__footer_tag'                                    => '', // HTML code.
@@ -556,7 +556,7 @@ namespace comment_mail
 					'template__type_s__site__sub_actions__snippet__unsubscribed'                     => '', // HTML code.
 					'template__type_s__site__sub_actions__snippet__unsubscribed_all'                 => '', // HTML code.
 
-					# Advanced HTML, PHP-based templates.
+					# Advanced HTML, PHP-based templates for the site.
 
 					'template__type_a__site__header'                                                 => '', // HTML/PHP code.
 					'template__type_a__site__header_styles'                                          => '', // HTML/PHP code.
@@ -584,9 +584,7 @@ namespace comment_mail
 					'template__type_a__site__sub_actions__manage_sub_form'                           => '', // HTML/PHP code.
 					'template__type_a__site__sub_actions__manage_sub_form_comment_id_row_via_ajax'   => '', // HTML/PHP code.
 
-					/* Template-related email templates. */
-
-					# Simple snippet-based templates.
+					# Simple snippet-based templates for emails.
 
 					'template__type_s__email__snippet__header_tag'                                   => '', // HTML code.
 					'template__type_s__email__snippet__footer_tag'                                   => '', // HTML code.
@@ -600,7 +598,7 @@ namespace comment_mail
 					'template__type_s__email__comment_notification__snippet__message_reply_from'     => '', // HTML code.
 					'template__type_s__email__comment_notification__snippet__message_comment_from'   => '', // HTML code.
 
-					# Advanced HTML, PHP-based templates.
+					# Advanced HTML, PHP-based templates for emails.
 
 					'template__type_a__email__header'                                                => '', // HTML/PHP code.
 					'template__type_a__email__header_styles'                                         => '', // HTML/PHP code.
