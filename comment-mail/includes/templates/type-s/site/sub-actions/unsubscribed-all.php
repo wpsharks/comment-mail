@@ -65,21 +65,11 @@ echo str_replace('%%title%%', __('Unsubscribe All', $plugin->text_domain), $site
 			$sub_new_url = $plugin->utils_url->sub_manage_sub_new_url();
 			?>
 
-			<div class="alert alert-success" style="margin:0;">
-				<h4 style="margin:0;">
-					<i class="fa fa-check fa-fw"></i> <?php echo __('Unsubscribed all successfully. Sorry to see you go!', $plugin->text_domain); ?>
-				</h4>
-			</div>
-
-			<h4>
-				<?php echo sprintf(__('&lt;%1$s&gt; will no longer be notified about any comments/replies.', $plugin->text_domain), esc_html($sub_email)); ?>
-			</h4>
-
-			<hr style="margin:0 0 1em 0;" />
-
-			<h5 style="font-style:italic; margin:0;">
-				<i class="fa fa-frown-o"></i> <?php echo sprintf(__('Too many emails? ~ Please feel free to <a href="%1$s">add a new/different subscription</a> if you like!', $plugin->text_domain), esc_attr($sub_new_url)); ?>
-			</h5>
+			<?php echo $template->snippet(
+				'unsubscribed-all.php', array(
+					'[sub_email]'   => esc_html($sub_email),
+					'[sub_new_url]' => esc_attr($sub_new_url),
+				)); ?>
 
 		<?php endif; // END: if unsubscribed all successfully w/ no major errors. ?>
 
