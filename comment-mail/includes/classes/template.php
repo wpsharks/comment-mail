@@ -400,7 +400,7 @@ namespace comment_mail // Root namespace.
 				$type       = $file = ''; // Initialize.
 				$option_key = trim(strtolower((string)$option_key));
 
-				if(preg_match('/^template__type_(?P<type>.+?)__/', '', $option_key, $_m))
+				if(preg_match('/^template__type_(?P<type>.+?)__/', $option_key, $_m))
 					$type = trim(strtolower((string)$_m['type'])); // Key has type?
 				if(!$type) $type = $plugin->options['template_type'];
 				unset($_m); // Just a little housekeeping.
