@@ -52,17 +52,16 @@ namespace comment_mail // Root namespace.
 				$form_fields       = new form_fields($form_field_args);
 				$current_value_for = function ($key) use ($_this)
 				{
-					if(strpos($key, 'template__') === 0)
-						if(isset($_this->plugin->options[$key]))
-						{
-							if($_this->plugin->options[$key])
-								return $_this->plugin->options[$key];
+					if(strpos($key, 'template__') === 0 && isset($_this->plugin->options[$key]))
+					{
+						if($_this->plugin->options[$key])
+							return $_this->plugin->options[$key];
 
-							$file             = template::option_key_to_file($key);
-							$default_template = new template($file, TRUE);
+						$data             = template::option_key_data($key);
+						$default_template = new template($data->file, $data->type, TRUE);
 
-							return $default_template->file_contents();
-						}
+						return $default_template->file_contents();
+					}
 					return isset($_this->plugin->options[$key]) ? $_this->plugin->options[$key] : NULL;
 				};
 				/* ----------------------------------------------------------------------------------------- */
@@ -384,18 +383,31 @@ namespace comment_mail // Root namespace.
 				$_panel_body .= '<div class="pmp-if-enabled-show">'.
 				                '  <table>'.
 				                '     <tbody>'.
-				                $form_fields->textarea_row(
-					                array(
-						                'label'         => __('Comment Form Subscr. Options Template', $this->plugin->text_domain),
-						                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						                'cm_mode'       => 'application/x-httpd-php', 'cm_height' => 250,
-						                'name'          => 'template__site__comment_form__sub_ops',
-						                'current_value' => $current_value_for('template__site__comment_form__sub_ops'),
-						                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
-						                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sub-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
-						                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>'.
-						                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					                )).
+				                ($this->plugin->options['template_type'] === 'a'
+					                ? $form_fields->textarea_row( // Advanced PHP-based template.
+						                array(
+							                'label'         => __('Comment Form Subscr. Options Template', $this->plugin->text_domain),
+							                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							                'cm_mode'       => 'application/x-httpd-php', 'cm_height' => 250,
+							                'name'          => 'template__type_'.$this->plugin->options['template_type'].'__site__comment_form__sub_ops',
+							                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__comment_form__sub_ops'),
+							                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+							                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sub-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
+							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>'.
+							                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						                ))
+					                : $form_fields->textarea_row( // Simple snippet-based template.
+						                array(
+							                'label'         => __('Comment Form Subscr. Options Template', $this->plugin->text_domain),
+							                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							                'cm_mode'       => 'text/html', 'cm_height' => 250,
+							                'name'          => 'template__type_'.$this->plugin->options['template_type'].'__site__comment_form__snippet__sub_ops',
+							                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__comment_form__snippet__sub_ops'),
+							                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+							                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sub-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
+							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>'.
+							                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						                ))).
 				                '     </tbody>'.
 				                '  </table>'.
 
@@ -415,7 +427,9 @@ namespace comment_mail // Root namespace.
 							                'comment'  => __('replies only (recommended)', $this->plugin->text_domain),
 							                'comments' => __('all comments/replies', $this->plugin->text_domain),
 						                ),
-						                'notes_after'     => '<p>'.__('This is the option that will be pre-selected for each commenter as the default value. You can change the wording that appears for these options by editing the template above. However, the default choice is determined systematically, based on the one that you choose here — assuming that you haven\'t dramatically altered code in the template. For most sites, the most logical default choice is: <code>replies only</code>; i.e. the commenter will only receive notifications for replies to the comment they are posting.', $this->plugin->text_domain).'</p>',
+						                'notes_after'     => $this->plugin->options['template_type'] === 'a'
+							                ? '<p>'.__('This is the option that will be pre-selected for each commenter as the default value. You can change the wording that appears for these options by editing the template above. However, the default choice is determined systematically, based on the one that you choose here — assuming that you haven\'t dramatically altered code in the template. For most sites, the most logical default choice is: <code>replies only</code>; i.e. the commenter will only receive notifications for replies to the comment they are posting.', $this->plugin->text_domain).'</p>'
+							                : '<p>'.__('This is the option that will be pre-selected for each commenter as the default value. For most sites, the most logical default choice is: <code>replies only</code>; i.e. the commenter will only receive notifications for replies to the comment they are posting.', $this->plugin->text_domain).'</p>',
 					                )).
 				                '     </tbody>'.
 				                '  </table>'.
@@ -431,7 +445,9 @@ namespace comment_mail // Root namespace.
 						                'allow_empty'     => FALSE, // Do not offer empty option value.
 						                'allow_arbitrary' => FALSE, // Must be one of these.
 						                'options'         => '%%deliver%%', // Predefined options.
-						                'notes_after'     => '<p>'.__('This is the option that will be pre-selected for each commenter as the default value. You can change the wording that appears for these options by editing the template above. However, the default choice is determined systematically, based on the one that you choose here — assuming that you haven\'t dramatically altered code in the template. For most sites, the most logical default choice is: <code>asap</code> (aka: instantly); i.e. the commenter will receive instant notifications regarding replies to their comment.', $this->plugin->text_domain).'</p>',
+						                'notes_after'     => $this->plugin->options['template_type'] === 'a'
+							                ? '<p>'.__('This is the option that will be pre-selected for each commenter as the default value. You can change the wording that appears for these options by editing the template above. However, the default choice is determined systematically, based on the one that you choose here — assuming that you haven\'t dramatically altered code in the template. For most sites, the most logical default choice is: <code>asap</code> (aka: instantly); i.e. the commenter will receive instant notifications regarding replies to their comment.', $this->plugin->text_domain).'</p>'
+							                : '<p>'.__('This is the option that will be pre-selected for each commenter as the default value. For most sites, the most logical default choice is: <code>asap</code> (aka: instantly); i.e. the commenter will receive instant notifications regarding replies to their comment.', $this->plugin->text_domain).'</p>',
 					                )).
 				                '     </tbody>'.
 				                '  </table>'.
@@ -910,7 +926,7 @@ namespace comment_mail // Root namespace.
 						                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('When Replies via Email are enabled through an RVE Handler:', $this->plugin->text_domain).'</p>'.
 						                                    '   <ul class="pmp-list-items">'.
 						                                    '      <li>'.sprintf(__('%1$s&trade; will allow replies to comments via email using a special <code>Reply-To</code> address that you will need to set up by following the instructions provided below. Any other <code>Reply-To</code> address configured elsewhere in %1$s will be overridden by the address you configure here for an RVE Handler. There are no special exceptions to this. An RVE Handler takes precedence over any other <code>Reply-To</code> you configure.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
-						                                    '      <li>'.sprintf(__('Replies to comments via email will be functional for all types of notifications sent by %1$s (including digest notifications). However, there are a few things worth noting before you enable an RVE Handler. <a href="#" [data-toggle="other" data-other=".pmp-rve-details">Click here to toggle important details</a>.', $this->plugin->text_domain), esc_html($this->plugin->name)).
+						                                    '      <li>'.sprintf(__('Replies to comments via email will be functional for all types of notifications sent by %1$s (including digest notifications). However, there are a few things worth noting before you enable an RVE Handler. <a href="#" data-toggle="other" data-other=".pmp-rve-details">Click here to toggle important details</a>.', $this->plugin->text_domain), esc_html($this->plugin->name)).
 						                                    '        <ul class="pmp-rve-details" style="display:none;">'.
 						                                    '           <li>'.sprintf(__('All replies posted via email must be sent to the special <code>Reply-To</code> address that you configure below. Once you configure a <code>Reply-To</code> for an RVE Handler, %1$s will automatically set the <code>Reply-To:</code> header in all email notifications that it sends. This way when somebody replies to a comment notification, their email program will reply to the address required for replies via email to work properly.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
 						                                    '           <li>'.sprintf(__('The <code>Reply-To</code> address that you configure below, will serve as a base for %1$s to work from. For instance, let\'s say you choose: <code>rve@mandrill.%2$s</code>. This base address will be suffixed automatically (at runtime) with details specific to a particular notification that %1$s sends. Ultimately, <code>rve@mandrill.%2$s</code> will look like: <code>rve<strong>+332-96-kgjdgxr4ldqpdrgjdgxr</strong>@mandrill.%2$s</code>. In this example, the additional details (following the <code>+</code> sign) are there to help %1$s route the reply to the proper location, and to provide a means by which to identify the end-user that is posting a reply.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html($this->plugin->utils_url->current_host_base())).'</li>'.
@@ -1231,18 +1247,31 @@ namespace comment_mail // Root namespace.
 				                '       <div class="pmp-if-enabled-show pmp-if-in-nest">'.
 				                '          <table>'.
 				                '             <tbody>'.
-				                $form_fields->textarea_row(
-					                array(
-						                'label'         => __('Comment Form SSO Options Template', $this->plugin->text_domain),
-						                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						                'cm_mode'       => 'application/x-httpd-php', 'cm_height' => 250,
-						                'name'          => 'template__site__comment_form__sso_ops',
-						                'current_value' => $current_value_for('template__site__comment_form__sso_ops'),
-						                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
-						                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
-						                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>'.
-						                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					                )).
+				                ($this->plugin->options['template_type'] === 'a'
+					                ? $form_fields->textarea_row( // Advanced PHP-based template.
+						                array(
+							                'label'         => __('Comment Form SSO Options Template', $this->plugin->text_domain),
+							                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							                'cm_mode'       => 'application/x-httpd-php', 'cm_height' => 250,
+							                'name'          => 'template__type_'.$this->plugin->options['template_type'].'__site__comment_form__sso_ops',
+							                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__comment_form__sso_ops'),
+							                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+							                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
+							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>'.
+							                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						                ))
+					                : $form_fields->textarea_row( // Simple snippet-based template.
+						                array(
+							                'label'         => __('Comment Form SSO Options Template', $this->plugin->text_domain),
+							                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							                'cm_mode'       => 'text/html', 'cm_height' => 250,
+							                'name'          => 'template__type_'.$this->plugin->options['template_type'].'__site__comment_form__snippet__sso_ops',
+							                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__comment_form__snippet__sso_ops'),
+							                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+							                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
+							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>'.
+							                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						                ))).
 				                '             </tbody>'.
 				                '          </table>'.
 				                '       </div>'.
@@ -1293,18 +1322,31 @@ namespace comment_mail // Root namespace.
 				                '       <div class="pmp-if-enabled-show pmp-if-in-nest">'.
 				                '          <table>'.
 				                '             <tbody>'.
-				                $form_fields->textarea_row(
-					                array(
-						                'label'         => __('Login Form SSO Options Template', $this->plugin->text_domain),
-						                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						                'cm_mode'       => 'application/x-httpd-php', 'cm_height' => 250,
-						                'name'          => 'template__site__login_form__sso_ops',
-						                'current_value' => $current_value_for('template__site__login_form__sso_ops'),
-						                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
-						                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
-						                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>'.
-						                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					                )).
+				                ($this->plugin->options['template_type'] === 'a'
+					                ? $form_fields->textarea_row( // Advanced PHP-based template.
+						                array(
+							                'label'         => __('Login Form SSO Options Template', $this->plugin->text_domain),
+							                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							                'cm_mode'       => 'application/x-httpd-php', 'cm_height' => 250,
+							                'name'          => 'template__type_'.$this->plugin->options['template_type'].'__site__login_form__sso_ops',
+							                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__login_form__sso_ops'),
+							                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+							                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
+							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>'.
+							                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						                ))
+					                : $form_fields->textarea_row( // Simple snippet-based template.
+						                array(
+							                'label'         => __('Login Form SSO Options Template', $this->plugin->text_domain),
+							                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							                'cm_mode'       => 'text/html', 'cm_height' => 250,
+							                'name'          => 'template__type_'.$this->plugin->options['template_type'].'__site__login_form__snippet__sso_ops',
+							                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__login_form__snippet__sso_ops'),
+							                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+							                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
+							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>'.
+							                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						                ))).
 				                '             </tbody>'.
 				                '          </table>'.
 				                '       </div>'.
@@ -1546,6 +1588,31 @@ namespace comment_mail // Root namespace.
 				               '</table>';
 
 				echo $this->panel(__('Post Meta Box Settings', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
+				               $form_fields->select_row(
+					               array(
+						               'label'           => sprintf(__('Simple Templates or Advanced PHP Templates?', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						               'name'            => 'template_type',
+						               'current_value'   => $current_value_for('template_type'),
+						               'allow_arbitrary' => FALSE,
+						               'options'         => array(
+							               's' => __('Simple shortcode templates (default; easiest to work with)', $this->plugin->text_domain),
+							               'a' => __('Advanced PHP-based templates (for developers and advanced site owners)', $this->plugin->text_domain),
+						               ),
+						               'notes_after'     => '<p>'.__('<strong>Note:</strong> If you change this setting, any template customizations that you\'ve made in one mode, will need to be done again for the new mode that you select; i.e. when this setting is changed, a new set of templates is loaded for the mode you select. You can always switch back though, and any changes that you made in the previous mode will be restored automatically.', $this->plugin->text_domain).'</p>'.
+						                                    '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Tip:</strong> You\'ll notice that by changing this setting, all of the customizable templates in %1$s will be impacted; i.e. when you select %2$s or %3$s from the menu at the top, a new set of templates will load-up; based on the mode that you choose here. You can also switch modes <em>while</em> you\'re editing templates (see: %2$s and/or %3$s). That will impact this setting in the exact same way. Change it here or change it there, no difference.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor($this->plugin->utils_url->email_templates_menu_page_only(), __('Email Templates', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor($this->plugin->utils_url->site_templates_menu_page_only(), __('Site Templates', $this->plugin->text_domain))).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Template-Related Settings', $this->plugin->text_domain), $_panel_body, array());
 
 				unset($_panel_body); // Housekeeping.
 
@@ -2019,17 +2086,16 @@ namespace comment_mail // Root namespace.
 				$form_fields       = new form_fields($form_field_args);
 				$current_value_for = function ($key) use ($_this)
 				{
-					if(strpos($key, 'template__') === 0)
-						if(isset($_this->plugin->options[$key]))
-						{
-							if($_this->plugin->options[$key])
-								return $_this->plugin->options[$key];
+					if(strpos($key, 'template__') === 0 && isset($_this->plugin->options[$key]))
+					{
+						if($_this->plugin->options[$key])
+							return $_this->plugin->options[$key];
 
-							$file             = template::option_key_to_file($key);
-							$default_template = new template($file, TRUE);
+						$data             = template::option_key_data($key);
+						$default_template = new template($data->file, $data->type, TRUE);
 
-							return $default_template->file_contents();
-						}
+						return $default_template->file_contents();
+					}
 					return isset($_this->plugin->options[$key]) ? $_this->plugin->options[$key] : NULL;
 				};
 				/* ----------------------------------------------------------------------------------------- */
@@ -2044,247 +2110,478 @@ namespace comment_mail // Root namespace.
 
 				echo '         '.$this->all_panel_togglers();
 
+				if($this->plugin->is_pro) // Only possible in the pro version.
+				{
+					echo '      <div class="pmp-template-types pmp-right">'.
+					     '         <span>'.__('Template Mode:', $this->plugin->text_domain).'</span>'.
+					     '         <a href="'.esc_attr($this->plugin->utils_url->set_template_type('s')).'"'.($this->plugin->options['template_type'] === 's' ? ' class="pmp-active"' : '').'>'.__('simple', $this->plugin->text_domain).'</a>'.
+					     '         <a href="'.esc_attr($this->plugin->utils_url->set_template_type('a')).'"'.($this->plugin->options['template_type'] === 'a' ? ' class="pmp-active"' : '').'>'.__('advanced', $this->plugin->text_domain).'</a>'.
+					     '      </div>';
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
-				echo '         <h2 class="pmp-section-heading">'.
-				     '            '.__('Email Header/Footer Templates', $this->plugin->text_domain).
-				     '            <small>'.__('These are used in all emails; i.e. global header/footer.', $this->plugin->text_domain).'</small>'.
-				     '         </h2>';
+				if($this->plugin->options['template_type'] === 's') // Simple snippet-based templates.
+				{
+					echo '         <h2 class="pmp-section-heading">'.
+					     '            '.__('Email Header/Footer Templates', $this->plugin->text_domain).
+					     '            <small>'.__('These are used in all emails; i.e. global header/footer.', $this->plugin->text_domain).'</small>'.
+					     '         </h2>';
 
-				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+					/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Email Header Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__email__email_header',
-						               'current_value' => $current_value_for('template__email__email_header'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template establishes the opening <code>&lt;html&gt;&lt;body&gt;</code> tags, and it pulls together a few other components; i.e. the Header Styles, Header Scripts, and Header Tag templates. These other components can be configured separately. For this reason, it is normally not necessary to edit this file. Instead, we suggest editing the "Email Header Tag" template. The choice is yours though.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Email Header Tag Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__snippet__header_tag',
+							               'current_value' => $current_value_for('template__type_s__email__snippet__header_tag'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template represents the meat of the email header design. If you would like to rebrand or enhance email messages, this is the file that we suggest you edit. This file contains the <code>&lt;header&gt;</code> tag, which is pulled together into a full, final, and complete HTML document. In other words, there is no reason to use <code>&lt;html&gt;&lt;body&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;header&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;header&gt;</code>; i.e. you can add any HTML that you like.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				echo $this->panel(__('Email Header', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Email Header Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
 
-				unset($_panel_body); // Housekeeping.
+					unset($_panel_body); // Housekeeping.
 
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Email Footer Tag Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__snippet__footer_tag',
+							               'current_value' => $current_value_for('template__type_s__email__snippet__footer_tag'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template allows you to create a custom email footer design. If you would like to rebrand or enhance email messages, this is the file that we suggest you edit. This file contains the <code>&lt;footer&gt;</code> tag, which is pulled together into a full, final, and complete HTML document. In other words, there is no reason to use <code>&lt;/body&gt;&lt;/html&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;footer&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;footer&gt;</code>; i.e. you can add any HTML that you like.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Email Footer Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					echo '         <h2 class="pmp-section-heading">'.
+					     '            '.__('Email Subscr. Confirmation Templates', $this->plugin->text_domain).
+					     '            <small>'.sprintf(__('Email subject line &amp; message used in %1$s&trade; confirmation requests.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</small>'.
+					     '         </h2>';
+
+					/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Subscr. Confirmation Subject Line Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__sub_confirmation__snippet__subject',
+							               'current_value' => $current_value_for('template__type_s__email__sub_confirmation__snippet__subject'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this is merely a subject line for email confirmation requests. Customize if you like, but not necessary. Note that extra whitespace in subject templates is stripped automatically at runtime. That\'s why this template is able to break things down into multiple lines. This is for clarity only. In the end, the email will always contain a one-line subject of course. Multiline subjects are unsupported by the vast majority of email clients anyway.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Subscr. Confirmation Subject', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Subscr. Confirmation Message Body Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__sub_confirmation__snippet__message',
+							               'current_value' => $current_value_for('template__type_s__email__sub_confirmation__snippet__message'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the body of an email message that is sent to request a subscription confirmation. Note that it is not necessary to create a header/footer for this template. This template pulls together a global email header/footer design that have already been configured elsewhere; i.e. all you need here is the message body. You\'ll notice that the first line of the message body is a link that a user may click to complete confirmation. If you modify this template, it is suggested that you always keep this link at the top of the email. It is (by far) the most important element in this message. End users need a way to confirm their subscription.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Subscr. Confirmation Message Body', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					echo '         <h2 class="pmp-section-heading">'.
+					     '            '.__('Comment Notification Email Templates', $this->plugin->text_domain).
+					     '            <small>'.sprintf(__('Email subject line &amp; message used in %1$s&trade; notifications.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</small>'.
+					     '         </h2>';
+
+					/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Notification Subject Line Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__comment_notification__snippet__subject',
+							               'current_value' => $current_value_for('template__type_s__email__comment_notification__snippet__subject'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this is merely a subject line for email notifications. Customize if you like, but not necessary. Note that extra whitespace in subject templates is stripped automatically at runtime. That\'s why this template is able to break things down into multiple lines. This is for clarity only. In the end, the email will always contain a one-line subject of course. Multiline subjects are unsupported by the vast majority of email clients anyway.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Comment Notification Subject', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Notification Message Heading Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__comment_notification__snippet__message_heading',
+							               'current_value' => $current_value_for('template__type_s__email__comment_notification__snippet__message_heading'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the heading in an email message that is sent to notify an end-user about one or more comments on your blog. You\'ll notice that there are several conditional tags in this template. An email notification can include one (or more) comments; i.e. some subscribers may choose to receive notifications in the form of a digest. This template has the job of dealing with either case; i.e. one comment in the notification, or more than one.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Comment Notification Message Heading', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Notification Message In-Response-To Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__comment_notification__snippet__message_in_response_to',
+							               'current_value' => $current_value_for('template__type_s__email__comment_notification__snippet__message_in_response_to'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the blurp that will appear before a comment that\'s a reply; i.e. not a new comment, but a response to someone. This helps to offer the reader some context when they receive the notification.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Comment Notification Message In-Response-To', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Notification Message Reply-From Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__comment_notification__snippet__message_reply_from',
+							               'current_value' => $current_value_for('template__type_s__email__comment_notification__snippet__message_reply_from'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the blurp that will appear for a comment that\'s a reply; i.e. not a new comment, but a response to someone. In the final email, this will come just after the In-Response-To template (as seen above).', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Comment Notification Message Reply-From', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Notification Message Comment-From Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__email__comment_notification__snippet__message_comment_from',
+							               'current_value' => $current_value_for('template__type_s__email__comment_notification__snippet__message_comment_from'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the blurp that will appear for a new comment; i.e. one that\'s not a reply, but a new top-level comment.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Comment Notification Message Comment-From', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Email Header Styles Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__email__email_header_styles',
-						               'current_value' => $current_value_for('template__email__email_header_styles'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template establishes just a few basic styles for email messages. If you modify the default set of email templates, it might be helpful to add a few new styles of your own here. That said, for emails, it is generally a good idea to use inline <code>style=""</code> attributes instead of a stylesheet. For some things it\'s OK, but for the most part, inline styles are better for emails; i.e. they are the most compatible across various email clients.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+				else if($this->plugin->options['template_type'] === 'a') // Advanced PHP-based templates.
+				{
+					echo '         <h2 class="pmp-section-heading">'.
+					     '            '.__('Email Header/Footer Templates', $this->plugin->text_domain).
+					     '            <small>'.__('These are used in all emails; i.e. global header/footer.', $this->plugin->text_domain).'</small>'.
+					     '         </h2>';
 
-				echo $this->panel(__('Email Header Styles', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
-				unset($_panel_body); // Housekeeping.
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Email Header Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__email__header',
+							               'current_value' => $current_value_for('template__type_a__email__header'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template establishes the opening <code>&lt;html&gt;&lt;body&gt;</code> tags, and it pulls together a few other components; i.e. the Header Styles, Header Scripts, and Header Tag templates. These other components can be configured separately. For this reason, it is normally not necessary to edit this file. Instead, we suggest editing the "Email Header Tag" template. The choice is yours though.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				/* ----------------------------------------------------------------------------------------- */
+					echo $this->panel(__('Email Header', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Email Header Scripts Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__email__email_header_scripts',
-						               'current_value' => $current_value_for('template__email__email_header_scripts'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template only exists for the sake of being thorough. Using <code>&lt;script&gt;</code> tags in email messages is NOT recommended. They will mostly likely be excluded by popular email clients anyway. For this reason, you will find that this template comes empty by default.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+					unset($_panel_body); // Housekeeping.
 
-				echo $this->panel(__('Email Header Scripts', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					/* ----------------------------------------------------------------------------------------- */
 
-				unset($_panel_body); // Housekeeping.
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Email Header Styles Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__email__header_styles',
+							               'current_value' => $current_value_for('template__type_a__email__header_styles'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template establishes just a few basic styles for email messages. If you modify the default set of email templates, it might be helpful to add a few new styles of your own here. That said, for emails, it is generally a good idea to use inline <code>style=""</code> attributes instead of a stylesheet. For some things it\'s OK, but for the most part, inline styles are better for emails; i.e. they are the most compatible across various email clients.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				/* ----------------------------------------------------------------------------------------- */
+					echo $this->panel(__('Email Header Styles', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Email Header Tag Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__email__email_header_tag',
-						               'current_value' => $current_value_for('template__email__email_header_tag'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template represents the meat of the email header design. If you would like to rebrand or enhance the default template, this is the file that we suggest you edit. This file contains the <code>&lt;header&gt;</code> tag, which is pulled together by the primary Email Header Template to create the full, final, complete HTML header markup. In other words, there is no reason to use <code>&lt;html&gt;&lt;body&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;header&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;header&gt;</code>; i.e. you can add any HTML that you like. As with all templates, you can also use PHP tags if necessary, and even WordPress functionality if you like.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+					unset($_panel_body); // Housekeeping.
 
-				echo $this->panel(__('Email Header Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
+					/* ----------------------------------------------------------------------------------------- */
 
-				unset($_panel_body); // Housekeeping.
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Email Header Scripts Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__email__header_scripts',
+							               'current_value' => $current_value_for('template__type_a__email__header_scripts'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template only exists for the sake of being thorough. Using <code>&lt;script&gt;</code> tags in email messages is NOT recommended. They will mostly likely be excluded by popular email clients anyway. For this reason, you will find that this template comes empty by default.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				echo '<hr />'; /* ----------------------------------------------------------------------------------------- */
+					echo $this->panel(__('Email Header Scripts', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Email Footer Tag Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__email__email_footer_tag',
-						               'current_value' => $current_value_for('template__email__email_footer_tag'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template is by far the easiest way to create a custom email footer design. If you would like to rebrand or enhance the default template, this is the file that we suggest you edit. This file contains the <code>&lt;footer&gt;</code> tag, which is pulled together by the primary Email Footer Template to create the full, final, complete HTML footer markup. In other words, there is no reason to use <code>&lt;/body&gt;&lt;/html&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;footer&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;footer&gt;</code>; i.e. you can add any HTML that you like. As with all templates, you can also use PHP tags if necessary, and even WordPress functionality if you like.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+					unset($_panel_body); // Housekeeping.
 
-				echo $this->panel(__('Email Footer Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
+					/* ----------------------------------------------------------------------------------------- */
 
-				unset($_panel_body); // Housekeeping.
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Email Header Tag Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__email__header_tag',
+							               'current_value' => $current_value_for('template__type_a__email__header_tag'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template represents the meat of the email header design. If you would like to rebrand or enhance the default template, this is the file that we suggest you edit. This file contains the <code>&lt;header&gt;</code> tag, which is pulled together by the primary Email Header Template to create the full, final, complete HTML header markup. In other words, there is no reason to use <code>&lt;html&gt;&lt;body&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;header&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;header&gt;</code>; i.e. you can add any HTML that you like. As with all templates, you can also use PHP tags if necessary, and even WordPress functionality if you like.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				/* ----------------------------------------------------------------------------------------- */
+					echo $this->panel(__('Email Header Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Email Footer Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__email__email_footer',
-						               'current_value' => $current_value_for('template__email__email_footer'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template deals with the closing <code>&lt;/body&gt;&lt;/html&gt;</code> tags. It also pulls together a few specific details from your config. options, in order to establish edit/unsubscribe links; along with a mailing address. These are needed for you to remain CAN-SPAM compliant. Please note, it is normally not necessary to edit this file. Instead, we suggest editing the "Email Footer Tag" template. The choice is yours though.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+					unset($_panel_body); // Housekeeping.
 
-				echo $this->panel(__('Email Footer', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo '<hr />'; /* ----------------------------------------------------------------------------------------- */
 
-				unset($_panel_body); // Housekeeping.
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Email Footer Tag Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__email__footer_tag',
+							               'current_value' => $current_value_for('template__type_a__email__footer_tag'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template is by far the easiest way to create a custom email footer design. If you would like to rebrand or enhance the default template, this is the file that we suggest you edit. This file contains the <code>&lt;footer&gt;</code> tag, which is pulled together by the primary Email Footer Template to create the full, final, complete HTML footer markup. In other words, there is no reason to use <code>&lt;/body&gt;&lt;/html&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;footer&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;footer&gt;</code>; i.e. you can add any HTML that you like. As with all templates, you can also use PHP tags if necessary, and even WordPress functionality if you like.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				/* ----------------------------------------------------------------------------------------- */
+					echo $this->panel(__('Email Footer Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
 
-				echo '         <h2 class="pmp-section-heading">'.
-				     '            '.__('Email Subscr. Confirmation Templates', $this->plugin->text_domain).
-				     '            <small>'.sprintf(__('Email subject line &amp; message used in %1$s&trade; confirmation requests.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</small>'.
-				     '         </h2>';
+					unset($_panel_body); // Housekeeping.
 
-				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+					/* ----------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Subscr. Confirmation Subject Line Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__email__sub_confirmation__subject',
-						               'current_value' => $current_value_for('template__email__sub_confirmation__subject'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this is merely a subject line for email confirmation requests. Customize if you like, but not necessary. Note that extra whitespace in subject templates is stripped automatically at runtime. That\'s why this template is able to break things down into multiple lines. This is for clarity only. In the end, the email will always contain a one-line subject of course. Multiline subjects are unsupported by the vast majority of email clients anyway.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Email Footer Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__email__footer',
+							               'current_value' => $current_value_for('template__type_a__email__footer'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template deals with the closing <code>&lt;/body&gt;&lt;/html&gt;</code> tags. It also pulls together a few specific details from your config. options, in order to establish edit/unsubscribe links; along with a mailing address. These are needed for you to remain CAN-SPAM compliant. Please note, it is normally not necessary to edit this file. Instead, we suggest editing the "Email Footer Tag" template. The choice is yours though.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				echo $this->panel(__('Subscr. Confirmation Subject', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Email Footer', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
 
-				unset($_panel_body); // Housekeeping.
+					unset($_panel_body); // Housekeeping.
 
-				/* ----------------------------------------------------------------------------------------- */
+					/* ----------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Subscr. Confirmation Message Body Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__email__sub_confirmation__message',
-						               'current_value' => $current_value_for('template__email__sub_confirmation__message'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the body of an email message that is sent to request a subscription confirmation. Note that it is not necessary to create a header/footer for this template. This template pulls together a global email header/footer design that have already been configured elsewhere; i.e. all you need here is the message body. You\'ll notice that the first line of the message body is a link that a user may click to complete confirmation. If you modify this template, it is suggested that you always keep this link at the top of the email. It is (by far) the most important element in this message. End users need a way to confirm their subscription.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+					echo '         <h2 class="pmp-section-heading">'.
+					     '            '.__('Email Subscr. Confirmation Templates', $this->plugin->text_domain).
+					     '            <small>'.sprintf(__('Email subject line &amp; message used in %1$s&trade; confirmation requests.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</small>'.
+					     '         </h2>';
 
-				echo $this->panel(__('Subscr. Confirmation Message Body', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
-				unset($_panel_body); // Housekeeping.
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Subscr. Confirmation Subject Line Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__email__sub_confirmation__subject',
+							               'current_value' => $current_value_for('template__type_a__email__sub_confirmation__subject'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this is merely a subject line for email confirmation requests. Customize if you like, but not necessary. Note that extra whitespace in subject templates is stripped automatically at runtime. That\'s why this template is able to break things down into multiple lines. This is for clarity only. In the end, the email will always contain a one-line subject of course. Multiline subjects are unsupported by the vast majority of email clients anyway.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				/* ----------------------------------------------------------------------------------------- */
+					echo $this->panel(__('Subscr. Confirmation Subject', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
 
-				echo '         <h2 class="pmp-section-heading">'.
-				     '            '.__('Comment Notification Email Templates', $this->plugin->text_domain).
-				     '            <small>'.sprintf(__('Email subject line &amp; message used in %1$s&trade; notifications.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</small>'.
-				     '         </h2>';
+					unset($_panel_body); // Housekeeping.
 
-				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+					/* ----------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Comment Notification Subject Line Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__email__comment_notification__subject',
-						               'current_value' => $current_value_for('template__email__comment_notification__subject'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this is merely a subject line for email notifications. Customize if you like, but not necessary. Note that extra whitespace in subject templates is stripped automatically at runtime. That\'s why this template is able to break things down into multiple lines. This is for clarity only. In the end, the email will always contain a one-line subject of course. Multiline subjects are unsupported by the vast majority of email clients anyway.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Subscr. Confirmation Message Body Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__email__sub_confirmation__message',
+							               'current_value' => $current_value_for('template__type_a__email__sub_confirmation__message'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the body of an email message that is sent to request a subscription confirmation. Note that it is not necessary to create a header/footer for this template. This template pulls together a global email header/footer design that have already been configured elsewhere; i.e. all you need here is the message body. You\'ll notice that the first line of the message body is a link that a user may click to complete confirmation. If you modify this template, it is suggested that you always keep this link at the top of the email. It is (by far) the most important element in this message. End users need a way to confirm their subscription.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				echo $this->panel(__('Comment Notification Subject', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Subscr. Confirmation Message Body', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
 
-				unset($_panel_body); // Housekeeping.
+					unset($_panel_body); // Housekeeping.
 
-				/* ----------------------------------------------------------------------------------------- */
+					/* ----------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Comment Notification Message Body Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__email__comment_notification__message',
-						               'current_value' => $current_value_for('template__email__comment_notification__message'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the body of an email message that is sent to notify an end-user about one or more comments on your blog. Note that it is not necessary to create a header/footer for this template. This template pulls together a global email header/footer design that have already been configured elsewhere; i.e. all you need here is the message body. You\'ll notice that there are several PHP conditional tags in this template. An email notification can include one (or more) comments; i.e. some subscribers may choose to receive notifications in the form of a digest. This template has the job of dealing with either case; i.e. one comment in the notification, or more than one.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+					echo '         <h2 class="pmp-section-heading">'.
+					     '            '.__('Comment Notification Email Templates', $this->plugin->text_domain).
+					     '            <small>'.sprintf(__('Email subject line &amp; message used in %1$s&trade; notifications.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</small>'.
+					     '         </h2>';
 
-				echo $this->panel(__('Comment Notification Message Body', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
-				unset($_panel_body); // Housekeeping.
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Notification Subject Line Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__email__comment_notification__subject',
+							               'current_value' => $current_value_for('template__type_a__email__comment_notification__subject'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this is merely a subject line for email notifications. Customize if you like, but not necessary. Note that extra whitespace in subject templates is stripped automatically at runtime. That\'s why this template is able to break things down into multiple lines. This is for clarity only. In the end, the email will always contain a one-line subject of course. Multiline subjects are unsupported by the vast majority of email clients anyway.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
+					echo $this->panel(__('Comment Notification Subject', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Notification Message Body Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__email__comment_notification__message',
+							               'current_value' => $current_value_for('template__type_a__email__comment_notification__message'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the body of an email message that is sent to notify an end-user about one or more comments on your blog. Note that it is not necessary to create a header/footer for this template. This template pulls together a global email header/footer design that have already been configured elsewhere; i.e. all you need here is the message body. You\'ll notice that there are several PHP conditional tags in this template. An email notification can include one (or more) comments; i.e. some subscribers may choose to receive notifications in the form of a digest. This template has the job of dealing with either case; i.e. one comment in the notification, or more than one.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Comment Notification Message Body', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
 				echo '         <div class="pmp-save">'."\n";
@@ -2312,17 +2609,16 @@ namespace comment_mail // Root namespace.
 				$form_fields       = new form_fields($form_field_args);
 				$current_value_for = function ($key) use ($_this)
 				{
-					if(strpos($key, 'template__') === 0)
-						if(isset($_this->plugin->options[$key]))
-						{
-							if($_this->plugin->options[$key])
-								return $_this->plugin->options[$key];
+					if(strpos($key, 'template__') === 0 && isset($_this->plugin->options[$key]))
+					{
+						if($_this->plugin->options[$key])
+							return $_this->plugin->options[$key];
 
-							$file             = template::option_key_to_file($key);
-							$default_template = new template($file, TRUE);
+						$data             = template::option_key_data($key);
+						$default_template = new template($data->file, $data->type, TRUE);
 
-							return $default_template->file_contents();
-						}
+						return $default_template->file_contents();
+					}
 					return isset($_this->plugin->options[$key]) ? $_this->plugin->options[$key] : NULL;
 				};
 				/* ----------------------------------------------------------------------------------------- */
@@ -2337,462 +2633,681 @@ namespace comment_mail // Root namespace.
 
 				echo '         '.$this->all_panel_togglers();
 
+				if($this->plugin->is_pro) // Only possible in the pro version.
+				{
+					echo '      <div class="pmp-template-types pmp-right">'.
+					     '         <span>'.__('Template Mode:', $this->plugin->text_domain).'</span>'.
+					     '         <a href="'.esc_attr($this->plugin->utils_url->set_template_type('s')).'"'.($this->plugin->options['template_type'] === 's' ? ' class="pmp-active"' : '').'>'.__('simple', $this->plugin->text_domain).'</a>'.
+					     '         <a href="'.esc_attr($this->plugin->utils_url->set_template_type('a')).'"'.($this->plugin->options['template_type'] === 'a' ? ' class="pmp-active"' : '').'>'.__('advanced', $this->plugin->text_domain).'</a>'.
+					     '      </div>';
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
-				echo '         <h2 class="pmp-section-heading">'.
-				     '            '.__('Site Header/Footer Templates', $this->plugin->text_domain).
-				     '            <small>'.__('These are used in all portions of the front-end UI; i.e. global header/footer.', $this->plugin->text_domain).'</small>'.
-				     '         </h2>';
+				if($this->plugin->options['template_type'] === 's') // Simple snippet-based templates.
+				{
+					echo '         <h2 class="pmp-section-heading">'.
+					     '            '.__('Site Header/Footer Templates', $this->plugin->text_domain).
+					     '            <small>'.__('These are used in all portions of the front-end UI; i.e. global header/footer.', $this->plugin->text_domain).'</small>'.
+					     '         </h2>';
 
-				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+					/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Site Header Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__site_header',
-						               'current_value' => $current_value_for('template__site__site_header'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template establishes the opening <code>&lt;html&gt;&lt;body&gt;</code> tags, and it pulls together a few other components; i.e. the Header Styles, Header Scripts, and Header Tag templates. These other components can be configured separately. For this reason, it is normally not necessary to edit this file. Instead, we suggest editing the "Site Header Tag" template. The choice is yours though.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Site Header Tag Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__site__snippet__header_tag',
+							               'current_value' => $current_value_for('template__type_s__site__snippet__header_tag'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template represents the meat of the front-end header design. If you would like to rebrand or enhance site templates, this is the file that we suggest you edit. This file contains the <code>&lt;header&gt;</code> tag, which is pulled together into a full, final, and complete HTML document. In other words, there is no reason to use <code>&lt;html&gt;&lt;body&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;header&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;header&gt;</code>; i.e. you can add any HTML that you like.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				echo $this->panel(__('Site Header', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Site Header Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
 
-				unset($_panel_body); // Housekeeping.
+					unset($_panel_body); // Housekeeping.
 
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Site Footer Tag Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__site__snippet__footer_tag',
+							               'current_value' => $current_value_for('template__type_s__site__snippet__footer_tag'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template allows you to create a custom front-end footer design. If you would like to rebrand or enhance site templates, this is the file that we suggest you edit. This file contains the <code>&lt;footer&gt;</code> tag, which is pulled together into a full, final, and complete HTML document. In other words, there is no reason to use <code>&lt;/body&gt;&lt;/html&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;footer&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;footer&gt;</code>; i.e. you can add any HTML that you like.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Site Footer Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					echo '         <h2 class="pmp-section-heading">'.
+					     '            '.__('Subscr. Action Templates', $this->plugin->text_domain).
+					     '            <small>'.__('These are shown to a subscriber when they confirm and/or unsubscribe.', $this->plugin->text_domain).'</small>'.
+					     '         </h2>';
+
+					/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Subscr. Confirmed Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__site__sub_actions__snippet__confirmed',
+							               'current_value' => $current_value_for('template__type_s__site__sub_actions__snippet__confirmed'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just confirmed their subscription via email (i.e. the page displayed after a user clicks the confirmation link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Subscr. Confirmed', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Unsubscribed Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__site__sub_actions__snippet__unsubscribed',
+							               'current_value' => $current_value_for('template__type_s__site__sub_actions__snippet__unsubscribed'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just unsubscribed from a subscription (i.e. the page displayed after a user clicks an unsubscribe link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Unsubscribed', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Unsubscribed All Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__site__sub_actions__snippet__unsubscribed_all',
+							               'current_value' => $current_value_for('template__type_s__site__sub_actions__snippet__unsubscribed_all'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just unsubscribed from all of their subscriptions (i.e. the page displayed after a user clicks the "unsubscribe all" link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Unsubscribed All', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					echo '         <h2 class="pmp-section-heading">'.
+					     '            '.__('Subscription Option Templates', $this->plugin->text_domain).
+					     '            <small>'.__('Provides options that allow commenters to subscribe &amp; receive notifications.', $this->plugin->text_domain).'</small>'.
+					     '         </h2>';
+
+					/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Form Subscr. Options Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__site__comment_form__snippet__sub_ops',
+							               'current_value' => $current_value_for('template__type_s__site__comment_form__snippet__sub_ops'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed below your comment form; providing end-users with a way to create a subscription.', $this->plugin->text_domain).
+							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Comment Form Subscr. Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					echo '         <h2 class="pmp-section-heading">'.
+					     '            '.__('Single Sign-on Templates', $this->plugin->text_domain).
+					     '            <small>'.__('Provides options that allow commenters to login w/ popular social network accounts.', $this->plugin->text_domain).'</small>'.
+					     '         </h2>';
+
+					/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Form SSO Options Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__site__comment_form__snippet__sso_ops',
+							               'current_value' => $current_value_for('template__type_s__site__comment_form__snippet__sso_ops'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed above your comment form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
+							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Comment Form SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Login Form SSO Options Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'text/html',
+							               'name'          => 'template__type_s__site__login_form__snippet__sso_ops',
+							               'current_value' => $current_value_for('template__type_s__site__login_form__snippet__sso_ops'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed within your login form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
+							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Login Form SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Site Header Styles Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__site_header_styles',
-						               'current_value' => $current_value_for('template__site__site_header_styles'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Tip:</strong> this template establishes just a few basic styles needed by other front-end templates listed on this page. If you modify the default set of templates, it might be helpful to add a few new styles of your own here. That said, this software uses the %1$s. Therefore, you already have a full set of mobile-first design functionality available to you, even before you add styles of your own.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://getbootstrap.com/css/', __('Bootstrap CSS/JS libraries', $this->plugin->text_domain))).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Site Header Styles', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-				unset($_panel_body); // Housekeeping.
-
-				/* ----------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Site Header Scripts Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__site_header_scripts',
-						               'current_value' => $current_value_for('template__site__site_header_scripts'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Tip:</strong> this template establishes just a few basic JavaScript libraries needed by other front-end templates listed on this page. If you modify the default set of templates, it might be helpful to add a few new scripts of your own here. That said, this software uses the %1$s. Therefore, you already have a full set of mobile-first design functionality available to you, even before you add scripts of your own.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://getbootstrap.com/css/', __('Bootstrap CSS/JS libraries', $this->plugin->text_domain))).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Site Header Scripts', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-				unset($_panel_body); // Housekeeping.
-
-				/* ----------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Site Header Tag Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__site_header_tag',
-						               'current_value' => $current_value_for('template__site__site_header_tag'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template represents the meat of the front-end header design. If you would like to rebrand or enhance the default template, this is the file that we suggest you edit. This file contains the <code>&lt;header&gt;</code> tag, which is pulled together by the primary Site Header Template to create the full, final, complete HTML header markup. In other words, there is no reason to use <code>&lt;html&gt;&lt;body&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;header&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;header&gt;</code>; i.e. you can add any HTML that you like. As with all templates, you can also use PHP tags if necessary, and even WordPress functionality if you like.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Site Header Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
-
-				unset($_panel_body); // Housekeeping.
-
-				echo '<hr />'; /* ----------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Site Footer Tag Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__site_footer_tag',
-						               'current_value' => $current_value_for('template__site__site_footer_tag'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template is by far the easiest way to create a custom front-end footer design. If you would like to rebrand or enhance the default template, this is the file that we suggest you edit. This file contains the <code>&lt;footer&gt;</code> tag, which is pulled together by the primary Site Footer Template to create the full, final, complete HTML footer markup. In other words, there is no reason to use <code>&lt;/body&gt;&lt;/html&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;footer&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;footer&gt;</code>; i.e. you can add any HTML that you like. As with all templates, you can also use PHP tags if necessary, and even WordPress functionality if you like.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Site Footer Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
-
-				unset($_panel_body); // Housekeeping.
-
-				/* ----------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Site Footer Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__site_footer',
-						               'current_value' => $current_value_for('template__site__site_footer'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template deals with the closing <code>&lt;/body&gt;&lt;/html&gt;</code> tags. It is normally not necessary to edit this file. Instead, we suggest editing the "Site Footer Tag" template. The choice is yours though.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Site Footer', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-				unset($_panel_body); // Housekeeping.
-
-				/* ----------------------------------------------------------------------------------------- */
-
-				echo '         <h2 class="pmp-section-heading">'.
-				     '            '.__('Subscr. Action Templates', $this->plugin->text_domain).
-				     '            <small>'.__('These are shown to a subscriber when they confirm and/or unsubscribe.', $this->plugin->text_domain).'</small>'.
-				     '         </h2>';
-
-				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Subscr. Confirmed Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__sub_actions__confirmed',
-						               'current_value' => $current_value_for('template__site__sub_actions__confirmed'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just confirmed their subscription via email (i.e. the page displayed after a user clicks the confirmation link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Subscr. Confirmed', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-				unset($_panel_body); // Housekeeping.
-
-				/* ----------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Unsubscribed Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__sub_actions__unsubscribed',
-						               'current_value' => $current_value_for('template__site__sub_actions__unsubscribed'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just unsubscribed from a subscription (i.e. the page displayed after a user clicks an unsubscribe link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Unsubscribed', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-				unset($_panel_body); // Housekeeping.
-
-				/* ----------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Unsubscribed All Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__sub_actions__unsubscribed_all',
-						               'current_value' => $current_value_for('template__site__sub_actions__unsubscribed_all'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just unsubscribed from all of their subscriptions (i.e. the page displayed after a user clicks the "unsubscribe all" link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Unsubscribed All', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-				unset($_panel_body); // Housekeeping.
-
-				/* ----------------------------------------------------------------------------------------- */
-
-				echo '         <h2 class="pmp-section-heading">'.
-				     '            '.__('Subscr. Summary Templates', $this->plugin->text_domain).
-				     '            <small>'.__('Related to the Summary (aka: "My Subscriptions") page and add/edit form.', $this->plugin->text_domain).'</small>'.
-				     '         </h2>';
-
-				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Summary Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__sub_actions__manage_summary',
-						               'current_value' => $current_value_for('template__site__sub_actions__manage_summary'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who is managing their subscriptions (i.e. the page displayed after a user clicks the "manage my subscriptions" link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Summary', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-				unset($_panel_body); // Housekeeping.
-
-				/* ----------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Add/Edit Form Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__sub_actions__manage_sub_form',
-						               'current_value' => $current_value_for('template__site__sub_actions__manage_sub_form'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who would like to add a new subscription (i.e. the page displayed after a user clicks the "add subscription" or "subscribe without commenting" link). This same template also contains the form that a subscriber may use to edit an existing subscription; i.e. it must be able to deal with both scenarios. Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Add/Edit Form', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-				unset($_panel_body); // Housekeeping.
-
-				/* ----------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Add/Edit Form Template (Comment ID Row via AJAX)', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__sub_actions__manage_sub_form_comment_id_row_via_ajax',
-						               'current_value' => $current_value_for('template__site__sub_actions__manage_sub_form_comment_id_row_via_ajax'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template contains content delivered via AJAX. When a subscriber is using the Add/Edit Form Template, and they choose a particular Post ID from a list of options, the comments for the post ID they select will be collected and displayed automagically for them. This table row will contain a list of those comments for the post ID they selected. If you edit this, please make sure that this template only contains a table row, and nothing more. The underlying JavaScript/AJAX routines will always expect this template to produce a single <code>&lt;tr&gt;</code> tag with a list of select menu options.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Comment ID Row via AJAX', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-				unset($_panel_body); // Housekeeping.
-
-				/* ----------------------------------------------------------------------------------------- */
-
-				echo '         <h2 class="pmp-section-heading">'.
-				     '            '.__('Subscription Option Templates', $this->plugin->text_domain).
-				     '            <small>'.__('Provides options that allow commenters to subscribe &amp; receive notifications.', $this->plugin->text_domain).'</small>'.
-				     '         </h2>';
-
-				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Comment Form Subscr. Options Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__comment_form__sub_ops',
-						               'current_value' => $current_value_for('template__site__comment_form__sub_ops'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed below your comment form; providing end-users with a way to create a subscription.', $this->plugin->text_domain).
-						                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Comment Form Subscr. Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-				unset($_panel_body); // Housekeeping.
-
-				/* ----------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Comment Form Scripts for Subscr. Options', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__comment_form__sub_op_scripts',
-						               'current_value' => $current_value_for('template__site__comment_form__sub_op_scripts'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template contains just a few lines of JavaScript needed by the default Comment Form Subscr. Options Template. Customize if you like, but not necessary.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Comment Form Scripts for Subscr. Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-				unset($_panel_body); // Housekeeping.
-
-				/* ----------------------------------------------------------------------------------------- */
-
-				echo '         <h2 class="pmp-section-heading">'.
-				     '            '.__('Single Sign-on Templates', $this->plugin->text_domain).
-				     '            <small>'.__('Provides options that allow commenters to login w/ popular social network accounts.', $this->plugin->text_domain).'</small>'.
-				     '         </h2>';
-
-				/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Comment Form SSO Options Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__comment_form__sso_ops',
-						               'current_value' => $current_value_for('template__site__comment_form__sso_ops'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed above your comment form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
-						                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Comment Form SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-				unset($_panel_body); // Housekeeping.
-
-				/* ----------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Comment Form Scripts for SSO Options', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__comment_form__sso_op_scripts',
-						               'current_value' => $current_value_for('template__site__comment_form__sso_op_scripts'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template contains just a few lines of JavaScript needed by the default Comment Form SSO Options Template. Customize if you like, but not necessary.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Comment Form Scripts for SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-				unset($_panel_body); // Housekeeping.
-
-				echo '<hr />'; /* ----------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Login Form SSO Options Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__login_form__sso_ops',
-						               'current_value' => $current_value_for('template__site__login_form__sso_ops'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed within your login form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
-						                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Login Form SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-				unset($_panel_body); // Housekeeping.
-
-				/* ----------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Login Form Scripts for SSO Options', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__login_form__sso_op_scripts',
-						               'current_value' => $current_value_for('template__site__login_form__sso_op_scripts'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template contains just a few lines of JavaScript needed by the default Login Form SSO Options Template. Customize if you like, but not necessary.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Login Form Scripts for SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-				unset($_panel_body); // Housekeeping.
-
-				echo '<hr />'; /* ----------------------------------------------------------------------------------------- */
-
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('SSO Registration Completion Template', $this->plugin->text_domain),
-						               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-						               'cm_mode'       => 'application/x-httpd-php',
-						               'name'          => 'template__site__sso_actions__complete',
-						               'current_value' => $current_value_for('template__site__sso_actions__complete'),
-						               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just logged-in through an SSO service provider for the first time. This is only applicable if you have Single Sign-on (SSO) enabled in your config. options. Also, this particular page is only displayed when there is information missing and/or considered private by the SSO service provider. For instance, Twitter will not share a user\'s email address through any of their APIs (i.e. there is no way to collect the email address behind-the-scenes when it comes to Twitter). Therefore, this template exists as a way for your site to collect that last bit of information before you allow them to log in for the first time. Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
-
-				echo $this->panel(__('Single Sign-on Registration Completion', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
-
-				unset($_panel_body); // Housekeeping.
-
+				else if($this->plugin->options['template_type'] === 'a') // Advanced PHP-based templates.
+				{
+					echo '         <h2 class="pmp-section-heading">'.
+					     '            '.__('Site Header/Footer Templates', $this->plugin->text_domain).
+					     '            <small>'.__('These are used in all portions of the front-end UI; i.e. global header/footer.', $this->plugin->text_domain).'</small>'.
+					     '         </h2>';
+
+					/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Site Header Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__header',
+							               'current_value' => $current_value_for('template__type_a__site__header'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template establishes the opening <code>&lt;html&gt;&lt;body&gt;</code> tags, and it pulls together a few other components; i.e. the Header Styles, Header Scripts, and Header Tag templates. These other components can be configured separately. For this reason, it is normally not necessary to edit this file. Instead, we suggest editing the "Site Header Tag" template. The choice is yours though.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Site Header', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Site Header Styles Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__header_styles',
+							               'current_value' => $current_value_for('template__type_a__site__header_styles'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Tip:</strong> this template establishes just a few basic styles needed by other front-end templates listed on this page. If you modify the default set of templates, it might be helpful to add a few new styles of your own here. That said, this software uses the %1$s. Therefore, you already have a full set of mobile-first design functionality available to you, even before you add styles of your own.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://getbootstrap.com/css/', __('Bootstrap CSS/JS libraries', $this->plugin->text_domain))).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Site Header Styles', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Site Header Scripts Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__header_scripts',
+							               'current_value' => $current_value_for('template__type_a__site__header_scripts'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Tip:</strong> this template establishes just a few basic JavaScript libraries needed by other front-end templates listed on this page. If you modify the default set of templates, it might be helpful to add a few new scripts of your own here. That said, this software uses the %1$s. Therefore, you already have a full set of mobile-first design functionality available to you, even before you add scripts of your own.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://getbootstrap.com/css/', __('Bootstrap CSS/JS libraries', $this->plugin->text_domain))).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Site Header Scripts', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Site Header Tag Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__header_tag',
+							               'current_value' => $current_value_for('template__type_a__site__header_tag'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template represents the meat of the front-end header design. If you would like to rebrand or enhance the default template, this is the file that we suggest you edit. This file contains the <code>&lt;header&gt;</code> tag, which is pulled together by the primary Site Header Template to create the full, final, complete HTML header markup. In other words, there is no reason to use <code>&lt;html&gt;&lt;body&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;header&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;header&gt;</code>; i.e. you can add any HTML that you like. As with all templates, you can also use PHP tags if necessary, and even WordPress functionality if you like.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Site Header Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
+
+					unset($_panel_body); // Housekeeping.
+
+					echo '<hr />'; /* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Site Footer Tag Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__footer_tag',
+							               'current_value' => $current_value_for('template__type_a__site__footer_tag'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template is by far the easiest way to create a custom front-end footer design. If you would like to rebrand or enhance the default template, this is the file that we suggest you edit. This file contains the <code>&lt;footer&gt;</code> tag, which is pulled together by the primary Site Footer Template to create the full, final, complete HTML footer markup. In other words, there is no reason to use <code>&lt;/body&gt;&lt;/html&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;footer&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;footer&gt;</code>; i.e. you can add any HTML that you like. As with all templates, you can also use PHP tags if necessary, and even WordPress functionality if you like.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Site Footer Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Site Footer Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__footer',
+							               'current_value' => $current_value_for('template__type_a__site__footer'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template deals with the closing <code>&lt;/body&gt;&lt;/html&gt;</code> tags. It is normally not necessary to edit this file. Instead, we suggest editing the "Site Footer Tag" template. The choice is yours though.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Site Footer', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					echo '         <h2 class="pmp-section-heading">'.
+					     '            '.__('Subscr. Action Templates', $this->plugin->text_domain).
+					     '            <small>'.__('These are shown to a subscriber when they confirm and/or unsubscribe.', $this->plugin->text_domain).'</small>'.
+					     '         </h2>';
+
+					/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Subscr. Confirmed Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__sub_actions__confirmed',
+							               'current_value' => $current_value_for('template__type_a__site__sub_actions__confirmed'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just confirmed their subscription via email (i.e. the page displayed after a user clicks the confirmation link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Subscr. Confirmed', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Unsubscribed Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__sub_actions__unsubscribed',
+							               'current_value' => $current_value_for('template__type_a__site__sub_actions__unsubscribed'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just unsubscribed from a subscription (i.e. the page displayed after a user clicks an unsubscribe link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Unsubscribed', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Unsubscribed All Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__sub_actions__unsubscribed_all',
+							               'current_value' => $current_value_for('template__type_a__site__sub_actions__unsubscribed_all'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just unsubscribed from all of their subscriptions (i.e. the page displayed after a user clicks the "unsubscribe all" link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Unsubscribed All', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					echo '         <h2 class="pmp-section-heading">'.
+					     '            '.__('Subscr. Summary Templates', $this->plugin->text_domain).
+					     '            <small>'.__('Related to the Summary (aka: "My Subscriptions") page and add/edit form.', $this->plugin->text_domain).'</small>'.
+					     '         </h2>';
+
+					/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Summary Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__sub_actions__manage_summary',
+							               'current_value' => $current_value_for('template__type_a__site__sub_actions__manage_summary'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who is managing their subscriptions (i.e. the page displayed after a user clicks the "manage my subscriptions" link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Summary', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Add/Edit Form Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__sub_actions__manage_sub_form',
+							               'current_value' => $current_value_for('template__type_a__site__sub_actions__manage_sub_form'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who would like to add a new subscription (i.e. the page displayed after a user clicks the "add subscription" or "subscribe without commenting" link). This same template also contains the form that a subscriber may use to edit an existing subscription; i.e. it must be able to deal with both scenarios. Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Add/Edit Form', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Add/Edit Form Template (Comment ID Row via AJAX)', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__sub_actions__manage_sub_form_comment_id_row_via_ajax',
+							               'current_value' => $current_value_for('template__type_a__site__sub_actions__manage_sub_form_comment_id_row_via_ajax'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template contains content delivered via AJAX. When a subscriber is using the Add/Edit Form Template, and they choose a particular Post ID from a list of options, the comments for the post ID they select will be collected and displayed automagically for them. This table row will contain a list of those comments for the post ID they selected. If you edit this, please make sure that this template only contains a table row, and nothing more. The underlying JavaScript/AJAX routines will always expect this template to produce a single <code>&lt;tr&gt;</code> tag with a list of select menu options.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Comment ID Row via AJAX', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					echo '         <h2 class="pmp-section-heading">'.
+					     '            '.__('Subscription Option Templates', $this->plugin->text_domain).
+					     '            <small>'.__('Provides options that allow commenters to subscribe &amp; receive notifications.', $this->plugin->text_domain).'</small>'.
+					     '         </h2>';
+
+					/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Form Subscr. Options Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__comment_form__sub_ops',
+							               'current_value' => $current_value_for('template__type_a__site__comment_form__sub_ops'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed below your comment form; providing end-users with a way to create a subscription.', $this->plugin->text_domain).
+							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Comment Form Subscr. Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Form Scripts for Subscr. Options', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__comment_form__sub_op_scripts',
+							               'current_value' => $current_value_for('template__type_a__site__comment_form__sub_op_scripts'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template contains just a few lines of JavaScript needed by the default Comment Form Subscr. Options Template. Customize if you like, but not necessary.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Comment Form Scripts for Subscr. Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					echo '         <h2 class="pmp-section-heading">'.
+					     '            '.__('Single Sign-on Templates', $this->plugin->text_domain).
+					     '            <small>'.__('Provides options that allow commenters to login w/ popular social network accounts.', $this->plugin->text_domain).'</small>'.
+					     '         </h2>';
+
+					/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Form SSO Options Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__comment_form__sso_ops',
+							               'current_value' => $current_value_for('template__type_a__site__comment_form__sso_ops'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed above your comment form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
+							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Comment Form SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Form Scripts for SSO Options', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__comment_form__sso_op_scripts',
+							               'current_value' => $current_value_for('template__type_a__site__comment_form__sso_op_scripts'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template contains just a few lines of JavaScript needed by the default Comment Form SSO Options Template. Customize if you like, but not necessary.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Comment Form Scripts for SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					echo '<hr />'; /* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Login Form SSO Options Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__login_form__sso_ops',
+							               'current_value' => $current_value_for('template__type_a__site__login_form__sso_ops'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed within your login form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
+							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Login Form SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					/* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Login Form Scripts for SSO Options', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__login_form__sso_op_scripts',
+							               'current_value' => $current_value_for('template__type_a__site__login_form__sso_op_scripts'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template contains just a few lines of JavaScript needed by the default Login Form SSO Options Template. Customize if you like, but not necessary.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Login Form Scripts for SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+
+					echo '<hr />'; /* ----------------------------------------------------------------------------------------- */
+
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('SSO Registration Completion Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__sso_actions__complete',
+							               'current_value' => $current_value_for('template__type_a__site__sso_actions__complete'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just logged-in through an SSO service provider for the first time. This is only applicable if you have Single Sign-on (SSO) enabled in your config. options. Also, this particular page is only displayed when there is information missing and/or considered private by the SSO service provider. For instance, Twitter will not share a user\'s email address through any of their APIs (i.e. there is no way to collect the email address behind-the-scenes when it comes to Twitter). Therefore, this template exists as a way for your site to collect that last bit of information before you allow them to log in for the first time. Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
+
+					echo $this->panel(__('Single Sign-on Registration Completion', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+
+					unset($_panel_body); // Housekeeping.
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
 				echo '         <div class="pmp-save">'."\n";

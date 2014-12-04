@@ -39,6 +39,7 @@ namespace comment_mail // Root namespace.
 				$this->valid_actions
 					= array(
 					'save_options',
+					'set_template_type',
 					'restore_default_options',
 
 					'dismiss_notice',
@@ -116,6 +117,36 @@ namespace comment_mail // Root namespace.
 					$this->plugin->enqueue_user_notice($smtp_test->results_markup, array('transient' => TRUE));
 				}
 				wp_redirect($this->plugin->utils_url->options_updated()).exit();
+			}
+
+			/**
+			 * Sets template type/mode.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param mixed $request_args Input argument(s).
+			 */
+			protected function set_template_type($request_args)
+			{
+				$template_type = (string)$request_args;
+
+				if(!current_user_can($this->plugin->cap))
+					return; // Unauthenticated; ignore.
+
+				$this->plugin->options_save(compact('template_type'));
+
+				$notice_markup = // Notice regarding options having been updated successfully.
+
+					sprintf(__('Template mode updated to: <code>%2$s</code>.', $this->plugin->text_domain),
+					        esc_html($this->plugin->name), $template_type === 'a' ? __('advanced', $this->plugin->text_domain) : __('simple', $this->plugin->text_domain)).
+
+					' '.($template_type === 'a' // Provide an additional note; to help explain what just occured in this scenario.
+						? 'A new set of templates has been loaded below. This mode uses advanced PHP-based templates. Recommended for advanced customization.</i>'
+						: 'A new set of templates has been loaded below. This mode uses simple shortcode templates. Easiest to work with <i class="fa fa-smile-o"></i>');
+
+				$this->plugin->enqueue_user_notice($notice_markup, array('transient' => TRUE));
+
+				wp_redirect($this->plugin->utils_url->template_type_updated()).exit();
 			}
 
 			/**

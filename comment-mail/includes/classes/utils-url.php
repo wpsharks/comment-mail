@@ -566,6 +566,42 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Restore default options URL.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string      $type New type/mode to use.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @return string Restore default options URL.
+			 */
+			public function set_template_type($type, $scheme = 'admin')
+			{
+				$type = trim(strtolower((string)$type));
+				$url  = $this->page_nonce_only('', __NAMESPACE__, '', $scheme);
+				$args = array(__NAMESPACE__ => array('set_template_type' => $type));
+
+				return add_query_arg(urlencode_deep($args), $url);
+			}
+
+			/**
+			 * Template type updated URL.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string|null $scheme Optional . Defaults to `admin`.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @return string Template type updated URL.
+			 */
+			public function template_type_updated($scheme = 'admin')
+			{
+				return $this->page_only('', '', $scheme);
+			}
+
+			/**
 			 * Pro preview URL.
 			 *
 			 * @since 141111 First documented version.

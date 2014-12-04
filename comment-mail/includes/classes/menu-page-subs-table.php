@@ -248,7 +248,7 @@ namespace comment_mail // Root namespace.
 					               '  '.__('Reconfirm', $this->plugin->text_domain).
 					               '</a>',
 
-					'confirm'   => '<a href="'.esc_attr($confirm_url).'">'.__('Confirm', $this->plugin->text_domain).'</a>',
+					'confirm'   => '<a href="'.esc_attr($confirm_url).'">'.__('Subscribe', $this->plugin->text_domain).'</a>',
 					'unconfirm' => '<a href="'.esc_attr($unconfirm_url).'">'.__('Unconfirm', $this->plugin->text_domain).'</a>',
 					'suspend'   => '<a href="'.esc_attr($suspend_url).'">'.__('Suspend', $this->plugin->text_domain).'</a>',
 					'trash'     => '<a href="'.esc_attr($trash_url).'" title="'.esc_attr(__('Trash', $this->plugin->text_domain)).'"><i class="fa fa-trash-o"></i></a>',
