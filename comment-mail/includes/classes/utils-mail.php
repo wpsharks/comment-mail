@@ -371,10 +371,10 @@ namespace comment_mail // Root namespace.
 				if(is_array($value) || is_object($value))
 				{
 					foreach($value as $_key => $_value) // Collect all addresses.
-						$addresses = array_merge($addresses, $this->parse_addresses_deep($_value, $strict, $emails_only));
+						$addresses = array_merge($addresses, $this->parse_addresses_deep($_value, $strict, FALSE));
 					unset($_key, $_value); // A little housekeeping.
 
-					goto finale; // Return handlers.
+					goto finale; // Where `$emails_only` is dealt w/ separately.
 				}
 				$value                       = trim((string)$value);
 				$delimiter                   = (strpos($value, ';') !== FALSE) ? ';' : ',';
