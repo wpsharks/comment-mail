@@ -427,7 +427,9 @@ namespace comment_mail // Root namespace.
 							                'comment'  => __('replies only (recommended)', $this->plugin->text_domain),
 							                'comments' => __('all comments/replies', $this->plugin->text_domain),
 						                ),
-						                'notes_after'     => '<p>'.__('This is the option that will be pre-selected for each commenter as the default value. You can change the wording that appears for these options by editing the template above. However, the default choice is determined systematically, based on the one that you choose here — assuming that you haven\'t dramatically altered code in the template. For most sites, the most logical default choice is: <code>replies only</code>; i.e. the commenter will only receive notifications for replies to the comment they are posting.', $this->plugin->text_domain).'</p>',
+						                'notes_after'     => $this->plugin->options['template_type'] === 'a'
+							                ? '<p>'.__('This is the option that will be pre-selected for each commenter as the default value. You can change the wording that appears for these options by editing the template above. However, the default choice is determined systematically, based on the one that you choose here — assuming that you haven\'t dramatically altered code in the template. For most sites, the most logical default choice is: <code>replies only</code>; i.e. the commenter will only receive notifications for replies to the comment they are posting.', $this->plugin->text_domain).'</p>'
+							                : '<p>'.__('This is the option that will be pre-selected for each commenter as the default value. For most sites, the most logical default choice is: <code>replies only</code>; i.e. the commenter will only receive notifications for replies to the comment they are posting.', $this->plugin->text_domain).'</p>',
 					                )).
 				                '     </tbody>'.
 				                '  </table>'.
@@ -443,7 +445,9 @@ namespace comment_mail // Root namespace.
 						                'allow_empty'     => FALSE, // Do not offer empty option value.
 						                'allow_arbitrary' => FALSE, // Must be one of these.
 						                'options'         => '%%deliver%%', // Predefined options.
-						                'notes_after'     => '<p>'.__('This is the option that will be pre-selected for each commenter as the default value. You can change the wording that appears for these options by editing the template above. However, the default choice is determined systematically, based on the one that you choose here — assuming that you haven\'t dramatically altered code in the template. For most sites, the most logical default choice is: <code>asap</code> (aka: instantly); i.e. the commenter will receive instant notifications regarding replies to their comment.', $this->plugin->text_domain).'</p>',
+						                'notes_after'     => $this->plugin->options['template_type'] === 'a'
+							                ? '<p>'.__('This is the option that will be pre-selected for each commenter as the default value. You can change the wording that appears for these options by editing the template above. However, the default choice is determined systematically, based on the one that you choose here — assuming that you haven\'t dramatically altered code in the template. For most sites, the most logical default choice is: <code>asap</code> (aka: instantly); i.e. the commenter will receive instant notifications regarding replies to their comment.', $this->plugin->text_domain).'</p>'
+							                : '<p>'.__('This is the option that will be pre-selected for each commenter as the default value. For most sites, the most logical default choice is: <code>asap</code> (aka: instantly); i.e. the commenter will receive instant notifications regarding replies to their comment.', $this->plugin->text_domain).'</p>',
 					                )).
 				                '     </tbody>'.
 				                '  </table>'.
@@ -1591,6 +1595,31 @@ namespace comment_mail // Root namespace.
 
 				$_panel_body = '<table>'.
 				               '  <tbody>'.
+				               $form_fields->select_row(
+					               array(
+						               'label'           => sprintf(__('Simple Templates or Advanced PHP Templates?', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+						               'name'            => 'template_type',
+						               'current_value'   => $current_value_for('template_type'),
+						               'allow_arbitrary' => FALSE,
+						               'options'         => array(
+							               's' => __('Simple snippet-based templates (default; easiest to work with)', $this->plugin->text_domain),
+							               'a' => __('Advanced PHP-based templates (for developers and advanced site owners)', $this->plugin->text_domain),
+						               ),
+						               'notes_after'     => '<p>'.__('<strong>Note:</strong> If you change this setting, any template customizations that you\'ve made in one mode, will need to be done again for the new mode that you select; i.e. when this setting is changed, a new set of templates is loaded for the mode you select. You can always switch back though, and any changes that you made in the previous mode will be restored automatically.', $this->plugin->text_domain).'</p>'.
+						                                    '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Tip:</strong> You\'ll notice that by changing this setting, all of the customizable templates in %1$s will be impacted; i.e. when you select %2$s or %3$s from the menu at the top, a new set of templates will load-up; based on the mode that you choose here. You can also switch modes <em>while</em> you\'re editing templates (see: %2$s and/or %3$s). That will impact this setting in the exact same way. Change it here or change it there, no difference.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor($this->plugin->utils_url->email_templates_menu_page_only(), __('Email Templates', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor($this->plugin->utils_url->site_templates_menu_page_only(), __('Site Templates', $this->plugin->text_domain))).'</p>',
+					               )).
+				               '  </tbody>'.
+				               '</table>';
+
+				echo $this->panel(__('Template-Related Settings', $this->plugin->text_domain), $_panel_body, array());
+
+				unset($_panel_body); // Housekeeping.
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = '<table>'.
+				               '  <tbody>'.
 				               $form_fields->input_row(
 					               array(
 						               'type'          => 'number',
@@ -2081,6 +2110,14 @@ namespace comment_mail // Root namespace.
 
 				echo '         '.$this->all_panel_togglers();
 
+				if($this->plugin->is_pro) // Only possible in the pro version.
+				{
+					echo '      <div class="pmp-template-types pmp-right">'.
+					     '         <span>'.__('Template Mode:', $this->plugin->text_domain).'</span>'.
+					     '         <a href="'.esc_attr($this->plugin->utils_url->set_template_type('s')).'"'.($this->plugin->options['template_type'] === 's' ? ' class="pmp-active"' : '').'>'.__('simple', $this->plugin->text_domain).'</a>'.
+					     '         <a href="'.esc_attr($this->plugin->utils_url->set_template_type('a')).'"'.($this->plugin->options['template_type'] === 'a' ? ' class="pmp-active"' : '').'>'.__('advanced', $this->plugin->text_domain).'</a>'.
+					     '      </div>';
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
 				if($this->plugin->options['template_type'] === 's') // Simple snippet-based templates.
@@ -2112,7 +2149,7 @@ namespace comment_mail // Root namespace.
 
 					unset($_panel_body); // Housekeeping.
 
-					echo '<hr />'; /* ----------------------------------------------------------------------------------------- */
+					/* ----------------------------------------------------------------------------------------- */
 
 					$_panel_body = '<table>'.
 					               '  <tbody>'.
@@ -2596,6 +2633,14 @@ namespace comment_mail // Root namespace.
 
 				echo '         '.$this->all_panel_togglers();
 
+				if($this->plugin->is_pro) // Only possible in the pro version.
+				{
+					echo '      <div class="pmp-template-types pmp-right">'.
+					     '         <span>'.__('Template Mode:', $this->plugin->text_domain).'</span>'.
+					     '         <a href="'.esc_attr($this->plugin->utils_url->set_template_type('s')).'"'.($this->plugin->options['template_type'] === 's' ? ' class="pmp-active"' : '').'>'.__('simple', $this->plugin->text_domain).'</a>'.
+					     '         <a href="'.esc_attr($this->plugin->utils_url->set_template_type('a')).'"'.($this->plugin->options['template_type'] === 'a' ? ' class="pmp-active"' : '').'>'.__('advanced', $this->plugin->text_domain).'</a>'.
+					     '      </div>';
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
 				if($this->plugin->options['template_type'] === 's') // Simple snippet-based templates.
@@ -2627,7 +2672,7 @@ namespace comment_mail // Root namespace.
 
 					unset($_panel_body); // Housekeeping.
 
-					echo '<hr />'; /* ----------------------------------------------------------------------------------------- */
+					/* ----------------------------------------------------------------------------------------- */
 
 					$_panel_body = '<table>'.
 					               '  <tbody>'.

@@ -759,6 +759,24 @@ Menu page body styles.
 	z-index   : 1;
 	position  : relative;
 }
+.comment-mail-menu-page .pmp-body .pmp-template-types a
+{
+	opacity         : 0.5;
+	border-radius   : 4px;
+	text-decoration : none;
+	padding         : .1em .25em .1em .25em;
+}
+.comment-mail-menu-page .pmp-body .pmp-template-types a:hover,
+.comment-mail-menu-page .pmp-body .pmp-template-types a.pmp-active
+{
+	opacity : 1;
+}
+.comment-mail-menu-page .pmp-body .pmp-template-types a.pmp-active
+{
+	font-weight : bold;
+	color       : #307D27;
+	background  : #FFFFFF;
+}
 /*
 Menu page section heading styles.
 */
