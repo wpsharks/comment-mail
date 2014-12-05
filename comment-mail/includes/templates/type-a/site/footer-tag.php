@@ -1,13 +1,12 @@
 <?php
 namespace comment_mail;
-
 /**
  * @var plugin   $plugin Plugin class.
  * @var template $template Template class.
  *
  * Other variables made available in this template file:
  *
- * @var string   $template_file Relative path to the current template file.
+ * @var template $parent_template Parent template class reference.
  *
  * @note This file is automatically included as a child of other templates.
  *    Therefore, this template will ALSO receive any variable(s) passed to the parent template file,
@@ -45,7 +44,7 @@ $can_spam_privacy_policy_url = $plugin->options['can_spam_privacy_policy_url'];
 
 		<div class="col-md-6 text-left">
 
-			<?php if($template_file !== 'site/sub-actions/manage-summary.php'): ?>
+			<?php if($parent_template->file() !== 'site/sub-actions/manage-summary.php'): ?>
 				<?php // Displays a link leading them back to their subscriptions; if not already there. ?>
 				<a href="<?php echo esc_attr($sub_summary_return_url); ?>">
 					<i class="fa fa-arrow-circle-left"></i> <?php echo __('My Comment Subscriptions', $plugin->text_domain); ?>

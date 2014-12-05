@@ -1,13 +1,12 @@
 <?php
 namespace comment_mail;
-
 /**
  * @var plugin   $plugin Plugin class.
  * @var template $template Template class.
  *
  * Other variables made available in this template file:
  *
- * @var string   $template_file Relative path to the current template file.
+ * @var template $parent_template Parent template class reference.
  *
  * @note This file is automatically included as a child of other templates.
  *    Therefore, this template will ALSO receive any variable(s) passed to the parent template file,

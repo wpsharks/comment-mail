@@ -1,6 +1,5 @@
 <?php
 namespace comment_mail;
-
 /**
  * @var plugin   $plugin Plugin class.
  * @var template $template Template class.
@@ -22,7 +21,7 @@ namespace comment_mail;
  * @note The `%%title%%` replacement code should remain as-is.
  *    It is replaced by other templates using this header.
  *
- * @var string   $template_file Relative path to the current template file.
+ * @var template $parent_template Parent template class reference.
  *
  * @note This file is automatically included as a child of other templates.
  *    Therefore, this template will ALSO receive any variable(s) passed to the parent template file,

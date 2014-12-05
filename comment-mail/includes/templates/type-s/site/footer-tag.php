@@ -1,13 +1,12 @@
 <?php
 namespace comment_mail;
-
 /**
  * @var plugin   $plugin Plugin class.
  * @var template $template Template class.
  *
  * Other variables made available in this template file:
  *
- * @var string   $template_file Relative path to the current template file.
+ * @var template $parent_template Parent template class reference.
  *
  * @note This file is automatically included as a child of other templates.
  *    Therefore, this template will ALSO receive any variable(s) passed to the parent template file,
@@ -45,6 +44,6 @@ $can_spam_privacy_policy_url = $plugin->options['can_spam_privacy_policy_url'];
 		'[home_url]'                    => esc_attr($home_url),
 		'[blog_name_clip]'              => esc_html($blog_name_clip),
 		'[can_spam_privacy_policy_url]' => esc_attr($can_spam_privacy_policy_url),
-		'[sub_summary_return_url]'      => $template_file !== 'site/sub-actions/manage-summary.php' ? esc_attr($sub_summary_return_url) : '',
+		'[sub_summary_return_url]'      => $parent_template->file() !== 'site/sub-actions/manage-summary.php' ? esc_attr($sub_summary_return_url) : '',
 		'[powered_by]'                  => $plugin->options['site_footer_powered_by_enable'] ? $plugin->utils_markup->powered_by() : '',
 	)); ?>
