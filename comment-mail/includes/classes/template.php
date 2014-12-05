@@ -101,6 +101,18 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Public access to file; relative path.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @return string Template file; relative path.
+			 */
+			public function file()
+			{
+				return $this->file;
+			}
+
+			/**
 			 * Public access to file contents.
 			 *
 			 * @since 141111 First documented version.
@@ -125,12 +137,8 @@ namespace comment_mail // Root namespace.
 			{
 				$vars['plugin'] = plugin(); // Plugin class.
 
-				if(!isset($vars['template']))
-					// Don't override in site/email children.
-				{
-					$vars['template']      = $this;
-					$vars['template_file'] = $this->file;
-				}
+				$vars['template'] = $this; // Template reference.
+
 				if(strpos($this->file, 'site/') === 0)
 					$vars = array_merge($vars, $this->site_vars($vars));
 
@@ -174,6 +182,7 @@ namespace comment_mail // Root namespace.
 				$snippet         = $sc_conditionals->parse(); // Evaluates [if expression] logic.
 
 				$snippet = str_ireplace(array_keys($shortcodes), array_values($shortcodes), $snippet);
+				$snippet = do_shortcode($snippet); // Support WordPress shortcodes also.
 
 				return $snippet; // Final snippet output.
 			}
@@ -194,6 +203,10 @@ namespace comment_mail // Root namespace.
 
 				if(strpos($this->file, 'site/footer') === 0)
 					return array(); // Prevent infinite loop.
+
+				// Parent template reference.
+
+				$vars['parent_template'] = $this; // Parent reference.
 
 				// All header-related templates.
 
@@ -246,6 +259,10 @@ namespace comment_mail // Root namespace.
 
 				if(strpos($this->file, 'email/footer') === 0)
 					return array(); // Prevent infinite loop.
+
+				// Parent template reference.
+
+				$vars['parent_template'] = $this; // Parent reference.
 
 				// All header-related templates.
 
