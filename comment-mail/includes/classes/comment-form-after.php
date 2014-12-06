@@ -57,6 +57,7 @@ namespace comment_mail // Root namespace.
 					$this->plugin->utils_sub->current_email_latest_info(
 						array('post_id' => $post_id, 'comment_form_defaults' => TRUE)
 					);
+				// @TODO What if they have a subscription, but not on this post?
 				$current      = (object)array(
 					'sub_email'   => $current_info->email,
 					'sub_type'    => $current_info->type,

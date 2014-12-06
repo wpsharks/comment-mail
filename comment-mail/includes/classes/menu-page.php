@@ -64,6 +64,20 @@ namespace comment_mail // Root namespace.
 					}
 					return isset($_this->plugin->options[$key]) ? $_this->plugin->options[$key] : NULL;
 				};
+				$shortcode_details = function ($shortcodes) use ($_this)
+				{
+					$detail_lis = array(); // Initialize.
+
+					foreach($shortcodes as $_shortcode => $_details)
+						$detail_lis[] = '<li><code>'.esc_html($_shortcode).'</code>&nbsp;&nbsp;'.$_details.'</li>';
+					unset($_shortcode, $_details); // Housekeeping.
+
+					if($detail_lis) // If we have shortcodes, let's list them.
+						$details = '<ul class="pmp-list-items" style="margin-top:0; margin-bottom:0;">'.implode('', $detail_lis).'</ul>';
+					else $details = __('No shortcodes for this template at the present time.', $_this->plugin->text_domain);
+
+					return '<a href="#" data-toggle="alert" data-alert="'.esc_attr($details).'">'.__('shortcodes explained', $_this->plugin->text_domain).'</a>';
+				};
 				/* ----------------------------------------------------------------------------------------- */
 
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-options '.$this->plugin->slug.'-menu-page-area').'">'."\n";
@@ -407,6 +421,16 @@ namespace comment_mail // Root namespace.
 							                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sub-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
 							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>'.
 							                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							                'cm_details'    => $shortcode_details(array(
+								                                                      '[css_styles]'          => __('Stylesheet containing a default set of structral styles.', $this->plugin->text_domain),
+								                                                      '[inline_icon_svg]'     => __('Inline SVG icon that inherits the color and width of it\'s container automatically. Note, this is a scalable vector graphic that will look great at any size &gt;= 16x16 pixels.', $this->plugin->text_domain),
+								                                                      '[sub_type_options]'    => __('Select menu options. Allows a subscriber to choose if they wan\'t to subscribe or not; and in which way.', $this->plugin->text_domain),
+								                                                      '[sub_deliver_options]' => __('Select menu options. Allows a subscriber to choose a delivery option; e.g. asap, hourly, daily, weeky. This can be excluded if you wish. A default value of <code>asap</code> will be used in that case.', $this->plugin->text_domain),
+								                                                      '[sub_type_id]'         => __('The <code>id=""</code> attribute value used in <code>[sub_type_options]</code>.', $this->plugin->text_domain),
+								                                                      '[current_sub_email]'   => __('The current subscriber\'s email address, if it is known to have been confirmed; i.e. if it really is their email address. This will be empty if they have not previously confirmed a subscription.', $this->plugin->text_domain),
+								                                                      '[sub_new_url]'         => __('A URL leading to the "Add Subscription" page. This allows a visitor to subscribe w/o commenting even.', $this->plugin->text_domain),
+								                                                      '[sub_summary_url]'     => __('A URL leading to the subscription summary page (i.e. the My Subscriptions page). A link to the summary page (i.e. the My Subscriptions page) should only be displayed <code>[if current_sub_email]</code> is known.', $this->plugin->text_domain),
+							                                                      )),
 						                ))).
 				                '     </tbody>'.
 				                '  </table>'.
@@ -1271,6 +1295,10 @@ namespace comment_mail // Root namespace.
 							                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
 							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>'.
 							                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							                'cm_details'    => $shortcode_details(array(
+								                                                      '[css_styles]'    => __('Stylesheet containing a default set of structral styles.', $this->plugin->text_domain),
+								                                                      '[service_links]' => __('Links/icons for the SSO services that you have integrated with.', $this->plugin->text_domain),
+							                                                      )),
 						                ))).
 				                '             </tbody>'.
 				                '          </table>'.
@@ -1346,6 +1374,10 @@ namespace comment_mail // Root namespace.
 							                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
 							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>'.
 							                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							                'cm_details'    => $shortcode_details(array(
+								                                                      '[css_styles]'    => __('Stylesheet containing a default set of structral styles.', $this->plugin->text_domain),
+								                                                      '[service_links]' => __('Links/icons for the SSO services that you have integrated with.', $this->plugin->text_domain),
+							                                                      )),
 						                ))).
 				                '             </tbody>'.
 				                '          </table>'.
@@ -2159,7 +2191,7 @@ namespace comment_mail // Root namespace.
 								                                                     '[home_url]'          => __('Site home page URL; i.e. back to main site.', $this->plugin->text_domain),
 								                                                     '[blog_name_clip]'    => __('A clip of the blog\'s name; as configured in WordPress.', $this->plugin->text_domain),
 								                                                     '[current_host_path]' => __('Current <code>domain/path</code> with support for multisite network child blogs.', $this->plugin->text_domain),
-								                                                     '[icon_bubbles_url]'  => __('Icon URL; defaults to the plugin\'s icon image.', $this->plugin->text_domain),
+								                                                     '[icon_bubbles_url]'  => __('Icon URL; to the plugin\'s icon image.', $this->plugin->text_domain),
 							                                                     )),
 						               )).
 					               '  </tbody>'.
@@ -2752,7 +2784,12 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template represents the meat of the front-end header design. If you would like to rebrand or enhance site templates, this is the file that we suggest you edit. This file contains the <code>&lt;header&gt;</code> tag, which is pulled together into a full, final, and complete HTML document. In other words, there is no reason to use <code>&lt;html&gt;&lt;body&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;header&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;header&gt;</code>; i.e. you can add any HTML that you like.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-							               'cm_details'    => $shortcode_details(array()),
+							               'cm_details'    => $shortcode_details(array(
+								                                                     '[home_url]'          => __('Site home page URL; i.e. back to main site.', $this->plugin->text_domain),
+								                                                     '[blog_name_clip]'    => __('A clip of the blog\'s name; as configured in WordPress.', $this->plugin->text_domain),
+								                                                     '[current_host_path]' => __('Current <code>host/path</code> with support for multisite network child blogs.', $this->plugin->text_domain),
+								                                                     '[icon_bubbles_url]'  => __('Icon URL; to the plugin\'s icon image.', $this->plugin->text_domain),
+							                                                     )),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2775,7 +2812,13 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template allows you to create a custom front-end footer design. If you would like to rebrand or enhance site templates, this is the file that we suggest you edit. This file contains the <code>&lt;footer&gt;</code> tag, which is pulled together into a full, final, and complete HTML document. In other words, there is no reason to use <code>&lt;/body&gt;&lt;/html&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;footer&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;footer&gt;</code>; i.e. you can add any HTML that you like.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-							               'cm_details'    => $shortcode_details(array()),
+							               'cm_details'    => $shortcode_details(array(
+								                                                     '[home_url]'                    => __('Site home page URL; i.e. back to main site.', $this->plugin->text_domain),
+								                                                     '[blog_name_clip]'              => __('A clip of the blog\'s name; as configured in WordPress.', $this->plugin->text_domain),
+								                                                     '[can_spam_privacy_policy_url]' => __('Privacy policy URL; as configured in plugin options via the dashboard.', $this->plugin->text_domain),
+								                                                     '[sub_summary_return_url]'      => __('Summary return URL; w/ all summary navigation vars preserved.', $this->plugin->text_domain),
+								                                                     '[powered_by]'                  => __('Plugin\'s powered-by link &amp; branding; if enabled in plugin config. options.', $this->plugin->text_domain),
+							                                                     )),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2805,7 +2848,20 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just confirmed their subscription via email (i.e. the page displayed after a user clicks the confirmation link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-							               'cm_details'    => $shortcode_details(array()),
+							               'cm_details'    => $shortcode_details(array(
+								                                                     '[if sub_comment]'               => __('If the subscription is to a specific comment; i.e. not the entire post.', $this->plugin->text_domain),
+								                                                     '[if subscribed_to_own_comment]' => __('Subscribed to their own comment?', $this->plugin->text_domain),
+								                                                     '[sub_fname]'                    => __('Subscriber\'s first name.', $this->plugin->text_domain),
+								                                                     '[sub_email]'                    => __('Subscriber\'s email address.', $this->plugin->text_domain),
+								                                                     '[sub_deliver_label]'            => __('Delivery option label; e.g. asap, hourly, daily, weekly.', $this->plugin->text_domain),
+								                                                     '[sub_deliver_description]'      => __('A brief description of the delivery option.', $this->plugin->text_domain),
+								                                                     '[sub_edit_url]'                 => __('Subscription edit URL; i.e. so they can make any last-minute changes.', $this->plugin->text_domain),
+								                                                     '[sub_post_comments_url]'        => __('URL to comments on the post they\'re subscribed to.', $this->plugin->text_domain),
+								                                                     '[sub_post_title_clip]'          => __('A short clip of the full post title.', $this->plugin->text_domain),
+								                                                     '[sub_post_id]'                  => __('The post ID they\'re subscribed to.', $this->plugin->text_domain),
+								                                                     '[sub_comment_url]'              => __('URL to comment they\'re subscribed to; if applicable.', $this->plugin->text_domain),
+								                                                     '[sub_comment_id]'               => __('Comment ID they\'re subscribed to; if applicable.', $this->plugin->text_domain),
+							                                                     )),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2828,7 +2884,20 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just unsubscribed from a subscription (i.e. the page displayed after a user clicks an unsubscribe link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-							               'cm_details'    => $shortcode_details(array()),
+							               'cm_details'    => $shortcode_details(array(
+								                                                     '[if sub_post]'                  => __('If the post they were subscribed to still exists.', $this->plugin->text_domain),
+								                                                     '[if sub_comment]'               => __('If the subscription was to a specific comment; i.e. not the entire post.', $this->plugin->text_domain),
+								                                                     '[if subscribed_to_own_comment]' => __('They were subscribed to their own comment?', $this->plugin->text_domain),
+								                                                     '[sub_fname]'                    => __('Subscriber\'s first name.', $this->plugin->text_domain),
+								                                                     '[sub_email]'                    => __('Subscriber\'s email address.', $this->plugin->text_domain),
+								                                                     '[sub_post_comments_url]'        => __('URL to comments on the post they were subscribed to.', $this->plugin->text_domain),
+								                                                     '[sub_post_title_clip]'          => __('A short clip of the full post title.', $this->plugin->text_domain),
+								                                                     '[sub_post_id]'                  => __('The post ID they were subscribed to.', $this->plugin->text_domain),
+								                                                     '[sub_comment_url]'              => __('URL to comment they were subscribed to; if applicable.', $this->plugin->text_domain),
+								                                                     '[sub_comment_id]'               => __('Comment ID they were subscribed to; if applicable.', $this->plugin->text_domain),
+								                                                     '[sub_unsubscribe_all_url]'      => __('Unsubscribes (deletes) ALL subscriptions associated w/ their email address.', $this->plugin->text_domain),
+								                                                     '[sub_new_url]'                  => __('Subscription creation URL; i.e. so they can add a new subscription if they like.', $this->plugin->text_domain),
+							                                                     )),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2851,7 +2920,10 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just unsubscribed from all of their subscriptions (i.e. the page displayed after a user clicks the "unsubscribe all" link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-							               'cm_details'    => $shortcode_details(array()),
+							               'cm_details'    => $shortcode_details(array(
+								                                                     '[sub_email]'   => __('Subscriber\'s email address.', $this->plugin->text_domain),
+								                                                     '[sub_new_url]' => __('Subscription creation URL; i.e. so they can add a new subscription if they like.', $this->plugin->text_domain),
+							                                                     )),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2882,7 +2954,16 @@ namespace comment_mail // Root namespace.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed below your comment form; providing end-users with a way to create a subscription.', $this->plugin->text_domain).
 							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-							               'cm_details'    => $shortcode_details(array()),
+							               'cm_details'    => $shortcode_details(array(
+								                                                     '[css_styles]'          => __('Stylesheet containing a default set of structral styles.', $this->plugin->text_domain),
+								                                                     '[inline_icon_svg]'     => __('Inline SVG icon that inherits the color and width of it\'s container automatically. Note, this is a scalable vector graphic that will look great at any size &gt;= 16x16 pixels.', $this->plugin->text_domain),
+								                                                     '[sub_type_options]'    => __('Select menu options. Allows a subscriber to choose if they wan\'t to subscribe or not; and in which way.', $this->plugin->text_domain),
+								                                                     '[sub_deliver_options]' => __('Select menu options. Allows a subscriber to choose a delivery option; e.g. asap, hourly, daily, weeky. This can be excluded if you wish. A default value of <code>asap</code> will be used in that case.', $this->plugin->text_domain),
+								                                                     '[sub_type_id]'         => __('The <code>id=""</code> attribute value used in <code>[sub_type_options]</code>.', $this->plugin->text_domain),
+								                                                     '[current_sub_email]'   => __('The current subscriber\'s email address, if it is known to have been confirmed; i.e. if it really is their email address. This will be empty if they have not previously confirmed a subscription.', $this->plugin->text_domain),
+								                                                     '[sub_new_url]'         => __('A URL leading to the "Add Subscription" page. This allows a visitor to subscribe w/o commenting even.', $this->plugin->text_domain),
+								                                                     '[sub_summary_url]'     => __('A URL leading to the subscription summary page (i.e. the My Subscriptions page). A link to the summary page (i.e. the My Subscriptions page) should only be displayed <code>[if current_sub_email]</code> is known.', $this->plugin->text_domain),
+							                                                     )),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2913,7 +2994,10 @@ namespace comment_mail // Root namespace.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed above your comment form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
 							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-							               'cm_details'    => $shortcode_details(array()),
+							               'cm_details'    => $shortcode_details(array(
+								                                                     '[css_styles]'    => __('Stylesheet containing a default set of structral styles.', $this->plugin->text_domain),
+								                                                     '[service_links]' => __('Links/icons for the SSO services that you have integrated with.', $this->plugin->text_domain),
+							                                                     )),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2937,7 +3021,10 @@ namespace comment_mail // Root namespace.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed within your login form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
 							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-							               'cm_details'    => $shortcode_details(array()),
+							               'cm_details'    => $shortcode_details(array(
+								                                                     '[css_styles]'    => __('Stylesheet containing a default set of structral styles.', $this->plugin->text_domain),
+								                                                     '[service_links]' => __('Links/icons for the SSO services that you have integrated with.', $this->plugin->text_domain),
+							                                                     )),
 						               )).
 					               '  </tbody>'.
 					               '</table>';

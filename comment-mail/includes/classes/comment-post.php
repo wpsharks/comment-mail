@@ -85,7 +85,8 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				$sub_deliver = !empty($_POST[__NAMESPACE__.'_sub_deliver'])
-					? (string)$_POST[__NAMESPACE__.'_sub_deliver'] : '';
+					? (string)$_POST[__NAMESPACE__.'_sub_deliver']
+					: $this->plugin->options['comment_form_default_sub_deliver_option'];
 
 				new sub_injector(wp_get_current_user(), $this->comment_id, array(
 					'type'           => $sub_type,
