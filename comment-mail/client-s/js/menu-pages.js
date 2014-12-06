@@ -87,13 +87,14 @@
 		{
 			e.preventDefault(), e.stopImmediatePropagation();
 
-			var $this = $(this), alertMarkup = $this.data('alert'),
+			var $this = $(this), $closestDiv = $this.closest('table,div'),
+				alertMarkup = $this.data('alert'), // The content for this alert.
 				$modalDialogOverlay = $('<div class="pmp-modal-dialog-overlay"></div>'),
 				$modalDialog = $('<div class="pmp-modal-dialog">' +
 				                 '   <a class="pmp-modal-dialog-close"></a>' +
 				                 '   ' + alertMarkup +
 				                 '</div>');
-			$this.after($modalDialogOverlay).after($modalDialog),
+			$closestDiv.after($modalDialogOverlay).after($modalDialog),
 				$modalDialogOverlay.add($modalDialog.find('> .pmp-modal-dialog-close')).on('click', function(e)
 				{
 					e.preventDefault(), e.stopImmediatePropagation(),

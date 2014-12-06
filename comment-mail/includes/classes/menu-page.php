@@ -2098,6 +2098,20 @@ namespace comment_mail // Root namespace.
 					}
 					return isset($_this->plugin->options[$key]) ? $_this->plugin->options[$key] : NULL;
 				};
+				$shortcode_details = function ($shortcodes) use ($_this)
+				{
+					$detail_lis = array(); // Initialize.
+
+					foreach($shortcodes as $_shortcode => $_details)
+						$detail_lis[] = '<li><code>'.esc_html($_shortcode).'</code>&nbsp;&nbsp;'.$_details.'</li>';
+					unset($_shortcode, $_details); // Housekeeping.
+
+					if($detail_lis) // If we have shortcodes, let's list them.
+						$details = '<ul class="pmp-list-items" style="margin-top:0; margin-bottom:0;">'.implode('', $detail_lis).'</ul>';
+					else $details = __('No shortcodes for this template at the present time.', $_this->plugin->text_domain);
+
+					return '<a href="#" data-toggle="alert" data-alert="'.esc_attr($details).'">'.__('shortcodes explained', $_this->plugin->text_domain).'</a>';
+				};
 				/* ----------------------------------------------------------------------------------------- */
 
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-email-templates '.$this->plugin->slug.'-menu-page-area').'">'."\n";
@@ -2141,6 +2155,12 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template represents the meat of the email header design. If you would like to rebrand or enhance email messages, this is the file that we suggest you edit. This file contains the <code>&lt;header&gt;</code> tag, which is pulled together into a full, final, and complete HTML document. In other words, there is no reason to use <code>&lt;html&gt;&lt;body&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;header&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;header&gt;</code>; i.e. you can add any HTML that you like.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array(
+								                                                     '[home_url]'          => __('Site home page URL; i.e. back to main site.', $this->plugin->text_domain),
+								                                                     '[blog_name_clip]'    => __('A clip of the blog\'s name; as configured in WordPress.', $this->plugin->text_domain),
+								                                                     '[current_host_path]' => __('Current <code>domain/path</code> with support for multisite network child blogs.', $this->plugin->text_domain),
+								                                                     '[icon_bubbles_url]'  => __('Icon URL; defaults to the plugin\'s icon image.', $this->plugin->text_domain),
+							                                                     )),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2163,6 +2183,7 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template allows you to create a custom email footer design. If you would like to rebrand or enhance email messages, this is the file that we suggest you edit. This file contains the <code>&lt;footer&gt;</code> tag, which is pulled together into a full, final, and complete HTML document. In other words, there is no reason to use <code>&lt;/body&gt;&lt;/html&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;footer&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;footer&gt;</code>; i.e. you can add any HTML that you like.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array()),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2192,6 +2213,12 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this is merely a subject line for email confirmation requests. Customize if you like, but not necessary. Note that extra whitespace in subject templates is stripped automatically at runtime. That\'s why this template is able to break things down into multiple lines. This is for clarity only. In the end, the email will always contain a one-line subject of course. Multiline subjects are unsupported by the vast majority of email clients anyway.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array(
+								                                                     '[if sub_comment]'               => __('If the subscription is for a specific comment; i.e. not the entire post.', $this->plugin->text_domain),
+								                                                     '[if subscribed_to_own_comment]' => __('If they are subscribing to their own comment.', $this->plugin->text_domain),
+								                                                     '[sub_post_title_clip]'          => __('A short clip of the full post title.', $this->plugin->text_domain),
+								                                                     '[sub_comment_id]'               => __('Comment ID; if applicable, they are subscribed to.', $this->plugin->text_domain),
+							                                                     )),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2214,6 +2241,17 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the body of an email message that is sent to request a subscription confirmation. Note that it is not necessary to create a header/footer for this template. This template pulls together a global email header/footer design that have already been configured elsewhere; i.e. all you need here is the message body. You\'ll notice that the first line of the message body is a link that a user may click to complete confirmation. If you modify this template, it is suggested that you always keep this link at the top of the email. It is (by far) the most important element in this message. End users need a way to confirm their subscription.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array(
+								                                                     '[if sub_comment]'               => __('If the subscription is for a specific comment; i.e. not the entire post.', $this->plugin->text_domain),
+								                                                     '[if subscribed_to_own_comment]' => __('If they are subscribing to their own comment.', $this->plugin->text_domain),
+								                                                     '[if sub_post_comments_open]'    => __('If comments are still open the underlying post they are subscribing to.', $this->plugin->text_domain),
+								                                                     '[sub_fname]'                    => __('Subscriber\'s first name.', $this->plugin->text_domain),
+								                                                     '[sub_confirm_url]'              => __('Confirmation URL. Clicking this URL will confirm the subscription.', $this->plugin->text_domain),
+								                                                     '[sub_post_comments_url]'        => __('URL to comments on the post they\'re subscribed to.', $this->plugin->text_domain),
+								                                                     '[sub_post_title_clip]'          => __('A short clip of the full post title.', $this->plugin->text_domain),
+								                                                     '[sub_comment_url]'              => __('URL to comment they\'re subscribed to; if applicable.', $this->plugin->text_domain),
+								                                                     '[sub_comment_id]'               => __('Comment ID; if applicable, they are subscribed to.', $this->plugin->text_domain),
+							                                                     )),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2243,6 +2281,13 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this is merely a subject line for email notifications. Customize if you like, but not necessary. Note that extra whitespace in subject templates is stripped automatically at runtime. That\'s why this template is able to break things down into multiple lines. This is for clarity only. In the end, the email will always contain a one-line subject of course. Multiline subjects are unsupported by the vast majority of email clients anyway.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array(
+								                                                     '[if is_digest]'                 => __('A notification may contain one (or more) comments. Is this a digest?', $this->plugin->text_domain),
+								                                                     '[if sub_comment]'               => __('If the subscription is to a specific comment; i.e. not the entire post.', $this->plugin->text_domain),
+								                                                     '[if subscribed_to_own_comment]' => __('Subscribed to their own comment?', $this->plugin->text_domain),
+								                                                     '[sub_post_title_clip]'          => __('A short clip of the full post title.', $this->plugin->text_domain),
+								                                                     '[sub_comment_id]'               => __('Comment ID; if applicable, they are subscribed to.', $this->plugin->text_domain),
+							                                                     )),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2265,6 +2310,15 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the heading in an email message that is sent to notify an end-user about one or more comments on your blog. You\'ll notice that there are several conditional tags in this template. An email notification can include one (or more) comments; i.e. some subscribers may choose to receive notifications in the form of a digest. This template has the job of dealing with either case; i.e. one comment in the notification, or more than one.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array(
+								                                                     '[if is_digest]'                 => __('A notification may contain one (or more) comments. Is this a digest?', $this->plugin->text_domain),
+								                                                     '[if sub_comment]'               => __('If the subscription is to a specific comment; i.e. not the entire post.', $this->plugin->text_domain),
+								                                                     '[if subscribed_to_own_comment]' => __('Subscribed to their own comment?', $this->plugin->text_domain),
+								                                                     '[sub_post_comments_url]'        => __('URL to comments on the post they\'re subscribed to.', $this->plugin->text_domain),
+								                                                     '[sub_post_title_clip]'          => __('A short clip of the full post title.', $this->plugin->text_domain),
+								                                                     '[sub_comment_url]'              => __('URL to comment they\'re subscribed to; if applicable.', $this->plugin->text_domain),
+								                                                     '[sub_comment_id]'               => __('Comment ID; if applicable, they are subscribed to.', $this->plugin->text_domain),
+							                                                     )),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2287,6 +2341,12 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the blurp that will appear before a comment that\'s a reply; i.e. not a new comment, but a response to someone. This helps to offer the reader some context when they receive the notification.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array(
+								                                                     '[comment_parent_url]'    => __('Parent comment URL.', $this->plugin->text_domain),
+								                                                     '[comment_parent_id]'     => __('Parent comment ID.', $this->plugin->text_domain),
+								                                                     '[comment_parent_author]' => __('Parent comment author name.', $this->plugin->text_domain),
+								                                                     '[comment_parent_clip]'   => __('A shorter clip of the full parent comment message body.', $this->plugin->text_domain),
+							                                                     )),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2309,6 +2369,13 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the blurp that will appear for a comment that\'s a reply; i.e. not a new comment, but a response to someone. In the final email, this will come just after the In-Response-To template (as seen above).', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array(
+								                                                     '[comment_url]'      => __('URL to comment reply.', $this->plugin->text_domain),
+								                                                     '[comment_id]'       => __('Comment reply ID.', $this->plugin->text_domain),
+								                                                     '[comment_time_ago]' => __('How long ago the comment reply was posted (human readable).', $this->plugin->text_domain),
+								                                                     '[comment_author]'   => __('Comment reply author\'s name.', $this->plugin->text_domain),
+								                                                     '[comment_clip]'     => __('A shorter clip of the full comment reply message body.', $this->plugin->text_domain),
+							                                                     )),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2331,6 +2398,13 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for popular email clients; i.e. you shouldn\'t need to customize. However, if don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the blurp that will appear for a new comment; i.e. one that\'s not a reply, but a new top-level comment.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array(
+								                                                     '[comment_url]'      => __('URL to comment.', $this->plugin->text_domain),
+								                                                     '[comment_id]'       => __('Comment ID.', $this->plugin->text_domain),
+								                                                     '[comment_time_ago]' => __('How long ago the comment was posted (human readable).', $this->plugin->text_domain),
+								                                                     '[comment_author]'   => __('Comment author\'s name.', $this->plugin->text_domain),
+								                                                     '[comment_clip]'     => __('A shorter clip of the full comment message body.', $this->plugin->text_domain),
+							                                                     )),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2621,6 +2695,20 @@ namespace comment_mail // Root namespace.
 					}
 					return isset($_this->plugin->options[$key]) ? $_this->plugin->options[$key] : NULL;
 				};
+				$shortcode_details = function ($shortcodes) use ($_this)
+				{
+					$detail_lis = array(); // Initialize.
+
+					foreach($shortcodes as $_shortcode => $_details)
+						$detail_lis[] = '<li><code>'.esc_html($_shortcode).'</code>&nbsp;&nbsp;'.$_details.'</li>';
+					unset($_shortcode, $_details); // Housekeeping.
+
+					if($detail_lis) // If we have shortcodes, let's list them.
+						$details = '<ul class="pmp-list-items" style="margin-top:0; margin-bottom:0;">'.implode('', $detail_lis).'</ul>';
+					else $details = __('No shortcodes for this template at the present time.', $_this->plugin->text_domain);
+
+					return '<a href="#" data-toggle="alert" data-alert="'.esc_attr($details).'">'.__('shortcodes explained', $_this->plugin->text_domain).'</a>';
+				};
 				/* ----------------------------------------------------------------------------------------- */
 
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-site-templates '.$this->plugin->slug.'-menu-page-area').'">'."\n";
@@ -2664,6 +2752,7 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template represents the meat of the front-end header design. If you would like to rebrand or enhance site templates, this is the file that we suggest you edit. This file contains the <code>&lt;header&gt;</code> tag, which is pulled together into a full, final, and complete HTML document. In other words, there is no reason to use <code>&lt;html&gt;&lt;body&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;header&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;header&gt;</code>; i.e. you can add any HTML that you like.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array()),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2686,6 +2775,7 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress installs; i.e. you shouldn\'t need to customize. However, if you don\'t like the defaults; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template allows you to create a custom front-end footer design. If you would like to rebrand or enhance site templates, this is the file that we suggest you edit. This file contains the <code>&lt;footer&gt;</code> tag, which is pulled together into a full, final, and complete HTML document. In other words, there is no reason to use <code>&lt;/body&gt;&lt;/html&gt;</code> tags here, they are produced elsewhere. Please note, while this template is focused on the <code>&lt;footer&gt;</code> tag, you are not limited to <em>just</em> the <code>&lt;footer&gt;</code>; i.e. you can add any HTML that you like.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array()),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2715,6 +2805,7 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just confirmed their subscription via email (i.e. the page displayed after a user clicks the confirmation link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array()),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2737,6 +2828,7 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just unsubscribed from a subscription (i.e. the page displayed after a user clicks an unsubscribe link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array()),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2759,6 +2851,7 @@ namespace comment_mail // Root namespace.
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just unsubscribed from all of their subscriptions (i.e. the page displayed after a user clicks the "unsubscribe all" link). Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e. all you need here is the content.', $this->plugin->text_domain).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array()),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2789,6 +2882,7 @@ namespace comment_mail // Root namespace.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed below your comment form; providing end-users with a way to create a subscription.', $this->plugin->text_domain).
 							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array()),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2819,6 +2913,7 @@ namespace comment_mail // Root namespace.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed above your comment form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
 							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array()),
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -2842,6 +2937,7 @@ namespace comment_mail // Root namespace.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed within your login form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
 							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							               'cm_details'    => $shortcode_details(array()),
 						               )).
 					               '  </tbody>'.
 					               '</table>';

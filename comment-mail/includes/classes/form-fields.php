@@ -217,6 +217,7 @@ namespace comment_mail // Root namespace.
 
 					'cm_mode'                  => '',
 					'cm_height'                => 500,
+					'cm_details'               => '',
 
 					'notes_before'             => '',
 					'notes_after'              => '',
@@ -251,8 +252,9 @@ namespace comment_mail // Root namespace.
 				if($current_value_empty_on_0 && in_array($current_value, array(0, '0'), TRUE))
 					$current_value = ''; // Empty value.
 
-				$cm_mode   = trim((string)$args['cm_mode']);
-				$cm_height = (integer)$args['cm_height'];
+				$cm_mode    = trim((string)$args['cm_mode']);
+				$cm_height  = (integer)$args['cm_height'];
+				$cm_details = trim((string)$args['cm_details']);
 
 				$notes_before = trim((string)$args['notes_before']);
 				$notes_after  = trim((string)$args['notes_after']);
@@ -273,6 +275,7 @@ namespace comment_mail // Root namespace.
 							'        <span class="description">'.__('(required) *', $this->plugin->text_domain).'</span>' : '').
 					        ($cm_mode ? '<span class="description" style="margin-left:2em;">'.
 					                    '   <small>'.__('(<code>F11</code> toggles fullscreen editing)', $this->plugin->text_domain).'</small>'.
+					                    ($cm_details ? '<small style="margin-left:2em;">'.$cm_details.'</small>' : '').
 					                    '</span>' : '').
 					        '   </label>';
 					$row .= '</th>';
