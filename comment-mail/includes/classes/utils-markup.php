@@ -21,38 +21,6 @@ namespace comment_mail // Root namespace.
 		class utils_markup extends abs_base
 		{
 			/**
-			 * @var array Regex block tags.
-			 *
-			 * @since 141111 First documented version.
-			 */
-			public $regex_block_tags = array(
-				'p',
-				'h[1-9]',
-				'div',
-				'pre',
-				'blockquote',
-				'audio',
-				'video',
-				'ul',
-				'ol',
-				'table',
-				'form',
-				'fieldset',
-				'hr',
-			);
-
-			/**
-			 * @var array Regex block container tags.
-			 *    i.e. block tags that serve as inline containers.
-			 *
-			 * @since 141111 First documented version.
-			 */
-			public $regex_block_container_tags = array(
-				'p',
-				'div',
-			);
-
-			/**
 			 * Class constructor.
 			 *
 			 * @since 141111 First documented version.
@@ -717,58 +685,6 @@ namespace comment_mail // Root namespace.
 				unset($_selected_value); // Housekeeping.
 
 				return $options; // HTML markup.
-			}
-
-			/**
-			 * Wraps inline markup (and optional leader) inside `<p></p>` tags.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string $markup Input markup to wrap.
-			 *
-			 * @param string $leader_markup `<[block]>$leader_markup`.
-			 *    If `$markup` is NOT already wrapped, this comes after first opening `<p>` tag; the most common occurrence here.
-			 *    If `$markup` IS already wrapped, this is placed after the first block-level open tag (IF it's an inline container; e.g. `<p>`, `<div>`).
-			 *
-			 *    In short, `$leader_markup` goes inside the first block-level open tag, even if that's not a `<p>` tag; so long as it's a block container.
-			 *       See: {@link $regex_block_container_tags}; e.g. `<p>`, `<div>` are containers; whereas `<ul>` may not contain arbitrary inline tags.
-			 *       If the first block-level open tag is NOT an inline container; a new `<p></p>` is prepended to hold the leader properly.
-			 *
-			 * @return string Inline markup (and optional leader) inside `<p></p>` (or existing block-level) tags.
-			 *    If markup is already wrapped inside a block-level tag, we simply inject `$leader_markup` and leave everything else as-is.
-			 *    If markup contains any block-level elements, they'll be moved after `<p></p>` tags to prevent HTML nesting issues.
-			 *    If markup is empty, this simply returns an empty string; indicating failure.
-			 */
-			public function p_wrap($markup, $leader_markup = '')
-			{
-				if(!($markup = trim((string)$markup)))
-					return ''; // Not possible.
-
-				$leader_markup  = trim((string)$leader_markup);
-				$markup_is_html = $this->plugin->utils_string->is_html($markup);
-
-				$block_tag_open_regex                   = '/(\<(?:'.implode('|', $this->regex_block_tags).')(?:\s[^>]*?)?\>)/i';
-				$leading_block_tag_open_regex           = '/^'.substr($block_tag_open_regex, 1); // Ditto; but beginning of the string.
-				$leading_block_container_tag_open_regex = '/^(\<(?:'.implode('|', $this->regex_block_container_tags).')(?:\s[^>]*?)?\>)/i';
-
-				if($markup_is_html) // Contains HTML markup?
-					if(preg_match($leading_block_tag_open_regex, $markup)) // Wrapped already?
-					{
-						if(preg_match($leading_block_container_tag_open_regex, $markup))
-							return preg_replace($leading_block_container_tag_open_regex, '${1}'.$leader_markup, $markup);
-						return '<p>'.$leader_markup.'</p>'.$markup; // Best we can do; given the circumstance.
-					}
-				$inline_markup           = $markup; // Initialize.
-				$markup_blocks_remaining = ''; // Initialize.
-
-				if($markup_is_html) // Quick check; contains HTML markup?
-					if(($notice_markup_parts = preg_split($block_tag_open_regex, $markup, 2, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)))
-					{
-						// We know the first part is NOT a block-level tag since the "leading" check above did not fire.
-						$inline_markup           = array_shift($notice_markup_parts); // First part; inline.
-						$markup_blocks_remaining = implode('', $notice_markup_parts); // Remaining parts.
-					}
-				return '<p>'.$leader_markup.$inline_markup.'</p>'.$markup_blocks_remaining;
 			}
 
 			/**

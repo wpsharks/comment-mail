@@ -1744,7 +1744,7 @@ namespace comment_mail
 
 						$_full_markup = // Put together the full markup; including other pieces.
 							'<div class="'.esc_attr($_classes).'">'.
-							'  '.$this->utils_markup->p_wrap($_args['markup'], $_dismiss).
+							'  '.$this->utils_string->p_wrap($_args['markup'], $_dismiss).
 							'</div>';
 						echo apply_filters(__METHOD__.'_notice', $_full_markup, get_defined_vars());
 					}

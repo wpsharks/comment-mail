@@ -1026,6 +1026,58 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Wraps inline markup (and optional leader) inside `<p></p>` tags.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $string Input markup to wrap.
+			 *
+			 * @param string $leader `<[block]>$leader`.
+			 *    If `$string` is NOT already wrapped, this comes after first opening `<p>` tag; the most common occurrence here.
+			 *    If `$string` IS already wrapped, this is placed after the first block-level open tag (IF it's an inline container; e.g. `<p>`, `<div>`).
+			 *
+			 *    In short, `$leader` goes inside the first block-level open tag, even if that's not a `<p>` tag; so long as it's a block container.
+			 *       See: {@link $block_container_tags}; e.g. `<p>`, `<div>` are containers; whereas `<ul>` may not contain arbitrary inline tags.
+			 *       If the first block-level open tag is NOT an inline container; a new `<p></p>` is prepended to hold the leader properly.
+			 *
+			 * @return string Inline markup (and optional leader) inside `<p></p>` (or existing block-level) tags.
+			 *    If markup is already wrapped inside a block-level tag, we simply inject `$leader` and leave everything else as-is.
+			 *    If markup contains any block-level elements, they'll be moved after `<p></p>` tags to prevent HTML nesting issues.
+			 *    If markup is empty, this simply returns an empty string; indicating failure.
+			 */
+			public function p_wrap($string, $leader = '')
+			{
+				if(!($string = trim((string)$string)))
+					return ''; // Not possible.
+
+				$leader         = trim((string)$leader);
+				$string_is_html = $this->plugin->utils_string->is_html($string);
+
+				$block_tag_open_regex                   = '/(\<(?:'.implode('|', $this->preg_quote_deep($this->block_tags)).')(?:\s[^>]*?)?\>)/i';
+				$leading_block_tag_open_regex           = '/^'.substr($block_tag_open_regex, 1); // Ditto; same as above, but beginning of the string.
+				$leading_block_container_tag_open_regex = '/^(\<(?:'.implode('|', $this->preg_quote_deep($this->block_container_tags)).')(?:\s[^>]*?)?\>)/i';
+
+				if($string_is_html) // Contains HTML markup?
+					if(preg_match($leading_block_tag_open_regex, $string)) // Wrapped already?
+					{
+						if(preg_match($leading_block_container_tag_open_regex, $string))
+							return preg_replace($leading_block_container_tag_open_regex, '${1}'.$leader, $string);
+						return '<p>'.$leader.'</p>'.$string; // Best we can do; given the circumstance.
+					}
+				$inline_markup           = $string; // Initialize.
+				$markup_blocks_remaining = ''; // Initialize.
+
+				if($string_is_html) // Quick check; contains HTML markup?
+					if(($notice_markup_parts = preg_split($block_tag_open_regex, $string, 2, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)))
+					{
+						// We know the first part is NOT a block-level tag since the "leading" check above did not fire.
+						$inline_markup           = array_shift($notice_markup_parts); // First part; inline.
+						$markup_blocks_remaining = implode('', $notice_markup_parts); // Remaining parts.
+					}
+				return '<p>'.$leader.$inline_markup.'</p>'.$markup_blocks_remaining;
+			}
+
+			/**
 			 * Get first name from a full name, user, or email address.
 			 *
 			 * @since 141111 First documented version.
@@ -1236,6 +1288,17 @@ namespace comment_mail // Root namespace.
 				'tfoot',
 				'ul',
 				'video',
+			);
+
+			/**
+			 * @var array Block container tags.
+			 *    i.e. block tags that serve as inline containers.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			public $block_container_tags = array(
+				'p',
+				'div',
 			);
 		}
 	}
