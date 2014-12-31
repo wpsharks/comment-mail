@@ -140,10 +140,10 @@ namespace comment_mail // Root namespace.
 			 * @param string $sql Input SQL to check.
 			 *
 			 * @return string Output `$sql` w/ possible engine modification.
-			 *    Only MySQL v5.6+ supports fulltext indexes with the InnoDB engine.
+			 *    Only MySQL v5.6.4+ supports fulltext indexes with the InnoDB engine.
 			 *    Otherwise, we use MyISAM for any table that includes a fulltext index.
 			 *
-			 * @note MySQL v5.6+ supports fulltext indexes w/ InnoDB.
+			 * @note MySQL v5.6.4+ supports fulltext indexes w/ InnoDB.
 			 *    See: <http://bit.ly/ZVeF42>
 			 */
 			public function fulltext_compat($sql)
