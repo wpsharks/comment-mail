@@ -161,7 +161,7 @@ namespace comment_mail // Root namespace.
 					return $sql; // Not using InnoDB anyway.
 
 				$mysql_version = $this->wp->db_version();
-				if($mysql_version && version_compare($mysql_version, '5.6', '>='))
+				if($mysql_version && version_compare($mysql_version, '5.6.4', '>='))
 					return $sql; // MySQL v5.6+ supports fulltext indexes.
 
 				return preg_replace('/\bENGINE\=InnoDB\b/i', 'ENGINE=MyISAM', $sql);
