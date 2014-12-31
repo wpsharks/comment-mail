@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS `%%prefix%%queue_event_log` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key.',
-  `queue_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Queue entry ID from the `queue` table; at the time of the event. The entry may or may not still exist.',
-  `dby_queue_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Digested by queue entry ID from the `queue` table; at the time of the event. The entry may or may not still exist.',
-  `sub_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Subscription ID from the `subs` table; at the time of the event. The subscription may or may not still exist.',
-  `user_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'User ID from the `wp_users` table; at the time of the event, if applicable. The user may or may not still exist.',
-  `post_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Post ID from the `wp_posts` table; at the time of the event. The post may or may not still exist.',
-  `comment_parent_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Comment parent ID from the `wp_comments` table; at the time of the event, if applicable. The comment may or may not still exist.',
-  `comment_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Comment ID from the `wp_comments` table; at the time of the event, if applicable. The comment may or may not still exist.',
+  `queue_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Queue entry ID from the queue table; at the time of the event. The entry may or may not still exist.',
+  `dby_queue_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Digested by queue entry ID from the queue table; at the time of the event. The entry may or may not still exist.',
+  `sub_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Subscription ID from the subs table; at the time of the event. The subscription may or may not still exist.',
+  `user_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'User ID from the wp_users table; at the time of the event, if applicable. The user may or may not still exist.',
+  `post_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Post ID from the wp_posts table; at the time of the event. The post may or may not still exist.',
+  `comment_parent_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Comment parent ID from the wp_comments table; at the time of the event, if applicable. The comment may or may not still exist.',
+  `comment_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Comment ID from the wp_comments table; at the time of the event, if applicable. The comment may or may not still exist.',
   `fname` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Subscriber first name; at the time of the event.',
   `lname` varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Subscriber last name; at the time of the event.',
   `email` varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Subscriber email address; at the time of the event.',
@@ -17,6 +17,6 @@ CREATE TABLE IF NOT EXISTS `%%prefix%%queue_event_log` (
   `event` enum('invalidated', 'notified') COLLATE utf8_unicode_ci NOT NULL COMMENT 'Event type.',
   `note_code` varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Optional note during processing.',
   `time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Event time. Unix timestamp.',
-  PRIMARY KEY (`ID`) COMMENT 'Primary key.',
-  FULLTEXT KEY `fulltext_search` (`fname`,`lname`,`email`,`ip`) COMMENT 'Fulltext search index.'
+  PRIMARY KEY (`ID`),
+  FULLTEXT KEY `fulltext_search` (`fname`,`lname`,`email`,`ip`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
