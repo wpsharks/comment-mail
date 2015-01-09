@@ -88,11 +88,11 @@ namespace comment_mail
 			public $short_name = 'CM';
 
 			/**
-			 * Plugin name.
+			 * Site name.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @var string Plugin name.
+			 * @var string Site name.
 			 */
 			public $site_name = 'Comment-Mail.com';
 
