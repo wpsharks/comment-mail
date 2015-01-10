@@ -88,6 +88,15 @@ namespace comment_mail
 			public $short_name = 'CM';
 
 			/**
+			 * Query var prefix.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @var string Query var prefix.
+			 */
+			public $qv_prefix = 'cm_';
+
+			/**
 			 * Site name.
 			 *
 			 * @since 141111 First documented version.
@@ -1759,6 +1768,11 @@ namespace comment_mail
 			 * Front-Side Scripts
 			 */
 
+			/**
+			 * Enqueues front-side scripts.
+			 *
+			 * @since 141111 First documented version.
+			 */
 			public function enqueue_front_scripts()
 			{
 				new front_scripts();
