@@ -1772,6 +1772,8 @@ namespace comment_mail
 			 * Enqueues front-side scripts.
 			 *
 			 * @since 141111 First documented version.
+			 *
+			 * @attaches-to `wp_print_scripts` hook.
 			 */
 			public function enqueue_front_scripts()
 			{
