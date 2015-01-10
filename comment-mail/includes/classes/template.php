@@ -345,7 +345,7 @@ namespace comment_mail // Root namespace.
 						return file_get_contents($_dir.'/'.$this->file);
 				unset($_dir); // Housekeeping.
 
-				throw new \exception(sprintf(__('Missing template: `%1$s/%2$s`.', $this->plugin->text_domain), $this->type, $this->file));
+				throw new \exception(sprintf(__('Missing template: `type-%1$s/%2$s`.', $this->plugin->text_domain), $this->type, $this->file));
 			}
 
 			/**
