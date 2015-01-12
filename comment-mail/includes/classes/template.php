@@ -147,6 +147,9 @@ namespace comment_mail // Root namespace.
 
 				$this->current_vars = &$vars; // Setup current variables.
 
+				if($this->plugin->utils_fs->extension($this->file) !== 'php')
+					return trim($this->file_contents); // No evaluate.
+
 				return trim($this->plugin->utils_php->evaluate($this->file_contents, $vars));
 			}
 

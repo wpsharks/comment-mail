@@ -48,6 +48,20 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Lowercase file extension.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string $path Directory|file `/path`.
+			 *
+			 * @return string File extension (lowercase).
+			 */
+			public function extension($path)
+			{
+				return strtolower(ltrim((string)strrchr(basename((string)$path), '.'), '.'));
+			}
+
+			/**
 			 * Normalizes `/path` separators.
 			 *
 			 * @since 141111 First documented version.
