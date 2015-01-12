@@ -88,6 +88,15 @@ namespace comment_mail
 			public $short_name = 'CM';
 
 			/**
+			 * Transient prefix.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @var string Query var prefix.
+			 */
+			public $transient_prefix = 'cmtmail_';
+
+			/**
 			 * Query var prefix.
 			 *
 			 * @since 141111 First documented version.

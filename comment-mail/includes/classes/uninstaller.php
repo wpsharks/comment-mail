@@ -53,6 +53,7 @@ namespace comment_mail // Root namespace.
 				$this->delete_notices();
 				$this->delete_install_time();
 				$this->delete_option_keys();
+				$this->delete_transient_keys();
 				$this->delete_post_meta_keys();
 				$this->delete_user_meta_keys();
 				$this->clear_cron_hooks();
@@ -102,7 +103,7 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Delete option/transient keys.
+			 * Delete option keys.
 			 *
 			 * @since 141111 First documented version.
 			 */
@@ -111,9 +112,31 @@ namespace comment_mail // Root namespace.
 				$like = // e.g. Delete all keys LIKE `%comment\_mail%`.
 					'%'.$this->plugin->utils_db->wp->esc_like(__NAMESPACE__).'%';
 
-				$sql = // This will remove our transients also.
+				$sql = // This will remove any other option keys.
 					"DELETE FROM `".esc_sql($this->plugin->utils_db->wp->options)."`".
 					" WHERE `option_name` LIKE '".esc_sql($like)."'";
+
+				$this->plugin->utils_db->wp->query($sql);
+			}
+
+			/**
+			 * Delete transient keys.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected function delete_transient_keys()
+			{
+				$like1 = // e.g. Delete all keys LIKE `%\_transient\_cmtmail\_%`.
+					'%'.$this->plugin->utils_db->wp->esc_like('_transient_'.$this->plugin->transient_prefix).'%';
+
+				$like2 = // e.g. Delete all keys LIKE `%\_transient\_timeout\_cmtmail\_%`.
+					'%'.$this->plugin->utils_db->wp->esc_like('_transient_timeout_'.$this->plugin->transient_prefix).'%';
+
+				// Note: the above LIKE queries need to match `_site_transient_*` also; and they do.
+
+				$sql = // This will remove our transients/timeouts.
+					"DELETE FROM `".esc_sql($this->plugin->utils_db->wp->options)."`".
+					" WHERE `option_name` LIKE '".esc_sql($like1)."' OR `option_name` LIKE '".esc_sql($like2)."'";
 
 				$this->plugin->utils_db->wp->query($sql);
 			}
