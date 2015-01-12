@@ -79,7 +79,9 @@ namespace comment_mail // Root namespace.
 					$this->key = $this->plugin->utils_enc->uunnci_key_20_max();
 					$this->plugin->utils_enc->set_cookie(__NAMESPACE__.'_sso_key', $this->key, $this->ttl);
 				}
-				$this->transient = $this->plugin->transient_prefix.md5(__NAMESPACE__.'_sso_'.$this->key);
+				$this->key       = preg_replace('/[^a-z0-9]/i', '', $this->key);
+				$this->key       = substr($this->key, 0, 20); // 20 chars max.
+				$this->transient = $this->plugin->transient_prefix.'sso_key_'.$this->key;
 
 				if(!($this->data = get_transient($this->transient)))
 					$this->data = array(); // Initialize.

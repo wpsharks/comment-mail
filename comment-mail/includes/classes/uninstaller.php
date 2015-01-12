@@ -112,7 +112,7 @@ namespace comment_mail // Root namespace.
 				$like = // e.g. Delete all keys LIKE `%comment\_mail%`.
 					'%'.$this->plugin->utils_db->wp->esc_like(__NAMESPACE__).'%';
 
-				$sql = // This will remove any other option keys.
+				$sql = // Removes any other option keys for this plugin.
 					"DELETE FROM `".esc_sql($this->plugin->utils_db->wp->options)."`".
 					" WHERE `option_name` LIKE '".esc_sql($like)."'";
 

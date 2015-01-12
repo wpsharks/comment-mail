@@ -92,7 +92,7 @@ namespace comment_mail
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @var string Query var prefix.
+			 * @var string 8-character transient prefix.
 			 */
 			public $transient_prefix = 'cmtmail_';
 
