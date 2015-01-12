@@ -330,7 +330,7 @@ namespace comment_mail // Root namespace.
 				check_option_key: // Target point.
 
 				// e.g. type `a` for `site/comment-form/file.php`.
-				// becomes: `template__type_a__site__comment_form__file`.
+				// becomes: `template__type_a__site__comment_form__file___php`.
 				$option_key = static::data_option_key(array('type' => $this->type, 'file' => $this->file));
 
 				if(!empty($this->plugin->options[$option_key]))
@@ -383,7 +383,7 @@ namespace comment_mail // Root namespace.
 				check_option_key: // Target point.
 
 				// e.g. type `a` for `site/comment-form/snippet/file.php`.
-				// becomes: `template__type_a__site__comment_form__snipppet__file`.
+				// becomes: `template__type_a__site__comment_form__snipppet__file___php`.
 				$option_key = static::data_option_key(array('type' => $this->type, 'file' => $this->snippet_sub_dir.'/'.$file));
 
 				if(!empty($this->plugin->options[$option_key]))
@@ -427,8 +427,9 @@ namespace comment_mail // Root namespace.
 
 				$file = $option_key; // Initialize.
 				$file = preg_replace('/^template__type_.+?__/', '', $file);
-				$file = str_replace('_', '-', str_replace('__', '/', $file));
-				$file .= '.php'; // Add `.php` extension also.
+				$file = str_replace('___', '.', $file);
+				$file = str_replace('__', '/', $file);
+				$file = str_replace('_', '-', $file);
 
 				$file = $plugin->utils_string->trim_deep($file, '', '/');
 				$file = $plugin->utils_fs->n_seps($file);
@@ -463,7 +464,7 @@ namespace comment_mail // Root namespace.
 				$file = $plugin->utils_fs->n_seps($file);
 
 				$option_key = $file; // Initialize.
-				$option_key = preg_replace('/\.php$/i', '', $option_key);
+				$option_key = str_replace('.', '___', $option_key);
 				$option_key = str_replace('/', '__', $option_key);
 				$option_key = str_replace('-', '_', $option_key);
 				$option_key = 'template__type_'.$type.'__'.$option_key;
