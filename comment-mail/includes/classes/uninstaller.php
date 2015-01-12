@@ -52,6 +52,7 @@ namespace comment_mail // Root namespace.
 				$this->delete_options();
 				$this->delete_notices();
 				$this->delete_install_time();
+				$this->delete_option_keys();
 				$this->delete_post_meta_keys();
 				$this->delete_user_meta_keys();
 				$this->clear_cron_hooks();
@@ -98,6 +99,23 @@ namespace comment_mail // Root namespace.
 				wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_queue_processor');
 				wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_sub_cleaner');
 				wp_clear_scheduled_hook('_cron_'.__NAMESPACE__.'_log_cleaner');
+			}
+
+			/**
+			 * Delete option/transient keys.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected function delete_option_keys()
+			{
+				$like = // e.g. Delete all keys LIKE `%comment\_mail%`.
+					'%'.$this->plugin->utils_db->wp->esc_like(__NAMESPACE__).'%';
+
+				$sql = // This will remove our transients also.
+					"DELETE FROM `".esc_sql($this->plugin->utils_db->wp->options)."`".
+					" WHERE `option_name` LIKE '".esc_sql($like)."'";
+
+				$this->plugin->utils_db->wp->query($sql);
 			}
 
 			/**
