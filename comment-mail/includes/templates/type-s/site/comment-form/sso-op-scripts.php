@@ -9,10 +9,11 @@ namespace comment_mail;
  *    you may also use any WordPress functions that you like.
  */
 ?>
-
 <script type="text/javascript">
 	(function($) // Comment Mail™ SSO options.
 	{
+		'use strict'; // Strict standards.
+
 		$(document).ready(
 			function() // On DOM ready handler.
 			{
