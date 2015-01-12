@@ -29,6 +29,9 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
+				if(is_admin())
+					return; // Not applicable.
+
 				$this->maybe_enqueue_login_form_sso_scripts();
 				$this->maybe_enqueue_comment_form_sso_scripts();
 				$this->maybe_enqueue_comment_form_sub_scripts();
