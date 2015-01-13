@@ -210,6 +210,25 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Current path info; e.g. `index.php/path/info/`.
+			 *
+			 * @since 150113 First documented version.
+			 *
+			 * @return string Current path info; e.g. `index.php/path/info/`.
+			 */
+			public function current_path_info()
+			{
+				if(!is_null($path_info = &$this->static_key(__FUNCTION__)))
+					return $path_info; // Cached this already.
+
+				$path_info = isset($_SERVER['PATH_INFO']) ? (string)$_SERVER['PATH_INFO'] : '';
+				if(strpos($path_info, '?') !== FALSE) list($path_info) = explode('?', $path_info);
+				$path_info = $this->plugin->utils_string->trim($path_info, '', '/');
+
+				return ($path_info = str_replace('%', '%25', $path_info));
+			}
+
+			/**
 			 * Current URL; i.e. scheme.host.URI put together.
 			 *
 			 * @since 141111 First documented version.
