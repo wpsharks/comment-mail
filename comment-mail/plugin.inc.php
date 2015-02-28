@@ -851,6 +851,22 @@ namespace comment_mail
 			/**
 			 * Saves new plugin options.
 			 *
+			 * @since 150227 Improving GitHub API Recursion.
+			 *
+			 * @param array $options An array of new plugin options.
+			 */
+			public function options_quick_save(array $options)
+			{
+				$this->options = array_merge($this->default_options, $this->options, $options);
+				$this->options = array_intersect_key($this->options, $this->default_options);
+				$this->options = array_map('strval', $this->options); // Force strings.
+
+				update_option(__NAMESPACE__.'_options', $this->options); // DB update.
+			}
+
+			/**
+			 * Saves new plugin options.
+			 *
 			 * @since 141111 First documented version.
 			 *
 			 * @param array $options An array of new plugin options.
