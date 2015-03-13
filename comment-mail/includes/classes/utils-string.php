@@ -973,7 +973,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * A very simple markdown parser.
 			 *
-			 * @since 141111 First documented version.
+			 * @since 150113 First documented version.
 			 *
 			 * @param string $string Input string to convert.
 			 * @param array  $args Any additional behavioral args.
@@ -986,20 +986,41 @@ namespace comment_mail // Root namespace.
 					return $string; // Not possible.
 
 				$default_args = array(
-					'no_p' => FALSE,
+					'oembed' => FALSE,
+					'breaks' => TRUE,
+					'no_p'   => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$no_p = (boolean)$args['no_p'];
+				$oembed = (boolean)$args['oembed'];
+				$breaks = (boolean)$args['breaks'];
+				$no_p   = (boolean)$args['no_p'];
 
+				if($oembed && strpos($string, '://') !== FALSE)
+				{
+					$_spcsm           = $this->spcsm_tokens($string, array(), __FUNCTION__);
+					$_oembed_args     = array_merge(wp_embed_defaults(), array('discover' => FALSE));
+					$_spcsm['string'] = preg_replace_callback('/^\s*(https?:\/\/[^\s"]+)\s*$/im', function ($m) use ($_oembed_args)
+					{
+						$oembed = wp_oembed_get($m[1], $_oembed_args);
+						return $oembed ? $oembed : $m[0];
+					}, $_spcsm['string']);
+					$string           = $this->spcsm_restore($_spcsm);
+
+					unset($_spcsm, $_oembed_args); // Housekeeping.
+				}
 				if(!class_exists('\\Parsedown')) // Need Parsedown class here.
 					require_once dirname(dirname(dirname(__FILE__))).'/submodules/parsedown/Parsedown.php';
 
-				if(is_null($parsedown = &$this->cache_key(__FUNCTION__, 'parsedown')))
-					/** @var $parsedown \Parsedown Reference for IDEs. */
-					$parsedown = new \Parsedown(); // Single instance.
+				if(!class_exists('\\ParsedownExtra')) // Need Parsedown Extra class here.
+					require_once dirname(dirname(dirname(__FILE__))).'/submodules/parsedown-extra/ParsedownExtra.php';
 
+				if(is_null($parsedown = &$this->cache_key(__FUNCTION__, 'parsedown')))
+					/** @var $parsedown \ParsedownExtra Reference for IDEs. */
+					$parsedown = new \ParsedownExtra(); // Singleton.
+
+				$parsedown->setBreaksEnabled($breaks);
 				$html = $parsedown->text($string);
 
 				if($no_p) // Remove `<p></p>` wrap?
@@ -1075,6 +1096,180 @@ namespace comment_mail // Root namespace.
 						$markup_blocks_remaining = implode('', $notice_markup_parts); // Remaining parts.
 					}
 				return '<p>'.$leader.$inline_markup.'</p>'.$markup_blocks_remaining;
+			}
+
+			/**
+			 * Shortcode/pre/code/samp/MD tokens.
+			 *
+			 * @param string $string Input string to tokenize.
+			 * @param array  $tokenize_only Can be used to limit what is tokenized.
+			 * @param string $marker Optional marker suffix.
+			 *
+			 * @return array Array with: `string`, `tokens`, `marker`.
+			 */
+			public function spcsm_tokens($string, array $tokenize_only = array(), $marker = '')
+			{
+				$marker = str_replace('.', '', uniqid('', TRUE)).
+				          ($marker ? sha1($marker) : '');
+
+				if(!($string = trim((string)$string))) // Nothing to tokenize.
+					return array('string' => $string, 'tokens' => array(), 'marker' => $marker);
+
+				$spcsm = // Convert string to an array w/ token details.
+					array('string' => $string, 'tokens' => array(), 'marker' => $marker);
+
+				shortcodes: // Target point; `[shortcode][/shortcode]`.
+
+				if($tokenize_only && !in_array('shortcodes', $tokenize_only, TRUE))
+					goto pre; // Not tokenizing these.
+
+				if(empty($GLOBALS['shortcode_tags']) || strpos($spcsm['string'], '[') === FALSE)
+					goto pre; // No `[` shortcodes.
+
+				$spcsm['string'] = preg_replace_callback('/'.get_shortcode_regex().'/s', function ($m) use (&$spcsm)
+				{
+					$spcsm['tokens'][] = $m[0]; // Tokenize.
+					return '%#%spcsm-'.$spcsm['marker'].'-'.(count($spcsm['tokens']) - 1).'%#%'; #
+
+				}, $spcsm['string']); // Shortcodes replaced by tokens.
+
+				pre: // Target point; HTML `<pre>` tags.
+
+				if($tokenize_only && !in_array('pre', $tokenize_only, TRUE))
+					goto code; // Not tokenizing these.
+
+				if(stripos($spcsm['string'], '<pre') === FALSE)
+					goto code; // Nothing to tokenize here.
+
+				$pre = // HTML `<pre>` tags.
+					'/(?P<tag_open_bracket>\<)'. // Opening `<` bracket.
+					'(?P<tag_open_name>pre)'. // Tag name; e.g. a `pre` tag.
+					'(?P<tag_open_attrs_bracket>\>|\s+[^>]*\>)'. // Attributes & `>`.
+					'(?P<tag_contents>.*?)'. // Tag contents (multiline possible).
+					'(?P<tag_close>\<\/\\2\>)/is'; // e.g. closing `</pre>` tag.
+
+				$spcsm['string'] = preg_replace_callback($pre, function ($m) use (&$spcsm)
+				{
+					$spcsm['tokens'][] = $m[0]; // Tokenize.
+					return '%#%spcsm-'.$spcsm['marker'].'-'.(count($spcsm['tokens']) - 1).'%#%'; #
+
+				}, $spcsm['string']); // Tags replaced by tokens.
+
+				code: // Target point; HTML `<code>` tags.
+
+				if($tokenize_only && !in_array('code', $tokenize_only, TRUE))
+					goto samp; // Not tokenizing these.
+
+				if(stripos($spcsm['string'], '<code') === FALSE)
+					goto samp; // Nothing to tokenize here.
+
+				$code = // HTML `<code>` tags.
+					'/(?P<tag_open_bracket>\<)'. // Opening `<` bracket.
+					'(?P<tag_open_name>code)'. // Tag name; e.g. a `code` tag.
+					'(?P<tag_open_attrs_bracket>\>|\s+[^>]*\>)'. // Attributes & `>`.
+					'(?P<tag_contents>.*?)'. // Tag contents (multiline possible).
+					'(?P<tag_close>\<\/\\2\>)/is'; // e.g. closing `</code>` tag.
+
+				$spcsm['string'] = preg_replace_callback($code, function ($m) use (&$spcsm)
+				{
+					$spcsm['tokens'][] = $m[0]; // Tokenize.
+					return '%#%spcsm-'.$spcsm['marker'].'-'.(count($spcsm['tokens']) - 1).'%#%'; #
+
+				}, $spcsm['string']); // Tags replaced by tokens.
+
+				samp: // Target point; HTML `<samp>` tags.
+
+				if($tokenize_only && !in_array('samp', $tokenize_only, TRUE))
+					goto md_fences; // Not tokenizing these.
+
+				if(stripos($spcsm['string'], '<samp') === FALSE)
+					goto md_fences; // Nothing to tokenize here.
+
+				$samp = // HTML `<samp>` tags.
+					'/(?P<tag_open_bracket>\<)'. // Opening `<` bracket.
+					'(?P<tag_open_name>samp)'. // Tag name; e.g. a `samp` tag.
+					'(?P<tag_open_attrs_bracket>\>|\s+[^>]*\>)'. // Attributes & `>`.
+					'(?P<tag_contents>.*?)'. // Tag contents (multiline possible).
+					'(?P<tag_close>\<\/\\2\>)/is'; // e.g. closing `</samp>` tag.
+
+				$spcsm['string'] = preg_replace_callback($samp, function ($m) use (&$spcsm)
+				{
+					$spcsm['tokens'][] = $m[0]; // Tokenize.
+					return '%#%spcsm-'.$spcsm['marker'].'-'.(count($spcsm['tokens']) - 1).'%#%'; #
+
+				}, $spcsm['string']); // Tags replaced by tokens.
+
+				md_fences: // Target point; Markdown pre/code fences.
+
+				if($tokenize_only && !in_array('md_fences', $tokenize_only, TRUE))
+					goto md_links; // Not tokenizing these.
+
+				if(strpos($spcsm['string'], '~') === FALSE && strpos($spcsm['string'], '`') === FALSE)
+					goto md_links; // Nothing to tokenize here.
+
+				$md_fences = // Markdown pre/code fences.
+					'/(?P<fence_open>~{3,}|`{3,}|`)'. // Opening fence.
+					'(?P<fence_contents>.*?)'. // Contents (multiline possible).
+					'(?P<fence_close>\\1)/is'; // Closing fence; ~~~, ```, `.
+
+				$spcsm['string'] = preg_replace_callback($md_fences, function ($m) use (&$spcsm)
+				{
+					$spcsm['tokens'][] = $m[0]; // Tokenize.
+					return '%#%spcsm-'.$spcsm['marker'].'-'.(count($spcsm['tokens']) - 1).'%#%'; #
+
+				}, $spcsm['string']); // Fences replaced by tokens.
+
+				md_links: // Target point; [Markdown](links).
+				// This also tokenizes [Markdown]: <link> "definitions".
+				// This routine includes considerations for images also.
+
+				// NOTE: The tokenizer does NOT deal with links that reference definitions, as this is not necessary.
+				//    So, while we DO tokenize <link> "definitions" themselves, the [actual][references] to
+				//    these definitions do not need to be tokenized; i.e. it is not necessary here.
+
+				if($tokenize_only && !in_array('md_links', $tokenize_only, TRUE))
+					goto finale; // Not tokenizing these.
+
+				$spcsm['string'] = preg_replace_callback(array('/^[ ]*(?:\[[^\]]+\])+[ ]*\:[ ]*(?:\<[^>]+\>|\S+)(?:[ ]+.+)?$/m',
+				                                               '/\!?\[(?:(?R)|[^\]]*)\]\([^)]+\)(?:\{[^}]*\})?/'), function ($m) use (&$spcsm)
+				{
+					$spcsm['tokens'][] = $m[0]; // Tokenize.
+					return '%#%spcsm-'.$spcsm['marker'].'-'.(count($spcsm['tokens']) - 1).'%#%'; #
+
+				}, $spcsm['string']); // Shortcodes replaced by tokens.
+
+				finale: // Target point; grand finale (return).
+
+				return $spcsm; // Array w/ string, tokens, and marker.
+			}
+
+			/**
+			 * Shortcode/pre/code/samp/MD restoration.
+			 *
+			 * @param array $spcsm `string`, `tokens`, `marker`.
+			 *
+			 * @return string The `string` w/ tokens restored now.
+			 */
+			public function spcsm_restore(array $spcsm)
+			{
+				if(!isset($spcsm['string']))
+					return ''; // Not possible.
+
+				if(!($string = trim((string)$spcsm['string'])))
+					return $string; // Nothing to restore.
+
+				$tokens = isset($spcsm['tokens']) ? (array)$spcsm['tokens'] : array();
+				$marker = isset($spcsm['marker']) ? (string)$spcsm['marker'] : '';
+
+				if(!$tokens || !$marker || strpos($string, '%#%') === FALSE)
+					return $string; // Nothing to restore in this case.
+
+				foreach(array_reverse($tokens, TRUE) as $_token => $_value)
+					$string = str_replace('%#%spcsm-'.$marker.'-'.$_token.'%#%', $_value, $string);
+				// Must go in reverse order so nested tokens unfold properly.
+				unset($_token, $_value); // Housekeeping.
+
+				return $string; // Restoration complete.
 			}
 
 			/**
