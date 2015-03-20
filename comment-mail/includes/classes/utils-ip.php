@@ -49,6 +49,7 @@ namespace comment_mail // Root namespace.
 						return ($ip = $REMOTE_ADDR);
 
 				$sources = array(
+					'HTTP_CF_CONNECTING_IP',
 					'HTTP_CLIENT_IP',
 					'HTTP_X_FORWARDED_FOR',
 					'HTTP_X_FORWARDED',
