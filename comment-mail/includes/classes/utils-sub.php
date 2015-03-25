@@ -841,7 +841,8 @@ namespace comment_mail // Root namespace.
 				if(!is_null($user_id_emails = &$this->cache_key(__FUNCTION__, $sub_email)) && !$no_cache)
 					return $user_id_emails; // Already cached this.
 
-				$user_ids = $this->email_user_ids($sub_email, $no_cache);
+				if(!($user_ids = $this->email_user_ids($sub_email, $no_cache)))
+					return ($user_id_emails = array($sub_email));
 
 				$sql = "SELECT DISTINCT `email` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 				       " WHERE `user_id` IN('".implode("','", array_map('esc_sql', $user_ids))."')";
