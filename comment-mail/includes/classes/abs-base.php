@@ -107,7 +107,7 @@ namespace comment_mail // Root namespace.
 				if(is_object($this->___overload) && property_exists($this->___overload, $property))
 					return $this->___overload->{$property};
 
-				throw new \exception(__('Undefined overload property.', $this->plugin->text_domain));
+				throw new \exception(sprintf(__('Undefined overload property: `%1$s`.', $this->plugin->text_domain), $property));
 			}
 
 			/**
@@ -125,7 +125,7 @@ namespace comment_mail // Root namespace.
 			{
 				$property = (string)$property; // Force string.
 
-				throw new \exception(__('Refused to set overload property.', $this->plugin->text_domain));
+				throw new \exception(sprintf(__('Refused to set overload property: `%1$s`.', $this->plugin->text_domain), $property));
 			}
 
 			/**
@@ -142,7 +142,7 @@ namespace comment_mail // Root namespace.
 			{
 				$property = (string)$property; // Force string.
 
-				throw new \exception(__('Refused to unset overload property.', $this->plugin->text_domain));
+				throw new \exception(sprintf(__('Refused to unset overload property: `%1$s`.', $this->plugin->text_domain), $property));
 			}
 
 			/*

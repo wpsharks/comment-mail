@@ -867,6 +867,49 @@ namespace comment_mail // Root namespace.
 
 				return $path;
 			}
+
+			/**
+			 * Fills menu page inline SVG icon color.
+			 *
+			 * @param string $svg Inline SVG icon markup.
+			 *
+			 * @return string Inline SVG icon markup.
+			 */
+			public function color_svg_menu_icon($svg)
+			{
+				if(!($color = get_user_option('admin_color')))
+					$color = 'fresh'; // Default color scheme.
+
+				if(empty($this->wp_admin_icon_colors[$color]))
+					return $svg; // Not possible.
+
+				$icon_colors         = $this->wp_admin_icon_colors[$color];
+				$use_icon_fill_color = $icon_colors['base']; // Default base.
+
+				if($this->plugin->utils_env->is_menu_page(__NAMESPACE__.'*'))
+					$use_icon_fill_color = $icon_colors['current'];
+
+				return str_replace(' fill="currentColor"', ' fill="'.esc_attr($use_icon_fill_color).'"', $svg);
+			}
+
+			/**
+			 * WordPress admin icon color schemes.
+			 *
+			 * @var array WP admin icon colors.
+			 *
+			 * @note These must be hard-coded, because they don't become available
+			 *    in core until `admin_init`; i.e., too late for `admin_menu`.
+			 */
+			public $wp_admin_icon_colors = array(
+				'fresh'     => array('base' => '#999999', 'focus' => '#2EA2CC', 'current' => '#FFFFFF'),
+				'light'     => array('base' => '#999999', 'focus' => '#CCCCCC', 'current' => '#CCCCCC'),
+				'blue'      => array('base' => '#E5F8FF', 'focus' => '#FFFFFF', 'current' => '#FFFFFF'),
+				'midnight'  => array('base' => '#F1F2F3', 'focus' => '#FFFFFF', 'current' => '#FFFFFF'),
+				'sunrise'   => array('base' => '#F3F1F1', 'focus' => '#FFFFFF', 'current' => '#FFFFFF'),
+				'ectoplasm' => array('base' => '#ECE6F6', 'focus' => '#FFFFFF', 'current' => '#FFFFFF'),
+				'ocean'     => array('base' => '#F2FCFF', 'focus' => '#FFFFFF', 'current' => '#FFFFFF'),
+				'coffee'    => array('base' => '#F3F2F1', 'focus' => '#FFFFFF', 'current' => '#FFFFFF'),
+			);
 		}
 	}
 }
