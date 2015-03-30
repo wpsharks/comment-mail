@@ -1,6 +1,3 @@
-[submodule "comment-mail-pro"]
-	path = comment-mail-pro
-	url = https://github.com/websharks/comment-mail-pro
 [submodule "comment-mail/submodules/wp-php-rv"]
 	path = comment-mail/submodules/wp-php-rv
 	url = https://github.com/websharks/wp-php-rv
