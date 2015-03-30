@@ -31,6 +31,25 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Finds a writable tmp directory.
+			 *
+			 * @since 150329 Improving tmp directory detection.
+			 *
+			 * @return string Writable tmp directory.
+			 *
+			 * @throws \exception On any failure.
+			 */
+			public function tmp_dir()
+			{
+				$tmp_dir = $this->n_seps(get_temp_dir());
+
+				if(!$tmp_dir || !@is_dir($tmp_dir) || !@is_writable($tmp_dir))
+					throw new \exception(__('Unable to find a writable tmp directory.', $this->plugin->text_domain));
+
+				return $tmp_dir; // Writable tmp directory.
+			}
+
+			/**
 			 * Adds tmp suffix to a directory|file `/path`.
 			 *
 			 * @since 141111 First documented version.
