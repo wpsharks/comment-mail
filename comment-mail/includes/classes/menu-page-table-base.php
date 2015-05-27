@@ -70,6 +70,13 @@ namespace comment_mail // Root namespace.
 			protected $sub_ids_regex;
 
 			/**
+			 * @var string Regex for sub emails.
+			 *
+			 * @since 150527 Bug fix; missing property.
+			 */
+			protected $sub_emails_regex;
+
+			/**
 			 * @var string Regex for user IDs.
 			 *
 			 * @since 141111 First documented version.
