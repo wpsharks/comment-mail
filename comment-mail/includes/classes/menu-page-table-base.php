@@ -1860,7 +1860,7 @@ namespace comment_mail // Root namespace.
 				parent::search_box($text, $input_id);
 				$search_box = ob_get_clean();
 
-				$regex = '/\bname\s*\=\s*(["\']).*?\\1\s+id\s*\=\s*(["\'])search\-submit\\2/i';
+				$regex = '/\b(?:name\s*\=\s*(["\']).*?\\1\s+)?id\s*\=\s*(["\'])search\-submit\\2/i';
 
 				if($search_box) // Only if there is a search box; it doesn't always display.
 					if(!($search_box = preg_replace($regex, 'name="search-submit" id="search-submit"', $search_box, 1, $replacements)) || !$replacements)
