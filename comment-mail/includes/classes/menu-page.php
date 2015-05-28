@@ -1637,29 +1637,31 @@ namespace comment_mail // Root namespace.
 
 				/* ----------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->select_row(
-					               array(
-						               'label'           => sprintf(__('Simple Templates or Advanced PHP Templates?', $this->plugin->text_domain), esc_html($this->plugin->name)),
-						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						               'name'            => 'template_type',
-						               'current_value'   => $current_value_for('template_type'),
-						               'allow_arbitrary' => FALSE,
-						               'options'         => array(
-							               's' => __('Simple shortcode templates (default; easiest to work with)', $this->plugin->text_domain),
-							               'a' => __('Advanced PHP-based templates (for developers and advanced site owners)', $this->plugin->text_domain),
-						               ),
-						               'notes_after'     => '<p>'.__('<strong>Note:</strong> If you change this setting, any template customizations that you\'ve made in one mode, will need to be done again for the new mode that you select; i.e. when this setting is changed, a new set of templates is loaded for the mode you select. You can always switch back though, and any changes that you made in the previous mode will be restored automatically.', $this->plugin->text_domain).'</p>'.
-						                                    '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Tip:</strong> You\'ll notice that by changing this setting, all of the customizable templates in %1$s will be impacted; i.e. when you select %2$s or %3$s from the menu at the top, a new set of templates will load-up; based on the mode that you choose here. You can also switch modes <em>while</em> you\'re editing templates (see: %2$s and/or %3$s). That will impact this setting in the exact same way. Change it here or change it there, no difference.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor($this->plugin->utils_url->email_templates_menu_page_only(), __('Email Templates', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor($this->plugin->utils_url->site_templates_menu_page_only(), __('Site Templates', $this->plugin->text_domain))).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+				if($this->plugin->is_pro || $this->plugin->utils_env->is_pro_preview())
+				{
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->select_row(
+						               array(
+							               'label'           => sprintf(__('Simple Templates or Advanced PHP Templates?', $this->plugin->text_domain), esc_html($this->plugin->name)),
+							               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							               'name'            => 'template_type',
+							               'current_value'   => $current_value_for('template_type'),
+							               'allow_arbitrary' => FALSE,
+							               'options'         => array(
+								               's' => __('Simple shortcode templates (default; easiest to work with)', $this->plugin->text_domain),
+								               'a' => __('Advanced PHP-based templates (for developers and advanced site owners)', $this->plugin->text_domain),
+							               ),
+							               'notes_after'     => '<p>'.__('<strong>Note:</strong> If you change this setting, any template customizations that you\'ve made in one mode, will need to be done again for the new mode that you select; i.e. when this setting is changed, a new set of templates is loaded for the mode you select. You can always switch back though, and any changes that you made in the previous mode will be restored automatically.', $this->plugin->text_domain).'</p>'.
+							                                    '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Tip:</strong> You\'ll notice that by changing this setting, all of the customizable templates in %1$s will be impacted; i.e. when you select %2$s or %3$s from the menu at the top, a new set of templates will load-up; based on the mode that you choose here. You can also switch modes <em>while</em> you\'re editing templates (see: %2$s and/or %3$s). That will impact this setting in the exact same way. Change it here or change it there, no difference.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor($this->plugin->utils_url->email_templates_menu_page_only(), __('Email Templates', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor($this->plugin->utils_url->site_templates_menu_page_only(), __('Site Templates', $this->plugin->text_domain))).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				echo $this->panel(__('Template-Related Settings', $this->plugin->text_domain), $_panel_body, array());
+					echo $this->panel(__('Template-Related Settings', $this->plugin->text_domain), $_panel_body, array('pro_only' => TRUE));
 
-				unset($_panel_body); // Housekeeping.
-
+					unset($_panel_body); // Housekeeping.
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
 				$_panel_body = '<table>'.
