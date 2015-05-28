@@ -1424,53 +1424,55 @@ namespace comment_mail // Root namespace.
 
 				/* ----------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->input_row(
-					               array(
-						               'type'          => 'number',
-						               'label'         => __('Max Execution Time (In Seconds)', $this->plugin->text_domain),
-						               'placeholder'   => __('e.g. 30', $this->plugin->text_domain),
-						               'name'          => 'sub_cleaner_max_time',
-						               'current_value' => $current_value_for('sub_cleaner_max_time'),
-						               'other_attrs'   => 'min="10" max="3600"',
-						               'notes_after'   => '<p>'.sprintf(__('The Subscription Cleaner automatically deletes unconfirmed and trashed subscriptions. It runs via %1$s every hour. This setting determines how much time you want to allow each cleaning process to run for. The minimum allowed value is <code>10</code> seconds. Maximum allowed value is <code>3600</code> seconds. A good default value is <code>30</code> seconds. That\'s more than adequate for most sites.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://www.smashingmagazine.com/2013/10/16/schedule-events-using-wordpress-cron/', 'WP-Cron')).'</p>'
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+				if($this->plugin->is_pro || $this->plugin->utils_env->is_pro_preview())
+				{
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->input_row(
+						               array(
+							               'type'          => 'number',
+							               'label'         => __('Max Execution Time (In Seconds)', $this->plugin->text_domain),
+							               'placeholder'   => __('e.g. 30', $this->plugin->text_domain),
+							               'name'          => 'sub_cleaner_max_time',
+							               'current_value' => $current_value_for('sub_cleaner_max_time'),
+							               'other_attrs'   => 'min="10" max="3600"',
+							               'notes_after'   => '<p>'.sprintf(__('The Subscription Cleaner automatically deletes unconfirmed and trashed subscriptions. It runs via %1$s every hour. This setting determines how much time you want to allow each cleaning process to run for. The minimum allowed value is <code>10</code> seconds. Maximum allowed value is <code>3600</code> seconds. A good default value is <code>30</code> seconds. That\'s more than adequate for most sites.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://www.smashingmagazine.com/2013/10/16/schedule-events-using-wordpress-cron/', 'WP-Cron')).'</p>'
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				$_panel_body .= '<table>'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'label'         => sprintf(__('Unconfirmed Expiration Time (<code>%1$s</code> Compatible)', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')),
-						                'placeholder'   => __('e.g. 60 days', $this->plugin->text_domain),
-						                'name'          => 'unconfirmed_expiration_time',
-						                'current_value' => $current_value_for('unconfirmed_expiration_time'),
-						                'notes_after'   => '<p>'.sprintf(__('How long should unconfirmed subscriptions be kept in the database? e.g. <code>2 days</code>, <code>1 week</code>, <code>2 months</code>. Anything compatible with PHP\'s <code>%1$s</code> function will work here.', $this->plugin->text_domain).'</p>'.
-						                                                 '<p class="pmp-note pmp-info">'.__('If you empty this field, unconfirmed subscriptions will not be cleaned, they will remain indefinitely.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')).'</p>'
-					                )).
-				                '  </tbody>'.
-				                '</table>';
+					$_panel_body .= '<table>'.
+					                '  <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'label'         => sprintf(__('Unconfirmed Expiration Time (<code>%1$s</code> Compatible)', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')),
+							                'placeholder'   => __('e.g. 60 days', $this->plugin->text_domain),
+							                'name'          => 'unconfirmed_expiration_time',
+							                'current_value' => $current_value_for('unconfirmed_expiration_time'),
+							                'notes_after'   => '<p>'.sprintf(__('How long should unconfirmed subscriptions be kept in the database? e.g. <code>2 days</code>, <code>1 week</code>, <code>2 months</code>. Anything compatible with PHP\'s <code>%1$s</code> function will work here.', $this->plugin->text_domain).'</p>'.
+							                                                 '<p class="pmp-note pmp-info">'.__('If you empty this field, unconfirmed subscriptions will not be cleaned, they will remain indefinitely.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')).'</p>'
+						                )).
+					                '  </tbody>'.
+					                '</table>';
 
-				$_panel_body .= '<table>'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'label'         => sprintf(__('Trash Expiration Time (<code>%1$s</code> Compatible)', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')),
-						                'placeholder'   => __('e.g. 60 days', $this->plugin->text_domain),
-						                'name'          => 'trashed_expiration_time',
-						                'current_value' => $current_value_for('trashed_expiration_time'),
-						                'notes_after'   => '<p>'.sprintf(__('How long should trashed subscriptions be kept in the database? e.g. <code>2 days</code>, <code>1 week</code>, <code>2 months</code>. Anything compatible with PHP\'s <code>%1$s</code> function will work here.', $this->plugin->text_domain).'</p>'.
-						                                                 '<p class="pmp-note pmp-info">'.__('If you empty this field, trashed subscriptions will not be cleaned, they will remain indefinitely.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')).'</p>'
-					                )).
-				                '  </tbody>'.
-				                '</table>';
+					$_panel_body .= '<table>'.
+					                '  <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'label'         => sprintf(__('Trash Expiration Time (<code>%1$s</code> Compatible)', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')),
+							                'placeholder'   => __('e.g. 60 days', $this->plugin->text_domain),
+							                'name'          => 'trashed_expiration_time',
+							                'current_value' => $current_value_for('trashed_expiration_time'),
+							                'notes_after'   => '<p>'.sprintf(__('How long should trashed subscriptions be kept in the database? e.g. <code>2 days</code>, <code>1 week</code>, <code>2 months</code>. Anything compatible with PHP\'s <code>%1$s</code> function will work here.', $this->plugin->text_domain).'</p>'.
+							                                                 '<p class="pmp-note pmp-info">'.__('If you empty this field, trashed subscriptions will not be cleaned, they will remain indefinitely.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')).'</p>'
+						                )).
+					                '  </tbody>'.
+					                '</table>';
 
-				echo $this->panel(__('Sub. Cleaner Adjustments', $this->plugin->text_domain), $_panel_body, array());
+					echo $this->panel(__('Sub. Cleaner Adjustments', $this->plugin->text_domain), $_panel_body, array('pro_only' => FALSE));
 
-				unset($_panel_body); // Housekeeping.
-
+					unset($_panel_body); // Housekeeping.
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
 				$_panel_body = '<table>'.
