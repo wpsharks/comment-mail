@@ -8,6 +8,7 @@
  */
 namespace comment_mail // Root namespace.
 {
+
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
@@ -76,19 +77,6 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * `TRUE` if we can send mail via SMTP.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @return boolean `TRUE` if we can send mail via SMTP.
-			 */
-			public function is_smtp_enabled()
-			{
-				return $this->plugin->options['smtp_enable'] // Enabled & configured?
-				       && $this->plugin->options['smtp_host'] && $this->plugin->options['smtp_port'];
-			}
-
-			/**
 			 * Does a particular header already exist?
 			 *
 			 * @since 141111 First documented version.
@@ -142,14 +130,6 @@ namespace comment_mail // Root namespace.
 			 */
 			public function send($to, $subject, $message, $headers = array(), $attachments = array(), $throw = FALSE)
 			{
-				if($this->is_smtp_enabled()) // Can use SMTP; i.e. enabled?
-				{
-					if(is_null($mail_smtp = &$this->cache_key(__FUNCTION__, 'mail_smtp')))
-						/** @var $mail_smtp mail_smtp Reference for IDEs. */
-						$mail_smtp = new mail_smtp(); // Single instance.
-
-					return $mail_smtp->send($to, $subject, $message, $headers, $attachments, $throw);
-				}
 				if(!is_array($headers)) // Force array.
 					$headers = explode("\r\n", (string)$headers);
 
@@ -194,9 +174,6 @@ namespace comment_mail // Root namespace.
 			 */
 			public function test($to, $subject, $message, $headers = array(), $attachments = array())
 			{
-				if($this->is_smtp_enabled()) // Can use SMTP; i.e. enabled?
-					return $this->smtp_test($to, $subject, $message, $headers, $attachments);
-
 				$to = array_map('strval', (array)$to); // Force array.
 
 				$via  = 'wp_mail'; // Via `wp_mail` in this case.
@@ -245,49 +222,6 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * SMTP mail testing utility.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @note This method always (ALWAYS) sends email in HTML format;
-			 *    w/ a plain text alternative — generated automatically.
-			 *
-			 * @param string|array $to Email address(es).
-			 * @param string       $subject Email subject line.
-			 * @param string       $message Message contents.
-			 * @param string|array $headers Optional. Additional headers.
-			 * @param string|array $attachments Optional. Files to attach.
-			 *
-			 * @return \stdClass With the following properties:
-			 *
-			 *    • `to` = addresses the test was sent to; as an array.
-			 *    • `via` = the transport layer used in the test; as a string.
-			 *    • `sent` = `TRUE` if the email was sent successfully; as a boolean.
-			 *    • `debug_output_markup` = HTML markup w/ any debugging output; as a string.
-			 *    • `results_markup` = Markup with all of the above in test response format; as a string.
-			 */
-			public function smtp_test($to, $subject, $message, $headers = array(), $attachments = array())
-			{
-				$to = array_map('strval', (array)$to); // Force array.
-
-				$via  = 'smtp'; // Via SMTP in this case.
-				$sent = FALSE; // Initialize as `FALSE`.
-
-				if($this->is_smtp_enabled()) // Can use SMTP; i.e. enabled?
-				{
-					$mail_smtp = new mail_smtp(TRUE); // Single instance w/ debugging.
-
-					$sent                = $mail_smtp->send($to, $subject, $message, $headers, $attachments);
-					$debug_output_markup = $this->plugin->utils_string->trim_html($mail_smtp->debug_output_markup());
-				}
-				else $debug_output_markup = __('Complete failure; configuration incomplete.', $this->plugin->text_domain);
-
-				$results_markup = $this->test_results_markup($to, $via, $sent, $debug_output_markup);
-
-				return (object)compact('to', 'via', 'sent', 'debug_output_markup', 'results_markup');
-			}
-
-			/**
 			 * Test results formatter.
 			 *
 			 * @since 141111 First documented version.
@@ -313,9 +247,6 @@ namespace comment_mail // Root namespace.
 
 				if($via === 'wp_mail') // Convert this to HTML markup.
 					$via_markup = $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/functions/wp_mail/', 'wp_mail');
-
-				else if($via === 'smtp') // Convert this to HTML markup.
-					$via_markup = $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol', 'SMTP');
 
 				else $via_markup = esc_html($via); // Convert this to HTML markup.
 

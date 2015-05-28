@@ -738,198 +738,200 @@ namespace comment_mail // Root namespace.
 
 				/* ----------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table style="margin:0;">'.
-				               ' <tbody>'.
-				               $form_fields->select_row(
-					               array(
-						               'label'           => __('Enable SMTP Integration?', $this->plugin->text_domain),
-						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						               'field_class'     => 'pmp-if-change', // JS change handler.
-						               'name'            => 'smtp_enable',
-						               'current_value'   => $current_value_for('smtp_enable'),
-						               'allow_arbitrary' => FALSE, // Must be one of these.
-						               'options'         => array(
-							               '0' => __('No, use the wp_mail function (default behavior)', $this->plugin->text_domain),
-							               '1' => __('Yes, integrate w/ an SMTP server of my choosing (as configured below)', $this->plugin->text_domain),
-						               ),
-						               'notes_after'     => '<div class="pmp-if-enabled-show">'.
-						                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('When SMTP Server Integration is enabled:', $this->plugin->text_domain).'</p>'.
-						                                    '   <ul class="pmp-list-items">'.
-						                                    '      <li>'.sprintf(__('Instead of using the default <code>%2$s</code> function, %1$s will send email confirmation requests &amp; comment/reply notifications through an SMTP server of your choosing; i.e. all email processed by %1$s will be routed through an SMTP server that you\'ve dedicated to comment subscriptions. This is highly recommended, since it can significantly improve the deliverability rate of emails that are sent by %1$s. In addition, it may also speed up your site (i.e. reduce the burden on your own web server). This is because an SMTP host is generally associated with an external server that is dedicated to email processing.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/functions/wp_mail/', 'wp_mail')).'</li>'.
-						                                    '      <li>'.sprintf(__('Instead of using the <code>%3$s</code>, <code>%4$s</code>, and <code>%2$s</code> email message headers configured elsewhere in %1$s, the values that you configure for the SMTP server will be used instead; i.e. what you configure here will override other email header options in %1$s. This allows you to be specific about what message headers are passed through your SMTP server whenever SMTP functionality is enabled. <strong>With one exception.</strong> If you happen to enable the %1$s&trade; RVE handler (Replies via Email), the SMTP <code>Reply-To</code> header is ignored in favor of the <code>Reply-To</code> address configured for the %1$s&trade; RVE handler. If RVE is enabled, the <code>Reply-To</code> address for the RVE handler receives precedence always.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</li>'.
-						                                    '   </ul>'.
-						                                    '  <p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> If you are already running a plugin like %2$s (i.e. a plugin that reconfigures the <code>%3$s</code> function globally); that is usually enough, and you should generally NOT enable SMTP integration here also. In other words, if <code>%3$s</code> is already configured globally to route mail through an SMTP server, you would only need the options below if your intention was to override your existing SMTP configuration specifically for %1$s.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('https://wordpress.org/plugins/wp-mail-smtp/', 'WP Mail SMTP'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/functions/wp_mail/', 'wp_mail')).'</p>'.
-						                                    '</div>',
-					               )).
-				               ' </tbody>'.
-				               '</table>';
+				if($this->plugin->is_pro || $this->plugin->utils_env->is_pro_preview())
+				{
+					$_panel_body = '<table style="margin:0;">'.
+					               ' <tbody>'.
+					               $form_fields->select_row(
+						               array(
+							               'label'           => __('Enable SMTP Integration?', $this->plugin->text_domain),
+							               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							               'field_class'     => 'pmp-if-change', // JS change handler.
+							               'name'            => 'smtp_enable',
+							               'current_value'   => $current_value_for('smtp_enable'),
+							               'allow_arbitrary' => FALSE, // Must be one of these.
+							               'options'         => array(
+								               '0' => __('No, use the wp_mail function (default behavior)', $this->plugin->text_domain),
+								               '1' => __('Yes, integrate w/ an SMTP server of my choosing (as configured below)', $this->plugin->text_domain),
+							               ),
+							               'notes_after'     => '<div class="pmp-if-enabled-show">'.
+							                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('When SMTP Server Integration is enabled:', $this->plugin->text_domain).'</p>'.
+							                                    '   <ul class="pmp-list-items">'.
+							                                    '      <li>'.sprintf(__('Instead of using the default <code>%2$s</code> function, %1$s will send email confirmation requests &amp; comment/reply notifications through an SMTP server of your choosing; i.e. all email processed by %1$s will be routed through an SMTP server that you\'ve dedicated to comment subscriptions. This is highly recommended, since it can significantly improve the deliverability rate of emails that are sent by %1$s. In addition, it may also speed up your site (i.e. reduce the burden on your own web server). This is because an SMTP host is generally associated with an external server that is dedicated to email processing.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/functions/wp_mail/', 'wp_mail')).'</li>'.
+							                                    '      <li>'.sprintf(__('Instead of using the <code>%3$s</code>, <code>%4$s</code>, and <code>%2$s</code> email message headers configured elsewhere in %1$s, the values that you configure for the SMTP server will be used instead; i.e. what you configure here will override other email header options in %1$s. This allows you to be specific about what message headers are passed through your SMTP server whenever SMTP functionality is enabled. <strong>With one exception.</strong> If you happen to enable the %1$s&trade; RVE handler (Replies via Email), the SMTP <code>Reply-To</code> header is ignored in favor of the <code>Reply-To</code> address configured for the %1$s&trade; RVE handler. If RVE is enabled, the <code>Reply-To</code> address for the RVE handler receives precedence always.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</li>'.
+							                                    '   </ul>'.
+							                                    '  <p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> If you are already running a plugin like %2$s (i.e. a plugin that reconfigures the <code>%3$s</code> function globally); that is usually enough, and you should generally NOT enable SMTP integration here also. In other words, if <code>%3$s</code> is already configured globally to route mail through an SMTP server, you would only need the options below if your intention was to override your existing SMTP configuration specifically for %1$s.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('https://wordpress.org/plugins/wp-mail-smtp/', 'WP Mail SMTP'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/functions/wp_mail/', 'wp_mail')).'</p>'.
+							                                    '</div>',
+						               )).
+					               ' </tbody>'.
+					               '</table>';
 
-				$_panel_body .= '<div class="pmp-if-enabled-show"><hr />'.
+					$_panel_body .= '<div class="pmp-if-enabled-show"><hr />'.
 
-				                '<a href="http://aws.amazon.com/ses/" target="_blank">'.
-				                '  <img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/aws-ses-rec.png')).'" class="pmp-right" style="margin:1em 0 0 3em;" />'.
-				                '</a>'.
+					                '<a href="http://aws.amazon.com/ses/" target="_blank">'.
+					                '  <img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/aws-ses-rec.png')).'" class="pmp-right" style="margin:1em 0 0 3em;" />'.
+					                '</a>'.
 
-				                ' <table style="width:auto;">'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'label'         => __('SMTP Host Name:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. email-smtp.us-east-1.amazonaws.com', $this->plugin->text_domain),
-						                'name'          => 'smtp_host',
-						                'current_value' => $current_value_for('smtp_host'),
-						                'notes_after'   => '<p>'.__('e.g. <code>email-smtp.us-east-1.amazonaws.com</code>, <code>smtp.gmail.com</code>, or another of your choosing.', $this->plugin->text_domain).'</p>'
-					                )).
-				                '  </tbody>'.
-				                ' </table>'.
+					                ' <table style="width:auto;">'.
+					                '  <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'label'         => __('SMTP Host Name:', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. email-smtp.us-east-1.amazonaws.com', $this->plugin->text_domain),
+							                'name'          => 'smtp_host',
+							                'current_value' => $current_value_for('smtp_host'),
+							                'notes_after'   => '<p>'.__('e.g. <code>email-smtp.us-east-1.amazonaws.com</code>, <code>smtp.gmail.com</code>, or another of your choosing.', $this->plugin->text_domain).'</p>'
+						                )).
+					                '  </tbody>'.
+					                ' </table>'.
 
-				                ' <table style="width:auto;">'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'number',
-						                'label'         => __('SMTP Port Number:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. 465', $this->plugin->text_domain),
-						                'name'          => 'smtp_port',
-						                'current_value' => $current_value_for('smtp_port'),
-						                'notes_after'   => '<p>'.__('With Amazon&reg; SES (or GMail&trade;) please use: <code>465</code>', $this->plugin->text_domain).'</p>'
-					                )).
-				                '  </tbody>'.
-				                ' </table>'.
+					                ' <table style="width:auto;">'.
+					                '  <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'type'          => 'number',
+							                'label'         => __('SMTP Port Number:', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. 465', $this->plugin->text_domain),
+							                'name'          => 'smtp_port',
+							                'current_value' => $current_value_for('smtp_port'),
+							                'notes_after'   => '<p>'.__('With Amazon&reg; SES (or GMail&trade;) please use: <code>465</code>', $this->plugin->text_domain).'</p>'
+						                )).
+					                '  </tbody>'.
+					                ' </table>'.
 
-				                ' <table style="width:auto;">'.
-				                '  <tbody>'.
-				                $form_fields->select_row(
-					                array(
-						                'label'           => __('SMTP Authentication Type:', $this->plugin->text_domain),
-						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'name'            => 'smtp_secure',
-						                'current_value'   => $current_value_for('smtp_secure'),
-						                'allow_arbitrary' => FALSE, // Must be one of these.
-						                'options'         => array(
-							                ''    => __('Plain Text Authentication', $this->plugin->text_domain),
-							                'ssl' => __('SSL Authentication (most common)', $this->plugin->text_domain),
-							                'tls' => __('TLS Authentication', $this->plugin->text_domain),
-						                ),
-						                'notes_after'     => '<p>'.__('With Amazon&reg; SES (or GMail&trade;) over port 465, please choose: <code>SSL</code>', $this->plugin->text_domain).'</p>'
-					                )).
-				                '  </tbody>'.
-				                ' </table>'.
+					                ' <table style="width:auto;">'.
+					                '  <tbody>'.
+					                $form_fields->select_row(
+						                array(
+							                'label'           => __('SMTP Authentication Type:', $this->plugin->text_domain),
+							                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							                'name'            => 'smtp_secure',
+							                'current_value'   => $current_value_for('smtp_secure'),
+							                'allow_arbitrary' => FALSE, // Must be one of these.
+							                'options'         => array(
+								                ''    => __('Plain Text Authentication', $this->plugin->text_domain),
+								                'ssl' => __('SSL Authentication (most common)', $this->plugin->text_domain),
+								                'tls' => __('TLS Authentication', $this->plugin->text_domain),
+							                ),
+							                'notes_after'     => '<p>'.__('With Amazon&reg; SES (or GMail&trade;) over port 465, please choose: <code>SSL</code>', $this->plugin->text_domain).'</p>'
+						                )).
+					                '  </tbody>'.
+					                ' </table>'.
 
-				                '<hr />'.
+					                '<hr />'.
 
-				                ' <table>'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'label'         => __('SMTP Username:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. AKIAJSA57DDLS5I6GCA; e.g. me@example.com', $this->plugin->text_domain),
-						                'name'          => 'smtp_username',
-						                'current_value' => $current_value_for('smtp_username'),
-						                'notes_after'   => '<p>'.__('With Amazon&reg; SES use your Access Key ID. With GMail&trade; use your login name, or full email address.', $this->plugin->text_domain).'</p>'
-					                )).
-				                '  </tbody>'.
-				                ' </table>'.
+					                ' <table>'.
+					                '  <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'label'         => __('SMTP Username:', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. AKIAJSA57DDLS5I6GCA; e.g. me@example.com', $this->plugin->text_domain),
+							                'name'          => 'smtp_username',
+							                'current_value' => $current_value_for('smtp_username'),
+							                'notes_after'   => '<p>'.__('With Amazon&reg; SES use your Access Key ID. With GMail&trade; use your login name, or full email address.', $this->plugin->text_domain).'</p>'
+						                )).
+					                '  </tbody>'.
+					                ' </table>'.
 
-				                ' <table>'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'password',
-						                'label'         => __('SMTP Password:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. AWS secret key, or email account password', $this->plugin->text_domain),
-						                'name'          => 'smtp_password',
-						                'current_value' => $current_value_for('smtp_password'),
-						                'notes_after'   => '<p>'.__('With Amazon&reg; SES use your Secret Key. With GMail&trade; use your password.', $this->plugin->text_domain).'</p>'
-					                )).
-				                '  </tbody>'.
-				                ' </table>'.
+					                ' <table>'.
+					                '  <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'type'          => 'password',
+							                'label'         => __('SMTP Password:', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. AWS secret key, or email account password', $this->plugin->text_domain),
+							                'name'          => 'smtp_password',
+							                'current_value' => $current_value_for('smtp_password'),
+							                'notes_after'   => '<p>'.__('With Amazon&reg; SES use your Secret Key. With GMail&trade; use your password.', $this->plugin->text_domain).'</p>'
+						                )).
+					                '  </tbody>'.
+					                ' </table>'.
 
-				                '<hr />'.
+					                '<hr />'.
 
-				                ' <table>'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'label'         => __('SMTP <code>From</code> and <code>Return-Path</code> Name:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. MySite.com', $this->plugin->text_domain),
-						                'name'          => 'smtp_from_name',
-						                'current_value' => $current_value_for('smtp_from_name'),
-						                'notes_after'   => '<p>'.sprintf(__('The name used in the <code>%3$s:</code> and <code>%4$s:</code> headers; e.g. <code>MySite.com</code>', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'
-					                )).
-				                '  </tbody>'.
-				                ' </table>'.
+					                ' <table>'.
+					                '  <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'label'         => __('SMTP <code>From</code> and <code>Return-Path</code> Name:', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. MySite.com', $this->plugin->text_domain),
+							                'name'          => 'smtp_from_name',
+							                'current_value' => $current_value_for('smtp_from_name'),
+							                'notes_after'   => '<p>'.sprintf(__('The name used in the <code>%3$s:</code> and <code>%4$s:</code> headers; e.g. <code>MySite.com</code>', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'
+						                )).
+					                '  </tbody>'.
+					                ' </table>'.
 
-				                ' <table>'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'email',
-						                'label'         => __('SMTP <code>From</code> and <code>Return-Path</code> Email Address:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. moderator@mysite.com', $this->plugin->text_domain),
-						                'name'          => 'smtp_from_email',
-						                'current_value' => $current_value_for('smtp_from_email'),
-						                'notes_after'   => '<p>'.sprintf(__('Email used in the <code>%3$s:</code> and <code>%4$s:</code> headers; e.g. <code>moderator@mysite.com</code>', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'.
-						                                   '<p class="pmp-note pmp-info">'.__('<strong>Note:</strong> most SMTP servers will require this email address to match up with specific users and/or specific domains; else mail is rejected automatically. Please be sure to check the documentation for your SMTP host before entering this address. For instance, with Amazon&reg; SES you will need to setup at least one Verified Sender and then enter that address here. With GMail&trade;, you will need to enter the email address that is associated with the Username/Password you entered above.', $this->plugin->text_domain).'</p>'
-					                )).
-				                '  </tbody>'.
-				                ' </table>'.
+					                ' <table>'.
+					                '  <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'type'          => 'email',
+							                'label'         => __('SMTP <code>From</code> and <code>Return-Path</code> Email Address:', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. moderator@mysite.com', $this->plugin->text_domain),
+							                'name'          => 'smtp_from_email',
+							                'current_value' => $current_value_for('smtp_from_email'),
+							                'notes_after'   => '<p>'.sprintf(__('Email used in the <code>%3$s:</code> and <code>%4$s:</code> headers; e.g. <code>moderator@mysite.com</code>', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'.
+							                                   '<p class="pmp-note pmp-info">'.__('<strong>Note:</strong> most SMTP servers will require this email address to match up with specific users and/or specific domains; else mail is rejected automatically. Please be sure to check the documentation for your SMTP host before entering this address. For instance, with Amazon&reg; SES you will need to setup at least one Verified Sender and then enter that address here. With GMail&trade;, you will need to enter the email address that is associated with the Username/Password you entered above.', $this->plugin->text_domain).'</p>'
+						                )).
+					                '  </tbody>'.
+					                ' </table>'.
 
-				                '<hr />'.
+					                '<hr />'.
 
-				                ' <table>'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'email',
-						                'label'         => __('SMTP <code>Reply-To</code> Email Address:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. moderator@mysite.com', $this->plugin->text_domain),
-						                'name'          => 'smtp_reply_to_email',
-						                'current_value' => $current_value_for('smtp_reply_to_email'),
-						                'notes_after'   => '<p>'.sprintf(__('Email used in the <code>%2$s:</code> header; e.g. <code>moderator@mysite.com</code>. This makes it so that if someone happens to reply to an email notification, that reply will be directed to a specific email address that you prefer. Some site owners like to use something like <code>noreply@mysite.com</code>, while others find it best to use a real email address that can monitor replies. It\'s a matter of preference.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'.
-						                                   '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> If you happen to enable a %1$s&trade; RVE Handler (Replies via Email), this value is ignored in favor of the <code>Reply-To</code> address configured for your RVE Handler. In other words, if you enable Replies via Email, you could simply leave this blank if you like. If RVE is enabled, the <code>Reply-To</code> address for the RVE Handler receives precedence always. The address you configure here will not be applied in that case.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'
-					                )).
-				                '  </tbody>'.
-				                ' </table>'.
+					                ' <table>'.
+					                '  <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'type'          => 'email',
+							                'label'         => __('SMTP <code>Reply-To</code> Email Address:', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. moderator@mysite.com', $this->plugin->text_domain),
+							                'name'          => 'smtp_reply_to_email',
+							                'current_value' => $current_value_for('smtp_reply_to_email'),
+							                'notes_after'   => '<p>'.sprintf(__('Email used in the <code>%2$s:</code> header; e.g. <code>moderator@mysite.com</code>. This makes it so that if someone happens to reply to an email notification, that reply will be directed to a specific email address that you prefer. Some site owners like to use something like <code>noreply@mysite.com</code>, while others find it best to use a real email address that can monitor replies. It\'s a matter of preference.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'.
+							                                   '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> If you happen to enable a %1$s&trade; RVE Handler (Replies via Email), this value is ignored in favor of the <code>Reply-To</code> address configured for your RVE Handler. In other words, if you enable Replies via Email, you could simply leave this blank if you like. If RVE is enabled, the <code>Reply-To</code> address for the RVE Handler receives precedence always. The address you configure here will not be applied in that case.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'
+						                )).
+					                '  </tbody>'.
+					                ' </table>'.
 
-				                /* This is currently forced to a value of `1`.
-				                ' <table>'.
-				                '  <tbody>'.
-				                $form_fields->select_row(
-					                array(
-						                'label'           => __('Force <code>From:</code> &amp; <code>Return-Path:</code> Headers?', $this->plugin->text_domain),
-						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'name'            => 'smtp_force_from',
-						                'current_value'   => $current_value_for('smtp_force_from'),
-						                'allow_arbitrary' => FALSE, // Must be one of these.
-						                'options'         => array(
-							                '1' => __('Yes, always use the "Name" <address> I\'ve given (recommended)', $this->plugin->text_domain),
-							                '0' => __('No, use "Name" <address> I\'ve given by default, but allow individual emails to override', $this->plugin->text_domain),
-						                ),
-					                )).
-				                '  </tbody>'.
-				                ' </table>'. */
+					                /* This is currently forced to a value of `1`.
+					                ' <table>'.
+					                '  <tbody>'.
+					                $form_fields->select_row(
+						                array(
+							                'label'           => __('Force <code>From:</code> &amp; <code>Return-Path:</code> Headers?', $this->plugin->text_domain),
+							                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							                'name'            => 'smtp_force_from',
+							                'current_value'   => $current_value_for('smtp_force_from'),
+							                'allow_arbitrary' => FALSE, // Must be one of these.
+							                'options'         => array(
+								                '1' => __('Yes, always use the "Name" <address> I\'ve given (recommended)', $this->plugin->text_domain),
+								                '0' => __('No, use "Name" <address> I\'ve given by default, but allow individual emails to override', $this->plugin->text_domain),
+							                ),
+						                )).
+					                '  </tbody>'.
+					                ' </table>'. */
 
-				                '<hr />'.
+					                '<hr />'.
 
-				                ' <table>'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'        => 'email',
-						                'label'       => __('Test SMTP Server Settings?', $this->plugin->text_domain),
-						                'placeholder' => __('e.g. me@mysite.com', $this->plugin->text_domain),
-						                'name'        => 'mail_smtp_test', // Not an actual option key; but the `save_options` handler picks this up.
-						                'notes_after' => sprintf(__('Enter an email address to have %1$s&trade; send a test message when you save these options, and report back about any success or failure.', $this->plugin->text_domain), esc_html($this->plugin->name)),
-					                )).
-				                '  </tbody>'.
-				                ' </table>'.
-				                '</div>';
+					                ' <table>'.
+					                '  <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'type'        => 'email',
+							                'label'       => __('Test SMTP Server Settings?', $this->plugin->text_domain),
+							                'placeholder' => __('e.g. me@mysite.com', $this->plugin->text_domain),
+							                'name'        => 'mail_smtp_test', // Not an actual option key; but the `save_options` handler picks this up.
+							                'notes_after' => sprintf(__('Enter an email address to have %1$s&trade; send a test message when you save these options, and report back about any success or failure.', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						                )).
+					                '  </tbody>'.
+					                ' </table>'.
+					                '</div>';
 
-				echo $this->panel(__('SMTP Server Integration', $this->plugin->text_domain), $_panel_body, array());
+					echo $this->panel(__('SMTP Server Integration', $this->plugin->text_domain), $_panel_body, array('pro_only' => TRUE));
 
-				unset($_panel_body); // Housekeeping.
-
+					unset($_panel_body); // Housekeeping.
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
 				if($this->plugin->is_pro || $this->plugin->utils_env->is_pro_preview())
