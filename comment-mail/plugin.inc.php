@@ -224,16 +224,6 @@ namespace comment_mail
 			public $auto_recompile_cap;
 
 			/**
-			 * Upgrade capability requirement.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @var string Capability required to upgrade.
-			 *    i.e. the ability to run any sort of plugin upgrader.
-			 */
-			public $upgrade_cap;
-
-			/**
 			 * Uninstall capability requirement.
 			 *
 			 * @since 141111 First documented version.
@@ -331,7 +321,6 @@ namespace comment_mail
 				$this->cap                = apply_filters(__METHOD__.'_cap', 'activate_plugins');
 				$this->manage_cap         = apply_filters(__METHOD__.'_manage_cap', 'moderate_comments');
 				$this->auto_recompile_cap = apply_filters(__METHOD__.'_auto_recompile_cap', 'activate_plugins');
-				$this->upgrade_cap        = apply_filters(__METHOD__.'_upgrade_cap', 'update_plugins');
 				$this->uninstall_cap      = apply_filters(__METHOD__.'_uninstall_cap', 'delete_plugins');
 
 				/*
