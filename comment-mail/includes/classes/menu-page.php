@@ -1526,75 +1526,77 @@ namespace comment_mail // Root namespace.
 				}
 				/* ----------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->input_row(
-					               array(
-						               'type'          => 'number',
-						               'label'         => __('Max Execution Time (In Seconds)', $this->plugin->text_domain),
-						               'placeholder'   => __('e.g. 30', $this->plugin->text_domain),
-						               'name'          => 'queue_processor_max_time',
-						               'current_value' => $current_value_for('queue_processor_max_time'),
-						               'other_attrs'   => 'min="10" max="300"',
-						               'notes_after'   => '<p>'.sprintf(__('The Queue Processor sends email notifications. It runs via %1$s every 5 minutes. This setting determines how much time you want to allow each process to run for. The minimum allowed value is <code>10</code> seconds. Maximum allowed value is <code>300</code> seconds. A good default value is <code>30</code> seconds. That\'s more than adequate for most sites.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://www.smashingmagazine.com/2013/10/16/schedule-events-using-wordpress-cron/', 'WP-Cron')).'</p>'
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+				if($this->plugin->is_pro || $this->plugin->utils_env->is_pro_preview())
+				{
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->input_row(
+						               array(
+							               'type'          => 'number',
+							               'label'         => __('Max Execution Time (In Seconds)', $this->plugin->text_domain),
+							               'placeholder'   => __('e.g. 30', $this->plugin->text_domain),
+							               'name'          => 'queue_processor_max_time',
+							               'current_value' => $current_value_for('queue_processor_max_time'),
+							               'other_attrs'   => 'min="10" max="300"',
+							               'notes_after'   => '<p>'.sprintf(__('The Queue Processor sends email notifications. It runs via %1$s every 5 minutes. This setting determines how much time you want to allow each process to run for. The minimum allowed value is <code>10</code> seconds. Maximum allowed value is <code>300</code> seconds. A good default value is <code>30</code> seconds. That\'s more than adequate for most sites.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://www.smashingmagazine.com/2013/10/16/schedule-events-using-wordpress-cron/', 'WP-Cron')).'</p>'
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				$_panel_body .= '<table>'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'number',
-						                'label'         => __('Delay Time (In Milliseconds)', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. 250', $this->plugin->text_domain),
-						                'name'          => 'queue_processor_delay',
-						                'current_value' => $current_value_for('queue_processor_delay'),
-						                'other_attrs'   => 'min="0"',
-						                'notes_before'  => '<p><em>1000 milliseconds = 1 second; 500 milliseconds = .5 seconds; 250 milliseconds = .25 seconds</em></p>',
-						                'notes_after'   => '<p>'.__('The Queue Processor has the ability to send multiple email notifications consecutively when it runs. However, you can force a delay between each email that it sends while it is running. This will help reduce server load and also reduce the chance of your server being flagged as a bulk sender. The minimum allowed value is <code>0</code> milliseconds (<code>0</code> will disable the delay completely). The maximum allowed value (converted to seconds) is <code>([configured Max Execution Time] - 5 seconds)</code>. A good default value is <code>250</code> milliseconds. That\'s perfect for most sites. That said, if you have a lot of emails ending up in the spam folder, try raising this in <code>250</code> millisecond increments until things improve.', $this->plugin->text_domain).'</p>'
-					                )).
-				                '  </tbody>'.
-				                '</table>';
+					$_panel_body .= '<table>'.
+					                '  <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'type'          => 'number',
+							                'label'         => __('Delay Time (In Milliseconds)', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. 250', $this->plugin->text_domain),
+							                'name'          => 'queue_processor_delay',
+							                'current_value' => $current_value_for('queue_processor_delay'),
+							                'other_attrs'   => 'min="0"',
+							                'notes_before'  => '<p><em>1000 milliseconds = 1 second; 500 milliseconds = .5 seconds; 250 milliseconds = .25 seconds</em></p>',
+							                'notes_after'   => '<p>'.__('The Queue Processor has the ability to send multiple email notifications consecutively when it runs. However, you can force a delay between each email that it sends while it is running. This will help reduce server load and also reduce the chance of your server being flagged as a bulk sender. The minimum allowed value is <code>0</code> milliseconds (<code>0</code> will disable the delay completely). The maximum allowed value (converted to seconds) is <code>([configured Max Execution Time] - 5 seconds)</code>. A good default value is <code>250</code> milliseconds. That\'s perfect for most sites. That said, if you have a lot of emails ending up in the spam folder, try raising this in <code>250</code> millisecond increments until things improve.', $this->plugin->text_domain).'</p>'
+						                )).
+					                '  </tbody>'.
+					                '</table>';
 
-				$_panel_body .= '<table>'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'number',
-						                'label'         => __('Max Email Notifications Per Process (Integer)', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. 100', $this->plugin->text_domain),
-						                'name'          => 'queue_processor_max_limit',
-						                'current_value' => $current_value_for('queue_processor_max_limit'),
-						                'other_attrs'   => 'min="1"',
-						                'notes_after'   => '<p>'.__('The Queue Processor will pull X number of pending notifications from the database each time it runs, and then work on those for as long as it can, given your configuration above. This setting allows you to control the max number of email notifications that it should work on in each process. In short, you can use this option to control the maximum number of emails that can ever be sent by each queue runner. Keep in mind, the Queue Processor runs once every 5 minutes. The limit that you define here will allow X number of emails to be sent each time that it runs. The minimum allowed value is <code>1</code>. Maximum allowed value is <code>1000</code> (for security reasons). However, this upper limit can be raised further (if absolutely necessary) through a WP filter.', $this->plugin->text_domain).'</p>'.
-						                                   '<p class="pmp-note pmp-info">'.__('It\'s important to realize that what you define here may not always be possible; i.e. this is a maximum limit, not an exact number that will always be processed. For instance, if you set this to <code>1000</code> but you change Max Execution Time to <code>10</code>, there is very little chance that 1000 email notifications can be sent in just <code>10</code> seconds. In such a scenario, the Queue Processor will attempt to process up to <code>1000</code>, but stop after <code>10</code> seconds and work on whatever remains later.', $this->plugin->text_domain).'</p>'
-					                )).
-				                '  </tbody>'.
-				                '</table>';
+					$_panel_body .= '<table>'.
+					                '  <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'type'          => 'number',
+							                'label'         => __('Max Email Notifications Per Process (Integer)', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. 100', $this->plugin->text_domain),
+							                'name'          => 'queue_processor_max_limit',
+							                'current_value' => $current_value_for('queue_processor_max_limit'),
+							                'other_attrs'   => 'min="1"',
+							                'notes_after'   => '<p>'.__('The Queue Processor will pull X number of pending notifications from the database each time it runs, and then work on those for as long as it can, given your configuration above. This setting allows you to control the max number of email notifications that it should work on in each process. In short, you can use this option to control the maximum number of emails that can ever be sent by each queue runner. Keep in mind, the Queue Processor runs once every 5 minutes. The limit that you define here will allow X number of emails to be sent each time that it runs. The minimum allowed value is <code>1</code>. Maximum allowed value is <code>1000</code> (for security reasons). However, this upper limit can be raised further (if absolutely necessary) through a WP filter.', $this->plugin->text_domain).'</p>'.
+							                                   '<p class="pmp-note pmp-info">'.__('It\'s important to realize that what you define here may not always be possible; i.e. this is a maximum limit, not an exact number that will always be processed. For instance, if you set this to <code>1000</code> but you change Max Execution Time to <code>10</code>, there is very little chance that 1000 email notifications can be sent in just <code>10</code> seconds. In such a scenario, the Queue Processor will attempt to process up to <code>1000</code>, but stop after <code>10</code> seconds and work on whatever remains later.', $this->plugin->text_domain).'</p>'
+						                )).
+					                '  </tbody>'.
+					                '</table>';
 
-				$_panel_body .= '<hr />';
+					$_panel_body .= '<hr />';
 
-				$_panel_body .= '<table>'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'number',
-						                'label'         => __('Real-Time Queue Processor; Max Email Notifications in Real-Time (Integer)', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. 5', $this->plugin->text_domain),
-						                'name'          => 'queue_processor_realtime_max_limit',
-						                'current_value' => $current_value_for('queue_processor_realtime_max_limit'),
-						                'other_attrs'   => 'min="0" max="100"',
-						                'notes_after'   => '<p>'.__('In addition to the Queue Processor running via WP-Cron, it can also run in real-time as a comment is being posted (assuming that particular comment is automatically approved; i.e. that it doesn\'t require administrative approval). In cases where it\'s possible, real-time queue processing allows for easier testing and for more-immediate notifications. It is particularly helpful on posts that only have just a few subscribers anyway. There is no mass-mailing needed in such a scenario.', $this->plugin->text_domain).'</p>'.
-						                                   '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> It is recommended that you keep this number very low; i.e. just a few notifications should be attempted in real-time. The rest (if there are any) can be handled by queue processes running via WP-Cron. A suggested setting for this option is <code>5</code>. If you set this to <code>0</code> it will effectively disable real-time queue processing if you wish. There\'s an upper limit of <code>100</code> to avoid serious real-time processing delays for end-users. Under no circumstance (no matter what you configure here), will real-time processing ever be allowed to continue for more than <code>10</code> seconds. Therefore, whatever you configure here will be a maximum allowed within the <code>10</code> second timeframe. If you set this too high for completion within <code>10</code> seconds, whatever remains will be processed by WP-Cron queue runners later.', $this->plugin->text_domain).'</p>'
-					                )).
-				                '  </tbody>'.
-				                '</table>';
+					$_panel_body .= '<table>'.
+					                '  <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'type'          => 'number',
+							                'label'         => __('Real-Time Queue Processor; Max Email Notifications in Real-Time (Integer)', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. 5', $this->plugin->text_domain),
+							                'name'          => 'queue_processor_realtime_max_limit',
+							                'current_value' => $current_value_for('queue_processor_realtime_max_limit'),
+							                'other_attrs'   => 'min="0" max="100"',
+							                'notes_after'   => '<p>'.__('In addition to the Queue Processor running via WP-Cron, it can also run in real-time as a comment is being posted (assuming that particular comment is automatically approved; i.e. that it doesn\'t require administrative approval). In cases where it\'s possible, real-time queue processing allows for easier testing and for more-immediate notifications. It is particularly helpful on posts that only have just a few subscribers anyway. There is no mass-mailing needed in such a scenario.', $this->plugin->text_domain).'</p>'.
+							                                   '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> It is recommended that you keep this number very low; i.e. just a few notifications should be attempted in real-time. The rest (if there are any) can be handled by queue processes running via WP-Cron. A suggested setting for this option is <code>5</code>. If you set this to <code>0</code> it will effectively disable real-time queue processing if you wish. There\'s an upper limit of <code>100</code> to avoid serious real-time processing delays for end-users. Under no circumstance (no matter what you configure here), will real-time processing ever be allowed to continue for more than <code>10</code> seconds. Therefore, whatever you configure here will be a maximum allowed within the <code>10</code> second timeframe. If you set this too high for completion within <code>10</code> seconds, whatever remains will be processed by WP-Cron queue runners later.', $this->plugin->text_domain).'</p>'
+						                )).
+					                '  </tbody>'.
+					                '</table>';
 
-				echo $this->panel(__('Queue Processor Adjustments', $this->plugin->text_domain), $_panel_body, array());
+					echo $this->panel(__('Queue Processor Adjustments', $this->plugin->text_domain), $_panel_body, array('pro_only' => TRUE));
 
-				unset($_panel_body); // Housekeeping.
-
+					unset($_panel_body); // Housekeeping.
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
 				$_panel_body = '<table>'.
