@@ -1165,15 +1165,6 @@ namespace comment_mail
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'], array($this, 'menu_page_queue_event_log_screen'));
 
 				unset($_menu_title, $_page_title); // Housekeeping.
-
-				/* ----------------------------------------- */
-
-				$_menu_title                                   = $divider.__('Statistics/Charts', $this->text_domain);
-				$_page_title                                   = $this->name.'&trade; &#10609; '.__('Statistics/Charts', $this->text_domain);
-				$this->menu_page_hooks[__NAMESPACE__.'_stats'] = add_submenu_page(__NAMESPACE__, $_page_title, $_menu_title, $this->manage_cap, __NAMESPACE__.'_stats', array($this, 'menu_page_stats'));
-				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_stats'], array($this, 'menu_page_stats_screen'));
-
-				unset($_menu_title, $_page_title); // Housekeeping.
 			}
 
 			/**
@@ -1419,40 +1410,6 @@ namespace comment_mail
 			public function menu_page_queue_event_log()
 			{
 				new menu_page('queue_event_log');
-			}
-
-			/**
-			 * Menu page screen; for stats.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @attaches-to `'load-'.$this->menu_page_hooks[__NAMESPACE__.'_stats']` action.
-			 *
-			 * @see add_menu_pages()
-			 */
-			public function menu_page_stats_screen()
-			{
-				$screen = get_current_screen();
-				if(!($screen instanceof \WP_Screen))
-					return; // Not possible.
-
-				if(empty($this->menu_page_hooks[__NAMESPACE__.'_stats'])
-				   || $screen->id !== $this->menu_page_hooks[__NAMESPACE__.'_stats']
-				) return; // Not applicable.
-
-				return; // No screen for this page right now.
-			}
-
-			/**
-			 * Menu page for stats.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @see add_menu_pages()
-			 */
-			public function menu_page_stats()
-			{
-				new menu_page('stats');
 			}
 
 			/**

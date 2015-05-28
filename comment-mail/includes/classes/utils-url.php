@@ -469,23 +469,6 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
-			 * Statistics menu page URL.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string|null $scheme Optional . Defaults to `admin`.
-			 *    See {@link set_scheme()} method for further details.
-			 *
-			 * @return string Statistics menu page URL.
-			 */
-			public function stats_menu_page_only($scheme = 'admin')
-			{
-				$url = admin_url('/admin.php');
-
-				return $this->page_only(__NAMESPACE__.'_stats', $url, $scheme);
-			}
-
-			/**
 			 * Import/export menu page URL.
 			 *
 			 * @since 141111 First documented version.

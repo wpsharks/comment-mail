@@ -3656,6 +3656,9 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function stats_()
 			{
+				if(!$this->plugin->is_pro)
+					return ''; // Pro only.
+
 				$_this                = $this;
 				$timezone             = $this->plugin->utils_date->i18n('T');
 				$current_value_for    = function ($key) use ($_this)
@@ -4221,6 +4224,9 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function stats_view($view, array $form_fields = array(), array $args = array())
 			{
+				if(!$this->plugin->is_pro)
+					return ''; // Pro only.
+
 				$view = trim(strtolower((string)$view));
 
 				$default_args            = array(

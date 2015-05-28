@@ -50,8 +50,6 @@ namespace comment_mail // Root namespace.
 					'sub_form',
 					'sub_form_comment_id_row_via_ajax',
 					'sub_form_user_id_info_via_ajax',
-
-					'stats_chart_data_via_ajax',
 				);
 				$this->maybe_handle();
 			}
@@ -289,28 +287,6 @@ namespace comment_mail // Root namespace.
 				header('Content-Type: application/json; charset=UTF-8');
 
 				exit(menu_page_sub_form_base::user_id_info_via_ajax($user_id));
-			}
-
-			/**
-			 * Outputs chart data for stats.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param mixed $request_args Input argument(s).
-			 */
-			protected function stats_chart_data_via_ajax($request_args)
-			{
-				$request_args = (array)$request_args;
-
-				if(!current_user_can($this->plugin->manage_cap))
-					if(!current_user_can($this->plugin->cap))
-						exit; // Unauthenticated; ignore.
-
-				header('Content-Type: application/json; charset=UTF-8');
-
-				new chart_data($request_args); // With JSON output.
-
-				exit(); // Stop after output; always.
 			}
 		}
 	}
