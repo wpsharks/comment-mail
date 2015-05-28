@@ -1074,329 +1074,331 @@ namespace comment_mail // Root namespace.
 				}
 				/* ----------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table style="margin-bottom:0;">'.
-				               '  <tbody>'.
-				               $form_fields->select_row(
-					               array(
-						               'label'           => __('Enable Single Sign-on (SSO)?', $this->plugin->text_domain),
-						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						               'field_class'     => 'pmp-if-change', // JS change handler.
-						               'name'            => 'sso_enable',
-						               'current_value'   => $current_value_for('sso_enable'),
-						               'allow_arbitrary' => FALSE, // Must be one of these.
-						               'options'         => array(
-							               '0' => __('No, disable Single Sign-on (SSO)', $this->plugin->text_domain),
-							               '1' => __('Yes, enable Single Sign-on (recommended)', $this->plugin->text_domain),
-						               ),
-						               'notes_after'     => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-services.png')).'" class="pmp-right" />'.
-						                                    sprintf(__('As a convenience, SSO allows commenters to login with a popular social network account; e.g. Twitter, Facebook, Google, LinkedIn. <span class="pmp-hilite">This feature is highly recommended, but disabled by default</span>; since it requires some work on your part to set things up properly. Detailed instructions are provided %1$s. When a visitor logs in through an SSO service provider, an account is automatically created for them in WordPress (if one does not exist already). These auto-generated WordPress accounts are created using details obtained from an SSO service provider. Such as first name, last name, email address. SSO users receive a default Role; i.e. whatever the default Role is for your site. Normally the %2$s, but you can change this from your %3$s on standard WP installs. WP Multisite Network installs always use the %2$s. An account created in this way (via SSO) could be logged into like any other WP account (technically), but it will also be connected to the underlying SSO service too. Meaning, a user may simply log into your site in the future w/ the SSO. They won\'t ever need a username/password that is specific to your site.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys', __('here', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Roles_and_Capabilities#Subscriber', __('Subscriber Role', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor(admin_url('/options-general.php'), __('WP General Settings', $this->plugin->text_domain))).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+				if($this->plugin->is_pro || $this->plugin->utils_env->is_pro_preview())
+				{
+					$_panel_body = '<table style="margin-bottom:0;">'.
+					               '  <tbody>'.
+					               $form_fields->select_row(
+						               array(
+							               'label'           => __('Enable Single Sign-on (SSO)?', $this->plugin->text_domain),
+							               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							               'field_class'     => 'pmp-if-change', // JS change handler.
+							               'name'            => 'sso_enable',
+							               'current_value'   => $current_value_for('sso_enable'),
+							               'allow_arbitrary' => FALSE, // Must be one of these.
+							               'options'         => array(
+								               '0' => __('No, disable Single Sign-on (SSO)', $this->plugin->text_domain),
+								               '1' => __('Yes, enable Single Sign-on (recommended)', $this->plugin->text_domain),
+							               ),
+							               'notes_after'     => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-services.png')).'" class="pmp-right" />'.
+							                                    sprintf(__('As a convenience, SSO allows commenters to login with a popular social network account; e.g. Twitter, Facebook, Google, LinkedIn. <span class="pmp-hilite">This feature is highly recommended, but disabled by default</span>; since it requires some work on your part to set things up properly. Detailed instructions are provided %1$s. When a visitor logs in through an SSO service provider, an account is automatically created for them in WordPress (if one does not exist already). These auto-generated WordPress accounts are created using details obtained from an SSO service provider. Such as first name, last name, email address. SSO users receive a default Role; i.e. whatever the default Role is for your site. Normally the %2$s, but you can change this from your %3$s on standard WP installs. WP Multisite Network installs always use the %2$s. An account created in this way (via SSO) could be logged into like any other WP account (technically), but it will also be connected to the underlying SSO service too. Meaning, a user may simply log into your site in the future w/ the SSO. They won\'t ever need a username/password that is specific to your site.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys', __('here', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Roles_and_Capabilities#Subscriber', __('Subscriber Role', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor(admin_url('/options-general.php'), __('WP General Settings', $this->plugin->text_domain))).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				$_panel_body .= '<div class="pmp-if-enabled-show pmp-if-nest">'.
+					$_panel_body .= '<div class="pmp-if-enabled-show pmp-if-nest">'.
 
-				                ' <p class="pmp-note pmp-info" style="font-size:90%; margin-top:1em !important;">'.sprintf(__('<strong>Note:</strong> In order for SSO to work (i.e. for SSO links to appear in your comment/login forms); your %1$s should "require users to be logged-in" before posting a comment. You must also "allow users to register" in your %2$s. WP Multisite Network installs can enable user registration from their Network Settings area. Now, with those settings configured properly, you will then need to create &amp; fill-in an oAuth App Key/Secret for each service that you\'d like to enable for SSO. Any of the services that you leave empty will simply not be offered as an SSO option to commenters. Please take a look at %3$s.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor(admin_url('/options-discussion.php'), __('WP Discussion Settings', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor(admin_url('/options-general.php'), __('WP General Settings', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys', __('this wiki article for detailed instructions', $this->plugin->text_domain))).'</p>'.
+					                ' <p class="pmp-note pmp-info" style="font-size:90%; margin-top:1em !important;">'.sprintf(__('<strong>Note:</strong> In order for SSO to work (i.e. for SSO links to appear in your comment/login forms); your %1$s should "require users to be logged-in" before posting a comment. You must also "allow users to register" in your %2$s. WP Multisite Network installs can enable user registration from their Network Settings area. Now, with those settings configured properly, you will then need to create &amp; fill-in an oAuth App Key/Secret for each service that you\'d like to enable for SSO. Any of the services that you leave empty will simply not be offered as an SSO option to commenters. Please take a look at %3$s.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor(admin_url('/options-discussion.php'), __('WP Discussion Settings', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor(admin_url('/options-general.php'), __('WP General Settings', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys', __('this wiki article for detailed instructions', $this->plugin->text_domain))).'</p>'.
 
-				                ' <div class="pmp-tabs">'.
-				                '    <a href="#" data-target=".pmp-tab-pane-twitter" class="pmp-active">'.__('Twitter', $this->plugin->text_domain).'</a>'.
-				                '    <a href="#" data-target=".pmp-tab-pane-facebook">'.__('Facebook', $this->plugin->text_domain).'</a>'.
-				                '    <a href="#" data-target=".pmp-tab-pane-google">'.__('Google', $this->plugin->text_domain).'</a>'.
-				                '    <a href="#" data-target=".pmp-tab-pane-linkedin">'.__('LinkedIn', $this->plugin->text_domain).'</a>'.
-				                ' </div>'.
+					                ' <div class="pmp-tabs">'.
+					                '    <a href="#" data-target=".pmp-tab-pane-twitter" class="pmp-active">'.__('Twitter', $this->plugin->text_domain).'</a>'.
+					                '    <a href="#" data-target=".pmp-tab-pane-facebook">'.__('Facebook', $this->plugin->text_domain).'</a>'.
+					                '    <a href="#" data-target=".pmp-tab-pane-google">'.__('Google', $this->plugin->text_domain).'</a>'.
+					                '    <a href="#" data-target=".pmp-tab-pane-linkedin">'.__('LinkedIn', $this->plugin->text_domain).'</a>'.
+					                ' </div>'.
 
-				                ' <div class="pmp-tab-panes">'.
+					                ' <div class="pmp-tab-panes">'.
 
-				                '    <div class="pmp-tab-pane-twitter pmp-active">'.
-				                '       <table style="margin-bottom:0;">'.
-				                '          <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'label'         => sprintf(__('Twitter oAuth Consumer Key: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys#twitter', __('instructions', $this->plugin->text_domain))),
-						                'placeholder'   => __('e.g. kyczbsh6nnwtzrkm882kh7jf8', $this->plugin->text_domain),
-						                'name'          => 'sso_twitter_key',
-						                'current_value' => $current_value_for('sso_twitter_key'),
-						                'notes_after'   => $this->select_all_field(__('<strong>oAuth 1.0a Redirect/Callback URL:</strong>', $this->plugin->text_domain), $this->plugin->utils_url->sso_action_url('twitter', 'callback')),
-					                )).
-				                '          </tbody>'.
-				                '       </table>'.
-
-				                '       <table style="margin-top:0;">'.
-				                '          <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'password',
-						                'label'         => __('Twitter oAuth Consumer Secret:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. gznuef64twbku3qpcdyx8jtfgcyccxsup8yu5gb95f493maf79', $this->plugin->text_domain),
-						                'name'          => 'sso_twitter_secret',
-						                'current_value' => $current_value_for('sso_twitter_secret'),
-					                )).
-				                '          </tbody>'.
-				                '       </table>'.
-				                '    </div>'.
-
-				                '    <div class="pmp-tab-pane-facebook">'.
-				                '       <table style="margin-bottom:0;">'.
-				                '          <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'label'         => sprintf(__('Facebook oAuth App ID: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys#facebook', __('instructions', $this->plugin->text_domain))),
-						                'placeholder'   => __('e.g. 87df9vcu8njzrrnrgy2u2k2cj', $this->plugin->text_domain),
-						                'name'          => 'sso_facebook_key',
-						                'current_value' => $current_value_for('sso_facebook_key'),
-						                'notes_after'   => $this->select_all_field(__('<strong>oAuth 2.0 Redirect/Callback URL:</strong>', $this->plugin->text_domain), $this->plugin->utils_url->sso_action_url('facebook', 'callback')),
-					                )).
-				                '          </tbody>'.
-				                '       </table>'.
-
-				                '       <table style="margin-top:0;">'.
-				                '          <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'password',
-						                'label'         => __('Facebook oAuth App Secret:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. pqs4vyjmw6rqt23knuajftuv7xxxgxtdwvuajnq7cj5a5ak22j', $this->plugin->text_domain),
-						                'name'          => 'sso_facebook_secret',
-						                'current_value' => $current_value_for('sso_facebook_secret'),
-					                )).
-				                '          </tbody>'.
-				                '       </table>'.
-				                '    </div>'.
-
-				                '    <div class="pmp-tab-pane-google">'.
-				                '       <table style="margin-bottom:0;">'.
-				                '          <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'label'         => sprintf(__('Google oAuth Client ID: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys#google', __('instructions', $this->plugin->text_domain))),
-						                'placeholder'   => __('e.g. qda788ac23s4m4utvqgkauwhf.apps.googleusercontent.com', $this->plugin->text_domain),
-						                'name'          => 'sso_google_key',
-						                'current_value' => $current_value_for('sso_google_key'),
-						                'notes_after'   => $this->select_all_field(__('<strong>oAuth 2.0 Redirect/Callback URL:</strong>', $this->plugin->text_domain), $this->plugin->utils_url->sso_action_url('google', 'callback')),
-					                )).
-				                '          </tbody>'.
-				                '       </table>'.
-
-				                '       <table style="margin-top:0;">'.
-				                '          <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'password',
-						                'label'         => __('Google oAuth Client Secret:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. djx4zsdyh4grkuw8qpkg382fr8uujmsahfj8x4b8aun437hye2', $this->plugin->text_domain),
-						                'name'          => 'sso_google_secret',
-						                'current_value' => $current_value_for('sso_google_secret'),
-					                )).
-				                '          </tbody>'.
-				                '       </table>'.
-				                '    </div>'.
-
-				                '    <div class="pmp-tab-pane-linkedin">'.
-				                '       <table style="margin-bottom:0;">'.
-				                '          <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'label'         => sprintf(__('LinkedIn oAuth API/Consumer Key: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys#linkedin', __('instructions', $this->plugin->text_domain))),
-						                'placeholder'   => __('e.g. swf73zuj2puaug9e5a4ytpcg7', $this->plugin->text_domain),
-						                'name'          => 'sso_linkedin_key',
-						                'current_value' => $current_value_for('sso_linkedin_key'),
-						                'notes_after'   => $this->select_all_field(__('<strong>oAuth 2.0 Redirect/Callback URL:</strong>', $this->plugin->text_domain), $this->plugin->utils_url->sso_action_url('linkedin', 'callback')),
-					                )).
-				                '          </tbody>'.
-				                '       </table>'.
-
-				                '       <table style="margin-top:0;">'.
-				                '          <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'password',
-						                'label'         => __('LinkedIn oAuth API/Consumer Secret:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. dtqvgh8qjkne4nhry7w56bzk86dcqr7racy5evmhegpt9gw9c4', $this->plugin->text_domain),
-						                'name'          => 'sso_linkedin_secret',
-						                'current_value' => $current_value_for('sso_linkedin_secret'),
-					                )).
-				                '          </tbody>'.
-				                '       </table>'.
-				                '    </div>'.
-
-				                ' </div>'. // End: tab panes.
-
-				                ' <hr />'. // Begin other advanced (optional) settings.
-
-				                ' <div style="margin-top:1em;">'.
-				                '     <i class="fa fa-caret-down"></i>'.
-				                '     <a href="#" data-toggle="other" data-other=".pmp-other-sso-settings" class="pmp-dotted-link">'.
-				                '    '.__('click to toggle other advanced (optional) SSO settings', $this->plugin->text_domain).'</a>'.
-				                ' </div>'.
-
-				                ' <div class="pmp-other-sso-settings" style="display:none;"><hr />'.
-
-				                '    <div class="pmp-if-nest">'.
-
-				                '       <table style="margin-bottom:0;">'.
-				                '          <tbody>'.
-				                $form_fields->select_row(
-					                array(
-						                'label'           => __('Enable Comment Form SSO Options Template?', $this->plugin->text_domain),
-						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'field_class'     => 'pmp-if-change', // JS change handler.
-						                'name'            => 'comment_form_sso_template_enable',
-						                'current_value'   => $current_value_for('comment_form_sso_template_enable'),
-						                'allow_arbitrary' => FALSE, // Must be one of these.
-						                'options'         => array(
-							                '1' => __('Yes, use built-in template system (recommended)', $this->plugin->text_domain),
-							                '0' => __('No, disable built-in template system; I have a deep theme integration of my own', $this->plugin->text_domain),
-						                ),
-						                'notes_after'     => '<p>'.__('The built-in template system is quite flexible already; you can even customize the default template yourself if you want to (as seen below). Therefore, it is not recommended that you disable the default template system. This option only exists for very advanced users; i.e. those who prefer to disable the template completely in favor of their own custom implementation. If you disable the built-in template, you\'ll need to integrate HTML markup of your own into the proper location of your theme.', $this->plugin->text_domain).'</p>',
-					                )).
-				                '          </tbody>'.
-				                '       </table>'.
-
-				                '       <div class="pmp-if-disabled-show pmp-if-in-nest">'.
-				                '          <table style="margin-bottom:0;">'.
-				                '             <tbody>'.
-				                $form_fields->select_row(
-					                array(
-						                'label'           => __('Also Disable Scripts Associated w/ Comment Form SSO Options?', $this->plugin->text_domain),
-						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'name'            => 'comment_form_sso_scripts_enable',
-						                'current_value'   => $current_value_for('comment_form_sso_scripts_enable'),
-						                'allow_arbitrary' => FALSE, // Must be one of these.
-						                'options'         => array(
-							                '1' => __('No, leave scripts associated w/ comment form SSO options enabled (recommended)', $this->plugin->text_domain),
-							                '0' => __('Yes, disable built-in scripts also; I have a deep theme integration of my own', $this->plugin->text_domain),
-						                ),
-						                'notes_after'     => '<p>'.__('For advanced use only. If you disable the built-in template system, you may also want to disable the built-in JavaScript associated w/ this template.', $this->plugin->text_domain).'</p>',
-					                )).
-				                '             </tbody>'.
-				                '          </table>'.
-				                '       </div>'.
-
-				                '       <div class="pmp-if-enabled-show pmp-if-in-nest">'.
-				                '          <table>'.
-				                '             <tbody>'.
-				                ($this->plugin->options['template_type'] === 'a'
-					                ? $form_fields->textarea_row( // Advanced PHP-based template.
+					                '    <div class="pmp-tab-pane-twitter pmp-active">'.
+					                '       <table style="margin-bottom:0;">'.
+					                '          <tbody>'.
+					                $form_fields->input_row(
 						                array(
-							                'label'         => __('Comment Form SSO Options Template', $this->plugin->text_domain),
-							                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-							                'cm_mode'       => 'application/x-httpd-php', 'cm_height' => 250,
-							                'name'          => 'template__type_'.$this->plugin->options['template_type'].'__site__comment_form__sso_ops___php',
-							                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__comment_form__sso_ops___php'),
-							                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
-							                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
-							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>'.
-							                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-						                ))
-					                : $form_fields->textarea_row( // Simple snippet-based template.
+							                'label'         => sprintf(__('Twitter oAuth Consumer Key: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys#twitter', __('instructions', $this->plugin->text_domain))),
+							                'placeholder'   => __('e.g. kyczbsh6nnwtzrkm882kh7jf8', $this->plugin->text_domain),
+							                'name'          => 'sso_twitter_key',
+							                'current_value' => $current_value_for('sso_twitter_key'),
+							                'notes_after'   => $this->select_all_field(__('<strong>oAuth 1.0a Redirect/Callback URL:</strong>', $this->plugin->text_domain), $this->plugin->is_pro ? $this->plugin->utils_url->sso_action_url('twitter', 'callback') : ''),
+						                )).
+					                '          </tbody>'.
+					                '       </table>'.
+
+					                '       <table style="margin-top:0;">'.
+					                '          <tbody>'.
+					                $form_fields->input_row(
 						                array(
-							                'label'         => __('Comment Form SSO Options Template', $this->plugin->text_domain),
-							                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-							                'cm_mode'       => 'text/html', 'cm_height' => 250,
-							                'name'          => 'template__type_'.$this->plugin->options['template_type'].'__site__comment_form__snippet__sso_ops___php',
-							                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__comment_form__snippet__sso_ops___php'),
-							                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
-							                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
-							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>'.
-							                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-							                'cm_details'    => $shortcode_details(array(
-								                                                      '[css_styles]'    => __('Stylesheet containing a default set of structral styles.', $this->plugin->text_domain),
-								                                                      '[service_links]' => __('Links/icons for the SSO services that you have integrated with.', $this->plugin->text_domain),
-							                                                      )),
-						                ))).
-				                '             </tbody>'.
-				                '          </table>'.
-				                '       </div>'.
-				                '    </div>'.
+							                'type'          => 'password',
+							                'label'         => __('Twitter oAuth Consumer Secret:', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. gznuef64twbku3qpcdyx8jtfgcyccxsup8yu5gb95f493maf79', $this->plugin->text_domain),
+							                'name'          => 'sso_twitter_secret',
+							                'current_value' => $current_value_for('sso_twitter_secret'),
+						                )).
+					                '          </tbody>'.
+					                '       </table>'.
+					                '    </div>'.
 
-				                '    <hr />'.
-
-				                '    <div class="pmp-if-nest">'.
-				                '       <table style="margin-bottom:0;">'.
-				                '          <tbody>'.
-				                $form_fields->select_row(
-					                array(
-						                'label'           => __('Enable Login Form SSO Options Template?', $this->plugin->text_domain),
-						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'field_class'     => 'pmp-if-change', // JS change handler.
-						                'name'            => 'login_form_sso_template_enable',
-						                'current_value'   => $current_value_for('login_form_sso_template_enable'),
-						                'allow_arbitrary' => FALSE, // Must be one of these.
-						                'options'         => array(
-							                '1' => __('Yes, use built-in template system (recommended)', $this->plugin->text_domain),
-							                '0' => __('No, disable built-in template system; I have a deep theme integration of my own', $this->plugin->text_domain),
-						                ),
-						                'notes_after'     => '<p>'.__('The built-in template system is quite flexible already; you can even customize the default template yourself if you want to (as seen below). Therefore, it is not recommended that you disable the default template system. This option only exists for very advanced users; i.e. those who prefer to disable the template completely in favor of their own custom implementation. If you disable the built-in template, you\'ll need to integrate HTML markup of your own into the proper location of your theme.', $this->plugin->text_domain).'</p>',
-					                )).
-				                '          </tbody>'.
-				                '       </table>'.
-
-				                '       <div class="pmp-if-disabled-show pmp-if-in-nest">'.
-				                '          <table style="margin-bottom:0;">'.
-				                '             <tbody>'.
-				                $form_fields->select_row(
-					                array(
-						                'label'           => __('Also Disable Scripts Associated w/ Login Form SSO Options?', $this->plugin->text_domain),
-						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'name'            => 'login_form_sso_scripts_enable',
-						                'current_value'   => $current_value_for('login_form_sso_scripts_enable'),
-						                'allow_arbitrary' => FALSE, // Must be one of these.
-						                'options'         => array(
-							                '1' => __('No, leave scripts associated w/ login form SSO options enabled (recommended)', $this->plugin->text_domain),
-							                '0' => __('Yes, disable built-in scripts also; I have a deep theme integration of my own', $this->plugin->text_domain),
-						                ),
-						                'notes_after'     => '<p>'.__('For advanced use only. If you disable the built-in template system, you may also want to disable the built-in JavaScript associated w/ this template.', $this->plugin->text_domain).'</p>',
-					                )).
-				                '             </tbody>'.
-				                '          </table>'.
-				                '       </div>'.
-
-				                '       <div class="pmp-if-enabled-show pmp-if-in-nest">'.
-				                '          <table>'.
-				                '             <tbody>'.
-				                ($this->plugin->options['template_type'] === 'a'
-					                ? $form_fields->textarea_row( // Advanced PHP-based template.
+					                '    <div class="pmp-tab-pane-facebook">'.
+					                '       <table style="margin-bottom:0;">'.
+					                '          <tbody>'.
+					                $form_fields->input_row(
 						                array(
-							                'label'         => __('Login Form SSO Options Template', $this->plugin->text_domain),
-							                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-							                'cm_mode'       => 'application/x-httpd-php', 'cm_height' => 250,
-							                'name'          => 'template__type_'.$this->plugin->options['template_type'].'__site__login_form__sso_ops___php',
-							                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__login_form__sso_ops___php'),
-							                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
-							                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
-							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>'.
-							                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-						                ))
-					                : $form_fields->textarea_row( // Simple snippet-based template.
+							                'label'         => sprintf(__('Facebook oAuth App ID: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys#facebook', __('instructions', $this->plugin->text_domain))),
+							                'placeholder'   => __('e.g. 87df9vcu8njzrrnrgy2u2k2cj', $this->plugin->text_domain),
+							                'name'          => 'sso_facebook_key',
+							                'current_value' => $current_value_for('sso_facebook_key'),
+							                'notes_after'   => $this->select_all_field(__('<strong>oAuth 2.0 Redirect/Callback URL:</strong>', $this->plugin->text_domain), $this->plugin->is_pro ? $this->plugin->utils_url->sso_action_url('facebook', 'callback') : ''),
+						                )).
+					                '          </tbody>'.
+					                '       </table>'.
+
+					                '       <table style="margin-top:0;">'.
+					                '          <tbody>'.
+					                $form_fields->input_row(
 						                array(
-							                'label'         => __('Login Form SSO Options Template', $this->plugin->text_domain),
-							                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-							                'cm_mode'       => 'text/html', 'cm_height' => 250,
-							                'name'          => 'template__type_'.$this->plugin->options['template_type'].'__site__login_form__snippet__sso_ops___php',
-							                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__login_form__snippet__sso_ops___php'),
-							                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
-							                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
-							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>'.
-							                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-							                'cm_details'    => $shortcode_details(array(
-								                                                      '[css_styles]'    => __('Stylesheet containing a default set of structral styles.', $this->plugin->text_domain),
-								                                                      '[service_links]' => __('Links/icons for the SSO services that you have integrated with.', $this->plugin->text_domain),
-							                                                      )),
-						                ))).
-				                '             </tbody>'.
-				                '          </table>'.
-				                '       </div>'.
+							                'type'          => 'password',
+							                'label'         => __('Facebook oAuth App Secret:', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. pqs4vyjmw6rqt23knuajftuv7xxxgxtdwvuajnq7cj5a5ak22j', $this->plugin->text_domain),
+							                'name'          => 'sso_facebook_secret',
+							                'current_value' => $current_value_for('sso_facebook_secret'),
+						                )).
+					                '          </tbody>'.
+					                '       </table>'.
+					                '    </div>'.
 
-				                '    </div>'. // END: if nest.
+					                '    <div class="pmp-tab-pane-google">'.
+					                '       <table style="margin-bottom:0;">'.
+					                '          <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'label'         => sprintf(__('Google oAuth Client ID: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys#google', __('instructions', $this->plugin->text_domain))),
+							                'placeholder'   => __('e.g. qda788ac23s4m4utvqgkauwhf.apps.googleusercontent.com', $this->plugin->text_domain),
+							                'name'          => 'sso_google_key',
+							                'current_value' => $current_value_for('sso_google_key'),
+							                'notes_after'   => $this->select_all_field(__('<strong>oAuth 2.0 Redirect/Callback URL:</strong>', $this->plugin->text_domain), $this->plugin->is_pro ? $this->plugin->utils_url->sso_action_url('google', 'callback') : ''),
+						                )).
+					                '          </tbody>'.
+					                '       </table>'.
 
-				                ' </div>'. // END: toggled advanced (optional) settings.
+					                '       <table style="margin-top:0;">'.
+					                '          <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'type'          => 'password',
+							                'label'         => __('Google oAuth Client Secret:', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. djx4zsdyh4grkuw8qpkg382fr8uujmsahfj8x4b8aun437hye2', $this->plugin->text_domain),
+							                'name'          => 'sso_google_secret',
+							                'current_value' => $current_value_for('sso_google_secret'),
+						                )).
+					                '          </tbody>'.
+					                '       </table>'.
+					                '    </div>'.
 
-				                '</div>'; // END: if nest.
+					                '    <div class="pmp-tab-pane-linkedin">'.
+					                '       <table style="margin-bottom:0;">'.
+					                '          <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'label'         => sprintf(__('LinkedIn oAuth API/Consumer Key: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys#linkedin', __('instructions', $this->plugin->text_domain))),
+							                'placeholder'   => __('e.g. swf73zuj2puaug9e5a4ytpcg7', $this->plugin->text_domain),
+							                'name'          => 'sso_linkedin_key',
+							                'current_value' => $current_value_for('sso_linkedin_key'),
+							                'notes_after'   => $this->select_all_field(__('<strong>oAuth 2.0 Redirect/Callback URL:</strong>', $this->plugin->text_domain), $this->plugin->is_pro ? $this->plugin->utils_url->sso_action_url('linkedin', 'callback') : ''),
+						                )).
+					                '          </tbody>'.
+					                '       </table>'.
 
-				echo $this->panel(__('Single Sign-on Integration (SSO)', $this->plugin->text_domain), $_panel_body, array());
+					                '       <table style="margin-top:0;">'.
+					                '          <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'type'          => 'password',
+							                'label'         => __('LinkedIn oAuth API/Consumer Secret:', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. dtqvgh8qjkne4nhry7w56bzk86dcqr7racy5evmhegpt9gw9c4', $this->plugin->text_domain),
+							                'name'          => 'sso_linkedin_secret',
+							                'current_value' => $current_value_for('sso_linkedin_secret'),
+						                )).
+					                '          </tbody>'.
+					                '       </table>'.
+					                '    </div>'.
 
-				unset($_panel_body); // Housekeeping.
+					                ' </div>'. // End: tab panes.
 
+					                ' <hr />'. // Begin other advanced (optional) settings.
+
+					                ' <div style="margin-top:1em;">'.
+					                '     <i class="fa fa-caret-down"></i>'.
+					                '     <a href="#" data-toggle="other" data-other=".pmp-other-sso-settings" class="pmp-dotted-link">'.
+					                '    '.__('click to toggle other advanced (optional) SSO settings', $this->plugin->text_domain).'</a>'.
+					                ' </div>'.
+
+					                ' <div class="pmp-other-sso-settings" style="display:none;"><hr />'.
+
+					                '    <div class="pmp-if-nest">'.
+
+					                '       <table style="margin-bottom:0;">'.
+					                '          <tbody>'.
+					                $form_fields->select_row(
+						                array(
+							                'label'           => __('Enable Comment Form SSO Options Template?', $this->plugin->text_domain),
+							                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							                'field_class'     => 'pmp-if-change', // JS change handler.
+							                'name'            => 'comment_form_sso_template_enable',
+							                'current_value'   => $current_value_for('comment_form_sso_template_enable'),
+							                'allow_arbitrary' => FALSE, // Must be one of these.
+							                'options'         => array(
+								                '1' => __('Yes, use built-in template system (recommended)', $this->plugin->text_domain),
+								                '0' => __('No, disable built-in template system; I have a deep theme integration of my own', $this->plugin->text_domain),
+							                ),
+							                'notes_after'     => '<p>'.__('The built-in template system is quite flexible already; you can even customize the default template yourself if you want to (as seen below). Therefore, it is not recommended that you disable the default template system. This option only exists for very advanced users; i.e. those who prefer to disable the template completely in favor of their own custom implementation. If you disable the built-in template, you\'ll need to integrate HTML markup of your own into the proper location of your theme.', $this->plugin->text_domain).'</p>',
+						                )).
+					                '          </tbody>'.
+					                '       </table>'.
+
+					                '       <div class="pmp-if-disabled-show pmp-if-in-nest">'.
+					                '          <table style="margin-bottom:0;">'.
+					                '             <tbody>'.
+					                $form_fields->select_row(
+						                array(
+							                'label'           => __('Also Disable Scripts Associated w/ Comment Form SSO Options?', $this->plugin->text_domain),
+							                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							                'name'            => 'comment_form_sso_scripts_enable',
+							                'current_value'   => $current_value_for('comment_form_sso_scripts_enable'),
+							                'allow_arbitrary' => FALSE, // Must be one of these.
+							                'options'         => array(
+								                '1' => __('No, leave scripts associated w/ comment form SSO options enabled (recommended)', $this->plugin->text_domain),
+								                '0' => __('Yes, disable built-in scripts also; I have a deep theme integration of my own', $this->plugin->text_domain),
+							                ),
+							                'notes_after'     => '<p>'.__('For advanced use only. If you disable the built-in template system, you may also want to disable the built-in JavaScript associated w/ this template.', $this->plugin->text_domain).'</p>',
+						                )).
+					                '             </tbody>'.
+					                '          </table>'.
+					                '       </div>'.
+
+					                '       <div class="pmp-if-enabled-show pmp-if-in-nest">'.
+					                '          <table>'.
+					                '             <tbody>'.
+					                ($this->plugin->options['template_type'] === 'a'
+						                ? $form_fields->textarea_row( // Advanced PHP-based template.
+							                array(
+								                'label'         => __('Comment Form SSO Options Template', $this->plugin->text_domain),
+								                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+								                'cm_mode'       => 'application/x-httpd-php', 'cm_height' => 250,
+								                'name'          => 'template__type_'.$this->plugin->options['template_type'].'__site__comment_form__sso_ops___php',
+								                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__comment_form__sso_ops___php'),
+								                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+								                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
+								                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>'.
+								                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							                ))
+						                : $form_fields->textarea_row( // Simple snippet-based template.
+							                array(
+								                'label'         => __('Comment Form SSO Options Template', $this->plugin->text_domain),
+								                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+								                'cm_mode'       => 'text/html', 'cm_height' => 250,
+								                'name'          => 'template__type_'.$this->plugin->options['template_type'].'__site__comment_form__snippet__sso_ops___php',
+								                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__comment_form__snippet__sso_ops___php'),
+								                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+								                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
+								                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>'.
+								                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+								                'cm_details'    => $shortcode_details(array(
+									                                                      '[css_styles]'    => __('Stylesheet containing a default set of structral styles.', $this->plugin->text_domain),
+									                                                      '[service_links]' => __('Links/icons for the SSO services that you have integrated with.', $this->plugin->text_domain),
+								                                                      )),
+							                ))).
+					                '             </tbody>'.
+					                '          </table>'.
+					                '       </div>'.
+					                '    </div>'.
+
+					                '    <hr />'.
+
+					                '    <div class="pmp-if-nest">'.
+					                '       <table style="margin-bottom:0;">'.
+					                '          <tbody>'.
+					                $form_fields->select_row(
+						                array(
+							                'label'           => __('Enable Login Form SSO Options Template?', $this->plugin->text_domain),
+							                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							                'field_class'     => 'pmp-if-change', // JS change handler.
+							                'name'            => 'login_form_sso_template_enable',
+							                'current_value'   => $current_value_for('login_form_sso_template_enable'),
+							                'allow_arbitrary' => FALSE, // Must be one of these.
+							                'options'         => array(
+								                '1' => __('Yes, use built-in template system (recommended)', $this->plugin->text_domain),
+								                '0' => __('No, disable built-in template system; I have a deep theme integration of my own', $this->plugin->text_domain),
+							                ),
+							                'notes_after'     => '<p>'.__('The built-in template system is quite flexible already; you can even customize the default template yourself if you want to (as seen below). Therefore, it is not recommended that you disable the default template system. This option only exists for very advanced users; i.e. those who prefer to disable the template completely in favor of their own custom implementation. If you disable the built-in template, you\'ll need to integrate HTML markup of your own into the proper location of your theme.', $this->plugin->text_domain).'</p>',
+						                )).
+					                '          </tbody>'.
+					                '       </table>'.
+
+					                '       <div class="pmp-if-disabled-show pmp-if-in-nest">'.
+					                '          <table style="margin-bottom:0;">'.
+					                '             <tbody>'.
+					                $form_fields->select_row(
+						                array(
+							                'label'           => __('Also Disable Scripts Associated w/ Login Form SSO Options?', $this->plugin->text_domain),
+							                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							                'name'            => 'login_form_sso_scripts_enable',
+							                'current_value'   => $current_value_for('login_form_sso_scripts_enable'),
+							                'allow_arbitrary' => FALSE, // Must be one of these.
+							                'options'         => array(
+								                '1' => __('No, leave scripts associated w/ login form SSO options enabled (recommended)', $this->plugin->text_domain),
+								                '0' => __('Yes, disable built-in scripts also; I have a deep theme integration of my own', $this->plugin->text_domain),
+							                ),
+							                'notes_after'     => '<p>'.__('For advanced use only. If you disable the built-in template system, you may also want to disable the built-in JavaScript associated w/ this template.', $this->plugin->text_domain).'</p>',
+						                )).
+					                '             </tbody>'.
+					                '          </table>'.
+					                '       </div>'.
+
+					                '       <div class="pmp-if-enabled-show pmp-if-in-nest">'.
+					                '          <table>'.
+					                '             <tbody>'.
+					                ($this->plugin->options['template_type'] === 'a'
+						                ? $form_fields->textarea_row( // Advanced PHP-based template.
+							                array(
+								                'label'         => __('Login Form SSO Options Template', $this->plugin->text_domain),
+								                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+								                'cm_mode'       => 'application/x-httpd-php', 'cm_height' => 250,
+								                'name'          => 'template__type_'.$this->plugin->options['template_type'].'__site__login_form__sso_ops___php',
+								                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__login_form__sso_ops___php'),
+								                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+								                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
+								                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>'.
+								                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+							                ))
+						                : $form_fields->textarea_row( // Simple snippet-based template.
+							                array(
+								                'label'         => __('Login Form SSO Options Template', $this->plugin->text_domain),
+								                'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+								                'cm_mode'       => 'text/html', 'cm_height' => 250,
+								                'name'          => 'template__type_'.$this->plugin->options['template_type'].'__site__login_form__snippet__sso_ops___php',
+								                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__login_form__snippet__sso_ops___php'),
+								                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e. you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
+								                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
+								                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>'.
+								                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+								                'cm_details'    => $shortcode_details(array(
+									                                                      '[css_styles]'    => __('Stylesheet containing a default set of structral styles.', $this->plugin->text_domain),
+									                                                      '[service_links]' => __('Links/icons for the SSO services that you have integrated with.', $this->plugin->text_domain),
+								                                                      )),
+							                ))).
+					                '             </tbody>'.
+					                '          </table>'.
+					                '       </div>'.
+
+					                '    </div>'. // END: if nest.
+
+					                ' </div>'. // END: toggled advanced (optional) settings.
+
+					                '</div>'; // END: if nest.
+
+					echo $this->panel(__('Single Sign-on Integration (SSO)', $this->plugin->text_domain), $_panel_body, array('pro_only' => TRUE));
+
+					unset($_panel_body); // Housekeeping.
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
 				$_panel_body = '<table>'.
