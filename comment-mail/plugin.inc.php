@@ -2030,9 +2030,6 @@ namespace comment_mail
 			 */
 			public function pre_option_comment_registration($registration_required)
 			{
-				if($this->options['replies_via_email_enable'])
-					$registration_required = $this->utils_rve->pre_option_comment_registration($registration_required);
-
 				return $registration_required; // Pass through.
 			}
 
@@ -2056,9 +2053,6 @@ namespace comment_mail
 			 */
 			public function pre_comment_approved($comment_status, array $comment_data)
 			{
-				if($this->options['replies_via_email_enable'])
-					$comment_status = $this->utils_rve->pre_comment_approved($comment_status, $comment_data);
-
 				return $comment_status; // Pass through.
 			}
 

@@ -36,10 +36,7 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
-				$this->valid_actions
-					= array(
-					'rve_mandrill',
-				);
+				$this->valid_actions = array();
 				$this->maybe_handle();
 			}
 
@@ -60,22 +57,6 @@ namespace comment_mail // Root namespace.
 					if($_action && in_array($_action, $this->valid_actions, TRUE))
 						$this->{$_action}($this->plugin->utils_string->trim_strip_deep($_request_args));
 				unset($_action, $_request_args); // Housekeeping.
-			}
-
-			/**
-			 * RVE Webhook for Mandrill.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param mixed $request_args Input argument(s).
-			 */
-			protected function rve_mandrill($request_args)
-			{
-				$key = trim((string)$request_args);
-
-				new rve_mandrill($key);
-
-				exit(); // Stop; always.
 			}
 		}
 	}

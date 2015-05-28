@@ -932,142 +932,144 @@ namespace comment_mail // Root namespace.
 
 				/* ----------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table style="margin:0;">'.
-				               ' <tbody>'.
-				               $form_fields->select_row(
-					               array(
-						               'label'           => __('Enable RVE (Replies via Email)?', $this->plugin->text_domain),
-						               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						               'field_class'     => 'pmp-if-change', // JS change handler.
-						               'name'            => 'replies_via_email_enable',
-						               'current_value'   => $current_value_for('replies_via_email_enable'),
-						               'allow_arbitrary' => FALSE, // Must be one of these.
-						               'options'         => array(
-							               '0' => __('No, do not allow comment replies via email', $this->plugin->text_domain),
-							               '1' => __('Yes, allow subscribers to post comment replies via email (recommended)', $this->plugin->text_domain),
-						               ),
-						               'notes_after'     => '<div class="pmp-if-enabled-show">'.
-						                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('When Replies via Email are enabled through an RVE Handler:', $this->plugin->text_domain).'</p>'.
-						                                    '   <ul class="pmp-list-items">'.
-						                                    '      <li>'.sprintf(__('%1$s&trade; will allow replies to comments via email using a special <code>Reply-To</code> address that you will need to set up by following the instructions provided below. Any other <code>Reply-To</code> address configured elsewhere in %1$s will be overridden by the address you configure here for an RVE Handler. There are no special exceptions to this. An RVE Handler takes precedence over any other <code>Reply-To</code> you configure.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
-						                                    '      <li>'.sprintf(__('Replies to comments via email will be functional for all types of notifications sent by %1$s (including digest notifications). However, there are a few things worth noting before you enable an RVE Handler. <a href="#" data-toggle="other" data-other=".pmp-rve-details">Click here to toggle important details</a>.', $this->plugin->text_domain), esc_html($this->plugin->name)).
-						                                    '        <ul class="pmp-rve-details" style="display:none;">'.
-						                                    '           <li>'.sprintf(__('All replies posted via email must be sent to the special <code>Reply-To</code> address that you configure below. Once you configure a <code>Reply-To</code> for an RVE Handler, %1$s will automatically set the <code>Reply-To:</code> header in all email notifications that it sends. This way when somebody replies to a comment notification, their email program will reply to the address required for replies via email to work properly.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
-						                                    '           <li>'.sprintf(__('The <code>Reply-To</code> address that you configure below, will serve as a base for %1$s to work from. For instance, let\'s say you choose: <code>rve@mandrill.%2$s</code>. This base address will be suffixed automatically (at runtime) with details specific to a particular notification that %1$s sends. Ultimately, <code>rve@mandrill.%2$s</code> will look like: <code>rve<strong>+332-96-kgjdgxr4ldqpdrgjdgxr</strong>@mandrill.%2$s</code>. In this example, the additional details (following the <code>+</code> sign) are there to help %1$s route the reply to the proper location, and to provide a means by which to identify the end-user that is posting a reply.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html($this->plugin->utils_url->current_host_base())).'</li>'.
-						                                    '           <li>'.sprintf(__('For single-comment notifications; i.e. where a subscriber chooses delivery type <code>asap</code> (aka: instantly), there is just a single comment in each notification that a subscriber receives. This works best with replies via email, since the <code>Reply-To:</code> header (on its own) is enough for everything to work as expected. Someone replying via email need only hit the Reply button in their email program and start typing. Very simple.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
-						                                    '           <li>'.sprintf(__('For multi-comment notifications; i.e. where a subscriber chooses a delivery type that is not <code>asap</code> (e.g. <code>hourly</code>, <code>daily</code>, etc.); there can be more than a single comment in each notification they receive. If there is more than one comment in the notification, instructions will be provided to the end-user explaining how to reply. The special <code>Reply-To</code> address is still used in this case. However, they also need to specify which comment they want to reply to. To do this, the end-user must start their reply with a special marker provided by %1$s. Again, if there is more than one comment in the notification, instructions will be provided to the end-user explaining how to reply.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
-						                                    '           <li>'.sprintf(__('Comments posted via email are still piped through the same underlying WordPress handler that normal on-site comments go through (i.e. <code>/wp-comments-post.php</code>). This means that all of your existing WordPress Discussion Settings (and/or Akismet settings) will still apply to all comments, even if they are posted via email. <strong>With one exception.</strong> When an RVE Handler is enabled, any comments posted via email are allowed through without an end-user being logged-in. If your WordPress Discussion Settings require that users be logged-in to post comments, that will be overridden temporarily whenever a reply via email comes through. Please note that replies posted via email are generally from confirmed subscribers. Any reply via email that is not from a confirmed subscriber will be forced into moderation by %1$s anyway. Otherwise, whatever your current Discussion Settings are configured to allow, will be adhered to for replies via email also. For instance, if you require that all comments be moderated, that will continue to be the case for all replies via email. %1$s will never approve a comment on it\'s own. Approval of comments is always determined by your WP Discussion Settings.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
-						                                    '           <li>'.sprintf(__('Any reply via email should include one of two things. A copy of the original quoted notification, or a special <code>%2$s</code> marker. Most email clients will include the original message in an email reply, and this is what %1$s will look for. %1$s scans the body of the email looking for an original quoted section and strips it out (along with anything below it). If a reply does not include a quoted section when replying to an email notification, an <code>%2$s</code> marker can be used instead. When %1$s reads <code>%2$s</code>, it will use it as a marker and ignore everything below that line. Everything above <code>%2$s</code> will become the comment reply on your blog. Therefore, you can use the <code>%2$s</code> feature even if you have quoting turned off in your email client. If neither of these are found, the reply is still accepted. However, it will be forced into moderation at all times; i.e. you must approve it manually no matter what the rest of your WordPress Discussion Settings say.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html($this->plugin->utils_rve->manual_end_divider())).'</li>'.
-						                                    '        </ul>'.
-						                                    '     </li>'.
-						                                    '   </ul>'.
-						                                    '</div>',
-					               )).
-				               ' </tbody>'.
-				               '</table>';
+				if($this->plugin->is_pro || $this->plugin->utils_env->is_pro_preview())
+				{
+					$_panel_body = '<table style="margin:0;">'.
+					               ' <tbody>'.
+					               $form_fields->select_row(
+						               array(
+							               'label'           => __('Enable RVE (Replies via Email)?', $this->plugin->text_domain),
+							               'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							               'field_class'     => 'pmp-if-change', // JS change handler.
+							               'name'            => 'replies_via_email_enable',
+							               'current_value'   => $current_value_for('replies_via_email_enable'),
+							               'allow_arbitrary' => FALSE, // Must be one of these.
+							               'options'         => array(
+								               '0' => __('No, do not allow comment replies via email', $this->plugin->text_domain),
+								               '1' => __('Yes, allow subscribers to post comment replies via email (recommended)', $this->plugin->text_domain),
+							               ),
+							               'notes_after'     => '<div class="pmp-if-enabled-show">'.
+							                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('When Replies via Email are enabled through an RVE Handler:', $this->plugin->text_domain).'</p>'.
+							                                    '   <ul class="pmp-list-items">'.
+							                                    '      <li>'.sprintf(__('%1$s&trade; will allow replies to comments via email using a special <code>Reply-To</code> address that you will need to set up by following the instructions provided below. Any other <code>Reply-To</code> address configured elsewhere in %1$s will be overridden by the address you configure here for an RVE Handler. There are no special exceptions to this. An RVE Handler takes precedence over any other <code>Reply-To</code> you configure.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
+							                                    '      <li>'.sprintf(__('Replies to comments via email will be functional for all types of notifications sent by %1$s (including digest notifications). However, there are a few things worth noting before you enable an RVE Handler. <a href="#" data-toggle="other" data-other=".pmp-rve-details">Click here to toggle important details</a>.', $this->plugin->text_domain), esc_html($this->plugin->name)).
+							                                    '        <ul class="pmp-rve-details" style="display:none;">'.
+							                                    '           <li>'.sprintf(__('All replies posted via email must be sent to the special <code>Reply-To</code> address that you configure below. Once you configure a <code>Reply-To</code> for an RVE Handler, %1$s will automatically set the <code>Reply-To:</code> header in all email notifications that it sends. This way when somebody replies to a comment notification, their email program will reply to the address required for replies via email to work properly.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
+							                                    '           <li>'.sprintf(__('The <code>Reply-To</code> address that you configure below, will serve as a base for %1$s to work from. For instance, let\'s say you choose: <code>rve@mandrill.%2$s</code>. This base address will be suffixed automatically (at runtime) with details specific to a particular notification that %1$s sends. Ultimately, <code>rve@mandrill.%2$s</code> will look like: <code>rve<strong>+332-96-kgjdgxr4ldqpdrgjdgxr</strong>@mandrill.%2$s</code>. In this example, the additional details (following the <code>+</code> sign) are there to help %1$s route the reply to the proper location, and to provide a means by which to identify the end-user that is posting a reply.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html($this->plugin->utils_url->current_host_base())).'</li>'.
+							                                    '           <li>'.sprintf(__('For single-comment notifications; i.e. where a subscriber chooses delivery type <code>asap</code> (aka: instantly), there is just a single comment in each notification that a subscriber receives. This works best with replies via email, since the <code>Reply-To:</code> header (on its own) is enough for everything to work as expected. Someone replying via email need only hit the Reply button in their email program and start typing. Very simple.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
+							                                    '           <li>'.sprintf(__('For multi-comment notifications; i.e. where a subscriber chooses a delivery type that is not <code>asap</code> (e.g. <code>hourly</code>, <code>daily</code>, etc.); there can be more than a single comment in each notification they receive. If there is more than one comment in the notification, instructions will be provided to the end-user explaining how to reply. The special <code>Reply-To</code> address is still used in this case. However, they also need to specify which comment they want to reply to. To do this, the end-user must start their reply with a special marker provided by %1$s. Again, if there is more than one comment in the notification, instructions will be provided to the end-user explaining how to reply.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
+							                                    '           <li>'.sprintf(__('Comments posted via email are still piped through the same underlying WordPress handler that normal on-site comments go through (i.e. <code>/wp-comments-post.php</code>). This means that all of your existing WordPress Discussion Settings (and/or Akismet settings) will still apply to all comments, even if they are posted via email. <strong>With one exception.</strong> When an RVE Handler is enabled, any comments posted via email are allowed through without an end-user being logged-in. If your WordPress Discussion Settings require that users be logged-in to post comments, that will be overridden temporarily whenever a reply via email comes through. Please note that replies posted via email are generally from confirmed subscribers. Any reply via email that is not from a confirmed subscriber will be forced into moderation by %1$s anyway. Otherwise, whatever your current Discussion Settings are configured to allow, will be adhered to for replies via email also. For instance, if you require that all comments be moderated, that will continue to be the case for all replies via email. %1$s will never approve a comment on it\'s own. Approval of comments is always determined by your WP Discussion Settings.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
+							                                    '           <li>'.sprintf(__('Any reply via email should include one of two things. A copy of the original quoted notification, or a special <code>%2$s</code> marker. Most email clients will include the original message in an email reply, and this is what %1$s will look for. %1$s scans the body of the email looking for an original quoted section and strips it out (along with anything below it). If a reply does not include a quoted section when replying to an email notification, an <code>%2$s</code> marker can be used instead. When %1$s reads <code>%2$s</code>, it will use it as a marker and ignore everything below that line. Everything above <code>%2$s</code> will become the comment reply on your blog. Therefore, you can use the <code>%2$s</code> feature even if you have quoting turned off in your email client. If neither of these are found, the reply is still accepted. However, it will be forced into moderation at all times; i.e. you must approve it manually no matter what the rest of your WordPress Discussion Settings say.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html($this->plugin->utils_rve->manual_end_divider())).'</li>'.
+							                                    '        </ul>'.
+							                                    '     </li>'.
+							                                    '   </ul>'.
+							                                    '</div>',
+						               )).
+					               ' </tbody>'.
+					               '</table>';
 
-				$_panel_body .= '<div class="pmp-if-enabled-show pmp-if-nest"><hr />'.
+					$_panel_body .= '<div class="pmp-if-enabled-show pmp-if-nest"><hr />'.
 
-				                '<a href="https://github.com/websharks/comment-mail/wiki/Mandrill-RVE-Handler" target="_blank">'.
-				                '<img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/mandrill-rec.png')).'" class="pmp-right" style="margin-left:3em;" /></a>'.
+					                '<a href="https://github.com/websharks/comment-mail/wiki/Mandrill-RVE-Handler" target="_blank">'.
+					                '<img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/mandrill-rec.png')).'" class="pmp-right" style="margin-left:3em;" /></a>'.
 
-				                ' <table style="width:auto; margin-bottom:0;">'.
-				                '    <tbody>'.
-				                $form_fields->select_row(
-					                array(
-						                'label'           => __('Choose an RVE Handler:', $this->plugin->text_domain),
-						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'field_class'     => 'pmp-if-change pmp-if-value-match',
-						                'name'            => 'replies_via_email_handler',
-						                'current_value'   => $current_value_for('replies_via_email_handler'),
-						                'allow_arbitrary' => FALSE, // Must be one of these.
-						                'options'         => array(
-							                ''         => '', // Empty value for the sake of making this somewhat understandable.
-							                'mandrill' => __('Mandrill RVE Handler (free; recommended)', $this->plugin->text_domain),
-						                ),
-						                'notes_after'     => '<p>'.sprintf(__('<strong>Note:</strong> %1$s is currently the only choice here; i.e. we have only integrated this with Mandrill thus far <i class="fa fa-smile-o"></i>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/21699367-Inbound-Email-Processing-Overview', 'Mandrill')).'</p>'
-					                )).
-				                '    </tbody>'.
-				                ' </table>'.
+					                ' <table style="width:auto; margin-bottom:0;">'.
+					                '    <tbody>'.
+					                $form_fields->select_row(
+						                array(
+							                'label'           => __('Choose an RVE Handler:', $this->plugin->text_domain),
+							                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							                'field_class'     => 'pmp-if-change pmp-if-value-match',
+							                'name'            => 'replies_via_email_handler',
+							                'current_value'   => $current_value_for('replies_via_email_handler'),
+							                'allow_arbitrary' => FALSE, // Must be one of these.
+							                'options'         => array(
+								                ''         => '', // Empty value for the sake of making this somewhat understandable.
+								                'mandrill' => __('Mandrill RVE Handler (free; recommended)', $this->plugin->text_domain),
+							                ),
+							                'notes_after'     => '<p>'.sprintf(__('<strong>Note:</strong> %1$s is currently the only choice here; i.e. we have only integrated this with Mandrill thus far <i class="fa fa-smile-o"></i>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/21699367-Inbound-Email-Processing-Overview', 'Mandrill')).'</p>'
+						                )).
+					                '    </tbody>'.
+					                ' </table>'.
 
-				                ' <div class="pmp-if-enabled-show pmp-if-value-mandrill pmp-in-if-nest"><hr />'.
-				                '    <table>'.
-				                '       <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'email',
-						                'label'         => __('Mandrill <code>Reply-To</code> Address:', $this->plugin->text_domain),
-						                'placeholder'   => sprintf(__('e.g. rve@mandrill.%1$s', $this->plugin->text_domain), $this->plugin->utils_url->current_host_base()),
-						                'name'          => 'rve_mandrill_reply_to_email',
-						                'current_value' => $current_value_for('rve_mandrill_reply_to_email'),
-						                'notes_after'   => '<p class="pmp-note pmp-info">'.sprintf(__('This is really all it takes to get Replies via Email working. However, it requires that you setup a Mandrill account (free) and then configure an Inbound Mailbox Route that will connect to the Webhook URL shown below. <span class="pmp-hilite">Please see %1$s for detailed instructions.</span>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/Mandrill-RVE-Handler', __('this wiki article', $this->plugin->text_domain))).'</p>'.
-						                                   $this->select_all_field(__('<strong>Mandrill Webhook URL:</strong>', $this->plugin->text_domain), $this->plugin->utils_url->rve_mandrill_webhook_url()),
-					                )).
-				                '       </tbody>'.
-				                '    </table>'.
+					                ' <div class="pmp-if-enabled-show pmp-if-value-mandrill pmp-in-if-nest"><hr />'.
+					                '    <table>'.
+					                '       <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'type'          => 'email',
+							                'label'         => __('Mandrill <code>Reply-To</code> Address:', $this->plugin->text_domain),
+							                'placeholder'   => sprintf(__('e.g. rve@mandrill.%1$s', $this->plugin->text_domain), $this->plugin->utils_url->current_host_base()),
+							                'name'          => 'rve_mandrill_reply_to_email',
+							                'current_value' => $current_value_for('rve_mandrill_reply_to_email'),
+							                'notes_after'   => '<p class="pmp-note pmp-info">'.sprintf(__('This is really all it takes to get Replies via Email working. However, it requires that you setup a Mandrill account (free) and then configure an Inbound Mailbox Route that will connect to the Webhook URL shown below. <span class="pmp-hilite">Please see %1$s for detailed instructions.</span>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/Mandrill-RVE-Handler', __('this wiki article', $this->plugin->text_domain))).'</p>'.
+							                                   $this->select_all_field(__('<strong>Mandrill Webhook URL:</strong>', $this->plugin->text_domain), $this->plugin->is_pro ? $this->plugin->utils_url->rve_mandrill_webhook_url() : ''),
+						                )).
+					                '       </tbody>'.
+					                '    </table>'.
 
-				                '    <hr />'.
+					                '    <hr />'.
 
-				                '    <table>'.
-				                '       <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'number',
-						                'label'         => __('Mandrill Max Overall Spam Score Allowed:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. 5.0', $this->plugin->text_domain),
-						                'name'          => 'rve_mandrill_max_spam_score',
-						                'current_value' => $current_value_for('rve_mandrill_max_spam_score'),
-						                'notes_after'   => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>3.0</code> to <code>5.0</code> is suggested here. Any reply via email with a spam score higher than what is configured here, will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g. if you use Akismet, each comment must also pass through Akismet too.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-', __('checks performed by Mandrill', $this->plugin->text_domain))).'</p>',
-					                )).
-				                '       </tbody>'.
-				                '    </table>'.
+					                '    <table>'.
+					                '       <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'type'          => 'number',
+							                'label'         => __('Mandrill Max Overall Spam Score Allowed:', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. 5.0', $this->plugin->text_domain),
+							                'name'          => 'rve_mandrill_max_spam_score',
+							                'current_value' => $current_value_for('rve_mandrill_max_spam_score'),
+							                'notes_after'   => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>3.0</code> to <code>5.0</code> is suggested here. Any reply via email with a spam score higher than what is configured here, will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g. if you use Akismet, each comment must also pass through Akismet too.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-', __('checks performed by Mandrill', $this->plugin->text_domain))).'</p>',
+						                )).
+					                '       </tbody>'.
+					                '    </table>'.
 
-				                '    <table>'.
-				                '       <tbody>'.
-				                $form_fields->select_row(
-					                array(
-						                'label'           => __('Mandrill SPF Rejection Policy:', $this->plugin->text_domain),
-						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'name'            => 'rve_mandrill_spf_check_enable',
-						                'current_value'   => $current_value_for('rve_mandrill_spf_check_enable'),
-						                'allow_arbitrary' => FALSE, // Must be one of these.
-						                'options'         => array(
-							                '0' => __('Do not check SPF test results at all; i.e. no SPF rejection policy', $this->plugin->text_domain),
-							                '1' => __('Require SPF test result: "pass|neutral|softfail|none"; else flag as spam for moderation (recommended)', $this->plugin->text_domain),
-							                '2' => __('Require SPF test result: "pass|neutral|none"; else flag as spam for moderation', $this->plugin->text_domain),
-							                '3' => __('Require SPF test result: "pass|neutral"; else flag as spam for moderation', $this->plugin->text_domain),
-							                '4' => __('Require SPF test result: "pass"; else flag as spam for moderation', $this->plugin->text_domain),
-						                ),
-						                'notes_after'     => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>pass|neutral|softfail|none</code> is suggested here; where <code>|</code> means "or" (i.e. one of these results). Any reply via email that does not pass your rejection policy will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g. if you use Akismet, each comment must also pass through Akismet too.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-', __('checks performed by Mandrill', $this->plugin->text_domain))).'</p>',
-					                )).
-				                '       </tbody>'.
-				                '    </table>'.
+					                '    <table>'.
+					                '       <tbody>'.
+					                $form_fields->select_row(
+						                array(
+							                'label'           => __('Mandrill SPF Rejection Policy:', $this->plugin->text_domain),
+							                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							                'name'            => 'rve_mandrill_spf_check_enable',
+							                'current_value'   => $current_value_for('rve_mandrill_spf_check_enable'),
+							                'allow_arbitrary' => FALSE, // Must be one of these.
+							                'options'         => array(
+								                '0' => __('Do not check SPF test results at all; i.e. no SPF rejection policy', $this->plugin->text_domain),
+								                '1' => __('Require SPF test result: "pass|neutral|softfail|none"; else flag as spam for moderation (recommended)', $this->plugin->text_domain),
+								                '2' => __('Require SPF test result: "pass|neutral|none"; else flag as spam for moderation', $this->plugin->text_domain),
+								                '3' => __('Require SPF test result: "pass|neutral"; else flag as spam for moderation', $this->plugin->text_domain),
+								                '4' => __('Require SPF test result: "pass"; else flag as spam for moderation', $this->plugin->text_domain),
+							                ),
+							                'notes_after'     => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>pass|neutral|softfail|none</code> is suggested here; where <code>|</code> means "or" (i.e. one of these results). Any reply via email that does not pass your rejection policy will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g. if you use Akismet, each comment must also pass through Akismet too.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-', __('checks performed by Mandrill', $this->plugin->text_domain))).'</p>',
+						                )).
+					                '       </tbody>'.
+					                '    </table>'.
 
-				                '    <table>'.
-				                '       <tbody>'.
-				                $form_fields->select_row(
-					                array(
-						                'label'           => __('Mandrill DKIM Rejection Policy:', $this->plugin->text_domain),
-						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'name'            => 'rve_mandrill_dkim_check_enable',
-						                'current_value'   => $current_value_for('rve_mandrill_dkim_check_enable'),
-						                'allow_arbitrary' => FALSE, // Must be one of these.
-						                'options'         => array(
-							                '0' => __('Do not check DKIM test results at all; i.e. no DKIM rejection policy', $this->plugin->text_domain),
-							                '1' => __('If DKIM signature "exists, but it\'s invalid"; flag as spam for moderation (recommended)', $this->plugin->text_domain),
-							                '2' => __('If DKIM signature "is missing or invalid"; flag as spam for moderation', $this->plugin->text_domain),
-						                ),
-						                'notes_after'     => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>signature exists, but invalid</code> is suggested here. Any reply via email that does not pass your rejection policy will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g. if you use Akismet, each comment must also pass through Akismet too.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-', __('checks performed by Mandrill', $this->plugin->text_domain))).'</p>',
-					                )).
-				                '       </tbody>'.
-				                '    </table>'.
-				                ' </div>'.
-				                '</div>';
+					                '    <table>'.
+					                '       <tbody>'.
+					                $form_fields->select_row(
+						                array(
+							                'label'           => __('Mandrill DKIM Rejection Policy:', $this->plugin->text_domain),
+							                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							                'name'            => 'rve_mandrill_dkim_check_enable',
+							                'current_value'   => $current_value_for('rve_mandrill_dkim_check_enable'),
+							                'allow_arbitrary' => FALSE, // Must be one of these.
+							                'options'         => array(
+								                '0' => __('Do not check DKIM test results at all; i.e. no DKIM rejection policy', $this->plugin->text_domain),
+								                '1' => __('If DKIM signature "exists, but it\'s invalid"; flag as spam for moderation (recommended)', $this->plugin->text_domain),
+								                '2' => __('If DKIM signature "is missing or invalid"; flag as spam for moderation', $this->plugin->text_domain),
+							                ),
+							                'notes_after'     => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>signature exists, but invalid</code> is suggested here. Any reply via email that does not pass your rejection policy will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g. if you use Akismet, each comment must also pass through Akismet too.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-', __('checks performed by Mandrill', $this->plugin->text_domain))).'</p>',
+						                )).
+					                '       </tbody>'.
+					                '    </table>'.
+					                ' </div>'.
+					                '</div>';
 
-				echo $this->panel(__('Replies via Email (RVE Handler)', $this->plugin->text_domain), $_panel_body, array());
+					echo $this->panel(__('Replies via Email (RVE Handler)', $this->plugin->text_domain), $_panel_body, array('pro_only' => TRUE));
 
-				unset($_panel_body); // Housekeeping.
-
+					unset($_panel_body); // Housekeeping.
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
 				$_panel_body = '<table style="margin-bottom:0;">'.

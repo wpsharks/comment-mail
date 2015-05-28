@@ -29,7 +29,7 @@ namespace comment_mail;
  *    another template file, that particular variable will ALSO be made available in this file too;
  *    as this file is automatically included as a child of other parent templates.
  *
- * @var string|null $email_rve_end_divider This variable may be defined for some parent templates.
+ * @var string|null $email_rve_end_divider Pro version only. This variable may be defined for some parent templates.
  *    If it exists, you should include it as part of the header to allow replies via email to work as expected.
  *    This will only be defined when replies via email have been enabled by the site owner; and only for certain parent templates.
  *    ~ This marks the end of a reply via email; i.e. the beginning of the original quoted message in a reply.
