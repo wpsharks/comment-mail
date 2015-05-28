@@ -37,26 +37,9 @@ namespace comment_mail // Root namespace.
 			{
 				parent::__construct();
 
-				$this->maybe_do_sso_actions();
 				$this->maybe_do_sub_actions();
 				$this->maybe_do_webhook_actions();
 				$this->maybe_do_menu_page_actions();
-			}
-
-			/**
-			 * Single sign-on actions.
-			 *
-			 * @since 141111 First documented version.
-			 */
-			protected function maybe_do_sso_actions()
-			{
-				if(is_admin())
-					return; // Not applicable.
-
-				if(empty($_REQUEST[__NAMESPACE__]))
-					return; // Nothing to do.
-
-				new sso_actions();
 			}
 
 			/**

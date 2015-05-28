@@ -36,7 +36,6 @@ namespace comment_mail
 		 * @property-read utils_queue           $utils_queue
 		 * @property-read utils_queue_event_log $utils_queue_event_log
 		 * @property-read utils_rve             $utils_rve
-		 * @property-read utils_sso             $utils_sso
 		 * @property-read utils_string          $utils_string
 		 * @property-read utils_sub             $utils_sub
 		 * @property-read utils_sub_event_log   $utils_sub_event_log

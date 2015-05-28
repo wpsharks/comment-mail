@@ -1471,56 +1471,6 @@ namespace comment_mail // Root namespace.
 
 				return add_query_arg(urlencode_deep($args), $url);
 			}
-
-			/**
-			 * URL for an SSO action handler.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @param string      $service SSO service integration slug.
-			 *
-			 * @param string      $action A particular action; defaults to `authorize`.
-			 *    To request authorization, set this to `authorize`.
-			 *    To receive a callback, set this to `callback`.
-			 *
-			 * @param null|string $redirect_to The underlying URL that a user is trying to access.
-			 *    If empty (and not === `NULL`), this defaults to the current URL; or the current `redirect_to`.
-			 *    If `NULL`, the `redirect_to` arg is excluded completely.
-			 *
-			 * @note If `$action` is `callback`, the `redirect_to` is forced to a `NULL` value.
-			 *    Callbacks should remain consistent; i.e. not be changed from one redirection URL to another.
-			 *    Before an oAuth authorization redirection occurs, a `redirect_to` should be stored in a session;
-			 *    i.e. NOT passed through the oAuth callback URL. This is why it is forced to a `NULL` value here.
-			 *
-			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
-			 *    See {@link set_scheme()} method for further details.
-			 *
-			 * @return string URL w/ the given `$scheme`.
-			 */
-			public function sso_action_url($service, $action = '', $redirect_to = '', $scheme = NULL)
-			{
-				$service = trim((string)$service);
-
-				if(!($action = trim((string)$action)))
-					$action = 'authorize';
-
-				if($action === 'callback') $redirect_to = NULL;
-
-				if(isset($redirect_to) && !($redirect_to = trim((string)$redirect_to)))
-				{
-					if(!empty($_REQUEST['redirect_to']))
-						$redirect_to = trim(stripslashes((string)$_REQUEST['redirect_to']));
-					else $redirect_to = $this->current();
-
-					if(strpos($redirect_to, 'wp-login.php') !== FALSE)
-						$redirect_to = home_url('/');
-				}
-				$url = home_url('/', $scheme);
-				if(!isset($redirect_to)) unset($redirect_to); // Prevent `compact()` inclusion.
-				$args = array(__NAMESPACE__ => array('sso' => compact('service', 'action', 'redirect_to')));
-
-				return add_query_arg(urlencode_deep($args), $url);
-			}
 		}
 	}
 }
