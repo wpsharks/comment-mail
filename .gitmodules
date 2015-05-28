@@ -10,9 +10,6 @@
 [submodule "comment-mail/submodules/datetimepicker"]
 	path = comment-mail/submodules/datetimepicker
 	url = https://github.com/xdan/datetimepicker
-[submodule "comment-mail/submodules/php-oauth-lib"]
-	path = comment-mail/submodules/php-oauth-lib
-	url = https://github.com/Lusitanian/PHPoAuthLib
 [submodule "comment-mail/submodules/parsedown-extra"]
 	path = comment-mail/submodules/parsedown-extra
 	url = https://github.com/erusev/parsedown-extra
