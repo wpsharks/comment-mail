@@ -58,7 +58,7 @@ namespace comment_mail
 			 *
 			 * @var boolean `TRUE` for pro version.
 			 */
-			public $is_pro = TRUE;
+			public $is_pro = FALSE;
 
 			/**
 			 * Identifies enterprise version.
@@ -67,7 +67,7 @@ namespace comment_mail
 			 *
 			 * @var boolean `TRUE` for enterprise version.
 			 */
-			public $is_enterprise = TRUE;
+			public $is_enterprise = FALSE;
 
 			/**
 			 * Plugin name.
