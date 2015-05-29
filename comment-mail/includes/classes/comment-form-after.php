@@ -8,6 +8,7 @@
  */
 namespace comment_mail // Root namespace.
 {
+
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
@@ -21,13 +22,24 @@ namespace comment_mail // Root namespace.
 		class comment_form_after extends abs_base
 		{
 			/**
-			 * Class constructor.
+			 * @var boolean Via API call?
 			 *
 			 * @since 141111 First documented version.
 			 */
-			public function __construct()
+			protected $via_api = FALSE;
+
+			/**
+			 * Class constructor.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param boolean $via_api Defaults to a FALSE value.
+			 */
+			public function __construct($via_api = FALSE)
 			{
 				parent::__construct();
+
+				$this->via_api = (boolean)$via_api;
 
 				$this->maybe_display_sub_ops();
 			}
@@ -45,7 +57,7 @@ namespace comment_mail // Root namespace.
 				if(!$this->plugin->options['new_subs_enable'])
 					return; // Disabled currently.
 
-				if(!$this->plugin->options['comment_form_sub_template_enable'])
+				if(!$this->via_api && !$this->plugin->options['comment_form_sub_template_enable'])
 					return; // Disabled currently.
 
 				if(empty($GLOBALS['post']) || !($GLOBALS['post'] instanceof \WP_Post))
@@ -58,7 +70,7 @@ namespace comment_mail // Root namespace.
 						array('post_id' => $post_id, 'comment_form_defaults' => TRUE)
 					);
 				// @TODO What if they have a subscription, but not on this post?
-				$current      = (object)array(
+				$current = (object)array(
 					'sub_email'   => $current_info->email,
 					'sub_type'    => $current_info->type,
 					'sub_deliver' => $current_info->deliver,

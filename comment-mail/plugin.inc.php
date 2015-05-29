@@ -6,8 +6,8 @@
  * @copyright WebSharks, Inc. <http://www.websharks-inc.com>
  * @license GNU General Public License, version 3
  */
-namespace comment_mail
-{
+namespace comment_mail {
+
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
@@ -320,6 +320,7 @@ namespace comment_mail
 
 					'version'                                                                              => $this->version,
 					'crons_setup'                                                                          => '0', // `0` or timestamp.
+					'stcr_transition_complete'                                                             => '0', // `0|1` transitioned?
 
 					/* Related to data safeguards. */
 
@@ -628,6 +629,9 @@ namespace comment_mail
 				if(!$this->options['auto_confirm_force_enable'])
 					$this->options['all_wp_users_confirm_email'] = '0';
 
+				require_once dirname(__FILE__).'/includes/api.php';
+				require_once dirname(__FILE__).'/includes/stcr.php';
+
 				/*
 				 * With or without hooks?
 				 */
@@ -860,7 +864,8 @@ namespace comment_mail
 
 				foreach($this->options as $_key => &$_value) if(strpos($_key, 'template__') === 0)
 				{
-					$_key_data             = template::option_key_data($_key);
+					$_key_data = template::option_key_data($_key);
+					if($_key_data->type === 'a') continue; // Not included with lite version.
 					$_default_template     = new template($_key_data->file, $_key_data->type, TRUE);
 					$_default_template_nws = preg_replace('/\s+/', '', $_default_template->file_contents());
 					$_option_template_nws  = preg_replace('/\s+/', '', $_value);

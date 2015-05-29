@@ -8,6 +8,7 @@
  */
 namespace comment_mail // Root namespace.
 {
+
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
@@ -34,6 +35,8 @@ namespace comment_mail // Root namespace.
 				$this->create_db_tables();
 				$this->maybe_enqueue_notice();
 				$this->set_install_time();
+
+				stcr_deactivate_transition();
 			}
 
 			/**

@@ -14,7 +14,7 @@ Plugin Name: Comment Mail
 Author: WebSharks, Inc.
 Author URI: http://www.websharks-inc.com
 
-Plugin URI: http://www.websharks-inc.com/product/comment-mail/
+Plugin URI: http://comment-mail.com/
 Description: A WordPress plugin enabling email subscriptions for comments.
 
 Enables email subscriptions for comments in WordPress.
