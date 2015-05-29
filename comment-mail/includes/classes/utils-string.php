@@ -720,7 +720,6 @@ namespace comment_mail // Root namespace.
 
 				if(defined('ENT_HTML5')) // PHP 5.4+ only.
 					$decode_flags |= ENT_HTML5;
-				else $decode_flags |= ENT_HTML401;
 
 				$string = wp_check_invalid_utf8($string);
 
@@ -745,7 +744,6 @@ namespace comment_mail // Root namespace.
 
 				if(defined('ENT_HTML5')) // PHP 5.4+ only.
 					$decode_flags |= ENT_HTML5;
-				else $decode_flags |= ENT_HTML401;
 
 				$string = wp_check_invalid_utf8($string);
 
