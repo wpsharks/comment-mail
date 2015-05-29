@@ -306,7 +306,7 @@ namespace comment_mail
 				 * Fire pre-setup hooks.
 				 */
 				if($this->enable_hooks) // Hooks enabled?
-					do_action('before__'.__METHOD__, get_defined_vars());
+					do_action('before_'.__METHOD__, get_defined_vars());
 
 				/*
 				 * Load the plugin's text domain for translations.
@@ -623,12 +623,12 @@ namespace comment_mail
 					'template__type_a__email__comment_notification__message___php'                         => '', // HTML/PHP code.
 
 				); // Default options are merged with those defined by the site owner.
-				$this->default_options = apply_filters(__METHOD__.'__default_options', $this->default_options); // Allow filters.
+				$this->default_options = apply_filters(__METHOD__.'_default_options', $this->default_options); // Allow filters.
 				$this->options         = is_array($this->options = get_option(__NAMESPACE__.'_options')) ? $this->options : array();
 
 				$this->options = array_merge($this->default_options, $this->options); // Merge into default options.
 				$this->options = array_intersect_key($this->options, $this->default_options); // Valid keys only.
-				$this->options = apply_filters(__METHOD__.'__options', $this->options); // Allow filters.
+				$this->options = apply_filters(__METHOD__.'_options', $this->options); // Allow filters.
 				$this->options = array_map('strval', $this->options); // Force string values.
 
 				if($this->options['manage_cap']) // This can be altered by plugin config. options.
@@ -713,7 +713,7 @@ namespace comment_mail
 				/*
 				 * Fire setup completion hooks.
 				 */
-				do_action('after__'.__METHOD__, get_defined_vars());
+				do_action('after_'.__METHOD__, get_defined_vars());
 				do_action(__METHOD__.'_complete', get_defined_vars());
 			}
 

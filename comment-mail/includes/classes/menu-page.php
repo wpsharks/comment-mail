@@ -119,7 +119,7 @@ namespace comment_mail // Root namespace.
 						                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.sprintf(__('When %1$s&trade; is disabled in this way:', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'.
 						                                    '   <ul class="pmp-list-items">'.
 						                                    '      <li>'.__('Comment Subscription Options (options for receiving email notifications regarding comments/replies) no longer appear on comment forms. In short, no new subscriptions are allowed. In addition, the ability to add a new subscription through any/all front-end forms is disabled too. All other front &amp; back-end functionality (including the ability for subscribers to edit and/or unsubscribe from existing subscriptions on the front-end) remains available.', $this->plugin->text_domain).'</li>'.
-						                                    '      <li>'.sprintf(__('The mail queue processor will stop processing, until such time as the plugin is renabled; i.e., no more email notifications. However, mail queue injections will continue; just no queue processing. This means that when somebody posts a comment, %1$s will still check if there are any subscribers. If there are, %1$s will inject with the queue with any notifications that should be sent once queue processing is resumed. If it is desirable that any/all queued notifications NOT be processed at all upon re-enabling, you can choose to delete all existing queued notifications before doing so. See: %2$s.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->pmp_path('Mail Queue')).'</li>'.
+						                                    '      <li>'.sprintf(__('The mail queue processor will stop processing, until such time as the plugin is renabled; i.e., no more email notifications. However, mail queue injections will continue; just no queue processing. This means that when somebody posts a comment, %1$s will still check if there are any subscribers. If there are, %1$s will inject the queue with any notifications that should be sent once queue processing is resumed. If it is desirable that any/all queued notifications NOT be processed at all upon re-enabling, you can choose to delete all existing queued notifications before doing so. See: %2$s.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->pmp_path('Mail Queue')).'</li>'.
 						                                    '   </ul>'.
 						                                    '   <p><em>'.sprintf(__('<strong>Note:</strong> If you want to disable %1$s&trade; completely, please deactivate it from the plugins menu in WordPress.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</em></p>'.
 						                                    '</div>',
@@ -159,7 +159,7 @@ namespace comment_mail // Root namespace.
 							                '1' => __('Yes, enable mail queue processing (recommended)', $this->plugin->text_domain),
 							                '0' => __('No, disable mail queue processing temporarily', $this->plugin->text_domain),
 						                ),
-						                'notes_after'     => '<p>'.sprintf(__('If you set this to <code>No</code> (disabled), all mail queue processing will stop. In short, no more email notifications will be sent. However, mail queue injections will continue; just no queue processing. This means that when somebody posts a comment, %1$s will still check if there are any subscribers. If there are, %1$s will inject with the queue with any notifications that should be sent once queue processing is resumed. If it is desirable that any/all queued notifications NOT be processed at all upon re-enabling, you can choose to delete all existing queued notifications before doing so. See: %2$s.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->pmp_path('Mail Queue')).'</p>',
+						                'notes_after'     => '<p>'.sprintf(__('If you set this to <code>No</code> (disabled), all mail queue processing will stop. In short, no more email notifications will be sent. However, mail queue injections will continue; just no queue processing. This means that when somebody posts a comment, %1$s will still check if there are any subscribers. If there are, %1$s will inject the queue with any notifications that should be sent once queue processing is resumed. If it is desirable that any/all queued notifications NOT be processed at all upon re-enabling, you can choose to delete all existing queued notifications before doing so. See: %2$s.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->pmp_path('Mail Queue')).'</p>',
 					                )).
 				                '    </tbody>'.
 				                ' </table>'.
@@ -200,7 +200,7 @@ namespace comment_mail // Root namespace.
 				               $form_fields->input_row(
 					               array(
 						               'label'         => __('<code>From</code> Name:', $this->plugin->text_domain),
-						               'placeholder'   => __('e.g. MySite.com', $this->plugin->text_domain),
+						               'placeholder'   => __('e.g., MySite.com', $this->plugin->text_domain),
 						               'name'          => 'from_name',
 						               'current_value' => $current_value_for('from_name'),
 						               'notes_after'   => '<p>'.sprintf(__('All emails sent by %1$s will have a specific <code>%3$s: "<strong>Name</strong>" &lt;email&gt;</code> header, indicating that each message was sent by your site; not by a specific individual. It\'s a good idea to use something like: <code>MySite.com</code>. This name will appear beside the subject line in most email clients. Provide the <strong>name only</strong>, excluding quotes please. Examples: <code>MySite.com</code>, <code>Acme&trade;</code>, <code>MyCompany, Inc.</code>', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'
@@ -214,7 +214,7 @@ namespace comment_mail // Root namespace.
 					                array(
 						                'type'          => 'email',
 						                'label'         => __('<code>From</code> Email Address:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. moderator@mysite.com', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g., moderator@mysite.com', $this->plugin->text_domain),
 						                'name'          => 'from_email',
 						                'current_value' => $current_value_for('from_email'),
 						                'notes_after'   => '<p>'.sprintf(__('All emails sent by %1$s will have a specific <code>%3$s: "Name" &lt;<strong>email</strong>&gt;</code> header, indicating that each message was sent by your site; not by a specific individual. It\'s a good idea to use something like: <code>moderator@mysite.com</code>. This email will appear beside the subject line in most email clients. Provide the <strong>email address only</strong>, excluding &lt;&gt; brackets please. Examples: <code>moderator@mysite.com</code>, <code>postmaster@example.com</code>, <code>notifications@example.com</code>', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'
@@ -230,7 +230,7 @@ namespace comment_mail // Root namespace.
 					                array(
 						                'type'          => 'email',
 						                'label'         => __('<code>Reply-To</code> Email Address:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. noreply@example.com', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g., noreply@example.com', $this->plugin->text_domain),
 						                'name'          => 'reply_to_email',
 						                'current_value' => $current_value_for('reply_to_email'),
 						                'notes_after'   => '<p>'.sprintf(__('All emails sent by %1$s can have a specific <code>%2$s:</code> email header, which might be different from the address that %1$s messages are actually sent <code>%3$s</code>. This makes it so that if someone happens to reply to an email notification, that reply will be directed to a specific email address that you prefer. Some site owners like to use something like <code>noreply@mysite.com</code>, while others find it best to use a real email address that can monitor replies. It\'s a matter of preference.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'.
@@ -247,9 +247,9 @@ namespace comment_mail // Root namespace.
 					                array(
 						                'type'        => 'email',
 						                'label'       => __('Test Mail Settings?', $this->plugin->text_domain),
-						                'placeholder' => __('e.g. me@mysite.com', $this->plugin->text_domain),
+						                'placeholder' => __('e.g., me@mysite.com', $this->plugin->text_domain),
 						                'name'        => 'mail_test', // Not an actual option key; but the `save_options` handler picks this up.
-						                'notes_after' => sprintf(__('Enter an email address to have %1$s&trade; send a test message when you save these options, and report back about any success or failure.', $this->plugin->text_domain), esc_html($this->plugin->name)),
+						                'notes_after' => sprintf(__('Enter an email address to have %1$s&trade; send a test message when you <strong>save</strong> these options, and report back about any success or failure.', $this->plugin->text_domain), esc_html($this->plugin->name)),
 					                )).
 				                '  </tbody>'.
 				                ' </table>';
@@ -266,7 +266,7 @@ namespace comment_mail // Root namespace.
 					               array(
 						               'type'          => 'email',
 						               'label'         => __('Postmaster Email Address', $this->plugin->text_domain),
-						               'placeholder'   => __('e.g. postmaster@example.com or abuse@example.com', $this->plugin->text_domain),
+						               'placeholder'   => __('e.g., postmaster@example.com or abuse@example.com', $this->plugin->text_domain),
 						               'name'          => 'can_spam_postmaster',
 						               'current_value' => $current_value_for('can_spam_postmaster'),
 						               'notes_after'   => '<p>'.sprintf(__('This is not the address that emails are sent from. This address is simply displayed at the bottom of each email sent by %1$s, as a way for people to report any abuse of the system.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
@@ -279,7 +279,7 @@ namespace comment_mail // Root namespace.
 				                $form_fields->textarea_row(
 					                array(
 						                'label'         => sprintf(__('Mailing Address (Required for %1$s)', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/CAN-SPAM_Act_of_2003', __('CAN-SPAM Compliance', $this->plugin->text_domain))),
-						                'placeholder'   => __('e.g. 123 Somewhere Street; Somewhere, USA 99999', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g., 123 Somewhere Street; Somewhere, USA 99999', $this->plugin->text_domain),
 						                'cm_mode'       => 'text/html', 'cm_height' => 150,
 						                'name'          => 'can_spam_mailing_address',
 						                'current_value' => $current_value_for('can_spam_mailing_address'),
@@ -295,7 +295,7 @@ namespace comment_mail // Root namespace.
 					                array(
 						                'type'          => 'url',
 						                'label'         => __('Privacy Policy URL (Optional)', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. http://example.com/privacy-policy/', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g., http://example.com/privacy-policy/', $this->plugin->text_domain),
 						                'name'          => 'can_spam_privacy_policy_url',
 						                'current_value' => $current_value_for('can_spam_privacy_policy_url'),
 						                'notes_after'   => '<p>'.sprintf(__('If you fill this in, %1$s will display a link to your privacy policy in strategic locations.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
@@ -408,7 +408,7 @@ namespace comment_mail // Root namespace.
 							                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__comment_form__sub_ops___php'),
 							                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
 							                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sub-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
-							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>'.
+							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g., subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>'.
 							                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 						                ))
 					                : $form_fields->textarea_row( // Simple snippet-based template.
@@ -420,13 +420,13 @@ namespace comment_mail // Root namespace.
 							                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__comment_form__snippet__sub_ops___php'),
 							                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
 							                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sub-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
-							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>'.
+							                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g., subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>'.
 							                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 							                'cm_details'    => $shortcode_details(array(
 								                                                      '[css_styles]'          => __('Stylesheet containing a default set of structral styles.', $this->plugin->text_domain),
 								                                                      '[inline_icon_svg]'     => __('Inline SVG icon that inherits the color and width of it\'s container automatically. Note, this is a scalable vector graphic that will look great at any size &gt;= 16x16 pixels.', $this->plugin->text_domain),
 								                                                      '[sub_type_options]'    => __('Select menu options. Allows a subscriber to choose if they wan\'t to subscribe or not; and in which way.', $this->plugin->text_domain),
-								                                                      '[sub_deliver_options]' => __('Select menu options. Allows a subscriber to choose a delivery option; e.g. asap, hourly, daily, weeky. This can be excluded if you wish. A default value of <code>asap</code> will be used in that case.', $this->plugin->text_domain),
+								                                                      '[sub_deliver_options]' => __('Select menu options. Allows a subscriber to choose a delivery option; e.g., asap, hourly, daily, weeky. This can be excluded if you wish. A default value of <code>asap</code> will be used in that case.', $this->plugin->text_domain),
 								                                                      '[sub_type_id]'         => __('The <code>id=""</code> attribute value used in <code>[sub_type_options]</code>.', $this->plugin->text_domain),
 								                                                      '[current_sub_email]'   => __('The current subscriber\'s email address, if it is known to have been confirmed; i.e., if it really is their email address. This will be empty if they have not previously confirmed a subscription.', $this->plugin->text_domain),
 								                                                      '[sub_new_url]'         => __('A URL leading to the "Add Subscription" page. This allows a visitor to subscribe w/o commenting even.', $this->plugin->text_domain),
@@ -535,7 +535,7 @@ namespace comment_mail // Root namespace.
 						                'placeholder'   => __('"John" <john@example.com>; jane@example.com; "Susan Smith" <susan@example.com>', $this->plugin->text_domain),
 						                'name'          => 'auto_subscribe_recipients',
 						                'current_value' => $current_value_for('auto_subscribe_recipients'),
-						                'notes_after'   => '<p>'.__('You can enter a list of other email addresses that should be auto-subscribed to all posts. This is a semicolon-delimited list of recipients; e.g. <code>"John" &lt;john@example.com&gt;; jane@example.com; "Susan Smith" &lt;susan@example.com&gt;</code>.', $this->plugin->text_domain).'</p>',
+						                'notes_after'   => '<p>'.__('You can enter a list of other email addresses that should be auto-subscribed to all posts. This is a semicolon-delimited list of recipients; e.g., <code>"John" &lt;john@example.com&gt;; jane@example.com; "Susan Smith" &lt;susan@example.com&gt;</code>.', $this->plugin->text_domain).'</p>',
 					                )).
 				                '    </tbody>'.
 				                ' </table>'.
@@ -563,10 +563,10 @@ namespace comment_mail // Root namespace.
 				                $form_fields->input_row(
 					                array(
 						                'label'         => __('Auto-Subscribe Post Types (Comma-Delimited):', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. post,page,portfolio,gallery', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g., post,page,portfolio,gallery', $this->plugin->text_domain),
 						                'name'          => 'auto_subscribe_post_types',
 						                'current_value' => $current_value_for('auto_subscribe_post_types'),
-						                'notes_after'   => '<p>'.sprintf(__('These are the %2$s that will trigger automatic subscriptions; i.e., %1$s will only auto-subscribe people to these types of posts. The default list is adequate for most sites. However, if you have other %2$s enabled by a theme/plugin, you might wish to include those here. e.g. <code>post,page,portfolio,gallery</code>; where <code>portfolio,gallery</code> might be two %3$s that you add to the default list, if applicable.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Post_Types', __('Post Types', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Post_Types#Custom_Post_Types', __('Custom Post Types', $this->plugin->text_domain))).'</p>',
+						                'notes_after'   => '<p>'.sprintf(__('These are the %2$s that will trigger automatic subscriptions; i.e., %1$s will only auto-subscribe people to these types of posts. The default list is adequate for most sites. However, if you have other %2$s enabled by a theme/plugin, you might wish to include those here. e.g., <code>post,page,portfolio,gallery</code>; where <code>portfolio,gallery</code> might be two %3$s that you add to the default list, if applicable.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Post_Types', __('Post Types', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Post_Types#Custom_Post_Types', __('Custom Post Types', $this->plugin->text_domain))).'</p>',
 					                )).
 				                '    </tbody>'.
 				                ' </table>'.
@@ -593,7 +593,7 @@ namespace comment_mail // Root namespace.
 							               '1' => __('Yes, automatically auto-confirm everyone; i.e., never ask for email confirmation', $this->plugin->text_domain),
 						               ),
 						               'notes_after'     => '<div class="pmp-if-enabled-show" style="margin-top:1em !important;">'.
-						                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('<span class="pmp-note pmp-warning" style="padding:0 .25em 0 .25em;">WARNING — when Auto-Confirm Everyone is enabled:</span>', $this->plugin->text_domain).'</p>'.
+						                                    '   <p class="pmp-note pmp-warning" style="margin:0;">'.__('<strong>WARNING:</strong> Auto-Confirm Everyone is Enabled', $this->plugin->text_domain).'</p>'.
 						                                    '   <ul class="pmp-list-items">'.
 						                                    '      <li>'.sprintf(__('Nobody will be required to confirm a subscription. For instance, when someone leaves a comment and chooses to be subscribed (with whatever email address they\'ve entered), that email address will be added to the list w/o getting confirmation from the real owner of that address. This scenario changes slightly if you %1$s before leaving a comment, via WordPress Discussion Settings. If that\'s the case, then depending on the way your users register (i.e., if they are required to verify their email address in some way), this option might be feasible. That said, in 99%% of all cases this option is NOT recommended. If you enable auto-confirmation for everyone, please take extreme caution.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor(admin_url('/options-discussion.php'), __('require users to be logged-in', $this->plugin->text_domain))).'</li>'.
 						                                    '      <li>'.sprintf(__('In addition to security issues associated w/ auto-confirming everyone automatically; if you enable this behavior it will also have the negative side-effect of making it slightly more difficult for users to view a summary of their existing subscriptions; i.e., they won\'t get an encrypted <code>%2$s</code> cookie right away via email confirmation, as would normally occur. This is how %1$s identifies a user when they are not currently logged into the site (typical w/ commenters). Therefore, if Auto-Confirm Everyone is enabled, the only way users can view a summary of their subscriptions, is if:', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html(__NAMESPACE__.'_sub_email')).
@@ -694,12 +694,12 @@ namespace comment_mail // Root namespace.
 								                '0' => __('No, search through proxies and other forwarded IP address headers first; in the most logical order (recommended)', $this->plugin->text_domain),
 								                '1' => __('Yes, always use $_SERVER[REMOTE_ADDR]; my server deals with advanced IP logic already', $this->plugin->text_domain),
 							                ),
-							                'notes_after'     => '<p>'.sprintf(__('Most hosting companies do NOT adequately fill <code>$_SERVER[REMOTE_ADDR]</code>. Instead, this is left up to your software (e.g. %1$s). So, unless you know for sure that your hosting company <em>is</em> properly analyzing forwarded IP address headers before filling the <code>$_SERVER[REMOTE_ADDR]</code> environment variable, it is suggested that you simply leave this set to <code>No</code>. This way %1$s will always get a visitor\'s real IP address, even if they\'re behind a proxy; or if your server uses a load balancer that alters <code>$_SERVER[REMOTE_ADDR]</code> inadvertently. You\'ll be happy to know that %1$s supports both IPv4 and IPv6 addresses.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+							                'notes_after'     => '<p>'.sprintf(__('Most hosting companies do NOT adequately fill <code>$_SERVER[REMOTE_ADDR]</code>. Instead, this is left up to your software (e.g., %1$s). So, unless you know for sure that your hosting company <em>is</em> properly analyzing forwarded IP address headers before filling the <code>$_SERVER[REMOTE_ADDR]</code> environment variable, it is suggested that you simply leave this set to <code>No</code>. This way %1$s will always get a visitor\'s real IP address, even if they\'re behind a proxy; or if your server uses a load balancer that alters <code>$_SERVER[REMOTE_ADDR]</code> inadvertently. You\'ll be happy to know that %1$s supports both IPv4 and IPv6 addresses.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
 						                )).
 					                ' </tbody>'.
 					                '</table>';
 
-					echo $this->panel(__('Geo IP Region/Country Tracking', $this->plugin->text_domain), $_panel_body, array());
+					echo $this->panel(__('Geo IP Region/Country Tracking', $this->plugin->text_domain), $_panel_body, array('pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 				}
@@ -713,7 +713,7 @@ namespace comment_mail // Root namespace.
 						               array(
 							               'type'          => 'number',
 							               'label'         => __('Maximum Chars in Parent Comment Clips:', $this->plugin->text_domain),
-							               'placeholder'   => __('e.g. 100', $this->plugin->text_domain),
+							               'placeholder'   => __('e.g., 100', $this->plugin->text_domain),
 							               'name'          => 'comment_notification_parent_content_clip_max_chars',
 							               'other_attrs'   => 'min="1"',
 							               'current_value' => $current_value_for('comment_notification_parent_content_clip_max_chars'),
@@ -728,7 +728,7 @@ namespace comment_mail // Root namespace.
 						                array(
 							                'type'          => 'number',
 							                'label'         => __('Maximum Chars in Other Comment/Reply Clips:', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. 200', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., 200', $this->plugin->text_domain),
 							                'name'          => 'comment_notification_content_clip_max_chars',
 							                'other_attrs'   => 'min="1"',
 							                'current_value' => $current_value_for('comment_notification_content_clip_max_chars'),
@@ -782,10 +782,10 @@ namespace comment_mail // Root namespace.
 					                $form_fields->input_row(
 						                array(
 							                'label'         => __('SMTP Host Name:', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. email-smtp.us-east-1.amazonaws.com', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., email-smtp.us-east-1.amazonaws.com', $this->plugin->text_domain),
 							                'name'          => 'smtp_host',
 							                'current_value' => $current_value_for('smtp_host'),
-							                'notes_after'   => '<p>'.__('e.g. <code>email-smtp.us-east-1.amazonaws.com</code>, <code>smtp.gmail.com</code>, or another of your choosing.', $this->plugin->text_domain).'</p>'
+							                'notes_after'   => '<p>'.__('e.g., <code>email-smtp.us-east-1.amazonaws.com</code>, <code>smtp.gmail.com</code>, or another of your choosing.', $this->plugin->text_domain).'</p>'
 						                )).
 					                '  </tbody>'.
 					                ' </table>'.
@@ -796,7 +796,7 @@ namespace comment_mail // Root namespace.
 						                array(
 							                'type'          => 'number',
 							                'label'         => __('SMTP Port Number:', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. 465', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., 465', $this->plugin->text_domain),
 							                'name'          => 'smtp_port',
 							                'current_value' => $current_value_for('smtp_port'),
 							                'notes_after'   => '<p>'.__('With Amazon&reg; SES (or GMail&trade;) please use: <code>465</code>', $this->plugin->text_domain).'</p>'
@@ -830,7 +830,7 @@ namespace comment_mail // Root namespace.
 					                $form_fields->input_row(
 						                array(
 							                'label'         => __('SMTP Username:', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. AKIAJSA57DDLS5I6GCA; e.g. me@example.com', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., AKIAJSA57DDLS5I6GCA; e.g., me@example.com', $this->plugin->text_domain),
 							                'name'          => 'smtp_username',
 							                'current_value' => $current_value_for('smtp_username'),
 							                'notes_after'   => '<p>'.__('With Amazon&reg; SES use your Access Key ID. With GMail&trade; use your login name, or full email address.', $this->plugin->text_domain).'</p>'
@@ -844,7 +844,7 @@ namespace comment_mail // Root namespace.
 						                array(
 							                'type'          => 'password',
 							                'label'         => __('SMTP Password:', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. AWS secret key, or email account password', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., AWS secret key, or email account password', $this->plugin->text_domain),
 							                'name'          => 'smtp_password',
 							                'current_value' => $current_value_for('smtp_password'),
 							                'notes_after'   => '<p>'.__('With Amazon&reg; SES use your Secret Key. With GMail&trade; use your password.', $this->plugin->text_domain).'</p>'
@@ -859,10 +859,10 @@ namespace comment_mail // Root namespace.
 					                $form_fields->input_row(
 						                array(
 							                'label'         => __('SMTP <code>From</code> and <code>Return-Path</code> Name:', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. MySite.com', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., MySite.com', $this->plugin->text_domain),
 							                'name'          => 'smtp_from_name',
 							                'current_value' => $current_value_for('smtp_from_name'),
-							                'notes_after'   => '<p>'.sprintf(__('The name used in the <code>%3$s:</code> and <code>%4$s:</code> headers; e.g. <code>MySite.com</code>', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'
+							                'notes_after'   => '<p>'.sprintf(__('The name used in the <code>%3$s:</code> and <code>%4$s:</code> headers; e.g., <code>MySite.com</code>', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'
 						                )).
 					                '  </tbody>'.
 					                ' </table>'.
@@ -873,10 +873,10 @@ namespace comment_mail // Root namespace.
 						                array(
 							                'type'          => 'email',
 							                'label'         => __('SMTP <code>From</code> and <code>Return-Path</code> Email Address:', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. moderator@mysite.com', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., moderator@mysite.com', $this->plugin->text_domain),
 							                'name'          => 'smtp_from_email',
 							                'current_value' => $current_value_for('smtp_from_email'),
-							                'notes_after'   => '<p>'.sprintf(__('Email used in the <code>%3$s:</code> and <code>%4$s:</code> headers; e.g. <code>moderator@mysite.com</code>', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'.
+							                'notes_after'   => '<p>'.sprintf(__('Email used in the <code>%3$s:</code> and <code>%4$s:</code> headers; e.g., <code>moderator@mysite.com</code>', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'.
 							                                   '<p class="pmp-note pmp-info">'.__('<strong>Note:</strong> most SMTP servers will require this email address to match up with specific users and/or specific domains; else mail is rejected automatically. Please be sure to check the documentation for your SMTP host before entering this address. For instance, with Amazon&reg; SES you will need to setup at least one Verified Sender and then enter that address here. With GMail&trade;, you will need to enter the email address that is associated with the Username/Password you entered above.', $this->plugin->text_domain).'</p>'
 						                )).
 					                '  </tbody>'.
@@ -890,10 +890,10 @@ namespace comment_mail // Root namespace.
 						                array(
 							                'type'          => 'email',
 							                'label'         => __('SMTP <code>Reply-To</code> Email Address:', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. moderator@mysite.com', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., moderator@mysite.com', $this->plugin->text_domain),
 							                'name'          => 'smtp_reply_to_email',
 							                'current_value' => $current_value_for('smtp_reply_to_email'),
-							                'notes_after'   => '<p>'.sprintf(__('Email used in the <code>%2$s:</code> header; e.g. <code>moderator@mysite.com</code>. This makes it so that if someone happens to reply to an email notification, that reply will be directed to a specific email address that you prefer. Some site owners like to use something like <code>noreply@mysite.com</code>, while others find it best to use a real email address that can monitor replies. It\'s a matter of preference.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'.
+							                'notes_after'   => '<p>'.sprintf(__('Email used in the <code>%2$s:</code> header; e.g., <code>moderator@mysite.com</code>. This makes it so that if someone happens to reply to an email notification, that reply will be directed to a specific email address that you prefer. Some site owners like to use something like <code>noreply@mysite.com</code>, while others find it best to use a real email address that can monitor replies. It\'s a matter of preference.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'.
 							                                   '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> If you happen to enable a %1$s&trade; RVE Handler (Replies via Email), this value is ignored in favor of the <code>Reply-To</code> address configured for your RVE Handler. In other words, if you enable Replies via Email, you could simply leave this blank if you like. If RVE is enabled, the <code>Reply-To</code> address for the RVE Handler receives precedence always. The address you configure here will not be applied in that case.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'
 						                )).
 					                '  </tbody>'.
@@ -925,7 +925,7 @@ namespace comment_mail // Root namespace.
 						                array(
 							                'type'        => 'email',
 							                'label'       => __('Test SMTP Server Settings?', $this->plugin->text_domain),
-							                'placeholder' => __('e.g. me@mysite.com', $this->plugin->text_domain),
+							                'placeholder' => __('e.g., me@mysite.com', $this->plugin->text_domain),
 							                'name'        => 'mail_smtp_test', // Not an actual option key; but the `save_options` handler picks this up.
 							                'notes_after' => sprintf(__('Enter an email address to have %1$s&trade; send a test message when you save these options, and report back about any success or failure.', $this->plugin->text_domain), esc_html($this->plugin->name)),
 						                )).
@@ -964,7 +964,7 @@ namespace comment_mail // Root namespace.
 							                                    '           <li>'.sprintf(__('All replies posted via email must be sent to the special <code>Reply-To</code> address that you configure below. Once you configure a <code>Reply-To</code> for an RVE Handler, %1$s will automatically set the <code>Reply-To:</code> header in all email notifications that it sends. This way when somebody replies to a comment notification, their email program will reply to the address required for replies via email to work properly.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
 							                                    '           <li>'.sprintf(__('The <code>Reply-To</code> address that you configure below, will serve as a base for %1$s to work from. For instance, let\'s say you choose: <code>rve@mandrill.%2$s</code>. This base address will be suffixed automatically (at runtime) with details specific to a particular notification that %1$s sends. Ultimately, <code>rve@mandrill.%2$s</code> will look like: <code>rve<strong>+332-96-kgjdgxr4ldqpdrgjdgxr</strong>@mandrill.%2$s</code>. In this example, the additional details (following the <code>+</code> sign) are there to help %1$s route the reply to the proper location, and to provide a means by which to identify the end-user that is posting a reply.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html($this->plugin->utils_url->current_host_base())).'</li>'.
 							                                    '           <li>'.sprintf(__('For single-comment notifications; i.e., where a subscriber chooses delivery type <code>asap</code> (aka: instantly), there is just a single comment in each notification that a subscriber receives. This works best with replies via email, since the <code>Reply-To:</code> header (on its own) is enough for everything to work as expected. Someone replying via email need only hit the Reply button in their email program and start typing. Very simple.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
-							                                    '           <li>'.sprintf(__('For multi-comment notifications; i.e., where a subscriber chooses a delivery type that is not <code>asap</code> (e.g. <code>hourly</code>, <code>daily</code>, etc.); there can be more than a single comment in each notification they receive. If there is more than one comment in the notification, instructions will be provided to the end-user explaining how to reply. The special <code>Reply-To</code> address is still used in this case. However, they also need to specify which comment they want to reply to. To do this, the end-user must start their reply with a special marker provided by %1$s. Again, if there is more than one comment in the notification, instructions will be provided to the end-user explaining how to reply.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
+							                                    '           <li>'.sprintf(__('For multi-comment notifications; i.e., where a subscriber chooses a delivery type that is not <code>asap</code> (e.g., <code>hourly</code>, <code>daily</code>, etc.); there can be more than a single comment in each notification they receive. If there is more than one comment in the notification, instructions will be provided to the end-user explaining how to reply. The special <code>Reply-To</code> address is still used in this case. However, they also need to specify which comment they want to reply to. To do this, the end-user must start their reply with a special marker provided by %1$s. Again, if there is more than one comment in the notification, instructions will be provided to the end-user explaining how to reply.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
 							                                    '           <li>'.sprintf(__('Comments posted via email are still piped through the same underlying WordPress handler that normal on-site comments go through (i.e., <code>/wp-comments-post.php</code>). This means that all of your existing WordPress Discussion Settings (and/or Akismet settings) will still apply to all comments, even if they are posted via email. <strong>With one exception.</strong> When an RVE Handler is enabled, any comments posted via email are allowed through without an end-user being logged-in. If your WordPress Discussion Settings require that users be logged-in to post comments, that will be overridden temporarily whenever a reply via email comes through. Please note that replies posted via email are generally from confirmed subscribers. Any reply via email that is not from a confirmed subscriber will be forced into moderation by %1$s anyway. Otherwise, whatever your current Discussion Settings are configured to allow, will be adhered to for replies via email also. For instance, if you require that all comments be moderated, that will continue to be the case for all replies via email. %1$s will never approve a comment on it\'s own. Approval of comments is always determined by your WP Discussion Settings.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
 							                                    '           <li>'.sprintf(__('Any reply via email should include one of two things. A copy of the original quoted notification, or a special <code>%2$s</code> marker. Most email clients will include the original message in an email reply, and this is what %1$s will look for. %1$s scans the body of the email looking for an original quoted section and strips it out (along with anything below it). If a reply does not include a quoted section when replying to an email notification, an <code>%2$s</code> marker can be used instead. When %1$s reads <code>%2$s</code>, it will use it as a marker and ignore everything below that line. Everything above <code>%2$s</code> will become the comment reply on your blog. Therefore, you can use the <code>%2$s</code> feature even if you have quoting turned off in your email client. If neither of these are found, the reply is still accepted. However, it will be forced into moderation at all times; i.e., you must approve it manually no matter what the rest of your WordPress Discussion Settings say.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html($this->plugin->is_pro ? $this->plugin->utils_rve->manual_end_divider() : '!END')).'</li>'.
 							                                    '        </ul>'.
@@ -1006,7 +1006,7 @@ namespace comment_mail // Root namespace.
 						                array(
 							                'type'          => 'email',
 							                'label'         => __('Mandrill <code>Reply-To</code> Address:', $this->plugin->text_domain),
-							                'placeholder'   => sprintf(__('e.g. rve@mandrill.%1$s', $this->plugin->text_domain), $this->plugin->utils_url->current_host_base()),
+							                'placeholder'   => sprintf(__('e.g., rve@mandrill.%1$s', $this->plugin->text_domain), $this->plugin->utils_url->current_host_base()),
 							                'name'          => 'rve_mandrill_reply_to_email',
 							                'current_value' => $current_value_for('rve_mandrill_reply_to_email'),
 							                'notes_after'   => '<p class="pmp-note pmp-info">'.sprintf(__('This is really all it takes to get Replies via Email working. However, it requires that you setup a Mandrill account (free) and then configure an Inbound Mailbox Route that will connect to the Webhook URL shown below. <span class="pmp-hilite">Please see %1$s for detailed instructions.</span>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/Mandrill-RVE-Handler', __('this wiki article', $this->plugin->text_domain))).'</p>'.
@@ -1023,10 +1023,10 @@ namespace comment_mail // Root namespace.
 						                array(
 							                'type'          => 'number',
 							                'label'         => __('Mandrill Max Overall Spam Score Allowed:', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. 5.0', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., 5.0', $this->plugin->text_domain),
 							                'name'          => 'rve_mandrill_max_spam_score',
 							                'current_value' => $current_value_for('rve_mandrill_max_spam_score'),
-							                'notes_after'   => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>3.0</code> to <code>5.0</code> is suggested here. Any reply via email with a spam score higher than what is configured here, will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g. if you use Akismet, each comment must also pass through Akismet too.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-', __('checks performed by Mandrill', $this->plugin->text_domain))).'</p>',
+							                'notes_after'   => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>3.0</code> to <code>5.0</code> is suggested here. Any reply via email with a spam score higher than what is configured here, will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g., if you use Akismet, each comment must also pass through Akismet too.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-', __('checks performed by Mandrill', $this->plugin->text_domain))).'</p>',
 						                )).
 					                '       </tbody>'.
 					                '    </table>'.
@@ -1047,7 +1047,7 @@ namespace comment_mail // Root namespace.
 								                '3' => __('Require SPF test result: "pass|neutral"; else flag as spam for moderation', $this->plugin->text_domain),
 								                '4' => __('Require SPF test result: "pass"; else flag as spam for moderation', $this->plugin->text_domain),
 							                ),
-							                'notes_after'     => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>pass|neutral|softfail|none</code> is suggested here; where <code>|</code> means "or" (i.e., one of these results). Any reply via email that does not pass your rejection policy will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g. if you use Akismet, each comment must also pass through Akismet too.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-', __('checks performed by Mandrill', $this->plugin->text_domain))).'</p>',
+							                'notes_after'     => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>pass|neutral|softfail|none</code> is suggested here; where <code>|</code> means "or" (i.e., one of these results). Any reply via email that does not pass your rejection policy will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g., if you use Akismet, each comment must also pass through Akismet too.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-', __('checks performed by Mandrill', $this->plugin->text_domain))).'</p>',
 						                )).
 					                '       </tbody>'.
 					                '    </table>'.
@@ -1066,7 +1066,7 @@ namespace comment_mail // Root namespace.
 								                '1' => __('If DKIM signature "exists, but it\'s invalid"; flag as spam for moderation (recommended)', $this->plugin->text_domain),
 								                '2' => __('If DKIM signature "is missing or invalid"; flag as spam for moderation', $this->plugin->text_domain),
 							                ),
-							                'notes_after'     => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>signature exists, but invalid</code> is suggested here. Any reply via email that does not pass your rejection policy will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g. if you use Akismet, each comment must also pass through Akismet too.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-', __('checks performed by Mandrill', $this->plugin->text_domain))).'</p>',
+							                'notes_after'     => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>signature exists, but invalid</code> is suggested here. Any reply via email that does not pass your rejection policy will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g., if you use Akismet, each comment must also pass through Akismet too.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-', __('checks performed by Mandrill', $this->plugin->text_domain))).'</p>',
 						                )).
 					                '       </tbody>'.
 					                '    </table>'.
@@ -1096,7 +1096,7 @@ namespace comment_mail // Root namespace.
 								               '1' => __('Yes, enable Single Sign-on (recommended)', $this->plugin->text_domain),
 							               ),
 							               'notes_after'     => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-services.png')).'" class="pmp-right" />'.
-							                                    sprintf(__('As a convenience, SSO allows commenters to login with a popular social network account; e.g. Twitter, Facebook, Google, LinkedIn. <span class="pmp-hilite">This feature is highly recommended, but disabled by default</span>; since it requires some work on your part to set things up properly. Detailed instructions are provided %1$s. When a visitor logs in through an SSO service provider, an account is automatically created for them in WordPress (if one does not exist already). These auto-generated WordPress accounts are created using details obtained from an SSO service provider. Such as first name, last name, email address. SSO users receive a default Role; i.e., whatever the default Role is for your site. Normally the %2$s, but you can change this from your %3$s on standard WP installs. WP Multisite Network installs always use the %2$s. An account created in this way (via SSO) could be logged into like any other WP account (technically), but it will also be connected to the underlying SSO service too. Meaning, a user may simply log into your site in the future w/ the SSO. They won\'t ever need a username/password that is specific to your site.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys', __('here', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Roles_and_Capabilities#Subscriber', __('Subscriber Role', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor(admin_url('/options-general.php'), __('WP General Settings', $this->plugin->text_domain))).'</p>',
+							                                    sprintf(__('As a convenience, SSO allows commenters to login with a popular social network account; e.g., Twitter, Facebook, Google, LinkedIn. <span class="pmp-hilite">This feature is highly recommended, but disabled by default</span>; since it requires some work on your part to set things up properly. Detailed instructions are provided %1$s. When a visitor logs in through an SSO service provider, an account is automatically created for them in WordPress (if one does not exist already). These auto-generated WordPress accounts are created using details obtained from an SSO service provider. Such as first name, last name, email address. SSO users receive a default Role; i.e., whatever the default Role is for your site. Normally the %2$s, but you can change this from your %3$s on standard WP installs. WP Multisite Network installs always use the %2$s. An account created in this way (via SSO) could be logged into like any other WP account (technically), but it will also be connected to the underlying SSO service too. Meaning, a user may simply log into your site in the future w/ the SSO. They won\'t ever need a username/password that is specific to your site.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys', __('here', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Roles_and_Capabilities#Subscriber', __('Subscriber Role', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor(admin_url('/options-general.php'), __('WP General Settings', $this->plugin->text_domain))).'</p>',
 						               )).
 					               '  </tbody>'.
 					               '</table>';
@@ -1120,7 +1120,7 @@ namespace comment_mail // Root namespace.
 					                $form_fields->input_row(
 						                array(
 							                'label'         => sprintf(__('Twitter oAuth Consumer Key: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys#twitter', __('instructions', $this->plugin->text_domain))),
-							                'placeholder'   => __('e.g. kyczbsh6nnwtzrkm882kh7jf8', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., kyczbsh6nnwtzrkm882kh7jf8', $this->plugin->text_domain),
 							                'name'          => 'sso_twitter_key',
 							                'current_value' => $current_value_for('sso_twitter_key'),
 							                'notes_after'   => $this->select_all_field(__('<strong>oAuth 1.0a Redirect/Callback URL:</strong>', $this->plugin->text_domain), $this->plugin->is_pro ? $this->plugin->utils_url->sso_action_url('twitter', 'callback') : ''),
@@ -1134,7 +1134,7 @@ namespace comment_mail // Root namespace.
 						                array(
 							                'type'          => 'password',
 							                'label'         => __('Twitter oAuth Consumer Secret:', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. gznuef64twbku3qpcdyx8jtfgcyccxsup8yu5gb95f493maf79', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., gznuef64twbku3qpcdyx8jtfgcyccxsup8yu5gb95f493maf79', $this->plugin->text_domain),
 							                'name'          => 'sso_twitter_secret',
 							                'current_value' => $current_value_for('sso_twitter_secret'),
 						                )).
@@ -1148,7 +1148,7 @@ namespace comment_mail // Root namespace.
 					                $form_fields->input_row(
 						                array(
 							                'label'         => sprintf(__('Facebook oAuth App ID: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys#facebook', __('instructions', $this->plugin->text_domain))),
-							                'placeholder'   => __('e.g. 87df9vcu8njzrrnrgy2u2k2cj', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., 87df9vcu8njzrrnrgy2u2k2cj', $this->plugin->text_domain),
 							                'name'          => 'sso_facebook_key',
 							                'current_value' => $current_value_for('sso_facebook_key'),
 							                'notes_after'   => $this->select_all_field(__('<strong>oAuth 2.0 Redirect/Callback URL:</strong>', $this->plugin->text_domain), $this->plugin->is_pro ? $this->plugin->utils_url->sso_action_url('facebook', 'callback') : ''),
@@ -1162,7 +1162,7 @@ namespace comment_mail // Root namespace.
 						                array(
 							                'type'          => 'password',
 							                'label'         => __('Facebook oAuth App Secret:', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. pqs4vyjmw6rqt23knuajftuv7xxxgxtdwvuajnq7cj5a5ak22j', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., pqs4vyjmw6rqt23knuajftuv7xxxgxtdwvuajnq7cj5a5ak22j', $this->plugin->text_domain),
 							                'name'          => 'sso_facebook_secret',
 							                'current_value' => $current_value_for('sso_facebook_secret'),
 						                )).
@@ -1176,7 +1176,7 @@ namespace comment_mail // Root namespace.
 					                $form_fields->input_row(
 						                array(
 							                'label'         => sprintf(__('Google oAuth Client ID: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys#google', __('instructions', $this->plugin->text_domain))),
-							                'placeholder'   => __('e.g. qda788ac23s4m4utvqgkauwhf.apps.googleusercontent.com', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., qda788ac23s4m4utvqgkauwhf.apps.googleusercontent.com', $this->plugin->text_domain),
 							                'name'          => 'sso_google_key',
 							                'current_value' => $current_value_for('sso_google_key'),
 							                'notes_after'   => $this->select_all_field(__('<strong>oAuth 2.0 Redirect/Callback URL:</strong>', $this->plugin->text_domain), $this->plugin->is_pro ? $this->plugin->utils_url->sso_action_url('google', 'callback') : ''),
@@ -1190,7 +1190,7 @@ namespace comment_mail // Root namespace.
 						                array(
 							                'type'          => 'password',
 							                'label'         => __('Google oAuth Client Secret:', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. djx4zsdyh4grkuw8qpkg382fr8uujmsahfj8x4b8aun437hye2', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., djx4zsdyh4grkuw8qpkg382fr8uujmsahfj8x4b8aun437hye2', $this->plugin->text_domain),
 							                'name'          => 'sso_google_secret',
 							                'current_value' => $current_value_for('sso_google_secret'),
 						                )).
@@ -1204,7 +1204,7 @@ namespace comment_mail // Root namespace.
 					                $form_fields->input_row(
 						                array(
 							                'label'         => sprintf(__('LinkedIn oAuth API/Consumer Key: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://github.com/websharks/comment-mail/wiki/SSO-App-Keys#linkedin', __('instructions', $this->plugin->text_domain))),
-							                'placeholder'   => __('e.g. swf73zuj2puaug9e5a4ytpcg7', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., swf73zuj2puaug9e5a4ytpcg7', $this->plugin->text_domain),
 							                'name'          => 'sso_linkedin_key',
 							                'current_value' => $current_value_for('sso_linkedin_key'),
 							                'notes_after'   => $this->select_all_field(__('<strong>oAuth 2.0 Redirect/Callback URL:</strong>', $this->plugin->text_domain), $this->plugin->is_pro ? $this->plugin->utils_url->sso_action_url('linkedin', 'callback') : ''),
@@ -1218,7 +1218,7 @@ namespace comment_mail // Root namespace.
 						                array(
 							                'type'          => 'password',
 							                'label'         => __('LinkedIn oAuth API/Consumer Secret:', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. dtqvgh8qjkne4nhry7w56bzk86dcqr7racy5evmhegpt9gw9c4', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., dtqvgh8qjkne4nhry7w56bzk86dcqr7racy5evmhegpt9gw9c4', $this->plugin->text_domain),
 							                'name'          => 'sso_linkedin_secret',
 							                'current_value' => $current_value_for('sso_linkedin_secret'),
 						                )).
@@ -1292,7 +1292,7 @@ namespace comment_mail // Root namespace.
 								                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__comment_form__sso_ops___php'),
 								                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
 								                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
-								                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>'.
+								                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g., SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>'.
 								                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 							                ))
 						                : $form_fields->textarea_row( // Simple snippet-based template.
@@ -1304,7 +1304,7 @@ namespace comment_mail // Root namespace.
 								                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__comment_form__snippet__sso_ops___php'),
 								                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
 								                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
-								                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>'.
+								                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g., SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>'.
 								                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 								                'cm_details'    => $shortcode_details(array(
 									                                                      '[css_styles]'    => __('Stylesheet containing a default set of structral styles.', $this->plugin->text_domain),
@@ -1371,7 +1371,7 @@ namespace comment_mail // Root namespace.
 								                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__login_form__sso_ops___php'),
 								                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
 								                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
-								                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>'.
+								                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g., SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>'.
 								                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 							                ))
 						                : $form_fields->textarea_row( // Simple snippet-based template.
@@ -1383,7 +1383,7 @@ namespace comment_mail // Root namespace.
 								                'current_value' => $current_value_for('template__type_'.$this->plugin->options['template_type'].'__site__login_form__snippet__sso_ops___php'),
 								                'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>',
 								                'notes_after'   => '<p><img src="'.esc_attr($this->plugin->utils_url->to('/client-s/images/sso-ops-ss.png')).'" class="pmp-right" style="margin-left:3em;" />'.
-								                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>'.
+								                                   sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g., SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>'.
 								                                   '<p class="pmp-note pmp-info pmp-max-width">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 								                'cm_details'    => $shortcode_details(array(
 									                                                      '[css_styles]'    => __('Stylesheet containing a default set of structral styles.', $this->plugin->text_domain),
@@ -1406,27 +1406,29 @@ namespace comment_mail // Root namespace.
 				}
 				/* ----------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->textarea_row(
-					               array(
-						               'label'         => __('Email Blacklist Patterns (One Per Line)', $this->plugin->text_domain),
-						               'placeholder'   => __('e.g. webmaster@*', $this->plugin->text_domain),
-						               'name'          => 'email_blacklist_patterns',
-						               'rows'          => 15, // Give them some room here.
-						               'other_attrs'   => 'spellcheck="false"',
-						               'current_value' => $current_value_for('email_blacklist_patterns'),
-						               'notes_before'  => '<p>'.__('These email addresses will not be allowed to subscribe.', $this->plugin->text_domain).'</p>',
-						               'notes_after'   => '<p>'.__('One pattern per line please. A <code>*</code> wildcard character can be used to match zero or more characters of any kind. A <code>^</code> caret symbol can be used to match zero or more characters that are NOT the <code>@</code> symbol.', $this->plugin->text_domain).'</p>'.
-						                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> It is suggested that you blacklist role-based email addresses to avoid sending email notifications to addresses not associated w/ individuals. Role-based email addresses (like admin@, help@, sales@) are email addresses that are not associated with a particular person, but rather with a company, department, position or group of recipients. They are not generally intended for personal use, as they typically include a distribution list of recipients.', $this->plugin->text_domain).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+				if($this->plugin->is_pro || $this->plugin->utils_env->is_pro_preview())
+				{
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Email Blacklist Patterns (One Per Line)', $this->plugin->text_domain),
+							               'placeholder'   => __('e.g., webmaster@*', $this->plugin->text_domain),
+							               'name'          => 'email_blacklist_patterns',
+							               'rows'          => 15, // Give them some room here.
+							               'other_attrs'   => 'spellcheck="false"',
+							               'current_value' => $current_value_for('email_blacklist_patterns'),
+							               'notes_before'  => '<p>'.__('These email addresses will not be allowed to subscribe.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p>'.__('One pattern per line please. A <code>*</code> wildcard character can be used to match zero or more characters of any kind. A <code>^</code> caret symbol can be used to match zero or more characters that are NOT the <code>@</code> symbol.', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> It is suggested that you blacklist role-based email addresses to avoid sending email notifications to addresses not associated w/ individuals. Role-based email addresses (like admin@, help@, sales@) are email addresses that are not associated with a particular person, but rather with a company, department, position or group of recipients. They are not generally intended for personal use, as they typically include a distribution list of recipients.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				echo $this->panel(__('Blacklisted Email Addresses', $this->plugin->text_domain), $_panel_body, array());
+					echo $this->panel(__('Blacklisted Email Addresses', $this->plugin->text_domain), $_panel_body, array('pro_only' => TRUE));
 
-				unset($_panel_body); // Housekeeping.
-
+					unset($_panel_body); // Housekeeping.
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
 				if($this->plugin->is_pro || $this->plugin->utils_env->is_pro_preview())
@@ -1437,7 +1439,7 @@ namespace comment_mail // Root namespace.
 						               array(
 							               'type'          => 'number',
 							               'label'         => __('Max Execution Time (In Seconds)', $this->plugin->text_domain),
-							               'placeholder'   => __('e.g. 30', $this->plugin->text_domain),
+							               'placeholder'   => __('e.g., 30', $this->plugin->text_domain),
 							               'name'          => 'sub_cleaner_max_time',
 							               'current_value' => $current_value_for('sub_cleaner_max_time'),
 							               'other_attrs'   => 'min="10" max="3600"',
@@ -1451,10 +1453,10 @@ namespace comment_mail // Root namespace.
 					                $form_fields->input_row(
 						                array(
 							                'label'         => sprintf(__('Unconfirmed Expiration Time (<code>%1$s</code> Compatible)', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')),
-							                'placeholder'   => __('e.g. 60 days', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., 60 days', $this->plugin->text_domain),
 							                'name'          => 'unconfirmed_expiration_time',
 							                'current_value' => $current_value_for('unconfirmed_expiration_time'),
-							                'notes_after'   => '<p>'.sprintf(__('How long should unconfirmed subscriptions be kept in the database? e.g. <code>2 days</code>, <code>1 week</code>, <code>2 months</code>. Anything compatible with PHP\'s <code>%1$s</code> function will work here.', $this->plugin->text_domain).'</p>'.
+							                'notes_after'   => '<p>'.sprintf(__('How long should unconfirmed subscriptions be kept in the database? e.g., <code>2 days</code>, <code>1 week</code>, <code>2 months</code>. Anything compatible with PHP\'s <code>%1$s</code> function will work here.', $this->plugin->text_domain).'</p>'.
 							                                                 '<p class="pmp-note pmp-info">'.__('If you empty this field, unconfirmed subscriptions will not be cleaned, they will remain indefinitely.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')).'</p>'
 						                )).
 					                '  </tbody>'.
@@ -1465,10 +1467,10 @@ namespace comment_mail // Root namespace.
 					                $form_fields->input_row(
 						                array(
 							                'label'         => sprintf(__('Trash Expiration Time (<code>%1$s</code> Compatible)', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')),
-							                'placeholder'   => __('e.g. 60 days', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., 60 days', $this->plugin->text_domain),
 							                'name'          => 'trashed_expiration_time',
 							                'current_value' => $current_value_for('trashed_expiration_time'),
-							                'notes_after'   => '<p>'.sprintf(__('How long should trashed subscriptions be kept in the database? e.g. <code>2 days</code>, <code>1 week</code>, <code>2 months</code>. Anything compatible with PHP\'s <code>%1$s</code> function will work here.', $this->plugin->text_domain).'</p>'.
+							                'notes_after'   => '<p>'.sprintf(__('How long should trashed subscriptions be kept in the database? e.g., <code>2 days</code>, <code>1 week</code>, <code>2 months</code>. Anything compatible with PHP\'s <code>%1$s</code> function will work here.', $this->plugin->text_domain).'</p>'.
 							                                                 '<p class="pmp-note pmp-info">'.__('If you empty this field, trashed subscriptions will not be cleaned, they will remain indefinitely.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')).'</p>'
 						                )).
 					                '  </tbody>'.
@@ -1488,7 +1490,7 @@ namespace comment_mail // Root namespace.
 						               array(
 							               'type'          => 'number',
 							               'label'         => __('Max Execution Time (In Seconds)', $this->plugin->text_domain),
-							               'placeholder'   => __('e.g. 30', $this->plugin->text_domain),
+							               'placeholder'   => __('e.g., 30', $this->plugin->text_domain),
 							               'name'          => 'log_cleaner_max_time',
 							               'current_value' => $current_value_for('log_cleaner_max_time'),
 							               'other_attrs'   => 'min="10" max="3600"',
@@ -1502,10 +1504,10 @@ namespace comment_mail // Root namespace.
 					                $form_fields->input_row(
 						                array(
 							                'label'         => sprintf(__('Sub. Event Log Expiration Time (<code>%1$s</code> Compatible)', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')),
-							                'placeholder'   => __('e.g. 7 years', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., 7 years', $this->plugin->text_domain),
 							                'name'          => 'sub_event_log_expiration_time',
 							                'current_value' => $current_value_for('sub_event_log_expiration_time'),
-							                'notes_after'   => '<p>'.sprintf(__('How long should should subscription event log entries be kept in the database? e.g. <code>90 days</code>, <code>1 year</code>, <code>10 years</code>. Anything compatible with PHP\'s <code>%1$s</code> function will work here.', $this->plugin->text_domain).'</p>'.
+							                'notes_after'   => '<p>'.sprintf(__('How long should should subscription event log entries be kept in the database? e.g., <code>90 days</code>, <code>1 year</code>, <code>10 years</code>. Anything compatible with PHP\'s <code>%1$s</code> function will work here.', $this->plugin->text_domain).'</p>'.
 							                                                 '<p class="pmp-note pmp-info">'.__('If you empty this field, log entries will not be cleaned; they will remain indefinitely (default behavior). By default, log entries remain indefinitely since these are the underlying data used for statistical reporting. However, if you are not concerned about long-term historical data, feel free to define an expiration time. If you do, it is recommended that your expiration time be <code>1 year</code> (or more) so that statistical reporting will still function properly for short-term data.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')).'</p>'
 						                )).
 					                '  </tbody>'.
@@ -1516,10 +1518,10 @@ namespace comment_mail // Root namespace.
 					                $form_fields->input_row(
 						                array(
 							                'label'         => sprintf(__('Queue Event Log Expiration Time (<code>%1$s</code> Compatible)', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')),
-							                'placeholder'   => __('e.g. 7 years', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., 7 years', $this->plugin->text_domain),
 							                'name'          => 'queue_event_log_expiration_time',
 							                'current_value' => $current_value_for('queue_event_log_expiration_time'),
-							                'notes_after'   => '<p>'.sprintf(__('How long should should queue event log entries be kept in the database? e.g. <code>90 days</code>, <code>1 year</code>, <code>10 years</code>. Anything compatible with PHP\'s <code>%1$s</code> function will work here.', $this->plugin->text_domain).'</p>'.
+							                'notes_after'   => '<p>'.sprintf(__('How long should should queue event log entries be kept in the database? e.g., <code>90 days</code>, <code>1 year</code>, <code>10 years</code>. Anything compatible with PHP\'s <code>%1$s</code> function will work here.', $this->plugin->text_domain).'</p>'.
 							                                                 '<p class="pmp-note pmp-info">'.__('If you empty this field, log entries will not be cleaned; they will remain indefinitely (default behavior). By default, log entries remain indefinitely since these are the underlying data used for statistical reporting. However, if you are not concerned about long-term historical data, feel free to define an expiration time. If you do, it is recommended that your expiration time be <code>1 year</code> (or more) so that statistical reporting will still function properly for short-term data.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://php.net/manual/en/function.strtotime.php', 'strtotime')).'</p>'
 						                )).
 					                '  </tbody>'.
@@ -1539,7 +1541,7 @@ namespace comment_mail // Root namespace.
 						               array(
 							               'type'          => 'number',
 							               'label'         => __('Max Execution Time (In Seconds)', $this->plugin->text_domain),
-							               'placeholder'   => __('e.g. 30', $this->plugin->text_domain),
+							               'placeholder'   => __('e.g., 30', $this->plugin->text_domain),
 							               'name'          => 'queue_processor_max_time',
 							               'current_value' => $current_value_for('queue_processor_max_time'),
 							               'other_attrs'   => 'min="10" max="300"',
@@ -1554,7 +1556,7 @@ namespace comment_mail // Root namespace.
 						                array(
 							                'type'          => 'number',
 							                'label'         => __('Delay Time (In Milliseconds)', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. 250', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., 250', $this->plugin->text_domain),
 							                'name'          => 'queue_processor_delay',
 							                'current_value' => $current_value_for('queue_processor_delay'),
 							                'other_attrs'   => 'min="0"',
@@ -1570,7 +1572,7 @@ namespace comment_mail // Root namespace.
 						                array(
 							                'type'          => 'number',
 							                'label'         => __('Max Email Notifications Per Process (Integer)', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. 100', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., 100', $this->plugin->text_domain),
 							                'name'          => 'queue_processor_max_limit',
 							                'current_value' => $current_value_for('queue_processor_max_limit'),
 							                'other_attrs'   => 'min="1"',
@@ -1588,7 +1590,7 @@ namespace comment_mail // Root namespace.
 						                array(
 							                'type'          => 'number',
 							                'label'         => __('Real-Time Queue Processor; Max Email Notifications in Real-Time (Integer)', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. 5', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., 5', $this->plugin->text_domain),
 							                'name'          => 'queue_processor_realtime_max_limit',
 							                'current_value' => $current_value_for('queue_processor_realtime_max_limit'),
 							                'other_attrs'   => 'min="0" max="100"',
@@ -1609,7 +1611,7 @@ namespace comment_mail // Root namespace.
 				               $form_fields->input_row(
 					               array(
 						               'label'         => __('WordPress Capability Required to Manage Subscriptions', $this->plugin->text_domain),
-						               'placeholder'   => __('e.g. moderate_comments', $this->plugin->text_domain),
+						               'placeholder'   => __('e.g., moderate_comments', $this->plugin->text_domain),
 						               'name'          => 'manage_cap',
 						               'current_value' => $current_value_for('manage_cap'),
 						               'notes_after'   => '<p>'.sprintf(__('If you can <code>%2$s</code>, you can always manage subscriptions and %1$s options, no matter what you configure here. However, if you have other users that help manage your site, you can set a specific %3$s they\'ll need in order for %1$s to allow them access. Users w/ this capability will be allowed to manage subscriptions, the mail queue, event logs, and statistics; i.e., everything <em>except</em> change %1$s options. To alter %1$s options you\'ll always need the <code>%2$s</code> capability.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Roles_and_Capabilities#'.$this->plugin->cap, $this->plugin->cap), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Roles_and_Capabilities', __('WordPress Capability', $this->plugin->text_domain))).'</p>',
@@ -1628,10 +1630,10 @@ namespace comment_mail // Root namespace.
 				               $form_fields->input_row(
 					               array(
 						               'label'         => __('Don\'t Show Meta Boxes for these Post Types:', $this->plugin->text_domain),
-						               'placeholder'   => __('e.g. link,comment,revision,attachment,nav_menu_item,snippet,redirect', $this->plugin->text_domain),
+						               'placeholder'   => __('e.g., link,comment,revision,attachment,nav_menu_item,snippet,redirect', $this->plugin->text_domain),
 						               'name'          => 'excluded_meta_box_post_types',
 						               'current_value' => $current_value_for('excluded_meta_box_post_types'),
-						               'notes_after'   => '<p>'.sprintf(__('These are %2$s NOT associated w/ comments in any way; i.e., %1$s will not display its meta boxes in the post editing station for these types of posts. The default list is adequate for most sites. However, if you have other %2$s enabled by a theme/plugin, you might wish to include those here. e.g. <code>portfolio,gallery</code> might be two %3$s that you add to the default list, assuming these are not to be associated w/ comments.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Post_Types', __('Post Types', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Post_Types#Custom_Post_Types', __('Custom Post Types', $this->plugin->text_domain))).'</p>',
+						               'notes_after'   => '<p>'.sprintf(__('These are %2$s NOT associated w/ comments in any way; i.e., %1$s will not display its meta boxes in the post editing station for these types of posts. The default list is adequate for most sites. However, if you have other %2$s enabled by a theme/plugin, you might wish to include those here. e.g., <code>portfolio,gallery</code> might be two %3$s that you add to the default list, assuming these are not to be associated w/ comments.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Post_Types', __('Post Types', $this->plugin->text_domain)), $this->plugin->utils_markup->x_anchor('http://codex.wordpress.org/Post_Types#Custom_Post_Types', __('Custom Post Types', $this->plugin->text_domain))).'</p>',
 					               )).
 				               '  </tbody>'.
 				               '</table>';
@@ -1677,7 +1679,7 @@ namespace comment_mail // Root namespace.
 						               array(
 							               'type'          => 'number',
 							               'label'         => __('"My Subscriptions" Summary; Max Subscriptions Per Page', $this->plugin->text_domain),
-							               'placeholder'   => __('e.g. 25', $this->plugin->text_domain),
+							               'placeholder'   => __('e.g., 25', $this->plugin->text_domain),
 							               'name'          => 'sub_manage_summary_max_limit',
 							               'current_value' => $current_value_for('sub_manage_summary_max_limit'),
 							               'other_attrs'   => 'min="1" max="1000"',
@@ -1772,10 +1774,10 @@ namespace comment_mail // Root namespace.
 						                array(
 							                'type'          => 'number',
 							                'label'         => __('Maximum Select Menu Options Before Input Fallback:', $this->plugin->text_domain),
-							                'placeholder'   => __('e.g. 2000', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g., 2000', $this->plugin->text_domain),
 							                'name'          => 'max_select_options',
 							                'current_value' => $current_value_for('max_select_options'),
-							                'notes_after'   => '<p>'.sprintf(__('If %1$s detects that any select menu may contain more than this number of options (e.g. if you have several thousands posts, comments, users, etc); then it will automatically fallback on a regular text input field instead. This prevents memory issues in browsers that may be unable to deal with super long select menus. Recommended setting for this option is <code>2000</code>.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'.
+							                'notes_after'   => '<p>'.sprintf(__('If %1$s detects that any select menu may contain more than this number of options (e.g., if you have several thousands posts, comments, users, etc); then it will automatically fallback on a regular text input field instead. This prevents memory issues in browsers that may be unable to deal with super long select menus. Recommended setting for this option is <code>2000</code>.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'.
 							                                   '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Tip:</strong> You\'ll be happy to know that %1$s is quite capable of including hundreds of select menu options w/o issue. It even makes each select menu searchable for you. However, there is a limit to what is possible. We recommend setting this to a value of around <code>1000</code> or more. It should never be set higher than <code>10000</code> though. Most browsers will be unable to deal with that many menu options; no matter the software.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
 						                )).
 					                '  </tbody>'.
@@ -1865,7 +1867,7 @@ namespace comment_mail // Root namespace.
 						                'name'          => 'data',
 						                'rows'          => 15,
 						                'current_value' => !empty($_REQUEST[__NAMESPACE__]['import']['data']) ? trim(stripslashes((string)$_REQUEST[__NAMESPACE__]['import']['data'])) : NULL,
-						                'notes_before'  => '<p>'.__('The first line of this input should be CSV headers; e.g. <code>"email", "post_id", "status"</code>', $this->plugin->text_domain).'</p>',
+						                'notes_before'  => '<p>'.__('The first line of this input should be CSV headers; e.g., <code>"email", "post_id", "status"</code>', $this->plugin->text_domain).'</p>',
 					                )).
 				                '   </tbody>'.
 				                ' </table>';
@@ -1878,9 +1880,9 @@ namespace comment_mail // Root namespace.
 					                array(
 						                'type'         => 'file',
 						                'label'        => __('Or, a Prepared CSV File Upload:', $this->plugin->text_domain),
-						                'placeholder'  => __('e.g. comment-subscriptions.csv', $this->plugin->text_domain),
+						                'placeholder'  => __('e.g., comment-subscriptions.csv', $this->plugin->text_domain),
 						                'name'         => 'data_file',
-						                'notes_before' => '<p>'.__('The first line of this file should be CSV headers; e.g. <code>"email", "post_id", "status"</code>', $this->plugin->text_domain).'</p>',
+						                'notes_before' => '<p>'.__('The first line of this file should be CSV headers; e.g., <code>"email", "post_id", "status"</code>', $this->plugin->text_domain).'</p>',
 						                'notes_after'  => '<p>'.__('If you upload a file, it will be used instead of any direct input above; i.e., a file takes precedence over direct input.', $this->plugin->text_domain).'</p>',
 					                )).
 				                '   </tbody>'.
@@ -1984,11 +1986,11 @@ namespace comment_mail // Root namespace.
 					                array(
 						                'type'          => 'number',
 						                'label'         => __('Start Position:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. 1', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g., 1', $this->plugin->text_domain),
 						                'name'          => 'start_from',
 						                'current_value' => '1',
 						                'other_attrs'   => 'min="1"',
-						                'notes_after'   => '<p>'.__('e.g. If you already downloaded the first 1000, set this to <code>1001</code> to export the next set.', $this->plugin->text_domain).'</p>'
+						                'notes_after'   => '<p>'.__('e.g., If you already downloaded the first 1000, set this to <code>1001</code> to export the next set.', $this->plugin->text_domain).'</p>'
 					                )).
 				                '    </tbody>'.
 				                ' </table>';
@@ -1999,11 +2001,11 @@ namespace comment_mail // Root namespace.
 					                array(
 						                'type'          => 'number',
 						                'label'         => __('Max Subscriptions in this Set:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. 1000', $this->plugin->text_domain),
+						                'placeholder'   => __('e.g., 1000', $this->plugin->text_domain),
 						                'name'          => 'max_limit',
 						                'current_value' => '1000',
 						                'other_attrs'   => 'min="1" max="5000"',
-						                'notes_after'   => '<p>'.__('e.g. If you start from <code>1</code> and set this to <code>1000</code>, you will get the first 1000 DB rows. If you want the next 1000 rows, set Start Position to <code>1001</code> and leave this as-is.', $this->plugin->text_domain).'</p>'.
+						                'notes_after'   => '<p>'.__('e.g., If you start from <code>1</code> and set this to <code>1000</code>, you will get the first 1000 DB rows. If you want the next 1000 rows, set Start Position to <code>1001</code> and leave this as-is.', $this->plugin->text_domain).'</p>'.
 						                                   '<p class="pmp-note pmp-warning">'.__('<strong>Upper Limit:</strong> There is an upper limit of <code>5000</code> per file to prevent extremely slow DB queries; i.e., you cannot set this higher than <code>5000</code>.', $this->plugin->text_domain).'</p>'
 					                )).
 				                '    </tbody>'.
@@ -2068,7 +2070,7 @@ namespace comment_mail // Root namespace.
 					                array(
 						                'type'        => 'file',
 						                'label'       => __('JSON Config. Options File:', $this->plugin->text_domain),
-						                'placeholder' => __('e.g. config-options.json', $this->plugin->text_domain),
+						                'placeholder' => __('e.g., config-options.json', $this->plugin->text_domain),
 						                'name'        => 'data_file',
 					                )).
 				                '   </tbody>'.
@@ -2874,7 +2876,7 @@ namespace comment_mail // Root namespace.
 								                                                     '[if subscribed_to_own_comment]' => __('Subscribed to their own comment?', $this->plugin->text_domain),
 								                                                     '[sub_fname]'                    => __('Subscriber\'s first name.', $this->plugin->text_domain),
 								                                                     '[sub_email]'                    => __('Subscriber\'s email address.', $this->plugin->text_domain),
-								                                                     '[sub_deliver_label]'            => __('Delivery option label; e.g. asap, hourly, daily, weekly.', $this->plugin->text_domain),
+								                                                     '[sub_deliver_label]'            => __('Delivery option label; e.g., asap, hourly, daily, weekly.', $this->plugin->text_domain),
 								                                                     '[sub_deliver_description]'      => __('A brief description of the delivery option.', $this->plugin->text_domain),
 								                                                     '[sub_edit_url]'                 => __('Subscription edit URL; i.e., so they can make any last-minute changes.', $this->plugin->text_domain),
 								                                                     '[sub_post_comments_url]'        => __('URL to comments on the post they\'re subscribed to.', $this->plugin->text_domain),
@@ -2973,13 +2975,13 @@ namespace comment_mail // Root namespace.
 							               'current_value' => $current_value_for('template__type_s__site__comment_form__snippet__sub_ops___php'),
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed below your comment form; providing end-users with a way to create a subscription.', $this->plugin->text_domain).
-							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>',
+							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g., subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 							               'cm_details'    => $shortcode_details(array(
 								                                                     '[css_styles]'          => __('Stylesheet containing a default set of structral styles.', $this->plugin->text_domain),
 								                                                     '[inline_icon_svg]'     => __('Inline SVG icon that inherits the color and width of it\'s container automatically. Note, this is a scalable vector graphic that will look great at any size &gt;= 16x16 pixels.', $this->plugin->text_domain),
 								                                                     '[sub_type_options]'    => __('Select menu options. Allows a subscriber to choose if they wan\'t to subscribe or not; and in which way.', $this->plugin->text_domain),
-								                                                     '[sub_deliver_options]' => __('Select menu options. Allows a subscriber to choose a delivery option; e.g. asap, hourly, daily, weeky. This can be excluded if you wish. A default value of <code>asap</code> will be used in that case.', $this->plugin->text_domain),
+								                                                     '[sub_deliver_options]' => __('Select menu options. Allows a subscriber to choose a delivery option; e.g., asap, hourly, daily, weeky. This can be excluded if you wish. A default value of <code>asap</code> will be used in that case.', $this->plugin->text_domain),
 								                                                     '[sub_type_id]'         => __('The <code>id=""</code> attribute value used in <code>[sub_type_options]</code>.', $this->plugin->text_domain),
 								                                                     '[current_sub_email]'   => __('The current subscriber\'s email address, if it is known to have been confirmed; i.e., if it really is their email address. This will be empty if they have not previously confirmed a subscription.', $this->plugin->text_domain),
 								                                                     '[sub_new_url]'         => __('A URL leading to the "Add Subscription" page. This allows a visitor to subscribe w/o commenting even.', $this->plugin->text_domain),
@@ -3015,7 +3017,7 @@ namespace comment_mail // Root namespace.
 								               'current_value' => $current_value_for('template__type_s__site__comment_form__snippet__sso_ops___php'),
 								               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 								                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed above your comment form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
-								                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>',
+								                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g., SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>',
 								               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 								               'cm_details'    => $shortcode_details(array(
 									                                                     '[css_styles]'    => __('Stylesheet containing a default set of structral styles.', $this->plugin->text_domain),
@@ -3042,7 +3044,7 @@ namespace comment_mail // Root namespace.
 								               'current_value' => $current_value_for('template__type_s__site__login_form__snippet__sso_ops___php'),
 								               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 								                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed within your login form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
-								                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>',
+								                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g., SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>',
 								               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 								               'cm_details'    => $shortcode_details(array(
 									                                                     '[css_styles]'    => __('Stylesheet containing a default set of structral styles.', $this->plugin->text_domain),
@@ -3364,7 +3366,7 @@ namespace comment_mail // Root namespace.
 							               'current_value' => $current_value_for('template__type_a__site__comment_form__sub_ops___php'),
 							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed below your comment form; providing end-users with a way to create a subscription.', $this->plugin->text_domain).
-							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>',
+							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook (most common). This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g., subscr. options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_field_comment/', 'comment_form_field_comment'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form/', 'comment_form')).'</p>',
 							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 						               )).
 					               '  </tbody>'.
@@ -3418,7 +3420,7 @@ namespace comment_mail // Root namespace.
 								               'current_value' => $current_value_for('template__type_a__site__comment_form__sso_ops___php'),
 								               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 								                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed above your comment form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
-								                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>',
+								                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g., SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>',
 								               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 							               )).
 						               '  </tbody>'.
@@ -3463,7 +3465,7 @@ namespace comment_mail // Root namespace.
 								               'current_value' => $current_value_for('template__type_a__site__login_form__sso_ops___php'),
 								               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
 								                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed within your login form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
-								                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g. SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>',
+								                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g., SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>',
 								               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
 							               )).
 						               '  </tbody>'.
@@ -3768,7 +3770,7 @@ namespace comment_mail // Root namespace.
 						$_form_fields->input_row(
 							array(
 								'label'         => sprintf(__('From Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
-								'placeholder'   => sprintf(__('e.g. 7 days ago; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y', strtotime('-7 days')))),
+								'placeholder'   => sprintf(__('e.g., 7 days ago; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y', strtotime('-7 days')))),
 								'name'          => 'from',
 								'other_attrs'   => 'data-toggle="date-time-picker"',
 								'current_value' => $this->coalesce($current_value_for('from'), '7 days ago'),
@@ -3776,7 +3778,7 @@ namespace comment_mail // Root namespace.
 						$_form_fields->input_row(
 							array(
 								'label'         => sprintf(__('To Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
-								'placeholder'   => sprintf(__('e.g. now; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y'))),
+								'placeholder'   => sprintf(__('e.g., now; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y'))),
 								'name'          => 'to',
 								'other_attrs'   => 'data-toggle="date-time-picker"',
 								'current_value' => $this->coalesce($current_value_for('to'), 'now'),
@@ -3784,7 +3786,7 @@ namespace comment_mail // Root namespace.
 						$_form_fields->select_row(
 							array(
 								'label'           => __('Breakdown By', $this->plugin->text_domain),
-								'placeholder'     => __('e.g. hours, days, weeks, months, years', $this->plugin->text_domain),
+								'placeholder'     => __('e.g., hours, days, weeks, months, years', $this->plugin->text_domain),
 								'name'            => 'by',
 								'current_value'   => $this->coalesce($current_value_for('by'), 'days'),
 								'allow_arbitrary' => FALSE,
@@ -3886,7 +3888,7 @@ namespace comment_mail // Root namespace.
 						$_form_fields->input_row(
 							array(
 								'label'         => sprintf(__('From Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
-								'placeholder'   => sprintf(__('e.g. 7 days ago; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y', strtotime('-7 days')))),
+								'placeholder'   => sprintf(__('e.g., 7 days ago; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y', strtotime('-7 days')))),
 								'name'          => 'from',
 								'other_attrs'   => 'data-toggle="date-time-picker"',
 								'current_value' => $this->coalesce($current_value_for('from'), '7 days ago'),
@@ -3894,7 +3896,7 @@ namespace comment_mail // Root namespace.
 						$_form_fields->input_row(
 							array(
 								'label'         => sprintf(__('To Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
-								'placeholder'   => sprintf(__('e.g. now; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y'))),
+								'placeholder'   => sprintf(__('e.g., now; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y'))),
 								'name'          => 'to',
 								'other_attrs'   => 'data-toggle="date-time-picker"',
 								'current_value' => $this->coalesce($current_value_for('to'), 'now'),
@@ -3902,7 +3904,7 @@ namespace comment_mail // Root namespace.
 						$_form_fields->select_row(
 							array(
 								'label'           => __('Breakdown By', $this->plugin->text_domain),
-								'placeholder'     => __('e.g. hours, days, weeks, months, years', $this->plugin->text_domain),
+								'placeholder'     => __('e.g., hours, days, weeks, months, years', $this->plugin->text_domain),
 								'name'            => 'by',
 								'current_value'   => $this->coalesce($current_value_for('by'), 'days'),
 								'allow_arbitrary' => FALSE,
@@ -3968,7 +3970,7 @@ namespace comment_mail // Root namespace.
 						$_form_fields->input_row(
 							array(
 								'label'         => sprintf(__('From Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
-								'placeholder'   => sprintf(__('e.g. 7 days ago; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y', strtotime('-7 days')))),
+								'placeholder'   => sprintf(__('e.g., 7 days ago; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y', strtotime('-7 days')))),
 								'name'          => 'from',
 								'other_attrs'   => 'data-toggle="date-time-picker"',
 								'current_value' => $this->coalesce($current_value_for('from'), '7 days ago'),
@@ -3976,7 +3978,7 @@ namespace comment_mail // Root namespace.
 						$_form_fields->input_row(
 							array(
 								'label'         => sprintf(__('To Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
-								'placeholder'   => sprintf(__('e.g. now; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y'))),
+								'placeholder'   => sprintf(__('e.g., now; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y'))),
 								'name'          => 'to',
 								'other_attrs'   => 'data-toggle="date-time-picker"',
 								'current_value' => $this->coalesce($current_value_for('to'), 'now'),
@@ -3984,7 +3986,7 @@ namespace comment_mail // Root namespace.
 						$_form_fields->select_row(
 							array(
 								'label'           => __('Breakdown By', $this->plugin->text_domain),
-								'placeholder'     => __('e.g. hours, days, weeks, months, years', $this->plugin->text_domain),
+								'placeholder'     => __('e.g., hours, days, weeks, months, years', $this->plugin->text_domain),
 								'name'            => 'by',
 								'current_value'   => $this->coalesce($current_value_for('by'), 'days'),
 								'allow_arbitrary' => FALSE,
@@ -4061,7 +4063,7 @@ namespace comment_mail // Root namespace.
 						$_form_fields->input_row(
 							array(
 								'label'         => sprintf(__('From Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
-								'placeholder'   => sprintf(__('e.g. 7 days ago; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y', strtotime('-7 days')))),
+								'placeholder'   => sprintf(__('e.g., 7 days ago; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y', strtotime('-7 days')))),
 								'name'          => 'from',
 								'other_attrs'   => 'data-toggle="date-time-picker"',
 								'current_value' => $this->coalesce($current_value_for('from'), '7 days ago'),
@@ -4069,7 +4071,7 @@ namespace comment_mail // Root namespace.
 						$_form_fields->input_row(
 							array(
 								'label'         => sprintf(__('To Date (%1$s) %2$s', $this->plugin->text_domain), esc_html($timezone), $date_info_anchor),
-								'placeholder'   => sprintf(__('e.g. now; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y'))),
+								'placeholder'   => sprintf(__('e.g., now; %1$s 00:00', $this->plugin->text_domain), esc_html($this->plugin->utils_date->i18n('M j, Y'))),
 								'name'          => 'to',
 								'other_attrs'   => 'data-toggle="date-time-picker"',
 								'current_value' => $this->coalesce($current_value_for('to'), 'now'),
@@ -4077,7 +4079,7 @@ namespace comment_mail // Root namespace.
 						$_form_fields->select_row(
 							array(
 								'label'           => __('Breakdown By', $this->plugin->text_domain),
-								'placeholder'     => __('e.g. hours, days, weeks, months, years', $this->plugin->text_domain),
+								'placeholder'     => __('e.g., hours, days, weeks, months, years', $this->plugin->text_domain),
 								'name'            => 'by',
 								'current_value'   => $this->coalesce($current_value_for('by'), 'days'),
 								'allow_arbitrary' => FALSE,
@@ -4103,6 +4105,8 @@ namespace comment_mail // Root namespace.
 				     '   </div>';
 
 				echo '</div>';
+
+				return null;
 			}
 
 			/**
@@ -4210,10 +4214,10 @@ namespace comment_mail // Root namespace.
 
 				if($this->plugin->utils_env->is_pro_preview())
 				{
-					$notes .= '<div class="pmp-note pmp-info">'."\n";
+					$notes .= '<div class="pmp-note pmp-notice">'."\n";
 					$notes .= '  <a href="'.esc_attr($this->plugin->utils_url->page_only()).'" style="float:right; margin:0 0 15px 25px; font-variant:small-caps; text-decoration:none;">'.__('close', $this->plugin->text_domain).' <i class="fa fa-eye-slash"></i></a>'."\n";
-					$notes .= '  <i class="fa fa-eye"></i> '.sprintf(__('<strong>Pro Features (Preview)</strong> ~ New option panels below. Please explore before <a href="%1$s" target="_blank">upgrading <i class="fa fa-heart-o"></i></a>.', $this->plugin->text_domain), esc_attr($this->plugin->utils_url->product_page())).'<br />'."\n";
-					$notes .= '  '.sprintf(__('<small>NOTE: the free version of %1$s (i.e., this lite version); is more-than-adequate for most sites. Please upgrade only if you desire advanced features or would like to support the developer.</small>', $this->plugin->text_domain), esc_html($this->plugin->name))."\n";
+					$notes .= '  <i class="fa fa-arrow-down"></i> '.sprintf(__('<strong>Pro Features (Preview)</strong> ~ New advanced option panels below. Please explore before <a href="%1$s" target="_blank">upgrading <i class="fa fa-heart-o"></i></a>.', $this->plugin->text_domain), esc_attr($this->plugin->utils_url->product_page())).'<br />'."\n";
+					$notes .= '  '.sprintf(__('<small><strong>MORE:</strong> in addition to what you see below, the pro version also includes import/export functionality, stats/graphs, and advanced PHP-based template options. [<a href="%2s" target="_blank">learn more</a>]</small>', $this->plugin->text_domain), esc_html($this->plugin->name), esc_attr($this->plugin->utils_url->product_page()))."\n";
 					$notes .= '</div>'."\n";
 				}
 				if($this->plugin->install_time() > strtotime('-48 hours') && $this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_*_templates'))
