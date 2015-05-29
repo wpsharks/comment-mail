@@ -234,7 +234,7 @@ namespace comment_mail // Root namespace.
 						                'name'          => 'reply_to_email',
 						                'current_value' => $current_value_for('reply_to_email'),
 						                'notes_after'   => '<p>'.sprintf(__('All emails sent by %1$s can have a specific <code>%2$s:</code> email header, which might be different from the address that %1$s messages are actually sent <code>%3$s</code>. This makes it so that if someone happens to reply to an email notification, that reply will be directed to a specific email address that you prefer. Some site owners like to use something like <code>noreply@mysite.com</code>, while others find it best to use a real email address that can monitor replies. It\'s a matter of preference.', $this->plugin->text_domain), esc_html($this->plugin->name), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Reply-To'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'From'), $this->plugin->utils_markup->x_anchor('http://en.wikipedia.org/wiki/Email#Message_header', 'Return-Path')).'</p>'.
-						                                   '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> If you happen to enable a %1$s&trade; RVE Handler (Replies via Email), this value is ignored in favor of the <code>Reply-To</code> address configured for your RVE Handler. In other words, if you enable Replies via Email, you could simply leave this blank if you like. If RVE is enabled, the <code>Reply-To</code> address for the RVE Handler receives precedence always. The address you configure here will not be applied in that case.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'
+						                                   ($this->plugin->is_pro ? '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> If you happen to enable a %1$s&trade; RVE Handler (Replies via Email), this value is ignored in favor of the <code>Reply-To</code> address configured for your RVE Handler. In other words, if you enable Replies via Email, you could simply leave this blank if you like. If RVE is enabled, the <code>Reply-To</code> address for the RVE Handler receives precedence always. The address you configure here will not be applied in that case.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>' : '')
 					                )).
 				                '  </tbody>'.
 				                '</table>';
@@ -592,8 +592,8 @@ namespace comment_mail // Root namespace.
 							               '0' => __('No, require subscriptions to be confirmed via email (highly recommended)', $this->plugin->text_domain),
 							               '1' => __('Yes, automatically auto-confirm everyone; i.e., never ask for email confirmation', $this->plugin->text_domain),
 						               ),
-						               'notes_after'     => '<div class="pmp-if-enabled-show">'.
-						                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('<span class="pmp-note pmp-warning" style="padding:0 .25em 0 .25em;">WARNING</span> — when Auto-Confirm Everyone is enabled:', $this->plugin->text_domain).'</p>'.
+						               'notes_after'     => '<div class="pmp-if-enabled-show" style="margin-top:1em !important;">'.
+						                                    '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('<span class="pmp-note pmp-warning" style="padding:0 .25em 0 .25em;">WARNING — when Auto-Confirm Everyone is enabled:</span>', $this->plugin->text_domain).'</p>'.
 						                                    '   <ul class="pmp-list-items">'.
 						                                    '      <li>'.sprintf(__('Nobody will be required to confirm a subscription. For instance, when someone leaves a comment and chooses to be subscribed (with whatever email address they\'ve entered), that email address will be added to the list w/o getting confirmation from the real owner of that address. This scenario changes slightly if you %1$s before leaving a comment, via WordPress Discussion Settings. If that\'s the case, then depending on the way your users register (i.e., if they are required to verify their email address in some way), this option might be feasible. That said, in 99%% of all cases this option is NOT recommended. If you enable auto-confirmation for everyone, please take extreme caution.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor(admin_url('/options-discussion.php'), __('require users to be logged-in', $this->plugin->text_domain))).'</li>'.
 						                                    '      <li>'.sprintf(__('In addition to security issues associated w/ auto-confirming everyone automatically; if you enable this behavior it will also have the negative side-effect of making it slightly more difficult for users to view a summary of their existing subscriptions; i.e., they won\'t get an encrypted <code>%2$s</code> cookie right away via email confirmation, as would normally occur. This is how %1$s identifies a user when they are not currently logged into the site (typical w/ commenters). Therefore, if Auto-Confirm Everyone is enabled, the only way users can view a summary of their subscriptions, is if:', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html(__NAMESPACE__.'_sub_email')).
@@ -628,10 +628,9 @@ namespace comment_mail // Root namespace.
 				                ' </table>'.
 				                '</div>';
 
-				$_panel_body .= '<hr />';
-
-				$_panel_body .= '<table>'.
-				                ' <tbody>'.
+				$_panel_body .= '<div class="pmp-if-enabled-show"><hr />'.
+				                ' <table>'.
+				                '    <tbody>'.
 				                $form_fields->select_row(
 					                array(
 						                'label'           => __('<i class="fa fa-wordpress"></i> <i class="fa fa-users"></i>'.
@@ -650,8 +649,9 @@ namespace comment_mail // Root namespace.
 						                                     '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> Your answer here does not enable or disable auto-confirmation in any way. It\'s simply a flag that is used by %1$s (internally), to help it make the most logical (safest) decision under certain scenarios that are impacted by the email address of the current user. It\'s important to realize that no matter what you answer here, %1$s will still be fully functional. You can only go wrong by saying <code>Yes</code> when in fact your users do NOT always confirm their email. <strong>If in doubt, please answer <code>No</code> (default behavior)</strong>.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'.
 						                                     '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Note:</strong> If you enable SSO "Single Sign-on" (another %1$s feature), then this setting is ignored; i.e., enabling SSO is an automatic flag which tells %1$s that all WP users do NOT confirm their email address in every scenario.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'
 					                )).
-				                ' </tbody>'.
-				                '</table>';
+				                '    </tbody>'.
+				                ' </table>'.
+				                '</div>';
 
 				echo $this->panel(__('Auto-Confirm Settings', $this->plugin->text_domain), $_panel_body, array());
 
@@ -1470,7 +1470,7 @@ namespace comment_mail // Root namespace.
 					                '  </tbody>'.
 					                '</table>';
 
-					echo $this->panel(__('Sub. Cleaner Adjustments', $this->plugin->text_domain), $_panel_body, array('pro_only' => FALSE));
+					echo $this->panel(__('Sub. Cleaner Adjustments', $this->plugin->text_domain), $_panel_body, array('pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 				}
@@ -1797,7 +1797,7 @@ namespace comment_mail // Root namespace.
 					                '  </tbody>'.
 					                '</table>';
 
-					echo $this->panel(__('Misc. UI-Related Settings', $this->plugin->text_domain), $_panel_body, array());
+					echo $this->panel(__('Misc. UI-Related Settings', $this->plugin->text_domain), $_panel_body, array('pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 				}
@@ -4128,13 +4128,34 @@ namespace comment_mail // Root namespace.
 				            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__) ? ' class="pmp-active"' : '').'>'.
 				            '<i class="fa fa-gears"></i> '.__('Options', $this->plugin->text_domain).'</a>'."\n";
 
-				$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->import_export_menu_page_only()).'"'.
-				            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_import_export') ? ' class="pmp-active"' : '').'>'.
-				            '<i class="fa fa-upload"></i> '.__('Import/Export', $this->plugin->text_domain).
-				            (!$this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_import_export') // Call to action for StCR users.
-				             && $this->plugin->install_time() > strtotime('-2 days') && import_stcr::data_exists() && !import_stcr::ever_imported()
-					            ? '<span class="pmp-blink">'.__('StCR Auto-Import', $this->plugin->text_domain).'</span>' : '').'</a>'."\n";
+				if(!$this->plugin->is_pro) // Display pro preview/upgrade related links?
+				{
+					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->pro_preview()).'"'.
+					            ($this->plugin->utils_env->is_pro_preview() ? ' class="pmp-active"' : '').'>'.
+					            '<i class="fa fa-eye"></i> '.__('Preview Pro Features', $this->plugin->text_domain).'</a>'."\n";
 
+					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->product_page()).'" target="_blank"><i class="fa fa-heart-o"></i> '.__('Pro Upgrade', $this->plugin->text_domain).'</a>'."\n";
+				}
+				if($this->plugin->is_pro) // Display import options for pro users.
+				{
+					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->import_export_menu_page_only()).'"'.
+					            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_import_export') ? ' class="pmp-active"' : '').'>'.
+					            '<i class="fa fa-upload"></i> '.__('Import/Export', $this->plugin->text_domain).
+
+					            ((!$this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_import_export') // Call to action for StCR users.
+					              && $this->plugin->install_time() > strtotime('-2 days') && import_stcr::data_exists() && !import_stcr::ever_imported())
+						            ? '<span class="pmp-blink">'.__('StCR Auto-Import', $this->plugin->text_domain).'</span>' : '').'</a>'."\n";
+				}
+				else if(!$this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_import_export') // Call to action for StCR users.
+				        && $this->plugin->install_time() > strtotime('-2 days') && import_stcr::data_exists() && !import_stcr::ever_imported()
+				) // Display import options for lite users; i.e., StCR only in this case.
+				{
+					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->import_export_menu_page_only()).'"'.
+					            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_import_export') ? ' class="pmp-active"' : '').'>'.
+					            '<i class="fa fa-upload"></i> '.__('Import/Export', $this->plugin->text_domain).
+
+					            '<span class="pmp-blink">'.__('StCR Auto-Import', $this->plugin->text_domain).'</span></a>'."\n";
+				}
 				$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->email_templates_menu_page_only()).'"'.
 				            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_email_templates') ? ' class="pmp-active"' : '').'>'.
 				            '<i class="fa fa-code"></i> '.__('Email Templates', $this->plugin->text_domain).'</a>'."\n";
@@ -4145,14 +4166,6 @@ namespace comment_mail // Root namespace.
 
 				$heading .= '     <a href="#" data-pmp-action="'.esc_attr($this->plugin->utils_url->restore_default_options()).'" data-pmp-confirmation="'.esc_attr(__('Restore default plugin options? You will lose all of your current settings! Are you absolutely sure?', $this->plugin->text_domain)).'"><i class="fa fa-ambulance"></i> '.__('Restore Default Options', $this->plugin->text_domain).'</a>'."\n";
 
-				if(!$this->plugin->is_pro) // Display pro preview/upgrade related links?
-				{
-					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->pro_preview()).'"'.
-					            ($this->plugin->utils_env->is_pro_preview() ? ' class="pmp-active"' : '').'>'.
-					            '<i class="fa fa-eye"></i> '.__('Preview Pro Features', $this->plugin->text_domain).'</a>'."\n";
-
-					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->product_page()).'" target="_blank"><i class="fa fa-heart-o"></i> '.__('Pro Upgrade', $this->plugin->text_domain).'</a>'."\n";
-				}
 				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->subscribe_page()).'" target="_blank"><i class="fa fa-envelope-o"></i> '.__('Newsletter (Subscribe)', $this->plugin->text_domain).'</a>'."\n";
 				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->product_page()).'" target="_blank"><i class="wsi wsi-comment-mail"></i> '.esc_html($this->plugin->site_name).'</a>'."\n";
 

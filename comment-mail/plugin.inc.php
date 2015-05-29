@@ -35,7 +35,6 @@ namespace comment_mail
 		 * @property-read utils_php             $utils_php
 		 * @property-read utils_queue           $utils_queue
 		 * @property-read utils_queue_event_log $utils_queue_event_log
-		 * @property-read utils_rve             $utils_rve
 		 * @property-read utils_string          $utils_string
 		 * @property-read utils_sub             $utils_sub
 		 * @property-read utils_sub_event_log   $utils_sub_event_log
@@ -537,7 +536,7 @@ namespace comment_mail
 
 					/* Related to menu pages; i.e. logo display. */
 
-					'menu_pages_logo_icon_enable'                                                          => '0', // `0|1`; display?
+					'menu_pages_logo_icon_enable'                                                          => '1', // `0|1`; display?
 
 					/* Related to branding; i.e. powered by Comment Mail™ notes.
 					~ IMPORTANT: please see <https://wordpress.org/plugins/about/guidelines/>
@@ -634,6 +633,9 @@ namespace comment_mail
 
 				if($this->options['manage_cap']) // This can be altered by plugin config. options.
 					$this->manage_cap = apply_filters(__METHOD__.'_manage_cap', $this->options['manage_cap']);
+
+				if(!$this->options['auto_confirm_force_enable'])
+					$this->options['all_wp_users_confirm_email'] = '0';
 
 				/*
 				 * With or without hooks?
