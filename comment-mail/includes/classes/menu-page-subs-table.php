@@ -76,21 +76,12 @@ namespace comment_mail // Root namespace.
 					'last_update_time'  => __('Last Update', $plugin->text_domain),
 
 					'insertion_ip'      => __('Subscr. IP', $plugin->text_domain),
-					'insertion_region'  => __('IP Region', $plugin->text_domain),
-					'insertion_country' => __('IP Country', $plugin->text_domain),
 
 					'last_ip'           => __('Last IP', $plugin->text_domain),
-					'last_region'       => __('Last IP Region', $plugin->text_domain),
-					'last_country'      => __('Last IP Country', $plugin->text_domain),
 
 					'key'               => __('Key', $plugin->text_domain),
 					'ID'                => __('ID', $plugin->text_domain),
 				);
-				if(!$plugin->options['geo_location_tracking_enable']) foreach($columns as $_key => $_column)
-					if(in_array($_key, array('insertion_region', 'insertion_country', 'last_region', 'last_country'), TRUE))
-						unset($columns[$_key]); // Ditch this column by key.
-				unset($_key, $_column); // Housekeeping.
-
 				return $columns; // Associative array.
 			}
 
@@ -116,21 +107,12 @@ namespace comment_mail // Root namespace.
 					'last_update_time',
 
 					'insertion_ip',
-					'insertion_region',
-					'insertion_country',
 
 					'last_ip',
-					'last_region',
-					'last_country',
 
 					'key',
 					'ID',
 				);
-				if(!$plugin->options['geo_location_tracking_enable']) foreach($columns as $_key => $_column)
-					if(in_array($_column, array('insertion_region', 'insertion_country', 'last_region', 'last_country'), TRUE))
-						unset($columns[$_key]); // Ditch this column by key.
-				unset($_key, $_column); // Housekeeping.
-
 				return array_values($columns);
 			}
 

@@ -98,18 +98,7 @@ namespace comment_mail // Root namespace.
 
 					'ip_before'         => __('IP Address Before', $plugin->text_domain),
 					'ip'                => __('IP Address After', $plugin->text_domain),
-
-					'region_before'     => __('IP Region Before', $plugin->text_domain),
-					'region'            => __('IP Region After', $plugin->text_domain),
-
-					'country_before'    => __('IP Country Before', $plugin->text_domain),
-					'country'           => __('IP Country After', $plugin->text_domain),
 				);
-				if(!$plugin->options['geo_location_tracking_enable']) foreach($columns as $_key => $_column)
-					if(in_array($_key, array('region_before', 'region', 'country_before', 'country'), TRUE))
-						unset($columns[$_key]); // Ditch this column by key.
-				unset($_key, $_column); // Housekeeping.
-
 				return $columns; // Associative array.
 			}
 
@@ -154,18 +143,7 @@ namespace comment_mail // Root namespace.
 
 					'ip_before',
 					'ip',
-
-					'region_before',
-					'region',
-
-					'country_before',
-					'country',
 				);
-				if(!$plugin->options['geo_location_tracking_enable']) foreach($columns as $_key => $_column)
-					if(in_array($_column, array('region_before', 'region', 'country_before', 'country'), TRUE))
-						unset($columns[$_key]); // Ditch this column by key.
-				unset($_key, $_column); // Housekeeping.
-
 				return array_values($columns);
 			}
 

@@ -156,11 +156,7 @@ namespace comment_mail // Root namespace.
 				if($this->user_initiated && !$this->last_ip)
 					$this->last_ip = $this->plugin->utils_ip->current();
 
-				if($this->user_initiated && !$this->last_region)
-					$this->last_region = $this->plugin->utils_ip->current_region();
-
-				if($this->user_initiated && !$this->last_country)
-					$this->last_country = $this->plugin->utils_ip->current_country();
+				$this->last_region = ''; $this->last_country = '';
 
 				# Auto-resolve conflicts between deletion event types.
 

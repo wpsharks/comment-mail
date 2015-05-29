@@ -80,16 +80,9 @@ namespace comment_mail // Root namespace.
 					'email'             => __('Subscr. Email', $plugin->text_domain),
 
 					'ip'                => __('Subscr. IP', $plugin->text_domain),
-					'region'            => __('Subscr. IP Region', $plugin->text_domain),
-					'country'           => __('Subscr. IP Country', $plugin->text_domain),
 
 					'status'            => __('Subscr. Status', $plugin->text_domain),
 				);
-				if(!$plugin->options['geo_location_tracking_enable']) foreach($columns as $_key => $_column)
-					if(in_array($_key, array('region', 'country'), TRUE))
-						unset($columns[$_key]); // Ditch this column by key.
-				unset($_key, $_column); // Housekeeping.
-
 				return $columns; // Associative array.
 			}
 
@@ -118,16 +111,9 @@ namespace comment_mail // Root namespace.
 					'email',
 
 					'ip',
-					'region',
-					'country',
 
 					'status',
 				);
-				if(!$plugin->options['geo_location_tracking_enable']) foreach($columns as $_key => $_column)
-					if(in_array($_column, array('region', 'country'), TRUE))
-						unset($columns[$_key]); // Ditch this column by key.
-				unset($_key, $_column); // Housekeeping.
-
 				return array_values($columns);
 			}
 
