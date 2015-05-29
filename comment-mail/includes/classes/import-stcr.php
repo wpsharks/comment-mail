@@ -8,6 +8,7 @@
  */
 namespace comment_mail // Root namespace.
 {
+
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
@@ -534,6 +535,25 @@ namespace comment_mail // Root namespace.
 				       " WHERE `meta_key` LIKE '".esc_sql($like)."' LIMIT 1";
 
 				return (boolean)$plugin->utils_db->wp->get_var($sql);
+			}
+
+			/**
+			 * Delete post meta keys.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			public static function delete_post_meta_keys()
+			{
+				$plugin = plugin(); // Need this below.
+
+				$like = // e.g. Delete all keys LIKE `%comment\_mail%`.
+					'%'.$plugin->plugin->utils_db->wp->esc_like(__NAMESPACE__.'_imported_stcr_subs').'%';
+
+				$sql = // This will remove our StCR import history also.
+					"DELETE FROM `".esc_sql($plugin->plugin->utils_db->wp->postmeta)."`".
+					" WHERE `meta_key` LIKE '".esc_sql($like)."'";
+
+				$plugin->plugin->utils_db->wp->query($sql);
 			}
 		}
 	}

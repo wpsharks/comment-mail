@@ -1963,7 +1963,7 @@ namespace comment_mail // Root namespace.
 
 					$_panel_body .= '<iframe src="'.esc_attr($this->plugin->utils_url->to('/client-s/blanks/cccccc.html')).'" name="'.esc_attr(__NAMESPACE__.'_import_stcr_iframe').'" class="pmp-import-iframe-output"></iframe>';
 
-					echo $this->panel(__('Subscribe to Comments Reloaded (StCR)', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-upload"></i>', 'open' => !import_stcr::ever_imported()));
+					echo $this->panel(__('Subscribe to Comments Reloaded (StCR)', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-upload"></i>', 'open' => (!$this->plugin->is_pro && !$this->plugin->utils_env->is_pro_preview()) || !import_stcr::ever_imported()));
 
 					unset($_form_field_args, $_form_fields, $_panel_body); // Housekeeping.
 				}
@@ -4158,13 +4158,14 @@ namespace comment_mail // Root namespace.
 					            ((!$this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_import_export') && import_stcr::data_exists() && !import_stcr::ever_imported())
 						            ? '<span class="pmp-blink">'.__('StCR Auto-Import', $this->plugin->text_domain).'</span>' : '').'</a>'."\n";
 				}
-				else if(!$this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_import_export') && import_stcr::data_exists() && !import_stcr::ever_imported())
+				else if(import_stcr::data_exists()) // Lite version exposes import functionality for StCR users.
 				{
 					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->import_export_menu_page_only()).'"'.
 					            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_import_export') ? ' class="pmp-active"' : '').'>'.
 					            '<i class="fa fa-upload"></i> '.__('Import/Export', $this->plugin->text_domain).
 
-					            '<span class="pmp-blink">'.__('StCR Auto-Import', $this->plugin->text_domain).'</span></a>'."\n";
+					            ((!$this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_import_export') && import_stcr::data_exists() && !import_stcr::ever_imported())
+						            ? '<span class="pmp-blink">'.__('StCR Auto-Import', $this->plugin->text_domain).'</span>' : '').'</a>'."\n";
 				}
 				$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->email_templates_menu_page_only()).'"'.
 				            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_email_templates') ? ' class="pmp-active"' : '').'>'.
