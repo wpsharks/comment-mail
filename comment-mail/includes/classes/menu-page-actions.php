@@ -173,7 +173,7 @@ namespace comment_mail // Root namespace.
 				if(empty($request_args['type']) || !is_string($request_args['type']))
 					return; // Missing and/or invalid import type.
 
-				if(!in_array($request_args['type'], array('subs', 'stcr', 'ops'), TRUE))
+				if(!in_array($request_args['type'], array('stcr'), TRUE))
 					return; // Invalid import type.
 
 				if(!class_exists($class = '\\'.__NAMESPACE__.'\\import_'.$request_args['type']))
@@ -202,7 +202,7 @@ namespace comment_mail // Root namespace.
 				if(empty($request_args['type']) || !is_string($request_args['type']))
 					return; // Missing and/or invalid import type.
 
-				if(!in_array($request_args['type'], array('subs', 'ops'), TRUE))
+				if(!in_array($request_args['type'], array(), TRUE))
 					return; // Invalid import type.
 
 				if(!class_exists($class = '\\'.__NAMESPACE__.'\\export_'.$request_args['type']))
