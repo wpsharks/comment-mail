@@ -8,6 +8,7 @@
  */
 namespace comment_mail // Root namespace.
 {
+
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
@@ -160,15 +161,21 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function maybe_display()
 			{
+				$_this   = $this;
 				$sub_key = $this->sub_key;
 				$is_edit = $this->is_edit;
 				$sub     = $this->sub;
 
 				$form_fields       = $this->form_fields;
-				$current_value_for = array($this, 'current_value_for');
-				$hidden_inputs     = array($this, 'hidden_inputs');
-
-				$processing = static::$processing;
+				$current_value_for = function ($key_prop) use ($_this)
+				{
+					return $_this->current_value_for($key_prop);
+				};
+				$hidden_inputs     = function () use ($_this)
+				{
+					return $_this->hidden_inputs();
+				};
+				$processing        = static::$processing;
 
 				$processing_errors      = static::$processing_errors;
 				$processing_error_codes = static::$processing_error_codes;
