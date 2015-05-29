@@ -25,21 +25,21 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 */
-			protected $string;
+			public $string; // Public for PHP v5.3 compat.
 
 			/**
 			 * @var array Array of contextual vars.
 			 *
 			 * @since 141111 First documented version.
 			 */
-			protected $vars;
+			public $vars; // Public for PHP v5.3 compat.
 
 			/**
 			 * @var array Array of tokens.
 			 *
 			 * @since 141111 First documented version.
 			 */
-			protected $tokens;
+			public $tokens; // Public for PHP v5.3 compat.
 
 			/**
 			 * Class constructor.

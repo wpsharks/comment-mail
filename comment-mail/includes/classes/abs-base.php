@@ -25,7 +25,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 */
-			protected $plugin;
+			public $plugin; // Public for PHP v5.3 compat.
 
 			/**
 			 * @var array Instance cache.

@@ -59,15 +59,6 @@ namespace comment_mail
 			public $is_pro = FALSE;
 
 			/**
-			 * Identifies enterprise version.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @var boolean `TRUE` for enterprise version.
-			 */
-			public $is_enterprise = FALSE;
-
-			/**
 			 * Plugin name.
 			 *
 			 * @since 141111 First documented version.

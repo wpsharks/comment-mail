@@ -394,7 +394,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string HTML markup for this table column.
 			 */
-			protected function column_cb(\stdClass $item)
+			protected function column_cb(/* \stdClass */ $item)
 			{
 				return '<input type="checkbox" name="'.esc_attr($this->plural_name).'[]" value="'.esc_attr($item->ID).'" />';
 			}
@@ -927,7 +927,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string HTML markup for this table column.
 			 */
-			protected function column_default(\stdClass $item, $property)
+			protected function column_default(/* \stdClass */ $item, $property)
 			{
 				if(!($property = trim((string)$property)))
 					return '—'; // Not applicable.

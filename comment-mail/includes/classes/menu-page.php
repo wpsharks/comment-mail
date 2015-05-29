@@ -2470,7 +2470,7 @@ namespace comment_mail // Root namespace.
 				}
 				/* ----------------------------------------------------------------------------------------- */
 
-				else if($this->plugin->options['template_type'] === 'a') // Advanced PHP-based templates.
+				else if($this->plugin->is_pro && $this->plugin->options['template_type'] === 'a') // Advanced PHP-based templates.
 				{
 					echo '         <h2 class="pmp-section-heading">'.
 					     '            '.__('Email Header/Footer Templates', $this->plugin->text_domain).
@@ -2495,7 +2495,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Email Header', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Email Header', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -2517,7 +2517,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Email Header Styles', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Email Header Styles', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -2539,7 +2539,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Email Header Scripts', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Email Header Scripts', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -2561,7 +2561,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Email Header Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
+					echo $this->panel(__('Email Header Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -2583,7 +2583,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Email Footer Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
+					echo $this->panel(__('Email Footer Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -2605,7 +2605,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Email Footer', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Email Footer', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -2634,7 +2634,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Subscr. Confirmation Subject', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Subscr. Confirmation Subject', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -2656,7 +2656,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Subscr. Confirmation Message Body', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Subscr. Confirmation Message Body', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -2685,7 +2685,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Comment Notification Subject', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Comment Notification Subject', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -2707,7 +2707,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Comment Notification Message Body', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Comment Notification Message Body', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 				}
@@ -3061,7 +3061,7 @@ namespace comment_mail // Root namespace.
 				}
 				/* ----------------------------------------------------------------------------------------- */
 
-				else if($this->plugin->options['template_type'] === 'a') // Advanced PHP-based templates.
+				else if($this->plugin->is_pro && $this->plugin->options['template_type'] === 'a') // Advanced PHP-based templates.
 				{
 					echo '         <h2 class="pmp-section-heading">'.
 					     '            '.__('Site Header/Footer Templates', $this->plugin->text_domain).
@@ -3086,7 +3086,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Site Header', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Site Header', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -3108,7 +3108,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Site Header Styles', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Site Header Styles', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -3130,7 +3130,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Site Header Scripts', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Site Header Scripts', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -3152,7 +3152,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Site Header Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
+					echo $this->panel(__('Site Header Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -3174,7 +3174,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Site Footer Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes'));
+					echo $this->panel(__('Site Footer Tag', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'note' => 'Recommended for Simple Branding Changes', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -3196,7 +3196,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Site Footer', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Site Footer', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -3225,7 +3225,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Subscr. Confirmed', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Subscr. Confirmed', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -3247,7 +3247,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Unsubscribed', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Unsubscribed', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -3269,7 +3269,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Unsubscribed All', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Unsubscribed All', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -3298,7 +3298,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Summary', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Summary', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -3320,7 +3320,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Add/Edit Form', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Add/Edit Form', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -3342,7 +3342,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Comment ID Row via AJAX', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Comment ID Row via AJAX', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -3372,7 +3372,7 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Comment Form Subscr. Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Comment Form Subscr. Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
@@ -3394,131 +3394,128 @@ namespace comment_mail // Root namespace.
 					               '  </tbody>'.
 					               '</table>';
 
-					echo $this->panel(__('Comment Form Scripts for Subscr. Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>'));
+					echo $this->panel(__('Comment Form Scripts for Subscr. Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
 					unset($_panel_body); // Housekeeping.
 
 					/* ----------------------------------------------------------------------------------------- */
 
-					if($this->plugin->is_pro || $this->plugin->utils_env->is_pro_preview())
-					{
-						echo '         <h2 class="pmp-section-heading">'.
-						     '            '.__('Single Sign-on Templates', $this->plugin->text_domain).
-						     '            <small>'.__('Provides options that allow commenters to login w/ popular social network accounts.', $this->plugin->text_domain).'</small>'.
-						     '         </h2>';
+					echo '         <h2 class="pmp-section-heading">'.
+					     '            '.__('Single Sign-on Templates', $this->plugin->text_domain).
+					     '            <small>'.__('Provides options that allow commenters to login w/ popular social network accounts.', $this->plugin->text_domain).'</small>'.
+					     '         </h2>';
 
-						/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+					/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
-						$_panel_body = '<table>'.
-						               '  <tbody>'.
-						               $form_fields->textarea_row(
-							               array(
-								               'label'         => __('Comment Form SSO Options Template', $this->plugin->text_domain),
-								               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-								               'cm_mode'       => 'application/x-httpd-php',
-								               'name'          => 'template__type_a__site__comment_form__sso_ops___php',
-								               'current_value' => $current_value_for('template__type_a__site__comment_form__sso_ops___php'),
-								               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-								                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed above your comment form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
-								                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g., SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>',
-								               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-							               )).
-						               '  </tbody>'.
-						               '</table>';
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Form SSO Options Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__comment_form__sso_ops___php',
+							               'current_value' => $current_value_for('template__type_a__site__comment_form__sso_ops___php'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed above your comment form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
+							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your comment form automatically. If both of these hooks are missing from your WP theme (e.g., SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_must_log_in_after/', 'comment_form_must_log_in_after'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/comment_form_top/', 'comment_form_top')).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-						echo $this->panel(__('Comment Form SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
+					echo $this->panel(__('Comment Form SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
-						unset($_panel_body); // Housekeeping.
+					unset($_panel_body); // Housekeeping.
 
-						/* ----------------------------------------------------------------------------------------- */
+					/* ----------------------------------------------------------------------------------------- */
 
-						$_panel_body = '<table>'.
-						               '  <tbody>'.
-						               $form_fields->textarea_row(
-							               array(
-								               'label'         => __('Comment Form Scripts for SSO Options', $this->plugin->text_domain),
-								               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-								               'cm_mode'       => 'application/x-httpd-php',
-								               'name'          => 'template__type_a__site__comment_form__sso_op_scripts___php',
-								               'current_value' => $current_value_for('template__type_a__site__comment_form__sso_op_scripts___php'),
-								               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-								                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template contains just a few lines of JavaScript needed by the default Comment Form SSO Options Template. Customize if you like, but not necessary.', $this->plugin->text_domain).'</p>',
-								               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-							               )).
-						               '  </tbody>'.
-						               '</table>';
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Comment Form Scripts for SSO Options', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__comment_form__sso_op_scripts___php',
+							               'current_value' => $current_value_for('template__type_a__site__comment_form__sso_op_scripts___php'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template contains just a few lines of JavaScript needed by the default Comment Form SSO Options Template. Customize if you like, but not necessary.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-						echo $this->panel(__('Comment Form Scripts for SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
+					echo $this->panel(__('Comment Form Scripts for SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
-						unset($_panel_body); // Housekeeping.
+					unset($_panel_body); // Housekeeping.
 
-						echo '<hr />'; /* ----------------------------------------------------------------------------------------- */
+					echo '<hr />'; /* ----------------------------------------------------------------------------------------- */
 
-						$_panel_body = '<table>'.
-						               '  <tbody>'.
-						               $form_fields->textarea_row(
-							               array(
-								               'label'         => __('Login Form SSO Options Template', $this->plugin->text_domain),
-								               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-								               'cm_mode'       => 'application/x-httpd-php',
-								               'name'          => 'template__type_a__site__login_form__sso_ops___php',
-								               'current_value' => $current_value_for('template__type_a__site__login_form__sso_ops___php'),
-								               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-								                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed within your login form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
-								                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g., SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>',
-								               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-							               )).
-						               '  </tbody>'.
-						               '</table>';
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Login Form SSO Options Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__login_form__sso_ops___php',
+							               'current_value' => $current_value_for('template__type_a__site__login_form__sso_ops___php'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the HTML snippet that is displayed within your login form; providing end-users with a way to login with a popular social network account. This will only be applicable if you have Single Sign-on (SSO) enabled in your config. options.', $this->plugin->text_domain).
+							                                  ' '.sprintf(__('This template is connected to one of two hooks that are expected to exist in all themes following WordPress standards. If the <code>%1$s</code> hook/filter exists, we use it (ideal). Otherwise, we use the <code>%2$s</code> action hook as a fallback. This is how the template is integrated into your login form automatically. If both of these hooks are missing from your WP theme (e.g., SSO options are not showing up no matter what you do), you will need to seek assistance from a theme developer.', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_form/', 'login_form'), $this->plugin->utils_markup->x_anchor('https://developer.wordpress.org/reference/hooks/login_footer/', 'login_footer')).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-						echo $this->panel(__('Login Form SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
+					echo $this->panel(__('Login Form SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
-						unset($_panel_body); // Housekeeping.
+					unset($_panel_body); // Housekeeping.
 
-						/* ----------------------------------------------------------------------------------------- */
+					/* ----------------------------------------------------------------------------------------- */
 
-						$_panel_body = '<table>'.
-						               '  <tbody>'.
-						               $form_fields->textarea_row(
-							               array(
-								               'label'         => __('Login Form Scripts for SSO Options', $this->plugin->text_domain),
-								               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-								               'cm_mode'       => 'application/x-httpd-php',
-								               'name'          => 'template__type_a__site__login_form__sso_op_scripts___php',
-								               'current_value' => $current_value_for('template__type_a__site__login_form__sso_op_scripts___php'),
-								               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-								                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template contains just a few lines of JavaScript needed by the default Login Form SSO Options Template. Customize if you like, but not necessary.', $this->plugin->text_domain).'</p>',
-								               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-							               )).
-						               '  </tbody>'.
-						               '</table>';
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('Login Form Scripts for SSO Options', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__login_form__sso_op_scripts___php',
+							               'current_value' => $current_value_for('template__type_a__site__login_form__sso_op_scripts___php'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this template contains just a few lines of JavaScript needed by the default Login Form SSO Options Template. Customize if you like, but not necessary.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-						echo $this->panel(__('Login Form Scripts for SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
+					echo $this->panel(__('Login Form Scripts for SSO Options', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
-						unset($_panel_body); // Housekeeping.
+					unset($_panel_body); // Housekeeping.
 
-						echo '<hr />'; /* ----------------------------------------------------------------------------------------- */
+					echo '<hr />'; /* ----------------------------------------------------------------------------------------- */
 
-						$_panel_body = '<table>'.
-						               '  <tbody>'.
-						               $form_fields->textarea_row(
-							               array(
-								               'label'         => __('SSO Registration Completion Template', $this->plugin->text_domain),
-								               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
-								               'cm_mode'       => 'application/x-httpd-php',
-								               'name'          => 'template__type_a__site__sso_actions__complete___php',
-								               'current_value' => $current_value_for('template__type_a__site__sso_actions__complete___php'),
-								               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
-								                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just logged-in through an SSO service provider for the first time. This is only applicable if you have Single Sign-on (SSO) enabled in your config. options. Also, this particular page is only displayed when there is information missing and/or considered private by the SSO service provider. For instance, Twitter will not share a user\'s email address through any of their APIs (i.e., there is no way to collect the email address behind-the-scenes when it comes to Twitter). Therefore, this template exists as a way for your site to collect that last bit of information before you allow them to log in for the first time. Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e., all you need here is the content.', $this->plugin->text_domain).'</p>',
-								               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
-							               )).
-						               '  </tbody>'.
-						               '</table>';
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->textarea_row(
+						               array(
+							               'label'         => __('SSO Registration Completion Template', $this->plugin->text_domain),
+							               'placeholder'   => __('Template Content...', $this->plugin->text_domain),
+							               'cm_mode'       => 'application/x-httpd-php',
+							               'name'          => 'template__type_a__site__sso_actions__complete___php',
+							               'current_value' => $current_value_for('template__type_a__site__sso_actions__complete___php'),
+							               'notes_before'  => '<p class="pmp-note pmp-notice">'.__('<strong>Note:</strong> The default template is already optimized for most WordPress themes; i.e., you shouldn\'t need to customize. However, if your theme is not playing well with the default; tweak things a bit until you reach perfection <i class="fa fa-smile-o"></i>', $this->plugin->text_domain).'</p>'.
+							                                  '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> this particular template allows you to customize the content of the page that is displayed to a user who has just logged-in through an SSO service provider for the first time. This is only applicable if you have Single Sign-on (SSO) enabled in your config. options. Also, this particular page is only displayed when there is information missing and/or considered private by the SSO service provider. For instance, Twitter will not share a user\'s email address through any of their APIs (i.e., there is no way to collect the email address behind-the-scenes when it comes to Twitter). Therefore, this template exists as a way for your site to collect that last bit of information before you allow them to log in for the first time. Note that it is not necessary to create a header/footer for this template. This template pulls together a global front-end header/footer design that have already been configured elsewhere; i.e., all you need here is the content.', $this->plugin->text_domain).'</p>',
+							               'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', $this->plugin->text_domain).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-						echo $this->panel(__('Single Sign-on Registration Completion', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
+					echo $this->panel(__('Single Sign-on Registration Completion', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-code"></i>', 'pro_only' => TRUE));
 
-						unset($_panel_body); // Housekeeping.
-					}
+					unset($_panel_body); // Housekeeping.
 				}
 				/* ----------------------------------------------------------------------------------------- */
 
@@ -4106,7 +4103,7 @@ namespace comment_mail // Root namespace.
 
 				echo '</div>';
 
-				return null;
+				return NULL;
 			}
 
 			/**
