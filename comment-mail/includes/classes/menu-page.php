@@ -962,7 +962,7 @@ namespace comment_mail // Root namespace.
 							                                    '           <li>'.sprintf(__('For single-comment notifications; i.e., where a subscriber chooses delivery type <code>asap</code> (aka: instantly), there is just a single comment in each notification that a subscriber receives. This works best with replies via email, since the <code>Reply-To:</code> header (on its own) is enough for everything to work as expected. Someone replying via email need only hit the Reply button in their email program and start typing. Very simple.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
 							                                    '           <li>'.sprintf(__('For multi-comment notifications; i.e., where a subscriber chooses a delivery type that is not <code>asap</code> (e.g. <code>hourly</code>, <code>daily</code>, etc.); there can be more than a single comment in each notification they receive. If there is more than one comment in the notification, instructions will be provided to the end-user explaining how to reply. The special <code>Reply-To</code> address is still used in this case. However, they also need to specify which comment they want to reply to. To do this, the end-user must start their reply with a special marker provided by %1$s. Again, if there is more than one comment in the notification, instructions will be provided to the end-user explaining how to reply.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
 							                                    '           <li>'.sprintf(__('Comments posted via email are still piped through the same underlying WordPress handler that normal on-site comments go through (i.e., <code>/wp-comments-post.php</code>). This means that all of your existing WordPress Discussion Settings (and/or Akismet settings) will still apply to all comments, even if they are posted via email. <strong>With one exception.</strong> When an RVE Handler is enabled, any comments posted via email are allowed through without an end-user being logged-in. If your WordPress Discussion Settings require that users be logged-in to post comments, that will be overridden temporarily whenever a reply via email comes through. Please note that replies posted via email are generally from confirmed subscribers. Any reply via email that is not from a confirmed subscriber will be forced into moderation by %1$s anyway. Otherwise, whatever your current Discussion Settings are configured to allow, will be adhered to for replies via email also. For instance, if you require that all comments be moderated, that will continue to be the case for all replies via email. %1$s will never approve a comment on it\'s own. Approval of comments is always determined by your WP Discussion Settings.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</li>'.
-							                                    '           <li>'.sprintf(__('Any reply via email should include one of two things. A copy of the original quoted notification, or a special <code>%2$s</code> marker. Most email clients will include the original message in an email reply, and this is what %1$s will look for. %1$s scans the body of the email looking for an original quoted section and strips it out (along with anything below it). If a reply does not include a quoted section when replying to an email notification, an <code>%2$s</code> marker can be used instead. When %1$s reads <code>%2$s</code>, it will use it as a marker and ignore everything below that line. Everything above <code>%2$s</code> will become the comment reply on your blog. Therefore, you can use the <code>%2$s</code> feature even if you have quoting turned off in your email client. If neither of these are found, the reply is still accepted. However, it will be forced into moderation at all times; i.e., you must approve it manually no matter what the rest of your WordPress Discussion Settings say.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html($this->plugin->utils_rve->manual_end_divider())).'</li>'.
+							                                    '           <li>'.sprintf(__('Any reply via email should include one of two things. A copy of the original quoted notification, or a special <code>%2$s</code> marker. Most email clients will include the original message in an email reply, and this is what %1$s will look for. %1$s scans the body of the email looking for an original quoted section and strips it out (along with anything below it). If a reply does not include a quoted section when replying to an email notification, an <code>%2$s</code> marker can be used instead. When %1$s reads <code>%2$s</code>, it will use it as a marker and ignore everything below that line. Everything above <code>%2$s</code> will become the comment reply on your blog. Therefore, you can use the <code>%2$s</code> feature even if you have quoting turned off in your email client. If neither of these are found, the reply is still accepted. However, it will be forced into moderation at all times; i.e., you must approve it manually no matter what the rest of your WordPress Discussion Settings say.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html($this->plugin->is_pro ? $this->plugin->utils_rve->manual_end_divider() : '!END')).'</li>'.
 							                                    '        </ul>'.
 							                                    '     </li>'.
 							                                    '   </ul>'.
@@ -1665,140 +1665,142 @@ namespace comment_mail // Root namespace.
 				}
 				/* ----------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->input_row(
-					               array(
-						               'type'          => 'number',
-						               'label'         => __('"My Subscriptions" Summary; Max Subscriptions Per Page', $this->plugin->text_domain),
-						               'placeholder'   => __('e.g. 25', $this->plugin->text_domain),
-						               'name'          => 'sub_manage_summary_max_limit',
-						               'current_value' => $current_value_for('sub_manage_summary_max_limit'),
-						               'other_attrs'   => 'min="1" max="1000"',
-						               'notes_after'   => '<p>'.sprintf(__('On the front-end of %1$s, the "My Subscriptions" summary page will list all of the subscriptions currently associated with a subscriber\'s email address. This controls the maximum number of subscriptions to list per page. Minimum value is <code>1</code> subscription per page. Maximum value is <code>1000</code> subscriptions per page. The recommended setting is <code>25</code> subscriptions per page. Based on your setting here; if there are too many to display on a single page, pagination links will appear automatically.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+				if($this->plugin->is_pro || $this->plugin->utils_env->is_pro_preview())
+				{
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->input_row(
+						               array(
+							               'type'          => 'number',
+							               'label'         => __('"My Subscriptions" Summary; Max Subscriptions Per Page', $this->plugin->text_domain),
+							               'placeholder'   => __('e.g. 25', $this->plugin->text_domain),
+							               'name'          => 'sub_manage_summary_max_limit',
+							               'current_value' => $current_value_for('sub_manage_summary_max_limit'),
+							               'other_attrs'   => 'min="1" max="1000"',
+							               'notes_after'   => '<p>'.sprintf(__('On the front-end of %1$s, the "My Subscriptions" summary page will list all of the subscriptions currently associated with a subscriber\'s email address. This controls the maximum number of subscriptions to list per page. Minimum value is <code>1</code> subscription per page. Maximum value is <code>1000</code> subscriptions per page. The recommended setting is <code>25</code> subscriptions per page. Based on your setting here; if there are too many to display on a single page, pagination links will appear automatically.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				$_panel_body .= '<hr />';
+					$_panel_body .= '<hr />';
 
-				$_panel_body .= '<table>'.
-				                '  <tbody>'.
-				                $form_fields->select_row(
-					                array(
-						                'label'           => __('Select Menu Options; List Posts?', $this->plugin->text_domain),
-						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'name'            => 'post_select_options_enable',
-						                'current_value'   => $current_value_for('post_select_options_enable'),
-						                'allow_arbitrary' => FALSE,
-						                'options'         => array(
-							                '1' => __('Yes, enable post select menu options', $this->plugin->text_domain),
-							                '0' => __('No, disable post selection; users can enter post IDs manually', $this->plugin->text_domain),
-						                ),
-						                'notes_after'     => '<p>'.sprintf(__('On both the back and front-end of %1$s, when you add/edit a subscription, %1$s can provide a drop-down menu with a list of all existing posts for you to choose from. Would you like to enable or disable this feature? If disabled, you will need to enter any post IDs manually instead of being able to choose from a drop-down menu. Since this impacts the front-end too, it is generally a good idea to enable select menu options for your users.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
-					                )).
-				                '  </tbody>'.
-				                '</table>';
+					$_panel_body .= '<table>'.
+					                '  <tbody>'.
+					                $form_fields->select_row(
+						                array(
+							                'label'           => __('Select Menu Options; List Posts?', $this->plugin->text_domain),
+							                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							                'name'            => 'post_select_options_enable',
+							                'current_value'   => $current_value_for('post_select_options_enable'),
+							                'allow_arbitrary' => FALSE,
+							                'options'         => array(
+								                '1' => __('Yes, enable post select menu options', $this->plugin->text_domain),
+								                '0' => __('No, disable post selection; users can enter post IDs manually', $this->plugin->text_domain),
+							                ),
+							                'notes_after'     => '<p>'.sprintf(__('On both the back and front-end of %1$s, when you add/edit a subscription, %1$s can provide a drop-down menu with a list of all existing posts for you to choose from. Would you like to enable or disable this feature? If disabled, you will need to enter any post IDs manually instead of being able to choose from a drop-down menu. Since this impacts the front-end too, it is generally a good idea to enable select menu options for your users.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+						                )).
+					                '  </tbody>'.
+					                '</table>';
 
-				$_panel_body .= '<table>'.
-				                '  <tbody>'.
-				                $form_fields->select_row(
-					                array(
-						                'label'           => __('Post Select Menu Options; Include Media?', $this->plugin->text_domain),
-						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'name'            => 'post_select_options_media_enable',
-						                'current_value'   => $current_value_for('post_select_options_media_enable'),
-						                'allow_arbitrary' => FALSE,
-						                'options'         => array(
-							                '0' => __('No, exclude media attachments (save space); I don\'t receive comments on media', $this->plugin->text_domain),
-							                '1' => __('Yes, include enable media attachments in any post select menu options', $this->plugin->text_domain),
-						                ),
-						                'notes_after'     => '<p>'.sprintf(__('On both the back and front-end of %1$s, when you add/edit a subscription, %1$s can provide a drop-down menu with a list of all existing posts for you to choose from. This feature can be enabled/disabled above. If enabled, do you want the post select menu options to include media attachments too? If you have a lot of posts, it\'s a good idea to exclude media attachments from the select menu options to save space. Most people don\'t leave comments on media attachments.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
-					                )).
-				                '  </tbody>'.
-				                '</table>';
+					$_panel_body .= '<table>'.
+					                '  <tbody>'.
+					                $form_fields->select_row(
+						                array(
+							                'label'           => __('Post Select Menu Options; Include Media?', $this->plugin->text_domain),
+							                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							                'name'            => 'post_select_options_media_enable',
+							                'current_value'   => $current_value_for('post_select_options_media_enable'),
+							                'allow_arbitrary' => FALSE,
+							                'options'         => array(
+								                '0' => __('No, exclude media attachments (save space); I don\'t receive comments on media', $this->plugin->text_domain),
+								                '1' => __('Yes, include enable media attachments in any post select menu options', $this->plugin->text_domain),
+							                ),
+							                'notes_after'     => '<p>'.sprintf(__('On both the back and front-end of %1$s, when you add/edit a subscription, %1$s can provide a drop-down menu with a list of all existing posts for you to choose from. This feature can be enabled/disabled above. If enabled, do you want the post select menu options to include media attachments too? If you have a lot of posts, it\'s a good idea to exclude media attachments from the select menu options to save space. Most people don\'t leave comments on media attachments.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+						                )).
+					                '  </tbody>'.
+					                '</table>';
 
-				$_panel_body .= '<hr />';
+					$_panel_body .= '<hr />';
 
-				$_panel_body .= '<table>'.
-				                '  <tbody>'.
-				                $form_fields->select_row(
-					                array(
-						                'label'           => __('Select Menu Options; List Comments?', $this->plugin->text_domain),
-						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'name'            => 'comment_select_options_enable',
-						                'current_value'   => $current_value_for('comment_select_options_enable'),
-						                'allow_arbitrary' => FALSE,
-						                'options'         => array(
-							                '1' => __('Yes, enable comment select menu options', $this->plugin->text_domain),
-							                '0' => __('No, disable comment selection; users enter comment IDs manually', $this->plugin->text_domain),
-						                ),
-						                'notes_after'     => '<p>'.sprintf(__('On both the back and front-end of %1$s, when you add/edit a subscription, %1$s can provide a drop-down menu with a list of all existing comments (on a given post) for you to choose from. Would you like to enable or disable this feature? If disabled, you will need to enter any comment IDs manually instead of being able to choose from a drop-down menu. Since this impacts the front-end too, it is generally a good idea to enable select menu options for your users.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
-					                )).
-				                '  </tbody>'.
-				                '</table>';
+					$_panel_body .= '<table>'.
+					                '  <tbody>'.
+					                $form_fields->select_row(
+						                array(
+							                'label'           => __('Select Menu Options; List Comments?', $this->plugin->text_domain),
+							                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							                'name'            => 'comment_select_options_enable',
+							                'current_value'   => $current_value_for('comment_select_options_enable'),
+							                'allow_arbitrary' => FALSE,
+							                'options'         => array(
+								                '1' => __('Yes, enable comment select menu options', $this->plugin->text_domain),
+								                '0' => __('No, disable comment selection; users enter comment IDs manually', $this->plugin->text_domain),
+							                ),
+							                'notes_after'     => '<p>'.sprintf(__('On both the back and front-end of %1$s, when you add/edit a subscription, %1$s can provide a drop-down menu with a list of all existing comments (on a given post) for you to choose from. Would you like to enable or disable this feature? If disabled, you will need to enter any comment IDs manually instead of being able to choose from a drop-down menu. Since this impacts the front-end too, it is generally a good idea to enable select menu options for your users.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+						                )).
+					                '  </tbody>'.
+					                '</table>';
 
-				$_panel_body .= '<hr />';
+					$_panel_body .= '<hr />';
 
-				$_panel_body .= '<table>'.
-				                '  <tbody>'.
-				                $form_fields->select_row(
-					                array(
-						                'label'           => __('Select Menu Options; List Users?', $this->plugin->text_domain),
-						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'name'            => 'user_select_options_enable',
-						                'current_value'   => $current_value_for('user_select_options_enable'),
-						                'allow_arbitrary' => FALSE,
-						                'options'         => array(
-							                '1' => __('Yes, enable user select menu options', $this->plugin->text_domain),
-							                '0' => __('No, disable user selection; I can enter user IDs manually', $this->plugin->text_domain),
-						                ),
-						                'notes_after'     => '<p>'.sprintf(__('On the back-end of %1$s, when you add/edit a subscription, %1$s can provide a drop-down menu with a list of all existing users for you to choose from. Would you like to enable or disable this feature? If disabled, you will need to enter any user IDs manually instead of being able to choose from a drop-down menu.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
-					                )).
-				                '  </tbody>'.
-				                '</table>';
+					$_panel_body .= '<table>'.
+					                '  <tbody>'.
+					                $form_fields->select_row(
+						                array(
+							                'label'           => __('Select Menu Options; List Users?', $this->plugin->text_domain),
+							                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							                'name'            => 'user_select_options_enable',
+							                'current_value'   => $current_value_for('user_select_options_enable'),
+							                'allow_arbitrary' => FALSE,
+							                'options'         => array(
+								                '1' => __('Yes, enable user select menu options', $this->plugin->text_domain),
+								                '0' => __('No, disable user selection; I can enter user IDs manually', $this->plugin->text_domain),
+							                ),
+							                'notes_after'     => '<p>'.sprintf(__('On the back-end of %1$s, when you add/edit a subscription, %1$s can provide a drop-down menu with a list of all existing users for you to choose from. Would you like to enable or disable this feature? If disabled, you will need to enter any user IDs manually instead of being able to choose from a drop-down menu.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+						                )).
+					                '  </tbody>'.
+					                '</table>';
 
-				$_panel_body .= '<hr />';
+					$_panel_body .= '<hr />';
 
-				$_panel_body .= '<table>'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'number',
-						                'label'         => __('Maximum Select Menu Options Before Input Fallback:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. 2000', $this->plugin->text_domain),
-						                'name'          => 'max_select_options',
-						                'current_value' => $current_value_for('max_select_options'),
-						                'notes_after'   => '<p>'.sprintf(__('If %1$s detects that any select menu may contain more than this number of options (e.g. if you have several thousands posts, comments, users, etc); then it will automatically fallback on a regular text input field instead. This prevents memory issues in browsers that may be unable to deal with super long select menus. Recommended setting for this option is <code>2000</code>.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'.
-						                                   '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Tip:</strong> You\'ll be happy to know that %1$s is quite capable of including hundreds of select menu options w/o issue. It even makes each select menu searchable for you. However, there is a limit to what is possible. We recommend setting this to a value of around <code>1000</code> or more. It should never be set higher than <code>10000</code> though. Most browsers will be unable to deal with that many menu options; no matter the software.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
-					                )).
-				                '  </tbody>'.
-				                '</table>';
+					$_panel_body .= '<table>'.
+					                '  <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'type'          => 'number',
+							                'label'         => __('Maximum Select Menu Options Before Input Fallback:', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. 2000', $this->plugin->text_domain),
+							                'name'          => 'max_select_options',
+							                'current_value' => $current_value_for('max_select_options'),
+							                'notes_after'   => '<p>'.sprintf(__('If %1$s detects that any select menu may contain more than this number of options (e.g. if you have several thousands posts, comments, users, etc); then it will automatically fallback on a regular text input field instead. This prevents memory issues in browsers that may be unable to deal with super long select menus. Recommended setting for this option is <code>2000</code>.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'.
+							                                   '<p class="pmp-note pmp-info">'.sprintf(__('<strong>Tip:</strong> You\'ll be happy to know that %1$s is quite capable of including hundreds of select menu options w/o issue. It even makes each select menu searchable for you. However, there is a limit to what is possible. We recommend setting this to a value of around <code>1000</code> or more. It should never be set higher than <code>10000</code> though. Most browsers will be unable to deal with that many menu options; no matter the software.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+						                )).
+					                '  </tbody>'.
+					                '</table>';
 
-				$_panel_body .= '<hr />';
+					$_panel_body .= '<hr />';
 
-				$_panel_body .= '<table>'.
-				                '  <tbody>'.
-				                $form_fields->select_row(
-					                array(
-						                'label'           => sprintf(__('Display %1$s&trade; Logo in Admin Area?', $this->plugin->text_domain), esc_html($this->plugin->name)),
-						                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
-						                'name'            => 'menu_pages_logo_icon_enable',
-						                'current_value'   => $current_value_for('menu_pages_logo_icon_enable'),
-						                'allow_arbitrary' => FALSE,
-						                'options'         => array(
-							                '1' => sprintf(__('Yes, enable logo in back-end administrative areas for %1$s&trade;', $this->plugin->text_domain), esc_html($this->plugin->name)),
-							                '0' => sprintf(__('No, disable logo in back-end administrative areas for %1$s&trade;', $this->plugin->text_domain), esc_html($this->plugin->name)),
-						                ),
-						                'notes_after'     => '<p>'.sprintf(__('Enabling/disabling the logo in back-end areas does not impact any functionality; it\'s simply a personal preference.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
-					                )).
-				                '  </tbody>'.
-				                '</table>';
+					$_panel_body .= '<table>'.
+					                '  <tbody>'.
+					                $form_fields->select_row(
+						                array(
+							                'label'           => sprintf(__('Display %1$s&trade; Logo in Admin Area?', $this->plugin->text_domain), esc_html($this->plugin->name)),
+							                'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+							                'name'            => 'menu_pages_logo_icon_enable',
+							                'current_value'   => $current_value_for('menu_pages_logo_icon_enable'),
+							                'allow_arbitrary' => FALSE,
+							                'options'         => array(
+								                '1' => sprintf(__('Yes, enable logo in back-end administrative areas for %1$s&trade;', $this->plugin->text_domain), esc_html($this->plugin->name)),
+								                '0' => sprintf(__('No, disable logo in back-end administrative areas for %1$s&trade;', $this->plugin->text_domain), esc_html($this->plugin->name)),
+							                ),
+							                'notes_after'     => '<p>'.sprintf(__('Enabling/disabling the logo in back-end areas does not impact any functionality; it\'s simply a personal preference.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+						                )).
+					                '  </tbody>'.
+					                '</table>';
 
-				echo $this->panel(__('Misc. UI-Related Settings', $this->plugin->text_domain), $_panel_body, array());
+					echo $this->panel(__('Misc. UI-Related Settings', $this->plugin->text_domain), $_panel_body, array());
 
-				unset($_panel_body); // Housekeeping.
-
+					unset($_panel_body); // Housekeeping.
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
 				echo '         <div class="pmp-save">'."\n";
