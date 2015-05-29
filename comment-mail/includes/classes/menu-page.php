@@ -703,40 +703,42 @@ namespace comment_mail // Root namespace.
 
 				/* ----------------------------------------------------------------------------------------- */
 
-				$_panel_body = '<table>'.
-				               '  <tbody>'.
-				               $form_fields->input_row(
-					               array(
-						               'type'          => 'number',
-						               'label'         => __('Maximum Chars in Parent Comment Clips:', $this->plugin->text_domain),
-						               'placeholder'   => __('e.g. 100', $this->plugin->text_domain),
-						               'name'          => 'comment_notification_parent_content_clip_max_chars',
-						               'other_attrs'   => 'min="1"',
-						               'current_value' => $current_value_for('comment_notification_parent_content_clip_max_chars'),
-						               'notes_after'   => '<p>'.sprintf(__('When %1$s notifies someone about a reply to their comment, there will first be a short clip of the original comment displayed to help offer some context; i.e., to show what the reply is pertaining to. How many characters (maximum) do you want to display in that short clip of the parent comment? The recommended setting is <code>100</code> characters, but you can change this to whatever you like. A very large number will prevent the parent comment from being clipped at all.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'
-					               )).
-				               '  </tbody>'.
-				               '</table>';
+				if($this->plugin->is_pro || $this->plugin->utils_env->is_pro_preview())
+				{
+					$_panel_body = '<table>'.
+					               '  <tbody>'.
+					               $form_fields->input_row(
+						               array(
+							               'type'          => 'number',
+							               'label'         => __('Maximum Chars in Parent Comment Clips:', $this->plugin->text_domain),
+							               'placeholder'   => __('e.g. 100', $this->plugin->text_domain),
+							               'name'          => 'comment_notification_parent_content_clip_max_chars',
+							               'other_attrs'   => 'min="1"',
+							               'current_value' => $current_value_for('comment_notification_parent_content_clip_max_chars'),
+							               'notes_after'   => '<p>'.sprintf(__('When %1$s notifies someone about a reply to their comment, there will first be a short clip of the original comment displayed to help offer some context; i.e., to show what the reply is pertaining to. How many characters (maximum) do you want to display in that short clip of the parent comment? The recommended setting is <code>100</code> characters, but you can change this to whatever you like. A very large number will prevent the parent comment from being clipped at all.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'
+						               )).
+					               '  </tbody>'.
+					               '</table>';
 
-				$_panel_body .= '<table>'.
-				                '  <tbody>'.
-				                $form_fields->input_row(
-					                array(
-						                'type'          => 'number',
-						                'label'         => __('Maximum Chars in Other Comment/Reply Clips:', $this->plugin->text_domain),
-						                'placeholder'   => __('e.g. 200', $this->plugin->text_domain),
-						                'name'          => 'comment_notification_content_clip_max_chars',
-						                'other_attrs'   => 'min="1"',
-						                'current_value' => $current_value_for('comment_notification_content_clip_max_chars'),
-						                'notes_after'   => '<p>'.sprintf(__('For all other comment/reply notifications, there will be a short clip of the comment, along with a link to [continue reading] on your website. How many characters (maximum) do you want to display in those short clips of the comment or reply? The recommended setting is <code>200</code> characters, but you can change this to whatever you like. A very large number will prevent comments from being clipped at all.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'
-					                )).
-				                '  </tbody>'.
-				                '</table>';
+					$_panel_body .= '<table>'.
+					                '  <tbody>'.
+					                $form_fields->input_row(
+						                array(
+							                'type'          => 'number',
+							                'label'         => __('Maximum Chars in Other Comment/Reply Clips:', $this->plugin->text_domain),
+							                'placeholder'   => __('e.g. 200', $this->plugin->text_domain),
+							                'name'          => 'comment_notification_content_clip_max_chars',
+							                'other_attrs'   => 'min="1"',
+							                'current_value' => $current_value_for('comment_notification_content_clip_max_chars'),
+							                'notes_after'   => '<p>'.sprintf(__('For all other comment/reply notifications, there will be a short clip of the comment, along with a link to [continue reading] on your website. How many characters (maximum) do you want to display in those short clips of the comment or reply? The recommended setting is <code>200</code> characters, but you can change this to whatever you like. A very large number will prevent comments from being clipped at all.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'
+						                )).
+					                '  </tbody>'.
+					                '</table>';
 
-				echo $this->panel(__('Email Notification Clips', $this->plugin->text_domain), $_panel_body, array());
+					echo $this->panel(__('Email Notification Clips', $this->plugin->text_domain), $_panel_body, array('pro_only' => TRUE));
 
-				unset($_panel_body); // Housekeeping.
-
+					unset($_panel_body); // Housekeeping.
+				}
 				/* ----------------------------------------------------------------------------------------- */
 
 				if($this->plugin->is_pro || $this->plugin->utils_env->is_pro_preview())
