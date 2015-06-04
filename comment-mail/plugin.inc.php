@@ -1143,7 +1143,7 @@ namespace comment_mail {
 				wp_enqueue_style('chosen', set_url_scheme('//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.min.css'), array(), NULL, 'all');
 
 				wp_enqueue_style('font-awesome', set_url_scheme('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css'), array(), NULL, 'all');
-				wp_enqueue_style('sharkicons', $this->utils_url->to('/submodules/sharkicons/styles.min.css'), array(), NULL, 'all');
+				wp_enqueue_style('sharkicons', $this->utils_url->to('/submodules/sharkicons/src/styles.min.css'), array(), NULL, 'all');
 
 				wp_enqueue_style(__NAMESPACE__, $this->utils_url->to('/client-s/css/menu-pages.min.css'), $deps, $this->version, 'all');
 			}
@@ -1164,7 +1164,7 @@ namespace comment_mail {
 				$deps = array('font-awesome', 'sharkicons'); // Dependencies.
 
 				wp_enqueue_style('font-awesome', set_url_scheme('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css'), array(), NULL, 'all');
-				wp_enqueue_style('sharkicons', $this->utils_url->to('/submodules/sharkicons/styles.min.css'), array(), NULL, 'all');
+				wp_enqueue_style('sharkicons', $this->utils_url->to('/submodules/sharkicons/src/styles.min.css'), array(), NULL, 'all');
 
 				wp_enqueue_style(__NAMESPACE__, $this->utils_url->to('/client-s/css/menu-pages.min.css'), $deps, $this->version, 'all');
 			}
