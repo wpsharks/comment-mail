@@ -272,7 +272,9 @@ namespace comment_mail // Root namespace.
 
 				       " WHERE (`email` = '".esc_sql($this->sub_email)."'".
 				       // See `assets/sma-diagram.png` for further details on this.
-				       "    OR `user_id` IN('".implode("','", array_map('esc_sql', $this->sub_user_ids))."'))".
+				       ($this->sub_user_ids ? // Only if we DO have user IDs to look for here.
+				       "    OR `user_id` IN('".implode("','", array_map('esc_sql', $this->sub_user_ids))."')"
+				           : '').')'.
 
 				       (isset($post_id) // Specific post ID?
 					       ? " AND `post_id` = '".esc_sql($post_id)."'" : '').
