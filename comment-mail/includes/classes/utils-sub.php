@@ -535,8 +535,10 @@ namespace comment_mail // Root namespace.
 				$user_ids = $this->email_user_ids($sub_email);
 
 				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
-				       " WHERE `email` = '".esc_sql($sub_email)."' OR `user_id` IN('".implode("','", array_map('esc_sql', $user_ids))."')";
-
+				       " WHERE `email` = '".esc_sql($sub_email)."'".
+				       ($user_ids // Only if we DO have user IDs to search for here.
+				           ? " OR `user_id` IN('".implode("','", array_map('esc_sql', $user_ids))."')"
+						   : '');
 				$sub_ids = array_map('intval', $this->plugin->utils_db->wp->get_col($sql));
 
 				return $this->bulk_delete($sub_ids, $args);
