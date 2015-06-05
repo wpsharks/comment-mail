@@ -607,7 +607,9 @@ namespace comment_mail // Root namespace.
 					       ? ($sub_email_or_user_ids // Email or user IDs?
 						       ? " AND (`email` = '".esc_sql($sub_email)."'".
 						         (isset($user_id) ? " OR `user_id` = '".esc_sql($user_id)."'" : '').
-						         "    OR `user_id` IN('".implode("','", array_map('esc_sql', $this->email_user_ids($sub_email, $no_cache)))."'))"
+						         (($_sub_email_user_ids = $this->email_user_ids($sub_email, $no_cache))
+						             ? " OR `user_id` IN('".implode("','", array_map('esc_sql', $_sub_email_user_ids))."')"
+						             : '').')' // ↑ Only if we DO have user IDs to look for.
 						       : " AND `email` = '".esc_sql($sub_email)."'")
 					       : ''). // End `sub_email` check.
 
