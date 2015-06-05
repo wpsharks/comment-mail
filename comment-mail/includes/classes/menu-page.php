@@ -1119,7 +1119,7 @@ namespace comment_mail // Root namespace.
 					                '          <tbody>'.
 					                $form_fields->input_row(
 						                array(
-							                'label'         => sprintf(__('Twitter oAuth Consumer Key: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://comment-mail.com/kb-article/sso-integration/#twitter', __('instructions', $this->plugin->text_domain))),
+							                'label'         => sprintf(__('Twitter oAuth Consumer Key: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://comment-mail.com/kb-article/sso-integration/#-twitter', __('instructions', $this->plugin->text_domain))),
 							                'placeholder'   => __('e.g., kyczbsh6nnwtzrkm882kh7jf8', $this->plugin->text_domain),
 							                'name'          => 'sso_twitter_key',
 							                'current_value' => $current_value_for('sso_twitter_key'),
@@ -1147,7 +1147,7 @@ namespace comment_mail // Root namespace.
 					                '          <tbody>'.
 					                $form_fields->input_row(
 						                array(
-							                'label'         => sprintf(__('Facebook oAuth App ID: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://comment-mail.com/kb-article/sso-integration/#facebook', __('instructions', $this->plugin->text_domain))),
+							                'label'         => sprintf(__('Facebook oAuth App ID: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://comment-mail.com/kb-article/sso-integration/#-facebook', __('instructions', $this->plugin->text_domain))),
 							                'placeholder'   => __('e.g., 87df9vcu8njzrrnrgy2u2k2cj', $this->plugin->text_domain),
 							                'name'          => 'sso_facebook_key',
 							                'current_value' => $current_value_for('sso_facebook_key'),
@@ -1175,7 +1175,7 @@ namespace comment_mail // Root namespace.
 					                '          <tbody>'.
 					                $form_fields->input_row(
 						                array(
-							                'label'         => sprintf(__('Google oAuth Client ID: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://comment-mail.com/kb-article/sso-integration/#google', __('instructions', $this->plugin->text_domain))),
+							                'label'         => sprintf(__('Google oAuth Client ID: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://comment-mail.com/kb-article/sso-integration/#-google', __('instructions', $this->plugin->text_domain))),
 							                'placeholder'   => __('e.g., qda788ac23s4m4utvqgkauwhf.apps.googleusercontent.com', $this->plugin->text_domain),
 							                'name'          => 'sso_google_key',
 							                'current_value' => $current_value_for('sso_google_key'),
@@ -1203,7 +1203,7 @@ namespace comment_mail // Root namespace.
 					                '          <tbody>'.
 					                $form_fields->input_row(
 						                array(
-							                'label'         => sprintf(__('LinkedIn oAuth API/Consumer Key: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://comment-mail.com/kb-article/sso-integration/#linkedin', __('instructions', $this->plugin->text_domain))),
+							                'label'         => sprintf(__('LinkedIn oAuth API/Consumer Key: &nbsp;&nbsp; <small><em>[%1$s]</em></small>', $this->plugin->text_domain), $this->plugin->utils_markup->x_anchor('http://comment-mail.com/kb-article/sso-integration/#-linkedin', __('instructions', $this->plugin->text_domain))),
 							                'placeholder'   => __('e.g., swf73zuj2puaug9e5a4ytpcg7', $this->plugin->text_domain),
 							                'name'          => 'sso_linkedin_key',
 							                'current_value' => $current_value_for('sso_linkedin_key'),
