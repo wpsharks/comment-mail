@@ -155,7 +155,7 @@ namespace comment_mail {
 			 *
 			 * @var string Current version of the software.
 			 */
-			public $version = '150529';
+			public $version = '150613';
 
 			/*
 			 * Public Properties (Defined @ Setup)
