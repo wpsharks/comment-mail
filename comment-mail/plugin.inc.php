@@ -325,6 +325,14 @@ namespace comment_mail {
 				 * Setup pro-only option keys.
 				 */
 				$this->pro_only_option_keys = array(
+		            # Related to automatic pro updates.
+
+		            'pro_update_check',
+		            'last_pro_update_check',
+
+		            'pro_update_username',
+		            'pro_update_password',
+
 					# Related to SSO.
 
 					'sso_enable',
@@ -484,6 +492,14 @@ namespace comment_mail {
 					# Related to user authentication.
 
 					'manage_cap'                                                                           => $this->manage_cap, // Capability.
+
+		            # Related to automatic pro updates.
+
+		            'pro_update_check'                                                                     => '1', // `0|1`; enable?
+		            'last_pro_update_check'                                                                => '0', // Timestamp.
+
+		            'pro_update_username'                                                                  => '', // Username.
+		            'pro_update_password'                                                                  => '', // Password or license key.
 
 					/* Low-level switches to enable/disable certain functionalities.
 					 *
@@ -1719,14 +1735,15 @@ namespace comment_mail {
 					return; // Nothing to do here.
 
 				$default_args   = array(
-					'markup'       => '',
-					'requires_cap' => '',
-					'for_user_id'  => 0,
-					'for_page'     => '',
-					'persistent'   => FALSE,
-					'transient'    => FALSE,
-					'push_to_top'  => FALSE,
-					'type'         => 'notice',
+					'markup'        => '',
+					'requires_cap'  => '',
+					'for_user_id'   => 0,
+					'for_page'      => '',
+					'persistent'    => FALSE,
+					'persistent_id' => '',
+					'transient'     => FALSE,
+					'push_to_top'   => FALSE,
+					'type'          => 'notice',
 				);
 				$args['markup'] = (string)$markup; // + markup.
 				$args           = array_merge($default_args, $args);
@@ -1739,9 +1756,10 @@ namespace comment_mail {
 				$args['for_user_id'] = (integer)$args['for_user_id'];
 				$args['for_page']    = trim((string)$args['for_page']);
 
-				$args['persistent']  = (boolean)$args['persistent'];
-				$args['transient']   = (boolean)$args['transient'];
-				$args['push_to_top'] = (boolean)$args['push_to_top'];
+				$args['persistent']     = (boolean)$args['persistent'];
+				$args['persistent_id']  = (string)$args['persistent_id'];
+				$args['transient']      = (boolean)$args['transient'];
+				$args['push_to_top']    = (boolean)$args['push_to_top'];
 
 				if(!in_array($args['type'], array('notice', 'error'), TRUE))
 					$args['type'] = 'notice'; // Use default type.
@@ -1826,14 +1844,15 @@ namespace comment_mail {
 				foreach($notices as $_key => $_args)
 				{
 					$default_args = array(
-						'markup'       => '',
-						'requires_cap' => '',
-						'for_user_id'  => 0,
-						'for_page'     => '',
-						'persistent'   => FALSE,
-						'transient'    => FALSE,
-						'push_to_top'  => FALSE,
-						'type'         => 'notice',
+						'markup'        => '',
+						'requires_cap'  => '',
+						'for_user_id'   => 0,
+						'for_page'      => '',
+						'persistent'    => FALSE,
+						'persistent_id' => '',
+						'transient'     => FALSE,
+						'push_to_top'   => FALSE,
+						'type'          => 'notice',
 					);
 					$_args        = array_merge($default_args, $_args);
 					$_args        = array_intersect_key($_args, $default_args);
@@ -1847,9 +1866,10 @@ namespace comment_mail {
 					$_args['for_user_id'] = (integer)$_args['for_user_id'];
 					$_args['for_page']    = trim((string)$_args['for_page']);
 
-					$_args['persistent']  = (boolean)$_args['persistent'];
-					$_args['transient']   = (boolean)$_args['transient'];
-					$_args['push_to_top'] = (boolean)$_args['push_to_top'];
+					$_args['persistent']     = (boolean)$_args['persistent'];
+					$_args['persistent_id']  = (string)$_args['persistent_id'];
+					$_args['transient']      = (boolean)$_args['transient'];
+					$_args['push_to_top']    = (boolean)$_args['push_to_top'];
 
 					if(!in_array($_args['type'], array('notice', 'error'), TRUE))
 						$_args['type'] = 'notice'; // Use default type.

@@ -4115,6 +4115,113 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Displays pro updater.
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected function pro_updater_()
+			{
+				if(!$this->plugin->is_pro)
+					return ''; // Pro only.
+
+				$_this             = $this;
+				$form_field_args   = array(
+					'ns_id_suffix'   => '-pro-updater-form',
+					'ns_name_suffix' => '[pro_update]',
+					'class_prefix'   => 'pmp-pro-updater-form-',
+				);
+				$form_fields       = new form_fields($form_field_args);
+				$current_value_for = function ($key) use ($_this)
+				{
+					if(strpos($key, 'template__') === 0 && isset($_this->plugin->options[$key]))
+					{
+						if($_this->plugin->options[$key])
+							return $_this->plugin->options[$key];
+
+						$data             = template::option_key_data($key);
+						$default_template = new template($data->file, $data->type, TRUE);
+
+						return $default_template->file_contents();
+					}
+					return isset($_this->plugin->options[$key]) ? $_this->plugin->options[$key] : NULL;
+				};
+				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page '.$this->plugin->slug.'-menu-page-pro-updater '.$this->plugin->slug.'-menu-page-area').'">'."\n";
+				echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->page_nonce_only()).'" novalidate="novalidate">'."\n";
+
+				echo '   	'.$this->heading(__('Pro Updater', $this->plugin->text_domain), 'logo.png').
+				     '   	'.$this->notes(); // Heading/notifications.
+
+				echo '   	<div class="pmp-body">'."\n";
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body  = '<i class="fa fa-user fa-4x" style="float:right; margin: 0 0 0 25px;"></i>'."\n";
+		        $_panel_body .= '<p style="margin-top:0;">'.sprintf(__('From this page you can update to the latest version of %1$s Pro for WordPress. %1$s Pro is a premium product available for purchase @ <a href="%2$s" target="_blank">%3$s</a>. In order to connect with our update servers, we ask that you supply your account login details for <a href="%2$s" target="_blank">%3$s</a>. If you prefer not to provide your password, you can use your License Key in place of your password. Your License Key is located under "My Account" when you log in @ <a href="%2$s" target="_blank">%3$s</a>. This will authenticate your copy of %1$s Pro; providing you with access to the latest version. You only need to enter these credentials once. %1$s Pro will save them in your WordPress database.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_attr($this->plugin->utils_url->product_page()), esc_html(parse_url($this->plugin->product_url, PHP_URL_HOST))).'</p>'."\n";
+
+				$_panel_body .= ' <table>'.
+								'   <tbody>'.
+								$form_fields->input_row(
+									array(
+										'name'          => 'username',
+										'label'         => __('Customer Username', $this->plugin->text_domain),
+										'placeholder'   => __('e.g., johndoe22', $this->plugin->text_domain),
+										'current_value' => $current_value_for('pro_update_username'),
+									)).
+								'   </tbody>'.
+								' </table>';
+
+				$_panel_body .= ' <table>'.
+								'   <tbody>'.
+								$form_fields->input_row(
+									array(
+										'type'          => 'password',
+										'name'          => 'password',
+										'label'         => __('Customer Password or Product License Key', $this->plugin->text_domain),
+										'current_value' => $current_value_for('pro_update_password'),
+									)).
+								'   </tbody>'.
+								' </table>';
+
+				echo $this->panel(__('Update Credentials', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-key"></i>', 'open' => TRUE, 'pro_only' => TRUE));
+
+				unset($_panel_body); // Housekeeping.
+
+		        /* ----------------------------------------------------------------------------------------- */
+
+				$_panel_body = ' <table>'.
+								'   <tbody>'.
+								$form_fields->select_row(
+									array(
+										'name'            => 'check', 'label' => '',
+										'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+										'current_value'   => $current_value_for('pro_update_check'),
+										'allow_arbitrary' => FALSE, 'options' => array(
+											'1' => __('Yes, display a notification in my WordPress Dashboard when a new version is available.', $this->plugin->text_domain),
+											'0' => __('No, do not display any update notifications in my WordPress Dashboard.', $this->plugin->text_domain),
+										),
+										'notes_after' => '<p>'.sprintf(__('When a new version of %1$s Pro becomes available, %1$s Pro can display a notification in your WordPress Dashboard prompting you to return to this page and perform an upgrade.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
+									)).
+								'   </tbody>'.
+								' </table>';
+
+				echo $this->panel(__('Update Notifier', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-bullhorn"></i>', 'open' => TRUE, 'pro_only' => TRUE));
+
+				unset($_panel_body); // Housekeeping.
+
+		        /* ----------------------------------------------------------------------------------------- */
+
+		        echo '         <div class="pmp-save">'."\n";
+				echo '            <button type="submit">'.__('Update Now', $this->plugin->text_domain).' <i class="fa fa-magic"></i></button>'."\n";
+				echo '         </div>'."\n";
+
+				/* ----------------------------------------------------------------------------------------- */
+
+				echo '   	</div>';
+				echo '   </form>';
+				echo '</div>';
+			}
+
+			/**
 			 * Constructs menu page heading.
 			 *
 			 * @since 141111 First documented version.
