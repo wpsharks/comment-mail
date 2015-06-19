@@ -4336,6 +4336,12 @@ namespace comment_mail // Root namespace.
 					$notes .= '  '.__('All templates come preconfigured; customization is optional <i class="fa fa-smile-o"></i>', $this->plugin->text_domain)."\n";
 					$notes .= '</div>'."\n";
 				}
+				if($this->plugin->utils_env->is_menu_page(__NAMESPACE__) && (get_option('comment_moderation') || get_option('comment_whitelist')))
+				{
+					$notes .= '<div class="pmp-note pmp-notice">'."\n";
+					$notes .= '  '.sprintf(__('<strong>Note:</strong> Your <a href="%1$s">Discussion Settings</a> indicate that comment moderation is enabled. That\'s fine. However, please remember that no emails will be sent until a comment (or reply) is approved.', $this->plugin->text_domain), esc_attr(admin_url('/options-discussion.php')))."\n";
+					$notes .= '</div>'."\n";
+				}
 				return $notes; // All notices; if any apply.
 			}
 
