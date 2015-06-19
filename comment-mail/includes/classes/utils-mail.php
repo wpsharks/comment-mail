@@ -486,6 +486,31 @@ namespace comment_mail // Root namespace.
 
 				return $attachments ? array_unique($attachments) : array();
 			}
+
+			/**
+			 * Formats the name of a header.
+			 *
+			 * @since 150619 Improving custom headers.
+			 *
+			 * @param string $header Input header name; lowercase.
+			 *
+			 * @return string The `Output-Header-Name`.
+			 */
+			public function ucwords_header($header)
+			{
+				if(!($header = trim((string)$header)))
+					return $header; // Nothing.
+
+				$header = strtolower($header);
+
+				if(strpos($header, '-') === FALSE)
+					return ucfirst($header);
+
+				$words_in_header         = explode('-', $header);
+				$ucfirst_words_in_header = array_map('ucfirst', $words_in_header);
+
+				return implode('-', $ucfirst_words_in_header);
+			}
 		}
 	}
 }
