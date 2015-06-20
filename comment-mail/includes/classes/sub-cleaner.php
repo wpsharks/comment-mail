@@ -117,6 +117,7 @@ namespace comment_mail // Root namespace.
 					return; // Not enough time.
 
 				$user_ids = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->wp->users)."`";
+				$user_ids = "SELECT `ID` FROM (".$user_ids.") AS `ID`"; // See: <http://jas.xyz/1I52mVE>
 
 				$sql = "SELECT `ID` FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 				       " WHERE `user_id` != '0' AND `user_id` NOT IN(".$user_ids.")";
