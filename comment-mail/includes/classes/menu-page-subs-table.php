@@ -338,7 +338,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function get_default_orderby()
 			{
-				return 'email'; // Default orderby.
+				return 'insertion_time'; // Default orderby.
 			}
 
 			/**
@@ -350,7 +350,7 @@ namespace comment_mail // Root namespace.
 			 */
 			protected function get_default_order()
 			{
-				return 'asc'; // Default order.
+				return 'desc'; // Default order.
 			}
 
 			/*
