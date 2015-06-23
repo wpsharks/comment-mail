@@ -532,7 +532,7 @@ namespace comment_mail {
 					 *    Note that `comment_form_sub_template_enable` must also be disabled for this option to actually work;
 					 *    i.e. the default comment form template relies on this; so IT must be off to turn this off.
 					 */
-					'enable'                                                                               => '1', // `0|1`; enable?
+					'enable'                                                                               => '0', // `0|1`; enable?
 					'new_subs_enable'                                                                      => '1', // `0|1`; enable?
 					'queue_processing_enable'                                                              => '1', // `0|1`; enable?
 
