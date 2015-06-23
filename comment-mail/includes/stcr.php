@@ -107,14 +107,17 @@ namespace comment_mail { // Root namespace.
 	}
 }
 namespace { // Global namespace.
-
 	add_action('init', function () // After StCR is loaded up.
 	{
-		if(!function_exists('subscribe_reloaded_show')):
-			function subscribe_reloaded_show()
-			{
-				comment_mail::sub_ops();
-			}
-		endif;
+		if(!is_admin())
+		{
+			if(!function_exists('subscribe_reloaded_show')):
+				function subscribe_reloaded_show()
+				{
+					comment_mail::sub_ops();
+				}
+			endif;
+		}
 	});
+
 }
