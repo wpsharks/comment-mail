@@ -356,16 +356,22 @@ namespace comment_mail // Root namespace.
 			public function total_posts(array $args = array())
 			{
 				$default_args = array(
-					'for_comments_only' => FALSE,
-					'no_cache'          => FALSE,
+					'for_comments_only'          => FALSE,
+					'exclude_post_types'         => array(),
+					'exclude_post_statuses'      => array(),
+					'exclude_password_protected' => FALSE,
+					'no_cache'                   => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$for_comments_only = (boolean)$args['for_comments_only'];
-				$no_cache          = (boolean)$args['no_cache'];
+				$for_comments_only          = (boolean)$args['for_comments_only'];
+				$exclude_post_types         = (array)$args['exclude_post_types'];
+				$exclude_post_statuses      = (array)$args['exclude_post_statuses'];
+				$exclude_password_protected = (boolean)$args['exclude_password_protected'];
+				$no_cache                   = (boolean)$args['no_cache'];
 
-				$cache_keys = compact('for_comments_only');
+				$cache_keys = compact('for_comments_only', 'exclude_post_types', 'exclude_post_statuses', 'exclude_password_protected');
 
 				if(!is_null($total = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
 					return $total; // Already cached this.
@@ -376,7 +382,12 @@ namespace comment_mail // Root namespace.
 				$sql = "SELECT SQL_CALC_FOUND_ROWS `ID` FROM `".esc_html($this->wp->posts)."`".
 
 				       " WHERE `post_type` IN('".implode("','", array_map('esc_sql', $post_types))."')".
+				       ($exclude_post_types ? " AND `post_type` NOT IN('".implode("','", array_map('esc_sql', $exclude_post_types))."')" : '').
+
 				       " AND `post_status` IN('".implode("','", array_map('esc_sql', $post_statuses))."')".
+				       ($exclude_post_statuses ? " AND `post_status` NOT IN('".implode("','", array_map('esc_sql', $exclude_post_statuses))."')" : '').
+
+				       ($exclude_password_protected ? " AND `post_password` = ''" : ''). // Exlude password protected posts?
 
 				       ($for_comments_only // For comments only?
 					       ? " AND (`comment_status` IN('1', 'open', 'opened')".
@@ -405,25 +416,27 @@ namespace comment_mail // Root namespace.
 			public function all_posts(array $args = array())
 			{
 				$default_args = array(
-					'max'                   => PHP_INT_MAX,
-					'fail_on_max'           => FALSE,
-					'for_comments_only'     => FALSE,
-					'exclude_post_types'    => array(),
-					'exclude_post_statuses' => array(),
-					'no_cache'              => FALSE,
+					'max'                        => PHP_INT_MAX,
+					'fail_on_max'                => FALSE,
+					'for_comments_only'          => FALSE,
+					'exclude_post_types'         => array(),
+					'exclude_post_statuses'      => array(),
+					'exclude_password_protected' => FALSE,
+					'no_cache'                   => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$max                   = (integer)$args['max'];
-				$max                   = $max < 1 ? 1 : $max;
-				$fail_on_max           = (boolean)$args['fail_on_max'];
-				$for_comments_only     = (boolean)$args['for_comments_only'];
-				$exclude_post_types    = (array)$args['exclude_post_types'];
-				$exclude_post_statuses = (array)$args['exclude_post_statuses'];
-				$no_cache              = (boolean)$args['no_cache'];
+				$max                        = (integer)$args['max'];
+				$max                        = $max < 1 ? 1 : $max;
+				$fail_on_max                = (boolean)$args['fail_on_max'];
+				$for_comments_only          = (boolean)$args['for_comments_only'];
+				$exclude_post_types         = (array)$args['exclude_post_types'];
+				$exclude_post_statuses      = (array)$args['exclude_post_statuses'];
+				$exclude_password_protected = (boolean)$args['exclude_password_protected'];
+				$no_cache                   = (boolean)$args['no_cache'];
 
-				$cache_keys = compact('max', 'fail_on_max', 'for_comments_only', 'exclude_post_types', 'exclude_post_statuses');
+				$cache_keys = compact('max', 'fail_on_max', 'for_comments_only', 'exclude_post_types', 'exclude_post_statuses', 'exclude_password_protected');
 
 				if(!is_null($posts = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
 					return $posts; // Already cached this.
@@ -454,6 +467,8 @@ namespace comment_mail // Root namespace.
 
 				           " AND `post_status` IN('".implode("','", array_map('esc_sql', $post_statuses))."')".
 				           ($exclude_post_statuses ? " AND `post_status` NOT IN('".implode("','", array_map('esc_sql', $exclude_post_statuses))."')" : '').
+
+				           ($exclude_password_protected ? " AND `post_password` = ''" : ''). // Exlude password protected posts?
 
 				           ($for_comments_only // For comments only?
 					           ? " AND (`comment_status` IN('1', 'open', 'opened')".

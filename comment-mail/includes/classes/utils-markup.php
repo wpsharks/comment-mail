@@ -349,11 +349,12 @@ namespace comment_mail // Root namespace.
 				$default_args = array(
 					'max'                   => // Plugin option value.
 						(integer)$this->plugin->options['max_select_options'],
-					'fail_on_max'           => TRUE,
-					'for_comments_only'     => FALSE,
-					'exclude_post_types'    => array(),
-					'exclude_post_statuses' => array(),
-					'no_cache'              => FALSE,
+					'fail_on_max'                => TRUE,
+					'for_comments_only'          => FALSE,
+					'exclude_post_types'         => array(),
+					'exclude_post_statuses'      => array(),
+					'exclude_password_protected' => !is_admin(),
+					'no_cache'                   => FALSE,
 
 					'allow_empty'           => TRUE,
 					'allow_arbitrary'       => TRUE,
@@ -364,6 +365,9 @@ namespace comment_mail // Root namespace.
 				$args['exclude_post_types'] = (array)$args['exclude_post_types'];
 				if(!$this->plugin->options['post_select_options_media_enable'])
 					$args['exclude_post_types'][] = 'attachment';
+
+				if(!$args['exclude_post_statuses'] && !is_admin()) // If not in an admin area.
+					$args['exclude_post_statuses'] = array('future', 'draft', 'pending', 'private');
 
 				$allow_empty     = (boolean)$args['allow_empty'];
 				$allow_arbitrary = (boolean)$args['allow_arbitrary'];
