@@ -285,6 +285,16 @@ namespace comment_mail // Root namespace.
 							))."\n";
 					$hidden_inputs .= $this->form_fields->hidden_input(
 							array(
+								'name'          => 'post_id',
+								'current_value' => $this->sub->post_id,
+							))."\n";
+					$hidden_inputs .= $this->form_fields->hidden_input(
+							array(
+								'name'          => 'comment_id',
+								'current_value' => $this->sub->comment_id,
+							))."\n";
+					$hidden_inputs .= $this->form_fields->hidden_input(
+							array(
 								'root_name'     => TRUE,
 								'name'          => __NAMESPACE__.'[manage][sub_edit]',
 								'current_value' => $this->sub->key,
