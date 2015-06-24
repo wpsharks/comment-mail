@@ -475,7 +475,7 @@ namespace comment_mail // Root namespace.
 					             "     OR `comment_count` > '0')"
 					           : '').
 
-				           " ORDER BY `post_type` ASC, `post_title` ASC".
+				           " ORDER BY `post_type` ASC, `post_date_gmt` DESC".
 
 				           ($max !== PHP_INT_MAX ? " LIMIT ".esc_sql($max) : '');
 

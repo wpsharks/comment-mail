@@ -396,10 +396,20 @@ namespace comment_mail // Root namespace.
 					if(($_post_type = get_post_type_object($_post->post_type)))
 						$_post_type_label = $_post_type->labels->singular_name;
 
-					$options .= '<option value="'.esc_attr($_post->ID).'"'.$_selected.'>'.
-					            '  '.esc_html($_post_type->labels->singular_name.' ID #'.$_post->ID.
-					                          ' :: '.$_post->post_title).
-					            '</option>';
+					if(is_admin()) // Slightly different format in admin area.
+					{
+						$options .= '<option value="'.esc_attr($_post->ID).'"'.$_selected.'>'.
+						            '  '.esc_html($_post_type->labels->singular_name.' #'.$_post->ID.':'.
+						                          ' '.($_post->post_title ? $_post->post_title : __('Untitled', $this->plugin->text_domain))).
+						            '</option>';
+					}
+					else // Front-end display should be friendlier in some ways.
+					{
+						$options .= '<option value="'.esc_attr($_post->ID).'"'.$_selected.'>'.
+						            '  '.esc_html('#'.$_post->ID.': '.$this->plugin->utils_date->i18n('M jS, Y', strtotime($_post->post_date_gmt)).
+						                          ' — '.($_post->post_title ? $_post->post_title : __('Untitled', $this->plugin->text_domain))).
+						            '</option>';
+					}
 				}
 				unset($_post, $_selected, $_post_type, $_post_type_label); // Housekeeping.
 
