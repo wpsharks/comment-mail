@@ -439,19 +439,25 @@ namespace comment_mail // Root namespace.
 					? (integer)$current_comment_id : NULL;
 
 				$default_args = array(
-					'max'             => // Plugin option value.
+					'max'                        => // Option value.
 						(integer)$this->plugin->options['max_select_options'],
-					'fail_on_max'     => TRUE,
-					'parents_only'    => FALSE,
-					'no_cache'        => FALSE,
+					'fail_on_max'                => TRUE,
+					'parents_only'               => FALSE,
+					'exclude_post_types'         => array(),
+					'exclude_post_statuses'      => array(),
+					'exclude_password_protected' => !is_admin(),
+					'no_cache'                   => FALSE,
 
-					'display_emails'  => // Show emails?
+					'display_emails'             => // Show emails?
 						is_admin() && current_user_can('moderate_comments'),
-					'allow_empty'     => TRUE,
-					'allow_arbitrary' => TRUE,
+					'allow_empty'                => TRUE,
+					'allow_arbitrary'            => TRUE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
+
+				if(!$args['exclude_post_statuses'] && !is_admin()) // If not in an admin area.
+					$args['exclude_post_statuses'] = array('future', 'draft', 'pending', 'private');
 
 				$display_emails  = (boolean)$args['display_emails'];
 				$allow_empty     = (boolean)$args['allow_empty'];

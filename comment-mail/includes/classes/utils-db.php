@@ -527,19 +527,36 @@ namespace comment_mail // Root namespace.
 					return 0; // Not possible.
 
 				$default_args = array(
-					'parents_only' => FALSE,
-					'no_cache'     => FALSE,
+					'parents_only'               => FALSE,
+					'exclude_post_types'         => array(),
+					'exclude_post_statuses'      => array(),
+					'exclude_password_protected' => FALSE,
+					'no_cache'                   => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$parents_only = (boolean)$args['parents_only'];
-				$no_cache     = (boolean)$args['no_cache'];
+				$parents_only               = (boolean)$args['parents_only'];
+				$exclude_post_types         = (array)$args['exclude_post_types'];
+				$exclude_post_statuses      = (array)$args['exclude_post_statuses'];
+				$exclude_password_protected = (boolean)$args['exclude_password_protected'];
+				$no_cache                   = (boolean)$args['no_cache'];
 
-				$cache_keys = compact('post_id', 'parents_only');
+				$cache_keys = compact('post_id', 'parents_only', 'exclude_post_types', 'exclude_post_statuses', 'exclude_password_protected');
 
 				if(!is_null($total = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
 					return $total; // Already cached this.
+
+				if(!($post = get_post($post_id))) return ($total = 0);
+
+				if($exclude_post_types && in_array($post->post_type, $exclude_post_types, TRUE))
+					return ($total = 0); // Post type is excluded; automatic zero.
+
+				if($exclude_post_statuses && in_array($post->post_status, $exclude_post_statuses, TRUE))
+					return ($total = 0); // Post status is excluded; automatic zero.
+
+				if($exclude_password_protected && $post->post_password) // Has password?
+					return ($total = 0); // Passwords excluded; automatic zero.
 
 				$sql = "SELECT SQL_CALC_FOUND_ROWS `comment_ID` FROM `".esc_html($this->wp->comments)."`".
 
@@ -575,24 +592,41 @@ namespace comment_mail // Root namespace.
 					return array(); // Not possible.
 
 				$default_args = array(
-					'max'          => PHP_INT_MAX,
-					'fail_on_max'  => FALSE,
-					'parents_only' => FALSE,
-					'no_cache'     => FALSE,
+					'max'                        => PHP_INT_MAX,
+					'fail_on_max'                => FALSE,
+					'parents_only'               => FALSE,
+					'exclude_post_types'         => array(),
+					'exclude_post_statuses'      => array(),
+					'exclude_password_protected' => FALSE,
+					'no_cache'                   => FALSE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
 
-				$max          = (integer)$args['max'];
-				$max          = $max < 1 ? 1 : $max;
-				$fail_on_max  = (boolean)$args['fail_on_max'];
-				$parents_only = (boolean)$args['parents_only'];
-				$no_cache     = (boolean)$args['no_cache'];
+				$max                        = (integer)$args['max'];
+				$max                        = $max < 1 ? 1 : $max;
+				$fail_on_max                = (boolean)$args['fail_on_max'];
+				$parents_only               = (boolean)$args['parents_only'];
+				$exclude_post_types         = (array)$args['exclude_post_types'];
+				$exclude_post_statuses      = (array)$args['exclude_post_statuses'];
+				$exclude_password_protected = (boolean)$args['exclude_password_protected'];
+				$no_cache                   = (boolean)$args['no_cache'];
 
-				$cache_keys = compact('post_id', 'max', 'fail_on_max', 'parents_only');
+				$cache_keys = compact('post_id', 'max', 'fail_on_max', 'parents_only', 'exclude_post_types', 'exclude_post_statuses', 'exclude_password_protected');
 
 				if(!is_null($comments = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
 					return $comments; // Already cached this.
+
+				if(!($post = get_post($post_id))) return ($comments = array());
+
+				if($exclude_post_types && in_array($post->post_type, $exclude_post_types, TRUE))
+					return ($comments = array()); // Post type is excluded; automatic empty.
+
+				if($exclude_post_statuses && in_array($post->post_status, $exclude_post_statuses, TRUE))
+					return ($comments = array()); // Post status is excluded; automatic empty.
+
+				if($exclude_password_protected && $post->post_password) // Has a password?
+					return ($comments = array()); // Passwords excluded; automatic empty.
 
 				if($fail_on_max && $this->total_comments($post_id, $args) > $max)
 					return ($comments = array()); // Fail when there are too many.
