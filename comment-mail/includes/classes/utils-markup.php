@@ -356,8 +356,8 @@ namespace comment_mail // Root namespace.
 					'exclude_password_protected' => !is_admin(),
 					'no_cache'                   => FALSE,
 
-					'allow_empty'           => TRUE,
-					'allow_arbitrary'       => TRUE,
+					'allow_empty'                => TRUE,
+					'allow_arbitrary'            => TRUE,
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
@@ -481,7 +481,7 @@ namespace comment_mail // Root namespace.
 
 				$options = ''; // Initialize.
 				if($allow_empty) // Allow empty selection?
-					$options = '<option value="0"></option>';
+					$options = '<option value="0">'.__('— All Comments/Replies —', $this->plugin->text_domain).'</option>';
 
 				foreach($comments as $_comment) // Iterate comments.
 				{
@@ -491,11 +491,22 @@ namespace comment_mail // Root namespace.
 						if(($_selected = selected($_comment->comment_ID, $current_comment_id, FALSE)))
 							$selected_comment_id = $_comment->comment_ID;
 
-					$options .= '<option value="'.esc_attr($_comment->comment_ID).'"'.$_selected.'>'.
-					            '  '.esc_html(__('Comment', $this->plugin->text_domain).' ID #'.$_comment->comment_ID.
-					                          ($_comment->comment_author ? ' :: '.__('by', $this->plugin->text_domain).' "'.$_comment->comment_author.'"'.($display_emails ? ' <'.$_comment->comment_author_email.'>' : '') : '').
-					                          ' :: '.$this->plugin->utils_date->i18n('M j, Y g:i a', strtotime($_comment->comment_date_gmt))).
-					            '</option>';
+					if(is_admin()) // Slightly different format in admin area.
+					{
+						$options .= '<option value="'.esc_attr($_comment->comment_ID).'"'.$_selected.'>'.
+						            '  '.esc_html('#'.$_comment->comment_ID.': '.$this->plugin->utils_date->i18n('M jS, Y g:i a', strtotime($_comment->comment_date_gmt)).
+						                          ($_comment->comment_author ? ' — "'.$_comment->comment_author.'"'.($display_emails ? ' <'.$_comment->comment_author_email.'>' : '').' writes:' : ' — ').
+												  ' '.$this->comment_content_clip($_comment, 45)).
+						            '</option>';
+					}
+					else // Front-end display should be friendlier in some ways.
+					{
+						$options .= '<option value="'.esc_attr($_comment->comment_ID).'"'.$_selected.'>'.
+						            '  '.esc_html('#'.$_comment->comment_ID.': '.$this->plugin->utils_date->i18n('M jS, Y g:i a', strtotime($_comment->comment_date_gmt)).
+						                          ($_comment->comment_author ? ' — "'.$_comment->comment_author.'"'.($display_emails ? ' <'.$_comment->comment_author_email.'>' : '').' writes:' : ' — ').
+												  ' '.$this->comment_content_clip($_comment, 45)).
+						            '</option>';
+					}
 				}
 				unset($_comment, $_selected); // Just a little housekeeping.
 

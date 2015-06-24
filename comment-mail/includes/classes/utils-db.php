@@ -640,6 +640,7 @@ namespace comment_mail // Root namespace.
 					'comment_approved',
 					'comment_type',
 					'comment_parent',
+					'comment_content',
 				);
 				$sql     = "SELECT `".implode("`,`", array_map('esc_sql', $columns))."`".
 				           " FROM `".esc_html($this->wp->comments)."`".
