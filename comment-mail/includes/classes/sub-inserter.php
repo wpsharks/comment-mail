@@ -1117,6 +1117,10 @@ namespace comment_mail // Root namespace.
 							else if($this->is_insert && (!isset($_value) || $_value < 1 || strlen((string)$_value) > 20))
 								$this->errors['invalid_sub_post_id'] = sprintf(__('Invalid post ID: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
 
+							else if($this->user_initiated && $this->ui_protected_data_keys_enable && ($_post = get_post($_value))
+								&& (in_array($_post->post_status, array('future', 'draft', 'pending', 'private'), TRUE) || ($_post->post_password && post_password_required($_post))))
+									$this->errors['invalid_sub_post_id'] = sprintf(__('Invalid post ID: `%1$s`.', $this->plugin->text_domain), esc_html($_value));
+
 							break; // Break switch handler.
 
 						case 'comment_id': // Comment ID.
