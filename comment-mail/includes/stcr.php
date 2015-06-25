@@ -20,10 +20,6 @@ namespace comment_mail { // Root namespace.
 		if($plugin->options['stcr_transition_complete'])
 			return; // Not applicable.
 
-		# Deactive the StCR plugin; conflicts with Comment Mail.
-
-		deactivate_plugins('subscribe-to-comments-reloaded/subscribe-to-comments-reloaded.php', TRUE);
-
 		# Do we have StCR options that we can import?
 
 		if(!get_option('subscribe_reloaded_version'))
@@ -99,7 +95,6 @@ namespace comment_mail { // Root namespace.
 
 		$notice = sprintf(__('<h3 style="font-weight:400; margin:0 0 1em 0;">Upgrading from <strong>StCR</strong> (Subscribe to Comments Reloaded) to <strong>%1$s&trade;</strong> %2$s — Welcome! :-)</h3>', $plugin->text_domain), esc_html($plugin->name), $plugin->utils_fs->inline_icon_svg());
 		$notice .= '<ul style="margin:0 0 0 3em; list-style:disc;">'.
-		           '   <li>'.sprintf(__('StCR (Subscribe to Comments Reloaded) has been deactivated in favor of Comment Mail.', $plugin->text_domain), esc_html($plugin->name)).'</li>'.
 		           '   <li>'.sprintf(__('%1$s automatically imported many of your StCR options. It\'s still a good idea to review your Comment Mail configuration though.', $plugin->text_domain), esc_html($plugin->name)).'</li>'.
 		           '   <li>'.sprintf(__('<strong>IMPORTANT TIP:</strong> %1$s can import your existing StCR subscribers automatically too! [<strong><a href="%2$s">click here to begin</a></strong>]', $plugin->text_domain), esc_html($plugin->name), esc_attr($plugin->utils_url->import_export_menu_page_only())).'</li>'.
 		           '</ul>';
