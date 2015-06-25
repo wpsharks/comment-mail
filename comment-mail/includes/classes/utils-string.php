@@ -611,6 +611,7 @@ namespace comment_mail // Root namespace.
 				$max_length = $max_length < 4 ? 4 : $max_length;
 
 				$string = $this->html_to_text($string, array('br2nl' => FALSE));
+				$string = str_replace('"', "'", $string);
 
 				if(strlen($string) > $max_length)
 					$string = (string)substr($string, 0, $max_length - 3).'...';
@@ -665,6 +666,7 @@ namespace comment_mail // Root namespace.
 				$max_length = $max_length < 4 ? 4 : $max_length;
 
 				$string = $this->html_to_text($string, array('br2nl' => FALSE));
+				$string = str_replace('"', "'", $string);
 
 				if(strlen($string) <= $max_length)
 					return $string; // Nothing to do.
