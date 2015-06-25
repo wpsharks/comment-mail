@@ -8,7 +8,7 @@
 				<span class="text-muted">|</span>
 			[endif]
 
-			<a href="[home_url]"><i class="fa fa-home"></i> Return to “[blog_name_clip]”</a>
+			<a href="[home_url]"><i class="fa fa-home"></i> Return to "[blog_name_clip]"</a>
 
 			[if can_spam_privacy_policy_url]
 				<span class="text-muted">|</span>
