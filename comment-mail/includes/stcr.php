@@ -102,7 +102,6 @@ namespace comment_mail { // Root namespace.
 	}
 }
 namespace { // Global namespace.
-
 	add_action('init', function () // After StCR is loaded up.
 	{
 		if(!is_admin() && !function_exists('subscribe_reloaded_show')):
@@ -112,4 +111,5 @@ namespace { // Global namespace.
 			}
 		endif;
 	});
+
 }
