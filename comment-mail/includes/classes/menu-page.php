@@ -1955,15 +1955,31 @@ namespace comment_mail // Root namespace.
 					                '    </tbody>'.
 					                ' </table>';
 
+					$_panel_body .= ' <hr />';
+
+					$_panel_body .= ' <h3>'.sprintf(__('Step 1: Import StCR Subscriptions', $this->plugin->text_domain), esc_html($this->plugin->name)).'</h3>'."\n";
+					$_panel_body .= ' <p>'.sprintf(__('Click the "Begin StCR Auto-Importation" button above to start the import process. %1$s will import all of your existing Subscribe to Comments Reloaded comment subscriptions. Your existing StCR comment subscriptions will remain intact—nothing will be deleted or removed. %1$s will simply copy the subscriptions from StCR into %1$s\'s database.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'."\n";
+					$_panel_body .= ' <p class="pmp-note pmp-info" style="font-size:90%;">'.sprintf(__('<strong>Note:</strong> This process may take several minutes. %1$s will work through each post in your database, collecting all of the StCR subscriptions that exist (just a few at a time to prevent any script timeouts). The status bar below may refresh several times during this process. When it\'s complete, you should see a message that reads "<strong>Import complete!</strong>", along with a few details regarding the importation. When it is finished, you may <a href="%2$s">click here</a> to view a list of all subscriptions; which will include any that were imported from StCR. If the importation is interrupted for any reason, you may simply click the button again and %1$s will resume where it left off.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_attr($this->plugin->utils_url->subs_menu_page_only())).'</p>';
+
+					$_panel_body .= ' <hr />';
+
+					$_panel_body .= ' <h3>'.sprintf(__('Step 2: Verify Subscriptions', $this->plugin->text_domain), esc_html($this->plugin->name)).'</h3>'."\n";
+					$_panel_body .= ' <p>'.sprintf(__('When you see a message below that says "<strong>Import Complete!</strong>", you can <a href="%2$s" target="_blank">click here</a> to view a list of all subscriptions; which will include any that were imported from StCR.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_attr($this->plugin->utils_url->subs_menu_page_only())).'</p>'."\n";
+
+					$_panel_body .= ' <hr />';
+
+					$_panel_body .= ' <h3>'.sprintf(__('Step 3: Activate %1$s', $this->plugin->text_domain), esc_html($this->plugin->name)).'</h3>'."\n";
+					$_panel_body .= ' <p>'.sprintf(__('Once %1$s has imported all of your existing Subscribe to Comments Reloaded subscriptions, you can review the rest of your %1$s configuration, then deactivate the Subscribe to Comments Reloaded plugin (there\'s no need to delete the plugin—you can simply deactivate it for now), and then enable %1$s.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>'."\n";
+
+					$_panel_body .= ' <hr />';
+
 					$_panel_body .= ' <div style="display:none;">'.
 					                '  '.$_form_fields->hidden_input(array('name' => 'type', 'current_value' => 'stcr')).
 					                ' </div>';
 
-					$_panel_body .= ' <p class="pmp-note pmp-info" style="font-size:90%;">'.sprintf(__('<strong>Note:</strong> This process may take several minutes. %1$s will work through each post in your database, collecting all of the StCR subscriptions that exist (just a few at a time to prevent any script timeouts). The status bar below may refresh several times during this process. When it\'s complete, you should see a message that reads "<strong>Import complete!</strong>", along with a few details regarding the importation. When it is finished, you may <a href="%2$s">click here</a> to view a list of all subscriptions; which will include any that were imported from StCR. If the importation is interrupted for any reason, you may simply click the button again and %1$s will resume where it left off.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_attr($this->plugin->utils_url->subs_menu_page_only())).'</p>';
-
 					$_panel_body .= '</form>';
 
-					$_panel_body .= '<iframe src="'.esc_attr($this->plugin->utils_url->to('/client-s/blanks/cccccc.html')).'" name="'.esc_attr(__NAMESPACE__.'_import_stcr_iframe').'" class="pmp-import-iframe-output"></iframe>';
+					$_panel_body .= '<iframe src="'.esc_attr($this->plugin->utils_url->to('/client-s/iframes/stcr-import-start.html')).'" name="'.esc_attr(__NAMESPACE__.'_import_stcr_iframe').'" class="pmp-import-iframe-output"></iframe>';
 
 					echo $this->panel(__('Subscribe to Comments Reloaded (StCR)', $this->plugin->text_domain), $_panel_body, array('icon' => '<i class="fa fa-upload"></i>', 'open' => (!$this->plugin->is_pro && !$this->plugin->utils_env->is_pro_preview()) || !import_stcr::ever_imported()));
 

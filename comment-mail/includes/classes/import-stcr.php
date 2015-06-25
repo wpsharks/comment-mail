@@ -411,7 +411,7 @@ namespace comment_mail // Root namespace.
 
 				$status .= '      <style type="text/css">'."\n";
 				$status .= '         body { background: #CCCCCC; color: #000000; }'."\n";
-				$status .= '         body { font-size: 13px; line-height: 1em; font-family: sans-serif; }'."\n";
+				$status .= '         body { font-size: 18px; line-height: 1em; font-family: Georgia, serif; }'."\n";
 				$status .= '         body { padding: .5em; text-align: center; }'."\n";
 				$status .= '      </style>'."\n";
 
@@ -431,7 +431,7 @@ namespace comment_mail // Root namespace.
 				$status .= '         function importComplete()'."\n".
 				           '            {'."\n".
 				           '               $("#importing").remove();'."\n". // Removing importing div/animation.
-				           '               $("body").append("<div><strong>'.__('Import complete!', $this->plugin->text_domain).'</strong></div>");'."\n".
+				           '               $("body").append("<div>'.sprintf(__('<strong>Import complete!<strong> (<a href=\'%1$s\'>view list of all subscriptions</a>)', $this->plugin->text_domain), esc_attr($this->plugin->utils_url->subs_menu_page_only())).'</div>");'."\n".
 				           '            }'."\n";
 				$status .= '      </script>'."\n";
 
