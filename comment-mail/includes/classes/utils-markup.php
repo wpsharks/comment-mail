@@ -406,7 +406,7 @@ namespace comment_mail // Root namespace.
 					else // Front-end display should be friendlier in some ways.
 					{
 						$options .= '<option value="'.esc_attr($_post->ID).'"'.$_selected.'>'.
-						            '  '.esc_html('#'.$_post->ID.': '.$this->plugin->utils_date->i18n('M jS, Y', strtotime($_post->post_date_gmt)).
+						            '  '.esc_html($this->plugin->utils_date->i18n('M jS, Y', strtotime($_post->post_date_gmt)).
 						                          ' — '.($_post->post_title ? $_post->post_title : __('Untitled', $this->plugin->text_domain))).
 						            '</option>';
 					}
@@ -502,7 +502,7 @@ namespace comment_mail // Root namespace.
 					else // Front-end display should be friendlier in some ways.
 					{
 						$options .= '<option value="'.esc_attr($_comment->comment_ID).'"'.$_selected.'>'.
-						            '  '.esc_html('#'.$_comment->comment_ID.': '.$this->plugin->utils_date->i18n('M jS, Y g:i a', strtotime($_comment->comment_date_gmt)).
+						            '  '.esc_html($this->plugin->utils_date->i18n('M jS, Y g:i a', strtotime($_comment->comment_date_gmt)).
 						                          ($_comment->comment_author ? ' — "'.$_comment->comment_author.'"'.($display_emails ? ' <'.$_comment->comment_author_email.'>' : '').' writes:' : ' — ').
 												  ' '.$this->comment_content_clip($_comment, 45)).
 						            '</option>';
