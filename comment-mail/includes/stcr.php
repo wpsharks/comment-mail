@@ -11,7 +11,7 @@ namespace comment_mail { // Root namespace.
 	if(!defined('WPINC')) // MUST have WordPress.
 		exit('Do NOT access this file directly: '.basename(__FILE__));
 
-	function stcr_deactivate_transition()
+	function stcr_transition()
 	{
 		$plugin = plugin(); // Reference needed below.
 

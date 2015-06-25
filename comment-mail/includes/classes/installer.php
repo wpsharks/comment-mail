@@ -36,7 +36,7 @@ namespace comment_mail // Root namespace.
 				$this->maybe_enqueue_notice();
 				$this->set_install_time();
 
-				stcr_deactivate_transition();
+				stcr_transition();
 			}
 
 			/**
