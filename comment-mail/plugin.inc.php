@@ -155,7 +155,7 @@ namespace comment_mail {
 			 *
 			 * @var string Current version of the software.
 			 */
-			public $version = '150625';
+			public $version = '150626';
 
 			/*
 			 * Public Properties (Defined @ Setup)
@@ -1013,7 +1013,7 @@ namespace comment_mail {
 			/**
 			 * Check for StCR conflict(s).
 			 *
-			 * @since 150625 Improving StCR compat.
+			 * @since 150626 Improving StCR compat.
 			 */
 			public function stcr_check()
 			{
@@ -1034,7 +1034,7 @@ namespace comment_mail {
 			/**
 			 * Check for Jetpack conflict(s).
 			 *
-			 * @since 150625 Improving Jetpack compat.
+			 * @since 150626 Improving Jetpack compat.
 			 */
 			public function jetpack_check()
 			{
