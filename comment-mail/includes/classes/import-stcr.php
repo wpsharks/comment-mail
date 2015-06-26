@@ -431,7 +431,7 @@ namespace comment_mail // Root namespace.
 				$status .= '         function importComplete()'."\n".
 				           '            {'."\n".
 				           '               $("#importing").remove();'."\n". // Removing importing div/animation.
-				           '               $("body").append("<div>'.sprintf(__('<strong>Import complete!<strong> (<a href=\'%1$s\'>view list of all subscriptions</a>)', $this->plugin->text_domain), esc_attr($this->plugin->utils_url->subs_menu_page_only())).'</div>");'."\n".
+				           '               $("body").append("<div>'.sprintf(__('<strong>Import complete!<strong> (<a href=\'%1$s\' target=\'_parent\'>view list of all subscriptions</a>)', $this->plugin->text_domain), esc_attr($this->plugin->utils_url->subs_menu_page_only())).'</div>");'."\n".
 				           '            }'."\n";
 				$status .= '      </script>'."\n";
 
