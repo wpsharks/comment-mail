@@ -818,6 +818,7 @@ namespace comment_mail {
 				 */
 				add_action('init', array($this, 'actions'), -10);
 				add_action('init', array($this, 'stcr_check'), 100);
+				add_action('init', array($this, 'jetpack_check'), 100);
 
 				add_action('admin_init', array($this, 'check_version'), 10);
 				add_action('all_admin_notices', array($this, 'all_admin_notices'), 10);
@@ -1006,9 +1007,14 @@ namespace comment_mail {
 			}
 
 			/*
-			 * StCR-relatd methods.
+			 * Conflict-relatd methods.
 			 */
 
+			/**
+			 * Check for StCR conflict(s).
+			 *
+			 * @since 150625 Improving StCR compat.
+			 */
 			public function stcr_check()
 			{
 				if(!$this->options['enable'])
@@ -1022,6 +1028,30 @@ namespace comment_mail {
 
 				$conflict = sprintf(__('<p style="font-size:120%%; font-weight:400; margin:0;"><strong>%1$s&trade;</strong> %2$s + <strong>StCR</strong> = Possible Conflict!</p>', $this->text_domain), esc_html($this->name), $this->utils_fs->inline_icon_svg());
 				$conflict .= '<p style="margin:0;">'.sprintf(__('<strong>WARNING (ACTION REQUIRED):</strong> Running %1$s&trade; while StCR (Subscribe to Comments Reloaded) is <em>also</em> an active WordPress plugin <strong>can cause problems</strong>; i.e., these two plugins do the same thing—%1$s being the newer of the two. Keep %1$s, but please deactivate the StCR plugin to get rid of this message.', $this->text_domain), esc_html($this->name)).'</p>';
+				$this->enqueue_error($conflict);
+			}
+
+			/**
+			 * Check for Jetpack conflict(s).
+			 *
+			 * @since 150625 Improving Jetpack compat.
+			 */
+			public function jetpack_check()
+			{
+				if(!$this->options['enable'])
+					return; // Not applicable.
+
+				if(!class_exists('Jetpack_Subscriptions'))
+					return; // Nothing to do here.
+
+				if(!get_option('stb_enabled') && !get_option('stc_enabled'))
+					return; // Nothing to do here.
+
+				if(!is_admin() || !empty($_REQUEST['action']))
+					return; // Stay quiet in this case.
+
+				$conflict = sprintf(__('<p style="font-size:120%%; font-weight:400; margin:0;"><strong>%1$s&trade;</strong> %2$s + <strong>Jetpack Subscriptions Module</strong> = Possible Conflict!</p>', $this->text_domain), esc_html($this->name), $this->utils_fs->inline_icon_svg());
+				$conflict .= '<p style="margin:0;">'.sprintf(__('<strong>WARNING (ACTION REQUIRED):</strong> Running %1$s&trade; while the Jetpack Subscriptions module is <em>also</em> active in WordPress <strong>can cause problems</strong>; i.e., these two plugins do the same thing—%1$s being the newer of the two. Keep %1$s, but please deactivate the Jetpack Subscriptions module to get rid of this message.', $this->text_domain), esc_html($this->name)).'</p>';
 				$this->enqueue_error($conflict);
 			}
 
