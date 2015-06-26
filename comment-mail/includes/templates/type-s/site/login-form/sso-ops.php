@@ -72,7 +72,7 @@ namespace comment_mail;
 			' { background-image : url("'.esc_url($plugin->utils_url->to('/client-s/images/sso-'.$_sso_service.'.png')).'"); }'."\n"; ?>
 		<?php endforeach; ?>
 	</style>
-<?php $css_styles = ob_end_clean(); ?>
+<?php $css_styles = ob_get_clean(); ?>
 
 <?php ob_start(); ?>
 <?php foreach($sso_services as $_sso_service): ?>
