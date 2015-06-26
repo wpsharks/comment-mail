@@ -1322,22 +1322,22 @@ namespace comment_mail {
 				$_menu_title                                           = // Visible on-demand only.
 					'<small><em>'.$child_branch_indent.__('Import/Export', $this->text_domain).'</em></small>';
 				$_page_title                                           = $this->name.'&trade; &#10609; '.__('Import/Export', $this->text_domain);
-				$_menu_parent                                          = $current_menu_page === __NAMESPACE__.'_import_export' ? __NAMESPACE__ : NULL;
-				$this->menu_page_hooks[__NAMESPACE__.'_import_export'] = add_submenu_page($_menu_parent, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_import_export', array($this, 'menu_page_import_export'));
+				//$_menu_parent                                          = $current_menu_page === __NAMESPACE__.'_import_export' ? __NAMESPACE__ : NULL;
+				$this->menu_page_hooks[__NAMESPACE__.'_import_export'] = add_submenu_page(__NAMESPACE__, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_import_export', array($this, 'menu_page_import_export'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_import_export'], array($this, 'menu_page_import_export_screen'));
 
 				$_menu_title                                             = // Visible on-demand only.
 					'<small><em>'.$child_branch_indent.__('Email Templates', $this->text_domain).'</em></small>';
 				$_page_title                                             = $this->name.'&trade; &#10609; '.__('Email Templates', $this->text_domain);
-				$_menu_parent                                            = $current_menu_page === __NAMESPACE__.'_email_templates' ? __NAMESPACE__ : NULL;
-				$this->menu_page_hooks[__NAMESPACE__.'_email_templates'] = add_submenu_page($_menu_parent, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_email_templates', array($this, 'menu_page_email_templates'));
+				//$_menu_parent                                            = $current_menu_page === __NAMESPACE__.'_email_templates' ? __NAMESPACE__ : NULL;
+				$this->menu_page_hooks[__NAMESPACE__.'_email_templates'] = add_submenu_page(__NAMESPACE__, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_email_templates', array($this, 'menu_page_email_templates'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_email_templates'], array($this, 'menu_page_email_templates_screen'));
 
 				$_menu_title                                            = // Visible on-demand only.
 					'<small><em>'.$child_branch_indent.__('Site Templates', $this->text_domain).'</em></small>';
 				$_page_title                                            = $this->name.'&trade; &#10609; '.__('Site Templates', $this->text_domain);
-				$_menu_parent                                           = $current_menu_page === __NAMESPACE__.'_site_templates' ? __NAMESPACE__ : NULL;
-				$this->menu_page_hooks[__NAMESPACE__.'_site_templates'] = add_submenu_page($_menu_parent, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_site_templates', array($this, 'menu_page_site_templates'));
+				//$_menu_parent                                           = $current_menu_page === __NAMESPACE__.'_site_templates' ? __NAMESPACE__ : NULL;
+				$this->menu_page_hooks[__NAMESPACE__.'_site_templates'] = add_submenu_page(__NAMESPACE__, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_site_templates', array($this, 'menu_page_site_templates'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_site_templates'], array($this, 'menu_page_site_templates_screen'));
 
 				unset($_menu_title, $_page_title, $_menu_parent); // Housekeeping.
