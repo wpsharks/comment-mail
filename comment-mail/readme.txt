@@ -220,7 +220,7 @@ _**TIP:** you can preview Pro features in the free version by clicking the "Prev
 
 In addition to the [WordPress Requirements](http://wordpress.org/about/requirements/), Comment Mail™ requires the following minimum versions:
 
-- PHP 5.3.2+
+- PHP 5.4+
 - Apache 2.1+
 
 == License ==
@@ -248,7 +248,7 @@ Released under the terms of the [GNU General Public License](http://www.gnu.org/
 
 = v150626 =
 
-Requires PHP v5.3.2+.
+Requires PHP v5.4+.
 
 == Changelog ==
 
