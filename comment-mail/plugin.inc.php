@@ -333,6 +333,10 @@ namespace comment_mail {
 		            'pro_update_username',
 		            'pro_update_password',
 
+					# Related to the stats pinger.
+
+					'last_pro_stats_log',
+
 					# Related to SSO.
 
 					'sso_enable',
