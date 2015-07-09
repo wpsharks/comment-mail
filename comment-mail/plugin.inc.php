@@ -505,6 +505,10 @@ namespace comment_mail {
 		            'pro_update_username'                                                                  => '', // Username.
 		            'pro_update_password'                                                                  => '', // Password or license key.
 
+					# Related to the stats pinger.
+
+					'last_pro_stats_log'                                                                   => '0', // Timestamp.
+
 					/* Low-level switches to enable/disable certain functionalities.
 					 *
 					 * With the `enable=0` option, here is an overview of what happens:
