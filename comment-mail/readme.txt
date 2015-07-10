@@ -8,7 +8,7 @@ Text Domain: comment-mail
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Contributors: WebSharks, JasWSInc, raamdev, anguz
+Contributors: WebSharks, JasWSInc, raamdev, kristineds, reedyseth, sitegeek
 Donate link: http://www.websharks-inc.com/r/wp-theme-plugin-donation/
 Tags: comments, subscribe, comment subscription, comment subscriptions, comment subscribe, subscribe comments, comment, comment email, comment notification, notifications, notification
 
@@ -152,7 +152,7 @@ See also: <http://comment-mail.com/installation/>
 
 1. Upload the `/comment-mail` folder to your `/wp-content/plugins/` directory.
 2. Activate the plugin through the Plugins menu in WordPress®.
-3. Navigate to the **Comment Subs** panel & enable it.
+3. Navigate to the **Comment Mail** panel & enable.
 
 == Frequently Asked Questions ==
 
