@@ -1360,8 +1360,8 @@ namespace comment_mail {
 				$_menu_title                                           = // Visible on-demand only.
 					'<small><em>'.$child_branch_indent.__('Import/Export', $this->text_domain).'</em></small>';
 				$_page_title                                           = $this->name.'&trade; &#10609; '.__('Import/Export', $this->text_domain);
-				//$_menu_parent                                          = $current_menu_page === __NAMESPACE__.'_import_export' ? __NAMESPACE__ : NULL;
-				$this->menu_page_hooks[__NAMESPACE__.'_import_export'] = add_submenu_page(__NAMESPACE__, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_import_export', array($this, 'menu_page_import_export'));
+				$_menu_parent                                          = $current_menu_page === __NAMESPACE__.'_import_export' ? __NAMESPACE__ : NULL;
+				$this->menu_page_hooks[__NAMESPACE__.'_import_export'] = add_submenu_page($_menu_parent, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_import_export', array($this, 'menu_page_import_export'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_import_export'], array($this, 'menu_page_import_export_screen'));
 
 				$_menu_title                                             = // Visible on-demand only.

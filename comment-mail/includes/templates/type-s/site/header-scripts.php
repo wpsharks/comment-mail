@@ -19,6 +19,6 @@ namespace comment_mail;
  *    you may also use any WordPress functions that you like.
  */
 ?>
-<script type="text/javascript" src="<?php echo esc_attr(includes_url('/js/jquery.js')); ?>"></script>
+<script type="text/javascript" src="<?php echo esc_attr(includes_url('/js/jquery/jquery.js')); ?>"></script>
 <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.min.js"></script>
