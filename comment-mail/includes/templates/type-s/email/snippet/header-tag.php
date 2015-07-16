@@ -5,7 +5,7 @@
 			<td style="vertical-align:top;">
 				<h1 style="margin:0;">
 					[blog_name_clip]<br />
-					<small style="color:#888888;">&nbsp;&#42774;&nbsp;
+					<small style="color:#888888;">&nbsp;&nbsp;
 						<a href="[home_url]" style="color:#888888;">[current_host_path]</a></small>
 				</h1>
 			</td>
