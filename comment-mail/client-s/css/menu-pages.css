@@ -822,7 +822,11 @@ Menu page panel styles.
 	-moz-user-select    : none;
 	user-select         : none;
 }
-.comment-mail-menu-page .pmp-panel-heading:hover,
+.comment-mail-menu-page .pmp-panel-heading:hover
+{
+	background : #142D4D;
+	color      : #FFFFFF !important;
+}
 .comment-mail-menu-page .pmp-panel-heading.open
 {
 	background : #307D27;
