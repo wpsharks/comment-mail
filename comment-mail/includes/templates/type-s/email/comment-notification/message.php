@@ -59,8 +59,7 @@ $sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $
 $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the notification.
 
 // Plugin is configured to allow replies via email? If so, this will be `TRUE`.
-// $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies_via_email_enable'];
-$replies_via_email_enable = true;
+$replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies_via_email_enable'];
 ?>
 <?php echo $template->snippet(
 	'message-heading.php', array(
