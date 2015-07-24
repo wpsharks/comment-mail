@@ -1052,7 +1052,7 @@ namespace comment_mail {
 				if(!class_exists('Jetpack_Subscriptions'))
 					return; // Nothing to do here.
 
-				if(/* !get_option('stb_enabled') && */ !get_option('stc_enabled'))
+				if(/* !get_option('stb_enabled') && */ !get_option('stc_enabled', 1))
 					return; // Nothing to do here.
 
 				if(!is_admin() || !empty($_REQUEST['action']))
