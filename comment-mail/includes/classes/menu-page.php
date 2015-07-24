@@ -283,7 +283,7 @@ namespace comment_mail // Root namespace.
 						                'cm_mode'       => 'text/html', 'cm_height' => 150,
 						                'name'          => 'can_spam_mailing_address',
 						                'current_value' => $current_value_for('can_spam_mailing_address'),
-						                'notes_before'  => '<p class="pmp-note pmp-notice">'__('Please be sure to provide a mailing address that %1$s can include at the bottom of every email that it sends.', $this->plugin->text_domain).'</p>',
+						                'notes_before'  => '<p class="pmp-note pmp-notice">'.sprintf(__('Please be sure to provide a mailing address that %1$s can include at the bottom of every email that it sends.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</p>',
 						                'notes_after'   => '<p class="pmp-note pmp-info">'.__('<strong>Note:</strong> this needs to be provided in HTML format please. For line breaks please use: <code>&lt;br /&gt;</code>', $this->plugin->text_domain).'</p>',
 					                )).
 				                '  </tbody>'.
