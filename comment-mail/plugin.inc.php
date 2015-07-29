@@ -1343,7 +1343,7 @@ namespace comment_mail {
 
 				/* ----------------------------------------- */
 
-				$_menu_title                          = $this->name;
+				$_menu_title                          = $this->name.' <sup style="font-size:60%; line-height:1;">Lite</sup>';
 				$_page_title                          = $this->name.'&trade;';
 				$_menu_position                       = apply_filters(__METHOD__.'_position', '25.00001');
 				$this->menu_page_hooks[__NAMESPACE__] = add_menu_page($_page_title, $_menu_title, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'), 'data:image/svg+xml;base64,'.base64_encode($icon), $_menu_position);
