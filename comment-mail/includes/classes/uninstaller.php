@@ -58,6 +58,22 @@ namespace comment_mail // Root namespace.
 				$this->delete_user_meta_keys();
 				$this->clear_cron_hooks();
 				$this->drop_db_tables();
+
+				if(is_multisite() && is_array($child_blogs = wp_get_sites()))
+					foreach($child_blogs as $_child_blog)
+					{
+						switch_to_blog($_child_blog->blog_id);
+						$this->delete_options();
+						$this->delete_notices();
+						$this->delete_install_time();
+						$this->delete_option_keys();
+						$this->delete_transient_keys();
+						$this->delete_post_meta_keys();
+						$this->delete_user_meta_keys();
+						$this->clear_cron_hooks();
+						$this->drop_db_tables();
+						restore_current_blog();
+					}
 			}
 
 			/**
@@ -131,8 +147,6 @@ namespace comment_mail // Root namespace.
 
 				$like2 = // e.g. Delete all keys LIKE `%\_transient\_timeout\_cmtmail\_%`.
 					'%'.$this->plugin->utils_db->wp->esc_like('_transient_timeout_'.$this->plugin->transient_prefix).'%';
-
-				// Note: the above LIKE queries need to match `_site_transient_*` also; and they do.
 
 				$sql = // This will remove our transients/timeouts.
 					"DELETE FROM `".esc_sql($this->plugin->utils_db->wp->options)."`".
