@@ -62,7 +62,7 @@ namespace comment_mail // Root namespace.
 				if(is_multisite() && is_array($child_blogs = wp_get_sites()))
 					foreach($child_blogs as $_child_blog)
 					{
-						switch_to_blog($_child_blog->blog_id);
+						switch_to_blog($_child_blog['blog_id']);
 						$this->delete_options();
 						$this->delete_notices();
 						$this->delete_install_time();
@@ -74,6 +74,7 @@ namespace comment_mail // Root namespace.
 						$this->drop_db_tables();
 						restore_current_blog();
 					}
+					unset($_child_blog); // Housekeeping.
 			}
 
 			/**
