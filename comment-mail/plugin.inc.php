@@ -385,6 +385,14 @@ namespace comment_mail {
 					'rve_mandrill_spf_check_enable',
 					'rve_mandrill_dkim_check_enable',
 
+					# Related to list server integrations.
+
+					'list_server_enable',
+					'list_server',
+
+					'list_server_mailchimp_api_key',
+					'list_server_mailchimp_list_id',
+
 					# Related to blacklisting.
 
 					'email_blacklist_patterns',
