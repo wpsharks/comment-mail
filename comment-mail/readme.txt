@@ -1,4 +1,4 @@
-=== Comment Mail™ (WP Comment Subscriptions) ===
+=== Comment Mail (WP Comment Subscriptions) ===
 
 Stable tag: 150709
 Requires at least: 4.0
@@ -12,7 +12,7 @@ Contributors: WebSharks, JasWSInc, raamdev, kristineds, reedyseth, sitegeek
 Donate link: http://www.websharks-inc.com/r/wp-theme-plugin-donation/
 Tags: comments, subscribe, comment subscription, comment subscriptions, comment subscribe, subscribe comments, comment, comment email, comment notification, notifications, notification
 
-Email comment subscriptions for WordPress®
+Email comment subscriptions for WordPress
 
 == Description ==
 
