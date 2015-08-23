@@ -26,37 +26,64 @@ namespace comment_mail // Root namespace.
 			 * @since 141111 First documented version.
 			 *
 			 * @param string $action An action; e.g. `confirm`, `delete`, `unconfirm`, etc.
+			 * @param string $transform Defaults to `lower`.
 			 *
 			 * @return string The string translation for the given `$action`.
 			 */
-			public function action_ed($action)
+			public function action_ed($action, $transform = 'lower')
 			{
-				$action = strtolower(trim((string)$action));
+			  $action = $i18n = strtolower(trim((string)$action));
 
-				switch($action) // Convert to past tense.
-				{
-					case 'reconfirm':
-						return __('reconfirmed', $this->plugin->text_domain);
+			  switch($action) // Convert to past tense.
+			  {
+			    case 'reconfirm':
+			      $i18n = __('reconfirmed', $this->plugin->text_domain);
+			      break;
 
-					case 'confirm':
-						return __('confirmed', $this->plugin->text_domain);
+			    case 'confirm':
+			      $i18n = __('confirmed', $this->plugin->text_domain);
+			      break;
 
-					case 'unconfirm':
-						return __('unconfirmed', $this->plugin->text_domain);
+			    case 'unconfirm':
+			      $i18n = __('unconfirmed', $this->plugin->text_domain);
+			      break;
 
-					case 'suspend':
-						return __('suspended', $this->plugin->text_domain);
+			    case 'suspend':
+			      $i18n = __('suspended', $this->plugin->text_domain);
+			      break;
 
-					case 'trash':
-						return __('trashed', $this->plugin->text_domain);
+			    case 'trash':
+			      $i18n = __('trashed', $this->plugin->text_domain);
+			      break;
 
-					case 'update':
-						return __('updated', $this->plugin->text_domain);
+			    case 'update':
+			      $i18n = __('updated', $this->plugin->text_domain);
+			      break;
 
-					case 'delete':
-						return __('deleted', $this->plugin->text_domain);
-				}
-				return !$action ? '' : __(rtrim($action, 'ed').'ed', $this->plugin->text_domain);
+			    case 'delete':
+			      $i18n = __('deleted', $this->plugin->text_domain);
+			      break;
+
+			    default: // Default case handler.
+			      if($action) // Only if it's not empty.
+			        $i18n = __(rtrim($action, 'ed').'ed', $this->plugin->text_domain);
+			      break;
+			  }
+			  if(ctype_alnum($i18n)) switch($transform)
+			  {
+			    case 'lower':
+			      $i18n = strtolower($i18n);
+			      break;
+
+			    case 'upper':
+			      $i18n = strtoupper($i18n);
+			      break;
+
+			    case 'ucwords':
+			      $i18n = ucwords($i18n);
+			      break;
+			  }
+			  return $i18n;
 			}
 
 			/**
