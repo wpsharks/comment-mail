@@ -177,8 +177,8 @@ namespace comment_mail // Root namespace.
 				$plugin = plugin(); // Needed for translations.
 
 				return array(
-					'event::invalidated' => $plugin->utils_i18n->event_label('invalidated'),
-					'event::notified'    => $plugin->utils_i18n->event_label('notified'),
+					'event::invalidated' => $plugin->utils_i18n->event_label('invalidated', 'ucwords'),
+					'event::notified'    => $plugin->utils_i18n->event_label('notified', 'ucwords'),
 				);
 			}
 
