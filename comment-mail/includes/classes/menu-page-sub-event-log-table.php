@@ -213,12 +213,13 @@ namespace comment_mail // Root namespace.
 				$plugin = plugin(); // Needed for translations.
 
 				return array(
-					'event::inserted'    => $plugin->utils_i18n->event_label('inserted'),
-					'event::updated'     => $plugin->utils_i18n->event_label('updated'),
-					'event::overwritten' => $plugin->utils_i18n->event_label('overwritten'),
-					'event::purged'      => $plugin->utils_i18n->event_label('purged'),
-					'event::cleaned'     => $plugin->utils_i18n->event_label('cleaned'),
-					'event::deleted'     => $plugin->utils_i18n->event_label('deleted'),
+					'event::inserted'    => $plugin->utils_i18n->event_label('inserted', 'ucwords'),
+					'event::updated'     => $plugin->utils_i18n->event_label('updated', 'ucwords'),
+					'event::overwritten' => $plugin->utils_i18n->event_label('overwritten', 'ucwords'),
+					'event::purged'      => $plugin->utils_i18n->event_label('purged', 'ucwords'),
+					'event::cleaned'     => $plugin->utils_i18n->event_label('cleaned', 'ucwords'),
+					'event::deleted'     => $plugin->utils_i18n->event_label('deleted', 'ucwords'),
+
 				);
 			}
 

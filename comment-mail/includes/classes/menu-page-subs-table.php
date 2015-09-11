@@ -179,10 +179,10 @@ namespace comment_mail // Root namespace.
 				$plugin = plugin(); // Needed for translations.
 
 				return array(
-					'status::unconfirmed' => $plugin->utils_i18n->status_label('unconfirmed'),
-					'status::subscribed'  => $plugin->utils_i18n->status_label('subscribed'),
-					'status::suspended'   => $plugin->utils_i18n->status_label('suspended'),
-					'status::trashed'     => $plugin->utils_i18n->status_label('trashed'),
+					'status::unconfirmed' => $plugin->utils_i18n->status_label('unconfirmed', 'ucwords'),
+					'status::subscribed'  => $plugin->utils_i18n->status_label('subscribed', 'ucwords'),
+					'status::suspended'   => $plugin->utils_i18n->status_label('suspended', 'ucwords'),
+					'status::trashed'     => $plugin->utils_i18n->status_label('trashed', 'ucwords'),
 				);
 			}
 
