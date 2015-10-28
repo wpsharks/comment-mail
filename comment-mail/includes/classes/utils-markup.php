@@ -351,6 +351,7 @@ namespace comment_mail // Root namespace.
 						(integer)$this->plugin->options['max_select_options'],
 					'fail_on_max'                => TRUE,
 					'for_comments_only'          => FALSE,
+                    'include_post_types'         => array(),
 					'exclude_post_types'         => array(),
 					'exclude_post_statuses'      => array(),
 					'exclude_password_protected' => !is_admin(),
@@ -361,6 +362,13 @@ namespace comment_mail // Root namespace.
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
+
+                $args['include_post_types'] = (array)$args['include_post_types'];
+                if ($this->plugin->options['enabled_post_types']) {
+                    $enabled_post_types = strtolower($this->plugin->options['enabled_post_types']);
+                    $enabled_post_types = preg_split('/[\s;,]+/', $enabled_post_types, NULL, PREG_SPLIT_NO_EMPTY);
+                    $args['include_post_types'] = array_unique(array_merge($args['include_post_types'], $enabled_post_types));
+                }
 
 				$args['exclude_post_types'] = (array)$args['exclude_post_types'];
 				if(!$this->plugin->options['post_select_options_media_enable'])
@@ -453,6 +461,7 @@ namespace comment_mail // Root namespace.
 						(integer)$this->plugin->options['max_select_options'],
 					'fail_on_max'                => TRUE,
 					'parents_only'               => FALSE,
+                    'include_post_types'         => array(),
 					'exclude_post_types'         => array(),
 					'exclude_post_statuses'      => array(),
 					'exclude_password_protected' => !is_admin(),
@@ -465,6 +474,17 @@ namespace comment_mail // Root namespace.
 				);
 				$args         = array_merge($default_args, $args);
 				$args         = array_intersect_key($args, $default_args);
+
+                $args['include_post_types'] = (array)$args['include_post_types'];
+                if ($this->plugin->options['enabled_post_types']) {
+                    $enabled_post_types = strtolower($this->plugin->options['enabled_post_types']);
+                    $enabled_post_types = preg_split('/[\s;,]+/', $enabled_post_types, NULL, PREG_SPLIT_NO_EMPTY);
+                    $args['include_post_types'] = array_unique(array_merge($args['include_post_types'], $enabled_post_types));
+                }
+
+                $args['exclude_post_types'] = (array)$args['exclude_post_types'];
+                if(!$this->plugin->options['post_select_options_media_enable'])
+                    $args['exclude_post_types'][] = 'attachment';
 
 				if(!$args['exclude_post_statuses'] && !is_admin()) // If not in an admin area.
 					$args['exclude_post_statuses'] = array('future', 'draft', 'pending', 'private');

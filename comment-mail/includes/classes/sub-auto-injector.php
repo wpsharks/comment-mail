@@ -78,6 +78,18 @@ namespace comment_mail // Root namespace.
 				$this->post_types = strtolower($this->plugin->options['auto_subscribe_post_types']);
 				$this->post_types = preg_split('/[;,\s]+/', $this->post_types, NULL, PREG_SPLIT_NO_EMPTY);
 
+                $enabled_post_types = strtolower($this->plugin->options['enabled_post_types']);
+                $enabled_post_types = preg_split('/[;,\s]+/', $enabled_post_types, NULL, PREG_SPLIT_NO_EMPTY);
+
+                if ($enabled_post_types && $this->post_types) {
+                    foreach($this->post_types as $_key => $_post_type) {
+                        if (!in_array($_post_type, $enabled_post_types, true)) {
+                            unset($this->post_types[$_key]);
+                        }
+                    }
+                    unset($_key, $_post_type); // Housekeeping.
+                }
+
 				$this->process_events = (boolean)$args['process_events'];
 
 				$this->maybe_auto_inject();

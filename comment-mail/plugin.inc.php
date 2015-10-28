@@ -551,6 +551,7 @@ namespace comment_mail {
 					'enable'                                                                               => '0', // `0|1`; enable?
 					'new_subs_enable'                                                                      => '1', // `0|1`; enable?
 					'queue_processing_enable'                                                              => '1', // `0|1`; enable?
+                    'enabled_post_types'                                                                   => 'post', // Comma-delimited post types.
 
 					'comment_form_sub_template_enable'                                                     => '1', // `0|1`; enable?
 					'comment_form_sub_scripts_enable'                                                      => '1', // `0|1`; enable?
@@ -597,7 +598,7 @@ namespace comment_mail {
 
 					'auto_subscribe_enable'                                                                => '1', // `0|1`; auto-subscribe enable?
 					'auto_subscribe_deliver'                                                               => 'asap', // `asap`, `hourly`, `daily`, `weekly`.
-					'auto_subscribe_post_types'                                                            => 'post,page', // Comma-delimited post types.
+                    'auto_subscribe_post_types'                                                            => 'post', // Comma-delimited post types.
 					'auto_subscribe_post_author_enable'                                                    => '1', // `0|1`; auto-subscribe post authors?
 					'auto_subscribe_recipients'                                                            => '', // Others `;|,` delimited emails.
 
@@ -1150,12 +1151,19 @@ namespace comment_mail {
 					if(!current_user_can($this->cap))
 						return; // Do not add meta boxes.
 
-				$post_type           = strtolower((string)$post_type);
-				$excluded_post_types = $this->options['excluded_meta_box_post_types'];
-				$excluded_post_types = preg_split('/[\s;,]+/', $excluded_post_types, NULL, PREG_SPLIT_NO_EMPTY);
+                $post_type = strtolower((string)$post_type);
 
-				if(in_array($post_type, $excluded_post_types, TRUE))
-					return; // Ignore; this post type excluded.
+                $enabled_post_types = strtolower($this->options['enabled_post_types']);
+                $enabled_post_types = preg_split('/[\s;,]+/', $enabled_post_types, NULL, PREG_SPLIT_NO_EMPTY);
+
+                if($enabled_post_types && !in_array($post_type, $enabled_post_types, TRUE))
+                    return; // Ignore; not enabled for this post type.
+
+                $excluded_post_types = strtolower($this->options['excluded_meta_box_post_types']);
+                $excluded_post_types = preg_split('/[\s;,]+/', $excluded_post_types, NULL, PREG_SPLIT_NO_EMPTY);
+
+                if(in_array($post_type, $excluded_post_types, TRUE))
+                    return; // Ignore; this post type excluded.
 
 				// Meta boxes use an SVG graphic.
 				$icon = $this->utils_fs->inline_icon_svg();
