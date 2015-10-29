@@ -669,6 +669,14 @@ namespace comment_mail {
 					'rve_mandrill_spf_check_enable'                                                        => '1', // `0|1|2|3|4`; where `0` = disable.
 					'rve_mandrill_dkim_check_enable'                                                       => '1', // `0|1|2`; where `0` = disable.
 
+					# Related to list server integrations.
+
+					'list_server_enable'  => '0', // `0|1`; enable?
+					'list_server' => 'mailchimp', // List server identifier.
+
+					'list_server_mailchimp_api_key' => '', // MailChimp API key.
+					'list_server_mailchimp_list_id' => '', // MailChimp list ID.
+
 					# Related to blacklisting.
 
 					'email_blacklist_patterns'                                                             => implode("\n", utils_mail::$role_based_blacklist_patterns),
