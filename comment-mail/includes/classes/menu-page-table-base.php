@@ -611,7 +611,7 @@ namespace comment_mail // Root namespace.
 				$post_title_clip        = $this->plugin->utils_string->mid_clip($item->{$prefix.'title'});
 				$post_date              = $this->plugin->utils_date->i18n('M j, Y', strtotime($item->{$prefix.'date_gmt'}));
 				$post_date_ago          = $this->plugin->utils_date->approx_time_difference(strtotime($item->{$prefix.'date_gmt'}));
-				$post_comments_status   = $this->plugin->utils_i18n->status_label($this->plugin->utils_db->post_comment_status__($item->{$prefix.'comment_status', 'ucwords'}));
+				$post_comments_status = $this->plugin->utils_i18n->status_label($this->plugin->utils_db->post_comment_status__($item->{$prefix.'comment_status'}), 'ucwords');
 				$post_edit_comments_url = $this->plugin->utils_url->post_edit_comments_short($item->{$key});
 				$post_total_subs        = $this->plugin->utils_sub->query_total($item->{$key});
 				$post_total_comments    = (integer)$item->{$prefix.'comment_count'};
@@ -678,7 +678,7 @@ namespace comment_mail // Root namespace.
 				);
 				$comment_date_time = $this->plugin->utils_date->i18n('M j, Y g:i a', strtotime($item->{$prefix.'date_gmt'}));
 				$comment_time_ago  = $this->plugin->utils_date->approx_time_difference(strtotime($item->{$prefix.'date_gmt'}));
-				$comment_status    = $this->plugin->utils_i18n->status_label($this->plugin->utils_db->comment_status__($item->{$prefix.'approved', 'ucwords'}));
+				$comment_status = $this->plugin->utils_i18n->status_label($this->plugin->utils_db->comment_status__($item->{$prefix.'approved'}), 'ucwords');
 
 				$comment_info = '<i class="fa fa-comment"></i>'. // Start w/ a comment bubble icon.
 				                ' '.$this->plugin->utils_markup->name_email($item->{$prefix.'author'}, $item->{$prefix.'author_email'}, $name_email_args);
