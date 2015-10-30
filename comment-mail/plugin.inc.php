@@ -1297,6 +1297,7 @@ namespace comment_mail {
 				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_vars', array(
 					'pluginUrl'    => rtrim($this->utils_url->to('/'), '/'),
 					'ajaxEndpoint' => rtrim($this->utils_url->page_nonce_only(), '/'),
+					'templateSyntaxTheme' => $this->options['template_syntax_theme'],
 				));
 				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_i18n', array(
 					'bulkReconfirmConfirmation' => __('Resend email confirmation link? Are you sure?', $this->text_domain),
