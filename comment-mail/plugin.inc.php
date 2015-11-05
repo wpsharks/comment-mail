@@ -868,7 +868,8 @@ namespace comment_mail {
 				add_action('comment_form_must_log_in_after', array($this, 'comment_form_must_log_in_after'), 5, 0);
 				add_action('comment_form_top', array($this, 'comment_form_must_log_in_after'), 5, 0); // Secondary fallback.
 
-				add_filter('comment_form_field_comment', array($this, 'comment_form_filter_append'), 5, 1);
+				//add_filter('comment_form_field_comment', array($this, 'comment_form_filter_append'), 5, 1);
+				add_filter('comment_form_submit_field', array($this, 'comment_form_filter_prepend'), 5, 1);
 				add_action('comment_form', array($this, 'comment_form'), 5, 0); // Secondary fallback.
 
 				add_action('comment_post', array($this, 'comment_post'), 10, 2);
@@ -2147,6 +2148,32 @@ namespace comment_mail {
 				$fired = TRUE; // Flag as `TRUE` now.
 
 				new comment_form_login();
+			}
+
+			/**
+			* Comment form integration; via filter.
+			*
+			* @since 15xxxx Improving comment form compat.
+			*
+			* @attaches-to `comment_form_submit_field` filter.
+			*
+			* @param mixed $value Value passed in by a filter.
+			*
+			* @return mixed The `$value`; possibly filtered here.
+			*/
+			public function comment_form_filter_prepend($value)
+			{
+			  if(!is_null($fired = &$this->static_key('comment_form')))
+			      return $value; // We only handle this for a single hook.
+			  // The first hook to fire this will win automatically.
+			  if(is_string($value))
+			  {
+			      $fired = TRUE; // Flag as `TRUE` now.
+			      ob_start(); // Output buffer.
+			      new comment_form_after();
+			      $value = ob_get_clean().$value;
+			  }
+			  return $value;
 			}
 
 			/**
