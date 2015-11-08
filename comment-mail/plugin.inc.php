@@ -441,7 +441,7 @@ namespace comment_mail {
 					# Template-related config. options.
 
 					'template_type',
-					'template_syntax_theme' => 'monokai',
+					'template_syntax_theme',
 
 					# Advanced HTML, PHP-based templates for the site.
 
@@ -730,6 +730,7 @@ namespace comment_mail {
 					# Template-related config. options.
 
 					'template_type'                                                                        => 's', // `a|s`.
+					'template_syntax_theme' => 'monokai',
 
 					# Simple snippet-based templates for the site.
 
