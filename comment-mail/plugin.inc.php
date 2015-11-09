@@ -601,6 +601,7 @@ namespace comment_mail {
                     'auto_subscribe_post_types'                                                            => 'post', // Comma-delimited post types.
 					'auto_subscribe_post_author_enable'                                                    => '1', // `0|1`; auto-subscribe post authors?
 					'auto_subscribe_recipients'                                                            => '', // Others `;|,` delimited emails.
+					'auto_subscribe_roles' => '', // Comma-delimited list of WP Roles.
 
 					/* Auto-confirm functionality and security issues related to this.
 
