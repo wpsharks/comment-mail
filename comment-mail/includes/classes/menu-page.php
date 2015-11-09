@@ -1690,6 +1690,66 @@ namespace comment_mail // Root namespace.
 						               )).
 					               '  </tbody>'.
 					               '</table>';
+					$_panel_body .= '<table>'.
+												  '  <tbody>'.
+												  $form_fields->select_row(
+												    array(
+													    'label'           => sprintf(__('Syntax Highlighting Theme', $this->plugin->text_domain), esc_html($this->plugin->name)),
+													    'placeholder'     => __('Select an Option...', $this->plugin->text_domain),
+													    'name'            => 'template_syntax_theme',
+													    'current_value'   => $current_value_for('template_syntax_theme'),
+													    'allow_arbitrary' => FALSE,
+													    'options'         => array(
+																'3024-day'         => __('3024 Day', $this->plugin->text_domain),
+																'3024-night'       => __('3024 Night', $this->plugin->text_domain),
+																'ambiance'         => __('Ambiance', $this->plugin->text_domain),
+																'base16-dark'      => __('Base 16 Dark', $this->plugin->text_domain),
+																'base16-light'     => __('Base 16 Light', $this->plugin->text_domain),
+																'bespin'           => __('Bespin', $this->plugin->text_domain),
+																'blackboard'       => __('Blackboard', $this->plugin->text_domain),
+																'cobalt'           => __('Cobalt', $this->plugin->text_domain),
+																'colorforth'       => __('Color Forth', $this->plugin->text_domain),
+																'dracula'          => __('Dracula', $this->plugin->text_domain),
+																'eclipse'          => __('Eclipse', $this->plugin->text_domain),
+																'elegant'          => __('Elegant', $this->plugin->text_domain),
+																'erlang-dark'      => __('Erlang Dark', $this->plugin->text_domain),
+																'hopscotch'        => __('Hopscotch', $this->plugin->text_domain),
+																'icecoder'         => __('IceCoder', $this->plugin->text_domain),
+																'isotope'          => __('Isotope', $this->plugin->text_domain),
+																'lesser-dark'      => __('Lesser Dark', $this->plugin->text_domain),
+																'liquibyte'        => __('Liquibyte', $this->plugin->text_domain),
+																'material'         => __('Material', $this->plugin->text_domain),
+																'mbo'              => __('MBO', $this->plugin->text_domain),
+																'mdn-like'         => __('MDN Like', $this->plugin->text_domain),
+																'midnight'         => __('Midnight', $this->plugin->text_domain),
+																'monokai'          => __('Monokai', $this->plugin->text_domain),
+																'neat'             => __('Neat', $this->plugin->text_domain),
+																'neo'              => __('Neo', $this->plugin->text_domain),
+																'night'            => __('Night', $this->plugin->text_domain),
+																'paraiso-dark'     => __('Paraiso Dark', $this->plugin->text_domain),
+																'paraiso-light'    => __('Paraiso Light', $this->plugin->text_domain),
+																'pastel-on-dark'   => __('Pastel On Dark', $this->plugin->text_domain),
+																'railscasts'       => __('RailsCasts', $this->plugin->text_domain),
+																'rubyblue'         => __('Rubyblue', $this->plugin->text_domain),
+																'seti'             => __('Seti', $this->plugin->text_domain),
+																'solarized dark'   => __('Solarized Dark', $this->plugin->text_domain),
+																'solarized light'  => __('Solarized Light', $this->plugin->text_domain),
+																'the-matrix'       => __('The Matrix', $this->plugin->text_domain),
+																'tomorrow-night-bright'    => __('Tomorrow Night Bright', $this->plugin->text_domain),
+																'tomorrow-night-eighties'  => __('Tomorrow Night Eighties', $this->plugin->text_domain),
+																'ttcn'             => __('TTCN', $this->plugin->text_domain),
+																'twilight'         => __('Twilight', $this->plugin->text_domain),
+																'vibrant-ink'      => __('Vibrant Ink', $this->plugin->text_domain),
+																'xq-dark'          => __('XQ Dark', $this->plugin->text_domain),
+																'xq-light'         => __('XQ Light', $this->plugin->text_domain),
+																'yeti'             => __('Yeti', $this->plugin->text_domain),
+																'zenburn'          => __('Zenburn', $this->plugin->text_domain),
+													         // add additional lines each for each of the available themes.
+													    ),
+													    'notes_after' => '<p>'.__('This changes the syntax highlighting color scheme used in textarea fields; e.g., Email Templates and Site Templates.', $this->plugin->text_domain).'</p>',
+													  )).
+												  '  </tbody>'.
+												  '</table>';
 
 					echo $this->panel(__('Template-Related Settings', $this->plugin->text_domain), $_panel_body, array('pro_only' => TRUE));
 

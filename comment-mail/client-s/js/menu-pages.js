@@ -32,7 +32,7 @@
 			codeMirrors = [], cmOptions = {
 				lineNumbers  : false,
 				matchBrackets: true,
-				theme        : 'ambiance',
+				theme : vars.templateSyntaxTheme,
 				tabSize      : 3, indentWithTabs: true,
 				extraKeys    : {
 					'F11': function(cm)
