@@ -594,8 +594,8 @@ namespace comment_mail // Root namespace.
 				if(!is_null($total = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
 					return $total; // Already cached this.
 
-				$sql = "SELECT SQL_CALC_FOUND_ROWS `ID`".
-				       " FROM `".esc_html($this->plugin->utils_db->prefix().'subs')."`".
+				$sql = "SELECT SQL_CALC_FOUND_ROWS `email`".
+				       " FROM `".esc_sql($this->plugin->utils_db->prefix().'subs')."`".
 
 				       " WHERE 1=1". // Initialize where clause.
 
@@ -624,7 +624,7 @@ namespace comment_mail // Root namespace.
 				       " LIMIT 1"; // Just one to check.
 
 				if($this->plugin->utils_db->wp->query($sql) === FALSE)
-					throw new \exception(__('Query failure.', $this->plugin->text_domain));
+								throw new \exception(sprintf(__('Query failure on SQL: `%1$s`', $this->plugin->text_domain), $sql));
 
 				return ($total = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()"));
 			}
