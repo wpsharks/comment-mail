@@ -515,7 +515,7 @@ namespace comment_mail // Root namespace.
 						                                    '  <p style="font-weight:bold; font-size:110%; margin:0;">'.__('When Auto-Subscribe is enabled:', $this->plugin->text_domain).'</p>'.
 						                                    '  <ul class="pmp-list-items">'.
 						                                    '     <li>'.__('The author of a post can be subscribed to all comments/replies automatically. This way they\'ll receive email notifications w/o needing to go through the normal comment subscription process.', $this->plugin->text_domain).'</li>'.
-																								'     <li>'.__('A list of <a href="https://codex.wordpress.org/Roles_and_Capabilities" target="_blank">WordPress Roles</a> can be provided, allowing you to auto-subscribe all users who have one of those Roles, to every post automatically.', $this->plugin->text_domain).'</li>'.
+																								'     <li>'.__('A list of <a href="https://codex.wordpress.org/Roles_and_Capabilities" target="_blank">WordPress Roles</a> can be provided. All users who have one of the listed Roles will be auto-subscribed to all comments/replies for every new post automatically.', $this->plugin->text_domain).'</li>'.
 																								'     <li>'.__('A list of other recipients can be added, allowing you to auto-subscribe other email addresses to every post automatically.', $this->plugin->text_domain).'</li>'.
 						                                    '  </ul>'.
 						                                    '</div>',
