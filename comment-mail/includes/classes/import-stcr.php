@@ -197,26 +197,27 @@ namespace comment_mail // Root namespace.
 					$sub_inserter    = new sub_inserter($sub_insert_data);
 					if($sub_inserter->did_insert()) $this->total_imported_subs++;
 				}
-				# Otherwise, specific comment(s) only; i.e. "Replies Only".
-
-				foreach($this->sub_comment_ids($post_id, $sub->email) as $_comment_id)
+				else # Otherwise, specific comment(s) only; i.e. "Replies Only".
 				{
-					$_sub_insert_data = array(
-						'post_id'        => $post_id,
-						'comment_id'     => $_comment_id,
+					foreach($this->sub_comment_ids($post_id, $sub->email) as $_comment_id)
+					{
+						$_sub_insert_data = array(
+							'post_id'        => $post_id,
+							'comment_id'     => $_comment_id,
 
-						'status'         => 'subscribed',
-						'deliver'        => 'asap',
+							'status'         => 'subscribed',
+							'deliver'        => 'asap',
 
-						'fname'          => $sub->fname,
-						'email'          => $sub->email,
+							'fname'          => $sub->fname,
+							'email'          => $sub->email,
 
-						'insertion_time' => $sub->time,
-					);
-					$_sub_inserter    = new sub_inserter($_sub_insert_data);
-					if($_sub_inserter->did_insert()) $this->total_imported_subs++;
+							'insertion_time' => $sub->time,
+						);
+						$_sub_inserter    = new sub_inserter($_sub_insert_data);
+						if($_sub_inserter->did_insert()) $this->total_imported_subs++;
+					}
+					unset($_comment_id, $_sub_insert_data, $_sub_inserter); // Housekeeping.
 				}
-				unset($_comment_id, $_sub_insert_data, $_sub_inserter); // Housekeeping.
 			}
 
 			/**
