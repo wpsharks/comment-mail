@@ -743,11 +743,11 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @param \stdClass $comment Comment object.
+			 * @param \WP_Comment $comment Comment object.
 			 *
 			 * @return string Comment content markup.
 			 */
-			public function comment_content(\stdClass $comment)
+			public function comment_content(/* \WP_Comment */ $comment)
 			{
 				$markup = $comment->comment_content; // Initialize.
 				$markup = apply_filters('get_comment_text', $markup, $comment, array());
@@ -761,7 +761,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @param \stdClass      $comment Comment object.
+			 * @param \WP_Comment      $comment Comment object.
 			 *
 			 * @param integer|string $max_length Defaults to a value of `100`.
 			 *    To use the default plugin option for notifications, pass the string `notification`.
@@ -771,7 +771,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string Comment content text; after markup/filters and then clipping.
 			 */
-			public function comment_content_clip(\stdClass $comment, $max_length = 100, $force_ellipsis = FALSE)
+			public function comment_content_clip(/* \WP_Comment */ $comment, $max_length = 100, $force_ellipsis = FALSE)
 			{
 				if($max_length === 'notification') // An empty string indicates plugin option value.
 					$max_length = $this->plugin->options['comment_notification_content_clip_max_chars'];
@@ -791,7 +791,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @since 141111 First documented version.
 			 *
-			 * @param \stdClass      $comment Comment object.
+			 * @param \WP_Comment      $comment Comment object.
 			 *
 			 * @param integer|string $max_length Defaults to a value of `100`.
 			 *    To use the default plugin option for notifications, pass the string `notification`.
@@ -799,7 +799,7 @@ namespace comment_mail // Root namespace.
 			 *
 			 * @return string Comment content text; after markup/filters and then mid-clipping.
 			 */
-			public function comment_content_mid_clip(\stdClass $comment, $max_length = 100)
+			public function comment_content_mid_clip(/* \WP_Comment */ $comment, $max_length = 100)
 			{
 				if($max_length === 'notification') // An empty string indicates plugin option value.
 					$max_length = $this->plugin->options['comment_notification_content_clip_max_chars'];
