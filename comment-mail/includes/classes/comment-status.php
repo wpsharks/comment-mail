@@ -62,13 +62,13 @@ namespace comment_mail // Root namespace.
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `post-trashed`, `spam`, `delete`.
 			 *
-			 * @param \stdClass|null $comment Comment object (now).
+			 * @param \WP_Comment|null $comment Comment object (now).
 			 */
-			public function __construct($new_comment_status, $old_comment_status, \stdClass $comment = NULL)
+			public function __construct($new_comment_status, $old_comment_status, /* \WP_Comment */ $comment = NULL)
 			{
 				parent::__construct();
 
-				$this->comment            = $comment; // \stdClass|null.
+				$this->comment            = $comment; // \WP_Comment|null.
 				$this->new_comment_status = $this->plugin->utils_db->comment_status__($new_comment_status);
 				$this->old_comment_status = $this->plugin->utils_db->comment_status__($old_comment_status);
 

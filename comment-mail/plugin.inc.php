@@ -2268,9 +2268,9 @@ namespace comment_mail {
 			 *       - `1` (aka: `approve`, `approved`),
 			 *       - or `trash`, `post-trashed`, `spam`, `delete`.
 			 *
-			 * @param \stdClass|null $comment Comment object (now).
+			 * @param \WP_Comment|null $comment Comment object (now).
 			 */
-			public function comment_status($new_comment_status, $old_comment_status, \stdClass $comment = NULL)
+			public function comment_status($new_comment_status, $old_comment_status, /* \WP_Comment */ $comment = NULL)
 			{
 				new comment_status($new_comment_status, $old_comment_status, $comment);
 			}

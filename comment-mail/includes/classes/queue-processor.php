@@ -562,10 +562,10 @@ namespace comment_mail // Root namespace.
 
 			                               \stdClass $sub = NULL,
 			                               \WP_Post $sub_post = NULL,
-			                               \stdClass $sub_comment = NULL,
+			                               /* \WP_Comment */ $sub_comment = NULL,
 
 			                               \WP_Post $post = NULL,
-			                               \stdClass $comment = NULL,
+			                               /* \WP_Comment */ $comment = NULL,
 
 			                               array $props = array(),
 			                               array $comments = array(),
