@@ -1,21 +1,21 @@
 <?php
 namespace comment_mail;
 /**
- * @var plugin         $plugin Plugin class.
- * @var template       $template Template class.
+ * @var plugin         $plugin       Plugin class.
+ * @var template       $template     Template class.
  *
  * Other variables made available in this template file:
  *
  * @var string         $email_header Parsed email header template.
  * @var string         $email_footer Parsed email footer template.
  *
- * @var \stdClass      $sub Subscription object data.
+ * @var \stdClass      $sub          Subscription object data.
  *
- * @var \WP_Post       $sub_post Post they're subscribed to.
+ * @var \WP_Post       $sub_post     Post they're subscribed to.
  *
- * @var \stdClass|null $sub_comment Comment they're subcribed to; if applicable.
+ * @var \stdClass|null $sub_comment  Comment they're subcribed to; if applicable.
  *
- * @var \stdClass[]    $comments An array of all WP comment objects we are notifying about.
+ * @var \stdClass[]    $comments     An array of all WP comment objects we are notifying about.
  *
  * -------------------------------------------------------------------
  * @note In addition to plugin-specific variables & functionality,
@@ -62,116 +62,121 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
 $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies_via_email_enable'];
 ?>
 <?php echo $template->snippet(
-	'message-heading.php', array(
-		'is_digest'                 => $is_digest,
-		'sub_comment'               => $sub_comment,
-		'subscribed_to_own_comment' => $subscribed_to_own_comment,
+  'message-heading.php', array(
+  'is_digest'                 => $is_digest,
+  'sub_comment'               => $sub_comment,
+  'subscribed_to_own_comment' => $subscribed_to_own_comment,
 
-		'[sub_post_comments_url]'   => esc_attr($sub_post_comments_url),
-		'[sub_post_title_clip]'     => esc_html($sub_post_title_clip),
+  '[sub_post_comments_url]' => esc_attr($sub_post_comments_url),
+  '[sub_post_title_clip]'   => esc_html($sub_post_title_clip),
 
-		'[sub_comment_url]'         => esc_attr($sub_comment_url),
-		'[sub_comment_id]'          => esc_html($sub_comment ? $sub_comment->comment_ID : 0),
-	)); ?>
+  '[sub_comment_url]' => esc_attr($sub_comment_url),
+  '[sub_comment_id]'  => esc_html($sub_comment ? $sub_comment->comment_ID : 0),
+)
+); ?>
 
-	<ul>
-		<?php foreach($comments as $_comment): // Comments in this notification. ?>
-			<?php
-			// Parent comment, if applicable; i.e. if this comment is a reply to another.
-			$_comment_parent = $_comment->comment_parent ? get_comment($_comment->comment_parent) : NULL;
+<?php foreach ($comments as $_comment): // Comments in this notification. ?>
+    <hr />
+    <?php
+    // Parent comment, if applicable; i.e. if this comment is a reply to another.
+    $_comment_parent = $_comment->comment_parent ? get_comment($_comment->comment_parent) : null;
 
-			// Parent comment URL, if applicable.
-			$_comment_parent_url = $_comment_parent ? get_comment_link($_comment_parent->comment_ID) : '';
+    // Parent comment URL, if applicable.
+    $_comment_parent_url = $_comment_parent ? get_comment_link($_comment_parent->comment_ID) : '';
 
-			// A shorter clip of the full parent comment message body; in plain text.
-			$_comment_parent_clip = $_comment_parent ? $plugin->utils_markup->comment_content_mid_clip($_comment_parent, 'notification_parent') : '';
+    // A shorter clip of the full parent comment message body; in plain text.
+    $_comment_parent_clip = $_comment_parent ? $plugin->utils_markup->comment_content_mid_clip($_comment_parent, 'notification_parent') : '';
 
-			// URL to this comment; i.e. the one we're notifying about.
-			$_comment_url = get_comment_link($_comment->comment_ID);
+    // URL to this comment; i.e. the one we're notifying about.
+    $_comment_url = get_comment_link($_comment->comment_ID);
 
-			// How long ago the comment was posted on the site (human readable).
-			$_comment_time_ago = $plugin->utils_date->approx_time_difference(strtotime($_comment->comment_date_gmt));
+    // How long ago the comment was posted on the site (human readable).
+    $_comment_time_ago = $plugin->utils_date->approx_time_difference(strtotime($_comment->comment_date_gmt));
 
-			// A shorter clip of the full comment message body; in plain text.
-			$_comment_clip = $plugin->utils_markup->comment_content_clip($_comment, 'notification', TRUE);
+    // A shorter clip of the full comment message body; in plain text.
+    $_comment_clip = $plugin->utils_markup->comment_content_clip($_comment, 'notification', true);
 
-			// Reply via email marker; if applicable. Only needed for digests, and only if replies via email are enabled currently.
-			// ~ Note: This marker is not necessary for single comment notifications. A `Reply-To:` header already handles single-comment notifications.
-			$_comment_rve_irt_marker = $plugin->is_pro ? $plugin->utils_rve->irt_marker($_comment->comment_post_ID, $_comment->comment_ID) : ''; // e.g. `~rve#779-84`.
-			?>
-			<li>
-				<?php if($_comment_parent): // This is a reply to someone? ?>
+    // Reply via email marker; if applicable. Only needed for digests, and only if replies via email are enabled currently.
+    // ~ Note: This marker is not necessary for single comment notifications. A `Reply-To:` header already handles single-comment notifications.
+    $_comment_rve_irt_marker = $plugin->is_pro ? $plugin->utils_rve->irt_marker($_comment->comment_post_ID, $_comment->comment_ID) : ''; // e.g. `~rve#779-84`.
+    ?>
+    <?php if ($_comment_parent): // This is a reply to someone? ?>
 
-					<?php echo $template->snippet(
-						'message-in-response-to.php', array(
-							'[comment_parent_url]'    => esc_attr($_comment_parent_url),
-							'[comment_parent_id]'     => esc_html($_comment_parent->comment_ID),
-							'[comment_parent_author]' => esc_html($_comment_parent->comment_author),
-							'[comment_parent_clip]'   => esc_html($_comment_parent_clip),
-						)); ?>
-					<ul>
-						<li>
-							<?php echo $template->snippet(
-								'message-reply-from.php', array(
-									'[comment_url]'      => esc_attr($_comment_url),
-									'[comment_id]'       => esc_html($_comment->comment_ID),
-									'[comment_time_ago]' => esc_html($_comment_time_ago),
-									'[comment_author]'   => esc_html($_comment->comment_author),
-									'[comment_clip]'     => esc_html($_comment_clip),
-								)); ?>
-							<p style="margin-bottom:0;">
-								<a href="<?php echo esc_attr($_comment_url); ?>">
-									<?php echo __('continue reading', $plugin->text_domain); ?>
-								</a>
-								<?php if($sub_post_comments_open): ?>
-									| <a href="<?php echo esc_attr($_comment_url); ?>">
-										<?php echo __('add reply', $plugin->text_domain); ?>
-									</a>
-									<?php if($replies_via_email_enable): ?>
-										<?php if($is_digest): // Marker only needed in digests. ?>
-											<small><em><?php echo sprintf(__('— or reply to this email &amp; start your message with: <code>%1$s</code>', $plugin->text_domain), esc_html($_comment_rve_irt_marker)); ?></em></small>
-										<?php else: // The `Reply-To:` field in the email will suffice in other cases; i.e. there is only one comment in this notification. ?>
-											<small><em><?php echo __('— or simply reply to this email', $plugin->text_domain); ?></em></small>
-										<?php endif; ?>
-									<?php endif; ?>
-								<?php endif; ?>
-							</p>
-						</li>
-					</ul>
+        <?php echo $template->snippet(
+          'message-in-response-to.php', array(
+          '[comment_parent_url]'    => esc_attr($_comment_parent_url),
+          '[comment_parent_id]'     => esc_html($_comment_parent->comment_ID),
+          '[comment_parent_author]' => esc_html($_comment_parent->comment_author),
+          '[comment_parent_clip]'   => esc_html($_comment_parent_clip),
+        )
+        ); ?>
+        <?php echo $template->snippet(
+          'message-reply-from.php', array(
+          '[comment_url]'      => esc_attr($_comment_url),
+          '[comment_id]'       => esc_html($_comment->comment_ID),
+          '[comment_time_ago]' => esc_html($_comment_time_ago),
+          '[comment_author]'   => esc_html($_comment->comment_author),
+          '[comment_clip]'     => esc_html($_comment_clip),
+        )
+        ); ?>
+        <p style="margin-bottom:0;">
+            <a href="<?php echo esc_attr($_comment_url); ?>">
+                <?php echo __('continue reading', $plugin->text_domain); ?>
+            </a>
+            <?php if ($sub_post_comments_open): ?>
+                | <a href="<?php echo esc_attr($_comment_url); ?>">
+                    <?php echo __('add reply', $plugin->text_domain); ?>
+                </a>
+                <?php if ($replies_via_email_enable): ?>
+                    <?php if ($is_digest): // Marker only needed in digests. ?>
+                        <small>
+                            <em><?php echo sprintf(__('— or reply to this email &amp; start your message with: <code>%1$s</code>', $plugin->text_domain), esc_html($_comment_rve_irt_marker)); ?></em>
+                        </small>
+                    <?php else: // The `Reply-To:` field in the email will suffice in other cases; i.e. there is only one comment in this notification. ?>
+                        <small><em><?php echo __('— or simply reply to this email', $plugin->text_domain); ?></em>
+                        </small>
+                    <?php endif; ?>
+                <?php endif; ?>
+            <?php endif; ?>
+        </p>
 
-				<?php else: // A new comment; i.e. not a reply to someone. ?>
+    <?php else: // A new comment; i.e. not a reply to someone. ?>
 
-					<?php echo $template->snippet(
-						'message-comment-from.php', array(
-							'[comment_url]'      => esc_attr($_comment_url),
-							'[comment_id]'       => esc_html($_comment->comment_ID),
-							'[comment_time_ago]' => esc_html($_comment_time_ago),
-							'[comment_author]'   => esc_html($_comment->comment_author),
-							'[comment_clip]'     => esc_html($_comment_clip),
-						)); ?>
-					<p style="margin-bottom:0;">
-						<a href="<?php echo esc_attr($_comment_url); ?>">
-							<?php echo __('continue reading', $plugin->text_domain); ?>
-						</a>
-						<?php if($sub_post_comments_open): ?>
-							| <a href="<?php echo esc_attr($_comment_url); ?>">
-								<?php echo __('add reply', $plugin->text_domain); ?>
-							</a>
-							<?php if($replies_via_email_enable): ?>
-								<?php if($is_digest): // Marker only needed in digests. ?>
-									<small><em><?php echo sprintf(__('— or reply to this email &amp; start your message with: <code>%1$s</code>', $plugin->text_domain), esc_html($_comment_rve_irt_marker)); ?></em></small>
-								<?php else: // The `Reply-To:` field in the email will suffice in other cases; i.e. there is only one comment in this notification. ?>
-									<small><em><?php echo __('— or simply reply to this email | ', $plugin->text_domain); ?></em></small>
-									<small><strong><?php echo __('Please Note:', $plugin->text_domain); ?></strong> <em><?php echo __('Your reply will be posted publicly and immediately.', $plugin->text_domain); ?></em></small>
-								<?php endif; ?>
-							<?php endif; ?>
-						<?php endif; ?>
-					</p>
+        <?php echo $template->snippet(
+          'message-comment-from.php', array(
+          '[comment_url]'      => esc_attr($_comment_url),
+          '[comment_id]'       => esc_html($_comment->comment_ID),
+          '[comment_time_ago]' => esc_html($_comment_time_ago),
+          '[comment_author]'   => esc_html($_comment->comment_author),
+          '[comment_clip]'     => esc_html($_comment_clip),
+        )
+        ); ?>
+        <p style="margin-bottom:0;">
+            <a href="<?php echo esc_attr($_comment_url); ?>">
+                <?php echo __('continue reading', $plugin->text_domain); ?>
+            </a>
+            <?php if ($sub_post_comments_open): ?>
+                | <a href="<?php echo esc_attr($_comment_url); ?>">
+                    <?php echo __('add reply', $plugin->text_domain); ?>
+                </a>
+                <?php if ($replies_via_email_enable): ?>
+                    <?php if ($is_digest): // Marker only needed in digests. ?>
+                        <small>
+                            <em><?php echo sprintf(__('— or reply to this email &amp; start your message with: <code>%1$s</code>', $plugin->text_domain), esc_html($_comment_rve_irt_marker)); ?></em>
+                        </small>
+                    <?php else: // The `Reply-To:` field in the email will suffice in other cases; i.e. there is only one comment in this notification. ?>
+                        <small><em><?php echo __('— or simply reply to this email | ', $plugin->text_domain); ?></em>
+                        </small>
+                        <small><strong><?php echo __('Please Note:', $plugin->text_domain); ?></strong>
+                            <em><?php echo __('Your reply will be posted publicly and immediately.', $plugin->text_domain); ?></em>
+                        </small>
+                    <?php endif; ?>
+                <?php endif; ?>
+            <?php endif; ?>
+        </p>
 
-				<?php endif; ?>
+    <?php endif; ?>
 
-			</li>
-		<?php endforeach; ?>
-	</ul>
+<?php endforeach; ?>
 
 <?php echo $email_footer; ?>
