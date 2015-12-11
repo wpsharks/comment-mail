@@ -84,7 +84,7 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
     $_comment_parent_url = $_comment_parent ? get_comment_link($_comment_parent->comment_ID) : '';
 
     // A shorter clip of the full parent comment message body; in plain text.
-    $_comment_parent_clip = $_comment_parent ? $plugin->utils_markup->comment_content_mid_clip($_comment_parent, 'notification_parent') : '';
+    $_comment_parent_clip = $_comment_parent ? $plugin->utils_markup->comment_content_clip($_comment_parent, 'notification_parent') : '';
 
     // URL to this comment; i.e. the one we're notifying about.
     $_comment_url = get_comment_link($_comment->comment_ID);
