@@ -121,11 +121,15 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
         )); ?>
         <p>
             <a href="<?php echo esc_attr($_comment_url); ?>">
-                <?php echo __('continue reading', $plugin->text_domain); ?>
+                <?php echo __('Continue reading', $plugin->text_domain); ?>
             </a>
             <?php if($sub_post_comments_open): ?>
                 | <a href="<?php echo esc_attr($_comment_reply_url); ?>">
-                    <?php echo __('add reply', $plugin->text_domain); ?>
+                    <?php if($_comment->comment_author) : ?>
+                        <?php echo __('Reply to ', $plugin->text_domain).esc_html($_comment->comment_author); ?>
+                    <?php else : ?>
+                        <?php echo __('Reply', $plugin->text_domain); ?>
+                    <?php endif; ?>
                 </a>
                 <?php if($replies_via_email_enable): ?>
                     <?php if($is_digest): // Marker only needed in digests. ?>
@@ -150,11 +154,15 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
         ); ?>
         <p>
             <a href="<?php echo esc_attr($_comment_url); ?>">
-                <?php echo __('continue reading', $plugin->text_domain); ?>
+                <?php echo __('Continue reading', $plugin->text_domain); ?>
             </a>
             <?php if($sub_post_comments_open): ?>
                 | <a href="<?php echo esc_attr($_comment_reply_url); ?>">
-                    <?php echo __('add reply', $plugin->text_domain); ?>
+                    <?php if($_comment->comment_author) : ?>
+                        <?php echo __('Reply to ', $plugin->text_domain).esc_html($_comment->comment_author); ?>
+                    <?php else : ?>
+                        <?php echo __('Reply', $plugin->text_domain); ?>
+                    <?php endif; ?>
                 </a>
                 <?php if($replies_via_email_enable): ?>
                     <?php if($is_digest): // Marker only needed in digests. ?>
