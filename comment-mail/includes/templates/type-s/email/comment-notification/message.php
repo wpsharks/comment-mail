@@ -86,6 +86,9 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
     // A shorter clip of the full parent comment message body; in plain text.
     $_comment_parent_clip = $_comment_parent ? $plugin->utils_markup->comment_content_clip($_comment_parent, 'notification_parent') : '';
 
+    // A reply to their own comment?
+    $_comment_reply_to_own_comment = $_comment_parent && strcasecmp($_comment_parent->comment_author_email, $sub->email) === 0;
+
     // URL to this comment; i.e. the one we're notifying about.
     $_comment_url = get_comment_link($_comment->comment_ID);
 
@@ -106,11 +109,13 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
 
         <?php echo $template->snippet(
           'message-in-response-to.php', array(
-          '[comment_parent_url]'    => esc_attr($_comment_parent_url),
-          '[comment_parent_id]'     => esc_html($_comment_parent->comment_ID),
-          '[comment_parent_author]' => esc_html($_comment_parent->comment_author),
-          '[comment_parent_clip]'   => esc_html($_comment_parent_clip),
+          '[comment_parent_url]'           => esc_attr($_comment_parent_url),
+          '[comment_parent_id]'            => esc_html($_comment_parent->comment_ID),
+          '[comment_parent_author]'        => esc_html($_comment_parent->comment_author),
+          '[comment_parent_clip]'          => esc_html($_comment_parent_clip),
+          '[comment_reply_to_own_comment]' => $_comment_reply_to_own_comment,
         )); ?>
+
         <?php echo $template->snippet(
           'message-reply-from.php', array(
           '[comment_url]'      => esc_attr($_comment_url),
@@ -150,8 +155,7 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
           '[comment_time_ago]' => esc_html($_comment_time_ago),
           '[comment_author]'   => esc_html($_comment->comment_author),
           '[comment_clip]'     => esc_html($_comment_clip),
-        )
-        ); ?>
+				)); ?>
         <p>
             <a href="<?php echo esc_attr($_comment_url); ?>">
                 <?php echo __('Continue reading', $plugin->text_domain); ?>
