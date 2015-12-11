@@ -93,7 +93,7 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
     $_comment_time_ago = $plugin->utils_date->approx_time_difference(strtotime($_comment->comment_date_gmt));
 
     // A shorter clip of the full comment message body; in plain text.
-    $_comment_clip = $plugin->utils_markup->comment_content_clip($_comment, 'notification', true);
+    $_comment_clip = $plugin->utils_markup->comment_content_clip($_comment, 'notification', false);
 
     // Reply via email marker; if applicable. Only needed for digests, and only if replies via email are enabled currently.
     // ~ Note: This marker is not necessary for single comment notifications. A `Reply-To:` header already handles single-comment notifications.
