@@ -614,12 +614,12 @@ namespace comment_mail // Root namespace.
 				$string = str_replace('"', "'", $string);
 
 				if(strlen($string) > $max_length)
-					$string = (string)substr($string, 0, $max_length - 3).'...';
+					$string = (string)substr($string, 0, $max_length - 3).'[...]';
 
 				else if($force_ellipsis && strlen($string) + 3 > $max_length)
-					$string = (string)substr($string, 0, $max_length - 3).'...';
+					$string = (string)substr($string, 0, $max_length - 3).'[...]';
 
-				else $string .= $force_ellipsis ? '...' : '';
+				else $string .= $force_ellipsis ? '[...]' : '';
 
 				return $string; // Clipped.
 			}
@@ -676,8 +676,8 @@ namespace comment_mail // Root namespace.
 
 				$first_clip = $half_max_length - 3;
 				$string     = ($first_clip >= 1) // Something?
-					? substr($full_string, 0, $first_clip).'...'
-					: '...'; // Ellipsis only.
+					? substr($full_string, 0, $first_clip).'[...]'
+					: '[...]'; // Ellipsis only.
 
 				$second_clip = strlen($full_string) - ($max_length - strlen($string));
 				$string .= ($second_clip >= 0 && $second_clip >= $first_clip)
