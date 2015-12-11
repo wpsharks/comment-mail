@@ -1,4 +1,4 @@
-<h2 style="margin-top:0; font-family:serif;">
+<h2 style="margin-top:0;">
 
 	[if is_digest]
 
