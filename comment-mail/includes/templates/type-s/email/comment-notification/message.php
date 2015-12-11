@@ -89,6 +89,9 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
     // URL to this comment; i.e. the one we're notifying about.
     $_comment_url = get_comment_link($_comment->comment_ID);
 
+    // URL to the reply link for this comment
+    $_comment_reply_url = get_permalink($_comment->comment_post_ID).'?replytocom='.$_comment->comment_ID.'#respond';
+
     // How long ago the comment was posted on the site (human readable).
     $_comment_time_ago = $plugin->utils_date->approx_time_difference(strtotime($_comment->comment_date_gmt));
 
@@ -121,7 +124,7 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
                 <?php echo __('continue reading', $plugin->text_domain); ?>
             </a>
             <?php if($sub_post_comments_open): ?>
-                | <a href="<?php echo esc_attr($_comment_url); ?>">
+                | <a href="<?php echo esc_attr($_comment_reply_url); ?>">
                     <?php echo __('add reply', $plugin->text_domain); ?>
                 </a>
                 <?php if($replies_via_email_enable): ?>
@@ -150,7 +153,7 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
                 <?php echo __('continue reading', $plugin->text_domain); ?>
             </a>
             <?php if($sub_post_comments_open): ?>
-                | <a href="<?php echo esc_attr($_comment_url); ?>">
+                | <a href="<?php echo esc_attr($_comment_reply_url); ?>">
                     <?php echo __('add reply', $plugin->text_domain); ?>
                 </a>
                 <?php if($replies_via_email_enable): ?>
