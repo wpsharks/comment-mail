@@ -55,10 +55,14 @@ namespace comment_mail;
 		<?php echo sprintf(__('<a href="%1$s">My Comment Subscriptions</a>', $plugin->text_domain), esc_attr($sub_summary_url)); ?><br />
 		&nbsp;&#42774;&nbsp; <?php echo sprintf(__('<a href="%1$s">One-Click Unsubscribe</a>', $plugin->text_domain), esc_attr($sub_unsubscribe_url)); ?>
 	</p>
+	<?php // Disable this functionality for now; see http://bit.ly/1OYd4ie ?>
+	<?php // @todo Remove completely, or reconsider, Add New Subscription from front-end ?>
+	<?php /*
 	<p style="color:#888888;">
 		<strong><?php echo __('Create New Subscription?', $plugin->text_domain); ?></strong><br />
 		<?php echo sprintf(__('<a href="%1$s">Add New Comment Subscription</a>', $plugin->text_domain), esc_attr($sub_new_url)); ?>
 	</p>
+ 	*/?>
 
 <?php endif; ?>
 
