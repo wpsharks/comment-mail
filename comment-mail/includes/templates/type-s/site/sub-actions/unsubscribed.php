@@ -1,23 +1,23 @@
 <?php
 namespace comment_mail;
 /**
- * @var plugin         $plugin Plugin class.
- * @var template       $template Template class.
+ * @var plugin           $plugin      Plugin class.
+ * @var template         $template    Template class.
  *
  * Other variables made available in this template file:
  *
- * @var string         $site_header Parsed site header template.
- * @var string         $site_footer Parsed site footer template.
+ * @var string           $site_header Parsed site header template.
+ * @var string           $site_footer Parsed site footer template.
  *
- * @var \stdClass|null $sub Subscription object data.
+ * @var \stdClass|null   $sub         Subscription object data.
  *
- * @var \WP_Post|null  $sub_post Post they were subscribed to.
+ * @var \WP_Post|null    $sub_post    Post they were subscribed to.
  *    This will be `NULL` if there were any `$error_codes` during processing.
  *    This will also be `NULL` if you deleted the post before they unsubscribed.
  *
- * @var \stdClass|null $sub_comment Comment they were subcribed to; if applicable.
+ * @var \WP_Comment|null $sub_comment Comment they were subcribed to; if applicable.
  *
- * @var array          $error_codes An array of any/all error codes.
+ * @var array            $error_codes An array of any/all error codes.
  *
  * -------------------------------------------------------------------
  * @note In addition to plugin-specific variables & functionality,

@@ -14,7 +14,7 @@ namespace comment_mail;
  * @var \WP_Post|null  $sub_post Post they're subscribed to.
  *    This will be `NULL` if there were any `$error_codes` during processing.
  *
- * @var \stdClass|null $sub_comment Comment they're subcribed to; if applicable.
+ * @var \WP_Comment|null $sub_comment Comment they're subcribed to; if applicable.
  *
  * @var array          $error_codes An array of any/all error codes.
  *

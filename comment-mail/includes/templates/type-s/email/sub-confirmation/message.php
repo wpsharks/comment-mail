@@ -1,19 +1,19 @@
 <?php
 namespace comment_mail;
 /**
- * @var plugin         $plugin Plugin class.
- * @var template       $template Template class.
+ * @var plugin           $plugin       Plugin class.
+ * @var template         $template     Template class.
  *
  * Other variables made available in this template file:
  *
- * @var string         $email_header Parsed email header template.
- * @var string         $email_footer Parsed email footer template.
+ * @var string           $email_header Parsed email header template.
+ * @var string           $email_footer Parsed email footer template.
  *
- * @var \stdClass      $sub Subscription object data.
+ * @var \stdClass        $sub          Subscription object data.
  *
- * @var \WP_Post       $sub_post Post they're subscribed to.
+ * @var \WP_Post         $sub_post     Post they're subscribed to.
  *
- * @var \stdClass|null $sub_comment Comment they're subcribed to; if applicable.
+ * @var \WP_Comment|null $sub_comment  Comment they're subcribed to; if applicable.
  *
  * -------------------------------------------------------------------
  * @note In addition to plugin-specific variables & functionality,
@@ -73,7 +73,7 @@ $sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $
 			'[sub_comment_id]'          => esc_html($sub_comment ? $sub_comment->comment_ID : 0),
 		)); ?>
 
-	<p style="color:#888888; font-style:italic; margin-left:1em;">
+	<p style="color:#888888; font-style:italic;">
 		<?php echo __('Note: if you did not make this request, please ignore this email. You will only be subscribed if you confirm.', $plugin->text_domain); ?>
 		<?php echo sprintf(__('This subscription was requested by %1$s; from IP address: <code>%2$s</code> on %3$s.', $plugin->text_domain), $sub_name_email_markup, esc_html($sub_last_ip), esc_html($sub_last_update_time_ago)); ?>
 		<?php echo __('If you need to report any continued abuse, please use the contact info at the bottom of this email.', $plugin->text_domain); ?>

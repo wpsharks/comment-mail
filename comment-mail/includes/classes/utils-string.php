@@ -608,18 +608,18 @@ namespace comment_mail // Root namespace.
 					return $string; // Empty.
 
 				$max_length = (integer)$max_length;
-				$max_length = $max_length < 4 ? 4 : $max_length;
+				$max_length = $max_length < 6 ? 6 : $max_length;
 
 				$string = $this->html_to_text($string, array('br2nl' => FALSE));
 				$string = str_replace('"', "'", $string);
 
 				if(strlen($string) > $max_length)
-					$string = (string)substr($string, 0, $max_length - 3).'...';
+					$string = (string)substr($string, 0, $max_length - 5).'[...]';
 
-				else if($force_ellipsis && strlen($string) + 3 > $max_length)
-					$string = (string)substr($string, 0, $max_length - 3).'...';
+				else if($force_ellipsis && strlen($string) + 5 > $max_length)
+					$string = (string)substr($string, 0, $max_length - 5).'[...]';
 
-				else $string .= $force_ellipsis ? '...' : '';
+				else $string .= $force_ellipsis ? '[...]' : '';
 
 				return $string; // Clipped.
 			}
@@ -663,7 +663,7 @@ namespace comment_mail // Root namespace.
 					return $string; // Empty.
 
 				$max_length = (integer)$max_length;
-				$max_length = $max_length < 4 ? 4 : $max_length;
+				$max_length = $max_length < 6 ? 6 : $max_length;
 
 				$string = $this->html_to_text($string, array('br2nl' => FALSE));
 				$string = str_replace('"', "'", $string);
@@ -674,10 +674,10 @@ namespace comment_mail // Root namespace.
 				$full_string     = $string;
 				$half_max_length = floor($max_length / 2);
 
-				$first_clip = $half_max_length - 3;
+				$first_clip = $half_max_length - 5;
 				$string     = ($first_clip >= 1) // Something?
-					? substr($full_string, 0, $first_clip).'...'
-					: '...'; // Ellipsis only.
+					? substr($full_string, 0, $first_clip).'[...]'
+					: '[...]'; // Ellipsis only.
 
 				$second_clip = strlen($full_string) - ($max_length - strlen($string));
 				$string .= ($second_clip >= 0 && $second_clip >= $first_clip)
