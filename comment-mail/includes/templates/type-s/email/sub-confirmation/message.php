@@ -1,19 +1,19 @@
 <?php
 namespace comment_mail;
 /**
- * @var plugin         $plugin Plugin class.
- * @var template       $template Template class.
+ * @var plugin           $plugin       Plugin class.
+ * @var template         $template     Template class.
  *
  * Other variables made available in this template file:
  *
- * @var string         $email_header Parsed email header template.
- * @var string         $email_footer Parsed email footer template.
+ * @var string           $email_header Parsed email header template.
+ * @var string           $email_footer Parsed email footer template.
  *
- * @var \stdClass      $sub Subscription object data.
+ * @var \stdClass        $sub          Subscription object data.
  *
- * @var \WP_Post       $sub_post Post they're subscribed to.
+ * @var \WP_Post         $sub_post     Post they're subscribed to.
  *
- * @var \stdClass|null $sub_comment Comment they're subcribed to; if applicable.
+ * @var \WP_Comment|null $sub_comment  Comment they're subcribed to; if applicable.
  *
  * -------------------------------------------------------------------
  * @note In addition to plugin-specific variables & functionality,
