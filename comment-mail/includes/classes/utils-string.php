@@ -616,7 +616,7 @@ namespace comment_mail // Root namespace.
 				if(strlen($string) > $max_length)
 					$string = (string)substr($string, 0, $max_length - 5).'[...]';
 
-				else if($force_ellipsis && strlen($string) + 3 > $max_length)
+				else if($force_ellipsis && strlen($string) + 5 > $max_length)
 					$string = (string)substr($string, 0, $max_length - 5).'[...]';
 
 				else $string .= $force_ellipsis ? '[...]' : '';
