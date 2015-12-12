@@ -109,11 +109,11 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
 
         <?php echo $template->snippet(
           'message-in-response-to.php', array(
-          '[comment_parent_url]'           => esc_attr($_comment_parent_url),
-          '[comment_parent_id]'            => esc_html($_comment_parent->comment_ID),
-          '[comment_parent_author]'        => esc_html($_comment_parent->comment_author),
-          '[comment_parent_clip]'          => esc_html($_comment_parent_clip),
-          '[comment_reply_to_own_comment]' => $_comment_reply_to_own_comment,
+          '[comment_parent_url]'         => esc_attr($_comment_parent_url),
+          '[comment_parent_id]'          => esc_html($_comment_parent->comment_ID),
+          '[comment_parent_author]'      => esc_html($_comment_parent->comment_author),
+          '[comment_parent_clip]'        => esc_html($_comment_parent_clip),
+          'comment_reply_to_own_comment' => $_comment_reply_to_own_comment,
         )); ?>
 
         <?php echo $template->snippet(
@@ -131,7 +131,7 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
             <?php if($sub_post_comments_open): ?>
                 | <a href="<?php echo esc_attr($_comment_reply_url); ?>">
                     <?php if($_comment->comment_author) : ?>
-                        <?php echo __('Reply to ', $plugin->text_domain).esc_html($_comment->comment_author); ?>
+                        <?php echo __('Reply to', $plugin->text_domain).' '.esc_html($_comment->comment_author); ?>
                     <?php else : ?>
                         <?php echo __('Reply', $plugin->text_domain); ?>
                     <?php endif; ?>
@@ -163,7 +163,7 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
             <?php if($sub_post_comments_open): ?>
                 | <a href="<?php echo esc_attr($_comment_reply_url); ?>">
                     <?php if($_comment->comment_author) : ?>
-                        <?php echo __('Reply to ', $plugin->text_domain).esc_html($_comment->comment_author); ?>
+                        <?php echo __('Reply to', $plugin->text_domain).' '.esc_html($_comment->comment_author); ?>
                     <?php else : ?>
                         <?php echo __('Reply', $plugin->text_domain); ?>
                     <?php endif; ?>
