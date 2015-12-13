@@ -2041,6 +2041,8 @@ namespace comment_mail // Root namespace.
 
 					$_panel_body .= '<iframe src="'.esc_attr($this->plugin->utils_url->to('/client-s/iframes/stcr-import-start.html')).'" name="'.esc_attr(__NAMESPACE__.'_import_stcr_iframe').'" class="pmp-import-iframe-output"></iframe>';
 
+					$_panel_body .= '<p><em>'.sprintf(__('Note: Running the import multiple times will not result in duplicate data; %1$s&trade; will simply ignore any subscriptions that have already been imported.', $this->plugin->text_domain), esc_html($this->plugin->name)).'</em></p>';
+
 					$_panel_body .= ' <hr />';
 
 					$_panel_body .= ' <h1>'.sprintf(__('How to Import StCR Subscriptions into Comment Mail', $this->plugin->text_domain), esc_html($this->plugin->name)).'</h1>'."\n";
