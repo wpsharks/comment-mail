@@ -114,6 +114,13 @@ namespace comment_mail // Root namespace.
 				if(!current_user_can($this->plugin->cap))
 					return; // Unauthenticated; ignore.
 
+				foreach(($notices = is_array($notices = get_option(__NAMESPACE__.'_notices')) ? $notices : array()) as $_key => $_notice)
+					if(!empty($_notice['persistent_id']) && $_notice['persistent_id'] === 'upgrading-from-stcr')
+						unset($notices[$_key]); // Remove this one! :-)
+				unset($_key, $_notice); // Housekeeping.
+
+				update_option(__NAMESPACE__.'_notices', $notices); // Update notices.
+
 				foreach($this->unimported_post_ids as $_post_id)
 				{
 					$this->total_imported_post_ids++;
