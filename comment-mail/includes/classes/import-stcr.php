@@ -106,7 +106,7 @@ namespace comment_mail // Root namespace.
 					$this->unimported_post_ids      = array_slice($this->unimported_post_ids, 0, $this->max_post_ids_limit);
 				}
 				$this->imported_post_ids       = array(); // Initialize.
-				$this->total_imported_post_ids = $this->total_imported_subs = $this->total_skipped_subs = $this->total_comments = 0;
+				$this->total_imported_post_ids = $this->total_imported_subs = $this->total_skipped_subs = 0;
 
 				$this->maybe_import(); // Handle importation.
 			}
