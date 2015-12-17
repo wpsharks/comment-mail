@@ -263,8 +263,9 @@ namespace comment_mail // Root namespace.
 							if ($_sub_inserter->did_insert()) {
 								$this->total_created_subs++;
 							} else {
-								$this->log_failure('Failed to import Replies Only (R) subscription', $_sub_insert_data);
+								$this->log_failure('Failed to import Replies Only (R) subscription (email address blacklisted?)', $_sub_insert_data);
 								$this->total_skipped_subs++;
+								$this->total_imported_subs--; // Imported subs are counted outside this foreach loop, so we need to decrease here when we have a failure.
 							}
 						}
 					} else { // No comments associated with $sub->email were found for $post_id
@@ -321,25 +322,29 @@ namespace comment_mail // Root namespace.
 					$_email = trim(strtolower($_email));
 
 					if(!$_email || strpos($_email, '@', 1) === FALSE || !is_email($_email)) {
-						$this->log_failure('Invalid Email Address', array($this->plugin->utils_db->wp->postmeta.'.meta_id'=>$_result->meta_id, 'email'=>$_email));
+						$this->log_failure('Invalid Email Address', array('email'=>$_email,$this->plugin->utils_db->wp->postmeta.'.meta_id'=>$_result->meta_id,'post_id'=>$post_id));
+						$this->total_skipped_subs++;
 						continue; // Invalid email address.
 					}
 
 					// Original format: `2013-03-11 01:31:01|R`.
 					if(!$_result->meta_value || strpos($_result->meta_value, '|', 1) === FALSE){
-						$this->log_failure('Invalid meta data', array($this->plugin->utils_db->wp->postmeta.'.meta_id'=>$_result->meta_id,'meta_value'=>$_result->meta_value));
+						$this->log_failure('Invalid meta data', array('email'=>$_email,'meta_value'=>$_result->meta_value,$this->plugin->utils_db->wp->postmeta.'.meta_id'=>$_result->meta_id,'post_id'=>$post_id));
+						$this->total_skipped_subs++;
 						continue; // Invalid meta data.
 					}
 
 					list($_local_datetime, $_status) = explode('|', $_result->meta_value);
 
 					if(!($_time = strtotime($_local_datetime))) {
-						$this->log_failure('Date not strtotime() compatible', array($this->plugin->utils_db->wp->postmeta.'.meta_id'=>$_result->meta_id, 'date'=>$_local_datetime));
+						$this->log_failure('Date not strtotime() compatible', array('email'=>$_email,'date'=>$_local_datetime, $this->plugin->utils_db->wp->postmeta.'.meta_id'=>$_result->meta_id,'post_id'=>$post_id));
+						$this->total_skipped_subs++;
 						continue; // Not `strtotime()` compatible.
 					}
 
 					if(($_time = $_time + (get_option('gmt_offset') * 3600)) < 1){
-						$this->log_failure('Unable to convert date to UTC timestamp', array($this->plugin->utils_db->wp->postmeta.'.meta_id'=>$_result->meta_id, 'date'=>$_time));
+						$this->log_failure('Unable to convert date to UTC timestamp', array('email'=>$_email,'date'=>$_time, $this->plugin->utils_db->wp->postmeta.'.meta_id'=>$_result->meta_id,'post_id'=>$post_id));
+						$this->total_skipped_subs++;
 						continue; // Unable to convert date to UTC timestamp.
 					}
 
@@ -348,14 +353,24 @@ namespace comment_mail // Root namespace.
 					// An `R` indicates they want notifications for replies only.
 					// A `C` indicates "suspended" or "unconfirmed".
 					if($_status !== 'Y' && $_status !== 'R') {// Active?
-						$this->log_failure('Ignoring this subscription; not an active status (Y or R)', array($this->plugin->utils_db->wp->postmeta.'.meta_id'=>$_result->meta_id, 'status'=>$_status));
+						$this->log_failure('Ignoring this subscription; not an active status (Y or R)', array('email'=>$_email,'status'=>$_status,$this->plugin->utils_db->wp->postmeta.'.meta_id'=>$_result->meta_id,'post_id'=>$post_id));
+						$this->total_skipped_subs++;
 						continue; // Not an active subscriber.
 					}
 
-					if(!isset($subs[$_email]) || ($_status === 'R' && $subs[$_email]->status === 'Y')) {
-						if(isset($subs[$_email]) && $_status === 'R' && $subs[$_email]->status === 'Y') {
-							$this->total_skipped_subs++; // We're overwriting a `Y` subscription with an `R` subscription below
+					if (isset($subs[$_email])) { // Only when we've already found a subscription for this email in a previous iteration; this if-block MUST come before the next section
+						if ($subs[$_email]->status === 'Y' && $_status === 'R') { // We're going to overwrite a `Y` subscription with an `R` subscription in the next section
+							$this->log_failure('Skipping this subscription', array('reason'=>'A Replies Only (R) subscription already exists for this Post ID; see http://bit.ly/1RqXCyD','email'=>$_email,'status'=>'Y','post_id'=>$post_id));
+							$this->total_skipped_subs++;
 						}
+						elseif($subs[$_email]->status === 'R' && $_status === 'R') { // We're going to skip an `R` subscription in the next section because we already have one
+							$this->log_failure('Skipping this subscription', array('reason'=>'A Replies Only (R) subscription already exists for this Post ID; see http://bit.ly/1RqXCyD','email'=>$_email,'status'=>'R','post_id'=>$post_id));
+							$this->total_skipped_subs++;
+						}
+					}
+
+					// Note: This section might overwrite a previously found `Y` subscription, or skip an existing `Y` or `R` subscription
+					if(!isset($subs[$_email]) || ($_status === 'R' && $subs[$_email]->status === 'Y')) {
 						// Give precedence to any subscription that chose to receive "Replies Only".
 						// See: <https://github.com/websharks/comment-mail/issues/7#issuecomment-57252200>
 						$subs[$_email] = (object)array(
