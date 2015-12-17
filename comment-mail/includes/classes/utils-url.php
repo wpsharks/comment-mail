@@ -547,7 +547,7 @@ namespace comment_mail // Root namespace.
 			public function restore_default_options($scheme = 'admin')
 			{
 				$url  = $this->main_menu_page_nonce_only(__NAMESPACE__, $scheme);
-				$args = array(__NAMESPACE__ => array('restore_default_options' => '1'));
+				$args = array(__NAMESPACE__ => array('restore_default_options' => time()));
 
 				return add_query_arg(urlencode_deep($args), $url);
 			}
