@@ -59,7 +59,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var integer Total created subs.
 			 *
-			 * @since 141111 First documented version.
+			 * @since 15xxxx Improving StCR import count results
 			 */
 			protected $total_created_subs;
 
