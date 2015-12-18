@@ -227,7 +227,7 @@ namespace comment_mail // Root namespace.
 						$this->total_imported_subs++;
 						$this->total_created_subs++;
 					} else {
-						$this->log_failure('Failed to insert an All Comments (Y) subscription', $sub_insert_data);
+						$this->log_failure('Failed to insert an All Comments (Y) subscription', array_merge($sub_insert_data, $sub_inserter->errors()));
 						$this->total_skipped_subs++;
 					}
 				}
@@ -263,13 +263,13 @@ namespace comment_mail // Root namespace.
 							if ($_sub_inserter->did_insert()) {
 								$this->total_created_subs++;
 							} else {
-								$this->log_failure('Failed to import Replies Only (R) subscription (email address blacklisted?)', $_sub_insert_data);
+								$this->log_failure('Failed to import Replies Only (R) subscription', array_merge($_sub_insert_data, $_sub_inserter->errors()));
 								$this->total_skipped_subs++;
 								$this->total_imported_subs--; // Imported subs are counted outside this foreach loop, so we need to decrease here when we have a failure.
 							}
 						}
 					} else { // No comments associated with $sub->email were found for $post_id
-						$this->log_failure('Failed to import Replies Only (R) subscription', array('reason'=>'Associated comment has been deleted, trashed, or marked as spam', 'post_id'=>$post_id, 'email'=>$sub->email));
+						$this->log_failure('Failed to import Replies Only (R) subscription', array('note'=>'Associated comment has been deleted, trashed, or marked as spam', 'post_id'=>$post_id, 'email'=>$sub->email));
 						$this->total_skipped_subs++;
 					}
 					unset($_comment_id, $_sub_insert_data, $_sub_inserter, $_sub_comment_ids); // Housekeeping.
@@ -360,11 +360,11 @@ namespace comment_mail // Root namespace.
 
 					if (isset($subs[$_email])) { // Only when we've already found a subscription for this email in a previous iteration; this if-block MUST come before the next section
 						if ($subs[$_email]->status === 'Y' && $_status === 'R') { // We're going to overwrite a `Y` subscription with an `R` subscription in the next section
-							$this->log_failure('Skipping this subscription', array('reason'=>'A Replies Only (R) subscription already exists for this Post ID; see http://bit.ly/1RqXCyD','email'=>$_email,'status'=>'Y','post_id'=>$post_id));
+							$this->log_failure('Skipping this subscription', array('note'=>'A Replies Only (R) subscription already exists for this Post ID; see http://bit.ly/1RqXCyD','email'=>$_email,'status'=>'Y','post_id'=>$post_id));
 							$this->total_skipped_subs++;
 						}
 						elseif($subs[$_email]->status === 'R' && $_status === 'R') { // We're going to skip an `R` subscription in the next section because we already have one
-							$this->log_failure('Skipping this subscription', array('reason'=>'A Replies Only (R) subscription already exists for this Post ID; see http://bit.ly/1RqXCyD','email'=>$_email,'status'=>'R','post_id'=>$post_id));
+							$this->log_failure('Skipping this subscription', array('note'=>'A Replies Only (R) subscription already exists for this Post ID; see http://bit.ly/1RqXCyD','email'=>$_email,'status'=>'R','post_id'=>$post_id));
 							$this->total_skipped_subs++;
 						}
 					}
