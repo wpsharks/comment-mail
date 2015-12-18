@@ -1849,7 +1849,7 @@ namespace comment_mail {
 				$args['transient']      = (boolean)$args['transient'];
 				$args['push_to_top']    = (boolean)$args['push_to_top'];
 
-				if(!in_array($args['type'], array('notice', 'error'), TRUE))
+				if(!in_array($args['type'], array('notice', 'error', 'warning'), TRUE))
 					$args['type'] = 'notice'; // Use default type.
 
 				ksort($args); // Sort args (by key) for key generation.
@@ -1895,6 +1895,19 @@ namespace comment_mail {
 			}
 
 			/**
+			 * Enqueue an administrative warning.
+			 *
+			 * @since 15xxxx Improving notices.
+			 *
+			 * @param string $markup HTML markup. See {@link enqueue_notice()}.
+			 * @param array  $args Additional args. See {@link enqueue_notice()}.
+			 */
+			public function enqueue_warning($markup, array $args = array())
+			{
+				$this->enqueue_notice($markup, array_merge($args, array('type' => 'warning')));
+			}
+
+			/**
 			 * Enqueue an administrative error; for a particular user.
 			 *
 			 * @since 141111 First documented version.
@@ -1920,7 +1933,7 @@ namespace comment_mail {
 			public function all_admin_notices()
 			{
 				if (!$this->options['enable']) {
-				  $this->enqueue_error(sprintf(__('<strong>%1$s is disabled. Please visit the <a href="%2$s">settings</a> and enable the plugin</strong>.', $this->text_domain), esc_html($this->name), esc_attr($this->utils_url->main_menu_page_only())));
+				  $this->enqueue_warning(sprintf(__('<strong>%1$s is disabled. Please visit the <a href="%2$s">settings</a> and enable the plugin</strong>.', $this->text_domain), esc_html($this->name), esc_attr($this->utils_url->main_menu_page_only())));
 				}
 
 				if(!is_array($notices = get_option(__NAMESPACE__.'_notices')))
@@ -1963,7 +1976,7 @@ namespace comment_mail {
 					$_args['transient']      = (boolean)$_args['transient'];
 					$_args['push_to_top']    = (boolean)$_args['push_to_top'];
 
-					if(!in_array($_args['type'], array('notice', 'error'), TRUE))
+					if(!in_array($_args['type'], array('notice', 'error', 'warning'), TRUE))
 						$_args['type'] = 'notice'; // Use default type.
 
 					if($_args['transient']) // Transient; i.e. single pass only?
@@ -1999,7 +2012,17 @@ namespace comment_mail {
 						else $_dismiss = ''; // Default value; n/a.
 
 						$_classes = $this->slug.'-menu-page-area'; // Always.
-						$_classes .= ' '.($_args['type'] === 'error' ? 'error' : 'updated');
+						switch($_args['type']) {
+							case 'error':
+								$_classes .= ' error'; // Red error
+								break;
+							case 'warning': // This is called 'warning' because the term 'notice' was already used throughout the codebase
+								$_classes .= ' notice notice-warning'; // Yellow warning notice
+								break;
+							case 'updated':
+							default:
+								$_classes .= ' updated'; // Green informational notice
+						}
 
 						$_full_markup = // Put together the full markup; including other pieces.
 							'<div class="'.esc_attr($_classes).'">'.
