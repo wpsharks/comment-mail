@@ -57,6 +57,20 @@ namespace comment_mail // Root namespace.
 			protected $total_imported_subs;
 
 			/**
+			 * @var integer Total created subs.
+			 *
+			 * @since 15xxxx Improving StCR import count results
+			 */
+			protected $total_created_subs;
+
+			/**
+			 * @var integer Total skipped subscriptions during import.
+			 *
+			 * @since 15xxxx Improving StCR import count results
+			 */
+			protected $total_skipped_subs;
+
+			/**
 			 * @var boolean Has more posts to import?
 			 *
 			 * @since 141111 First documented version.
@@ -99,7 +113,7 @@ namespace comment_mail // Root namespace.
 					$this->unimported_post_ids      = array_slice($this->unimported_post_ids, 0, $this->max_post_ids_limit);
 				}
 				$this->imported_post_ids       = array(); // Initialize.
-				$this->total_imported_post_ids = $this->total_imported_subs = 0;
+				$this->total_imported_post_ids = $this->total_imported_subs = $this->total_created_subs = $this->total_skipped_subs = 0;
 
 				$this->maybe_import(); // Handle importation.
 			}
@@ -161,11 +175,14 @@ namespace comment_mail // Root namespace.
 				if(!($post_id = (integer)$post_id))
 					return; // Not possible.
 
-				if(!($stcr_subs = $this->stcr_subs_for_post($post_id)))
+				if(!($stcr_subs = $this->stcr_subs_for_post($post_id))) {
+					$this->log_failure('Failed to insert subscriptions for Post; no StCR subscribers found', array('post_id'=>$post_id));
 					return; // No StCR subscribers.
+				}
 
-				foreach($stcr_subs as $_email => $_sub)
+				foreach($stcr_subs as $_email => $_sub) {
 					$this->maybe_import_sub($post_id, $_sub);
+				}
 				unset($_email, $_sub); // Housekeeping.
 			}
 
@@ -182,48 +199,80 @@ namespace comment_mail // Root namespace.
 				if(!($post_id = (integer)$post_id))
 					return; // Not possible.
 
-				if(empty($sub->email) || empty($sub->time) || empty($sub->status))
+				if(empty($sub->email) || empty($sub->time) || empty($sub->status)){
+					$this->log_failure('Not importing subscription; data missing', $sub);
 					return; // Not possible; data missing.
+				}
 
-				if($sub->status !== 'Y' && $sub->status !== 'R')
+				if($sub->status !== 'Y' && $sub->status !== 'R') {
+					$this->log_failure('Not importing subscription; not an active subscriber', $sub);
 					return; // Not an active subscriber.
+				}
 
 				if($sub->status === 'Y') // All comments?
 				{
 					$sub_insert_data = array(
-						'post_id'        => $post_id,
+					'post_id'        => $post_id,
 
-						'status'         => 'subscribed',
-						'deliver'        => 'asap',
+					'status'         => 'subscribed',
+					'deliver'        => 'asap',
 
-						'fname'          => $sub->fname,
-						'email'          => $sub->email,
+					'fname'          => $sub->fname,
+					'email'          => $sub->email,
 
-						'insertion_time' => $sub->time,
+					'insertion_time' => $sub->time,
 					);
 					$sub_inserter    = new sub_inserter($sub_insert_data);
-					if($sub_inserter->did_insert()) $this->total_imported_subs++;
+					if($sub_inserter->did_insert()){
+						$this->total_imported_subs++;
+						$this->total_created_subs++;
+					} else {
+						$this->log_failure('Failed to insert an All Comments (Y) subscription', array_merge($sub_insert_data, $sub_inserter->errors()));
+						$this->total_skipped_subs++;
+					}
 				}
 				else # Otherwise, specific comment(s) only; i.e. "Replies Only".
 				{
-					foreach($this->sub_comment_ids($post_id, $sub->email) as $_comment_id)
-					{
-						$_sub_insert_data = array(
-							'post_id'        => $post_id,
-							'comment_id'     => $_comment_id,
+					$_sub_comment_ids = $this->sub_comment_ids($post_id, $sub->email);
 
-							'status'         => 'subscribed',
-							'deliver'        => 'asap',
+					if(!empty($_sub_comment_ids)) {
+						/*
+						 * This is where the behavior of Comment Mail and StCR diverge when it comes to how they store subscriptions.
+						 * StCR only stores one (1) `R` subscription per email per Post ID, while Comment Mail creates a Replies Only subscription
+						 * for each comment the user has posted on a given Post ID. That means the Total StCR Subscriptions imported will
+						 * likely be much lower than the total subscriptions created by Comment Mail. See also: http://bit.ly/1QtwEWO
+						 *
+						 * Note how we count imported subs outside of this foreach loop, but we count created subs inside the foreach loop.
+						 */
+						$this->total_imported_subs++;
 
-							'fname'          => $sub->fname,
-							'email'          => $sub->email,
+						foreach ($_sub_comment_ids as $_comment_id) {
+							$_sub_insert_data = array(
+							'post_id'    => $post_id,
+							'comment_id' => $_comment_id,
+
+							'status'  => 'subscribed',
+							'deliver' => 'asap',
+
+							'fname' => $sub->fname,
+							'email' => $sub->email,
 
 							'insertion_time' => $sub->time,
-						);
-						$_sub_inserter    = new sub_inserter($_sub_insert_data);
-						if($_sub_inserter->did_insert()) $this->total_imported_subs++;
+							);
+							$_sub_inserter    = new sub_inserter($_sub_insert_data);
+							if ($_sub_inserter->did_insert()) {
+								$this->total_created_subs++;
+							} else {
+								$this->log_failure('Failed to import Replies Only (R) subscription', array_merge($_sub_insert_data, $_sub_inserter->errors()));
+								$this->total_skipped_subs++;
+								$this->total_imported_subs--; // Imported subs are counted outside this foreach loop, so we need to decrease here when we have a failure.
+							}
+						}
+					} else { // No comments associated with $sub->email were found for $post_id
+						$this->log_failure('Failed to import Replies Only (R) subscription', array('note'=>'Associated comment has been deleted, trashed, or marked as spam', 'post_id'=>$post_id, 'email'=>$sub->email));
+						$this->total_skipped_subs++;
 					}
-					unset($_comment_id, $_sub_insert_data, $_sub_inserter); // Housekeeping.
+					unset($_comment_id, $_sub_insert_data, $_sub_inserter, $_sub_comment_ids); // Housekeeping.
 				}
 			}
 
@@ -259,8 +308,10 @@ namespace comment_mail // Root namespace.
 				       " WHERE `post_id` = '".esc_sql($post_id)."'".
 				       " AND `meta_key` LIKE '%\\_stcr@\\_%'";
 
-				if(!($results = $this->plugin->utils_db->wp->get_results($sql)))
+				if(!($results = $this->plugin->utils_db->wp->get_results($sql))) {
+					$this->log_failure('No subscriptions for this Post ID', array('post_id'=>$post_id));
 					return array(); // Nothing to do; no results.
+				}
 
 				$subs = array(); // Initialize array of subscribers.
 
@@ -270,33 +321,63 @@ namespace comment_mail // Root namespace.
 					$_email = preg_replace('/^.*?_stcr@_/i', '', $_result->meta_key);
 					$_email = trim(strtolower($_email));
 
-					if(!$_email || strpos($_email, '@', 1) === FALSE || !is_email($_email))
+					if(!$_email || strpos($_email, '@', 1) === FALSE || !is_email($_email)) {
+						$this->log_failure('Invalid Email Address', array('email'=>$_email,$this->plugin->utils_db->wp->postmeta.'.meta_id'=>$_result->meta_id,'post_id'=>$post_id));
+						$this->total_skipped_subs++;
 						continue; // Invalid email address.
+					}
 
 					// Original format: `2013-03-11 01:31:01|R`.
-					if(!$_result->meta_value || strpos($_result->meta_value, '|', 1) === FALSE)
+					if(!$_result->meta_value || strpos($_result->meta_value, '|', 1) === FALSE){
+						$this->log_failure('Invalid meta data', array('email'=>$_email,'meta_value'=>$_result->meta_value,$this->plugin->utils_db->wp->postmeta.'.meta_id'=>$_result->meta_id,'post_id'=>$post_id));
+						$this->total_skipped_subs++;
 						continue; // Invalid meta data.
+					}
 
 					list($_local_datetime, $_status) = explode('|', $_result->meta_value);
 
-					if(!($_time = strtotime($_local_datetime)))
+					if(!($_time = strtotime($_local_datetime))) {
+						$this->log_failure('Date not strtotime() compatible', array('email'=>$_email,'date'=>$_local_datetime, $this->plugin->utils_db->wp->postmeta.'.meta_id'=>$_result->meta_id,'post_id'=>$post_id));
+						$this->total_skipped_subs++;
 						continue; // Not `strtotime()` compatible.
+					}
 
-					if(($_time = $_time + (get_option('gmt_offset') * 3600)) < 1)
+					if(($_time = $_time + (get_option('gmt_offset') * 3600)) < 1){
+						$this->log_failure('Unable to convert date to UTC timestamp', array('email'=>$_email,'date'=>$_time, $this->plugin->utils_db->wp->postmeta.'.meta_id'=>$_result->meta_id,'post_id'=>$post_id));
+						$this->total_skipped_subs++;
 						continue; // Unable to convert date to UTC timestamp.
+					}
 
 					// Possible statuses: `Y|R|YC|RC|C|-C`.
 					// A `Y` indicates they want notifications for all comments.
 					// An `R` indicates they want notifications for replies only.
 					// A `C` indicates "suspended" or "unconfirmed".
-					if($_status !== 'Y' && $_status !== 'R') // Active?
+					if($_status !== 'Y' && $_status !== 'R') {// Active?
+						$this->log_failure('Ignoring this subscription; not an active status (Y or R)', array('email'=>$_email,'status'=>$_status,$this->plugin->utils_db->wp->postmeta.'.meta_id'=>$_result->meta_id,'post_id'=>$post_id));
+						$this->total_skipped_subs++;
 						continue; // Not an active subscriber.
+					}
 
-					if(!isset($subs[$_email]) || ($_status === 'R' && $subs[$_email]->status === 'Y'))
+					if (isset($subs[$_email])) { // Only when we've already found a subscription for this email in a previous iteration; this if-block MUST come before the next section
+						if ($subs[$_email]->status === 'Y' && $_status === 'R') { // We're going to overwrite a `Y` subscription with an `R` subscription in the next section
+							$this->log_failure('Skipping this subscription', array('note'=>'A Replies Only (R) subscription already exists for this Post ID; see http://bit.ly/1RqXCyD','email'=>$_email,'status'=>'Y','post_id'=>$post_id));
+							$this->total_skipped_subs++;
+						}
+						elseif($subs[$_email]->status === 'R' && $_status === 'R') { // We're going to skip an `R` subscription in the next section because we already have one
+							$this->log_failure('Skipping this subscription', array('note'=>'A Replies Only (R) subscription already exists for this Post ID; see http://bit.ly/1RqXCyD','email'=>$_email,'status'=>'R','post_id'=>$post_id));
+							$this->total_skipped_subs++;
+						}
+					}
+
+					// Note: This section might overwrite a previously found `Y` subscription, or skip an existing `Y` or `R` subscription
+					if(!isset($subs[$_email]) || ($_status === 'R' && $subs[$_email]->status === 'Y')) {
 						// Give precedence to any subscription that chose to receive "Replies Only".
 						// See: <https://github.com/websharks/comment-mail/issues/7#issuecomment-57252200>
-						$subs[$_email] = (object)array('fname' => $this->plugin->utils_string->first_name('', $_email),
-						                               'email' => $_email, 'time' => $_time, 'status' => $_status);
+						$subs[$_email] = (object)array(
+						'fname' => $this->plugin->utils_string->first_name('', $_email),
+						'email' => $_email, 'time' => $_time, 'status' => $_status
+						);
+					}
 				}
 				unset($_result, $_email, $_local_datetime, $_status); // Housekeeping.
 
@@ -317,8 +398,10 @@ namespace comment_mail // Root namespace.
 			{
 				$comment_ids = array(); // Initialize.
 
-				if(!($post_id = (integer)$post_id) || !($email = (string)$email))
+				if(!($post_id = (integer)$post_id) || !($email = (string)$email)) {
+					$this->log_failure('Can\'t get subscriber\'s comment IDs', array('post_id'=>$post_id, 'email'=>$email));
 					return $comment_ids; // Not possible; data missing.
+				}
 
 				$sql = "SELECT `comment_ID` FROM  `".esc_sql($this->plugin->utils_db->wp->comments)."`".
 
@@ -428,16 +511,22 @@ namespace comment_mail // Root namespace.
 				           '      </script>'."\n";
 
 				$status .= '      <script type="text/javascript">'."\n";
-				$status .= '         function updateCounters(childTotalPostIds, childTotalSubs)'."\n".
+				$status .= '         function updateCounters(childTotalPostIds, childTotalSubs, childTotalSkippedSubs, childTotalCreatedSubs)'."\n".
 				           '            {'."\n".
 				           '               var $totalImportedPostIds = $("#total-imported-post-ids");'."\n".
 				           '               var $totalImportedSubs = $("#total-imported-subs");'."\n".
+				           '               var $totalSkippedSubs = $("#total-skipped-subs");'."\n".
+						   '               var $totalCreatedSubs = $("#total-created-subs");'."\n".
 
 				           '               $totalImportedPostIds.html(Number($totalImportedPostIds.text()) + Number(childTotalPostIds));'."\n".
 				           '               $totalImportedSubs.html(Number($totalImportedSubs.text()) + Number(childTotalSubs));'."\n".
+				           '               $totalSkippedSubs.html(Number($totalSkippedSubs.text()) + Number(childTotalSkippedSubs));'."\n".
+						   '               $totalCreatedSubs.html(Number($totalCreatedSubs.text()) + Number(childTotalCreatedSubs));'."\n".
 				           '            }'."\n";
-				$status .= '         function importComplete()'."\n".
+				$status .= '         function importComplete(additionalSkippedSubs)'."\n".
 				           '            {'."\n".
+						   '               var $totalSkippedSubs = $("#total-skipped-subs");'."\n".
+						   '               $totalSkippedSubs.html(Number($totalSkippedSubs.text()) + Number(additionalSkippedSubs));'."\n".
 				           '               $("#importing").remove();'."\n". // Removing importing div/animation.
 				           '               $("body").append("<div>'.sprintf(__('<strong>Import complete!<strong> (<a href=\'%1$s\' target=\'_parent\'>view list of all subscriptions</a>)', $this->plugin->text_domain), esc_attr($this->plugin->utils_url->subs_menu_page_only())).'</div>");'."\n".
 				           '            }'."\n";
@@ -455,7 +544,9 @@ namespace comment_mail // Root namespace.
 					           '   </div>'."\n";
 
 				$status .= '      <code id="total-imported-post-ids">'.esc_html($this->total_imported_post_ids).'</code> '.__('post IDs', $this->plugin->text_domain).';'.
-				           '      <code id="total-imported-subs">'.esc_html($this->total_imported_subs).'</code> '.__('subscriptions', $this->plugin->text_domain).'.'."\n";
+				           '      <code id="total-imported-subs">'.esc_html($this->total_imported_subs).'</code> '.__('subscriptions', $this->plugin->text_domain).
+				           '      (<code id="total-skipped-subs">'.esc_html($this->total_skipped_subs).'</code> '.__('skipped', $this->plugin->text_domain).';'.
+				           '      <code id="total-created-subs">'.esc_html($this->total_created_subs).'</code> '.__('created', $this->plugin->text_domain).').'."\n";
 
 				if($this->has_more_posts_to_import) // Import will contiue w/ child processes?
 					$status .= '   <iframe src="'.esc_attr((string)$child_status_url).'" style="width:1px; height:1px; border:0; visibility:hidden;"></iframe>';
@@ -486,7 +577,7 @@ namespace comment_mail // Root namespace.
 				$status .= '      <meta charset="UTF-8" />'."\n";
 
 				$status .= '      <script type="text/javascript">'."\n";
-				$status .= '         parent.updateCounters('.$this->total_imported_post_ids.', '.$this->total_imported_subs.');'."\n";
+				$status .= '         parent.updateCounters('.$this->total_imported_post_ids.', '.$this->total_imported_subs.', '.$this->total_skipped_subs.', '.$this->total_created_subs.');'."\n";
 				$status .= '      </script>'."\n";
 
 				if($this->has_more_posts_to_import)
@@ -495,7 +586,7 @@ namespace comment_mail // Root namespace.
 				else // Import complete; signal the parent output status window.
 				{
 					$status .= '   <script type="text/javascript">'."\n";
-					$status .= '      parent.importComplete();'."\n";
+					$status .= '      parent.importComplete('.$this->total_subs_with_invalid_post_ids().');'."\n";
 					$status .= '   </script>'."\n";
 				}
 				$status .= '   </head>'."\n"; // End `<head>`.
@@ -555,13 +646,63 @@ namespace comment_mail // Root namespace.
 				$plugin = plugin(); // Need this below.
 
 				$like = // e.g. Delete all keys LIKE `%comment\_mail%`.
-					'%'.$plugin->plugin->utils_db->wp->esc_like(__NAMESPACE__.'_imported_stcr_subs').'%';
+					'%'.$plugin->utils_db->wp->esc_like(__NAMESPACE__.'_imported_stcr_subs').'%';
 
 				$sql = // This will remove our StCR import history also.
-					"DELETE FROM `".esc_sql($plugin->plugin->utils_db->wp->postmeta)."`".
+					"DELETE FROM `".esc_sql($plugin->utils_db->wp->postmeta)."`".
 					" WHERE `meta_key` LIKE '".esc_sql($like)."'";
 
-				$plugin->plugin->utils_db->wp->query($sql);
+				$plugin->utils_db->wp->query($sql);
+			}
+
+			/**
+			 * Count StCR subscriptions that belong to Post IDs that no longer exist or are no longer published
+			 *
+			 * @since 15xxxx Improving StCR import count results
+			 *
+			 * @return int Number of subscriptions the importer will skip due to non-existent Post IDs
+			 *
+			 * @note This routine is used to update the total number of skipped subscriptions, as the import routine only processes subscriptions for posts that exist.
+			 */
+
+			protected function total_subs_with_invalid_post_ids()
+			{
+				$valid_post_ids = // All valid Post IDs
+				"SELECT DISTINCT `ID` FROM `".esc_sql($this->plugin->utils_db->wp->posts)."`";
+
+				$sql = "SELECT COUNT(*) as `count` FROM `".esc_sql($this->plugin->utils_db->wp->postmeta)."`".
+					   " WHERE `meta_key` LIKE '%\\_stcr@\\_%'".
+					   " AND `post_id` NOT IN (".$valid_post_ids.")"; // StCR subs that belong to invalid Post IDs
+
+				return (int)$this->plugin->utils_db->wp->get_var($sql);
+			}
+
+			/**
+			 * Log StCR import failures.
+			 *
+			 * @since 15xxxx Improving StCR import debugging.
+			 *
+			 * @param string $msg     Description of import failure
+			 *
+			 * @param array  $details Array of key => value pairs with additional information to be logged
+			 *
+			 * @throws \Exception If log file exists already; but is NOT writable.
+			 */
+			protected function log_failure($msg, $details = array())
+			{
+				$log_file = dirname(dirname(plugin_dir_path(__FILE__))).'/stcr-import-failures.log';
+
+				if (is_file($log_file) && !is_writable($log_file)) {
+					throw new \Exception(sprintf(__('StCR import log file is NOT writable: `%1$s`. Please set permissions to `644` (or higher). `666` might be needed in some cases.', $this->plugin->text_domain), $log_file));
+				}
+
+				$log_entry = $msg."\n";
+				foreach ($details as $key => $val) {
+					$log_entry .= $key.': '.$val."\n";
+				}
+				$log_entry .= "\n";
+
+				file_put_contents($log_file, $log_entry, FILE_APPEND);
 			}
 		}
 	}
