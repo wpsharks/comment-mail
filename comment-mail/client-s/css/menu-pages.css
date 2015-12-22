@@ -1,6 +1,23 @@
 /* ------------------------------------------------------------------------------------------------------------
 	Plugin-specific styles for any menu page area of the dashboard.
 ------------------------------------------------------------------------------------------------------------ */
+@font-face {
+	font-family : sharkicons;
+	src         : url("../../submodules/sharkicons/src/fonts/sharkicons.eot");
+	src         : url("../../submodules/sharkicons/src/fonts/sharkicons.eot?#iefix") format("embedded-opentype"), url("../../submodules/sharkicons/src/fonts/sharkicons.ttf") format("truetype"), url("../../submodules/sharkicons/src/fonts/sharkicons.woff") format("woff"), url("../../submodules/sharkicons/src/fonts/sharkicons.svg#sharkicons") format("svg");
+	font-weight : normal;
+	font-style  : normal
+}
+.si::before {
+	font                   : normal normal normal 14px/1 sharkicons;
+	text-rendering         : optimizeLegibility;
+	-webkit-font-smoothing : antialiased;
+	font-smoothing         : antialiased;
+	display                : inline-block;
+	font-size              : inherit;
+	text-decoration        : inherit;
+	text-transform         : none
+}
 /*
 A menu page area ~ notifications.
 */
@@ -129,7 +146,7 @@ A menu page area ~ post com/sub bubbles.
 {
 	text-rendering         : auto;
 	font-weight            : normal;
-	content                : '\e000';
+	content                : '\e002';
 	color                  : #5A5A5A;
 	font-family            : sharkicons;
 	-webkit-font-smoothing : antialiased;

@@ -210,7 +210,7 @@ namespace comment_mail // Root namespace.
 					'email_style'  => 'font-weight:normal;',
 				);
 				$name            = $item->fname.' '.$item->lname; // Concatenate.
-				$email_info      = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
+				$email_info      = '<i class="'.esc_attr('si si-'.$this->plugin->slug.'-one').'"></i>'.
 				                   ' '.$this->plugin->utils_markup->name_email($name, $item->email, $name_email_args);
 
 				$edit_url      = $this->plugin->utils_url->edit_sub_short($item->ID);

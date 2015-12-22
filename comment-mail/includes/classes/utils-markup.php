@@ -230,7 +230,7 @@ namespace comment_mail // Root namespace.
 					if($show_lname) $_name_maybe .= ' '.$_sub->lname;
 
 					$last_x_email_lis[] = '<li>'. // Display varies based on arguments.
-					                      ' <i class="'.esc_attr('wsi-'.$this->plugin->slug).'"></i> '.
+					                      ' <i class="'.esc_attr('si si-'.$this->plugin->slug).'"></i> '.
 					                      $this->name_email($_name_maybe, $_sub->email, $name_email_args).'</a>'.
 					                      '</li>';
 				}
@@ -844,7 +844,7 @@ namespace comment_mail // Root namespace.
 				$icon_prefix          = (boolean)$args['icon_prefix'];
 				$for_wordpress_suffix = (boolean)$args['for_wordpress_suffix'];
 
-				$icon   = '<i class="'.esc_attr('wsi-'.$this->plugin->slug).'"></i>';
+				$icon   = '<i class="'.esc_attr('si si-'.$this->plugin->slug).'"></i>';
 				$anchor = '<a href="'.esc_attr($anchor_to).'" target="'.esc_attr($anchor_target).'" style="'.esc_attr($anchor_style).'">'.
 				          ($icon_prefix ? $icon.' ' : '').esc_html($this->plugin->name).'&trade;'.
 				          '</a>';
