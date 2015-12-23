@@ -2025,7 +2025,7 @@ namespace comment_mail {
 						}
 
 						$_full_markup = // Put together the full markup; including other pieces.
-							'<div class="'.esc_attr($_classes).'">'.
+							'<div class="'.esc_attr($_classes).'" style="clear: both;">'. // clear:both needed to fix StCR options page clash; see http://bit.ly/1V83vQl
 							'  '.$this->utils_string->p_wrap($_args['markup'], $_dismiss).
 							'</div>';
 						echo apply_filters(__METHOD__.'_notice', $_full_markup, get_defined_vars());
