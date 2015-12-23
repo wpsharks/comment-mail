@@ -283,10 +283,10 @@ namespace comment_mail // Root namespace.
 						if($item->oby_sub_id && !empty($this->merged_result_sets['subs'][$item->oby_sub_id]))
 						{
 							$edit_url     = $this->plugin->utils_url->edit_sub_short($item->oby_sub_id);
-							$oby_sub_info = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
+							$oby_sub_info = '<i class="'.esc_attr('si si-'.$this->plugin->slug.'-one').'"></i>'.
 							                ' <span>ID <a href="'.esc_attr($edit_url).'" title="'.esc_attr($item->oby_sub_key).'">#'.esc_html($item->oby_sub_id).'</a></span>';
 						}
-						else $oby_sub_info = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
+						else $oby_sub_info = '<i class="'.esc_attr('si si-'.$this->plugin->slug.'-one').'"></i>'.
 						                     ' <span>ID #'.esc_html($item->oby_sub_id).'</span>';
 
 						return esc_html($event_label).' '.$this->plugin->utils_event->sub_overwritten_q_link($item).'<br />'.

@@ -454,7 +454,7 @@ namespace comment_mail // Root namespace.
 				if(!$item->{$key})
 					return '—'; // Not possible.
 
-				$id_only = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
+				$id_only = '<i class="'.esc_attr('si si-'.$this->plugin->slug.'-one').'"></i>'.
 				           ' <span style="font-weight:bold;">ID #'.esc_html($item->{$key}).'</span>';
 
 				if(empty($this->merged_result_sets['subs'][$item->{$key}]))
@@ -467,7 +467,7 @@ namespace comment_mail // Root namespace.
 					'email_style' => 'font-weight:normal;',
 				);
 				$name            = $item->{$prefix.'fname'}.' '.$item->{$prefix.'lname'};
-				$sub_info        = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
+				$sub_info        = '<i class="'.esc_attr('si si-'.$this->plugin->slug.'-one').'"></i>'.
 				                   ' '.$this->plugin->utils_markup->name_email($name, $item->{$prefix.'email'}, $name_email_args);
 
 				$edit_url = $this->plugin->utils_url->edit_sub_short($item->{$key});
@@ -1939,7 +1939,7 @@ namespace comment_mail // Root namespace.
 					$_sub_edit_link   = $this->plugin->utils_url->edit_sub_short($_sub->ID);
 
 					$sub_lis[$_sub->ID] = '<li>'. // [icon] ID "Name" <email> [edit].
-					                      '<i class="'.esc_attr('wsi-'.$this->plugin->slug).'"></i>'.
+					                      '<i class="'.esc_attr('si si-'.$this->plugin->slug).'"></i>'.
 					                      ' '.$this->plugin->utils_markup->name_email($_sub_name, $_sub->email, $_name_email_args).
 					                      ($_sub_edit_link // Only if they can edit the subscription ID; else this will be empty.
 						                      ? ' [<a href="'.esc_attr($_sub_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
