@@ -399,7 +399,8 @@ A menu page area ~ utilities.
 Align w/ menu page.
 */
 body[class*='comment_mail'] #wpbody-content > div.updated,
-body[class*='comment_mail'] #wpbody-content > div.error
+body[class*='comment_mail'] #wpbody-content > div.error,
+body[class*='comment_mail'] #wpbody-content > div.notice-warning
 {
 	margin : 1.25em 1.25em 1.25em .25em;
 }
