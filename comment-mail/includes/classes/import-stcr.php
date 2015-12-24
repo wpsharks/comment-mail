@@ -59,14 +59,14 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var integer Total created subs.
 			 *
-			 * @since 15xxxx Improving StCR import count results
+			 * @since 151224 Improving StCR import count results
 			 */
 			protected $total_created_subs;
 
 			/**
 			 * @var integer Total skipped subscriptions during import.
 			 *
-			 * @since 15xxxx Improving StCR import count results
+			 * @since 151224 Improving StCR import count results
 			 */
 			protected $total_skipped_subs;
 
@@ -498,7 +498,7 @@ namespace comment_mail // Root namespace.
 				$status .= '   <head>'."\n";
 
 				$status .= '      <meta charset="UTF-8" />'."\n";
-				$status .= '      <title>'.esc_html(__('StCR Importer', $this->plugin->text_domain)).'</title>'."\n";
+				$status .= '      <title>'.esc_html(__('StCR Importer', 'comment-mail')).'</title>'."\n";
 
 				$status .= '      <style type="text/css">'."\n";
 				$status .= '         body { background: #CCCCCC; color: #000000; }'."\n";
@@ -528,7 +528,7 @@ namespace comment_mail // Root namespace.
 						   '               var $totalSkippedSubs = $("#total-skipped-subs");'."\n".
 						   '               $totalSkippedSubs.html(Number($totalSkippedSubs.text()) + Number(additionalSkippedSubs));'."\n".
 				           '               $("#importing").remove();'."\n". // Removing importing div/animation.
-				           '               $("body").append("<div>'.sprintf(__('<strong>Import complete!<strong> (<a href=\'%1$s\' target=\'_parent\'>view list of all subscriptions</a>)', $this->plugin->text_domain), esc_attr($this->plugin->utils_url->subs_menu_page_only())).'</div>");'."\n".
+				           '               $("body").append("<div>'.sprintf(__('<strong>Import complete!<strong> (<a href=\'%1$s\' target=\'_parent\'>view list of all subscriptions</a>)', 'comment-mail'), esc_attr($this->plugin->utils_url->subs_menu_page_only())).'</div>");'."\n".
 				           '            }'."\n";
 				$status .= '      </script>'."\n";
 
@@ -538,19 +538,19 @@ namespace comment_mail // Root namespace.
 
 				if($this->has_more_posts_to_import) // Import will contiue w/ child processes?
 					$status .= '   <div id="importing">'.
-					           '      <strong>'.__('Importing StCR Subscribers', $this->plugin->text_domain).'</strong>'.
+					           '      <strong>'.__('Importing StCR Subscribers', 'comment-mail').'</strong>'.
 					           '       &nbsp;&nbsp; <img src="'.esc_html($this->plugin->utils_url->to('/client-s/images/tiny-progress-bar.gif')).'"'.
 					           '                        style="width:16px; height:11px; border:0; vertical-align:middle;" />'.
 					           '   </div>'."\n";
 
-				$status .= '      <code id="total-imported-post-ids">'.esc_html($this->total_imported_post_ids).'</code> '.__('post IDs', $this->plugin->text_domain).';'.
-				           '      <code id="total-imported-subs">'.esc_html($this->total_imported_subs).'</code> '.__('subscriptions', $this->plugin->text_domain).
-				           '      (<code id="total-skipped-subs">'.esc_html($this->total_skipped_subs).'</code> '.__('skipped', $this->plugin->text_domain).';'.
-				           '      <code id="total-created-subs">'.esc_html($this->total_created_subs).'</code> '.__('created', $this->plugin->text_domain).').'."\n";
+				$status .= '      <code id="total-imported-post-ids">'.esc_html($this->total_imported_post_ids).'</code> '.__('post IDs', 'comment-mail').';'.
+				           '      <code id="total-imported-subs">'.esc_html($this->total_imported_subs).'</code> '.__('subscriptions', 'comment-mail').
+				           '      (<code id="total-skipped-subs">'.esc_html($this->total_skipped_subs).'</code> '.__('skipped', 'comment-mail').';'.
+				           '      <code id="total-created-subs">'.esc_html($this->total_created_subs).'</code> '.__('created', 'comment-mail').').'."\n";
 
 				if($this->has_more_posts_to_import) // Import will contiue w/ child processes?
 					$status .= '   <iframe src="'.esc_attr((string)$child_status_url).'" style="width:1px; height:1px; border:0; visibility:hidden;"></iframe>';
-				else $status .= ' <div><strong>'.__('Import complete!', $this->plugin->text_domain).'</strong></div>';
+				else $status .= ' <div><strong>'.__('Import complete!', 'comment-mail').'</strong></div>';
 
 				$status .= '   </body>'."\n";
 
@@ -658,7 +658,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Count StCR subscriptions that belong to Post IDs that no longer exist or are no longer published
 			 *
-			 * @since 15xxxx Improving StCR import count results
+			 * @since 151224 Improving StCR import count results
 			 *
 			 * @return int Number of subscriptions the importer will skip due to non-existent Post IDs
 			 *
@@ -680,7 +680,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Log StCR import failures.
 			 *
-			 * @since 15xxxx Improving StCR import debugging.
+			 * @since 151224 Improving StCR import debugging.
 			 *
 			 * @param string $msg     Description of import failure
 			 *
@@ -693,7 +693,7 @@ namespace comment_mail // Root namespace.
 				$log_file = dirname(dirname(plugin_dir_path(__FILE__))).'/stcr-import-failures.log';
 
 				if (is_file($log_file) && !is_writable($log_file)) {
-					throw new \Exception(sprintf(__('StCR import log file is NOT writable: `%1$s`. Please set permissions to `644` (or higher). `666` might be needed in some cases.', $this->plugin->text_domain), $log_file));
+					throw new \Exception(sprintf(__('StCR import log file is NOT writable: `%1$s`. Please set permissions to `644` (or higher). `666` might be needed in some cases.', 'comment-mail'), $log_file));
 				}
 
 				$log_entry = $msg."\n";

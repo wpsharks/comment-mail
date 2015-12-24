@@ -57,8 +57,8 @@ namespace comment_mail;
  */
 ?>
 <?php // Sets document <title> tag via `%%title%%` replacement code in header.
-echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_domain)
-	: __('Add New Subscription', $plugin->text_domain), $site_header); ?>
+echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
+	: __('Add New Subscription', 'comment-mail'), $site_header); ?>
 
 	<div class="manage-sub-form">
 
@@ -69,7 +69,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 
 			<div class="alert alert-success" style="margin:0;">
 				<h4>
-					<?php echo __('Submission accepted; nice work!', $plugin->text_domain); ?>
+					<?php echo __('Submission accepted; nice work!', 'comment-mail'); ?>
 				</h4>
 				<ul class="list-unstyled">
 					<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
@@ -80,7 +80,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 				</ul>
 				<p style="margin-top:1em;">
 					<a href="<?php echo esc_attr($plugin->utils_url->sub_manage_summary_url($sub_key, NULL, TRUE)); ?>">
-						<i class="fa fa-arrow-circle-left"></i> <?php echo __('Back to My Subscriptions', $plugin->text_domain); ?>
+						<i class="fa fa-arrow-circle-left"></i> <?php echo __('Back to My Subscriptions', 'comment-mail'); ?>
 					</a>
 				</p>
 			</div>
@@ -89,7 +89,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 
 			<div class="alert alert-danger" style="margin:0;">
 				<h4>
-					<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
+					<?php echo __('Please review the following error(s):', 'comment-mail'); ?>
 				</h4>
 				<ul class="list-unstyled">
 					<?php foreach($error_codes as $_error_code): ?>
@@ -97,19 +97,19 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 							<i class="fa fa-warning fa-fw"></i> <?php switch($_error_code)
 							{
 								case 'missing_sub_key':
-									echo __('Subscription key is missing; unable to edit.', $plugin->text_domain);
+									echo __('Subscription key is missing; unable to edit.', 'comment-mail');
 									break; // Break switch handler.
 
 								case 'invalid_sub_key':
-									echo __('Invalid subscription key; unable to edit.', $plugin->text_domain);
+									echo __('Invalid subscription key; unable to edit.', 'comment-mail');
 									break; // Break switch handler.
 
 								case 'new_subs_disabled':
-									echo __('Sorry; not accepting new subscriptions at this time.', $plugin->text_domain);
+									echo __('Sorry; not accepting new subscriptions at this time.', 'comment-mail');
 									break; // Break switch handler.
 
 								default: // Anything else that is unexpected/unknown at this time.
-									echo __('Unknown error; unable to add/edit. Sorry!', $plugin->text_domain);
+									echo __('Unknown error; unable to add/edit. Sorry!', 'comment-mail');
 							} ?>
 						</li>
 					<?php endforeach; ?>
@@ -135,7 +135,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 
 				<div class="alert alert-danger">
 					<h4>
-						<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
+						<?php echo __('Please review the following error(s):', 'comment-mail'); ?>
 					</h4>
 					<ul class="list-unstyled">
 						<?php foreach($processing_errors_html as $_error_code => $_error_html): ?>
@@ -152,7 +152,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 
 				<div class="alert alert-success">
 					<h4>
-						<?php echo __('Submission accepted; nice work!', $plugin->text_domain); ?>
+						<?php echo __('Submission accepted; nice work!', 'comment-mail'); ?>
 					</h4>
 					<ul class="list-unstyled">
 						<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
@@ -163,7 +163,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 					</ul>
 					<p style="margin-top:1em;">
 						<a href="<?php echo esc_attr($sub_summary_return_url); ?>">
-							<i class="fa fa-arrow-circle-left"></i> <?php echo __('Back to My Subscriptions', $plugin->text_domain); ?>
+							<i class="fa fa-arrow-circle-left"></i> <?php echo __('Back to My Subscriptions', 'comment-mail'); ?>
 						</a>
 					</p>
 				</div>
@@ -171,13 +171,13 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 			<?php endif; ?>
 
 				<h2 style="margin-top:0;">
-					<a href="<?php echo esc_attr($sub_summary_return_url); ?>" title="<?php echo __('Back to My Subscriptions', $plugin->text_domain); ?>">
+					<a href="<?php echo esc_attr($sub_summary_return_url); ?>" title="<?php echo __('Back to My Subscriptions', 'comment-mail'); ?>">
 						<i class="fa fa-arrow-circle-left pull-right"></i>
 					</a>
 					<?php if($is_edit): ?>
-						<?php echo __('Edit Subscription', $plugin->text_domain); ?>
+						<?php echo __('Edit Subscription', 'comment-mail'); ?>
 					<?php else: // Creating a new subscription. ?>
-						<?php echo __('Add New Subscription', $plugin->text_domain); ?>
+						<?php echo __('Add New Subscription', 'comment-mail'); ?>
 					<?php endif; ?>
 				</h2>
 
@@ -190,19 +190,19 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 					<?php if(!$is_edit): ?>
 						<?php echo $form_fields->select_row(
 							array(
-								'placeholder'         => __('Select a Post...', $plugin->text_domain),
-								'label'               => __('<i class="fa fa-fw fa-thumb-tack"></i> Post', $plugin->text_domain),
+								'placeholder'         => __('Select a Post...', 'comment-mail'),
+								'label'               => __('<i class="fa fa-fw fa-thumb-tack"></i> Post', 'comment-mail'),
 								'name'                => 'post_id', 'required' => TRUE, 'options' => '%%posts%%', 'current_value' => $current_value_for('post_id'),
-								'notes_after'         => __('Required; the Post you\'re subscribing to.', $plugin->text_domain),
+								'notes_after'         => __('Required; the Post you\'re subscribing to.', 'comment-mail'),
 								'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'placeholder' => '', 'current_value_empty_on_0' => TRUE),
 							)); ?>
 						<?php echo $form_fields->select_row(
 						// Note: if you change this row; also change the AJAX template variation.
 							array(
-								'placeholder'         => __('— All Comments/Replies —', $plugin->text_domain),
-								'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment', $plugin->text_domain),
+								'placeholder'         => __('— All Comments/Replies —', 'comment-mail'),
+								'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment', 'comment-mail'),
 								'name'                => 'comment_id', 'required' => FALSE, 'options' => '%%comments%%', 'post_id' => $current_value_for('post_id'), 'current_value' => $current_value_for('comment_id'),
-								'notes_after'         => __('If empty, you\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $plugin->text_domain),
+								'notes_after'         => __('If empty, you\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', 'comment-mail'),
 								'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'current_value_empty_on_0' => TRUE),
 							)); ?>
 						<?php /* -------------------------------------------------------------------- */ ?>
@@ -213,17 +213,17 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 					<?php echo $form_fields->input_row(
 						array(
 							'type'  => 'email', // For `<input>` type.
-							'label' => __('<i class="fa fa-fw fa-envelope-o"></i> Email', $plugin->text_domain),
+							'label' => __('<i class="fa fa-fw fa-envelope-o"></i> Email', 'comment-mail'),
 							'name'  => 'email', 'required' => TRUE, 'maxlength' => 100, 'current_value' => $current_value_for('email'),
 						)); ?>
 					<?php echo $form_fields->input_row(
 						array(
-							'label' => __('<i class="fa fa-fw fa-pencil-square-o"></i> First Name', $plugin->text_domain),
+							'label' => __('<i class="fa fa-fw fa-pencil-square-o"></i> First Name', 'comment-mail'),
 							'name'  => 'fname', 'required' => TRUE, 'maxlength' => 50, 'current_value' => $current_value_for('fname'),
 						)); ?>
 					<?php echo $form_fields->input_row(
 						array(
-							'label' => __('<i class="fa fa-fw fa-level-up fa-rotate-90"></i> Last Name', $plugin->text_domain),
+							'label' => __('<i class="fa fa-fw fa-level-up fa-rotate-90"></i> Last Name', 'comment-mail'),
 							'name'  => 'lname', 'required' => FALSE, 'maxlength' => 100, 'current_value' => $current_value_for('lname'),
 						)); ?>
 					<?php /* -------------------------------------------------------------------- */ ?>
@@ -234,16 +234,16 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 						// New subscriptions always start w/ an `unconfirmed` status.
 						echo $form_fields->select_row(
 							array(
-								'placeholder' => __('Select a Status...', $plugin->text_domain),
-								'label'       => __('<i class="fa fa-fw fa-flag-o"></i> Status', $plugin->text_domain),
+								'placeholder' => __('Select a Status...', 'comment-mail'),
+								'label'       => __('<i class="fa fa-fw fa-flag-o"></i> Status', 'comment-mail'),
 								'name'        => 'status', 'required' => TRUE, 'options' => '%%status%%', 'current_value' => $current_value_for('status'),
 							)); ?>
 					<?php echo $form_fields->select_row(
 						array(
-							'placeholder' => __('Select a Delivery Option...', $plugin->text_domain),
-							'label'       => __('<i class="fa fa-fw fa-paper-plane-o"></i> Deliver', $plugin->text_domain),
+							'placeholder' => __('Select a Delivery Option...', 'comment-mail'),
+							'label'       => __('<i class="fa fa-fw fa-paper-plane-o"></i> Deliver', 'comment-mail'),
 							'name'        => 'deliver', 'required' => TRUE, 'options' => '%%deliver%%', 'current_value' => $current_value_for('deliver'),
-							'notes_after' => __('Any value that is not <code>asap</code> results in a digest instead of instant notifications.', $plugin->text_domain),
+							'notes_after' => __('Any value that is not <code>asap</code> results in a digest instead of instant notifications.', 'comment-mail'),
 						)); ?>
 
 					</tbody>
@@ -256,8 +256,8 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', $plugin->text_d
 
 					<?php echo '   <input type="submit"'.
 					           ($is_edit  // Are they editing?
-						           ? ' value="'.esc_attr(__('Update Subscription', $plugin->text_domain)).'"'
-						           : ' value="'.esc_attr(__('Create Subscription', $plugin->text_domain)).'"').
+						           ? ' value="'.esc_attr(__('Update Subscription', 'comment-mail')).'"'
+						           : ' value="'.esc_attr(__('Create Subscription', 'comment-mail')).'"').
 					           '    class="btn btn-primary" />'; ?>
 
 				</p>

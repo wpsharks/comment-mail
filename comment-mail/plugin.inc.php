@@ -122,15 +122,6 @@ namespace comment_mail {
 			public $enable_hooks;
 
 			/**
-			 * Text domain for translations; based on `__NAMESPACE__`.
-			 *
-			 * @since 141111 First documented version.
-			 *
-			 * @var string Defined by class constructor; for translations.
-			 */
-			public $text_domain;
-
-			/**
 			 * Plugin slug; based on `__NAMESPACE__`.
 			 *
 			 * @since 141111 First documented version.
@@ -155,7 +146,7 @@ namespace comment_mail {
 			 *
 			 * @var string Current version of the software.
 			 */
-			public $version = '151221-RC';
+			public $version = '151224';
 
 			/*
 			 * Public Properties (Defined @ Setup)
@@ -261,7 +252,7 @@ namespace comment_mail {
 				 * Initialize properties.
 				 */
 				$this->enable_hooks = (boolean)$enable_hooks;
-				$this->text_domain  = $this->slug = str_replace('_', '-', __NAMESPACE__);
+				$this->slug = str_replace('_', '-', __NAMESPACE__);
 				$this->file         = preg_replace('/\.inc\.php$/', '.php', __FILE__);
 
 				/*
@@ -311,7 +302,7 @@ namespace comment_mail {
 				/*
 				 * Load the plugin's text domain for translations.
 				 */
-				load_plugin_textdomain($this->text_domain); // Translations.
+				load_plugin_textdomain('comment-mail'); // Translations.
 
 				/*
 				 * Setup class properties related to authentication/capabilities.
@@ -1055,8 +1046,8 @@ namespace comment_mail {
 				if(!is_admin() || !empty($_REQUEST['action']))
 					return; // Stay quiet in this case.
 
-				$conflict = sprintf(__('<p style="font-size:120%%; font-weight:400; margin:0;"><strong>%1$s&trade;</strong> + <strong>Subscribe to Comments Reloaded</strong> = Possible Conflict!</p>', $this->text_domain), esc_html($this->name));
-				$conflict .= '<p style="margin:0;">'.sprintf(__('<strong>WARNING (ACTION REQUIRED):</strong> Running %1$s&trade; while Subscribe to Comments Reloaded is <em>also</em> an active WordPress plugin <strong>can cause problems</strong>; i.e., these two plugins do the same thing—%1$s being the newer of the two. We recommend keeping %1$s; please <a href="%2$s">deactivate the Subscribe to Comments Reloaded plugin</a> to get rid of this message.', $this->text_domain), esc_html($this->name), esc_html(admin_url('plugins.php'))).'</p>';
+				$conflict = sprintf(__('<p style="font-size:120%%; font-weight:400; margin:0;"><strong>%1$s&trade;</strong> + <strong>Subscribe to Comments Reloaded</strong> = Possible Conflict!</p>', 'comment-mail'), esc_html($this->name));
+				$conflict .= '<p style="margin:0;">'.sprintf(__('<strong>WARNING (ACTION REQUIRED):</strong> Running %1$s&trade; while Subscribe to Comments Reloaded is <em>also</em> an active WordPress plugin <strong>can cause problems</strong>; i.e., these two plugins do the same thing—%1$s being the newer of the two. We recommend keeping %1$s; please <a href="%2$s">deactivate the Subscribe to Comments Reloaded plugin</a> to get rid of this message.', 'comment-mail'), esc_html($this->name), esc_html(admin_url('plugins.php'))).'</p>';
 				$this->enqueue_error($conflict);
 			}
 
@@ -1079,8 +1070,8 @@ namespace comment_mail {
 				if(!is_admin() || !empty($_REQUEST['action']))
 					return; // Stay quiet in this case.
 
-				$conflict = sprintf(__('<p style="font-size:120%%; font-weight:400; margin:0;"><strong>%1$s&trade;</strong> + <strong>Jetpack Subscriptions module</strong> (with Follow Comments enabled) = Possible Conflict!</p>', $this->text_domain), esc_html($this->name));
-				$conflict .= '<p style="margin:0;">'.sprintf(__('<strong>WARNING (ACTION REQUIRED):</strong> Running %1$s&trade; while the Jetpack Subscriptions module (with Follow Comments enabled) is <em>also</em> active in WordPress <strong>can cause problems</strong>; i.e., these two handle the same thing—%1$s being the newer of the two. We recommend keeping %1$s; please deactivate the Follow Comments functionality in the Jetpack Subscriptions module to get rid of this message (see <strong>Dashboard → Settings → Discussion → Jetpack Subscriptions Settings</strong>).', $this->text_domain), esc_html($this->name)).'</p>';
+				$conflict = sprintf(__('<p style="font-size:120%%; font-weight:400; margin:0;"><strong>%1$s&trade;</strong> + <strong>Jetpack Subscriptions module</strong> (with Follow Comments enabled) = Possible Conflict!</p>', 'comment-mail'), esc_html($this->name));
+				$conflict .= '<p style="margin:0;">'.sprintf(__('<strong>WARNING (ACTION REQUIRED):</strong> Running %1$s&trade; while the Jetpack Subscriptions module (with Follow Comments enabled) is <em>also</em> active in WordPress <strong>can cause problems</strong>; i.e., these two handle the same thing—%1$s being the newer of the two. We recommend keeping %1$s; please deactivate the Follow Comments functionality in the Jetpack Subscriptions module to get rid of this message (see <strong>Dashboard → Settings → Discussion → Jetpack Subscriptions Settings</strong>).', 'comment-mail'), esc_html($this->name)).'</p>';
 				$this->enqueue_error($conflict);
 			}
 
@@ -1184,7 +1175,7 @@ namespace comment_mail {
 					add_meta_box(__NAMESPACE__.'_small', $icon.' '.$this->name.'&trade;', array($this, 'post_small_meta_box'), $post_type, 'side', 'high');
 
 				// @TODO disabling this for now.
-				//add_meta_box(__NAMESPACE__.'_large', $icon.' '.$this->name.'&trade; '.__('Subscriptions', $this->text_domain),
+				//add_meta_box(__NAMESPACE__.'_large', $icon.' '.$this->name.'&trade; '.__('Subscriptions', 'comment-mail'),
 				//             array($this, 'post_large_meta_box'), $post_type, 'normal', 'high');
 			}
 
@@ -1311,33 +1302,33 @@ namespace comment_mail {
 					'templateSyntaxTheme' => $this->options['template_syntax_theme'],
 				));
 				wp_localize_script(__NAMESPACE__, __NAMESPACE__.'_i18n', array(
-					'bulkReconfirmConfirmation' => __('Resend email confirmation link? Are you sure?', $this->text_domain),
+					'bulkReconfirmConfirmation' => __('Resend email confirmation link? Are you sure?', 'comment-mail'),
 					'bulkDeleteConfirmation'    => $this->utils_env->is_menu_page('*_event_log')
 						? $this->utils_i18n->log_entry_js_deletion_confirmation_warning()
-						: __('Delete permanently? Are you sure?', $this->text_domain),
+						: __('Delete permanently? Are you sure?', 'comment-mail'),
 					'dateTimePickerI18n'        => array('en' => array(
 						'months'    => array(
-							__('January', $this->text_domain),
-							__('February', $this->text_domain),
-							__('March', $this->text_domain),
-							__('April', $this->text_domain),
-							__('May', $this->text_domain),
-							__('June', $this->text_domain),
-							__('July', $this->text_domain),
-							__('August', $this->text_domain),
-							__('September', $this->text_domain),
-							__('October', $this->text_domain),
-							__('November', $this->text_domain),
-							__('December', $this->text_domain),
+							__('January', 'comment-mail'),
+							__('February', 'comment-mail'),
+							__('March', 'comment-mail'),
+							__('April', 'comment-mail'),
+							__('May', 'comment-mail'),
+							__('June', 'comment-mail'),
+							__('July', 'comment-mail'),
+							__('August', 'comment-mail'),
+							__('September', 'comment-mail'),
+							__('October', 'comment-mail'),
+							__('November', 'comment-mail'),
+							__('December', 'comment-mail'),
 						),
 						'dayOfWeek' => array(
-							__('Sun', $this->text_domain),
-							__('Mon', $this->text_domain),
-							__('Tue', $this->text_domain),
-							__('Wed', $this->text_domain),
-							__('Thu', $this->text_domain),
-							__('Fri', $this->text_domain),
-							__('Sat', $this->text_domain),
+							__('Sun', 'comment-mail'),
+							__('Mon', 'comment-mail'),
+							__('Tue', 'comment-mail'),
+							__('Wed', 'comment-mail'),
+							__('Thu', 'comment-mail'),
+							__('Fri', 'comment-mail'),
+							__('Sat', 'comment-mail'),
 						),
 					)),
 				));
@@ -1382,27 +1373,27 @@ namespace comment_mail {
 
 				/* ----------------------------------------- */
 
-				$_menu_title = __('Config. Options', $this->text_domain);
-				$_page_title = $this->name.'&trade; &#10609; '.__('Config. Options', $this->text_domain);
+				$_menu_title = __('Config. Options', 'comment-mail');
+				$_page_title = $this->name.'&trade; &#10609; '.__('Config. Options', 'comment-mail');
 				add_submenu_page(__NAMESPACE__, $_page_title, $_menu_title, $this->cap, __NAMESPACE__, array($this, 'menu_page_options'));
 
 				$_menu_title                                           = // Visible on-demand only.
-					'<small><em>'.$child_branch_indent.__('Import/Export', $this->text_domain).'</em></small>';
-				$_page_title                                           = $this->name.'&trade; &#10609; '.__('Import/Export', $this->text_domain);
+					'<small><em>'.$child_branch_indent.__('Import/Export', 'comment-mail').'</em></small>';
+				$_page_title                                           = $this->name.'&trade; &#10609; '.__('Import/Export', 'comment-mail');
 				$_menu_parent                                          = $current_menu_page === __NAMESPACE__.'_import_export' ? __NAMESPACE__ : NULL;
 				$this->menu_page_hooks[__NAMESPACE__.'_import_export'] = add_submenu_page($_menu_parent, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_import_export', array($this, 'menu_page_import_export'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_import_export'], array($this, 'menu_page_import_export_screen'));
 
 				$_menu_title                                             = // Visible on-demand only.
-					'<small><em>'.$child_branch_indent.__('Email Templates', $this->text_domain).'</em></small>';
-				$_page_title                                             = $this->name.'&trade; &#10609; '.__('Email Templates', $this->text_domain);
+					'<small><em>'.$child_branch_indent.__('Email Templates', 'comment-mail').'</em></small>';
+				$_page_title                                             = $this->name.'&trade; &#10609; '.__('Email Templates', 'comment-mail');
 				//$_menu_parent                                            = $current_menu_page === __NAMESPACE__.'_email_templates' ? __NAMESPACE__ : NULL;
 				$this->menu_page_hooks[__NAMESPACE__.'_email_templates'] = add_submenu_page(__NAMESPACE__, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_email_templates', array($this, 'menu_page_email_templates'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_email_templates'], array($this, 'menu_page_email_templates_screen'));
 
 				$_menu_title                                            = // Visible on-demand only.
-					'<small><em>'.$child_branch_indent.__('Site Templates', $this->text_domain).'</em></small>';
-				$_page_title                                            = $this->name.'&trade; &#10609; '.__('Site Templates', $this->text_domain);
+					'<small><em>'.$child_branch_indent.__('Site Templates', 'comment-mail').'</em></small>';
+				$_page_title                                            = $this->name.'&trade; &#10609; '.__('Site Templates', 'comment-mail');
 				//$_menu_parent                                           = $current_menu_page === __NAMESPACE__.'_site_templates' ? __NAMESPACE__ : NULL;
 				$this->menu_page_hooks[__NAMESPACE__.'_site_templates'] = add_submenu_page(__NAMESPACE__, $_page_title, $_menu_title, $this->cap, __NAMESPACE__.'_site_templates', array($this, 'menu_page_site_templates'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_site_templates'], array($this, 'menu_page_site_templates_screen'));
@@ -1411,13 +1402,13 @@ namespace comment_mail {
 
 				/* ----------------------------------------- */
 
-				$_menu_title                                  = $divider.__('Subscriptions', $this->text_domain);
-				$_page_title                                  = $this->name.'&trade; &#10609; '.__('Subscriptions', $this->text_domain);
+				$_menu_title                                  = $divider.__('Subscriptions', 'comment-mail');
+				$_page_title                                  = $this->name.'&trade; &#10609; '.__('Subscriptions', 'comment-mail');
 				$this->menu_page_hooks[__NAMESPACE__.'_subs'] = add_submenu_page(__NAMESPACE__, $_page_title, $_menu_title, $this->manage_cap, __NAMESPACE__.'_subs', array($this, 'menu_page_subs'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_subs'], array($this, 'menu_page_subs_screen'));
 
-				$_menu_title                                           = $child_branch_indent.__('Event Log', $this->text_domain);
-				$_page_title                                           = $this->name.'&trade; &#10609; '.__('Sub. Event Log', $this->text_domain);
+				$_menu_title                                           = $child_branch_indent.__('Event Log', 'comment-mail');
+				$_page_title                                           = $this->name.'&trade; &#10609; '.__('Sub. Event Log', 'comment-mail');
 				$this->menu_page_hooks[__NAMESPACE__.'_sub_event_log'] = add_submenu_page(__NAMESPACE__, $_page_title, $_menu_title, $this->manage_cap, __NAMESPACE__.'_sub_event_log', array($this, 'menu_page_sub_event_log'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_sub_event_log'], array($this, 'menu_page_sub_event_log_screen'));
 
@@ -1425,13 +1416,13 @@ namespace comment_mail {
 
 				/* ----------------------------------------- */
 
-				$_menu_title                                   = $divider.__('Mail Queue', $this->text_domain);
-				$_page_title                                   = $this->name.'&trade; &#10609; '.__('Mail Queue', $this->text_domain);
+				$_menu_title                                   = $divider.__('Mail Queue', 'comment-mail');
+				$_page_title                                   = $this->name.'&trade; &#10609; '.__('Mail Queue', 'comment-mail');
 				$this->menu_page_hooks[__NAMESPACE__.'_queue'] = add_submenu_page(__NAMESPACE__, $_page_title, $_menu_title, $this->manage_cap, __NAMESPACE__.'_queue', array($this, 'menu_page_queue'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue'], array($this, 'menu_page_queue_screen'));
 
-				$_menu_title                                             = $child_branch_indent.__('Event Log', $this->text_domain);
-				$_page_title                                             = $this->name.'&trade; &#10609; '.__('Queue Event Log', $this->text_domain);
+				$_menu_title                                             = $child_branch_indent.__('Event Log', 'comment-mail');
+				$_page_title                                             = $this->name.'&trade; &#10609; '.__('Queue Event Log', 'comment-mail');
 				$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'] = add_submenu_page(__NAMESPACE__, $_page_title, $_menu_title, $this->manage_cap, __NAMESPACE__.'_queue_event_log', array($this, 'menu_page_queue_event_log'));
 				add_action('load-'.$this->menu_page_hooks[__NAMESPACE__.'_queue_event_log'], array($this, 'menu_page_queue_event_log_screen'));
 
@@ -1519,7 +1510,7 @@ namespace comment_mail {
 
 				add_screen_option('per_page', array(
 					'default' => '20', // Default items per page.
-					'label'   => __('Per Page', $this->text_domain),
+					'label'   => __('Per Page', 'comment-mail'),
 					'option'  => __NAMESPACE__.'_subs_per_page',
 				));
 				add_filter('manage_'.$screen->id.'_columns', function ()
@@ -1566,7 +1557,7 @@ namespace comment_mail {
 
 				add_screen_option('per_page', array(
 					'default' => '20', // Default items per page.
-					'label'   => __('Per Page', $this->text_domain),
+					'label'   => __('Per Page', 'comment-mail'),
 					'option'  => __NAMESPACE__.'_sub_event_log_entries_per_page',
 				));
 				add_filter('manage_'.$screen->id.'_columns', function ()
@@ -1612,7 +1603,7 @@ namespace comment_mail {
 
 				add_screen_option('per_page', array(
 					'default' => '20', // Default items per page.
-					'label'   => __('Per Page', $this->text_domain),
+					'label'   => __('Per Page', 'comment-mail'),
 					'option'  => __NAMESPACE__.'_queued_notifications_per_page',
 				));
 				add_filter('manage_'.$screen->id.'_columns', function ()
@@ -1658,7 +1649,7 @@ namespace comment_mail {
 
 				add_screen_option('per_page', array(
 					'default' => '20', // Default items per page.
-					'label'   => __('Per Page', $this->text_domain),
+					'label'   => __('Per Page', 'comment-mail'),
 					'option'  => __NAMESPACE__.'_queue_event_log_entries_per_page',
 				));
 				add_filter('manage_'.$screen->id.'_columns', function ()
@@ -1798,9 +1789,9 @@ namespace comment_mail {
 			 */
 			public function add_settings_link(array $links)
 			{
-				$links[] = '<a href="'.esc_attr($this->utils_url->main_menu_page_only()).'">'.__('Settings', $this->text_domain).'</a><br/>';
-				if(!$this->is_pro) $links[] = '<a href="'.esc_attr($this->utils_url->pro_preview()).'">'.__('Preview Pro Features', $this->text_domain).'</a>';
-				if(!$this->is_pro) $links[] = '<a href="'.esc_attr($this->utils_url->product_page()).'" target="_blank">'.__('Upgrade', $this->text_domain).'</a>';
+				$links[] = '<a href="'.esc_attr($this->utils_url->main_menu_page_only()).'">'.__('Settings', 'comment-mail').'</a><br/>';
+				if(!$this->is_pro) $links[] = '<a href="'.esc_attr($this->utils_url->pro_preview()).'">'.__('Preview Pro Features', 'comment-mail').'</a>';
+				if(!$this->is_pro) $links[] = '<a href="'.esc_attr($this->utils_url->product_page()).'" target="_blank">'.__('Upgrade', 'comment-mail').'</a>';
 
 				return apply_filters(__METHOD__, $links, get_defined_vars());
 			}
@@ -1897,7 +1888,7 @@ namespace comment_mail {
 			/**
 			 * Enqueue an administrative warning.
 			 *
-			 * @since 15xxxx Improving notices.
+			 * @since 151224 Improving notices.
 			 *
 			 * @param string $markup HTML markup. See {@link enqueue_notice()}.
 			 * @param array  $args Additional args. See {@link enqueue_notice()}.
@@ -1933,7 +1924,7 @@ namespace comment_mail {
 			public function all_admin_notices()
 			{
 				if (!$this->options['enable']) {
-				  $this->enqueue_warning(sprintf(__('<strong>%1$s is disabled. Please visit the <a href="%2$s">settings</a> and enable the plugin</strong>.', $this->text_domain), esc_html($this->name), esc_attr($this->utils_url->main_menu_page_only())));
+				  $this->enqueue_warning(sprintf(__('<strong>%1$s is disabled. Please visit the <a href="%2$s">settings</a> and enable the plugin</strong>.', 'comment-mail'), esc_html($this->name), esc_attr($this->utils_url->main_menu_page_only())));
 				}
 
 				if(!is_array($notices = get_option(__NAMESPACE__.'_notices')))
@@ -2006,7 +1997,7 @@ namespace comment_mail {
 							$_dismiss_url   = $this->utils_url->dismiss_notice($_key);
 							$_dismiss       = '<a href="'.esc_attr($_dismiss_url).'"'.
 							                  '  style="'.esc_attr($_dismiss_style).'">'.
-							                  '  '.__('dismiss &times;', $this->text_domain).
+							                  '  '.__('dismiss &times;', 'comment-mail').
 							                  '</a>';
 						}
 						else $_dismiss = ''; // Default value; n/a.
@@ -2184,7 +2175,7 @@ namespace comment_mail {
 			/**
 			* Comment form integration; via filter.
 			*
-			* @since 15xxxx Improving comment form compat.
+			* @since 151224 Improving comment form compat.
 			*
 			* @attaches-to `comment_form_submit_field` filter.
 			*
@@ -2393,8 +2384,8 @@ namespace comment_mail {
 			 */
 			public function extend_cron_schedules(array $schedules)
 			{
-				$schedules['every5m']  = array('interval' => 300, 'display' => __('Every 5 Minutes', $this->text_domain));
-				$schedules['every15m'] = array('interval' => 900, 'display' => __('Every 15 Minutes', $this->text_domain));
+				$schedules['every5m']  = array('interval' => 300, 'display' => __('Every 5 Minutes', 'comment-mail'));
+				$schedules['every15m'] = array('interval' => 900, 'display' => __('Every 15 Minutes', 'comment-mail'));
 
 				return apply_filters(__METHOD__, $schedules, get_defined_vars());
 			}

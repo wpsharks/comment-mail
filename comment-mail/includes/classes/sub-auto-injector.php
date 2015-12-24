@@ -196,7 +196,7 @@ namespace comment_mail // Root namespace.
 			/**
 			* Injects users by role.
 			*
-			* @since 15xxxx Adding auto-subscribe roles.
+			* @since 151224 Adding auto-subscribe roles.
 			*/
 			protected function maybe_inject_users_by_role()
 			{

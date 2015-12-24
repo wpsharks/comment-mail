@@ -133,7 +133,7 @@ namespace comment_mail // Root namespace.
 
 				$style = (string)$args['style'];
 
-				$post_total_comments_desc = sprintf(_n('%1$s Comment', '%1$s Comments', $post_total_comments, $this->plugin->text_domain), esc_html($post_total_comments));
+				$post_total_comments_desc = sprintf(_n('%1$s Comment', '%1$s Comments', $post_total_comments, 'comment-mail'), esc_html($post_total_comments));
 				$post_edit_comments_url   = $this->plugin->utils_url->post_edit_comments_short($post_id);
 
 				return '<a href="'.esc_attr($post_edit_comments_url).'" class="pmp-post-com-count post-com-count" style="'.esc_attr($style).'" title="'.esc_attr($post_total_comments_desc).'">'.
@@ -169,7 +169,7 @@ namespace comment_mail // Root namespace.
 				$post_total_subs_label = $subscriptions // What should label contain?
 					? $this->plugin->utils_i18n->subscriptions($post_total_subs) : $post_total_subs;
 
-				$post_total_subs_desc = sprintf(_n('%1$s Subscription', '%1$s Subscriptions', $post_total_subs, $this->plugin->text_domain), esc_html($post_total_subs));
+				$post_total_subs_desc = sprintf(_n('%1$s Subscription', '%1$s Subscriptions', $post_total_subs, 'comment-mail'), esc_html($post_total_subs));
 				$post_edit_subs_url   = $this->plugin->utils_url->post_edit_subs_short($post_id);
 
 				return '<a href="'.esc_attr($post_edit_subs_url).'" class="pmp-post-sub-count" style="'.esc_attr($style).'" title="'.esc_attr($post_total_subs_desc).'">'.
@@ -238,7 +238,7 @@ namespace comment_mail // Root namespace.
 
 				if(empty($last_x_email_lis)) // If no results, add a no subscriptions message.
 					$last_x_email_lis[] = '<li style="font-style:italic;">'.
-					                      ' '.__('No subscriptions at this time.', $this->plugin->text_domain).
+					                      ' '.__('No subscriptions at this time.', 'comment-mail').
 					                      '</li>';
 
 				return '<ul class="pmp-last-x-sub-emails pmp-clean-list-items" style="'.esc_attr($list_style).'">'.
@@ -308,7 +308,7 @@ namespace comment_mail // Root namespace.
 							$selected_user_id = $_user->ID;
 
 					$options .= '<option value="'.esc_attr($_user->ID).'"'.$_selected.'>'.
-					            '  '.esc_html(__('User', $this->plugin->text_domain).' ID #'.$_user->ID.
+					            '  '.esc_html(__('User', 'comment-mail').' ID #'.$_user->ID.
 					                          ' :: '.$_user->user_login. // The user's username; i.e. what they log in with.
 					                          ' :: "'.$_user->display_name.'"'.($display_emails ? ' <'.$_user->user_email.'>' : '')).
 					            '</option>';
@@ -318,7 +318,7 @@ namespace comment_mail // Root namespace.
 				if($allow_arbitrary) // Allow arbitrary select option?
 					if(!isset($selected_user_id) && isset($current_user_id) && $current_user_id > 0)
 						$options .= '<option value="'.esc_attr($current_user_id).'" selected="selected">'.
-						            '  '.esc_html(__('User', $this->plugin->text_domain).' ID #'.$current_user_id).
+						            '  '.esc_html(__('User', 'comment-mail').' ID #'.$current_user_id).
 						            '</option>';
 
 				return $options; // HTML markup.
@@ -390,7 +390,7 @@ namespace comment_mail // Root namespace.
 				if($allow_empty) // Allow empty selection?
 					$options = '<option value="0"></option>';
 
-				$default_post_type_label = __('Post', $this->plugin->text_domain);
+				$default_post_type_label = __('Post', 'comment-mail');
 
 				foreach($posts as $_post) // Iterate posts.
 				{
@@ -408,14 +408,14 @@ namespace comment_mail // Root namespace.
 					{
 						$options .= '<option value="'.esc_attr($_post->ID).'"'.$_selected.'>'.
 						            '  '.esc_html($_post_type->labels->singular_name.' #'.$_post->ID.':'.
-						                          ' '.($_post->post_title ? $_post->post_title : __('Untitled', $this->plugin->text_domain))).
+						                          ' '.($_post->post_title ? $_post->post_title : __('Untitled', 'comment-mail'))).
 						            '</option>';
 					}
 					else // Front-end display should be friendlier in some ways.
 					{
 						$options .= '<option value="'.esc_attr($_post->ID).'"'.$_selected.'>'.
 						            '  '.esc_html($this->plugin->utils_date->i18n('M jS, Y', strtotime($_post->post_date_gmt)).
-						                          ' — '.($_post->post_title ? $_post->post_title : __('Untitled', $this->plugin->text_domain))).
+						                          ' — '.($_post->post_title ? $_post->post_title : __('Untitled', 'comment-mail'))).
 						            '</option>';
 					}
 				}
@@ -424,7 +424,7 @@ namespace comment_mail // Root namespace.
 				if($allow_arbitrary) // Allow arbitrary select option?
 					if(!isset($selected_post_id) && isset($current_post_id) && $current_post_id > 0)
 						$options .= '<option value="'.esc_attr($current_post_id).'" selected="selected">'.
-						            '  '.esc_html(__('Post', $this->plugin->text_domain).' ID #'.$current_post_id).
+						            '  '.esc_html(__('Post', 'comment-mail').' ID #'.$current_post_id).
 						            '</option>';
 
 				return $options; // HTML markup.
@@ -501,7 +501,7 @@ namespace comment_mail // Root namespace.
 
 				$options = ''; // Initialize.
 				if($allow_empty) // Allow empty selection?
-					$options = '<option value="0">'.__('— All Comments/Replies —', $this->plugin->text_domain).'</option>';
+					$options = '<option value="0">'.__('— All Comments/Replies —', 'comment-mail').'</option>';
 
 				foreach($comments as $_comment) // Iterate comments.
 				{
@@ -533,7 +533,7 @@ namespace comment_mail // Root namespace.
 				if($allow_arbitrary) // Allow arbitrary select option?
 					if(!isset($selected_comment_id) && isset($current_comment_id) && $current_comment_id > 0)
 						$options .= '<option value="'.esc_attr($current_comment_id).'" selected="selected">'.
-						            '  '.esc_html(__('Comment', $this->plugin->text_domain).' ID #'.$current_comment_id).
+						            '  '.esc_html(__('Comment', 'comment-mail').' ID #'.$current_comment_id).
 						            '</option>';
 
 				return $options; // HTML markup.
@@ -848,9 +848,9 @@ namespace comment_mail // Root namespace.
 				$anchor = '<a href="'.esc_attr($anchor_to).'" target="'.esc_attr($anchor_target).'" style="'.esc_attr($anchor_style).'">'.
 				          ($icon_prefix ? $icon.' ' : '').esc_html($this->plugin->name).'&trade;'.
 				          '</a>';
-				$suffix = $for_wordpress_suffix ? ' '.__('for WordPress', $this->plugin->text_domain) : '';
+				$suffix = $for_wordpress_suffix ? ' '.__('for WordPress', 'comment-mail') : '';
 
-				return sprintf(__('Powered by %1$s', $this->plugin->text_domain), $anchor.$suffix);
+				return sprintf(__('Powered by %1$s', 'comment-mail'), $anchor.$suffix);
 			}
 
 			/**
@@ -907,8 +907,8 @@ namespace comment_mail // Root namespace.
 			public function pmp_path()
 			{
 				$path = '<code class="pmp-path">';
-				$path .= __('WP Dashboard', $this->plugin->text_domain);
-				# $path .= ' &#10609; '.__('Comments', $this->plugin->text_domain);
+				$path .= __('WP Dashboard', 'comment-mail');
+				# $path .= ' &#10609; '.__('Comments', 'comment-mail');
 				$path .= ' &#10609; '.esc_html($this->plugin->name).'&trade;';
 
 				foreach(func_get_args() as $_path_name)
