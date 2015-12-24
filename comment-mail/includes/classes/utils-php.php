@@ -94,7 +94,7 @@ namespace comment_mail // Root namespace.
 
 					return ob_get_clean();
 				}
-				throw new \exception(__('The PHP `eval()` function (an application requirement) has been disabled on this server. Please check with your hosting provider to resolve this issue and have the PHP `eval()` function enabled.', $this->plugin->text_domain).
+				throw new \exception(__('The PHP `eval()` function (an application requirement) has been disabled on this server. Please check with your hosting provider to resolve this issue and have the PHP `eval()` function enabled.', 'comment-mail').
 
 				                     // The rest of this explanation is not translatable; allowing us to keep it on multiple lines.
 				                     ' The use of `eval()` in this software is limited to areas where it is absolutely necessary to achieve a desired functionality.'.

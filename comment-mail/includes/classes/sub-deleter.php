@@ -223,7 +223,7 @@ namespace comment_mail // Root namespace.
 				       " WHERE `ID` = '".esc_sql($this->sub->ID)."'";
 
 				if(($this->deleted = $this->plugin->utils_db->wp->query($sql)) === FALSE)
-					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
+					throw new \exception(__('Deletion failure.', 'comment-mail'));
 				$this->deleted = (boolean)$this->deleted; // Convert to boolean now.
 
 				$this->sub->status = 'deleted'; // Obj. properties.

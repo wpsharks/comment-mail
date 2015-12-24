@@ -206,8 +206,8 @@ namespace comment_mail // Root namespace.
 					'delete' => '<a href="#"'.  // Depends on `menu-pages.js`.
 					            ' data-pmp-action="'.esc_attr($delete_url).'"'. // The action URL.
 					            ' data-pmp-confirmation="'.esc_attr($this->plugin->utils_i18n->log_entry_js_deletion_confirmation_warning()).'"'.
-					            ' title="'.esc_attr(__('Delete Queue Event Log Entry', $this->plugin->text_domain)).'">'.
-					            '  <i class="fa fa-times-circle"></i> '.__('Delete', $this->plugin->text_domain).
+					            ' title="'.esc_attr(__('Delete Queue Event Log Entry', 'comment-mail')).'">'.
+					            '  <i class="fa fa-times-circle"></i> '.__('Delete', 'comment-mail').
 					            '</a>',
 				);
 				return $id_info.$this->row_actions($row_actions);
@@ -365,7 +365,7 @@ namespace comment_mail // Root namespace.
 			protected function get_bulk_actions()
 			{
 				return array(
-					'delete' => __('Delete', $this->plugin->text_domain),
+					'delete' => __('Delete', 'comment-mail'),
 				);
 			}
 

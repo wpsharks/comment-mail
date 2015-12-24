@@ -222,23 +222,23 @@ namespace comment_mail // Root namespace.
 				$delete_url    = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'delete');
 
 				$row_actions = array(
-					'edit'      => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscr.', $this->plugin->text_domain).'</a>',
+					'edit'      => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscr.', 'comment-mail').'</a>',
 
 					'reconfirm' => '<a href="#"'.  // Depends on `menu-pages.js`.
 					               ' data-pmp-action="'.esc_attr($reconfirm_url).'"'. // The action URL.
-					               ' data-pmp-confirmation="'.esc_attr(__('Resend email confirmation link? Are you sure?', $this->plugin->text_domain)).'">'.
-					               '  '.__('Reconfirm', $this->plugin->text_domain).
+					               ' data-pmp-confirmation="'.esc_attr(__('Resend email confirmation link? Are you sure?', 'comment-mail')).'">'.
+					               '  '.__('Reconfirm', 'comment-mail').
 					               '</a>',
 
-					'confirm'   => '<a href="'.esc_attr($confirm_url).'">'.__('Subscribe', $this->plugin->text_domain).'</a>',
-					'unconfirm' => '<a href="'.esc_attr($unconfirm_url).'">'.__('Unconfirm', $this->plugin->text_domain).'</a>',
-					'suspend'   => '<a href="'.esc_attr($suspend_url).'">'.__('Suspend', $this->plugin->text_domain).'</a>',
-					'trash'     => '<a href="'.esc_attr($trash_url).'" title="'.esc_attr(__('Trash', $this->plugin->text_domain)).'"><i class="fa fa-trash-o"></i></a>',
+					'confirm'   => '<a href="'.esc_attr($confirm_url).'">'.__('Subscribe', 'comment-mail').'</a>',
+					'unconfirm' => '<a href="'.esc_attr($unconfirm_url).'">'.__('Unconfirm', 'comment-mail').'</a>',
+					'suspend'   => '<a href="'.esc_attr($suspend_url).'">'.__('Suspend', 'comment-mail').'</a>',
+					'trash'     => '<a href="'.esc_attr($trash_url).'" title="'.esc_attr(__('Trash', 'comment-mail')).'"><i class="fa fa-trash-o"></i></a>',
 
 					'delete'    => '<a href="#"'.  // Depends on `menu-pages.js`.
 					               ' data-pmp-action="'.esc_attr($delete_url).'"'. // The action URL.
-					               ' data-pmp-confirmation="'.esc_attr(__('Delete permanently? Are you sure?', $this->plugin->text_domain)).'"'.
-					               ' title="'.esc_attr(__('Delete', $this->plugin->text_domain)).'">'.
+					               ' data-pmp-confirmation="'.esc_attr(__('Delete permanently? Are you sure?', 'comment-mail')).'"'.
+					               ' title="'.esc_attr(__('Delete', 'comment-mail')).'">'.
 					               '  <i class="fa fa-times-circle"></i>'.
 					               '</a>',
 				);
@@ -367,12 +367,12 @@ namespace comment_mail // Root namespace.
 			protected function get_bulk_actions()
 			{
 				return array(
-					'reconfirm' => __('Reconfirm', $this->plugin->text_domain),
-					'confirm'   => __('Confirm', $this->plugin->text_domain),
-					'unconfirm' => __('Unconfirm', $this->plugin->text_domain),
-					'suspend'   => __('Suspend', $this->plugin->text_domain),
-					'trash'     => __('Trash', $this->plugin->text_domain),
-					'delete'    => __('Delete', $this->plugin->text_domain),
+					'reconfirm' => __('Reconfirm', 'comment-mail'),
+					'confirm'   => __('Confirm', 'comment-mail'),
+					'unconfirm' => __('Unconfirm', 'comment-mail'),
+					'suspend'   => __('Suspend', 'comment-mail'),
+					'trash'     => __('Trash', 'comment-mail'),
+					'delete'    => __('Delete', 'comment-mail'),
 				);
 			}
 

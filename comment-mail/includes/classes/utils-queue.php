@@ -79,7 +79,7 @@ namespace comment_mail // Root namespace.
 				       " WHERE `ID` = '".esc_sql($queue_id)."'";
 
 				if(($deleted = $this->plugin->utils_db->wp->query($sql)) === FALSE)
-					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
+					throw new \exception(__('Deletion failure.', 'comment-mail'));
 
 				return (boolean)$deleted; // Convert to boolean value.
 			}
