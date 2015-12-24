@@ -59,14 +59,14 @@ namespace comment_mail // Root namespace.
 			/**
 			 * @var integer Total created subs.
 			 *
-			 * @since 15xxxx Improving StCR import count results
+			 * @since 151224 Improving StCR import count results
 			 */
 			protected $total_created_subs;
 
 			/**
 			 * @var integer Total skipped subscriptions during import.
 			 *
-			 * @since 15xxxx Improving StCR import count results
+			 * @since 151224 Improving StCR import count results
 			 */
 			protected $total_skipped_subs;
 
@@ -658,7 +658,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Count StCR subscriptions that belong to Post IDs that no longer exist or are no longer published
 			 *
-			 * @since 15xxxx Improving StCR import count results
+			 * @since 151224 Improving StCR import count results
 			 *
 			 * @return int Number of subscriptions the importer will skip due to non-existent Post IDs
 			 *
@@ -680,7 +680,7 @@ namespace comment_mail // Root namespace.
 			/**
 			 * Log StCR import failures.
 			 *
-			 * @since 15xxxx Improving StCR import debugging.
+			 * @since 151224 Improving StCR import debugging.
 			 *
 			 * @param string $msg     Description of import failure
 			 *

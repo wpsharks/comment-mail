@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the Comment Mail package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Comment Mail 151221-RC\n"
+"Project-Id-Version: Comment Mail 151224\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/comment-mail\n"
-"POT-Creation-Date: 2015-12-21 02:46:37+00:00\n"
+"POT-Creation-Date: 2015-12-24 21:50:33+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"

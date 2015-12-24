@@ -155,7 +155,7 @@ namespace comment_mail {
 			 *
 			 * @var string Current version of the software.
 			 */
-			public $version = '151221-RC';
+			public $version = '151224';
 
 			/*
 			 * Public Properties (Defined @ Setup)
@@ -1897,7 +1897,7 @@ namespace comment_mail {
 			/**
 			 * Enqueue an administrative warning.
 			 *
-			 * @since 15xxxx Improving notices.
+			 * @since 151224 Improving notices.
 			 *
 			 * @param string $markup HTML markup. See {@link enqueue_notice()}.
 			 * @param array  $args Additional args. See {@link enqueue_notice()}.
@@ -2184,7 +2184,7 @@ namespace comment_mail {
 			/**
 			* Comment form integration; via filter.
 			*
-			* @since 15xxxx Improving comment form compat.
+			* @since 151224 Improving comment form compat.
 			*
 			* @attaches-to `comment_form_submit_field` filter.
 			*
