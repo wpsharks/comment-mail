@@ -1,23 +1,23 @@
 <?php
 namespace comment_mail;
 /**
- * @var plugin         $plugin Plugin class.
- * @var template       $template Template class.
+ * @var plugin           $plugin      Plugin class.
+ * @var template         $template    Template class.
  *
  * Other variables made available in this template file:
  *
- * @var string         $site_header Parsed site header template.
- * @var string         $site_footer Parsed site footer template.
+ * @var string           $site_header Parsed site header template.
+ * @var string           $site_footer Parsed site footer template.
  *
- * @var \stdClass|null $sub Subscription object data.
+ * @var \stdClass|null   $sub         Subscription object data.
  *
- * @var \WP_Post|null  $sub_post Post they were subscribed to.
+ * @var \WP_Post|null    $sub_post    Post they were subscribed to.
  *    This will be `NULL` if there were any `$error_codes` during processing.
  *    This will also be `NULL` if you deleted the post before they unsubscribed.
  *
- * @var \stdClass|null $sub_comment Comment they were subcribed to; if applicable.
+ * @var \WP_Comment|null $sub_comment Comment they were subcribed to; if applicable.
  *
- * @var array          $error_codes An array of any/all error codes.
+ * @var array            $error_codes An array of any/all error codes.
  *
  * -------------------------------------------------------------------
  * @note In addition to plugin-specific variables & functionality,
@@ -25,7 +25,7 @@ namespace comment_mail;
  */
 ?>
 <?php // Sets document <title> tag via `%%title%%` replacement code in header.
-echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_header); ?>
+echo str_replace('%%title%%', __('Unsubscribe', 'comment-mail'), $site_header); ?>
 
 	<div class="unsubscribe">
 
@@ -33,7 +33,7 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 
 			<div class="alert alert-danger" style="margin:0;">
 				<h4>
-					<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
+					<?php echo __('Please review the following error(s):', 'comment-mail'); ?>
 				</h4>
 				<ul class="list-unstyled">
 					<?php foreach($error_codes as $_error_code): ?>
@@ -41,21 +41,21 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 							<i class="fa fa-warning fa-fw"></i> <?php switch($_error_code)
 							{
 								case 'missing_sub_key':
-									echo __('Subscription key is missing; unable to unsubscribe.', $plugin->text_domain);
+									echo __('Subscription key is missing; unable to unsubscribe.', 'comment-mail');
 									break; // Break switch handler.
 
 								case 'invalid_sub_key':
-									// echo __('Invalid subscription key; unable to unsubscribe (or already unsubscribed).', $plugin->text_domain);
-									echo __('Looks like you\'ve already unsubscribed! Sorry to see you go.', $plugin->text_domain);
+									// echo __('Invalid subscription key; unable to unsubscribe (or already unsubscribed).', 'comment-mail');
+									echo __('Looks like you\'ve already unsubscribed! Sorry to see you go.', 'comment-mail');
 									break; // Break switch handler.
 
 								case 'sub_already_unsubscribed':
-									echo __('Already unsubscribed! Sorry to see you go.', $plugin->text_domain);
+									echo __('Already unsubscribed! Sorry to see you go.', 'comment-mail');
 									break; // Break switch handler.
 
 								default: // Anything else that is unexpected/unknown at this time.
-									echo __('Unknown error; unable to unsubscribe. Sorry!', $plugin->text_domain).
-									     ' '.sprintf(__('Please contact &lt;%1$s&gt; for assistance.', $plugin->text_domain),
+									echo __('Unknown error; unable to unsubscribe. Sorry!', 'comment-mail').
+									     ' '.sprintf(__('Please contact &lt;%1$s&gt; for assistance.', 'comment-mail'),
 									                 esc_html($plugin->options['can_spam_postmaster']));
 							} ?>
 						</li>
@@ -97,7 +97,7 @@ echo str_replace('%%title%%', __('Unsubscribe', $plugin->text_domain), $site_hea
 		$sub_name_email_markup = $plugin->utils_markup->name_email($sub->fname.' '.$sub->lname, $sub->email);
 
 		// Subscriber's last known IP address.
-		$sub_last_ip = $sub->last_ip ? $sub->last_ip : __('unknown', $plugin->text_domain);
+		$sub_last_ip = $sub->last_ip ? $sub->last_ip : __('unknown', 'comment-mail');
 
 		// Subscription last update time "ago"; e.g. `X [seconds/minutes/days/weeks/years] ago`.
 		$sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $sub->last_update_time);

@@ -1,18 +1,18 @@
 <?php
 namespace comment_mail;
 /**
- * @var plugin         $plugin Plugin class.
- * @var template       $template Template class.
+ * @var plugin           $plugin      Plugin class.
+ * @var template         $template    Template class.
  *
  * Other variables made available in this template file:
  *
- * @var \stdClass      $sub Subscription object data.
+ * @var \stdClass        $sub         Subscription object data.
  *
- * @var \WP_Post       $sub_post Post they're subscribed to.
+ * @var \WP_Post         $sub_post    Post they're subscribed to.
  *
- * @var \stdClass|null $sub_comment Comment they're subcribed to; if applicable.
+ * @var \WP_Comment|null $sub_comment Comment they're subcribed to; if applicable.
  *
- * @var \stdClass[]    $comments An array of all WP comment objects we are notifying about.
+ * @var \WP_Comment[]    $comments    An array of all WP comment objects we are notifying about.
  *
  * -------------------------------------------------------------------
  * @note Extra whitespace in subject templates is stripped automatically.

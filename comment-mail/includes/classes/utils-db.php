@@ -211,7 +211,7 @@ namespace comment_mail // Root namespace.
 						return 'delete';
 
 					default: // Throw exception on anything else.
-						throw new \exception(sprintf(__('Unexpected comment status: `%1$s`.', $this->plugin->text_domain), $status));
+						throw new \exception(sprintf(__('Unexpected comment status: `%1$s`.', 'comment-mail'), $status));
 				}
 			}
 
@@ -246,7 +246,7 @@ namespace comment_mail // Root namespace.
 						return 'closed';
 
 					default: // Throw exception on anything else.
-						throw new \exception(sprintf(__('Unexpected post comment status: `%1$s`.', $this->plugin->text_domain), $status));
+						throw new \exception(sprintf(__('Unexpected post comment status: `%1$s`.', 'comment-mail'), $status));
 				}
 			}
 
@@ -281,7 +281,7 @@ namespace comment_mail // Root namespace.
 				       " LIMIT 1"; // One to check.
 
 				if($this->wp->query($sql) === FALSE) // Initial query failure?
-					throw new \exception(__('Query failure.', $this->plugin->text_domain));
+					throw new \exception(__('Query failure.', 'comment-mail'));
 
 				return ($total = (integer)$this->wp->get_var("SELECT FOUND_ROWS()"));
 			}
@@ -357,6 +357,7 @@ namespace comment_mail // Root namespace.
 			{
 				$default_args = array(
 					'for_comments_only'          => FALSE,
+                    'include_post_types'         => array(),
 					'exclude_post_types'         => array(),
 					'exclude_post_statuses'      => array(),
 					'exclude_password_protected' => FALSE,
@@ -366,6 +367,7 @@ namespace comment_mail // Root namespace.
 				$args         = array_intersect_key($args, $default_args);
 
 				$for_comments_only          = (boolean)$args['for_comments_only'];
+                $include_post_types         = (array)$args['include_post_types'];
 				$exclude_post_types         = (array)$args['exclude_post_types'];
 				$exclude_post_statuses      = (array)$args['exclude_post_statuses'];
 				$exclude_password_protected = (boolean)$args['exclude_password_protected'];
@@ -376,7 +378,7 @@ namespace comment_mail // Root namespace.
 				if(!is_null($total = &$this->cache_key(__FUNCTION__, $cache_keys)) && !$no_cache)
 					return $total; // Already cached this.
 
-				$post_types    = get_post_types(array('exclude_from_search' => FALSE));
+                $post_types    = $include_post_types ? $include_post_types : get_post_types(array('exclude_from_search' => FALSE));
 				$post_statuses = get_post_stati(array('exclude_from_search' => FALSE));
 
 				$sql = "SELECT SQL_CALC_FOUND_ROWS `ID` FROM `".esc_html($this->wp->posts)."`".
@@ -397,7 +399,7 @@ namespace comment_mail // Root namespace.
 				       " LIMIT 1"; // One to check.
 
 				if($this->wp->query($sql) === FALSE) // Initial query failure?
-					throw new \exception(__('Query failure.', $this->plugin->text_domain));
+					throw new \exception(__('Query failure.', 'comment-mail'));
 
 				return ($total = (integer)$this->wp->get_var("SELECT FOUND_ROWS()"));
 			}
@@ -419,6 +421,7 @@ namespace comment_mail // Root namespace.
 					'max'                        => PHP_INT_MAX,
 					'fail_on_max'                => FALSE,
 					'for_comments_only'          => FALSE,
+                    'include_post_types'         => array(),
 					'exclude_post_types'         => array(),
 					'exclude_post_statuses'      => array(),
 					'exclude_password_protected' => FALSE,
@@ -431,6 +434,7 @@ namespace comment_mail // Root namespace.
 				$max                        = $max < 1 ? 1 : $max;
 				$fail_on_max                = (boolean)$args['fail_on_max'];
 				$for_comments_only          = (boolean)$args['for_comments_only'];
+                $include_post_types         = (array)$args['include_post_types'];
 				$exclude_post_types         = (array)$args['exclude_post_types'];
 				$exclude_post_statuses      = (array)$args['exclude_post_statuses'];
 				$exclude_password_protected = (boolean)$args['exclude_password_protected'];
@@ -444,7 +448,7 @@ namespace comment_mail // Root namespace.
 				if($fail_on_max && $this->total_posts($args) > $max)
 					return ($posts = array()); // Fail when there are too many.
 
-				$post_types    = get_post_types(array('exclude_from_search' => FALSE));
+                $post_types    = $include_post_types ? $include_post_types : get_post_types(array('exclude_from_search' => FALSE));
 				$post_statuses = get_post_stati(array('exclude_from_search' => FALSE));
 
 				$columns = array(
@@ -528,6 +532,7 @@ namespace comment_mail // Root namespace.
 
 				$default_args = array(
 					'parents_only'               => FALSE,
+                    'include_post_types'         => array(),
 					'exclude_post_types'         => array(),
 					'exclude_post_statuses'      => array(),
 					'exclude_password_protected' => FALSE,
@@ -537,6 +542,7 @@ namespace comment_mail // Root namespace.
 				$args         = array_intersect_key($args, $default_args);
 
 				$parents_only               = (boolean)$args['parents_only'];
+                $include_post_types         = (array)$args['include_post_types'];
 				$exclude_post_types         = (array)$args['exclude_post_types'];
 				$exclude_post_statuses      = (array)$args['exclude_post_statuses'];
 				$exclude_password_protected = (boolean)$args['exclude_password_protected'];
@@ -548,6 +554,9 @@ namespace comment_mail // Root namespace.
 					return $total; // Already cached this.
 
 				if(!($post = get_post($post_id))) return ($total = 0);
+
+                if($include_post_types && !in_array($post->post_type, $include_post_types, TRUE))
+                    return ($total = 0); // Post type not included; automatic zero.
 
 				if($exclude_post_types && in_array($post->post_type, $exclude_post_types, TRUE))
 					return ($total = 0); // Post type is excluded; automatic zero.
@@ -569,7 +578,7 @@ namespace comment_mail // Root namespace.
 				       " LIMIT 1"; // One to check.
 
 				if($this->wp->query($sql) === FALSE) // Initial query failure?
-					throw new \exception(__('Query failure.', $this->plugin->text_domain));
+					throw new \exception(__('Query failure.', 'comment-mail'));
 
 				return ($total = (integer)$this->wp->get_var("SELECT FOUND_ROWS()"));
 			}
@@ -595,6 +604,7 @@ namespace comment_mail // Root namespace.
 					'max'                        => PHP_INT_MAX,
 					'fail_on_max'                => FALSE,
 					'parents_only'               => FALSE,
+                    'include_post_types'         => array(),
 					'exclude_post_types'         => array(),
 					'exclude_post_statuses'      => array(),
 					'exclude_password_protected' => FALSE,
@@ -607,6 +617,7 @@ namespace comment_mail // Root namespace.
 				$max                        = $max < 1 ? 1 : $max;
 				$fail_on_max                = (boolean)$args['fail_on_max'];
 				$parents_only               = (boolean)$args['parents_only'];
+                $include_post_types         = (array)$args['include_post_types'];
 				$exclude_post_types         = (array)$args['exclude_post_types'];
 				$exclude_post_statuses      = (array)$args['exclude_post_statuses'];
 				$exclude_password_protected = (boolean)$args['exclude_password_protected'];
@@ -618,6 +629,9 @@ namespace comment_mail // Root namespace.
 					return $comments; // Already cached this.
 
 				if(!($post = get_post($post_id))) return ($comments = array());
+
+                if($include_post_types && !in_array($post->post_type, $include_post_types, TRUE))
+                    return ($comments = array()); // Post type not included; automatic empty.
 
 				if($exclude_post_types && in_array($post->post_type, $exclude_post_types, TRUE))
 					return ($comments = array()); // Post type is excluded; automatic empty.

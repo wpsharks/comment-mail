@@ -36,8 +36,8 @@ namespace comment_mail // Root namespace.
 				$args = array(
 					'singular_name'  => 'queue_event_log_entry',
 					'plural_name'    => 'queue_event_log_entries',
-					'singular_label' => __('queue event log entry', $plugin->text_domain),
-					'plural_label'   => __('queue event log entries', $plugin->text_domain),
+					'singular_label' => __('queue event log entry', 'comment-mail'),
+					'plural_label'   => __('queue event log entries', 'comment-mail'),
 					'screen'         => $plugin->menu_page_hooks[__NAMESPACE__.'_queue_event_log'],
 				);
 				parent::__construct($args); // Parent constructor.
@@ -60,28 +60,28 @@ namespace comment_mail // Root namespace.
 
 				$columns = array(
 					'cb'                => '1', // Include checkboxes.
-					'ID'                => __('Entry', $plugin->text_domain),
+					'ID'                => __('Entry', 'comment-mail'),
 
-					'time'              => __('Time', $plugin->text_domain),
-					'event'             => __('Event', $plugin->text_domain),
+					'time'              => __('Time', 'comment-mail'),
+					'event'             => __('Event', 'comment-mail'),
 
-					'queue_id'          => __('Queue ID', $plugin->text_domain),
-					'dby_queue_id'      => __('Digested by Queue ID', $plugin->text_domain),
+					'queue_id'          => __('Queue ID', 'comment-mail'),
+					'dby_queue_id'      => __('Digested by Queue ID', 'comment-mail'),
 
-					'sub_id'            => __('Subscr. ID', $plugin->text_domain),
+					'sub_id'            => __('Subscr. ID', 'comment-mail'),
 
-					'user_id'           => __('WP User ID', $plugin->text_domain),
-					'post_id'           => __('Subscr. to Post ID', $plugin->text_domain),
-					'comment_parent_id' => __('Subscr. to Comment ID', $plugin->text_domain),
-					'comment_id'        => __('Regarding Comment ID', $plugin->text_domain),
+					'user_id'           => __('WP User ID', 'comment-mail'),
+					'post_id'           => __('Subscr. to Post ID', 'comment-mail'),
+					'comment_parent_id' => __('Subscr. to Comment ID', 'comment-mail'),
+					'comment_id'        => __('Regarding Comment ID', 'comment-mail'),
 
-					'fname'             => __('Subscr. First Name', $plugin->text_domain),
-					'lname'             => __('Subscr. Last Name', $plugin->text_domain),
-					'email'             => __('Subscr. Email', $plugin->text_domain),
+					'fname'             => __('Subscr. First Name', 'comment-mail'),
+					'lname'             => __('Subscr. Last Name', 'comment-mail'),
+					'email'             => __('Subscr. Email', 'comment-mail'),
 
-					'ip'                => __('Subscr. IP', $plugin->text_domain),
+					'ip'                => __('Subscr. IP', 'comment-mail'),
 
-					'status'            => __('Subscr. Status', $plugin->text_domain),
+					'status'            => __('Subscr. Status', 'comment-mail'),
 				);
 				return $columns; // Associative array.
 			}
@@ -177,8 +177,8 @@ namespace comment_mail // Root namespace.
 				$plugin = plugin(); // Needed for translations.
 
 				return array(
-					'event::invalidated' => $plugin->utils_i18n->event_label('invalidated'),
-					'event::notified'    => $plugin->utils_i18n->event_label('notified'),
+					'event::invalidated' => $plugin->utils_i18n->event_label('invalidated', 'ucwords'),
+					'event::notified'    => $plugin->utils_i18n->event_label('notified', 'ucwords'),
 				);
 			}
 
@@ -206,8 +206,8 @@ namespace comment_mail // Root namespace.
 					'delete' => '<a href="#"'.  // Depends on `menu-pages.js`.
 					            ' data-pmp-action="'.esc_attr($delete_url).'"'. // The action URL.
 					            ' data-pmp-confirmation="'.esc_attr($this->plugin->utils_i18n->log_entry_js_deletion_confirmation_warning()).'"'.
-					            ' title="'.esc_attr(__('Delete Queue Event Log Entry', $this->plugin->text_domain)).'">'.
-					            '  <i class="fa fa-times-circle"></i> '.__('Delete', $this->plugin->text_domain).
+					            ' title="'.esc_attr(__('Delete Queue Event Log Entry', 'comment-mail')).'">'.
+					            '  <i class="fa fa-times-circle"></i> '.__('Delete', 'comment-mail').
 					            '</a>',
 				);
 				return $id_info.$this->row_actions($row_actions);
@@ -365,7 +365,7 @@ namespace comment_mail // Root namespace.
 			protected function get_bulk_actions()
 			{
 				return array(
-					'delete' => __('Delete', $this->plugin->text_domain),
+					'delete' => __('Delete', 'comment-mail'),
 				);
 			}
 

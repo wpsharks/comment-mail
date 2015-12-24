@@ -36,8 +36,8 @@ namespace comment_mail // Root namespace.
 				$args = array(
 					'singular_name'  => 'subscription',
 					'plural_name'    => 'subscriptions',
-					'singular_label' => __('subscription', $plugin->text_domain),
-					'plural_label'   => __('subscriptions', $plugin->text_domain),
+					'singular_label' => __('subscription', 'comment-mail'),
+					'plural_label'   => __('subscriptions', 'comment-mail'),
 					'screen'         => $plugin->menu_page_hooks[__NAMESPACE__.'_subs'],
 				);
 				parent::__construct($args); // Parent constructor.
@@ -61,26 +61,26 @@ namespace comment_mail // Root namespace.
 				$columns = array(
 					'cb'                => '1', // Include checkboxes.
 
-					'email'             => __('Subscriber', $plugin->text_domain),
-					'fname'             => __('First Name', $plugin->text_domain),
-					'lname'             => __('Last Name', $plugin->text_domain),
+					'email'             => __('Subscriber', 'comment-mail'),
+					'fname'             => __('First Name', 'comment-mail'),
+					'lname'             => __('Last Name', 'comment-mail'),
 
-					'user_id'           => __('WP User ID', $plugin->text_domain),
-					'post_id'           => __('Post', $plugin->text_domain),
-					'comment_id'        => __('Comment', $plugin->text_domain),
+					'user_id'           => __('WP User ID', 'comment-mail'),
+					'post_id'           => __('Post', 'comment-mail'),
+					'comment_id'        => __('Comment', 'comment-mail'),
 
-					'deliver'           => __('Delivery', $plugin->text_domain),
-					'status'            => __('Status', $plugin->text_domain),
+					'deliver'           => __('Delivery', 'comment-mail'),
+					'status'            => __('Status', 'comment-mail'),
 
-					'insertion_time'    => __('Subscr. Time', $plugin->text_domain),
-					'last_update_time'  => __('Last Update', $plugin->text_domain),
+					'insertion_time'    => __('Subscr. Time', 'comment-mail'),
+					'last_update_time'  => __('Last Update', 'comment-mail'),
 
-					'insertion_ip'      => __('Subscr. IP', $plugin->text_domain),
+					'insertion_ip'      => __('Subscr. IP', 'comment-mail'),
 
-					'last_ip'           => __('Last IP', $plugin->text_domain),
+					'last_ip'           => __('Last IP', 'comment-mail'),
 
-					'key'               => __('Key', $plugin->text_domain),
-					'ID'                => __('ID', $plugin->text_domain),
+					'key'               => __('Key', 'comment-mail'),
+					'ID'                => __('ID', 'comment-mail'),
 				);
 				return $columns; // Associative array.
 			}
@@ -179,10 +179,10 @@ namespace comment_mail // Root namespace.
 				$plugin = plugin(); // Needed for translations.
 
 				return array(
-					'status::unconfirmed' => $plugin->utils_i18n->status_label('unconfirmed'),
-					'status::subscribed'  => $plugin->utils_i18n->status_label('subscribed'),
-					'status::suspended'   => $plugin->utils_i18n->status_label('suspended'),
-					'status::trashed'     => $plugin->utils_i18n->status_label('trashed'),
+					'status::unconfirmed' => $plugin->utils_i18n->status_label('unconfirmed', 'ucwords'),
+					'status::subscribed'  => $plugin->utils_i18n->status_label('subscribed', 'ucwords'),
+					'status::suspended'   => $plugin->utils_i18n->status_label('suspended', 'ucwords'),
+					'status::trashed'     => $plugin->utils_i18n->status_label('trashed', 'ucwords'),
 				);
 			}
 
@@ -210,7 +210,7 @@ namespace comment_mail // Root namespace.
 					'email_style'  => 'font-weight:normal;',
 				);
 				$name            = $item->fname.' '.$item->lname; // Concatenate.
-				$email_info      = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
+				$email_info      = '<i class="'.esc_attr('si si-'.$this->plugin->slug.'-one').'"></i>'.
 				                   ' '.$this->plugin->utils_markup->name_email($name, $item->email, $name_email_args);
 
 				$edit_url      = $this->plugin->utils_url->edit_sub_short($item->ID);
@@ -222,23 +222,23 @@ namespace comment_mail // Root namespace.
 				$delete_url    = $this->plugin->utils_url->table_bulk_action($this->plural_name, array($item->ID), 'delete');
 
 				$row_actions = array(
-					'edit'      => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscr.', $this->plugin->text_domain).'</a>',
+					'edit'      => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscr.', 'comment-mail').'</a>',
 
 					'reconfirm' => '<a href="#"'.  // Depends on `menu-pages.js`.
 					               ' data-pmp-action="'.esc_attr($reconfirm_url).'"'. // The action URL.
-					               ' data-pmp-confirmation="'.esc_attr(__('Resend email confirmation link? Are you sure?', $this->plugin->text_domain)).'">'.
-					               '  '.__('Reconfirm', $this->plugin->text_domain).
+					               ' data-pmp-confirmation="'.esc_attr(__('Resend email confirmation link? Are you sure?', 'comment-mail')).'">'.
+					               '  '.__('Reconfirm', 'comment-mail').
 					               '</a>',
 
-					'confirm'   => '<a href="'.esc_attr($confirm_url).'">'.__('Subscribe', $this->plugin->text_domain).'</a>',
-					'unconfirm' => '<a href="'.esc_attr($unconfirm_url).'">'.__('Unconfirm', $this->plugin->text_domain).'</a>',
-					'suspend'   => '<a href="'.esc_attr($suspend_url).'">'.__('Suspend', $this->plugin->text_domain).'</a>',
-					'trash'     => '<a href="'.esc_attr($trash_url).'" title="'.esc_attr(__('Trash', $this->plugin->text_domain)).'"><i class="fa fa-trash-o"></i></a>',
+					'confirm'   => '<a href="'.esc_attr($confirm_url).'">'.__('Subscribe', 'comment-mail').'</a>',
+					'unconfirm' => '<a href="'.esc_attr($unconfirm_url).'">'.__('Unconfirm', 'comment-mail').'</a>',
+					'suspend'   => '<a href="'.esc_attr($suspend_url).'">'.__('Suspend', 'comment-mail').'</a>',
+					'trash'     => '<a href="'.esc_attr($trash_url).'" title="'.esc_attr(__('Trash', 'comment-mail')).'"><i class="fa fa-trash-o"></i></a>',
 
 					'delete'    => '<a href="#"'.  // Depends on `menu-pages.js`.
 					               ' data-pmp-action="'.esc_attr($delete_url).'"'. // The action URL.
-					               ' data-pmp-confirmation="'.esc_attr(__('Delete permanently? Are you sure?', $this->plugin->text_domain)).'"'.
-					               ' title="'.esc_attr(__('Delete', $this->plugin->text_domain)).'">'.
+					               ' data-pmp-confirmation="'.esc_attr(__('Delete permanently? Are you sure?', 'comment-mail')).'"'.
+					               ' title="'.esc_attr(__('Delete', 'comment-mail')).'">'.
 					               '  <i class="fa fa-times-circle"></i>'.
 					               '</a>',
 				);
@@ -367,12 +367,12 @@ namespace comment_mail // Root namespace.
 			protected function get_bulk_actions()
 			{
 				return array(
-					'reconfirm' => __('Reconfirm', $this->plugin->text_domain),
-					'confirm'   => __('Confirm', $this->plugin->text_domain),
-					'unconfirm' => __('Unconfirm', $this->plugin->text_domain),
-					'suspend'   => __('Suspend', $this->plugin->text_domain),
-					'trash'     => __('Trash', $this->plugin->text_domain),
-					'delete'    => __('Delete', $this->plugin->text_domain),
+					'reconfirm' => __('Reconfirm', 'comment-mail'),
+					'confirm'   => __('Confirm', 'comment-mail'),
+					'unconfirm' => __('Unconfirm', 'comment-mail'),
+					'suspend'   => __('Suspend', 'comment-mail'),
+					'trash'     => __('Trash', 'comment-mail'),
+					'delete'    => __('Delete', 'comment-mail'),
 				);
 			}
 

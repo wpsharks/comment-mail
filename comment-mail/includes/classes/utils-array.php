@@ -83,7 +83,7 @@ namespace comment_mail // Root namespace.
 			public function unshift_assoc(array &$array, $key, $value)
 			{
 				if(!is_integer($key) && !is_string($key))
-					throw new \exception(__('Invalid `$key` arg.', $this->plugin->text_domain));
+					throw new \exception(__('Invalid `$key` arg.', 'comment-mail'));
 
 				unset($array[$key]); // Unset first.
 

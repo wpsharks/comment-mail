@@ -36,8 +36,8 @@ namespace comment_mail // Root namespace.
 				$args = array(
 					'singular_name'  => 'sub_event_log_entry',
 					'plural_name'    => 'sub_event_log_entries',
-					'singular_label' => __('sub. event log entry', $plugin->text_domain),
-					'plural_label'   => __('sub. event log entries', $plugin->text_domain),
+					'singular_label' => __('sub. event log entry', 'comment-mail'),
+					'plural_label'   => __('sub. event log entries', 'comment-mail'),
 					'screen'         => $plugin->menu_page_hooks[__NAMESPACE__.'_sub_event_log'],
 				);
 				parent::__construct($args); // Parent constructor.
@@ -60,44 +60,44 @@ namespace comment_mail // Root namespace.
 
 				$columns = array(
 					'cb'                => '1', // Include checkboxes.
-					'ID'                => __('Entry', $plugin->text_domain),
+					'ID'                => __('Entry', 'comment-mail'),
 
-					'time'              => __('Time', $plugin->text_domain),
-					'sub_id'            => __('Subscr. ID', $plugin->text_domain),
+					'time'              => __('Time', 'comment-mail'),
+					'sub_id'            => __('Subscr. ID', 'comment-mail'),
 
-					'event'             => __('Event', $plugin->text_domain),
-					'oby_sub_id'        => __('Overwritten By', $plugin->text_domain),
-					'user_initiated'    => __('User Initiated', $plugin->text_domain),
+					'event'             => __('Event', 'comment-mail'),
+					'oby_sub_id'        => __('Overwritten By', 'comment-mail'),
+					'user_initiated'    => __('User Initiated', 'comment-mail'),
 
-					'key_before'        => __('Subscr. Key Before', $plugin->text_domain),
-					'key'               => __('Subscr. Key After', $plugin->text_domain),
+					'key_before'        => __('Subscr. Key Before', 'comment-mail'),
+					'key'               => __('Subscr. Key After', 'comment-mail'),
 
-					'user_id_before'    => __('WP User ID Before', $plugin->text_domain),
-					'user_id'           => __('WP User ID After', $plugin->text_domain),
+					'user_id_before'    => __('WP User ID Before', 'comment-mail'),
+					'user_id'           => __('WP User ID After', 'comment-mail'),
 
-					'post_id_before'    => __('Post ID Before', $plugin->text_domain),
-					'post_id'           => __('Post ID After', $plugin->text_domain),
+					'post_id_before'    => __('Post ID Before', 'comment-mail'),
+					'post_id'           => __('Post ID After', 'comment-mail'),
 
-					'comment_id_before' => __('Comment ID Before', $plugin->text_domain),
-					'comment_id'        => __('Comment ID After', $plugin->text_domain),
+					'comment_id_before' => __('Comment ID Before', 'comment-mail'),
+					'comment_id'        => __('Comment ID After', 'comment-mail'),
 
-					'status_before'     => __('Status Before', $plugin->text_domain),
-					'status'            => __('Status After', $plugin->text_domain),
+					'status_before'     => __('Status Before', 'comment-mail'),
+					'status'            => __('Status After', 'comment-mail'),
 
-					'deliver_before'    => __('Delivery Before', $plugin->text_domain),
-					'deliver'           => __('Delivery After', $plugin->text_domain),
+					'deliver_before'    => __('Delivery Before', 'comment-mail'),
+					'deliver'           => __('Delivery After', 'comment-mail'),
 
-					'fname_before'      => __('First Name Before', $plugin->text_domain),
-					'fname'             => __('First Name After', $plugin->text_domain),
+					'fname_before'      => __('First Name Before', 'comment-mail'),
+					'fname'             => __('First Name After', 'comment-mail'),
 
-					'lname_before'      => __('Last Name Before', $plugin->text_domain),
-					'lname'             => __('Last Name After', $plugin->text_domain),
+					'lname_before'      => __('Last Name Before', 'comment-mail'),
+					'lname'             => __('Last Name After', 'comment-mail'),
 
-					'email_before'      => __('Email Before', $plugin->text_domain),
-					'email'             => __('Email After', $plugin->text_domain),
+					'email_before'      => __('Email Before', 'comment-mail'),
+					'email'             => __('Email After', 'comment-mail'),
 
-					'ip_before'         => __('IP Address Before', $plugin->text_domain),
-					'ip'                => __('IP Address After', $plugin->text_domain),
+					'ip_before'         => __('IP Address Before', 'comment-mail'),
+					'ip'                => __('IP Address After', 'comment-mail'),
 				);
 				return $columns; // Associative array.
 			}
@@ -213,12 +213,13 @@ namespace comment_mail // Root namespace.
 				$plugin = plugin(); // Needed for translations.
 
 				return array(
-					'event::inserted'    => $plugin->utils_i18n->event_label('inserted'),
-					'event::updated'     => $plugin->utils_i18n->event_label('updated'),
-					'event::overwritten' => $plugin->utils_i18n->event_label('overwritten'),
-					'event::purged'      => $plugin->utils_i18n->event_label('purged'),
-					'event::cleaned'     => $plugin->utils_i18n->event_label('cleaned'),
-					'event::deleted'     => $plugin->utils_i18n->event_label('deleted'),
+					'event::inserted'    => $plugin->utils_i18n->event_label('inserted', 'ucwords'),
+					'event::updated'     => $plugin->utils_i18n->event_label('updated', 'ucwords'),
+					'event::overwritten' => $plugin->utils_i18n->event_label('overwritten', 'ucwords'),
+					'event::purged'      => $plugin->utils_i18n->event_label('purged', 'ucwords'),
+					'event::cleaned'     => $plugin->utils_i18n->event_label('cleaned', 'ucwords'),
+					'event::deleted'     => $plugin->utils_i18n->event_label('deleted', 'ucwords'),
+
 				);
 			}
 
@@ -246,8 +247,8 @@ namespace comment_mail // Root namespace.
 					'delete' => '<a href="#"'.  // Depends on `menu-pages.js`.
 					            ' data-pmp-action="'.esc_attr($delete_url).'"'. // The action URL.
 					            ' data-pmp-confirmation="'.esc_attr($this->plugin->utils_i18n->log_entry_js_deletion_confirmation_warning()).'"'.
-					            ' title="'.esc_attr(__('Delete Sub. Event Log Entry', $this->plugin->text_domain)).'">'.
-					            '  <i class="fa fa-times-circle"></i> '.__('Delete', $this->plugin->text_domain).
+					            ' title="'.esc_attr(__('Delete Sub. Event Log Entry', 'comment-mail')).'">'.
+					            '  <i class="fa fa-times-circle"></i> '.__('Delete', 'comment-mail').
 					            '</a>',
 				);
 				return $id_info.$this->row_actions($row_actions);
@@ -282,14 +283,14 @@ namespace comment_mail // Root namespace.
 						if($item->oby_sub_id && !empty($this->merged_result_sets['subs'][$item->oby_sub_id]))
 						{
 							$edit_url     = $this->plugin->utils_url->edit_sub_short($item->oby_sub_id);
-							$oby_sub_info = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
+							$oby_sub_info = '<i class="'.esc_attr('si si-'.$this->plugin->slug.'-one').'"></i>'.
 							                ' <span>ID <a href="'.esc_attr($edit_url).'" title="'.esc_attr($item->oby_sub_key).'">#'.esc_html($item->oby_sub_id).'</a></span>';
 						}
-						else $oby_sub_info = '<i class="'.esc_attr('wsi-'.$this->plugin->slug.'-one').'"></i>'.
+						else $oby_sub_info = '<i class="'.esc_attr('si si-'.$this->plugin->slug.'-one').'"></i>'.
 						                     ' <span>ID #'.esc_html($item->oby_sub_id).'</span>';
 
 						return esc_html($event_label).' '.$this->plugin->utils_event->sub_overwritten_q_link($item).'<br />'.
-						       '<i class="pmp-child-branch"></i> '.__('by', $this->plugin->text_domain).' '.$oby_sub_info;
+						       '<i class="pmp-child-branch"></i> '.__('by', 'comment-mail').' '.$oby_sub_info;
 
 					case 'purged': // Subscription was purged in this case.
 
@@ -437,7 +438,7 @@ namespace comment_mail // Root namespace.
 			protected function get_bulk_actions()
 			{
 				return array(
-					'delete' => __('Delete', $this->plugin->text_domain),
+					'delete' => __('Delete', 'comment-mail'),
 				);
 			}
 

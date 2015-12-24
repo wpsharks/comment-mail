@@ -78,6 +78,18 @@ namespace comment_mail // Root namespace.
 				$this->post_types = strtolower($this->plugin->options['auto_subscribe_post_types']);
 				$this->post_types = preg_split('/[;,\s]+/', $this->post_types, NULL, PREG_SPLIT_NO_EMPTY);
 
+                $enabled_post_types = strtolower($this->plugin->options['enabled_post_types']);
+                $enabled_post_types = preg_split('/[;,\s]+/', $enabled_post_types, NULL, PREG_SPLIT_NO_EMPTY);
+
+                if ($enabled_post_types && $this->post_types) {
+                    foreach($this->post_types as $_key => $_post_type) {
+                        if (!in_array($_post_type, $enabled_post_types, true)) {
+                            unset($this->post_types[$_key]);
+                        }
+                    }
+                    unset($_key, $_post_type); // Housekeeping.
+                }
+
 				$this->process_events = (boolean)$args['process_events'];
 
 				$this->maybe_auto_inject();
@@ -107,6 +119,7 @@ namespace comment_mail // Root namespace.
 
 				$this->maybe_inject_post_author();
 				$this->maybe_inject_recipients();
+				$this->maybe_inject_users_by_role();
 			}
 
 			/**
@@ -179,6 +192,43 @@ namespace comment_mail // Root namespace.
 					));
 				}
 				unset($_recipient, $_data); // Housekeeping.
+			}
+			/**
+			* Injects users by role.
+			*
+			* @since 151224 Adding auto-subscribe roles.
+			*/
+			protected function maybe_inject_users_by_role()
+			{
+  			if(!$this->plugin->options['auto_subscribe_roles'])
+    			return; // Not applicable.
+
+				$roles = $this->plugin->options['auto_subscribe_roles'];
+  			$roles = preg_split('/[;,\s]+/', $roles, NULL, PREG_SPLIT_NO_EMPTY);
+
+  			foreach($roles as $_role) // All users w/ any of these roles.
+  			{
+    			foreach((array)get_users('role='.$_role) as $_user)
+    			{
+      			if(!($_user instanceof \WP_User) || !$_user->user_email)
+        			continue; // Not applicable/possible.
+
+      			$_data = array(
+        			'post_id'    => $this->post->ID,
+        			'comment_id' => 0, // Subscribe to all comments.
+        			'deliver'    => $this->plugin->options['auto_subscribe_deliver'],
+        			'fname'      => $_user->first_name,
+        			'lname'      => $_user->last_name,
+        			'email'      => $_user->user_email,
+        			'status'     => 'subscribed',
+      			);
+      			new sub_inserter($_data, array(
+        			'process_events' => $this->process_events,
+      			));
+    			}
+    			unset($_user, $_data); // Housekeeping.
+  			}
+  			unset($_role); // Housekeeping.
 			}
 		}
 	}
