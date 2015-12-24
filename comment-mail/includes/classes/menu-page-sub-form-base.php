@@ -255,10 +255,10 @@ namespace comment_mail // Root namespace.
 
 				return $form_fields->select_row(
 					array(
-						'placeholder'         => __('— All Comments/Replies —', $plugin->text_domain),
-						'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID #', $plugin->text_domain),
+						'placeholder'         => __('— All Comments/Replies —', 'comment-mail'),
+						'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID #', 'comment-mail'),
 						'name'                => 'comment_id', 'required' => FALSE, 'options' => '%%comments%%', 'post_id' => $post_id, 'current_value' => NULL,
-						'notes_after'         => __('If empty, they\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $plugin->text_domain),
+						'notes_after'         => __('If empty, they\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', 'comment-mail'),
 						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"'),
 					));
 			}
@@ -346,7 +346,7 @@ namespace comment_mail // Root namespace.
 					if($sub_updater->did_update()) // Updated successfully?
 					{
 						$plugin->enqueue_user_notice( // Queue notice.
-							sprintf(__('Subscription ID #<code>%1$s</code> updated successfully.', $plugin->text_domain), esc_html($request_args['ID'])),
+							sprintf(__('Subscription ID #<code>%1$s</code> updated successfully.', 'comment-mail'), esc_html($request_args['ID'])),
 							array('transient' => TRUE, 'for_page' => $plugin->utils_env->current_menu_page()));
 
 						$redirect_to = $plugin->utils_url->page_table_nav_vars_only();
@@ -354,7 +354,7 @@ namespace comment_mail // Root namespace.
 					else // There were errors; display those errors to the current user.
 					{
 						$plugin->enqueue_user_error( // Queue error notice.
-							sprintf(__('Failed to update subscription ID #<code>%1$s</code>. Please review the following error(s):', $plugin->text_domain), esc_html($request_args['ID'])).
+							sprintf(__('Failed to update subscription ID #<code>%1$s</code>. Please review the following error(s):', 'comment-mail'), esc_html($request_args['ID'])).
 							'<ul class="pmp-list-items"><li>'.implode('</li><li>', $sub_updater->errors_html()).'</li></ul>',
 							array('transient' => TRUE, 'for_page' => $plugin->utils_env->current_menu_page()));
 					}
@@ -366,7 +366,7 @@ namespace comment_mail // Root namespace.
 					if($sub_inserter->did_insert()) // Inserted successfully?
 					{
 						$plugin->enqueue_user_notice( // Queue notice.
-							sprintf(__('Subscription ID #<code>%1$s</code> created successfully.', $plugin->text_domain), esc_html($sub_inserter->insert_id())),
+							sprintf(__('Subscription ID #<code>%1$s</code> created successfully.', 'comment-mail'), esc_html($sub_inserter->insert_id())),
 							array('transient' => TRUE, 'for_page' => $plugin->utils_env->current_menu_page()));
 
 						$redirect_to = $plugin->utils_url->page_table_nav_vars_only();
@@ -374,7 +374,7 @@ namespace comment_mail // Root namespace.
 					else // There were errors; display those errors to the current user.
 					{
 						$plugin->enqueue_user_error( // Queue error notice.
-							__('Failed to create new subscription. Please review the following error(s):', $plugin->text_domain).
+							__('Failed to create new subscription. Please review the following error(s):', 'comment-mail').
 							'<ul class="pmp-list-items"><li>'.implode('</li><li>', $sub_inserter->errors_html()).'</li></ul>',
 							array('transient' => TRUE, 'for_page' => $plugin->utils_env->current_menu_page()));
 					}

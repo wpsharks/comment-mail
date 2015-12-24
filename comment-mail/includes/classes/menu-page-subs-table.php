@@ -36,8 +36,8 @@ namespace comment_mail // Root namespace.
 				$args = array(
 					'singular_name'  => 'subscription',
 					'plural_name'    => 'subscriptions',
-					'singular_label' => __('subscription', $plugin->text_domain),
-					'plural_label'   => __('subscriptions', $plugin->text_domain),
+					'singular_label' => __('subscription', 'comment-mail'),
+					'plural_label'   => __('subscriptions', 'comment-mail'),
 					'screen'         => $plugin->menu_page_hooks[__NAMESPACE__.'_subs'],
 				);
 				parent::__construct($args); // Parent constructor.
@@ -61,26 +61,26 @@ namespace comment_mail // Root namespace.
 				$columns = array(
 					'cb'                => '1', // Include checkboxes.
 
-					'email'             => __('Subscriber', $plugin->text_domain),
-					'fname'             => __('First Name', $plugin->text_domain),
-					'lname'             => __('Last Name', $plugin->text_domain),
+					'email'             => __('Subscriber', 'comment-mail'),
+					'fname'             => __('First Name', 'comment-mail'),
+					'lname'             => __('Last Name', 'comment-mail'),
 
-					'user_id'           => __('WP User ID', $plugin->text_domain),
-					'post_id'           => __('Post', $plugin->text_domain),
-					'comment_id'        => __('Comment', $plugin->text_domain),
+					'user_id'           => __('WP User ID', 'comment-mail'),
+					'post_id'           => __('Post', 'comment-mail'),
+					'comment_id'        => __('Comment', 'comment-mail'),
 
-					'deliver'           => __('Delivery', $plugin->text_domain),
-					'status'            => __('Status', $plugin->text_domain),
+					'deliver'           => __('Delivery', 'comment-mail'),
+					'status'            => __('Status', 'comment-mail'),
 
-					'insertion_time'    => __('Subscr. Time', $plugin->text_domain),
-					'last_update_time'  => __('Last Update', $plugin->text_domain),
+					'insertion_time'    => __('Subscr. Time', 'comment-mail'),
+					'last_update_time'  => __('Last Update', 'comment-mail'),
 
-					'insertion_ip'      => __('Subscr. IP', $plugin->text_domain),
+					'insertion_ip'      => __('Subscr. IP', 'comment-mail'),
 
-					'last_ip'           => __('Last IP', $plugin->text_domain),
+					'last_ip'           => __('Last IP', 'comment-mail'),
 
-					'key'               => __('Key', $plugin->text_domain),
-					'ID'                => __('ID', $plugin->text_domain),
+					'key'               => __('Key', 'comment-mail'),
+					'ID'                => __('ID', 'comment-mail'),
 				);
 				return $columns; // Associative array.
 			}

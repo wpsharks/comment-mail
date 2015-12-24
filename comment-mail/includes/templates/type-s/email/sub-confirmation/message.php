@@ -21,7 +21,7 @@ namespace comment_mail;
  */
 ?>
 <?php // Sets document <title> tag via `%%title%%` replacement code in header.
-echo str_replace('%%title%%', __('Confirmation Request', $plugin->text_domain), $email_header); ?>
+echo str_replace('%%title%%', __('Confirmation Request', 'comment-mail'), $email_header); ?>
 
 <?php
 /*
@@ -51,7 +51,7 @@ $sub_confirm_url = $plugin->utils_url->sub_confirm_url($sub->key);
 $sub_name_email_markup = $plugin->utils_markup->name_email($sub->fname.' '.$sub->lname, $sub->email);
 
 // Subscriber's last known IP address.
-$sub_last_ip = $sub->last_ip ? $sub->last_ip : __('unknown', $plugin->text_domain);
+$sub_last_ip = $sub->last_ip ? $sub->last_ip : __('unknown', 'comment-mail');
 
 // Subscription last update time "ago"; e.g. `X [seconds/minutes/days/weeks/years] ago`.
 $sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $sub->last_update_time);
@@ -74,9 +74,9 @@ $sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $
 		)); ?>
 
 	<p style="color:#888888; font-style:italic;">
-		<?php echo __('Note: if you did not make this request, please ignore this email. You will only be subscribed if you confirm.', $plugin->text_domain); ?>
-		<?php echo sprintf(__('This subscription was requested by %1$s; from IP address: <code>%2$s</code> on %3$s.', $plugin->text_domain), $sub_name_email_markup, esc_html($sub_last_ip), esc_html($sub_last_update_time_ago)); ?>
-		<?php echo __('If you need to report any continued abuse, please use the contact info at the bottom of this email.', $plugin->text_domain); ?>
+		<?php echo __('Note: if you did not make this request, please ignore this email. You will only be subscribed if you confirm.', 'comment-mail'); ?>
+		<?php echo sprintf(__('This subscription was requested by %1$s; from IP address: <code>%2$s</code> on %3$s.', 'comment-mail'), $sub_name_email_markup, esc_html($sub_last_ip), esc_html($sub_last_update_time_ago)); ?>
+		<?php echo __('If you need to report any continued abuse, please use the contact info at the bottom of this email.', 'comment-mail'); ?>
 	</p>
 
 <?php echo $email_footer; ?>
