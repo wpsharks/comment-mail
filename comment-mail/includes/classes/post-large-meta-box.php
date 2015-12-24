@@ -54,7 +54,7 @@ namespace comment_mail // Root namespace.
 					= $this->plugin->utils_db->post_comment_status__($this->post->comment_status);
 
 				echo '<div class="'.esc_attr($this->plugin->slug.'-menu-page-area').'">'."\n";
-				echo __('Coming soon...', $this->plugin->text_domain);
+				echo __('Coming soon...', 'comment-mail');
 				echo '</div>';
 
 				if($post_comment_status !== 'open' && !$this->post->comment_count)

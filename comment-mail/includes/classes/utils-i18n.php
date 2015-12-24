@@ -37,36 +37,36 @@ namespace comment_mail // Root namespace.
 				switch($action) // Convert to past tense.
 				{
 					case 'reconfirm':
-						$i18n = __('reconfirmed', $this->plugin->text_domain);
+						$i18n = __('reconfirmed', 'comment-mail');
 						break;
 
 					case 'confirm':
-						$i18n = __('confirmed', $this->plugin->text_domain);
+						$i18n = __('confirmed', 'comment-mail');
 						break;
 
 					case 'unconfirm':
-						$i18n = __('unconfirmed', $this->plugin->text_domain);
+						$i18n = __('unconfirmed', 'comment-mail');
 						break;
 
 					case 'suspend':
-						$i18n = __('suspended', $this->plugin->text_domain);
+						$i18n = __('suspended', 'comment-mail');
 						break;
 
 					case 'trash':
-						$i18n = __('trashed', $this->plugin->text_domain);
+						$i18n = __('trashed', 'comment-mail');
 						break;
 
 					case 'update':
-						$i18n = __('updated', $this->plugin->text_domain);
+						$i18n = __('updated', 'comment-mail');
 						break;
 
 					case 'delete':
-						$i18n = __('deleted', $this->plugin->text_domain);
+						$i18n = __('deleted', 'comment-mail');
 						break;
 
 					default: // Default case handler.
 						if($action) // Only if it's not empty.
-							$i18n = __(rtrim($action, 'ed').'ed', $this->plugin->text_domain);
+							$i18n = __(rtrim($action, 'ed').'ed', 'comment-mail');
 						break;
 				}
 				if(ctype_alnum($i18n)) switch($transform) // No special chars?
@@ -103,52 +103,52 @@ namespace comment_mail // Root namespace.
 				switch($status) // Convert to label.
 				{
 					case 'approve':
-						$i18n = __('approved', $this->plugin->text_domain);
+						$i18n = __('approved', 'comment-mail');
 						break;
 
 					case 'hold':
-						$i18n = __('pending', $this->plugin->text_domain);
+						$i18n = __('pending', 'comment-mail');
 						break;
 
 					case 'trash':
-						$i18n = __('trashed', $this->plugin->text_domain);
+						$i18n = __('trashed', 'comment-mail');
 						break;
 
 					case 'spam':
-						$i18n = __('spammy', $this->plugin->text_domain);
+						$i18n = __('spammy', 'comment-mail');
 						break;
 
 					case 'delete':
-						$i18n = __('deleted', $this->plugin->text_domain);
+						$i18n = __('deleted', 'comment-mail');
 						break;
 
 					case 'open':
-						$i18n = __('open', $this->plugin->text_domain);
+						$i18n = __('open', 'comment-mail');
 						break;
 
 					case 'closed':
-						$i18n = __('closed', $this->plugin->text_domain);
+						$i18n = __('closed', 'comment-mail');
 						break;
 
 					case 'unconfirmed':
-						$i18n = __('unconfirmed', $this->plugin->text_domain);
+						$i18n = __('unconfirmed', 'comment-mail');
 						break;
 
 					case 'subscribed':
-						$i18n = __('subscribed', $this->plugin->text_domain);
+						$i18n = __('subscribed', 'comment-mail');
 						break;
 
 					case 'suspended':
-						$i18n = __('suspended', $this->plugin->text_domain);
+						$i18n = __('suspended', 'comment-mail');
 						break;
 
 					case 'trashed':
-						$i18n = __('trashed', $this->plugin->text_domain);
+						$i18n = __('trashed', 'comment-mail');
 						break;
 
 					default: // Default case handler.
 						if($status) // Only if it's not empty.
-							$i18n = __(rtrim($status, 'ed').'ed', $this->plugin->text_domain);
+							$i18n = __(rtrim($status, 'ed').'ed', 'comment-mail');
 						break;
 				}
 				if(ctype_alnum($i18n)) switch($transform) // No special chars?
@@ -185,40 +185,40 @@ namespace comment_mail // Root namespace.
 				switch($event) // Convert to label.
 				{
 					case 'inserted':
-						$i18n = __('inserted', $this->plugin->text_domain);
+						$i18n = __('inserted', 'comment-mail');
 						break;
 
 					case 'updated':
-						$i18n = __('updated', $this->plugin->text_domain);
+						$i18n = __('updated', 'comment-mail');
 						break;
 
 					case 'overwritten':
-						$i18n = __('overwritten', $this->plugin->text_domain);
+						$i18n = __('overwritten', 'comment-mail');
 						break;
 
 					case 'purged':
-						$i18n = __('purged', $this->plugin->text_domain);
+						$i18n = __('purged', 'comment-mail');
 						break;
 
 					case 'cleaned':
-						$i18n = __('cleaned', $this->plugin->text_domain);
+						$i18n = __('cleaned', 'comment-mail');
 						break;
 
 					case 'deleted':
-						$i18n = __('deleted', $this->plugin->text_domain);
+						$i18n = __('deleted', 'comment-mail');
 						break;
 
 					case 'invalidated':
-						$i18n = __('invalidated', $this->plugin->text_domain);
+						$i18n = __('invalidated', 'comment-mail');
 						break;
 
 					case 'notified':
-						$i18n = __('notified', $this->plugin->text_domain);
+						$i18n = __('notified', 'comment-mail');
 						break;
 
 					default: // Default case handler.
 						if($event) // Only if it's not empty.
-							$i18n = __(rtrim($event, 'ed').'ed', $this->plugin->text_domain);
+							$i18n = __(rtrim($event, 'ed').'ed', 'comment-mail');
 						break;
 				}
 				if(ctype_alnum($i18n)) switch($transform) // No special chars?
@@ -255,24 +255,24 @@ namespace comment_mail // Root namespace.
 				switch($deliver) // Convert to label.
 				{
 					case 'asap':
-						$i18n = __('asap', $this->plugin->text_domain);
+						$i18n = __('asap', 'comment-mail');
 						break;
 
 					case 'hourly':
-						$i18n = __('hourly', $this->plugin->text_domain);
+						$i18n = __('hourly', 'comment-mail');
 						break;
 
 					case 'daily':
-						$i18n = __('daily', $this->plugin->text_domain);
+						$i18n = __('daily', 'comment-mail');
 						break;
 
 					case 'weekly':
-						$i18n = __('weekly', $this->plugin->text_domain);
+						$i18n = __('weekly', 'comment-mail');
 						break;
 
 					default: // Default case handler.
 						if($deliver) // Only if it's not empty.
-							$i18n = __(rtrim($deliver, 'ed').'ed', $this->plugin->text_domain);
+							$i18n = __(rtrim($deliver, 'ed').'ed', 'comment-mail');
 						break;
 				}
 				if(ctype_alnum($i18n)) switch($transform) // No special chars?
@@ -309,16 +309,16 @@ namespace comment_mail // Root namespace.
 				switch($sub_type) // Convert to label.
 				{
 					case 'comments':
-						$i18n = __('all comments', $this->plugin->text_domain);
+						$i18n = __('all comments', 'comment-mail');
 						break;
 
 					case 'comment':
-						$i18n = __('replies only', $this->plugin->text_domain);
+						$i18n = __('replies only', 'comment-mail');
 						break;
 
 					default: // Default case handler.
 						if($action) // Only if it's not empty.
-							$i18n = __(rtrim($action, 'ed').'ed', $this->plugin->text_domain);
+							$i18n = __(rtrim($action, 'ed').'ed', 'comment-mail');
 						break;
 				}
 				if(ctype_alnum($i18n)) switch($transform) // No special chars?
@@ -351,7 +351,7 @@ namespace comment_mail // Root namespace.
 			{
 				$counter = (integer)$counter; // Force integer.
 
-				return sprintf(_n('%1$s subscription', '%1$s subscriptions', $counter, $this->plugin->text_domain), $counter);
+				return sprintf(_n('%1$s subscription', '%1$s subscriptions', $counter, 'comment-mail'), $counter);
 			}
 
 			/**
@@ -367,7 +367,7 @@ namespace comment_mail // Root namespace.
 			{
 				$counter = (integer)$counter; // Force integer.
 
-				return sprintf(_n('%1$s sub. event log entry', '%1$s sub. event log entries', $counter, $this->plugin->text_domain), $counter);
+				return sprintf(_n('%1$s sub. event log entry', '%1$s sub. event log entries', $counter, 'comment-mail'), $counter);
 			}
 
 			/**
@@ -383,7 +383,7 @@ namespace comment_mail // Root namespace.
 			{
 				$counter = (integer)$counter; // Force integer.
 
-				return sprintf(_n('%1$s queued notification', '%1$s queued notifications', $counter, $this->plugin->text_domain), $counter);
+				return sprintf(_n('%1$s queued notification', '%1$s queued notifications', $counter, 'comment-mail'), $counter);
 			}
 
 			/**
@@ -399,7 +399,7 @@ namespace comment_mail // Root namespace.
 			{
 				$counter = (integer)$counter; // Force integer.
 
-				return sprintf(_n('%1$s queue event log entry', '%1$s queue event log entries', $counter, $this->plugin->text_domain), $counter);
+				return sprintf(_n('%1$s queue event log entry', '%1$s queue event log entries', $counter, 'comment-mail'), $counter);
 			}
 
 			/**
@@ -411,9 +411,9 @@ namespace comment_mail // Root namespace.
 			 */
 			public function log_entry_js_deletion_confirmation_warning()
 			{
-				return __('Delete permanently? Are you sure?', $this->plugin->text_domain)."\n\n".
-					   __('WARNING: Deleting log entries is not recommended, as this will have an impact on statistical reporting.', $this->plugin->text_domain)."\n\n".
-					   __('If you want statistical reports to remain accurate, please leave ALL log entries intact.', $this->plugin->text_domain);
+				return __('Delete permanently? Are you sure?', 'comment-mail')."\n\n".
+					   __('WARNING: Deleting log entries is not recommended, as this will have an impact on statistical reporting.', 'comment-mail')."\n\n".
+					   __('If you want statistical reports to remain accurate, please leave ALL log entries intact.', 'comment-mail');
 			}
 		}
 	}

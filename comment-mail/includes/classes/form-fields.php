@@ -142,7 +142,7 @@ namespace comment_mail // Root namespace.
 					$row .= '<th scope="row">';
 					$row .= '   <label for="'.esc_attr($id).'">'.
 					        '      '.$label.($required ? // Change the short description based on this boolean.
-							'        <span class="description">'.__('(required) *', $this->plugin->text_domain).'</span>' : '').
+							'        <span class="description">'.__('(required) *', 'comment-mail').'</span>' : '').
 					        '   </label>';
 					$row .= '</th>';
 				}
@@ -272,9 +272,9 @@ namespace comment_mail // Root namespace.
 					$row .= '<th scope="row">';
 					$row .= '   <label for="'.esc_attr($id).'">'.
 					        '      '.$label.($required ? // Change the short description based on this boolean.
-							'        <span class="description">'.__('(required) *', $this->plugin->text_domain).'</span>' : '').
+							'        <span class="description">'.__('(required) *', 'comment-mail').'</span>' : '').
 					        ($cm_mode ? '<span class="description" style="margin-left:2em;">'.
-					                    '   <small>'.__('(<code>F11</code> toggles fullscreen editing)', $this->plugin->text_domain).'</small>'.
+					                    '   <small>'.__('(<code>F11</code> toggles fullscreen editing)', 'comment-mail').'</small>'.
 					                    ($cm_details ? '<small style="margin-left:2em;">'.$cm_details.'</small>' : '').
 					                    '</span>' : '').
 					        '   </label>';
@@ -419,7 +419,7 @@ namespace comment_mail // Root namespace.
 					$row .= '<th scope="row">';
 					$row .= '   <label for="'.esc_attr($id).'">'.
 					        '      '.$label.($required ? // Change the short description based on this boolean.
-							'        <span class="description">'.__('(required) *', $this->plugin->text_domain).'</span>' : '').
+							'        <span class="description">'.__('(required) *', 'comment-mail').'</span>' : '').
 					        '   </label>';
 					$row .= '</th>';
 				}

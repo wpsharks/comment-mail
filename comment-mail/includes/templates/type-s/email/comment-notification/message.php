@@ -23,7 +23,7 @@ namespace comment_mail;
  */
 ?>
 <?php // Sets document <title> tag via `%%title%%` replacement code in header.
-echo str_replace('%%title%%', __('Comment Notification(s)', $plugin->text_domain), $email_header); ?>
+echo str_replace('%%title%%', __('Comment Notification(s)', 'comment-mail'), $email_header); ?>
 
 <?php
 /*
@@ -50,7 +50,7 @@ $subscribed_to_own_comment = $sub_comment && strcasecmp($sub_comment->comment_au
 $sub_name_email_markup = $plugin->utils_markup->name_email($sub->fname.' '.$sub->lname, $sub->email);
 
 // Subscriber's last known IP address.
-$sub_last_ip = $sub->last_ip ? $sub->last_ip : __('unknown', $plugin->text_domain);
+$sub_last_ip = $sub->last_ip ? $sub->last_ip : __('unknown', 'comment-mail');
 
 // Subscription last update time "ago"; e.g. `X [seconds/minutes/days/weeks/years] ago`.
 $sub_last_update_time_ago = $plugin->utils_date->i18n_utc('M jS, Y @ g:i a T', $sub->last_update_time);
@@ -126,21 +126,21 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
         )); ?>
         <p>
             <a href="<?php echo esc_attr($_comment_url); ?>">
-                <?php echo __('Continue reading', $plugin->text_domain); ?>
+                <?php echo __('Continue reading', 'comment-mail'); ?>
             </a>
             <?php if($sub_post_comments_open): ?>
                 | <a href="<?php echo esc_attr($_comment_reply_url); ?>">
                     <?php if($_comment->comment_author) : ?>
-                        <?php echo __('Reply to', $plugin->text_domain).' '.esc_html($_comment->comment_author); ?>
+                        <?php echo __('Reply to', 'comment-mail').' '.esc_html($_comment->comment_author); ?>
                     <?php else : ?>
-                        <?php echo __('Reply', $plugin->text_domain); ?>
+                        <?php echo __('Reply', 'comment-mail'); ?>
                     <?php endif; ?>
                 </a>
                 <?php if($replies_via_email_enable): ?>
                     <?php if($is_digest): // Marker only needed in digests. ?>
-                        <small><em><?php echo sprintf(__('— or reply to this email &amp; start your message with: <code>%1$s</code>', $plugin->text_domain), esc_html($_comment_rve_irt_marker)); ?></em></small>
+                        <small><em><?php echo sprintf(__('— or reply to this email &amp; start your message with: <code>%1$s</code>', 'comment-mail'), esc_html($_comment_rve_irt_marker)); ?></em></small>
                     <?php else: // The `Reply-To:` field in the email will suffice in other cases; i.e. there is only one comment in this notification. ?>
-                        <small><em><?php echo __('— or simply reply to this email', $plugin->text_domain); ?></em></small>
+                        <small><em><?php echo __('— or simply reply to this email', 'comment-mail'); ?></em></small>
                     <?php endif; ?>
                 <?php endif; ?>
             <?php endif; ?>
@@ -158,22 +158,22 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
 				)); ?>
         <p>
             <a href="<?php echo esc_attr($_comment_url); ?>">
-                <?php echo __('Continue reading', $plugin->text_domain); ?>
+                <?php echo __('Continue reading', 'comment-mail'); ?>
             </a>
             <?php if($sub_post_comments_open): ?>
                 | <a href="<?php echo esc_attr($_comment_reply_url); ?>">
                     <?php if($_comment->comment_author) : ?>
-                        <?php echo __('Reply to', $plugin->text_domain).' '.esc_html($_comment->comment_author); ?>
+                        <?php echo __('Reply to', 'comment-mail').' '.esc_html($_comment->comment_author); ?>
                     <?php else : ?>
-                        <?php echo __('Reply', $plugin->text_domain); ?>
+                        <?php echo __('Reply', 'comment-mail'); ?>
                     <?php endif; ?>
                 </a>
                 <?php if($replies_via_email_enable): ?>
                     <?php if($is_digest): // Marker only needed in digests. ?>
-                        <small><em><?php echo sprintf(__('— or reply to this email &amp; start your message with: <code>%1$s</code>', $plugin->text_domain), esc_html($_comment_rve_irt_marker)); ?></em></small>
+                        <small><em><?php echo sprintf(__('— or reply to this email &amp; start your message with: <code>%1$s</code>', 'comment-mail'), esc_html($_comment_rve_irt_marker)); ?></em></small>
                     <?php else: // The `Reply-To:` field in the email will suffice in other cases; i.e. there is only one comment in this notification. ?>
-                        <small><em><?php echo __('— or simply reply to this email | ', $plugin->text_domain); ?></em></small>
-                        <small><strong><?php echo __('Please Note:', $plugin->text_domain); ?></strong> <em><?php echo __('Your reply will be posted publicly and immediately.', $plugin->text_domain); ?></em></small>
+                        <small><em><?php echo __('— or simply reply to this email | ', 'comment-mail'); ?></em></small>
+                        <small><strong><?php echo __('Please Note:', 'comment-mail'); ?></strong> <em><?php echo __('Your reply will be posted publicly and immediately.', 'comment-mail'); ?></em></small>
                     <?php endif; ?>
                 <?php endif; ?>
             <?php endif; ?>

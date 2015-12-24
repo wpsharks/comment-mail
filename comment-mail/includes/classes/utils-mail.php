@@ -251,20 +251,20 @@ namespace comment_mail // Root namespace.
 				else $via_markup = esc_html($via); // Convert this to HTML markup.
 
 				if($sent && !$debug_output_markup) // There might not be any output in some cases; e.g., if SMTP is not in use.
-					$debug_output_markup = '<em>'.esc_html(__('— please check your email to be sure you received the message —', $this->plugin->text_domain)).'</em>';
+					$debug_output_markup = '<em>'.esc_html(__('— please check your email to be sure you received the message —', 'comment-mail')).'</em>';
 
 				else if(!$sent && !$debug_output_markup) // There might not be any output in some cases; e.g., if SMTP is not in use.
-					$debug_output_markup = '<em>'.esc_html(__('— please seek assistance from your hosting company —', $this->plugin->text_domain)).'</em>';
+					$debug_output_markup = '<em>'.esc_html(__('— please seek assistance from your hosting company —', 'comment-mail')).'</em>';
 
 				$results_markup = '<h4 style="margin:0 0 1em 0;">'.
-				                  '   '.sprintf(__('%1$s&trade; sent a test email via %2$s to:', $this->plugin->text_domain),
+				                  '   '.sprintf(__('%1$s&trade; sent a test email via %2$s to:', 'comment-mail'),
 				                                esc_html($this->plugin->name), $via_markup).'<br />'.
 				                  '   &lt;<code>'.esc_html(implode('; ', $to)).'</code>&gt;'.
 				                  '</h4>';
 
 				$results_markup .= '<h4 style="margin:0 0 1em 0;">'.
-				                   '   '.__('Email sent successfully?', $this->plugin->text_domain).'<br />'.
-				                   '<code>'.esc_html($sent ? __('seems so; please check your email to be sure', $this->plugin->text_domain) : __('no', $this->plugin->text_domain)).'</code>'.
+				                   '   '.__('Email sent successfully?', 'comment-mail').'<br />'.
+				                   '<code>'.esc_html($sent ? __('seems so; please check your email to be sure', 'comment-mail') : __('no', 'comment-mail')).'</code>'.
 				                   '</h4>';
 
 				$results_markup .= '<hr />'.
