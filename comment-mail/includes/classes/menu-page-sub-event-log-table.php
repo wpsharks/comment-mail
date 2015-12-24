@@ -36,8 +36,8 @@ namespace comment_mail // Root namespace.
 				$args = array(
 					'singular_name'  => 'sub_event_log_entry',
 					'plural_name'    => 'sub_event_log_entries',
-					'singular_label' => __('sub. event log entry', 'comment-mail'),
-					'plural_label'   => __('sub. event log entries', 'comment-mail'),
+					'singular_label' => __('sub. event log entry', $plugin->text_domain),
+					'plural_label'   => __('sub. event log entries', $plugin->text_domain),
 					'screen'         => $plugin->menu_page_hooks[__NAMESPACE__.'_sub_event_log'],
 				);
 				parent::__construct($args); // Parent constructor.
@@ -60,44 +60,44 @@ namespace comment_mail // Root namespace.
 
 				$columns = array(
 					'cb'                => '1', // Include checkboxes.
-					'ID'                => __('Entry', 'comment-mail'),
+					'ID'                => __('Entry', $plugin->text_domain),
 
-					'time'              => __('Time', 'comment-mail'),
-					'sub_id'            => __('Subscr. ID', 'comment-mail'),
+					'time'              => __('Time', $plugin->text_domain),
+					'sub_id'            => __('Subscr. ID', $plugin->text_domain),
 
-					'event'             => __('Event', 'comment-mail'),
-					'oby_sub_id'        => __('Overwritten By', 'comment-mail'),
-					'user_initiated'    => __('User Initiated', 'comment-mail'),
+					'event'             => __('Event', $plugin->text_domain),
+					'oby_sub_id'        => __('Overwritten By', $plugin->text_domain),
+					'user_initiated'    => __('User Initiated', $plugin->text_domain),
 
-					'key_before'        => __('Subscr. Key Before', 'comment-mail'),
-					'key'               => __('Subscr. Key After', 'comment-mail'),
+					'key_before'        => __('Subscr. Key Before', $plugin->text_domain),
+					'key'               => __('Subscr. Key After', $plugin->text_domain),
 
-					'user_id_before'    => __('WP User ID Before', 'comment-mail'),
-					'user_id'           => __('WP User ID After', 'comment-mail'),
+					'user_id_before'    => __('WP User ID Before', $plugin->text_domain),
+					'user_id'           => __('WP User ID After', $plugin->text_domain),
 
-					'post_id_before'    => __('Post ID Before', 'comment-mail'),
-					'post_id'           => __('Post ID After', 'comment-mail'),
+					'post_id_before'    => __('Post ID Before', $plugin->text_domain),
+					'post_id'           => __('Post ID After', $plugin->text_domain),
 
-					'comment_id_before' => __('Comment ID Before', 'comment-mail'),
-					'comment_id'        => __('Comment ID After', 'comment-mail'),
+					'comment_id_before' => __('Comment ID Before', $plugin->text_domain),
+					'comment_id'        => __('Comment ID After', $plugin->text_domain),
 
-					'status_before'     => __('Status Before', 'comment-mail'),
-					'status'            => __('Status After', 'comment-mail'),
+					'status_before'     => __('Status Before', $plugin->text_domain),
+					'status'            => __('Status After', $plugin->text_domain),
 
-					'deliver_before'    => __('Delivery Before', 'comment-mail'),
-					'deliver'           => __('Delivery After', 'comment-mail'),
+					'deliver_before'    => __('Delivery Before', $plugin->text_domain),
+					'deliver'           => __('Delivery After', $plugin->text_domain),
 
-					'fname_before'      => __('First Name Before', 'comment-mail'),
-					'fname'             => __('First Name After', 'comment-mail'),
+					'fname_before'      => __('First Name Before', $plugin->text_domain),
+					'fname'             => __('First Name After', $plugin->text_domain),
 
-					'lname_before'      => __('Last Name Before', 'comment-mail'),
-					'lname'             => __('Last Name After', 'comment-mail'),
+					'lname_before'      => __('Last Name Before', $plugin->text_domain),
+					'lname'             => __('Last Name After', $plugin->text_domain),
 
-					'email_before'      => __('Email Before', 'comment-mail'),
-					'email'             => __('Email After', 'comment-mail'),
+					'email_before'      => __('Email Before', $plugin->text_domain),
+					'email'             => __('Email After', $plugin->text_domain),
 
-					'ip_before'         => __('IP Address Before', 'comment-mail'),
-					'ip'                => __('IP Address After', 'comment-mail'),
+					'ip_before'         => __('IP Address Before', $plugin->text_domain),
+					'ip'                => __('IP Address After', $plugin->text_domain),
 				);
 				return $columns; // Associative array.
 			}

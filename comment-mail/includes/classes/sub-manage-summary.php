@@ -355,12 +355,12 @@ namespace comment_mail // Root namespace.
 				$deleted === NULL ? 'invalid_sub_key' : 'sub_already_unsubscribed';
 
 				if($deleted === NULL) // Invalid sub key?
-					$errors['sub_key'] = __('Invalid subscription key; unable to delete.', 'comment-mail');
+					$errors['sub_key'] = __('Invalid subscription key; unable to delete.', $plugin->text_domain);
 
 				else if(!$deleted) // Subscription has already been deleted?
-					$errors['sub_key'] = __('Already deleted; thanks.', 'comment-mail');
+					$errors['sub_key'] = __('Already deleted; thanks.', $plugin->text_domain);
 
-				else $successes['deleted_successfully'] = __('Subscription deleted successfully.', 'comment-mail');
+				else $successes['deleted_successfully'] = __('Subscription deleted successfully.', $plugin->text_domain);
 
 				if($errors) // We have deletion errors to report back?
 				{

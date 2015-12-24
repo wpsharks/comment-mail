@@ -83,7 +83,7 @@ namespace comment_mail;
  */
 ?>
 <?php echo // Sets document <title> tag via `%%title%%` replacement code in header.
-str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_header); ?>
+str_replace('%%title%%', __('My Comment Subscriptions', $plugin->text_domain), $site_header); ?>
 
 	<div class="manage-summary">
 
@@ -91,7 +91,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 
 			<div class="alert alert-danger" style="margin:0;">
 				<h4>
-					<?php echo __('Please review the following error(s):', 'comment-mail'); ?>
+					<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
 				</h4>
 				<ul class="list-unstyled">
 					<?php foreach($error_codes as $_error_code): ?>
@@ -99,15 +99,15 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 							<i class="fa fa-warning fa-fw"></i> <?php switch($_error_code)
 							{
 								case 'missing_sub_key':
-									echo __('Missing subscription key; unable to display summary.', 'comment-mail');
+									echo __('Missing subscription key; unable to display summary.', $plugin->text_domain);
 									break; // Break switch handler.
 
 								case 'invalid_sub_key':
-									echo __('Invalid subscription key; unable to display summary.', 'comment-mail');
+									echo __('Invalid subscription key; unable to display summary.', $plugin->text_domain);
 									break; // Break switch handler.
 
 								default: // Anything else that is unexpected/unknown at this time.
-									echo __('Unknown error; unable to display summary. Sorry!', 'comment-mail');
+									echo __('Unknown error; unable to display summary. Sorry!', $plugin->text_domain);
 							} ?>
 						</li>
 					<?php endforeach; ?>
@@ -136,7 +136,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 
 				<div class="alert alert-danger">
 					<h4>
-						<?php echo __('Please review the following error(s):', 'comment-mail'); ?>
+						<?php echo __('Please review the following error(s):', $plugin->text_domain); ?>
 					</h4>
 					<ul class="list-unstyled">
 						<?php foreach($processing_errors_html as $_error_code => $_error_html): ?>
@@ -153,7 +153,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 
 				<div class="alert alert-success">
 					<h4>
-						<?php echo __('Submission accepted; thank you :-)', 'comment-mail'); ?>
+						<?php echo __('Submission accepted; thank you :-)', $plugin->text_domain); ?>
 					</h4>
 					<ul class="list-unstyled">
 						<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
@@ -170,17 +170,17 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 				<?php // Disable this functionality for now; see http://bit.ly/1OYd4ie ?>
 				<?php // @todo Remove completely, or reconsider, Add New Subscription from front-end ?>
 				<?php /*
-				<a href="<?php echo esc_attr($sub_new_url); ?>" title="<?php echo __('Add New Subscription', 'comment-mail'); ?>">
+				<a href="<?php echo esc_attr($sub_new_url); ?>" title="<?php echo __('Add New Subscription', $plugin->text_domain); ?>">
 					<i class="fa fa-plus-square text-success pull-right" style="margin-left:.5em;"></i>
 				</a>
  				*/?>
 				<a href="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
 				   data-action="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
-				   data-confirmation="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address? Are you absolutely sure?', 'comment-mail'); ?>"
-				   title="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address?', 'comment-mail'); ?>">
+				   data-confirmation="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address? Are you absolutely sure?', $plugin->text_domain); ?>"
+				   title="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address?', $plugin->text_domain); ?>">
 					<i class="fa fa-times-circle text-danger pull-right"></i>
 				</a>
-				<?php echo __('My Comment Subscriptions', 'comment-mail'); ?><br />
+				<?php echo __('My Comment Subscriptions', $plugin->text_domain); ?><br />
 				<em style="margin-left:.5em;">
 					<small>&lt;<?php echo esc_html(implode('&gt;, &lt;', array_slice($sub_emails, 0, 100))); ?>&gt;</small>
 				</em>
@@ -190,7 +190,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 
 			<?php if (empty($subs)): ?>
 				<h4>
-					<?php echo sprintf(__('No subscriptions at this time. You may <a href="%1$s">click here</a> to create one <i class="fa fa-smile-o"></i>', 'comment-mail'), esc_attr($sub_new_url)); ?>
+					<?php echo sprintf(__('No subscriptions at this time. You may <a href="%1$s">click here</a> to create one <i class="fa fa-smile-o"></i>', $plugin->text_domain), esc_attr($sub_new_url)); ?>
 				</h4>
 			<?php endif; ?>
 
@@ -199,19 +199,19 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 					<thead>
 						<tr>
 							<th class="manage-summary-subscr-email">
-								<?php echo __('Email Address', 'comment-mail'); ?>
+								<?php echo __('Email Address', $plugin->text_domain); ?>
 							</th>
 							<th class="manage-summary-subscr-to">
-								<?php echo __('Subscribed To', 'comment-mail'); ?>
+								<?php echo __('Subscribed To', $plugin->text_domain); ?>
 							</th>
 							<th class="manage-summary-subscr-type">
-								<?php echo __('Type', 'comment-mail'); ?>
+								<?php echo __('Type', $plugin->text_domain); ?>
 							</th>
 							<th class="manage-summary-subscr-status">
-								<?php echo __('Status', 'comment-mail'); ?>
+								<?php echo __('Status', $plugin->text_domain); ?>
 							</th>
 							<th class="manage-summary-subscr-delivery-op">
-								<?php echo __('Deliver', 'comment-mail'); ?>
+								<?php echo __('Deliver', $plugin->text_domain); ?>
 							</th>
 						</tr>
 					</thead>
@@ -264,22 +264,22 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 
 									<div class="hover-links">
 										<a href="<?php echo esc_attr($_sub_edit_url); ?>"
-										   title="<?php echo esc_attr(__('Edit Subscription', 'comment-mail')); ?>"
-											><i class="fa fa-pencil-square-o"></i> <?php echo __('Edit Subscr.', 'comment-mail'); ?></a>
+										   title="<?php echo esc_attr(__('Edit Subscription', $plugin->text_domain)); ?>"
+											><i class="fa fa-pencil-square-o"></i> <?php echo __('Edit Subscr.', $plugin->text_domain); ?></a>
 
 										<span class="text-muted">|</span>
 
 										<a data-action="<?php echo esc_attr($_sub_delete_url); ?>" href="<?php echo esc_attr($_sub_delete_url); ?>"
-										   data-confirmation="<?php echo esc_attr(__('Delete subscription? Are you sure?', 'comment-mail')); ?>"
-										   title="<?php echo esc_attr(__('Delete Subscription', 'comment-mail')); ?>" class="text-danger"
-											><?php echo __('Delete', 'comment-mail'); ?> <i class="fa fa-times-circle"></i></a>
+										   data-confirmation="<?php echo esc_attr(__('Delete subscription? Are you sure?', $plugin->text_domain)); ?>"
+										   title="<?php echo esc_attr(__('Delete Subscription', $plugin->text_domain)); ?>" class="text-danger"
+											><?php echo __('Delete', $plugin->text_domain); ?> <i class="fa fa-times-circle"></i></a>
 									</div>
 								</td>
 								<td>
 									<?php if($_sub_post && $_sub_post_type_label): ?>
-										<?php echo sprintf(__('%1$s ID <a href="%2$s">#<code>%3$s</code></a> <a href="%4$s">%5$s</a>', 'comment-mail'), esc_html($_sub_post_type_label), esc_attr($_sub_post_url), esc_html($_sub_post->ID), esc_attr($_sub_post_comments_url), esc_html($_sub_post_title_clip)); ?>
+										<?php echo sprintf(__('%1$s ID <a href="%2$s">#<code>%3$s</code></a> <a href="%4$s">%5$s</a>', $plugin->text_domain), esc_html($_sub_post_type_label), esc_attr($_sub_post_url), esc_html($_sub_post->ID), esc_attr($_sub_post_comments_url), esc_html($_sub_post_title_clip)); ?>
 									<?php else: // Post no longer exists for whatever reason; display post ID only in this case. ?>
-										<?php echo sprintf(__('Post ID #<code>%1$s</code>', 'comment-mail'), esc_html($_sub->post_id)); ?>
+										<?php echo sprintf(__('Post ID #<code>%1$s</code>', $plugin->text_domain), esc_html($_sub->post_id)); ?>
 									<?php endif; ?>
 
 									<?php if($_sub->comment_id): ?><br />
@@ -287,15 +287,15 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 
 										<?php if($_sub_comment): ?>
 											<?php if($_subscribed_to_own_comment): ?>
-												<?php echo sprintf(__('Replies to <a href="%1$s">your comment</a>; ID <a href="%1$s">#<code>%2$s</code></a> posted %3$s', 'comment-mail'), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_ID), esc_html($_sub_comment_time_ago)); ?>
+												<?php echo sprintf(__('Replies to <a href="%1$s">your comment</a>; ID <a href="%1$s">#<code>%2$s</code></a> posted %3$s', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_ID), esc_html($_sub_comment_time_ago)); ?>
 											<?php else: // It's not their own comment; i.e. it's by someone else. ?>
-												<?php echo sprintf(__('Replies to <a href="%1$s">comment ID #<code>%2$s</code></a> posted %3$s', 'comment-mail'), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_ID), esc_html($_sub_comment_time_ago)); ?>
+												<?php echo sprintf(__('Replies to <a href="%1$s">comment ID #<code>%2$s</code></a> posted %3$s', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_ID), esc_html($_sub_comment_time_ago)); ?>
 											<?php endif; ?>
 											<?php if($_sub_comment->comment_author): ?>
-												<?php echo sprintf(__('by: <a href="%1$s">%2$s</a>', 'comment-mail'), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_author)); ?>
+												<?php echo sprintf(__('by: <a href="%1$s">%2$s</a>', $plugin->text_domain), esc_attr($_sub_comment_url), esc_html($_sub_comment->comment_author)); ?>
 											<?php endif; ?>
 										<?php else: // Comment no longer exists for whatever reason; display comment ID only in this case. ?>
-											<?php echo sprintf(__('Comment ID #<code>%1$s</code>', 'comment-mail'), esc_html($_sub->comment_id)); ?>
+											<?php echo sprintf(__('Comment ID #<code>%1$s</code>', $plugin->text_domain), esc_html($_sub->comment_id)); ?>
 										<?php endif; ?>
 
 									<?php endif; ?>
@@ -320,7 +320,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 				<div class="row subs-pagination">
 					<div class="col-md-3 text-left">
 								<span class="label label-default" style="font-size:110%; vertical-align:bottom;">
-									<?php echo sprintf(__('Page %1$s of %2$s', 'comment-mail'), esc_html($pagination_vars->current_page), esc_html($pagination_vars->total_pages)); ?>
+									<?php echo sprintf(__('Page %1$s of %2$s', $plugin->text_domain), esc_html($pagination_vars->current_page), esc_html($pagination_vars->total_pages)); ?>
 								</span>
 					</div>
 					<div class="col-md-9 text-right">

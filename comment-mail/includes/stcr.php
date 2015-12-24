@@ -93,10 +93,10 @@ namespace comment_mail { // Root namespace.
 
 		# Notice to existing StCR users now upgrading to Comment Mail.
 
-		$notice = sprintf(__('<h3 style="font-weight:400; margin:0 0 1em 0;">Upgrading from <strong>Subscribe to Comments Reloaded</strong> (StCR) to <strong>%1$s&trade;</strong> %2$s — Welcome! :-)</h3>', 'comment-mail'), esc_html($plugin->name), $plugin->utils_fs->inline_icon_svg());
+		$notice = sprintf(__('<h3 style="font-weight:400; margin:0 0 1em 0;">Upgrading from <strong>Subscribe to Comments Reloaded</strong> (StCR) to <strong>%1$s&trade;</strong> %2$s — Welcome! :-)</h3>', $plugin->text_domain), esc_html($plugin->name), $plugin->utils_fs->inline_icon_svg());
 		$notice .= '<ul style="margin:0 0 0 3em; list-style:disc;">'.
-		           '   <li>'.sprintf(__('%1$s automatically imported many of your StCR options (to learn what was imported, see <a href="http://comment-mail.com/kb-article/stcr-options-transitioned-by-comment-mail/" target="_blank">this article</a>). It\'s still a good idea to review your %1$s configuration though.', 'comment-mail'), esc_html($plugin->name)).'</li>'.
-		           '   <li>'.sprintf(__('<strong>IMPORTANT TIP:</strong> %1$s can import your existing StCR subscribers automatically too! <strong><a href="%2$s">Click here to review the StCR → %1$s import process</a></strong>.', 'comment-mail'), esc_html($plugin->name), esc_attr($plugin->utils_url->import_export_menu_page_only())).'</li>'.
+		           '   <li>'.sprintf(__('%1$s automatically imported many of your StCR options (to learn what was imported, see <a href="http://comment-mail.com/kb-article/stcr-options-transitioned-by-comment-mail/" target="_blank">this article</a>). It\'s still a good idea to review your %1$s configuration though.', $plugin->text_domain), esc_html($plugin->name)).'</li>'.
+		           '   <li>'.sprintf(__('<strong>IMPORTANT TIP:</strong> %1$s can import your existing StCR subscribers automatically too! <strong><a href="%2$s">Click here to review the StCR → %1$s import process</a></strong>.', $plugin->text_domain), esc_html($plugin->name), esc_attr($plugin->utils_url->import_export_menu_page_only())).'</li>'.
 		           '</ul>';
 		$plugin->enqueue_notice($notice, array('persistent' => TRUE, 'persistent_id' => 'upgrading-from-stcr'));
 	}
