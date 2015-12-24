@@ -85,14 +85,14 @@ namespace comment_mail // Root namespace.
 				if(!$this->type) $this->type = $this->plugin->options['template_type'];
 
 				if(!$this->type) // Empty type property?
-					throw new \exception(__('Empty type.', 'comment-mail'));
+					throw new \exception(__('Empty type.', $this->plugin->text_domain));
 
 				$this->file = (string)$file; // Initialize.
 				$this->file = $this->plugin->utils_string->trim_deep($this->file, '', '/');
 				$this->file = $this->plugin->utils_fs->n_seps($this->file);
 
 				if(!$this->file) // Empty file property?
-					throw new \exception(__('Empty file.', 'comment-mail'));
+					throw new \exception(__('Empty file.', $this->plugin->text_domain));
 
 				$this->snippet_sub_dir = dirname($this->file).'/snippet';
 				$this->force_default   = (boolean)$force_default;
@@ -348,7 +348,7 @@ namespace comment_mail // Root namespace.
 						return file_get_contents($_dir.'/'.$this->file);
 				unset($_dir); // Housekeeping.
 
-				throw new \exception(sprintf(__('Missing template: `type-%1$s/%2$s`.', 'comment-mail'), $this->type, $this->file));
+				throw new \exception(sprintf(__('Missing template: `type-%1$s/%2$s`.', $this->plugin->text_domain), $this->type, $this->file));
 			}
 
 			/**
@@ -401,7 +401,7 @@ namespace comment_mail // Root namespace.
 						return file_get_contents($_dir.'/'.$file);
 				unset($_dir); // Housekeeping.
 
-				throw new \exception(sprintf(__('Missing snippet: `%1$s`.', 'comment-mail'), 'type-'.$this->type.'/'.$this->snippet_sub_dir.'/'.$file));
+				throw new \exception(sprintf(__('Missing snippet: `%1$s`.', $this->plugin->text_domain), 'type-'.$this->type.'/'.$this->snippet_sub_dir.'/'.$file));
 			}
 
 			/**

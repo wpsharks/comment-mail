@@ -122,6 +122,15 @@ namespace comment_mail {
 			public $enable_hooks;
 
 			/**
+			 * Text domain for translations; based on `__NAMESPACE__`.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @var string Defined by class constructor; for translations.
+			 */
+			public $text_domain;
+
+			/**
 			 * Plugin slug; based on `__NAMESPACE__`.
 			 *
 			 * @since 141111 First documented version.

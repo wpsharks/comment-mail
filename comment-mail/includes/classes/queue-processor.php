@@ -685,7 +685,7 @@ namespace comment_mail // Root namespace.
 				       " WHERE `ID` = '".esc_sql($entry_props->entry->ID)."'";
 
 				if(!$this->plugin->utils_db->wp->query($sql))
-					throw new \exception(__('Update failure.', 'comment-mail'));
+					throw new \exception(__('Update failure.', $this->plugin->text_domain));
 
 				$entry_props->entry->hold_until_time = $entry_hold_until_time;
 				$entry_props->held                   = TRUE; // Flag as `TRUE` now.

@@ -44,7 +44,7 @@ namespace comment_mail // Root namespace.
 				$tmp_dir = $this->n_seps(get_temp_dir());
 
 				if(!$tmp_dir || !@is_dir($tmp_dir) || !@is_writable($tmp_dir))
-					throw new \exception(__('Unable to find a writable tmp directory.', 'comment-mail'));
+					throw new \exception(__('Unable to find a writable tmp directory.', $this->plugin->text_domain));
 
 				return $tmp_dir; // Writable tmp directory.
 			}
@@ -136,14 +136,14 @@ namespace comment_mail // Root namespace.
 				if(!isset($path[0])) return; // Empty.
 
 				if($require_uploaded_file && (empty($_FILES) || !is_uploaded_file($path)))
-					throw new \exception(sprintf(__('Security flag. Not an uploaded file: `%1$s`.', 'comment-mail'), $path));
+					throw new \exception(sprintf(__('Security flag. Not an uploaded file: `%1$s`.', $this->plugin->text_domain), $path));
 
 				$path = $this->n_seps($path); // Normalize separators for remaining checks.
 
 				if(strpos($path, '~') !== FALSE // A backup file?
 				   || strpos($path, './') !== FALSE || strpos($path, '..') !== FALSE
 				   || strpos($path, '/.') !== FALSE || stripos(basename($path), 'config') !== FALSE
-				) throw new \exception(sprintf(__('Security flag. Dangerous file path: `%1$s`.', 'comment-mail'), $path));
+				) throw new \exception(sprintf(__('Security flag. Dangerous file path: `%1$s`.', $this->plugin->text_domain), $path));
 			}
 
 			/**

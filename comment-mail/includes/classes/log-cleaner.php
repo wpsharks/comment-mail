@@ -118,7 +118,7 @@ namespace comment_mail // Root namespace.
 				       " WHERE `time` < '".esc_sql($exp_time)."'";
 
 				if($this->plugin->utils_db->wp->query($sql) === FALSE)
-					throw new \exception(__('Deletion failure.', 'comment-mail'));
+					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
 			}
 
 			/**
@@ -141,7 +141,7 @@ namespace comment_mail // Root namespace.
 				       " WHERE `time` < '".esc_sql($exp_time)."'";
 
 				if($this->plugin->utils_db->wp->query($sql) === FALSE)
-					throw new \exception(__('Deletion failure.', 'comment-mail'));
+					throw new \exception(__('Deletion failure.', $this->plugin->text_domain));
 			}
 
 			/**

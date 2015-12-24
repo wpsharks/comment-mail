@@ -166,9 +166,9 @@ namespace comment_mail // Root namespace.
 				$row_actions = array(
 					'delete' => '<a href="#"'.  // Depends on `menu-pages.js`.
 					            ' data-pmp-action="'.esc_attr($delete_url).'"'. // The action URL.
-					            ' data-pmp-confirmation="'.esc_attr(__('Delete queued notification? Are you sure?', 'comment-mail')).'"'.
-					            ' title="'.esc_attr(__('Delete Queued Notification', 'comment-mail')).'">'.
-					            '  <i class="fa fa-times-circle"></i> '.__('Delete', 'comment-mail').
+					            ' data-pmp-confirmation="'.esc_attr(__('Delete queued notification? Are you sure?', $this->plugin->text_domain)).'"'.
+					            ' title="'.esc_attr(__('Delete Queued Notification', $this->plugin->text_domain)).'">'.
+					            '  <i class="fa fa-times-circle"></i> '.__('Delete', $this->plugin->text_domain).
 					            '</a>',
 				);
 				return $id_info.$this->row_actions($row_actions);
@@ -281,7 +281,7 @@ namespace comment_mail // Root namespace.
 			protected function get_bulk_actions()
 			{
 				return array(
-					'delete' => __('Delete', 'comment-mail'),
+					'delete' => __('Delete', $this->plugin->text_domain),
 				);
 			}
 

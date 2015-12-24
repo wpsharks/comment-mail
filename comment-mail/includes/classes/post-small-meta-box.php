@@ -63,7 +63,7 @@ namespace comment_mail // Root namespace.
 
 				     '  '.$total_subs_bubble. // In block format; i.e. 100% width.
 
-				     '   <h4 style="margin:1em 0 .25em 0;">'.__('Most Recent Subscriptions', 'comment-mail').'</h4>'.
+				     '   <h4 style="margin:1em 0 .25em 0;">'.__('Most Recent Subscriptions', $this->plugin->text_domain).'</h4>'.
 				     '   '.$this->plugin->utils_markup->last_x_subs(5, $this->post->ID, array('group_by_email' => TRUE)).
 
 				     '</div>';

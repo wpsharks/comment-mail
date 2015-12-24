@@ -82,7 +82,7 @@ namespace comment_mail // Root namespace.
 					$this->sub     = $this->plugin->utils_sub->get($sub_id);
 
 					if(!$this->sub) // Unexpected scenario; fail w/ message.
-						wp_die(__('Subscription ID not found.', 'comment-mail'));
+						wp_die(__('Subscription ID not found.', $this->plugin->text_domain));
 				}
 				$this->form_fields = new form_fields(static::$form_field_args);
 
@@ -105,27 +105,27 @@ namespace comment_mail // Root namespace.
 
 				echo $this->form_fields->select_row(
 					array(
-						'placeholder'         => __('Select a Post ID...', 'comment-mail'),
-						'label'               => __('<i class="fa fa-fw fa-thumb-tack"></i> Post ID #', 'comment-mail'),
+						'placeholder'         => __('Select a Post ID...', $this->plugin->text_domain),
+						'label'               => __('<i class="fa fa-fw fa-thumb-tack"></i> Post ID #', $this->plugin->text_domain),
 						'name'                => 'post_id', 'required' => TRUE, 'options' => '%%posts%%', 'current_value' => $this->current_value_for('post_id'),
-						'notes_after'         => __('Required; the Post ID they are subscribed to.', 'comment-mail'),
+						'notes_after'         => __('Required; the Post ID they are subscribed to.', $this->plugin->text_domain),
 						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'placeholder' => '', 'current_value_empty_on_0' => TRUE),
 					));
 				echo $this->form_fields->select_row(
 					array(
-						'placeholder'         => __('— All Comments/Replies —', 'comment-mail'),
-						'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID #', 'comment-mail'),
+						'placeholder'         => __('— All Comments/Replies —', $this->plugin->text_domain),
+						'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment ID #', $this->plugin->text_domain),
 						'name'                => 'comment_id', 'required' => FALSE, 'options' => '%%comments%%', 'post_id' => $this->current_value_for('post_id'), 'current_value' => $this->current_value_for('comment_id'),
-						'notes_after'         => __('If empty, they\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', 'comment-mail'),
+						'notes_after'         => __('If empty, they\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', $this->plugin->text_domain),
 						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'current_value_empty_on_0' => TRUE),
 					));
 				echo $this->form_fields->select_row(
 					array(
-						'placeholder'         => __('— N/A; no WP User ID —', 'comment-mail'),
-						'label'               => __('<i class="fa fa-fw fa-user"></i> WP User ID #', 'comment-mail'),
+						'placeholder'         => __('— N/A; no WP User ID —', $this->plugin->text_domain),
+						'label'               => __('<i class="fa fa-fw fa-user"></i> WP User ID #', $this->plugin->text_domain),
 						'name'                => 'user_id', 'required' => FALSE, 'options' => '%%users%%', 'current_value' => $this->current_value_for('user_id'),
-						'notes_after'         => __('Associates subscription w/ a WP User ID (if applicable) to improve statistical reporting.', 'comment-mail').
-						                         ' '.__('If empty, the system will automatically try to find a matching user ID for the email address.', 'comment-mail'),
+						'notes_after'         => __('Associates subscription w/ a WP User ID (if applicable) to improve statistical reporting.', $this->plugin->text_domain).
+						                         ' '.__('If empty, the system will automatically try to find a matching user ID for the email address.', $this->plugin->text_domain),
 						'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'current_value_empty_on_0' => TRUE),
 					));
 				/* -------------------------------------------------------------------- */
@@ -135,17 +135,17 @@ namespace comment_mail // Root namespace.
 				echo $this->form_fields->input_row(
 					array(
 						'type'  => 'email', // For `<input>` type.
-						'label' => __('<i class="fa fa-fw fa-envelope-o"></i> Email', 'comment-mail'),
+						'label' => __('<i class="fa fa-fw fa-envelope-o"></i> Email', $this->plugin->text_domain),
 						'name'  => 'email', 'required' => TRUE, 'maxlength' => 100, 'current_value' => $this->current_value_for('email'),
 					));
 				echo $this->form_fields->input_row(
 					array(
-						'label' => __('<i class="fa fa-fw fa-pencil-square-o"></i> First Name', 'comment-mail'),
+						'label' => __('<i class="fa fa-fw fa-pencil-square-o"></i> First Name', $this->plugin->text_domain),
 						'name'  => 'fname', 'required' => TRUE, 'maxlength' => 50, 'current_value' => $this->current_value_for('fname'),
 					));
 				echo $this->form_fields->input_row(
 					array(
-						'label' => __('<i class="fa fa-fw fa-level-up fa-rotate-90" style="margin-left:1px;"></i> Last Name', 'comment-mail'),
+						'label' => __('<i class="fa fa-fw fa-level-up fa-rotate-90" style="margin-left:1px;"></i> Last Name', $this->plugin->text_domain),
 						'name'  => 'lname', 'required' => FALSE, 'maxlength' => 100, 'current_value' => $this->current_value_for('lname'),
 					));
 				/* -------------------------------------------------------------------- */
@@ -154,9 +154,9 @@ namespace comment_mail // Root namespace.
 
 				echo $this->form_fields->input_row(
 					array(
-						'label'       => __('<i class="fa fa-fw fa-bullseye"></i> IP Address', 'comment-mail'),
+						'label'       => __('<i class="fa fa-fw fa-bullseye"></i> IP Address', $this->plugin->text_domain),
 						'name'        => 'insertion_ip', 'required' => FALSE, 'maxlength' => 39, 'current_value' => $this->current_value_for('insertion_ip'),
-						'notes_after' => __('If empty, this is filled automatically when a subscriber confirms or updates their subscription.', 'comment-mail'),
+						'notes_after' => __('If empty, this is filled automatically when a subscriber confirms or updates their subscription.', $this->plugin->text_domain),
 					));
 				/* -------------------------------------------------------------------- */
 				echo $this->form_fields->horizontal_line_row(/* -------------------------------------------------------------------- */);
@@ -164,20 +164,20 @@ namespace comment_mail // Root namespace.
 
 				echo $this->form_fields->select_row(
 					array(
-						'placeholder'          => __('Select a Status...', 'comment-mail'),
-						'label'                => __('<i class="fa fa-fw fa-flag-o"></i> Status', 'comment-mail'),
+						'placeholder'          => __('Select a Status...', $this->plugin->text_domain),
+						'label'                => __('<i class="fa fa-fw fa-flag-o"></i> Status', $this->plugin->text_domain),
 						'name'                 => 'status', 'required' => TRUE, 'options' => '%%status%%', 'current_value' => $this->current_value_for('status'),
 
 						'nested_checkbox_args' => array('name'          => 'process_confirmation', // With additional checkbox option too.
-						                                'label'         => __('Request confirmation via email', 'comment-mail').' <i class="fa fa-envelope-o"></i>',
+						                                'label'         => __('Request confirmation via email', $this->plugin->text_domain).' <i class="fa fa-envelope-o"></i>',
 						                                'current_value' => $this->current_value_for('process_confirmation')),
 					));
 				echo $this->form_fields->select_row(
 					array(
-						'placeholder' => __('Select a Delivery Option...', 'comment-mail'),
-						'label'       => __('<i class="fa fa-fw fa-paper-plane-o"></i> Deliver', 'comment-mail'),
+						'placeholder' => __('Select a Delivery Option...', $this->plugin->text_domain),
+						'label'       => __('<i class="fa fa-fw fa-paper-plane-o"></i> Deliver', $this->plugin->text_domain),
 						'name'        => 'deliver', 'required' => TRUE, 'options' => '%%deliver%%', 'current_value' => $this->current_value_for('deliver'),
-						'notes_after' => __('Any value that is not <code>asap</code> results in a digest instead of instant notifications.', 'comment-mail'),
+						'notes_after' => __('Any value that is not <code>asap</code> results in a digest instead of instant notifications.', $this->plugin->text_domain),
 					));
 
 				echo '   </tbody>';
@@ -192,8 +192,8 @@ namespace comment_mail // Root namespace.
 
 				echo '   <input type="submit"'.
 				     ($this->is_edit  // Are we editing?
-					     ? ' value="'.esc_attr(__('Update Subscription', 'comment-mail')).'"'
-					     : ' value="'.esc_attr(__('Create Subscription', 'comment-mail')).'"').
+					     ? ' value="'.esc_attr(__('Update Subscription', $this->plugin->text_domain)).'"'
+					     : ' value="'.esc_attr(__('Create Subscription', $this->plugin->text_domain)).'"').
 				     '    class="button button-primary" />';
 
 				echo '</p>';

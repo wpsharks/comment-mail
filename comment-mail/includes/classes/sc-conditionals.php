@@ -176,7 +176,7 @@ namespace comment_mail // Root namespace.
 							'/ix', $expression) // End of regex; pattern delimiter.
 
 						) // We only allow variables to be tested by shortcodes; against integers, floats, strings, booleans.
-							throw new \exception(__('Invalid shortcode conditional expression.', 'comment-mail'));
+							throw new \exception(__('Invalid shortcode conditional expression.', $_this->plugin->text_domain));
 
 						$token                 = count($_this->tokens);
 						$_this->tokens[$token] = '<?php '.$if.'('.$expression.'): ?>';

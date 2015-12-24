@@ -85,7 +85,7 @@ namespace comment_mail // Root namespace.
 				if($this->plugin->utils_db->wp->query($sql1) === FALSE
 				   || $this->plugin->utils_db->wp->query($sql2) === FALSE
 				   || $this->plugin->utils_db->wp->query($sql3) === FALSE
-				) throw new \exception(__('Query failure.', 'comment-mail'));
+				) throw new \exception(__('Query failure.', $this->plugin->text_domain));
 			}
 		}
 	}

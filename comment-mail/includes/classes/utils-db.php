@@ -211,7 +211,7 @@ namespace comment_mail // Root namespace.
 						return 'delete';
 
 					default: // Throw exception on anything else.
-						throw new \exception(sprintf(__('Unexpected comment status: `%1$s`.', 'comment-mail'), $status));
+						throw new \exception(sprintf(__('Unexpected comment status: `%1$s`.', $this->plugin->text_domain), $status));
 				}
 			}
 
@@ -246,7 +246,7 @@ namespace comment_mail // Root namespace.
 						return 'closed';
 
 					default: // Throw exception on anything else.
-						throw new \exception(sprintf(__('Unexpected post comment status: `%1$s`.', 'comment-mail'), $status));
+						throw new \exception(sprintf(__('Unexpected post comment status: `%1$s`.', $this->plugin->text_domain), $status));
 				}
 			}
 
@@ -281,7 +281,7 @@ namespace comment_mail // Root namespace.
 				       " LIMIT 1"; // One to check.
 
 				if($this->wp->query($sql) === FALSE) // Initial query failure?
-					throw new \exception(__('Query failure.', 'comment-mail'));
+					throw new \exception(__('Query failure.', $this->plugin->text_domain));
 
 				return ($total = (integer)$this->wp->get_var("SELECT FOUND_ROWS()"));
 			}
@@ -399,7 +399,7 @@ namespace comment_mail // Root namespace.
 				       " LIMIT 1"; // One to check.
 
 				if($this->wp->query($sql) === FALSE) // Initial query failure?
-					throw new \exception(__('Query failure.', 'comment-mail'));
+					throw new \exception(__('Query failure.', $this->plugin->text_domain));
 
 				return ($total = (integer)$this->wp->get_var("SELECT FOUND_ROWS()"));
 			}
@@ -578,7 +578,7 @@ namespace comment_mail // Root namespace.
 				       " LIMIT 1"; // One to check.
 
 				if($this->wp->query($sql) === FALSE) // Initial query failure?
-					throw new \exception(__('Query failure.', 'comment-mail'));
+					throw new \exception(__('Query failure.', $this->plugin->text_domain));
 
 				return ($total = (integer)$this->wp->get_var("SELECT FOUND_ROWS()"));
 			}

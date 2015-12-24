@@ -93,15 +93,15 @@ namespace comment_mail // Root namespace.
 				$this->plugin->options_save($request_args);
 
 				$notice_markup = // Notice regarding options having been updated successfully.
-					sprintf(__('%1$s&trade; options updated successfully.', 'comment-mail'), esc_html($this->plugin->name));
+					sprintf(__('%1$s&trade; options updated successfully.', $this->plugin->text_domain), esc_html($this->plugin->name));
 				$this->plugin->enqueue_user_notice($notice_markup, array('transient' => TRUE));
 
 				if(!empty($request_args['mail_test']) && ($mail_test_to = trim((string)$request_args['mail_test'])))
 				{
 					$mail_test = $this->plugin->utils_mail->test(
 						$mail_test_to, // To the address specificed in the request args.
-						sprintf(__('Test Email Message sent by %1$s™', 'comment-mail'), $this->plugin->name),
-						sprintf(__('Test email message sent by %1$s&trade; from: <code>%2$s</code>.', 'comment-mail'), esc_html($this->plugin->name), esc_html($this->plugin->utils_url->current_host_path()))
+						sprintf(__('Test Email Message sent by %1$s™', $this->plugin->text_domain), $this->plugin->name),
+						sprintf(__('Test email message sent by %1$s&trade; from: <code>%2$s</code>.', $this->plugin->text_domain), esc_html($this->plugin->name), esc_html($this->plugin->utils_url->current_host_path()))
 					);
 					$this->plugin->enqueue_user_notice($mail_test->results_markup, array('transient' => TRUE));
 				}
@@ -128,7 +128,7 @@ namespace comment_mail // Root namespace.
 				import_stcr::delete_post_meta_keys(); // Reset import tracking.
 
 				$notice_markup = // Notice regarding options having been retored successfully.
-					sprintf(__('%1$s&trade; default options restored successfully.', 'comment-mail'), esc_html($this->plugin->name));
+					sprintf(__('%1$s&trade; default options restored successfully.', $this->plugin->text_domain), esc_html($this->plugin->name));
 				$this->plugin->enqueue_user_notice($notice_markup, array('transient' => TRUE));
 
 				wp_redirect($this->plugin->utils_url->default_options_restored()).exit();

@@ -473,7 +473,7 @@ namespace comment_mail // Root namespace.
 				$edit_url = $this->plugin->utils_url->edit_sub_short($item->{$key});
 
 				$row_actions = array(
-					'edit' => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscr.', 'comment-mail').'</a>',
+					'edit' => '<a href="'.esc_attr($edit_url).'">'.__('Edit Subscr.', $this->plugin->text_domain).'</a>',
 				);
 				return $sub_info.$this->row_actions($row_actions);
 			}
@@ -557,7 +557,7 @@ namespace comment_mail // Root namespace.
 				$edit_url = $this->plugin->utils_url->edit_user_short($item->{$key});
 
 				$row_actions = array(
-					'edit' => '<a href="'.esc_attr($edit_url).'">'.__('Edit User', 'comment-mail').'</a>',
+					'edit' => '<a href="'.esc_attr($edit_url).'">'.__('Edit User', $this->plugin->text_domain).'</a>',
 				);
 				return $user_info.$this->row_actions($row_actions);
 			}
@@ -624,8 +624,8 @@ namespace comment_mail // Root namespace.
 				$post_view_url    = $this->plugin->utils_url->post_short($item->{$key});
 				$post_edit_url    = $this->plugin->utils_url->post_edit_short($item->{$key});
 				$post_row_actions = array(
-					'edit' => '<a href="'.esc_attr($post_edit_url).'">'.sprintf(__('Edit %1$s', 'comment-mail'), esc_html($post_type_label)).'</a>',
-					'view' => '<a href="'.esc_attr($post_view_url).'">'.sprintf(__('View', 'comment-mail'), esc_html($post_type_label)).'</a>',
+					'edit' => '<a href="'.esc_attr($post_edit_url).'">'.sprintf(__('Edit %1$s', $this->plugin->text_domain), esc_html($post_type_label)).'</a>',
+					'view' => '<a href="'.esc_attr($post_view_url).'">'.sprintf(__('View', $this->plugin->text_domain), esc_html($post_type_label)).'</a>',
 				);
 				return $post_info.$this->row_actions($post_row_actions);
 			}
@@ -661,7 +661,7 @@ namespace comment_mail // Root namespace.
 					return '—'; // Not possible.
 
 				if(!$item->{$key} && $key === 'comment_id')
-					return __('all comments', 'comment-mail');
+					return __('all comments', $this->plugin->text_domain);
 
 				if(!$item->{$key}) return '—'; // Not possible.
 
@@ -686,8 +686,8 @@ namespace comment_mail // Root namespace.
 				$comment_view_url    = $this->plugin->utils_url->comment_short($item->{$key});
 				$comment_edit_url    = $this->plugin->utils_url->comment_edit_short($item->{$key});
 				$comment_row_actions = array(
-					'edit' => '<a href="'.esc_attr($comment_edit_url).'">'.__('Edit Comment', 'comment-mail').'</a>',
-					'view' => '<a href="'.esc_attr($comment_view_url).'">'.__('View', 'comment-mail').'</a>',
+					'edit' => '<a href="'.esc_attr($comment_edit_url).'">'.__('Edit Comment', $this->plugin->text_domain).'</a>',
+					'view' => '<a href="'.esc_attr($comment_view_url).'">'.__('View', $this->plugin->text_domain).'</a>',
 				);
 				return $comment_info.$this->row_actions($comment_row_actions);
 			}
@@ -896,11 +896,11 @@ namespace comment_mail // Root namespace.
 					return '—'; // Not possible.
 
 				if(!$item->{$key})
-					return __('n/a; awaiting processing', 'comment-mail');
+					return __('n/a; awaiting processing', $this->plugin->text_domain);
 
 				return esc_html($this->plugin->utils_date->i18n('M j, Y g:i a', $item->{$key})).'<br />'.
 				       '<span style="font-style:italic;">('.esc_html($this->plugin->utils_date->approx_time_difference(time(), $item->{$key}, '')).')</span>'.
-				       ' '.__('~ part of a digest', 'comment-mail');
+				       ' '.__('~ part of a digest', $this->plugin->text_domain);
 			}
 
 			/**
@@ -1797,7 +1797,7 @@ namespace comment_mail // Root namespace.
 				if(method_exists($this->plugin->utils_i18n, $this->plural_name))
 					$this->plugin->enqueue_user_notice
 					(
-						sprintf(__('Action complete. %1$s %2$s.', 'comment-mail'),
+						sprintf(__('Action complete. %1$s %2$s.', $this->plugin->text_domain),
 						        esc_html($this->plugin->utils_i18n->{$this->plural_name}($counter)),
 						        esc_html($this->plugin->utils_i18n->action_ed($bulk_action))),
 
@@ -1859,7 +1859,7 @@ namespace comment_mail // Root namespace.
 
 				$text     = (string)$text;
 				$input_id = (string)$input_id;
-				$text     = !$text ? __('Search', 'comment-mail') : esc_html($text);
+				$text     = !$text ? __('Search', $this->plugin->text_domain) : esc_html($text);
 				$input_id = !$input_id ? get_class($this).'::'.__FUNCTION__ : $input_id;
 				$input_id = trim(preg_replace('/[^a-z0-9\-]/i', '-', $input_id), '-');
 
@@ -1871,7 +1871,7 @@ namespace comment_mail // Root namespace.
 
 				if($search_box) // Only if there is a search box; it doesn't always display.
 					if(!($search_box = preg_replace($regex, 'name="search-submit" id="search-submit"', $search_box, 1, $replacements)) || !$replacements)
-						throw new \exception(__('Unable to set `name="search-submit"` attribute.', 'comment-mail'));
+						throw new \exception(__('Unable to set `name="search-submit"` attribute.', $this->plugin->text_domain));
 
 				echo $search_box; // Display.
 			}
@@ -1942,7 +1942,7 @@ namespace comment_mail // Root namespace.
 					                      '<i class="'.esc_attr('si si-'.$this->plugin->slug).'"></i>'.
 					                      ' '.$this->plugin->utils_markup->name_email($_sub_name, $_sub->email, $_name_email_args).
 					                      ($_sub_edit_link // Only if they can edit the subscription ID; else this will be empty.
-						                      ? ' [<a href="'.esc_attr($_sub_edit_link).'">'.__('edit', 'comment-mail').'</a>]' : '').
+						                      ? ' [<a href="'.esc_attr($_sub_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
 					                      '</li>';
 				}
 				unset($_sub, $_name_email_args, $_sub_name, $_sub_edit_link); // Housekeeping.
@@ -1960,7 +1960,7 @@ namespace comment_mail // Root namespace.
 					);
 					$sub_email_lis[$_sub_email] = '<li>'. // [icon] <email>.
 					                              '<i class="fa fa-envelope"></i>'. // e.g. [icon] <email>.
-					                              ' <span style="font-weight:bold;" title="'.esc_attr($_sub_email).'">'.__('Email:', 'comment-mail').'</span>'.
+					                              ' <span style="font-weight:bold;" title="'.esc_attr($_sub_email).'">'.__('Email:', $this->plugin->text_domain).'</span>'.
 					                              ' '.$this->plugin->utils_markup->name_email('', $_sub_email, $_name_email_args).
 					                              '</li>';
 				}
@@ -1984,7 +1984,7 @@ namespace comment_mail // Root namespace.
 					                        '<i class="fa fa-user"></i>'. // e.g. [icon] "Name" <email>
 					                        ' '.$this->plugin->utils_markup->name_email($_user->display_name, $_user->user_email, $_name_email_args).
 					                        ($_user_edit_link // Only if they can edit the user ID; else this will be empty.
-						                        ? ' [<a href="'.esc_attr($_user_edit_link).'">'.__('edit', 'comment-mail').'</a>]' : '').
+						                        ? ' [<a href="'.esc_attr($_user_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
 					                        '</li>';
 				}
 				unset($_user, $_name_email_args, $_user_edit_link); // Housekeeping.
@@ -2007,7 +2007,7 @@ namespace comment_mail // Root namespace.
 					$post_lis[$_post->ID] = '<li>'. // <title> [edit].
 					                        '  "<a href="'.esc_attr($_post_permalink).'" target="_blank">'.esc_html($_post_title_clip).'</a>"'.
 					                        ($_post_edit_link // Only if they can edit the post ID; else this will be empty.
-						                        ? ' [<a href="'.esc_attr($_post_edit_link).'">'.__('edit', 'comment-mail').'</a>]' : '').
+						                        ? ' [<a href="'.esc_attr($_post_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
 					                        '</li>';
 				}
 				unset($_post, $_post_type, $_post_permalink, $_post_edit_link, $_post_title_clip, $_post_type_label); // Housekeeping.
@@ -2043,15 +2043,15 @@ namespace comment_mail // Root namespace.
 					$comment_lis[$_comment->comment_ID] = '<li>'. // <title> [edit].
 					                                      '   "<a href="'.esc_attr($_post_permalink).'" target="_blank">'.esc_html($_post_title_clip).'</a>"'.
 					                                      ($_post_edit_link // Only if they can edit the post ID; else this will be empty.
-						                                      ? ' [<a href="'.esc_attr($_post_edit_link).'">'.__('edit', 'comment-mail').'</a>]' : '').
+						                                      ? ' [<a href="'.esc_attr($_post_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
 
 					                                      '   <ul>'. // Nest comment under post.
 					                                      '      <li>'. // Comment ID: <author> [edit] ... followed by a content clip.
-					                                      '         <span style="font-weight:bold;">'.__('Comment', 'comment-mail').'</span>'.
+					                                      '         <span style="font-weight:bold;">'.__('Comment', $this->plugin->text_domain).'</span>'.
 					                                      '         <span style="font-weight:bold;">ID <a href="'.esc_attr($_comment_permalink).'" target="_blank">#'.esc_html($_comment->comment_ID).'</a>:</span>'.
 					                                      '         '.$this->plugin->utils_markup->name_email($_comment->comment_author, $_comment->comment_author_email, $_name_email_args).
 					                                      ($_comment_edit_link // Only if they can edit the comment ID; else this will be empty.
-						                                      ? '     [<a href="'.esc_attr($_comment_edit_link).'">'.__('edit', 'comment-mail').'</a>]' : '').
+						                                      ? '     [<a href="'.esc_attr($_comment_edit_link).'">'.__('edit', $this->plugin->text_domain).'</a>]' : '').
 					                                      '         <blockquote>'.esc_html($_comment_content_clip).'</blockquote>'.
 					                                      '      </li>'.
 					                                      '   </ul>'.
@@ -2065,7 +2065,7 @@ namespace comment_mail // Root namespace.
 						$navigable_filter_lis[] = '<li>'. // List item for special navigable filter `all`.
 						                          '   <a href="'.esc_attr($this->plugin->utils_url->table_search_filter('::')).'"'.
 						                          (!$query_contains_navigable_filters ? ' class="pmp-active"' : '').'>'.
-						                          '      '.__('all', 'comment-mail').
+						                          '      '.__('all', $this->plugin->text_domain).
 						                          '   </a>'.
 						                          '</li>';
 					$navigable_filter_lis[] = '<li>'. // List item for a navigable filter in this table.
@@ -2084,11 +2084,11 @@ namespace comment_mail // Root namespace.
 				if($query_contains_filters) // If query contains non-navigable filters.
 				{
 					if(!$filter_lis_exist) // Unable to build list items for search filter(s)?
-						$unknown_lis[] = '<li>'.sprintf(__('Unknown filter(s). Unable to build list items for: <code>%1$s</code>', 'comment-mail'),
+						$unknown_lis[] = '<li>'.sprintf(__('Unknown filter(s). Unable to build list items for: <code>%1$s</code>', $this->plugin->text_domain),
 						                                esc_html($this->get_raw_search_query())).'</li>';
 					echo '<h3>'. // Display.
 					     '   <i class="fa fa-filter"></i>'. // Filter icon.
-					     '   '.sprintf(__('<strong>Search Filters Applied</strong> :: only showing %1$s for:', 'comment-mail'), esc_html($this->plural_label)).
+					     '   '.sprintf(__('<strong>Search Filters Applied</strong> :: only showing %1$s for:', $this->plugin->text_domain), esc_html($this->plural_label)).
 					     '</h3>';
 					if($sub_lis) echo '<ul class="pmp-search-filters pmp-filters pmp-list-items">'.implode('', $sub_lis).'</ul>';
 					if($sub_email_lis) echo '<ul class="pmp-search-filters pmp-filters pmp-list-items">'.implode('', $sub_email_lis).'</ul>';
@@ -2099,7 +2099,7 @@ namespace comment_mail // Root namespace.
 				}
 				if($navigable_filter_lis_exist && $navigable_filter_lis)
 					echo '<ul class="pmp-navigable-filters pmp-filters pmp-clean-list-items">'.
-					     ' <li>'.__('Navigable Filters:', 'comment-mail').'</li>'.
+					     ' <li>'.__('Navigable Filters:', $this->plugin->text_domain).'</li>'.
 					     ' '.implode('', $navigable_filter_lis).
 					     '</ul>';
 			}
@@ -2138,7 +2138,7 @@ namespace comment_mail // Root namespace.
 			 */
 			public function no_items()
 			{
-				echo esc_html(sprintf(__('No %1$s to display.', 'comment-mail'), $this->plural_label));
+				echo esc_html(sprintf(__('No %1$s to display.', $this->plugin->text_domain), $this->plural_label));
 			}
 
 			/**

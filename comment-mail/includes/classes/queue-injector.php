@@ -80,7 +80,7 @@ namespace comment_mail // Root namespace.
 				$sql = $this->plugin->utils_string->trim($sql, '', ','); // Trim leftover delimiter.
 
 				if(!$this->plugin->utils_db->wp->query($sql)) // Insert failure?
-					throw new \exception(__('Insertion failure.', 'comment-mail'));
+					throw new \exception(__('Insertion failure.', $this->plugin->text_domain));
 			}
 
 			/**

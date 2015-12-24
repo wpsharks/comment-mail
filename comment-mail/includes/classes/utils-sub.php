@@ -624,7 +624,7 @@ namespace comment_mail // Root namespace.
 				       " LIMIT 1"; // Just one to check.
 
 				if($this->plugin->utils_db->wp->query($sql) === FALSE)
-								throw new \exception(sprintf(__('Query failure on SQL: `%1$s`', 'comment-mail'), $sql));
+								throw new \exception(sprintf(__('Query failure on SQL: `%1$s`', $this->plugin->text_domain), $sql));
 
 				return ($total = (integer)$this->plugin->utils_db->wp->get_var("SELECT FOUND_ROWS()"));
 			}
@@ -1138,10 +1138,10 @@ namespace comment_mail // Root namespace.
 				if(isset($sub_email[0])) // Double-check security issues here.
 				{
 					if(!$sub_key || !in_array($sub_key, $this->email_keys($sub_email), TRUE))
-						throw new \exception(__('Key-to-email mismatch; possible security issue.', 'comment-mail'));
+						throw new \exception(__('Key-to-email mismatch; possible security issue.', $this->plugin->text_domain));
 
 					if(is_admin() || (!isset($_REQUEST[__NAMESPACE__]['confirm']) && !isset($_REQUEST[__NAMESPACE__]['unsubscribe']) && !isset($_REQUEST[__NAMESPACE__]['manage'])))
-						throw new \exception(__('Trying to set current email w/o a user-initiated sub. action.', 'comment-mail'));
+						throw new \exception(__('Trying to set current email w/o a user-initiated sub. action.', $this->plugin->text_domain));
 				}
 				// Cookie is ONLY set for subscribers that received a secret `key` in one way or another.
 				// A subscriber only receives a secret key if we can confirm they own the email associated w/ it.

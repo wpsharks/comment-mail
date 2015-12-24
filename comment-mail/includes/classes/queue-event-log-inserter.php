@@ -101,7 +101,7 @@ namespace comment_mail // Root namespace.
 					return; // Not applicable.
 
 				if(!$this->plugin->utils_db->wp->insert($this->plugin->utils_db->prefix().'queue_event_log', $this->entry))
-					throw new \exception(__('Insertion failure.', 'comment-mail'));
+					throw new \exception(__('Insertion failure.', $this->plugin->text_domain));
 			}
 		}
 	}

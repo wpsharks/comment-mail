@@ -142,7 +142,7 @@ namespace comment_mail // Root namespace.
 					$to = time(); // Current time.
 
 				if(!isset($suffix)) // Use default value?
-					$suffix = ' '.__('ago', 'comment-mail');
+					$suffix = ' '.__('ago', $this->plugin->text_domain);
 
 				$from   = (integer)$from; // Force integer.
 				$to     = (integer)$to; // Force integer.
@@ -154,42 +154,42 @@ namespace comment_mail // Root namespace.
 				{
 					$minutes = (integer)round($difference / 60);
 
-					$since = sprintf(_n('%1$s minute', '%1$s minutes', $minutes, 'comment-mail'), $minutes);
-					$since = ($minutes < 1) ? __('less than a minute', 'comment-mail') : $since;
-					$since = ($minutes >= 60) ? __('about 1 hour', 'comment-mail') : $since;
+					$since = sprintf(_n('%1$s minute', '%1$s minutes', $minutes, $this->plugin->text_domain), $minutes);
+					$since = ($minutes < 1) ? __('less than a minute', $this->plugin->text_domain) : $since;
+					$since = ($minutes >= 60) ? __('about 1 hour', $this->plugin->text_domain) : $since;
 				}
 				else if($difference >= 3600 && $difference < 86400)
 				{
 					$hours = (integer)round($difference / 3600);
 
-					$since = sprintf(_n('%1$s hour', '%1$s hours', $hours, 'comment-mail'), $hours);
-					$since = ($hours >= 24) ? __('about 1 day', 'comment-mail') : $since;
+					$since = sprintf(_n('%1$s hour', '%1$s hours', $hours, $this->plugin->text_domain), $hours);
+					$since = ($hours >= 24) ? __('about 1 day', $this->plugin->text_domain) : $since;
 				}
 				else if($difference >= 86400 && $difference < 604800)
 				{
 					$days = (integer)round($difference / 86400);
 
-					$since = sprintf(_n('%1$s day', '%1$s days', $days, 'comment-mail'), $days);
-					$since = ($days >= 7) ? __('about 1 week', 'comment-mail') : $since;
+					$since = sprintf(_n('%1$s day', '%1$s days', $days, $this->plugin->text_domain), $days);
+					$since = ($days >= 7) ? __('about 1 week', $this->plugin->text_domain) : $since;
 				}
 				else if($difference >= 604800 && $difference < 2592000)
 				{
 					$weeks = (integer)round($difference / 604800);
 
-					$since = sprintf(_n('%1$s week', '%1$s weeks', $weeks, 'comment-mail'), $weeks);
-					$since = ($weeks >= 4) ? __('about 1 month', 'comment-mail') : $since;
+					$since = sprintf(_n('%1$s week', '%1$s weeks', $weeks, $this->plugin->text_domain), $weeks);
+					$since = ($weeks >= 4) ? __('about 1 month', $this->plugin->text_domain) : $since;
 				}
 				else if($difference >= 2592000 && $difference < 31556926)
 				{
 					$months = (integer)round($difference / 2592000);
 
-					$since = sprintf(_n('%1$s month', '%1$s months', $months, 'comment-mail'), $months);
-					$since = ($months >= 12) ? __('about 1 year', 'comment-mail') : $since;
+					$since = sprintf(_n('%1$s month', '%1$s months', $months, $this->plugin->text_domain), $months);
+					$since = ($months >= 12) ? __('about 1 year', $this->plugin->text_domain) : $since;
 				}
 				else // We use years here (default case handler).
 				{
 					$years = (integer)round($difference / 31556926);
-					$since = sprintf(_n('%1$s year', '%1$s years', $years, 'comment-mail'), $years);
+					$since = sprintf(_n('%1$s year', '%1$s years', $years, $this->plugin->text_domain), $years);
 				}
 				return $since.$suffix; // Human readable time difference calculation.
 			}
