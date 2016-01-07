@@ -330,8 +330,8 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
 							subFormPostIdProps.$input.on('blur', subFormPostIdProps.handler);
 
 						$('.manage-sub-form form tr.manage-sub-form-comment-id select').chosen(chosenOps);
-						$('.manage-sub-form form tr.manage-sub-form-status select').chosen(chosenOps);
-						$('.manage-sub-form form tr.manage-sub-form-deliver select').chosen(chosenOps);
+						$('.manage-sub-form form tr.manage-sub-form-status select').chosen($.extend({}, chosenOps, {allow_single_deselect: false}));
+						$('.manage-sub-form form tr.manage-sub-form-deliver select').chosen($.extend({}, chosenOps, {allow_single_deselect: false}));
 
 						/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
