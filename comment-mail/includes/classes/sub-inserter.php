@@ -154,6 +154,13 @@ namespace comment_mail // Root namespace.
 			 */
 			protected $keep_existing;
 
+			/**
+			 * @var boolean Keep existing?
+			 *
+			 * @since 141111 First documented version.
+			 */
+			protected $check_blacklist;
+
 			/* Related to user. */
 
 			/**
@@ -349,6 +356,8 @@ namespace comment_mail // Root namespace.
 					'user_allow_0'                  => NULL,
 
 					'keep_existing'                 => FALSE,
+
+					'check_blacklist' 						  => TRUE,
 				);
 				$args          = array_merge($defaults_args, $args);
 				$args          = array_intersect_key($args, $defaults_args);
@@ -389,6 +398,7 @@ namespace comment_mail // Root namespace.
 
 				$this->keep_existing = (boolean)$args['keep_existing'];
 
+				$this->check_blacklist = (boolean)$args['check_blacklist'];
 				/* Related to user. */
 
 				if(!isset($this->user) || !$this->user->ID)
@@ -1234,7 +1244,7 @@ namespace comment_mail // Root namespace.
 							else if($this->is_insert && (!isset($_value) || !$_value || !is_email($_value) || strlen($_value) > 100))
 								$this->errors['invalid_sub_email'] = sprintf(__('Invalid email address: `%1$s`.', 'comment-mail'), esc_html($_value));
 
-							else if(isset($_value) && $this->plugin->utils_sub->email_is_blacklisted($_value))
+							else if(isset($_value) && $this->check_blacklist($_value, TRUE))
 								$this->errors['blacklisted_sub_email'] = sprintf(__('Blacklisted email address: `%1$s`.', 'comment-mail'), esc_html($_value));
 
 							break; // Break switch handler.
