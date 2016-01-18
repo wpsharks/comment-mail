@@ -1244,7 +1244,7 @@ namespace comment_mail // Root namespace.
 							else if($this->is_insert && (!isset($_value) || !$_value || !is_email($_value) || strlen($_value) > 100))
 								$this->errors['invalid_sub_email'] = sprintf(__('Invalid email address: `%1$s`.', 'comment-mail'), esc_html($_value));
 
-							else if(isset($_value) && $this->check_blacklist($_value))
+							else if(isset($_value) && $this->check_blacklist && $this->plugin->utils_sub->email_is_blacklisted($_value))
 								$this->errors['blacklisted_sub_email'] = sprintf(__('Blacklisted email address: `%1$s`.', 'comment-mail'), esc_html($_value));
 
 							break; // Break switch handler.
