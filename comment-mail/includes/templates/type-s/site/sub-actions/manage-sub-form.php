@@ -202,7 +202,6 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
 								'placeholder'         => __('— All Comments/Replies —', 'comment-mail'),
 								'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment', 'comment-mail'),
 								'name'                => 'comment_id', 'required' => FALSE, 'options' => '%%comments%%', 'post_id' => $current_value_for('post_id'), 'current_value' => $current_value_for('comment_id'),
-								'notes_after'         => __('If empty, you\'ll be subscribed to all comments/replies; i.e. NOT to a specific comment.', 'comment-mail'),
 								'input_fallback_args' => array('type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'current_value_empty_on_0' => TRUE),
 							)); ?>
 						<?php /* -------------------------------------------------------------------- */ ?>
