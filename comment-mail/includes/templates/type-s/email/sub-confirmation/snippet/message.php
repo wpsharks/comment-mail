@@ -8,12 +8,12 @@
 
 	[if sub_comment]
 		[if subscribed_to_own_comment]
-			You are receiving this email because asked to be notified about replies to <a href="[sub_comment_url]">your comment</a>; on:
+			You are receiving this email because you asked to be notified about replies to <a href="[sub_comment_url]">your comment</a>; on:
 		[else]
-	        You are receiving this email because asked to be notified about replies to <a href="[sub_comment_url]">this comment</a>; on:
+	        You are receiving this email because you asked to be notified about replies to <a href="[sub_comment_url]">this comment</a>; on:
 		[endif]
 	[else]
-		You are receiving this email because asked to be notified about all comments/replies to:
+		You are receiving this email because you asked to be notified about all comments/replies to:
 	[endif]
 
 </p>
