@@ -20,7 +20,7 @@
 
 <p>
 	<span style="font-size:120%;">
-		"[sub_post_title_clip]"
+		[sub_post_title_clip]
 	</span>
 </p>
 

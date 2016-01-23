@@ -19,9 +19,9 @@
 <h4>
 	<i class="fa fa-thumb-tack"></i>
 	[if sub_comment]
-		"<a href="[sub_comment_url]">[sub_post_title_clip]</a>"
+		<a href="[sub_comment_url]">[sub_post_title_clip]</a>
 	[else]
-		"<a href="[sub_post_comments_url]">[sub_post_title_clip]</a>"
+		<a href="[sub_post_comments_url]">[sub_post_title_clip]</a>
 	[endif]
 </h4>
 
