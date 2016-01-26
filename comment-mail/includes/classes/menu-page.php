@@ -4356,9 +4356,13 @@ namespace comment_mail // Root namespace.
 
 					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->product_page()).'" target="_blank"><i class="fa fa-heart-o"></i> '.__('Pro Upgrade', 'comment-mail').'</a>'."\n";
 				}
-				
+
 				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->subscribe_page()).'" target="_blank"><i class="fa fa-envelope-o"></i> '.__('Newsletter (Subscribe)', 'comment-mail').'</a>'."\n";
 				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->tester_page()).'" target="_blank"><i class="fa fa-envelope-o"></i> '.__('Beta Testers', 'comment-mail').'</a>'."\n";
+				$heading .= '  </div>'."\n";
+
+				$heading .= '  <div class="pmp-version">'."\n";
+				$heading .= '     <span> '.sprintf(__('%1$s&trade; Pro v%2$s (<a href="https://comment-mail.com/changelog/">changelog</a>)', 'comment-mail'), esc_html($this->plugin->name), esc_html($this->plugin->version)).'</span>'."\n";
 				$heading .= '  </div>'."\n";
 
 				if($logo_icon && $this->plugin->options['menu_pages_logo_icon_enable'])
