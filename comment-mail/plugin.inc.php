@@ -1172,7 +1172,7 @@ namespace comment_mail {
 				$icon = $this->utils_fs->inline_icon_svg();
 
 				if(!$this->utils_env->is_menu_page('post-new.php'))
-					add_meta_box(__NAMESPACE__.'_small', $icon.' '.$this->name.'&trade;', array($this, 'post_small_meta_box'), $post_type, 'side', 'high');
+					add_meta_box(__NAMESPACE__.'_small', $icon.' '.$this->name.'&trade;', array($this, 'post_small_meta_box'), $post_type, 'normal', 'default');
 
 				// @TODO disabling this for now.
 				//add_meta_box(__NAMESPACE__.'_large', $icon.' '.$this->name.'&trade; '.__('Subscriptions', 'comment-mail'),
