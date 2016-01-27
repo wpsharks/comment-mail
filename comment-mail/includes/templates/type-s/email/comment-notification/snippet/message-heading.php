@@ -9,7 +9,7 @@
 				New Replies to <a href="[sub_comment_url]">a Comment</a> on <em>[sub_post_title_clip]</em>
 			[endif]
 		[else]
-			New Comments on <a href="[sub_post_comments_url]"><em>[sub_post_title_clip]</em></a>
+			New Comments on <em><a href="[sub_post_comments_url]">[sub_post_title_clip]</a></em>
 		[endif]
 
 	[else]
