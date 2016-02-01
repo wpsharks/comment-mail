@@ -26,9 +26,9 @@
 <h4>
 	<i class="fa fa-thumb-tack"></i>
 	[if sub_post && sub_comment]
-		"<a href="[sub_comment_url]">[sub_post_title_clip]</a>"
+		<em><a href="[sub_comment_url]">[sub_post_title_clip]</a></em>
 	[elseif sub_post]
-		"<a href="[sub_post_comments_url]">[sub_post_title_clip]</a>"
+		<em><a href="[sub_post_comments_url]">[sub_post_title_clip]</a></em>
 	[else]
 		Post ID #<code>[sub_post_id]</code>
 	[endif]
