@@ -242,7 +242,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
 							'placeholder' => __('Select a Delivery Option...', 'comment-mail'),
 							'label'       => __('<i class="fa fa-fw fa-paper-plane-o"></i> Deliver', 'comment-mail'),
 							'name'        => 'deliver', 'required' => TRUE, 'options' => '%%deliver%%', 'current_value' => $current_value_for('deliver'),
-							'notes_after' => __('Any value that is not <code>asap</code> results in a digest instead of instant notifications.', 'comment-mail'),
+							'notes_after' => __('Any value that is not <code>instantly</code> results in a digest instead of instant notifications.', 'comment-mail'),
 						)); ?>
 
 					</tbody>
