@@ -294,8 +294,8 @@ namespace comment_mail // Root namespace.
 				            break;
 
 				        case 'email':
-				            if(!empty($current->email)) {
-				                return (string)$current->email;
+				            if(!empty($current->user_email)) {
+				                return (string)$current->user_email;
 				            }
 				            break;
 				    }
