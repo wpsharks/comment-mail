@@ -252,6 +252,55 @@ namespace comment_mail // Root namespace.
 					if(!empty($current_email_latest_info->{$key_prop}))
 						return trim((string)$current_email_latest_info->{$key_prop});
 
+				if(!$this->is_edit && !static::$processing && in_array($key_prop, array('fname', 'lname', 'email'), TRUE)) {
+				    // We can try to autofill fname, lname, email for new subscriptions.
+				    $current = wp_get_current_commenter();
+
+				    switch($key_prop) {
+				        case 'fname':
+				            if(!empty($current['comment_author'])) {
+				                return $this->plugin->utils_string->first_name((string)$current['comment_author']);
+				            }
+				            break;
+
+				        case 'lname':
+				            if(!empty($current['comment_author'])) {
+				                return $this->plugin->utils_string->last_name((string)$current['comment_author']);
+				            }
+				            break;
+
+				        case 'email':
+				            if(!empty($current['comment_author_email'])) {
+				                return (string)$current['comment_author_email'];
+				            }
+				            break;
+				    }
+				}
+				if(!$this->is_edit && !static::$processing && in_array($key_prop, array('fname', 'lname', 'email'), TRUE)) {
+				    // We can try to autofill fname, lname, email for new subscriptions.
+				    $current = wp_get_current_user();
+
+				    switch($key_prop) {
+				        case 'fname':
+				            if(!empty($current->first_name)) {
+				                return $this->plugin->utils_string->first_name((string)$current->first_name);
+				            }
+				            break;
+
+				        case 'lname':
+				            if(!empty($current->last_name)) {
+				                return $this->plugin->utils_string->last_name('- '.(string)$current->last_name);
+				            }
+				            break;
+
+				        case 'email':
+				            if(!empty($current->user_email)) {
+				                return (string)$current->user_email;
+				            }
+				            break;
+				    }
+				}
+
 				return NULL; // Default value.
 			}
 
