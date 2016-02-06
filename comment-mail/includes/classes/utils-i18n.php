@@ -255,7 +255,7 @@ namespace comment_mail // Root namespace.
 				switch($deliver) // Convert to label.
 				{
 					case 'asap':
-						$i18n = __('asap', 'comment-mail');
+						$i18n = __('instantly', 'comment-mail');
 						break;
 
 					case 'hourly':
