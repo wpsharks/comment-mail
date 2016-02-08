@@ -4344,14 +4344,9 @@ namespace comment_mail // Root namespace.
 
 				$heading .= '<div class="pmp-heading">'."\n";
 
-				if($logo_icon && $this->plugin->options['menu_pages_logo_icon_enable'])
-					$heading .= '  <img class="pmp-logo-icon" src="'.$this->plugin->utils_url->to('/client-s/images/'.$logo_icon).'" alt="'.esc_attr($title).'" />'."\n";
+				$heading .= '     <button type="button" class="plugin-menu-page-restore-defaults"'.'<a href="#" data-pmp-action="'.esc_attr($this->plugin->utils_url->restore_default_options()).'" data-pmp-confirmation="'.esc_attr(__('Restore default plugin options? You will lose all of your current settings! Are you absolutely sure?', 'comment-mail')).'"> '.__('Restore', 'comment-mail').' <i class="fa fa-ambulance"></i></button>'.'</a>'."\n";
 
-				$heading .= '  <div class="pmp-heading-links">'."\n";
-
-				$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->main_menu_page_only()).'"'.
-				            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__) ? ' class="pmp-active"' : '').'>'.
-				            '<i class="fa fa-gears"></i> '.__('Options', 'comment-mail').'</a>'."\n";
+				$heading .= '  <div class="pmp-heading-options">'."\n";
 
 				if(!$this->plugin->is_pro) // Display pro preview/upgrade related links?
 				{
@@ -4361,6 +4356,24 @@ namespace comment_mail // Root namespace.
 
 					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->product_page()).'" target="_blank"><i class="fa fa-heart-o"></i> '.__('Pro Upgrade', 'comment-mail').'</a>'."\n";
 				}
+
+				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->subscribe_page()).'" target="_blank"><i class="fa fa-envelope-o"></i> '.__('Newsletter (Subscribe)', 'comment-mail').'</a>'."\n";
+				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->tester_page()).'" target="_blank"><i class="fa fa-envelope-o"></i> '.__('Beta Testers', 'comment-mail').'</a>'."\n";
+				$heading .= '  </div>'."\n";
+
+				$heading .= '  <div class="pmp-version">'."\n";
+				$heading .= '     <span> '.sprintf(__('%1$s&trade; v%2$s (<a href="https://comment-mail.com/changelog/" target="_blank">changelog</a>)', 'comment-mail'), esc_html($this->plugin->name), esc_html($this->plugin->version)).'</span>'."\n";
+				$heading .= '  </div>'."\n";
+
+				if($logo_icon && $this->plugin->options['menu_pages_logo_icon_enable'])
+					$heading .= '  <img class="pmp-logo-icon" src="'.$this->plugin->utils_url->to('/client-s/images/'.$logo_icon).'" alt="'.esc_attr($title).'" />'."\n";
+
+				$heading .= '  <div class="pmp-heading-links">'."\n";
+
+				$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->main_menu_page_only()).'"'.
+				            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__) ? ' class="pmp-active"' : '').'>'.
+				            '<i class="fa fa-gears"></i> '.__('Options', 'comment-mail').'</a>'."\n";
+
 				if($this->plugin->is_pro) // Display import options for pro users.
 				{
 					$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->import_export_menu_page_only()).'"'.
@@ -4386,11 +4399,6 @@ namespace comment_mail // Root namespace.
 				$heading .= '  <a href="'.esc_attr($this->plugin->utils_url->site_templates_menu_page_only()).'"'.
 				            ($this->plugin->utils_env->is_menu_page(__NAMESPACE__.'_site_templates') ? ' class="pmp-active"' : '').'>'.
 				            '<i class="fa fa-code"></i> '.__('Site Templates', 'comment-mail').'</a>'."\n";
-
-				$heading .= '     <a href="#" data-pmp-action="'.esc_attr($this->plugin->utils_url->restore_default_options()).'" data-pmp-confirmation="'.esc_attr(__('Restore default plugin options? You will lose all of your current settings! Are you absolutely sure?', 'comment-mail')).'"><i class="fa fa-ambulance"></i> '.__('Restore Default Options', 'comment-mail').'</a>'."\n";
-
-				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->subscribe_page()).'" target="_blank"><i class="fa fa-envelope-o"></i> '.__('Newsletter (Subscribe)', 'comment-mail').'</a>'."\n";
-				$heading .= '     <a href="'.esc_attr($this->plugin->utils_url->product_page()).'" target="_blank"><i class="si si-comment-mail"></i> '.esc_html($this->plugin->site_name).'</a>'."\n";
 
 				$heading .= '  </div>'."\n";
 
