@@ -1989,9 +1989,6 @@ namespace comment_mail {
 					{
 						if($_args['persistent']) // Need [dismiss] link?
 						{
-							$_dismiss_style = ' -webkit-box-shadow: none;'.
-							                  ' margin: 0;'.
-											  ' padding: 0;';
 							$_dismiss       = '<button type="button"'.
 							                  '  class="notice-dismiss">'.
 							                  '  <span class="screen-reader-text">'.
