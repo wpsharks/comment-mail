@@ -1989,16 +1989,12 @@ namespace comment_mail {
 					{
 						if($_args['persistent']) // Need [dismiss] link?
 						{
-							$_dismiss_style = 'float: right;'.
-							                  'margin: 0 0 0 15px;'.
-							                  'display: inline-block;'.
-							                  'text-decoration: none;'.
-							                  'font-weight: bold;';
-							$_dismiss_url   = $this->utils_url->dismiss_notice($_key);
-							$_dismiss       = '<a href="'.esc_attr($_dismiss_url).'"'.
-							                  '  style="'.esc_attr($_dismiss_style).'">'.
-							                  '  '.__('dismiss &times;', 'comment-mail').
-							                  '</a>';
+							$_dismiss       = '<button type="button"'.
+							                  '  class="notice-dismiss">'.
+							                  '  <span class="screen-reader-text">'.
+							                  '  '.__('Dismiss this notice.', 'comment-mail').
+							                  '  </span>'.
+							                  '</button>';
 						}
 						else $_dismiss = ''; // Default value; n/a.
 
