@@ -842,6 +842,25 @@ namespace comment_mail // Root namespace.
 			}
 
 			/**
+			 * Beta Testers page URL; normally at WebSharks™.
+			 *
+			 * @since 141111 First documented version.
+			 *
+			 * @param string|null $scheme Optional. Defaults to a `NULL` value.
+			 *    See {@link set_scheme()} method for further details.
+			 *
+			 * @return string Beta Testers page URL; normally at WebSharks™.
+			 */
+			public function tester_page($scheme = NULL)
+			{
+				if(!empty($this->plugin->tester_url))
+					$url = $this->plugin->tester_url; // Provided by plugin class?
+				else $url = 'http://www.comment-mail.com/beta%20testers';
+
+				return isset($scheme) ? $this->set_scheme($url, $scheme) : $url;
+			}
+
+			/**
 			 * URL to a plugin file.
 			 *
 			 * @since 141111 First documented version.

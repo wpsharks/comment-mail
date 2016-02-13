@@ -1,6 +1,6 @@
 === Comment Mail (WP Comment Subscriptions) ===
 
-Stable tag: 151224
+Stable tag: 160213
 Requires at least: 4.0
 Tested up to: 4.5-alpha
 Text Domain: comment-mail
@@ -251,6 +251,20 @@ Released under the terms of the [GNU General Public License](http://www.gnu.org/
 Requires PHP v5.4+.
 
 == Changelog ==
+
+= v160213 =
+
+- **Minor Fix**: Fixed a spelling mistake in one of the default email templates. Props @kristineds  @RealDavidoff. See [Issue #208](https://github.com/websharks/comment-mail/issues/208).
+- **Enhancement**: Moved the default location for the Subscriptions Meta Box on the Post Edit screen so that it shows up underneath the post editing area instead of above the Publish box. See [Issue #57](https://github.com/websharks/comment-mail/issues/57#issuecomment-174482908).
+- **Enhancement**: Removed an irrelevant and confusing note from the Add New Subscription page. Props @kristineds @RealDavidoff. See [Issue #207](https://github.com/websharks/comment-mail/issues/207).
+- **Enhancement**: Improved the front-end Edit Subscription form and removed the "x" in on the Status and Deliver fields that allowed clearing those fields, which did not make sense since both of those fields are required. Props @kristineds. See [Issue #195](https://github.com/websharks/comment-mail/issues/195).
+- **Enhancement**: Improved the way some links work by opening on-site links in current tab, and external links in new tab. Props @RealDavidoff @kristineds @renzms. See [Issue #202](https://github.com/websharks/comment-mail/issues/202).
+- **Enhancement**: Improved front-end pages by using `<em>` (emphasis) tags instead of quotation marks in various areas. Props @RealDavidoff @renzms. See [Issue #201](https://github.com/websharks/comment-mail/issues/201).
+- **Enhancement**: Improved email templates by simplifying the subject lines by using `[` and `]` brackets around the meta information in the subject. See [Issue #232](https://github.com/websharks/comment-mail/issues/232).
+- **Enhancement**: When Subscribing Without Commenting, the Add New Subscription form now pre-populates the Name and Email address fields whenever possible. Props @kristineds. See [Issue #204](https://github.com/websharks/comment-mail/issues/204).
+- **Enhancement**: Improved the consistency of how we refer to the "instant" delivery option by replacing any occurrences of "asap" with "instantly". These names were previously being mixed. We now use "instantly". Props @RealDavidoff @renzms @kristineds. See [Issue #206](https://github.com/websharks/comment-mail/issues/206).
+- **Enhancement**: Added the installed version number to the plugin options pages. Props @kristineds. See [Issue #187](https://github.com/websharks/comment-mail/issues/187).
+- **Enhancement**: Improved the organization of navigation links on the plugin options pages. Props @kristineds. See [Issue #187](https://github.com/websharks/comment-mail/issues/187).
 
 = v151224 =
 

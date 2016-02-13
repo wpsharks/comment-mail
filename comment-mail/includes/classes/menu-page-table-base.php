@@ -2005,7 +2005,7 @@ namespace comment_mail // Root namespace.
 					$_post_type_label = $_post_type->labels->singular_name;
 
 					$post_lis[$_post->ID] = '<li>'. // <title> [edit].
-					                        '  "<a href="'.esc_attr($_post_permalink).'" target="_blank">'.esc_html($_post_title_clip).'</a>"'.
+					                        '  "<a href="'.esc_attr($_post_permalink).'">'.esc_html($_post_title_clip).'</a>"'.
 					                        ($_post_edit_link // Only if they can edit the post ID; else this will be empty.
 						                        ? ' [<a href="'.esc_attr($_post_edit_link).'">'.__('edit', 'comment-mail').'</a>]' : '').
 					                        '</li>';
@@ -2041,7 +2041,7 @@ namespace comment_mail // Root namespace.
 					$_comment_content_clip = $this->plugin->utils_string->clip($_comment->comment_content, 100);
 
 					$comment_lis[$_comment->comment_ID] = '<li>'. // <title> [edit].
-					                                      '   "<a href="'.esc_attr($_post_permalink).'" target="_blank">'.esc_html($_post_title_clip).'</a>"'.
+					                                      '   "<a href="'.esc_attr($_post_permalink).'">'.esc_html($_post_title_clip).'</a>"'.
 					                                      ($_post_edit_link // Only if they can edit the post ID; else this will be empty.
 						                                      ? ' [<a href="'.esc_attr($_post_edit_link).'">'.__('edit', 'comment-mail').'</a>]' : '').
 
