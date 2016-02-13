@@ -1,9 +1,9 @@
 [if sub_comment]
 	[if subscribed_to_own_comment]
-		Confirm subscription to your comment on <em>[sub_post_title_clip]</em>
+		Confirm subscription to your comment on: [sub_post_title_clip]
 	[else]
-		Confirm subscription to comment ID #[sub_comment_id] on <em>[sub_post_title_clip]</em>
+		Confirm subscription to comment ID #[sub_comment_id] on: [sub_post_title_clip]
 	[endif]
 [else]
-	Confirm subscription to <em>[sub_post_title_clip]</em>
+	Confirm subscription to: [sub_post_title_clip]
 [endif]
