@@ -1,0 +1,27 @@
+<wpml-config>
+    <admin-texts>
+        <key name="comment_mail_options">
+            <key name="from_name" />
+            <key name="from_email" />
+            <key name="reply_to_email" />
+            <key name="can_spam_postmaster" />
+            <key name="can_spam_mailing_address" />
+            <key name="can_spam_privacy_policy_url" />
+            <key name="template__type_s__site__comment_form__snippet__sub_ops___php" />
+            <key name="template__type_s__email__snippet__header_tag___php" />
+            <key name="template__type_s__email__snippet__footer_tag___php" />
+            <key name="template__type_s__email__sub_confirmation__snippet__subject___php" />
+            <key name="template__type_s__email__sub_confirmation__snippet__message___php" />
+            <key name="template__type_s__email__comment_notification__snippet__subject___php" />
+            <key name="template__type_s__email__comment_notification__snippet__message_heading___php" />
+            <key name="template__type_s__email__comment_notification__snippet__message_in_response_to___php" />
+            <key name="template__type_s__email__comment_notification__snippet__message_reply_from___php" />
+            <key name="template__type_s__email__comment_notification__snippet__message_comment_from___php" />
+            <key name="template__type_s__site__snippet__header_tag___php" />
+            <key name="template__type_s__site__snippet__footer_tag___php" />
+            <key name="template__type_s__site__sub_actions__snippet__confirmed___php" />
+            <key name="template__type_s__site__sub_actions__snippet__unsubscribed___php" />
+            <key name="template__type_s__site__sub_actions__snippet__unsubscribed_all___php" />
+        </key>
+    </admin-texts>
+</wpml-config>
