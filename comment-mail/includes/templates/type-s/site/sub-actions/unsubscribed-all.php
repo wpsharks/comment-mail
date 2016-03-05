@@ -27,7 +27,7 @@ echo str_replace('%%title%%', __('Unsubscribe All', 'comment-mail'), $site_heade
 
 			<div class="alert alert-danger" style="margin:0;">
 				<h4>
-					<?php echo __('Please review the following error(s):', 'comment-mail'); ?>
+					<?php _e('Please review the following error(s):', 'comment-mail'); ?>
 				</h4>
 				<ul class="list-unstyled">
 					<?php foreach($error_codes as $_error_code): ?>
@@ -35,15 +35,15 @@ echo str_replace('%%title%%', __('Unsubscribe All', 'comment-mail'), $site_heade
 							<i class="fa fa-warning fa-fw"></i> <?php switch($_error_code)
 							{
 								case 'missing_sub_email':
-									echo __('Subscription email is missing; unable to unsubscribe all.', 'comment-mail');
+									_e('Subscription email is missing; unable to unsubscribe all.', 'comment-mail');
 									break; // Break switch handler.
 
 								case 'sub_already_unsubscribed_all':
-									echo __('Already unsubscribed all! Sorry to see you go.', 'comment-mail');
+									_e('Already unsubscribed all! Sorry to see you go.', 'comment-mail');
 									break; // Break switch handler.
 
 								default: // Anything else that is unexpected/unknown at this time.
-									echo __('Unknown error; unable to unsubscribe all. Sorry!', 'comment-mail').
+									_e('Unknown error; unable to unsubscribe all. Sorry!', 'comment-mail').
 									     ' '.sprintf(__('Please contact &lt;%1$s&gt; for assistance.', 'comment-mail'),
 									                 esc_html($plugin->options['can_spam_postmaster']));
 							} ?>

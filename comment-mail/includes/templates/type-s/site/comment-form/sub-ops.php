@@ -85,19 +85,19 @@ namespace comment_mail;
 <?php $css_styles = ob_get_clean(); ?>
 
 <?php ob_start(); ?>
-	<select id="<?php echo esc_attr($sub_type_id); ?>" name="<?php echo esc_attr($sub_type_name); ?>" class="cso-sub-type form-control" title="<?php echo __('Receive Notifications?', 'comment-mail'); ?>">
-		<option value=""<?php selected('', $current->sub_type); ?>><?php echo __('no, do not subscribe', 'comment-mail'); ?></option>
-		<option value="comment"<?php selected('comment', $current->sub_type); ?>><?php echo __('yes, replies to my comment', 'comment-mail'); ?></option>
-		<option value="comments"<?php selected('comments', $current->sub_type); ?>><?php echo __('yes, all comments/replies', 'comment-mail'); ?></option>
+	<select id="<?php echo esc_attr($sub_type_id); ?>" name="<?php echo esc_attr($sub_type_name); ?>" class="cso-sub-type form-control" title="<?php _e('Receive Notifications?', 'comment-mail'); ?>">
+		<option value=""<?php selected('', $current->sub_type); ?>><?php _e('no, do not subscribe', 'comment-mail'); ?></option>
+		<option value="comment"<?php selected('comment', $current->sub_type); ?>><?php _e('yes, replies to my comment', 'comment-mail'); ?></option>
+		<option value="comments"<?php selected('comments', $current->sub_type); ?>><?php _e('yes, all comments/replies', 'comment-mail'); ?></option>
 	</select>
 <?php $sub_type_options = ob_get_clean(); ?>
 
 <?php ob_start(); ?>
-	<select id="<?php echo esc_attr($sub_deliver_id); ?>" name="<?php echo esc_attr($sub_deliver_name); ?>" class="cso-sub-deliver form-control" title="<?php echo __('Notify Me', 'comment-mail'); ?>">
-		<option value="asap"<?php selected('asap', $current->sub_deliver); ?>><?php echo __('instantly', 'comment-mail'); ?></option>
-		<option value="hourly"<?php selected('hourly', $current->sub_deliver); ?>><?php echo __('hourly digest', 'comment-mail'); ?></option>
-		<option value="daily"<?php selected('daily', $current->sub_deliver); ?>><?php echo __('daily digest', 'comment-mail'); ?></option>
-		<option value="weekly"<?php selected('weekly', $current->sub_deliver); ?>><?php echo __('weekly digest', 'comment-mail'); ?></option>
+	<select id="<?php echo esc_attr($sub_deliver_id); ?>" name="<?php echo esc_attr($sub_deliver_name); ?>" class="cso-sub-deliver form-control" title="<?php _e('Notify Me', 'comment-mail'); ?>">
+		<option value="asap"<?php selected('asap', $current->sub_deliver); ?>><?php _e('instantly', 'comment-mail'); ?></option>
+		<option value="hourly"<?php selected('hourly', $current->sub_deliver); ?>><?php _e('hourly digest', 'comment-mail'); ?></option>
+		<option value="daily"<?php selected('daily', $current->sub_deliver); ?>><?php _e('daily digest', 'comment-mail'); ?></option>
+		<option value="weekly"<?php selected('weekly', $current->sub_deliver); ?>><?php _e('weekly digest', 'comment-mail'); ?></option>
 	</select>
 <?php $sub_deliver_options = ob_get_clean(); ?>
 

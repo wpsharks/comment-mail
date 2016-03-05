@@ -51,7 +51,7 @@ namespace comment_mail;
 	?>
 
 	<p style="color:#888888;">
-		<strong><?php echo __('Manage Subscriptions', 'comment-mail'); ?></strong><br />
+		<strong><?php _e('Manage Subscriptions', 'comment-mail'); ?></strong><br />
 		<?php echo sprintf(__('<a href="%1$s">My Comment Subscriptions</a>', 'comment-mail'), esc_attr($sub_summary_url)); ?><br />
 		&nbsp;&#42774;&nbsp; <?php echo sprintf(__('<a href="%1$s">One-Click Unsubscribe</a>', 'comment-mail'), esc_attr($sub_unsubscribe_url)); ?>
 	</p>
@@ -59,7 +59,7 @@ namespace comment_mail;
 	<?php // @todo Remove completely, or reconsider, Add New Subscription from front-end ?>
 	<?php /*
 	<p style="color:#888888;">
-		<strong><?php echo __('Create New Subscription?', 'comment-mail'); ?></strong><br />
+		<strong><?php _e('Create New Subscription?', 'comment-mail'); ?></strong><br />
 		<?php echo sprintf(__('<a href="%1$s">Add New Comment Subscription</a>', 'comment-mail'), esc_attr($sub_new_url)); ?>
 	</p>
  	*/?>
@@ -88,7 +88,7 @@ $can_spam_privacy_policy_url = $plugin->options['can_spam_privacy_policy_url'];
 ?>
 
 <p style="color:#888888;">
-	<strong><?php echo __('Contact Info', 'comment-mail'); ?></strong><br />
+	<strong><?php _e('Contact Info', 'comment-mail'); ?></strong><br />
 	<?php echo sprintf(__('Website URL: <a href="%1$s">%2$s</a>', 'comment-mail'), esc_attr($home_url), esc_html($home_url)); ?><br />
 	<?php echo sprintf(__('Report Abuse to: <a href="mailto:%1$s">%2$s</a>', 'comment-mail'), esc_attr(urlencode($can_spam_postmaster)), esc_html($can_spam_postmaster)); ?>
 	<?php if($can_spam_privacy_policy_url): ?><br />
@@ -96,7 +96,7 @@ $can_spam_privacy_policy_url = $plugin->options['can_spam_privacy_policy_url'];
 	<?php endif; ?>
 </p>
 <p style="color:#888888;">
-	<strong><?php echo __('Our Mailing Address', 'comment-mail'); ?></strong><br />
+	<strong><?php _e('Our Mailing Address', 'comment-mail'); ?></strong><br />
 	<?php echo $can_spam_mailing_address; ?>
 </p>
 

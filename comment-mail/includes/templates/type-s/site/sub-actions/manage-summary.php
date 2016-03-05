@@ -91,7 +91,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 
 			<div class="alert alert-danger" style="margin:0;">
 				<h4>
-					<?php echo __('Please review the following error(s):', 'comment-mail'); ?>
+					<?php _e('Please review the following error(s):', 'comment-mail'); ?>
 				</h4>
 				<ul class="list-unstyled">
 					<?php foreach($error_codes as $_error_code): ?>
@@ -99,15 +99,15 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 							<i class="fa fa-warning fa-fw"></i> <?php switch($_error_code)
 							{
 								case 'missing_sub_key':
-									echo __('Missing subscription key; unable to display summary.', 'comment-mail');
+									_e('Missing subscription key; unable to display summary.', 'comment-mail');
 									break; // Break switch handler.
 
 								case 'invalid_sub_key':
-									echo __('Invalid subscription key; unable to display summary.', 'comment-mail');
+									_e('Invalid subscription key; unable to display summary.', 'comment-mail');
 									break; // Break switch handler.
 
 								default: // Anything else that is unexpected/unknown at this time.
-									echo __('Unknown error; unable to display summary. Sorry!', 'comment-mail');
+									_e('Unknown error; unable to display summary. Sorry!', 'comment-mail');
 							} ?>
 						</li>
 					<?php endforeach; ?>
@@ -136,7 +136,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 
 				<div class="alert alert-danger">
 					<h4>
-						<?php echo __('Please review the following error(s):', 'comment-mail'); ?>
+						<?php _e('Please review the following error(s):', 'comment-mail'); ?>
 					</h4>
 					<ul class="list-unstyled">
 						<?php foreach($processing_errors_html as $_error_code => $_error_html): ?>
@@ -153,7 +153,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 
 				<div class="alert alert-success">
 					<h4>
-						<?php echo __('Submission accepted; thank you :-)', 'comment-mail'); ?>
+						<?php _e('Submission accepted; thank you :-)', 'comment-mail'); ?>
 					</h4>
 					<ul class="list-unstyled">
 						<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
@@ -170,17 +170,17 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 				<?php // Disable this functionality for now; see http://bit.ly/1OYd4ie ?>
 				<?php // @todo Remove completely, or reconsider, Add New Subscription from front-end ?>
 				<?php /*
-				<a href="<?php echo esc_attr($sub_new_url); ?>" title="<?php echo __('Add New Subscription', 'comment-mail'); ?>">
+				<a href="<?php echo esc_attr($sub_new_url); ?>" title="<?php _e('Add New Subscription', 'comment-mail'); ?>">
 					<i class="fa fa-plus-square text-success pull-right" style="margin-left:.5em;"></i>
 				</a>
  				*/?>
 				<a href="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
 				   data-action="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
-				   data-confirmation="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address? Are you absolutely sure?', 'comment-mail'); ?>"
-				   title="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address?', 'comment-mail'); ?>">
+				   data-confirmation="<?php _e('Delete (unsubscribe) ALL subscriptions associated with your email address? Are you absolutely sure?', 'comment-mail'); ?>"
+				   title="<?php _e('Delete (unsubscribe) ALL subscriptions associated with your email address?', 'comment-mail'); ?>">
 					<i class="fa fa-times-circle text-danger pull-right"></i>
 				</a>
-				<?php echo __('My Comment Subscriptions', 'comment-mail'); ?><br />
+				<?php _e('My Comment Subscriptions', 'comment-mail'); ?><br />
 				<em style="margin-left:.5em;">
 					<small>&lt;<?php echo esc_html(implode('&gt;, &lt;', array_slice($sub_emails, 0, 100))); ?>&gt;</small>
 				</em>
@@ -199,19 +199,19 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 					<thead>
 						<tr>
 							<th class="manage-summary-subscr-email">
-								<?php echo __('Email Address', 'comment-mail'); ?>
+								<?php _e('Email Address', 'comment-mail'); ?>
 							</th>
 							<th class="manage-summary-subscr-to">
-								<?php echo __('Subscribed To', 'comment-mail'); ?>
+								<?php _e('Subscribed To', 'comment-mail'); ?>
 							</th>
 							<th class="manage-summary-subscr-type">
-								<?php echo __('Type', 'comment-mail'); ?>
+								<?php _e('Type', 'comment-mail'); ?>
 							</th>
 							<th class="manage-summary-subscr-status">
-								<?php echo __('Status', 'comment-mail'); ?>
+								<?php _e('Status', 'comment-mail'); ?>
 							</th>
 							<th class="manage-summary-subscr-delivery-op">
-								<?php echo __('Deliver', 'comment-mail'); ?>
+								<?php _e('Deliver', 'comment-mail'); ?>
 							</th>
 						</tr>
 					</thead>
@@ -265,14 +265,14 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 									<div class="hover-links">
 										<a href="<?php echo esc_attr($_sub_edit_url); ?>"
 										   title="<?php echo esc_attr(__('Edit Subscription', 'comment-mail')); ?>"
-											><i class="fa fa-pencil-square-o"></i> <?php echo __('Edit Subscr.', 'comment-mail'); ?></a>
+											><i class="fa fa-pencil-square-o"></i> <?php _e('Edit Subscr.', 'comment-mail'); ?></a>
 
 										<span class="text-muted">|</span>
 
 										<a data-action="<?php echo esc_attr($_sub_delete_url); ?>" href="<?php echo esc_attr($_sub_delete_url); ?>"
 										   data-confirmation="<?php echo esc_attr(__('Delete subscription? Are you sure?', 'comment-mail')); ?>"
 										   title="<?php echo esc_attr(__('Delete Subscription', 'comment-mail')); ?>" class="text-danger"
-											><?php echo __('Delete', 'comment-mail'); ?> <i class="fa fa-times-circle"></i></a>
+											><?php _e('Delete', 'comment-mail'); ?> <i class="fa fa-times-circle"></i></a>
 									</div>
 								</td>
 								<td>
