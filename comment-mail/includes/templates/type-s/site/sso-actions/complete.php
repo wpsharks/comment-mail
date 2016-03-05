@@ -40,7 +40,7 @@ echo str_replace('%%title%%', __('Complete Registration', 'comment-mail'), $site
 	<div class="sso-complete">
 
 		<h2 style="margin-top:0;">
-			<?php echo __('Please Complete Registration', 'comment-mail'); ?>
+			<?php _e('Please Complete Registration', 'comment-mail'); ?>
 		</h2>
 
 		<hr />
@@ -49,7 +49,7 @@ echo str_replace('%%title%%', __('Complete Registration', 'comment-mail'), $site
 
 			<div class="alert alert-danger">
 				<h4>
-					<?php echo __('Please review the following error(s):', 'comment-mail'); ?>
+					<?php _e('Please review the following error(s):', 'comment-mail'); ?>
 				</h4>
 				<ul class="list-unstyled">
 					<?php foreach($error_codes as $_error_code): ?>
@@ -57,30 +57,30 @@ echo str_replace('%%title%%', __('Complete Registration', 'comment-mail'), $site
 							<i class="fa fa-warning fa-fw"></i> <?php switch($_error_code)
 							{
 								case 'users_cannot_register':
-									echo __('Sorry, not accepting new users at this time. Please try again later.', 'comment-mail');
+									_e('Sorry, not accepting new users at this time. Please try again later.', 'comment-mail');
 									// This will only occur if you forget to enable "anyone can register" in your WP General Settings.
 									break; // Break switch handler.
 
 								case 'missing_fname':
-									echo __('Missing first name; please try again.', 'comment-mail');
+									_e('Missing first name; please try again.', 'comment-mail');
 									break; // Break switch handler.
 
 								case 'missing_email':
-									echo __('Missing email address; please try again.', 'comment-mail');
+									_e('Missing email address; please try again.', 'comment-mail');
 									break; // Break switch handler.
 
 								case 'invalid_email':
-									echo __('Invalid email address; please try again.', 'comment-mail');
+									_e('Invalid email address; please try again.', 'comment-mail');
 									break; // Break switch handler.
 
 								case 'email_exists': // Only occurs if an account exists w/ a different underlying SSO ID.
 									// Otherwise, for existing accounts w/ a matching SSO ID, they will have already been logged-in automatically.
-									echo __('An account w/ this email address already exists.', 'comment-mail').
+									_e('An account w/ this email address already exists.', 'comment-mail').
 									     ' '.sprintf(__('Please <a href="%1$s">log in</a>.', 'comment-mail'), esc_attr(wp_login_url($redirect_to)));
 									break; // Break switch handler.
 
 								default: // Anything else that is unexpected/unknown at this time.
-									echo __('Unknown error; unable to complete registration/login. Sorry!', 'comment-mail');
+									_e('Unknown error; unable to complete registration/login. Sorry!', 'comment-mail');
 							} ?>
 						</li>
 					<?php endforeach; ?>

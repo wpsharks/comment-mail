@@ -126,21 +126,21 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
         )); ?>
         <p>
             <a href="<?php echo esc_attr($_comment_url); ?>">
-                <?php echo __('Continue reading', 'comment-mail'); ?>
+                <?php _e('Continue reading', 'comment-mail'); ?>
             </a>
             <?php if($sub_post_comments_open): ?>
                 | <a href="<?php echo esc_attr($_comment_reply_url); ?>">
                     <?php if($_comment->comment_author) : ?>
-                        <?php echo __('Reply to', 'comment-mail').' '.esc_html($_comment->comment_author); ?>
+                        <?php _e('Reply to', 'comment-mail').' '.esc_html($_comment->comment_author); ?>
                     <?php else : ?>
-                        <?php echo __('Reply', 'comment-mail'); ?>
+                        <?php _e('Reply', 'comment-mail'); ?>
                     <?php endif; ?>
                 </a>
                 <?php if($replies_via_email_enable): ?>
                     <?php if($is_digest): // Marker only needed in digests. ?>
                         <small><em><?php echo sprintf(__('— or reply to this email &amp; start your message with: <code>%1$s</code>', 'comment-mail'), esc_html($_comment_rve_irt_marker)); ?></em></small>
                     <?php else: // The `Reply-To:` field in the email will suffice in other cases; i.e. there is only one comment in this notification. ?>
-                        <small><em><?php echo __('— or simply reply to this email', 'comment-mail'); ?></em></small>
+                        <small><em><?php _e('— or simply reply to this email', 'comment-mail'); ?></em></small>
                     <?php endif; ?>
                 <?php endif; ?>
             <?php endif; ?>
@@ -158,22 +158,22 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
 				)); ?>
         <p>
             <a href="<?php echo esc_attr($_comment_url); ?>">
-                <?php echo __('Continue reading', 'comment-mail'); ?>
+                <?php _e('Continue reading', 'comment-mail'); ?>
             </a>
             <?php if($sub_post_comments_open): ?>
                 | <a href="<?php echo esc_attr($_comment_reply_url); ?>">
                     <?php if($_comment->comment_author) : ?>
-                        <?php echo __('Reply to', 'comment-mail').' '.esc_html($_comment->comment_author); ?>
+                        <?php _e('Reply to', 'comment-mail').' '.esc_html($_comment->comment_author); ?>
                     <?php else : ?>
-                        <?php echo __('Reply', 'comment-mail'); ?>
+                        <?php _e('Reply', 'comment-mail'); ?>
                     <?php endif; ?>
                 </a>
                 <?php if($replies_via_email_enable): ?>
                     <?php if($is_digest): // Marker only needed in digests. ?>
                         <small><em><?php echo sprintf(__('— or reply to this email &amp; start your message with: <code>%1$s</code>', 'comment-mail'), esc_html($_comment_rve_irt_marker)); ?></em></small>
                     <?php else: // The `Reply-To:` field in the email will suffice in other cases; i.e. there is only one comment in this notification. ?>
-                        <small><em><?php echo __('— or simply reply to this email | ', 'comment-mail'); ?></em></small>
-                        <small><strong><?php echo __('Please Note:', 'comment-mail'); ?></strong> <em><?php echo __('Your reply will be posted publicly and immediately.', 'comment-mail'); ?></em></small>
+                        <small><em><?php _e('— or simply reply to this email | ', 'comment-mail'); ?></em></small>
+                        <small><strong><?php _e('Please Note:', 'comment-mail'); ?></strong> <em><?php _e('Your reply will be posted publicly and immediately.', 'comment-mail'); ?></em></small>
                     <?php endif; ?>
                 <?php endif; ?>
             <?php endif; ?>

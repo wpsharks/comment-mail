@@ -32,7 +32,7 @@ echo str_replace('%%title%%', __('Confirmation', 'comment-mail'), $site_header);
 
 			<div class="alert alert-danger" style="margin:0;">
 				<h4>
-					<?php echo __('Please review the following error(s):', 'comment-mail'); ?>
+					<?php _e('Please review the following error(s):', 'comment-mail'); ?>
 				</h4>
 				<ul class="list-unstyled">
 					<?php foreach($error_codes as $_error_code): ?>
@@ -40,27 +40,27 @@ echo str_replace('%%title%%', __('Confirmation', 'comment-mail'), $site_header);
 							<i class="fa fa-warning fa-fw"></i> <?php switch($_error_code)
 							{
 								case 'missing_sub_key':
-									echo __('Subscription key is missing; unable to confirm.', 'comment-mail');
+									_e('Subscription key is missing; unable to confirm.', 'comment-mail');
 									break; // Break switch handler.
 
 								case 'invalid_sub_key':
-									echo __('Invalid subscription key; unable to confirm.', 'comment-mail');
+									_e('Invalid subscription key; unable to confirm.', 'comment-mail');
 									break; // Break switch handler.
 
 								case 'sub_post_id_missing':
-									echo __('Unable to confirm; the post you\'re subscribing to has since been deleted. Sorry!', 'comment-mail');
+									_e('Unable to confirm; the post you\'re subscribing to has since been deleted. Sorry!', 'comment-mail');
 									break; // Break switch handler.
 
 								case 'sub_comment_id_missing':
-									echo __('Unable to confirm; the comment you\'re subscribing to has since been deleted. Sorry!', 'comment-mail');
+									_e('Unable to confirm; the comment you\'re subscribing to has since been deleted. Sorry!', 'comment-mail');
 									break; // Break switch handler.
 
 								case 'sub_already_confirmed':
-									echo __('Already confirmed! Thank you.', 'comment-mail');
+									_e('Already confirmed! Thank you.', 'comment-mail');
 									break; // Break switch handler.
 
 								default: // Anything else that is unexpected/unknown at this time.
-									echo __('Unknown error; unable to confirm. Sorry!', 'comment-mail');
+									_e('Unknown error; unable to confirm. Sorry!', 'comment-mail');
 							} ?>
 						</li>
 					<?php endforeach; ?>

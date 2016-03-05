@@ -69,7 +69,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
 
 			<div class="alert alert-success" style="margin:0;">
 				<h4>
-					<?php echo __('Submission accepted; nice work!', 'comment-mail'); ?>
+					<?php _e('Submission accepted; nice work!', 'comment-mail'); ?>
 				</h4>
 				<ul class="list-unstyled">
 					<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
@@ -80,7 +80,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
 				</ul>
 				<p style="margin-top:1em;">
 					<a href="<?php echo esc_attr($plugin->utils_url->sub_manage_summary_url($sub_key, NULL, TRUE)); ?>">
-						<i class="fa fa-arrow-circle-left"></i> <?php echo __('Back to My Subscriptions', 'comment-mail'); ?>
+						<i class="fa fa-arrow-circle-left"></i> <?php _e('Back to My Subscriptions', 'comment-mail'); ?>
 					</a>
 				</p>
 			</div>
@@ -89,7 +89,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
 
 			<div class="alert alert-danger" style="margin:0;">
 				<h4>
-					<?php echo __('Please review the following error(s):', 'comment-mail'); ?>
+					<?php _e('Please review the following error(s):', 'comment-mail'); ?>
 				</h4>
 				<ul class="list-unstyled">
 					<?php foreach($error_codes as $_error_code): ?>
@@ -97,19 +97,19 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
 							<i class="fa fa-warning fa-fw"></i> <?php switch($_error_code)
 							{
 								case 'missing_sub_key':
-									echo __('Subscription key is missing; unable to edit.', 'comment-mail');
+									_e('Subscription key is missing; unable to edit.', 'comment-mail');
 									break; // Break switch handler.
 
 								case 'invalid_sub_key':
-									echo __('Invalid subscription key; unable to edit.', 'comment-mail');
+									_e('Invalid subscription key; unable to edit.', 'comment-mail');
 									break; // Break switch handler.
 
 								case 'new_subs_disabled':
-									echo __('Sorry; not accepting new subscriptions at this time.', 'comment-mail');
+									_e('Sorry; not accepting new subscriptions at this time.', 'comment-mail');
 									break; // Break switch handler.
 
 								default: // Anything else that is unexpected/unknown at this time.
-									echo __('Unknown error; unable to add/edit. Sorry!', 'comment-mail');
+									_e('Unknown error; unable to add/edit. Sorry!', 'comment-mail');
 							} ?>
 						</li>
 					<?php endforeach; ?>
@@ -135,7 +135,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
 
 				<div class="alert alert-danger">
 					<h4>
-						<?php echo __('Please review the following error(s):', 'comment-mail'); ?>
+						<?php _e('Please review the following error(s):', 'comment-mail'); ?>
 					</h4>
 					<ul class="list-unstyled">
 						<?php foreach($processing_errors_html as $_error_code => $_error_html): ?>
@@ -152,7 +152,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
 
 				<div class="alert alert-success">
 					<h4>
-						<?php echo __('Submission accepted; nice work!', 'comment-mail'); ?>
+						<?php _e('Submission accepted; nice work!', 'comment-mail'); ?>
 					</h4>
 					<ul class="list-unstyled">
 						<?php foreach($processing_successes_html as $_success_code => $_success_html): ?>
@@ -163,7 +163,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
 					</ul>
 					<p style="margin-top:1em;">
 						<a href="<?php echo esc_attr($sub_summary_return_url); ?>">
-							<i class="fa fa-arrow-circle-left"></i> <?php echo __('Back to My Subscriptions', 'comment-mail'); ?>
+							<i class="fa fa-arrow-circle-left"></i> <?php _e('Back to My Subscriptions', 'comment-mail'); ?>
 						</a>
 					</p>
 				</div>
@@ -171,13 +171,13 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
 			<?php endif; ?>
 
 				<h2 style="margin-top:0;">
-					<a href="<?php echo esc_attr($sub_summary_return_url); ?>" title="<?php echo __('Back to My Subscriptions', 'comment-mail'); ?>">
+					<a href="<?php echo esc_attr($sub_summary_return_url); ?>" title="<?php _e('Back to My Subscriptions', 'comment-mail'); ?>">
 						<i class="fa fa-arrow-circle-left pull-right"></i>
 					</a>
 					<?php if($is_edit): ?>
-						<?php echo __('Edit Subscription', 'comment-mail'); ?>
+						<?php _e('Edit Subscription', 'comment-mail'); ?>
 					<?php else: // Creating a new subscription. ?>
-						<?php echo __('Add New Subscription', 'comment-mail'); ?>
+						<?php _e('Add New Subscription', 'comment-mail'); ?>
 					<?php endif; ?>
 				</h2>
 
