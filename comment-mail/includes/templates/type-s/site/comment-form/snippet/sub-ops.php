@@ -7,9 +7,9 @@
 	[sub_type_options] [sub_deliver_options]
 
 	<div class="cso-links">
-		<span class="cso-link-new">Or, you can <a href="[sub_new_url]">subscribe without commenting</a>.</span>
+		<span class="cso-link-new">Or, you can <a href="[sub_new_url]" rel="nofollow">subscribe without commenting</a>.</span>
 		[if current_sub_email]
-			<span class="cso-link-summary">~ <a href="[sub_summary_url]">manage my subscriptions</a></span>
+			<span class="cso-link-summary">~ <a href="[sub_summary_url]" rel="nofollow">manage my subscriptions</a></span>
 		[endif]
 	</div>
 
