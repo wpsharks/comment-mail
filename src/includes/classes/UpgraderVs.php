@@ -89,17 +89,17 @@ class UpgraderVs extends AbsBase
     }
 
     /**
-     * Upgrading from a version prior to changes that broke back. compat. w/ Advanced Templates
+     * Upgrading from a Pro version prior to changes that broke back. compat. w/ Advanced Templates
      *
-     * @since 16xxxx First documented version.
+     * @since 160618 First documented version.
      */
     protected function fromLteV160213()
     {
-        if (version_compare($this->prev_version, '160213', '<=')) {
+        if (version_compare($this->prev_version, '160213', '<=') && IS_PRO) {
 
             $_marker = '<?php /* --------------------------- Legacy Template Backup ---------------------------
- * Comment Mail v16xxxx included changes that were not backwards compatible with your 
- * customized Advanced Template. To prevent problems with the upgrade to v16xxxx, we reset
+ * Comment Mail v160618 included changes that were not backwards compatible with your 
+ * customized Advanced Template. To prevent problems with the upgrade to v160618, we reset
  * the Advanced Templates to their (new) default and backed up your customized template, a
  * copy of which is included below. You can reference your original template below to reapply
  * those changes to the new default template above. When you are ready to discard this backup,

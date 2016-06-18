@@ -33,27 +33,13 @@ class Actions extends AbsBase
     {
         parent::__construct();
 
-        $this->maybeDoSsoActions();
+        
         $this->maybeDoSubActions();
         $this->maybeDoWebhookActions();
         $this->maybeDoMenuPageActions();
     }
 
-    /**
-     * Single sign-on actions.
-     *
-     * @since 141111 First documented version.
-     */
-    protected function maybeDoSsoActions()
-    {
-        if (is_admin()) {
-            return; // Not applicable.
-        }
-        if (empty($_REQUEST[GLOBAL_NS])) {
-            return; // Nothing to do.
-        }
-        new SsoActions();
-    }
+    
 
     /**
      * Subscriber actions.

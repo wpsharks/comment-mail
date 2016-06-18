@@ -4,14 +4,14 @@ namespace WebSharks\CommentMail;
 /**
  * Conflicts.
  *
- * @since 16xxxx
+ * @since 160618
  */
 class Conflicts
 {
     /**
      * Check.
      *
-     * @since 16xxxx Rewrite.
+     * @since 160618 Rewrite.
      */
     public static function check()
     {
@@ -24,7 +24,7 @@ class Conflicts
     /**
      * Perform check.
      *
-     * @since 16xxxx Rewrite.
+     * @since 160618 Rewrite.
      */
     protected static function doCheck()
     {
@@ -60,7 +60,7 @@ class Conflicts
     /**
      * Maybe enqueue dashboard notice.
      *
-     * @since 16xxxx Rewrite.
+     * @since 160618 Rewrite.
      */
     protected function maybeEnqueueNotice()
     {

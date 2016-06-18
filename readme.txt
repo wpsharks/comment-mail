@@ -1,8 +1,8 @@
 === Comment Mail ===
 
-Stable tag: 160611-RC
+Stable tag: 160618
 Requires at least: 4.4
-Tested up to: 4.5-alpha
+Tested up to: 4.6-alpha
 Text Domain: comment-mail
 
 License: GPLv3 or later
@@ -251,6 +251,43 @@ Released under the terms of the [GNU General Public License](http://www.gnu.org/
 Requires PHP v5.4+.
 
 == Changelog ==
+
+= v160618 =
+
+- **Restructured Codebase**: The codebase has been completely restructured to improve performance, enhance flexibility, and make it easier to build in new features! Props @jaswsinc. See [Issue #150](https://github.com/websharks/comment-mail/issues/150).
+- **Comment Mail Pro Upgrade Notice: Incompatible Advanced Templates.** This version of Comment Mail includes a rewritten and improved codebase. This rewrite, however, came with the unfortunate side effect of breaking backwards compatibility with Advanced Templates that were customized in a previous version of Comment Mail Pro.
+
+     If you are currently using Comment Mail Pro and you've customized your Advanced Templates, all of your customized Advanced Templates will be backed up and the templates will then be reset to their new defaults. You will find the backup of your old customized template appended to the bottom of the new template, separated with a  <code>Legacy Template Backup</code> PHP comment. See [example screenshots](https://github.com/websharks/comment-mail/issues/238#issuecomment-225029042).
+
+     Note: This change has no effect on Simple templates—only Advanced Templates are affected. Advanced Templates are a Pro-only feature, so this notice only applies to Comment Mail Pro. See [Issue #238](https://github.com/websharks/comment-mail/issues/238).
+- **Bug Fix**: Fixed a bug where `esc_html()` was being used where `esc_sql()` should've been used. Props @jaswsinc @kristineds. See [Issue #268](https://github.com/websharks/comment-mail/issues/268).
+- **Bug Fix**: Fixed a bug that in some scenarios resulted in a "DB table creation failure" error when activating the plugin. Props @thienhaxanh2405, @PanNovak, @kristineds, and @jaswsinc. See [Issue #260](https://github.com/websharks/comment-mail/issues/260).
+- **Bug Fix**: Fixed a bug where "New reply" notification emails were not being parsed properly by some Hotmail accounts and were showing up as blank. Props @kristineds. See [Issue #259](https://github.com/websharks/comment-mail/issues/259).
+- **Bug Fix**: Fixed a bug that allowed spam comments to create subscriptions in Comment Mail when using Akismet. Props @IvanRF. See [Issue #250](https://github.com/websharks/comment-mail/issues/250).
+- **Bug Fix** (Pro): When Chrome or Firefox Autofill Username/Password was enabled, the Comment Mail Pro Updater fields would incorrectly be autofilled by the browser with invalid credentials. This has been fixed. Props @renzms. [Issue #274](https://github.com/websharks/comment-mail/issues/274).
+- **Bug Fix**: Fixed a bug where the cron job for the Queue Processor could get deleted and never recreated, which would result in notifications getting stuck in the Mail Queue and not being sent out. If you ever installed Comment Mail and then deleted it (without first disabling Data Safeguards), and then installed Comment Mail again, you were probably affected by this issue. This release fixes the issue and makes the cron setup more robust. Props @kristineds, @renzms, @jaswsinc, and @IvanRF for help testing. See [Issue #194](https://github.com/websharks/comment-mail/issues/194) and [Issue #173](https://github.com/websharks/comment-mail/issues/173).
+- **Bug Fix:** Fixed a bug where a subscriber who selected Hourly Digest and who had never been notified before could, in some scenarios, have their subscription treated instead as a Weekly Digest. This bug was found and fixed during the codebase restructuring. Props @jaswsinc. See [Issue #150](https://github.com/websharks/comment-mail/issues/150) and additional discussion in [Issue #173](https://github.com/websharks/comment-mail/issues/173#issuecomment-225215333).
+- **Bug Fix:** Fixed a bug where in some scenarios Mail Queue entries for Digest Notifications that should have been held for sending later were not being held and were also not being sent. They also would not have shown up in the Mail Queue Event Log. This bug was found and fixed during the codebase restructuring. Props @jaswsinc. See [Issue #150](https://github.com/websharks/comment-mail/issues/150) and additional discussion in [Issue #173](https://github.com/websharks/comment-mail/issues/173#issuecomment-225215333).
+- **Enhancement**: Minor improvements to the Options Page menu links and positioning of the Pro Preview link. Props @renzms. See [Issue #227](https://github.com/websharks/comment-mail/issues/227).
+- **Enhancement**: It's now possible to use the following shortcodes in the Email Footer Tag for Email Footer Templates: `[home_url]`, `[blog_name_clip]`, and `[current_host_path]`. Props @kristineds and @IvanRF. See [Issue #246](https://github.com/websharks/comment-mail/issues/246).
+- **Enhancement**: Improved the Subscriptions meta box that appears on the Post Edit screen. For each subscription, the meta box now lists the full name and email address, the date the subscription was created, and a view link that allows you to view/edit the subscription. Props @kristineds. See [Issue #231](https://github.com/websharks/comment-mail/issues/231).
+- **UX Enhancement (Pro)**: Improved the Dashboard notice that appears when you try to enable the Pro version of Comment Mail when the Lite version is currently enabled. Props @kristineds @jaswsinc. See [Issue #230](https://github.com/websharks/comment-mail/issues/230).
+- **UX Enhancement**: When Subscribing Without Commenting, the Add New Subscription form now pre-populates the Name and Email address fields whenever possible. Props @kristineds. See [Issue #204](https://github.com/websharks/comment-mail/issues/204).
+- **UI Enhancement**: Dashboard notices generated by Comment Mail now use the WordPress-style dismiss button to keep things consistent. Props @kristineds. See [Issue #193](https://github.com/websharks/comment-mail/issues/193).
+
+= v160213 =
+
+- **Minor Fix**: Fixed a spelling mistake in one of the default email templates. Props @kristineds  @RealDavidoff. See [Issue #208](https://github.com/websharks/comment-mail/issues/208).
+- **Enhancement**: Moved the default location for the Subscriptions Meta Box on the Post Edit screen so that it shows up underneath the post editing area instead of above the Publish box. See [Issue #57](https://github.com/websharks/comment-mail/issues/57#issuecomment-174482908).
+- **Enhancement**: Removed an irrelevant and confusing note from the Add New Subscription page. Props @kristineds @RealDavidoff. See [Issue #207](https://github.com/websharks/comment-mail/issues/207).
+- **Enhancement**: Improved the front-end Edit Subscription form and removed the "x" in on the Status and Deliver fields that allowed clearing those fields, which did not make sense since both of those fields are required. Props @kristineds. See [Issue #195](https://github.com/websharks/comment-mail/issues/195).
+- **Enhancement**: Improved the way some links work by opening on-site links in current tab, and external links in new tab. Props @RealDavidoff @kristineds @renzms. See [Issue #202](https://github.com/websharks/comment-mail/issues/202).
+- **Enhancement**: Improved front-end pages by using `<em>` (emphasis) tags instead of quotation marks in various areas. Props @RealDavidoff @renzms. See [Issue #201](https://github.com/websharks/comment-mail/issues/201).
+- **Enhancement**: Improved email templates by simplifying the subject lines by using `[` and `]` brackets around the meta information in the subject. See [Issue #232](https://github.com/websharks/comment-mail/issues/232).
+- **Enhancement**: When Subscribing Without Commenting, the Add New Subscription form now pre-populates the Name and Email address fields whenever possible. Props @kristineds. See [Issue #204](https://github.com/websharks/comment-mail/issues/204).
+- **Enhancement**: Improved the consistency of how we refer to the "instant" delivery option by replacing any occurrences of "asap" with "instantly". These names were previously being mixed. We now use "instantly". Props @RealDavidoff @renzms @kristineds. See [Issue #206](https://github.com/websharks/comment-mail/issues/206).
+- **Enhancement**: Added the installed version number to the plugin options pages. Props @kristineds. See [Issue #187](https://github.com/websharks/comment-mail/issues/187).
+- **Enhancement**: Improved the organization of navigation links on the plugin options pages. Props @kristineds. See [Issue #187](https://github.com/websharks/comment-mail/issues/187).
 
 = v151224 =
 

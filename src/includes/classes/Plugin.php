@@ -1343,12 +1343,14 @@ class Plugin extends AbsBase
         $_page_title = NAME.'&trade; &#8594; '.__('Config. Options', 'comment-mail');
         add_submenu_page(GLOBAL_NS, $_page_title, $_menu_title, $this->cap, GLOBAL_NS, [$this, 'menuPageOptions']);
 
-        $_menu_title = // Visible on-demand only.
-            '<small><em>'.$child_branch_indent.__('Import/Export', 'comment-mail').'</em></small>';
-        $_page_title = NAME.'&trade; &#8594; '.__('Import/Export', 'comment-mail');
-        //$_menu_parent                                          = $current_menu_page === GLOBAL_NS.'_import_export' ? GLOBAL_NS : NULL;
-        $this->menu_page_hooks[GLOBAL_NS.'_import_export'] = add_submenu_page(GLOBAL_NS, $_page_title, $_menu_title, $this->cap, GLOBAL_NS.'_import_export', [$this, 'menuPageImportExport']);
-        add_action('load-'.$this->menu_page_hooks[GLOBAL_NS.'_import_export'], [$this, 'menuPageImportExportScreen']);
+        if (IS_PRO || ImportStcr::dataExists()) {
+            $_menu_title = // Visible on-demand only.
+                '<small><em>'.$child_branch_indent.__('Import/Export', 'comment-mail').'</em></small>';
+            $_page_title = NAME.'&trade; &#8594; '.__('Import/Export', 'comment-mail');
+            //$_menu_parent                                          = $current_menu_page === GLOBAL_NS.'_import_export' ? GLOBAL_NS : NULL;
+            $this->menu_page_hooks[GLOBAL_NS.'_import_export'] = add_submenu_page(GLOBAL_NS, $_page_title, $_menu_title, $this->cap, GLOBAL_NS.'_import_export', [$this, 'menuPageImportExport']);
+            add_action('load-'.$this->menu_page_hooks[GLOBAL_NS.'_import_export'], [$this, 'menuPageImportExportScreen']);
+        }
 
         $_menu_title = // Visible on-demand only.
             '<small><em>'.$child_branch_indent.__('Email Templates', 'comment-mail').'</em></small>';
@@ -2525,7 +2527,7 @@ class Plugin extends AbsBase
      *
      * @attaches-to `init` hook.
      *
-     * @since 16xxxx Improving WP Cron setup and validation of schedules
+     * @since 160618 Improving WP Cron setup and validation of schedules
      */
     public function checkCronSetup()
     {
@@ -2555,7 +2557,7 @@ class Plugin extends AbsBase
     /**
      * Resets `crons_setup` and clears WP-Cron schedules.
      *
-     * @since 16xxxx Fixing bug with Queue Processor cron disappearing in some scenarios
+     * @since 160618 Fixing bug with Queue Processor cron disappearing in some scenarios
      *
      * @note This MUST happen upon uninstall and deactivation due to buggy WP_Cron behavior. Events with a custom schedule will disappear when plugin is not active (see http://bit.ly/1lGdr78).
      */
@@ -2571,6 +2573,10 @@ class Plugin extends AbsBase
             wp_clear_scheduled_hook('_cron_'.GLOBAL_NS.'_queue_processor');
             wp_clear_scheduled_hook('_cron_'.GLOBAL_NS.'_sub_cleaner');
             wp_clear_scheduled_hook('_cron_'.GLOBAL_NS.'_log_cleaner');
+        }
+
+        if (!empty($GLOBALS[GLOBAL_NS.'_uninstalling'])) {
+            return; // Uninstalling, nothing more to do here
         }
 
         $this->options['crons_setup']                      = $this->default_options['crons_setup'];
