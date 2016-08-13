@@ -346,6 +346,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
                         $('.manage-sub-form form tr.manage-sub-form-status select').chosen($.extend({}, chosenOps, {allow_single_deselect: false}));
                         $('.manage-sub-form form tr.manage-sub-form-deliver select').chosen($.extend({}, chosenOps, {allow_single_deselect: false}));
 
+
                         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
                         $('.manage-sub-form form').on('submit', function(e)

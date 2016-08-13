@@ -31,24 +31,21 @@ $home_url = home_url('/'); // Multisite compatible.
 $blog_name_clip = $plugin->utils_string->clip(get_bloginfo('name'));
 
 // Summary return URL; w/ all summary navigation vars preserved.
-$current_email          = $this->plugin->utils_sub->currentEmail();
-$has_subscriptions      = (boolean) $current_email ? (boolean) $this->plugin->utils_sub->queryTotal(null, ['sub_email' => $current_email, 'status' => 'subscribed', 'sub_email_or_user_ids' => true]) : false;
-$sub_summary_return_url = $has_subscriptions ? $plugin->utils_url->subManageSummaryUrl(!empty($sub_key) ? $sub_key : '', null, true) : false;
+$sub_summary_return_url = $plugin->utils_url->subManageSummaryUrl(!empty($sub_key) ? $sub_key : '', null, true);
 
 // Current `host[/path]` with support for multisite network child blogs.
 $current_host_path = $plugin->utils_url->currentHostPath();
 
-// Privacy policy URL; as configured in plugin options via the dashboard.
-$can_spam_privacy_policy_url = $plugin->options['can_spam_privacy_policy_url'];
+// Icon URL; defaults to the plugin's icon image.
+$icon_bubbles_url = $plugin->utils_url->to('/src/client-s/images/icon-bubbles.png');
 ?>
 
-<?php echo $template->snippet(
-    'footer-tag.php',
-    [
-    '[home_url]'                    => esc_attr($home_url),
-    '[blog_name_clip]'              => esc_html($blog_name_clip),
-    '[can_spam_privacy_policy_url]' => esc_attr($can_spam_privacy_policy_url),
-    '[sub_summary_return_url]'      => $parent_template->file() !== 'site/sub-actions/manage-summary.php' ? esc_attr($sub_summary_return_url) : '',
-    '[powered_by]'                  => $plugin->options['site_footer_powered_by_enable'] ? $plugin->utils_markup->poweredBy() : '',
-    ]
-); ?>
+<header class="center-block clearfix">
+    <h1>
+        <?php echo esc_html($blog_name_clip); ?><br />
+        <a href="<?php echo esc_attr($home_url); ?>">
+            <small><i class="fa fa-link"></i> <?php echo esc_html($current_host_path); ?></small>
+        </a>
+    </h1>
+    <img src="<?php echo esc_attr($icon_bubbles_url); ?>" class="icon-bubbles" />
+</header>

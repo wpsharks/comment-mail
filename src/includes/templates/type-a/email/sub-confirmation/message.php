@@ -60,23 +60,60 @@ $sub_last_ip = $sub->last_ip ? $sub->last_ip : __('unknown', 'comment-mail');
 $sub_last_update_time_ago = $plugin->utils_date->i18nUtc('M jS, Y @ g:i a T', $sub->last_update_time);
 ?>
 
-    <?php echo $template->snippet(
-        'message.php',
-        [
-            'sub_comment'               => $sub_comment,
-            'subscribed_to_own_comment' => $subscribed_to_own_comment,
-            'sub_post_comments_open'    => $sub_post_comments_open,
+    <h2 style="margin-top:0; font-weight:normal;">
 
-            '[sub_fname]'       => esc_html($sub->fname),
-            '[sub_confirm_url]' => esc_attr($sub_confirm_url),
+        <?php if ($sub->fname) : // We can call them by name? ?>
+            <?php echo esc_html(sprintf(__('%1$s, please', 'comment-mail'), esc_html($sub->fname))); ?>
+        <?php else : echo __('Please', 'comment-mail'); ?>
+        <?php endif; ?>
 
-            '[sub_post_comments_url]' => esc_attr($sub_post_comments_url),
-            '[sub_post_title_clip]'   => esc_html($sub_post_title_clip),
+        <a href="<?php echo esc_attr($sub_confirm_url); ?>">
+            <strong><?php echo __('click here to confirm', 'comment-mail'); ?></strong>
+        </a>
 
-            '[sub_comment_url]' => esc_attr($sub_comment_url),
-            '[sub_comment_id]'  => esc_html($sub_comment ? $sub_comment->comment_ID : 0),
-        ]
-    ); ?>
+        <?php echo __('your subscription.', 'comment-mail'); ?>
+
+    </h2>
+
+    <hr />
+
+    <p>
+
+        <?php if ($sub_comment) : // Subscribing to a specific comment? ?>
+
+            <?php if ($subscribed_to_own_comment) : ?>
+                <?php echo sprintf(__('You are receiving this email because you asked to be notified about replies to <a href="%1$s">your comment</a>; on:', 'comment-mail'), esc_html($sub_comment_url)); ?>
+            <?php else : // The comment was not authored by this subscriber; i.e. it's not their own. ?>
+                <?php echo sprintf(__('You are receiving this email because you asked to be notified about replies to <a href="%1$s">this comment</a>; on:', 'comment-mail'), esc_html($sub_comment_url)); ?>
+            <?php endif; ?>
+
+        <?php else : // All comments/replies on this post. ?>
+            <?php echo __('You are receiving this email because you asked to be notified about all comments/replies to:', 'comment-mail'); ?>
+        <?php endif; ?>
+
+    </p>
+
+    <p>
+
+        <span style="font-size:120%;">
+            <?php echo esc_html($sub_post_title_clip); ?>
+        </span>
+
+    </p>
+
+    <p>
+
+        <?php if ($sub_comment) : // A specific comment? ?>
+            <a href="<?php echo esc_attr($sub_comment_url); ?>">
+                <?php echo esc_html($sub_comment_url); ?>
+            </a>
+        <?php else : // Subscribing to all comments/replies. ?>
+            <a href="<?php echo esc_attr($sub_post_comments_url); ?>">
+                <?php echo esc_html($sub_post_comments_url); ?>
+            </a>
+        <?php endif; ?>
+
+    </p>
 
     <p style="color:#888888; font-style:italic;">
         <?php echo __('Note: if you did not make this request, please ignore this email. You will only be subscribed if you confirm.', 'comment-mail'); ?>

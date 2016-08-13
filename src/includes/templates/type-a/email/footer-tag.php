@@ -20,6 +20,7 @@ namespace WebSharks\CommentMail;
  *    you may also use any WordPress functions that you like.
  */
 ?>
+
 <?php
 /*
  * Here we define a few variables of our own.
@@ -30,25 +31,14 @@ $home_url = home_url('/'); // Multisite compatible.
 // A clip of the blog's name; as configured in WordPress.
 $blog_name_clip = $plugin->utils_string->clip(get_bloginfo('name'));
 
-// Summary return URL; w/ all summary navigation vars preserved.
-$current_email          = $this->plugin->utils_sub->currentEmail();
-$has_subscriptions      = (boolean) $current_email ? (boolean) $this->plugin->utils_sub->queryTotal(null, ['sub_email' => $current_email, 'status' => 'subscribed', 'sub_email_or_user_ids' => true]) : false;
-$sub_summary_return_url = $has_subscriptions ? $plugin->utils_url->subManageSummaryUrl(!empty($sub_key) ? $sub_key : '', null, true) : false;
-
 // Current `host[/path]` with support for multisite network child blogs.
 $current_host_path = $plugin->utils_url->currentHostPath();
 
-// Privacy policy URL; as configured in plugin options via the dashboard.
-$can_spam_privacy_policy_url = $plugin->options['can_spam_privacy_policy_url'];
 ?>
 
-<?php echo $template->snippet(
-    'footer-tag.php',
-    [
-    '[home_url]'                    => esc_attr($home_url),
-    '[blog_name_clip]'              => esc_html($blog_name_clip),
-    '[can_spam_privacy_policy_url]' => esc_attr($can_spam_privacy_policy_url),
-    '[sub_summary_return_url]'      => $parent_template->file() !== 'site/sub-actions/manage-summary.php' ? esc_attr($sub_summary_return_url) : '',
-    '[powered_by]'                  => $plugin->options['site_footer_powered_by_enable'] ? $plugin->utils_markup->poweredBy() : '',
-    ]
-); ?>
+<footer>
+    <p style="margin:0; color:#888888;">
+        <?php echo esc_html($blog_name_clip); ?><br />
+        <a href="<?php echo esc_attr($home_url); ?>" style="color:#888888;"><?php echo esc_html($current_host_path); ?></a>
+    </p>
+</footer>

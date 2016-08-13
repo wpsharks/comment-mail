@@ -4565,14 +4565,17 @@ class MenuPage extends AbsBase
 
         $heading .= '<div class="pmp-heading">'."\n";
 
-        $heading .= '  <button type="button" class="plugin-menu-page-restore-defaults"'.'<a href="#" data-pmp-action="'.esc_attr($this->plugin->utils_url->restoreDefaultOptions()).'" data-pmp-confirmation="'.esc_attr(__('Restore default plugin options? You will lose all of your current settings! Are you absolutely sure?', 'comment-mail')).'"> '.__('Restore', 'comment-mail').' <i class="fa fa-ambulance"></i></button>'.'</a>'."\n";
-
         $heading .= '  <div class="pmp-heading-options">'."\n";
         if (IS_PRO) { // Display Pro Updater link?
             $heading .= '     <a href="'.esc_attr($this->plugin->utils_url->proUpdaterMenuPageOnly()).'" ><i class="fa fa-magic"></i> '.__('Pro Updater', 'comment-mail').'</a>'."\n";
         }
         $heading .= '     <a href="'.esc_attr($this->plugin->utils_url->subscribePage()).'" target="_blank"><i class="fa fa-envelope-o"></i> '.__('Newsletter (Subscribe)', 'comment-mail').'</a>'."\n";
         $heading .= '     <a href="'.esc_attr($this->plugin->utils_url->betaTesterPage()).'" target="_blank"><i class="fa fa-envelope-o"></i> '.__('Beta Testers', 'comment-mail').'</a>'."\n";
+        $heading .= '  </div>'."\n";
+
+        $heading .= '  <div class="pmp-heading-options">'."\n";
+        $heading .= '     <a href="'.esc_attr('https://twitter.com/CommentMail').'" target="_blank"><i class="si si-twitter"></i> '.__('Twitter', 'comment-mail').'</a>'."\n";
+        $heading .= '     <a href="'.esc_attr('https://www.facebook.com/Comment-Mail-565683256946855/').'" target="_blank"><i class="si si-facebook"></i> '.__('Facebook', 'comment-mail').'</a>'."\n";
         $heading .= '  </div>'."\n";
 
         $heading .= '  <div class="pmp-version">'."\n";
@@ -4610,6 +4613,8 @@ class MenuPage extends AbsBase
         $heading .= '  <a href="'.esc_attr($this->plugin->utils_url->siteTemplatesMenuPageOnly()).'"'.
                     ($this->plugin->utils_env->isMenuPage(GLOBAL_NS.'_site_templates') ? ' class="pmp-active"' : '').'>'.
                     '<i class="fa fa-code"></i> '.__('Site Templates', 'comment-mail').'</a>'."\n";
+
+        $heading .= '  <a href="#" data-pmp-action="'.esc_attr($this->plugin->utils_url->restoreDefaultOptions()).'" data-pmp-confirmation="'.esc_attr(__('Restore default plugin options? You will lose all of your current settings! Are you absolutely sure?', 'comment-mail')).'"> '.__('Restore', 'comment-mail').' <i class="fa fa-ambulance"></i></button>'.'</a>'."\n";
 
         if (!IS_PRO) { // Display pro preview/upgrade related links?
             $heading .= '  <a href="'.esc_attr($this->plugin->utils_url->proPreview()).'"'.
