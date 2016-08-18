@@ -1,3 +1,14 @@
+= v160818 =
+
+- **Bug Fix**: Fixed a bug where the "My Comment Subscriptions" link would appear on the Add New Subscription page (when Subscribing without Commenting) and would lead to a page that displayed an error message stating that there were no subscriptions to list. That link is now hidden when there are no subscriptions to list. Props @Reedyseth @kristineds. See [Issue #229](https://github.com/websharks/comment-mail/issues/229).
+- **Bug Fix** (Pro): Removed an erroneous anchor tag in the Advanced Template for Comment Notification Message Body. Props @kristineds. See [Issue #287](https://github.com/websharks/comment-mail/issues/287).
+- **UI Enhancement:** Improved the nav bar at the top of the options pages to reduce unnecessary whitespace. Also moved the Restore button to the nav bar so that it's not so prominent. Props @renzms. See [Issue #284](https://github.com/websharks/comment-mail/issues/284).
+- **UI Enhancement:** Added links to the Comment Mail [Twitter](http://twitter.com/CommentMail) and [Facebook](https://www.facebook.com/Comment-Mail-565683256946855/) pages to the nav bar on the options page. Props @renzms. See [Issue #286](https://github.com/websharks/comment-mail/issues/286).
+- **UX Enhancement:** Removed IP address information from email notification templates to better comply with data protection laws in certain countries. Props @kristineds. See [Issue #288](https://github.com/websharks/comment-mail/issues/288).
+- **SEO Improvement:** Added `rel="nofollow"` to the "Subscribe without Commenting" link and "Manage Subscriptions" link on the comment subscription form to avoid indexing or transferring PageRank. Props @IvanRF. See [Issue #80](https://github.com/websharks/comment-mail-pro/pull/80).
+- Removed several development-only files from the distributable that were inadvertently included during the build process. See [Issue #285](https://github.com/websharks/comment-mail/issues/285).
+- Added Renz Sevilla (`renzms`) to the contributors list.
+
 = v160618 =
 
 - **Restructured Codebase**: The codebase has been completely restructured to improve performance, enhance flexibility, and make it easier to build in new features! Props @jaswsinc. See [Issue #150](https://github.com/websharks/comment-mail/issues/150).
