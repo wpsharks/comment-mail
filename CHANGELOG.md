@@ -1,3 +1,7 @@
+= v160824 =
+
+- **Bug Fix**: Fixed a bug that was generating a fatal error when replying to comments. This bug only affected the Lite version of Comment Mail and was introduced by the previous release (v160818) where [work](https://github.com/websharks/comment-mail/issues/285) was done to strip out unused Pro-only code from the Lite codebase. A few references to Pro-only functions were missed and that resulted in fatal errors for the Lite version in some scenarios. See [Issue #297](https://github.com/websharks/comment-mail/issues/297).
+
 = v160818 =
 
 - **Bug Fix**: Fixed a bug where the "My Comment Subscriptions" link would appear on the Add New Subscription page (when Subscribing without Commenting) and would lead to a page that displayed an error message stating that there were no subscriptions to list. That link is now hidden when there are no subscriptions to list. Props @Reedyseth @kristineds. See [Issue #229](https://github.com/websharks/comment-mail/issues/229).

@@ -59,8 +59,6 @@ $sub_last_update_time_ago = $plugin->utils_date->i18nUtc('M jS, Y @ g:i a T', $s
 // A notification may contain one (or more) comments. Is this a digest?
 $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the notification.
 
-// Plugin is configured to allow replies via email? If so, this will be `TRUE`.
-$replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies_via_email_enable'];
 ?>
 <?php echo $template->snippet(
     'message-heading.php',
@@ -103,10 +101,7 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
 
         // A shorter clip of the full comment message body; in plain text.
         $_comment_clip = $plugin->utils_markup->commentContentClip($_comment, 'notification', false);
-
-        // Reply via email marker; if applicable. Only needed for digests, and only if replies via email are enabled currently.
-        // ~ Note: This marker is not necessary for single comment notifications. A `Reply-To:` header already handles single-comment notifications.
-        $_comment_rve_irt_marker = $plugin->utils_rve->irtMarker($_comment->comment_post_ID, $_comment->comment_ID); // e.g. `~rve#779-84`.
+        
         ?>
         <?php if ($_comment_parent) : // This is a reply to someone? ?>
 
@@ -143,13 +138,7 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
                             <?php echo __('Reply', 'comment-mail'); ?>
                         <?php endif; ?>
                     </a>
-                    <?php if ($replies_via_email_enable) : ?>
-                        <?php if ($is_digest) : // Marker only needed in digests. ?>
-                            <small><em><?php echo sprintf(__('— or reply to this email &amp; start your message with: <code>%1$s</code>', 'comment-mail'), esc_html($_comment_rve_irt_marker)); ?></em></small>
-                        <?php else : // The `Reply-To:` field in the email will suffice in other cases; i.e. there is only one comment in this notification. ?>
-                            <small><em><?php echo __('— or simply reply to this email', 'comment-mail'); ?></em></small>
-                        <?php endif; ?>
-                    <?php endif; ?>
+                    <?php  ?>
                 <?php endif; ?>
             </p>
 
@@ -177,14 +166,7 @@ $replies_via_email_enable = $sub_post_comments_open && $plugin->options['replies
                             <?php echo __('Reply', 'comment-mail'); ?>
                         <?php endif; ?>
                     </a>
-                    <?php if ($replies_via_email_enable) : ?>
-                        <?php if ($is_digest) : // Marker only needed in digests. ?>
-                            <small><em><?php echo sprintf(__('— or reply to this email &amp; start your message with: <code>%1$s</code>', 'comment-mail'), esc_html($_comment_rve_irt_marker)); ?></em></small>
-                        <?php else : // The `Reply-To:` field in the email will suffice in other cases; i.e. there is only one comment in this notification. ?>
-                            <small><em><?php echo __('— or simply reply to this email', 'comment-mail'); ?></em></small>
-                            <small><strong><?php echo __('Please Note:', 'comment-mail'); ?></strong> <em><?php echo __('Your reply will be posted publicly and immediately.', 'comment-mail'); ?></em></small>
-                        <?php endif; ?>
-                    <?php endif; ?>
+                    <?php  ?>
                 <?php endif; ?>
             </p>
 

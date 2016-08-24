@@ -1,6 +1,6 @@
 === Comment Mail ===
 
-Stable tag: 160818
+Stable tag: 160824
 Requires at least: 4.4
 Tested up to: 4.7-alpha
 Text Domain: comment-mail
@@ -8,7 +8,7 @@ Text Domain: comment-mail
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Contributors: WebSharks, JasWSInc, raamdev, kristineds, reedyseth, sitegeek, renzms
+Contributors: WebSharks, JasWSInc, raamdev, kristineds, sitegeek, renzms
 Donate link: http://www.websharks-inc.com/r/wp-theme-plugin-donation/
 Tags: comments, subscribe, comment subscription, comment subscriptions, comment subscribe, subscribe comments, comment, comment email, comment notification, notifications, notification
 
@@ -251,6 +251,10 @@ Released under the terms of the [GNU General Public License](http://www.gnu.org/
 Requires PHP v5.4+.
 
 == Changelog ==
+
+= v160824 =
+
+- **Bug Fix**: Fixed a bug that was generating a fatal error when replying to comments. This bug only affected the Lite version of Comment Mail and was introduced by the previous release (v160818) where [work](https://github.com/websharks/comment-mail/issues/285) was done to strip out unused Pro-only code from the Lite codebase. A few references to Pro-only functions were missed and that resulted in fatal errors for the Lite version in some scenarios. See [Issue #297](https://github.com/websharks/comment-mail/issues/297).
 
 = v160818 =
 
