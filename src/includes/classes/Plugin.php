@@ -51,7 +51,7 @@ class Plugin extends AbsBase
      *
      * @since 141111 Adding uninstall handler.
      *
-     * @type bool|null Defined by constructor.
+     * @var bool|null Defined by constructor.
      */
     public $enable_hooks = null;
 
@@ -64,7 +64,7 @@ class Plugin extends AbsBase
      *
      * @since 141111 First documented version.
      *
-     * @type array Default options array.
+     * @var array Default options array.
      */
     public $pro_only_option_keys;
 
@@ -73,7 +73,7 @@ class Plugin extends AbsBase
      *
      * @since 141111 First documented version.
      *
-     * @type array Default options array.
+     * @var array Default options array.
      */
     public $default_options;
 
@@ -82,7 +82,7 @@ class Plugin extends AbsBase
      *
      * @since 141111 First documented version.
      *
-     * @type array Options configured by site owner.
+     * @var array Options configured by site owner.
      */
     public $options;
 
@@ -91,7 +91,7 @@ class Plugin extends AbsBase
      *
      * @since 141111 First documented version.
      *
-     * @type string Capability required to administer.
+     * @var string Capability required to administer.
      *             i.e. to use any aspect of the plugin, including the configuration
      *             of any/all plugin options and/or advanced settings.
      */
@@ -102,7 +102,7 @@ class Plugin extends AbsBase
      *
      * @since 141111 First documented version.
      *
-     * @type string Capability required to manage.
+     * @var string Capability required to manage.
      *             i.e. to use/manage the plugin from the back-end,
      *             but NOT to allow for any config. changes.
      */
@@ -113,7 +113,7 @@ class Plugin extends AbsBase
      *
      * @since 141111 First documented version.
      *
-     * @type string Capability required to auto-recompile.
+     * @var string Capability required to auto-recompile.
      *             i.e. to see notices regarding automatic recompilations
      *             following an upgrade the plugin files/version.
      */
@@ -124,7 +124,7 @@ class Plugin extends AbsBase
      *
      * @since 141111 First documented version.
      *
-     * @type string Capability required to upgrade.
+     * @var string Capability required to upgrade.
      *             i.e. the ability to run any sort of plugin upgrader.
      */
     public $update_cap;
@@ -134,7 +134,7 @@ class Plugin extends AbsBase
      *
      * @since 141111 First documented version.
      *
-     * @type string Capability required to uninstall.
+     * @var string Capability required to uninstall.
      *             i.e. the ability to deactivate and even delete the plugin.
      */
     public $uninstall_cap;
@@ -172,7 +172,7 @@ class Plugin extends AbsBase
         /*
          * Initialize properties.
          */
-        $this->enable_hooks = (boolean) $enable_hooks;
+        $this->enable_hooks = (bool) $enable_hooks;
 
         /*
          * With or without hooks?
@@ -293,6 +293,11 @@ class Plugin extends AbsBase
             'replies_via_email_enable',
             'replies_via_email_handler',
 
+            'rve_sparkpost_api_key',
+            'rve_sparkpost_reply_to_email',
+            'rve_sparkpost_webhook_setup_hash',
+            'rve_sparkpost_webhook_id',
+
             'rve_mandrill_reply_to_email',
             'rve_mandrill_max_spam_score',
             'rve_mandrill_spf_check_enable',
@@ -303,7 +308,10 @@ class Plugin extends AbsBase
             'list_server_enable',
             'list_server',
 
-            'list_server_mailchimp_api_key',
+            'list_server_checkbox_label',
+            'list_server_checkbox_default_state',
+
+            'list_server_mailchimp_list_id',
             'list_server_mailchimp_list_id',
 
             # Blacklisting.
@@ -409,9 +417,9 @@ class Plugin extends AbsBase
             'version'                  => VERSION,
             'stcr_transition_complete' => '0', // `0|1` transitioned?
 
-            'crons_setup'                             => '0', // `0` or timestamp.
-            'crons_setup_on_namespace'                => '', // The namespace on which they were set up.
-            'crons_setup_on_wp_with_schedules'        => '', // A sha1 hash of `wp_get_schedules()`
+            'crons_setup'                      => '0', // `0` or timestamp.
+            'crons_setup_on_namespace'         => '', // The namespace on which they were set up.
+            'crons_setup_on_wp_with_schedules' => '', // A sha1 hash of `wp_get_schedules()`
 
             # Related to data safeguards.
 
@@ -578,8 +586,13 @@ class Plugin extends AbsBase
             # Related to replies via email.
 
             'replies_via_email_enable'  => '0', // `0|1`; enable?
-            'replies_via_email_handler' => '', // `mandrill`.
+            'replies_via_email_handler' => '', // `sparkpost` or `mandrill`.
             // Mandrill is currently the only choice. In the future we may add other options to this list.
+
+            'rve_sparkpost_api_key'            => '', // SparkPost API key.
+            'rve_sparkpost_reply_to_email'     => '', // `Reply-To:` address.
+            'rve_sparkpost_webhook_setup_hash' => '', // Setup hash.
+            'rve_sparkpost_webhook_id'         => '', // Webhook ID.
 
             'rve_mandrill_reply_to_email'    => '', // `Reply-To:` address.
             'rve_mandrill_max_spam_score'    => '5.0', // Max allowable spam score.
@@ -590,6 +603,9 @@ class Plugin extends AbsBase
 
             'list_server_enable' => '0', // `0|1`; enable?
             'list_server'        => 'mailchimp', // List server identifier.
+
+            'list_server_checkbox_default_state' => 'checked', // `checked` or empty.
+            'list_server_checkbox_label'         => __('Yes, I want to receive blog updates also.', 'comment-mail'),
 
             'list_server_mailchimp_api_key' => '', // MailChimp API key.
             'list_server_mailchimp_list_id' => '', // MailChimp list ID.
@@ -762,6 +778,7 @@ class Plugin extends AbsBase
         add_action('init', [$this, 'jetpackCheck'], 100);
 
         add_action('admin_init', [$this, 'checkVersion'], 10);
+        add_action('admin_init', [$this, 'checkPhpVersion'], 10);
 
         
 
@@ -879,7 +896,7 @@ class Plugin extends AbsBase
      */
     public function installTime()
     {
-        return (integer) get_option(GLOBAL_NS.'_install_time');
+        return (int) get_option(GLOBAL_NS.'_install_time');
     }
 
     /**
@@ -907,6 +924,45 @@ class Plugin extends AbsBase
             return; // Nothing to do; already @ latest version.
         }
         new Upgrader(); // Upgrade handler.
+    }
+
+    /**
+     * Check current PHP version.
+     *
+     * @since       16xxxx PHP version check.
+     *
+     * @attaches-to `admin_init` action.
+     */
+    public function checkPhpVersion()
+    {
+        $is_php7              = version_compare(PHP_VERSION, '7', '>=');
+        $is_php7_incompatible = $is_php7 && version_compare(PHP_VERSION, '7.0.9', '<');
+        $php_clean_version    = PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION;
+
+        if ($is_php7 && $is_php7_incompatible) {
+            $markup = sprintf(
+                __('<strong>PHP v7 Warning:</strong> The %1$s&trade; plugin is compatible with PHP v7.0, but you\'re running PHP v%2$s which has a bug that causes problems in Comment Mail. Please upgrade to PHP v7.0.9 or higher.', 'comment-mail'),
+                esc_html(NAME),
+                esc_html($php_clean_version)
+            );
+            $this->enqueueWarning($markup, [
+                'persistent'    => true,
+                'dismissable'   => false,
+                'persistent_id' => 'php-7-compat',
+                'requires_cap'  => 'administrator',
+            ]);
+        } elseif ($is_php7 && !$is_php7_incompatible) {
+            $notices = get_option(GLOBAL_NS.'_notices');
+            $notices = is_array($notices) ? $notices : [];
+
+            foreach ($notices as $_key => $_notice) {
+                if (!empty($_notice['persistent_id']) && $_notice['persistent_id'] === 'php-7-compat') {
+                    unset($notices[$_key]); // i.e., Get rid of `php-7-compat` warning.
+                    update_option(GLOBAL_NS.'_notices', $notices);
+                    break; // Dismiss persistent key.
+                }
+            } // unset($_key, $_notice);
+        }
     }
 
     /*
@@ -1083,6 +1139,8 @@ class Plugin extends AbsBase
         }
         unset($_key, $_key_data, $_value); // Housekeeping.
         unset($_default_template, $_option_template_nws, $_default_template_nws);
+
+        
 
         update_option(GLOBAL_NS.'_options', $this->options); // DB update.
     }
@@ -1943,6 +2001,7 @@ class Plugin extends AbsBase
             'for_page'      => '',
             'persistent'    => false,
             'persistent_id' => '',
+            'dismissable'   => true,
             'transient'     => false,
             'push_to_top'   => false,
             'type'          => 'notice',
@@ -1955,13 +2014,14 @@ class Plugin extends AbsBase
         $args['requires_cap'] = $args['requires_cap'] // Force valid format.
             ? strtolower(preg_replace('/\W/', '_', $args['requires_cap'])) : '';
 
-        $args['for_user_id'] = (integer) $args['for_user_id'];
+        $args['for_user_id'] = (int) $args['for_user_id'];
         $args['for_page']    = trim((string) $args['for_page']);
 
-        $args['persistent']    = (boolean) $args['persistent'];
+        $args['persistent']    = (bool) $args['persistent'];
         $args['persistent_id'] = (string) $args['persistent_id'];
-        $args['transient']     = (boolean) $args['transient'];
-        $args['push_to_top']   = (boolean) $args['push_to_top'];
+        $args['dismissable']   = (bool) $args['dismissable'];
+        $args['transient']     = (bool) $args['transient'];
+        $args['push_to_top']   = (bool) $args['push_to_top'];
 
         if (!in_array($args['type'], ['notice', 'error', 'warning'], true)) {
             $args['type'] = 'notice'; // Use default type.
@@ -2068,6 +2128,7 @@ class Plugin extends AbsBase
                 'for_page'      => '',
                 'persistent'    => false,
                 'persistent_id' => '',
+                'dismissable'   => true,
                 'transient'     => false,
                 'push_to_top'   => false,
                 'type'          => 'notice',
@@ -2081,13 +2142,14 @@ class Plugin extends AbsBase
             $_args['requires_cap'] = $_args['requires_cap'] // Force valid format.
                 ? strtolower(preg_replace('/\W/', '_', $_args['requires_cap'])) : '';
 
-            $_args['for_user_id'] = (integer) $_args['for_user_id'];
+            $_args['for_user_id'] = (int) $_args['for_user_id'];
             $_args['for_page']    = trim((string) $_args['for_page']);
 
-            $_args['persistent']    = (boolean) $_args['persistent'];
+            $_args['persistent']    = (bool) $_args['persistent'];
             $_args['persistent_id'] = (string) $_args['persistent_id'];
-            $_args['transient']     = (boolean) $_args['transient'];
-            $_args['push_to_top']   = (boolean) $_args['push_to_top'];
+            $_args['dismissable']   = (bool) $_args['dismissable'];
+            $_args['transient']     = (bool) $_args['transient'];
+            $_args['push_to_top']   = (bool) $_args['push_to_top'];
 
             if (!in_array($_args['type'], ['notice', 'error', 'warning'], true)) {
                 $_args['type'] = 'notice'; // Use default type.
@@ -2108,19 +2170,18 @@ class Plugin extends AbsBase
                 continue; // Don't display on this page; i.e. pattern match failure.
             }
             if ($_args['markup']) { // Only display non-empty notices.
-                if ($_args['persistent']) { // Need [dismiss] link?
+                if ($_args['persistent'] && $_args['dismissable']) {
                     $_dismiss_style = 'clear: both;'.
                                       'padding-right: 38px;'.
-                                      'position: relative;'.
-                                      'padding-bottom: 10px;';
-                    $_dismiss_url   = $this->utils_url->dismissNotice($_key);
-                    $_dismiss       = '<a href="'.esc_attr($_dismiss_url).'">'.
+                                      'position: relative;';
+                    $_dismiss_url = $this->utils_url->dismissNotice($_key);
+                    $_dismiss     = '<a href="'.esc_attr($_dismiss_url).'">'.
                                       '  <button type="button" class="notice-dismiss">'.
                                       '     <span class="screen-reader-text">Dismiss this notice.</span>'.
                                       '  </button>'.
                                       '</a>';
                 } else {
-                    $_dismiss = ''; // Default value; n/a.
+                    $_dismiss       = ''; // Default value; n/a.
                     $_dismiss_style = '';
                 }
                 $_classes = SLUG_TD.'-menu-page-area'; // Always.
@@ -2531,7 +2592,7 @@ class Plugin extends AbsBase
      */
     public function checkCronSetup()
     {
-        if ((integer) $this->options['crons_setup'] < 1465568335
+        if ((int) $this->options['crons_setup'] < 1465568335
             || $this->options['crons_setup_on_namespace'] !== __NAMESPACE__
             || $this->options['crons_setup_on_wp_with_schedules'] !== sha1(serialize(wp_get_schedules()))
             || !wp_next_scheduled('_cron_'.GLOBAL_NS.'_queue_processor')

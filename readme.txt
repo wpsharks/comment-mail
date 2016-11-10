@@ -1,6 +1,6 @@
 === Comment Mail ===
 
-Stable tag: 160824
+Stable tag: 161110-RC
 Requires at least: 4.4
 Tested up to: 4.7-alpha
 Text Domain: comment-mail

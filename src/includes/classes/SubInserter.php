@@ -19,14 +19,14 @@ class SubInserter extends AbsBase
     /* Related to the data. */
 
     /**
-     * @type array Based on request args.
+     * @var array Based on request args.
      *
      * @since 141111 First documented version.
      */
     protected $data;
 
     /**
-     * @type bool Did we validate?
+     * @var bool Did we validate?
      *
      * @since 141111 First documented version.
      */
@@ -35,28 +35,28 @@ class SubInserter extends AbsBase
     /* Related to inserts. */
 
     /**
-     * @type bool An insert?
+     * @var bool An insert?
      *
      * @since 141111 First documented version.
      */
     protected $is_insert;
 
     /**
-     * @type bool Did we insert?
+     * @var bool Did we insert?
      *
      * @since 141111 First documented version.
      */
     protected $inserted;
 
     /**
-     * @type bool Did we replace?
+     * @var bool Did we replace?
      *
      * @since 141111 First documented version.
      */
     protected $replaced;
 
     /**
-     * @type int Insertion ID.
+     * @var int Insertion ID.
      *
      * @since 141111 First documented version.
      */
@@ -65,28 +65,28 @@ class SubInserter extends AbsBase
     /* Related to updates. */
 
     /**
-     * @type bool An update?
+     * @var bool An update?
      *
      * @since 141111 First documented version.
      */
     protected $is_update;
 
     /**
-     * @type \stdClass|null Subscription.
+     * @var \stdClass|null Subscription.
      *
      * @since 141111 First documented version.
      */
     protected $sub; // On update only.
 
     /**
-     * @type bool Did we update?
+     * @var bool Did we update?
      *
      * @since 141111 First documented version.
      */
     protected $updated;
 
     /**
-     * @type bool Email & key changed?
+     * @var bool Email & key changed?
      *
      * @since 141111 First documented version.
      */
@@ -95,70 +95,70 @@ class SubInserter extends AbsBase
     /* Related to args/flags. */
 
     /**
-     * @type bool Auto-confirm?
+     * @var bool Auto-confirm?
      *
      * @since 141111 First documented version.
      */
     protected $auto_confirm;
 
     /**
-     * @type bool Process events?
+     * @var bool Process events?
      *
      * @since 141111 First documented version.
      */
     protected $process_events;
 
     /**
-     * @type bool Process confirmation?
+     * @var bool Process confirmation?
      *
      * @since 141111 First documented version.
      */
     protected $process_confirmation;
 
     /**
-     * @type bool Process list server?
+     * @var bool Process list server?
      *
      * @since 150922 Adding list server.
      */
     protected $process_list_server;
 
     /**
-     * @type bool User initiated?
+     * @var bool User initiated?
      *
      * @since 141111 First documented version.
      */
     protected $user_initiated;
 
     /**
-     * @type bool User-initiated data key protections?
+     * @var bool User-initiated data key protections?
      *
      * @since 141111 First documented version.
      */
     protected $ui_protected_data_keys_enable;
 
     /**
-     * @type \WP_User|null Initiating user.
+     * @var \WP_User|null Initiating user.
      *
      * @since 141111 First documented version.
      */
     protected $ui_protected_data_user;
 
     /**
-     * @type bool Interpret `0` as current?
+     * @var bool Interpret `0` as current?
      *
      * @since 141111 First documented version.
      */
     protected $user_allow_0;
 
     /**
-     * @type bool Keep existing?
+     * @var bool Keep existing?
      *
      * @since 141111 First documented version.
      */
     protected $keep_existing;
 
     /**
-     * @type bool Keep existing?
+     * @var bool Keep existing?
      *
      * @since 141111 First documented version.
      */
@@ -167,14 +167,14 @@ class SubInserter extends AbsBase
     /* Related to user. */
 
     /**
-     * @type \WP_User|null Subscriber.
+     * @var \WP_User|null Subscriber.
      *
      * @since 141111 First documented version.
      */
     protected $user; // Subscriber.
 
     /**
-     * @type bool Subscriber is current user?
+     * @var bool Subscriber is current user?
      *
      * @since 141111 First documented version.
      */
@@ -183,14 +183,14 @@ class SubInserter extends AbsBase
     /* Related to duplicates. */
 
     /**
-     * @type array An array of any duplicate key IDs.
+     * @var array An array of any duplicate key IDs.
      *
      * @since 141111 First documented version.
      */
     protected $duplicate_key_ids;
 
     /**
-     * @type array An array of any other duplicate IDs.
+     * @var array An array of any other duplicate IDs.
      *
      * @since 141111 First documented version.
      */
@@ -199,7 +199,7 @@ class SubInserter extends AbsBase
     /* Other misc. properties. */
 
     /**
-     * @type sub_confirmer|null Sub confirmer.
+     * @var sub_confirmer|null Sub confirmer.
      *
      * @since 141111 First documented version.
      */
@@ -208,14 +208,14 @@ class SubInserter extends AbsBase
     /* Related to error/success reporting. */
 
     /**
-     * @type array An array of any errors.
+     * @var array An array of any errors.
      *
      * @since 141111 First documented version.
      */
     protected $errors;
 
     /**
-     * @type array An array of any successes.
+     * @var array An array of any successes.
      *
      * @since 141111 First documented version.
      */
@@ -328,7 +328,7 @@ class SubInserter extends AbsBase
         $this->validated = false; // Initialize; not validated yet, obviously.
 
         if (isset($this->data['ID'])) {
-            $this->data['ID'] = (integer) $this->data['ID'];
+            $this->data['ID'] = (int) $this->data['ID'];
         }
         /* Related to inserts. */
 
@@ -369,13 +369,13 @@ class SubInserter extends AbsBase
         $args = array_intersect_key($args, $defaults_args);
 
         if (isset($args['auto_confirm'])) {
-            $this->auto_confirm = (boolean) $args['auto_confirm'];
+            $this->auto_confirm = (bool) $args['auto_confirm'];
         }
-        $this->process_events       = (boolean) $args['process_events'];
-        $this->process_confirmation = (boolean) $args['process_confirmation'];
-        $this->process_list_server  = (boolean) $args['process_list_server'];
+        $this->process_events       = (bool) $args['process_events'];
+        $this->process_confirmation = (bool) $args['process_confirmation'];
+        $this->process_list_server  = (bool) $args['process_list_server'];
 
-        $this->user_initiated = (boolean) $args['user_initiated'];
+        $this->user_initiated = (bool) $args['user_initiated'];
         $this->user_initiated = $this->plugin->utils_sub->checkUserInitiatedByAdmin(
             $this->data['email'] ? $this->data['email'] : ($this->is_update && $this->sub ? $this->sub->email : ''),
             $this->user_initiated
@@ -404,15 +404,15 @@ class SubInserter extends AbsBase
         } else {
             $this->user_allow_0 = $this->user_initiated; // Defaults to this value.
         }
-        $this->keep_existing = (boolean) $args['keep_existing'];
+        $this->keep_existing = (bool) $args['keep_existing'];
 
-        $this->check_blacklist = (boolean) $args['check_blacklist'];
+        $this->check_blacklist = (bool) $args['check_blacklist'];
 
         /* Related to user. */
 
         if (!isset($this->user) || !$this->user->ID) {
-            if ((integer) $this->data['user_id'] > 0) { // A potentially new user ID?
-                $this->user = new \WP_User((integer) $this->data['user_id']);
+            if ((int) $this->data['user_id'] > 0) { // A potentially new user ID?
+                $this->user = new \WP_User((int) $this->data['user_id']);
             }
         }
         if ($this->user_initiated && $this->ui_protected_data_keys_enable
@@ -720,7 +720,7 @@ class SubInserter extends AbsBase
         if (($insert_replace = $this->plugin->utils_db->wp->replace($table, $data_to_insert)) === false) {
             throw new \exception(__('Insert/replace failure.', 'comment-mail'));
         }
-        if (!($this->insert_id = (integer) $this->plugin->utils_db->wp->insert_id)) {
+        if (!($this->insert_id = (int) $this->plugin->utils_db->wp->insert_id)) {
             throw new \exception(__('Insert/replace failure.', 'comment-mail'));
         }
         $this->inserted = true; // Flag as `TRUE` now; i.e. the Insert/replace was a success.
@@ -754,13 +754,24 @@ class SubInserter extends AbsBase
                 [
                     'auto_confirm'        => $this->auto_confirm,
                     'process_events'      => $this->process_events,
-                    'process_list_server' => $this->process_list_server,
+                    'process_list_server' => $this->process_list_server && !$this->auto_confirm,
                     'user_initiated'      => $this->user_initiated,
                 ]
             ); // With behavioral args.
 
             if ($this->sub_confirmer->sentEmailSuccessfully()) {
                 $this->successes['sent_confirmation_email_successfully'] = __('Request for email confirmation sent successfully.', 'comment-mail');
+            }
+            if ($this->process_list_server && $this->auto_confirm) {
+                $this->plugin->utils_list_server->maybeSubscribe(
+                    [
+                        'double_optin' => false,
+                        'email'        => $this->sub->email,
+                        'fname'        => $this->sub->fname,
+                        'lname'        => $this->sub->lname,
+                        'ip'           => $this->sub->last_ip,
+                    ]
+                );
             }
         }
         $this->overwriteAnyOthersAfterInsertUpdate(); // Overwrites any others.
@@ -819,16 +830,28 @@ class SubInserter extends AbsBase
             $this->sub_confirmer = new SubConfirmer(
                 $this->sub->ID,
                 [
-                    'auto_confirm'   => $this->auto_confirm,
-                    'process_events' => $this->process_events,
-                    'user_initiated' => $this->user_initiated,
+                    'auto_confirm'        => $this->auto_confirm,
+                    'process_events'      => $this->process_events,
+                    'process_list_server' => $this->process_list_server && !$this->auto_confirm,
+                    'user_initiated'      => $this->user_initiated,
                 ]
             ); // With behavioral args.
 
             if ($this->sub_confirmer->sentEmailSuccessfully()) {
                 $this->successes['sent_confirmation_email_successfully'] = __('Request for email confirmation sent successfully.', 'comment-mail');
             }
-        } elseif ($this->sub->status === 'subscribed' && $this->process_list_server) {
+            if ($this->process_list_server && $this->auto_confirm) {
+                $this->plugin->utils_list_server->maybeSubscribe(
+                    [
+                        'double_optin' => false,
+                        'email'        => $this->sub->email,
+                        'fname'        => $this->sub->fname,
+                        'lname'        => $this->sub->lname,
+                        'ip'           => $this->sub->last_ip,
+                    ]
+                );
+            }
+        } elseif ($this->process_list_server && $this->sub->status === 'subscribed') {
             $this->plugin->utils_list_server->maybeSubscribe(
                 [
                     'double_optin' => false,
@@ -872,7 +895,7 @@ class SubInserter extends AbsBase
                " AND `status` = 'subscribed'".// Only if `subscribed`.
                " AND `deliver` = '".esc_sql($this->data['deliver'])."'";
 
-        return (boolean) $this->plugin->utils_db->wp->get_var($sql);
+        return (bool) $this->plugin->utils_db->wp->get_var($sql);
     }
 
     /*
@@ -1096,7 +1119,7 @@ class SubInserter extends AbsBase
                 case 'ID': // Primary key.
 
                     if (isset($_value)) {
-                        $_value = (integer) $_value;
+                        $_value = (int) $_value;
                     }
                     if ($this->is_insert) {
                         $_value = null; // Nullify.
@@ -1153,7 +1176,7 @@ class SubInserter extends AbsBase
                         }
                     }
                     if (isset($_value)) {
-                        $_value = (integer) $_value;
+                        $_value = (int) $_value;
                     }
                     if ($this->is_insert && !$_value) {
                         $_value = 0; // Use a default value.
@@ -1171,7 +1194,7 @@ class SubInserter extends AbsBase
                 case 'post_id': // Post ID.
 
                     if (isset($_value)) {
-                        $_value = (integer) $_value;
+                        $_value = (int) $_value;
                     }
                     if ($this->is_insert && !$_value) {
                         $_value = 0; // Use a default value.
@@ -1190,7 +1213,7 @@ class SubInserter extends AbsBase
                 case 'comment_id': // Comment ID.
 
                     if (isset($_value)) {
-                        $_value = (integer) $_value;
+                        $_value = (int) $_value;
                     }
                     if ($this->is_insert && !$_value) {
                         $_value = 0; // Use a default value.
@@ -1554,7 +1577,7 @@ class SubInserter extends AbsBase
                         }
                     }
                     if (isset($_value)) {
-                        $_value = (integer) $_value;
+                        $_value = (int) $_value;
                     }
                     if ($this->is_insert && $_value < 1) {
                         $_value = time(); // Use a default value.
@@ -1574,7 +1597,7 @@ class SubInserter extends AbsBase
                         }
                     }
                     if (isset($_value)) {
-                        $_value = (integer) $_value;
+                        $_value = (int) $_value;
                     }
                     if ($this->is_insert && $_value < 1) {
                         $_value = time(); // Use a default value.

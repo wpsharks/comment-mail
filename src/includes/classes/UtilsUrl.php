@@ -972,7 +972,7 @@ class UtilsUrl extends AbsBase
      */
     public function postShort($post_id, $scheme = null)
     {
-        $post_id = (integer) $post_id;
+        $post_id = (int) $post_id;
 
         $url  = home_url('/', $scheme);
         $args = ['p' => $post_id];
@@ -993,7 +993,7 @@ class UtilsUrl extends AbsBase
      */
     public function postEditShort($post_id, $scheme = 'admin')
     {
-        $post_id = (integer) $post_id;
+        $post_id = (int) $post_id;
 
         $url  = admin_url('/post.php', $scheme);
         $args = ['post' => $post_id, 'action' => 'edit'];
@@ -1014,7 +1014,7 @@ class UtilsUrl extends AbsBase
      */
     public function postEditCommentsShort($post_id, $scheme = 'admin')
     {
-        $post_id = (integer) $post_id;
+        $post_id = (int) $post_id;
 
         $url  = admin_url('/edit-comments.php', $scheme);
         $args = ['p' => $post_id];
@@ -1036,7 +1036,7 @@ class UtilsUrl extends AbsBase
      */
     public function postEditSubsShort($post_id, $s = '', $scheme = 'admin')
     {
-        $post_id = (integer) $post_id;
+        $post_id = (int) $post_id;
         $s       = trim((string) $s);
 
         $url  = $this->subsMenuPageOnly($scheme);
@@ -1098,7 +1098,7 @@ class UtilsUrl extends AbsBase
      */
     public function editSubShort($sub_id, $scheme = 'admin')
     {
-        $sub_id = (integer) $sub_id;
+        $sub_id = (int) $sub_id;
 
         $url  = $this->subsMenuPageOnly();
         $url  = $this->pageTableNavVarsOnly([], $url, $scheme);
@@ -1120,7 +1120,7 @@ class UtilsUrl extends AbsBase
      */
     public function editUserShort($user_id, $scheme = 'admin')
     {
-        $user_id = (integer) $user_id;
+        $user_id = (int) $user_id;
 
         $url  = admin_url('/user-edit.php', $scheme);
         $args = ['user_id' => $user_id];
@@ -1141,7 +1141,7 @@ class UtilsUrl extends AbsBase
      */
     public function commentShort($comment_id, $scheme = null)
     {
-        $comment_id = (integer) $comment_id;
+        $comment_id = (int) $comment_id;
 
         $url  = home_url('/', $scheme);
         $args = ['c' => $comment_id];
@@ -1162,7 +1162,7 @@ class UtilsUrl extends AbsBase
      */
     public function commentEditShort($comment_id, $scheme = 'admin')
     {
-        $comment_id = (integer) $comment_id;
+        $comment_id = (int) $comment_id;
 
         $url  = admin_url('/comment.php', $scheme);
         $args = ['action' => 'editcomment', 'c' => $comment_id];
@@ -1447,6 +1447,25 @@ class UtilsUrl extends AbsBase
         if ($include_nav_vars && ($nav_vars = $this->subManageSummaryNavVars($include_nav_vars))) {
             $args[GLOBAL_NS]['manage']['summary_nav'] = $nav_vars;
         }
+        return add_query_arg(urlencode_deep($args), $url);
+    }
+
+    /**
+     * Webhook URL for replies via email; through SparkPost.
+     *
+     * @since 16xxxx Adding SparkPost integration.
+     *
+     * @param string|null $scheme Optional. Defaults to a `NULL` value.
+     *                            See {@link set_scheme()} method for further details.
+     *
+     * @return string URL w/ the given `$scheme`.
+     */
+    public function rveSparkPostWebhookUrl($scheme = null)
+    {
+        $url  = home_url('/', $scheme);
+        $key  = RveSparkPost::key(); // Webhook key.
+        $args = [GLOBAL_NS => ['rve_sparkpost' => $key]];
+
         return add_query_arg(urlencode_deep($args), $url);
     }
 

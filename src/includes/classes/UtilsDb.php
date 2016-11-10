@@ -17,7 +17,7 @@ namespace WebSharks\CommentMail;
 class UtilsDb extends AbsBase
 {
     /**
-     * @type \wpdb WP DB class reference.
+     * @var \wpdb WP DB class reference.
      *
      * @since 141111 First documented version.
      */
@@ -63,7 +63,7 @@ class UtilsDb extends AbsBase
                 if (is_array($_value) || is_object($_value)) {
                     $_value = $this->typifyDeep($_value);
                 } elseif ($this->isIntegerKey($_key)) {
-                    $_value = (integer) $_value;
+                    $_value = (int) $_value;
                 } elseif ($this->isFloatKey($_key)) {
                     $_value = (float) $_value;
                 } else {
@@ -102,7 +102,6 @@ class UtilsDb extends AbsBase
         $preg_quoted_integer_keys = array_map(
             function ($key) {
                 return preg_quote($key, '/'); #
-
             },
             $integer_keys
         );
@@ -261,7 +260,7 @@ class UtilsDb extends AbsBase
         $args = array_merge($default_args, $args);
         $args = array_intersect_key($args, $default_args);
 
-        $no_cache = (boolean) $args['no_cache'];
+        $no_cache = (bool) $args['no_cache'];
 
         $cache_keys = []; // No cacheable keys at this time.
 
@@ -275,7 +274,7 @@ class UtilsDb extends AbsBase
         if ($this->wp->query($sql) === false) { // Initial query failure?
             throw new \exception(__('Query failure.', 'comment-mail'));
         }
-        return $total = (integer) $this->wp->get_var('SELECT FOUND_ROWS()');
+        return $total = (int) $this->wp->get_var('SELECT FOUND_ROWS()');
     }
 
     /**
@@ -299,10 +298,10 @@ class UtilsDb extends AbsBase
         $args = array_merge($default_args, $args);
         $args = array_intersect_key($args, $default_args);
 
-        $max         = (integer) $args['max'];
+        $max         = (int) $args['max'];
         $max         = $max < 1 ? 1 : $max;
-        $fail_on_max = (boolean) $args['fail_on_max'];
-        $no_cache    = (boolean) $args['no_cache'];
+        $fail_on_max = (bool) $args['fail_on_max'];
+        $no_cache    = (bool) $args['no_cache'];
 
         $cache_keys = compact('max', 'fail_on_max');
 
@@ -352,12 +351,12 @@ class UtilsDb extends AbsBase
         $args = array_merge($default_args, $args);
         $args = array_intersect_key($args, $default_args);
 
-        $for_comments_only          = (boolean) $args['for_comments_only'];
+        $for_comments_only          = (bool) $args['for_comments_only'];
         $include_post_types         = (array) $args['include_post_types'];
         $exclude_post_types         = (array) $args['exclude_post_types'];
         $exclude_post_statuses      = (array) $args['exclude_post_statuses'];
-        $exclude_password_protected = (boolean) $args['exclude_password_protected'];
-        $no_cache                   = (boolean) $args['no_cache'];
+        $exclude_password_protected = (bool) $args['exclude_password_protected'];
+        $no_cache                   = (bool) $args['no_cache'];
 
         $cache_keys = compact('for_comments_only', 'exclude_post_types', 'exclude_post_statuses', 'exclude_password_protected');
 
@@ -387,7 +386,7 @@ class UtilsDb extends AbsBase
         if ($this->wp->query($sql) === false) { // Initial query failure?
             throw new \exception(__('Query failure.', 'comment-mail'));
         }
-        return $total = (integer) $this->wp->get_var('SELECT FOUND_ROWS()');
+        return $total = (int) $this->wp->get_var('SELECT FOUND_ROWS()');
     }
 
     /**
@@ -416,15 +415,15 @@ class UtilsDb extends AbsBase
         $args = array_merge($default_args, $args);
         $args = array_intersect_key($args, $default_args);
 
-        $max                        = (integer) $args['max'];
+        $max                        = (int) $args['max'];
         $max                        = $max < 1 ? 1 : $max;
-        $fail_on_max                = (boolean) $args['fail_on_max'];
-        $for_comments_only          = (boolean) $args['for_comments_only'];
+        $fail_on_max                = (bool) $args['fail_on_max'];
+        $for_comments_only          = (bool) $args['for_comments_only'];
         $include_post_types         = (array) $args['include_post_types'];
         $exclude_post_types         = (array) $args['exclude_post_types'];
         $exclude_post_statuses      = (array) $args['exclude_post_statuses'];
-        $exclude_password_protected = (boolean) $args['exclude_password_protected'];
-        $no_cache                   = (boolean) $args['no_cache'];
+        $exclude_password_protected = (bool) $args['exclude_password_protected'];
+        $no_cache                   = (bool) $args['no_cache'];
 
         $cache_keys = compact('max', 'fail_on_max', 'for_comments_only', 'exclude_post_types', 'exclude_post_statuses', 'exclude_password_protected');
 
@@ -500,28 +499,30 @@ class UtilsDb extends AbsBase
      */
     public function totalComments($post_id, array $args = [])
     {
-        if (!($post_id = (integer) $post_id)) {
+        if (!($post_id = (int) $post_id)) {
             return 0; // Not possible.
         }
         $default_args = [
-            'parents_only'               => false,
-            'include_post_types'         => [],
-            'exclude_post_types'         => [],
-            'exclude_post_statuses'      => [],
-            'exclude_password_protected' => false,
-            'no_cache'                   => false,
+            'parents_only'                => false,
+            'include_post_types'          => [],
+            'exclude_post_types'          => [],
+            'exclude_post_statuses'       => [],
+            'exclude_password_protected'  => false,
+            'exclude_unapproved_comments' => false,
+            'no_cache'                    => false,
         ];
         $args = array_merge($default_args, $args);
         $args = array_intersect_key($args, $default_args);
 
-        $parents_only               = (boolean) $args['parents_only'];
-        $include_post_types         = (array) $args['include_post_types'];
-        $exclude_post_types         = (array) $args['exclude_post_types'];
-        $exclude_post_statuses      = (array) $args['exclude_post_statuses'];
-        $exclude_password_protected = (boolean) $args['exclude_password_protected'];
-        $no_cache                   = (boolean) $args['no_cache'];
+        $parents_only                = (bool) $args['parents_only'];
+        $include_post_types          = (array) $args['include_post_types'];
+        $exclude_post_types          = (array) $args['exclude_post_types'];
+        $exclude_post_statuses       = (array) $args['exclude_post_statuses'];
+        $exclude_password_protected  = (bool) $args['exclude_password_protected'];
+        $exclude_unapproved_comments = (bool) $args['exclude_unapproved_comments'];
+        $no_cache                    = (bool) $args['no_cache'];
 
-        $cache_keys = compact('post_id', 'parents_only', 'exclude_post_types', 'exclude_post_statuses', 'exclude_password_protected');
+        $cache_keys = compact('post_id', 'parents_only', 'exclude_post_types', 'exclude_post_statuses', 'exclude_password_protected', 'exclude_unapproved_comments');
 
         if (!is_null($total = &$this->cacheKey(__FUNCTION__, $cache_keys)) && !$no_cache) {
             return $total; // Already cached this.
@@ -549,12 +550,15 @@ class UtilsDb extends AbsBase
                ($parents_only // Parents only?
                    ? " AND `comment_parent` <= '0'" : '').
 
+               ($exclude_unapproved_comments
+                   ? " AND `comment_approved` IN('1', 'approve', 'approved')" : '').
+
                ' LIMIT 1'; // One to check.
 
         if ($this->wp->query($sql) === false) { // Initial query failure?
             throw new \exception(__('Query failure.', 'comment-mail'));
         }
-        return $total = (integer) $this->wp->get_var('SELECT FOUND_ROWS()');
+        return $total = (int) $this->wp->get_var('SELECT FOUND_ROWS()');
     }
 
     /**
@@ -571,33 +575,35 @@ class UtilsDb extends AbsBase
      */
     public function allComments($post_id, array $args = [])
     {
-        if (!($post_id = (integer) $post_id)) {
+        if (!($post_id = (int) $post_id)) {
             return []; // Not possible.
         }
         $default_args = [
-            'max'                        => PHP_INT_MAX,
-            'fail_on_max'                => false,
-            'parents_only'               => false,
-            'include_post_types'         => [],
-            'exclude_post_types'         => [],
-            'exclude_post_statuses'      => [],
-            'exclude_password_protected' => false,
-            'no_cache'                   => false,
+            'max'                         => PHP_INT_MAX,
+            'fail_on_max'                 => false,
+            'parents_only'                => false,
+            'include_post_types'          => [],
+            'exclude_post_types'          => [],
+            'exclude_post_statuses'       => [],
+            'exclude_password_protected'  => false,
+            'exclude_unapproved_comments' => false,
+            'no_cache'                    => false,
         ];
         $args = array_merge($default_args, $args);
         $args = array_intersect_key($args, $default_args);
 
-        $max                        = (integer) $args['max'];
-        $max                        = $max < 1 ? 1 : $max;
-        $fail_on_max                = (boolean) $args['fail_on_max'];
-        $parents_only               = (boolean) $args['parents_only'];
-        $include_post_types         = (array) $args['include_post_types'];
-        $exclude_post_types         = (array) $args['exclude_post_types'];
-        $exclude_post_statuses      = (array) $args['exclude_post_statuses'];
-        $exclude_password_protected = (boolean) $args['exclude_password_protected'];
-        $no_cache                   = (boolean) $args['no_cache'];
+        $max                         = (int) $args['max'];
+        $max                         = $max < 1 ? 1 : $max;
+        $fail_on_max                 = (bool) $args['fail_on_max'];
+        $parents_only                = (bool) $args['parents_only'];
+        $include_post_types          = (array) $args['include_post_types'];
+        $exclude_post_types          = (array) $args['exclude_post_types'];
+        $exclude_post_statuses       = (array) $args['exclude_post_statuses'];
+        $exclude_password_protected  = (bool) $args['exclude_password_protected'];
+        $exclude_unapproved_comments = (bool) $args['exclude_unapproved_comments'];
+        $no_cache                    = (bool) $args['no_cache'];
 
-        $cache_keys = compact('post_id', 'max', 'fail_on_max', 'parents_only', 'exclude_post_types', 'exclude_post_statuses', 'exclude_password_protected');
+        $cache_keys = compact('post_id', 'max', 'fail_on_max', 'parents_only', 'exclude_post_types', 'exclude_post_statuses', 'exclude_password_protected', 'exclude_unapproved_comments');
 
         if (!is_null($comments = &$this->cacheKey(__FUNCTION__, $cache_keys)) && !$no_cache) {
             return $comments; // Already cached this.
@@ -628,6 +634,9 @@ class UtilsDb extends AbsBase
 
                    ($parents_only // Parents only?
                        ? " AND `comment_parent` <= '0'" : '').
+
+                   ($exclude_unapproved_comments
+                       ? " AND `comment_approved` IN('1', 'approve', 'approved')" : '').
 
                    ' ORDER BY `comment_date_gmt` ASC'.
 
@@ -662,14 +671,14 @@ class UtilsDb extends AbsBase
      */
     public function paginationLinksStartPage($current_page, $total_pages, $max_links)
     {
-        $current_page = (integer) $current_page;
-        $total_pages  = (integer) $total_pages;
-        $max_links    = (integer) $max_links;
+        $current_page = (int) $current_page;
+        $total_pages  = (int) $total_pages;
+        $max_links    = (int) $max_links;
 
         $min_start_page = 1; // Obviously.
         $max_start_page = max($total_pages - ($max_links - 1), $min_start_page);
         $start_page     = max(min($current_page - floor($max_links / 2), $max_start_page), $min_start_page);
 
-        return (integer) $start_page;
+        return (int) $start_page;
     }
 }

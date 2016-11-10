@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e634d1284302823714cd5343ca7eec21",
-    "content-hash": "08a4113873beb825342cdedb9ed1dcec",
+    "hash": "9b47a002235ee15bba067916732c559c",
+    "content-hash": "ceb544bcc7c966e5ee5a6c06c9a89719",
     "packages": [
         {
             "name": "erusev/parsedown",
@@ -267,16 +267,16 @@
         },
         {
             "name": "websharks/wp-php-rv",
-            "version": "150511",
+            "version": "160824.6416",
             "source": {
                 "type": "git",
                 "url": "https://github.com/websharks/wp-php-rv.git",
-                "reference": "ed0a58f3647e59c740560235da1e61904dca8d84"
+                "reference": "d889d4ac090d674153a8de1ec2ae927527d66d35"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/websharks/wp-php-rv/zipball/ed0a58f3647e59c740560235da1e61904dca8d84",
-                "reference": "ed0a58f3647e59c740560235da1e61904dca8d84",
+                "url": "https://api.github.com/repos/websharks/wp-php-rv/zipball/d889d4ac090d674153a8de1ec2ae927527d66d35",
+                "reference": "d889d4ac090d674153a8de1ec2ae927527d66d35",
                 "shasum": ""
             },
             "require": {
@@ -289,19 +289,19 @@
             ],
             "authors": [
                 {
-                    "name": "websharks",
-                    "homepage": "http://websharks-inc.com/",
-                    "role": "company"
-                },
-                {
                     "name": "jaswsinc",
-                    "homepage": "http://jaswsinc.com/",
+                    "homepage": "https://jaswsinc.com",
                     "role": "developer"
                 },
                 {
                     "name": "raamdev",
-                    "homepage": "http://raam.org/",
+                    "homepage": "http://raam.org",
                     "role": "developer"
+                },
+                {
+                    "name": "wpsharks",
+                    "homepage": "https://wpsharks.com",
+                    "role": "company"
                 }
             ],
             "description": "Stub for WordPress themes/plugins that require PHP vX.x+.",
@@ -309,9 +309,10 @@
             "keywords": [
                 "php",
                 "websharks",
-                "wordpress"
+                "wordpress",
+                "wpsharks"
             ],
-            "time": "2015-05-10 10:30:04"
+            "time": "2016-08-24 01:47:28"
         }
     ],
     "packages-dev": [
@@ -332,12 +333,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/websharks/wp-i18n-tools.git",
-                "reference": "47a2af9f88cfaf0ad33a81c2c882cd70bfed95b6"
+                "reference": "0275dc189293aee71e80a8bde43c4087f81ce9bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/websharks/wp-i18n-tools/zipball/47a2af9f88cfaf0ad33a81c2c882cd70bfed95b6",
-                "reference": "47a2af9f88cfaf0ad33a81c2c882cd70bfed95b6",
+                "url": "https://api.github.com/repos/websharks/wp-i18n-tools/zipball/0275dc189293aee71e80a8bde43c4087f81ce9bb",
+                "reference": "0275dc189293aee71e80a8bde43c4087f81ce9bb",
                 "shasum": ""
             },
             "type": "library",
@@ -371,7 +372,7 @@
                 "websharks",
                 "wordpress"
             ],
-            "time": "2015-05-11 14:42:39"
+            "time": "2016-04-16 08:29:33"
         }
     ],
     "aliases": [],

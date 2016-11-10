@@ -80,7 +80,7 @@ function stcr_transition()
     # Notice to existing StCR users now upgrading to Comment Mail.
 
     $notice = sprintf(__('<h3 style="font-weight:400; margin:0 0 1em 0;">Upgrading from <strong>Subscribe to Comments Reloaded</strong> (StCR) to <strong>%1$s&trade;</strong> %2$s — Welcome! :-)</h3>', 'comment-mail'), esc_html(NAME), $plugin->utils_fs->inlineIconSvg());
-    $notice .= '<ul style="margin:0 0 0 3em; list-style:disc;">'.
+    $notice .= '<ul style="margin:0 0 1.3em 3em; list-style:disc;">'.
                '   <li>'.sprintf(__('%1$s automatically imported many of your StCR options (to learn what was imported, see <a href="http://comment-mail.com/r/kb-article-stcr-options-transitioned-by-comment-mail/" target="_blank">this article</a>). It\'s still a good idea to review your %1$s configuration though.', 'comment-mail'), esc_html(NAME)).'</li>'.
                (ImportStcr::dataExists() ? '   <li>'.sprintf(__('<strong>IMPORTANT TIP:</strong> %1$s can import your existing StCR subscribers automatically too! <strong><a href="%2$s">Click here to review the StCR → %1$s import process</a></strong>.', 'comment-mail'), esc_html(NAME), esc_attr($plugin->utils_url->importExportMenuPageOnly())).'</li>' : '').
                '</ul>';

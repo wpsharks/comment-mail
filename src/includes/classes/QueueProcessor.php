@@ -17,70 +17,70 @@ namespace WebSharks\CommentMail;
 class QueueProcessor extends AbsBase
 {
     /**
-     * @type bool A CRON job?
+     * @var bool A CRON job?
      *
      * @since 141111 First documented version.
      */
     protected $is_cron;
 
     /**
-     * @type int Start time.
+     * @var int Start time.
      *
      * @since 141111 First documented version.
      */
     protected $start_time;
 
     /**
-     * @type int Max time (in seconds).
+     * @var int Max time (in seconds).
      *
      * @since 141111 First documented version.
      */
     protected $max_time;
 
     /**
-     * @type int Delay (in milliseconds).
+     * @var int Delay (in milliseconds).
      *
      * @since 141111 First documented version.
      */
     protected $delay;
 
     /**
-     * @type int Max entries to process.
+     * @var int Max entries to process.
      *
      * @since 141111 First documented version.
      */
     protected $max_limit;
 
     /**
-     * @type Template Subject template.
+     * @var Template Subject template.
      *
      * @since 141111 First documented version.
      */
     protected $subject_template;
 
     /**
-     * @type Template Message template.
+     * @var Template Message template.
      *
      * @since 141111 First documented version.
      */
     protected $message_template;
 
     /**
-     * @type \stdClass[] Entries being processed.
+     * @var \stdClass[] Entries being processed.
      *
      * @since 141111 First documented version.
      */
     protected $entries;
 
     /**
-     * @type int Total entries.
+     * @var int Total entries.
      *
      * @since 141111 First documented version.
      */
     protected $total_entries;
 
     /**
-     * @type int Processed entry counter.
+     * @var int Processed entry counter.
      *
      * @since 141111 First documented version.
      */
@@ -116,14 +116,14 @@ class QueueProcessor extends AbsBase
     {
         parent::__construct();
 
-        $this->is_cron = (boolean) $is_cron;
+        $this->is_cron = (bool) $is_cron;
 
         $this->start_time = time(); // Start time.
 
         if (isset($max_time)) { // Argument is set?
-            $this->max_time = (integer) $max_time; // This takes precedence.
+            $this->max_time = (int) $max_time; // This takes precedence.
         } else {
-            $this->max_time = (integer) $this->plugin->options['queue_processor_max_time'];
+            $this->max_time = (int) $this->plugin->options['queue_processor_max_time'];
         }
         if ($this->max_time < 10) {
             $this->max_time = 10;
@@ -132,9 +132,9 @@ class QueueProcessor extends AbsBase
             $this->max_time = 300;
         }
         if (isset($delay)) { // Argument is set?
-            $this->delay = (integer) $delay; // This takes precedence.
+            $this->delay = (int) $delay; // This takes precedence.
         } else {
-            $this->delay = (integer) $this->plugin->options['queue_processor_delay'];
+            $this->delay = (int) $this->plugin->options['queue_processor_delay'];
         }
         if ($this->delay < 0) {
             $this->delay = 0;
@@ -143,14 +143,14 @@ class QueueProcessor extends AbsBase
             $this->delay = 250; // Cannot be greater than max time - 5 seconds.
         }
         if (isset($max_limit)) { // Argument is set?
-            $this->max_limit = (integer) $max_limit; // This takes precedence.
+            $this->max_limit = (int) $max_limit; // This takes precedence.
         } else {
-            $this->max_limit = (integer) $this->plugin->options['queue_processor_max_limit'];
+            $this->max_limit = (int) $this->plugin->options['queue_processor_max_limit'];
         }
         if ($this->max_limit < 1) {
             $this->max_limit = 1;
         }
-        $upper_max_limit = (integer) apply_filters(__CLASS__.'_upper_max_limit', 1000);
+        $upper_max_limit = (int) apply_filters(__CLASS__.'_upper_max_limit', 1000);
         if ($this->max_limit > $upper_max_limit) {
             $this->max_limit = $upper_max_limit;
         }
@@ -483,7 +483,7 @@ class QueueProcessor extends AbsBase
         } /*
          * Again, make sure the subscription still matches up with the same post/comment IDs; and that both still exist.
          */
-        elseif ($sub->post_id !== (integer) $comment->comment_post_ID) {
+        elseif ($sub->post_id !== (int) $comment->comment_post_ID) {
             $invalidated_entry_props = $this->entryProps('invalidated', 'sub_post_id_comment_mismtach', $entry, $sub, $sub_post, $sub_comment, $post, $comment);
         } /*
          * Else, we can return the full set of entry properties for this queue entry.
@@ -570,9 +570,9 @@ class QueueProcessor extends AbsBase
         if (!$comments && $comment) { // Not passed in?
             $comments = [$comment->comment_ID => $comment];
         }
-        $held         = (boolean) $held;
-        $dby_queue_id = (integer) $dby_queue_id;
-        $logged       = (boolean) $logged;
+        $held         = (bool) $held;
+        $dby_queue_id = (int) $dby_queue_id;
+        $logged       = (bool) $logged;
 
         $entry_props = (object) compact(
             'event',
@@ -670,7 +670,7 @@ class QueueProcessor extends AbsBase
         if ($entry_props->held) {
             return; // Already did this.
         }
-        $entry_hold_until_time = (integer) $entry_hold_until_time;
+        $entry_hold_until_time = (int) $entry_hold_until_time;
 
         $sql = 'UPDATE `'.esc_sql($this->plugin->utils_db->prefix().'queue').'`'.
 
@@ -710,7 +710,7 @@ class QueueProcessor extends AbsBase
 
                ' LIMIT 1'; // Only need the last time.
 
-        return (integer) $this->plugin->utils_db->wp->get_var($sql);
+        return (int) $this->plugin->utils_db->wp->get_var($sql);
     }
 
     /**
@@ -842,7 +842,22 @@ class QueueProcessor extends AbsBase
 
         if ($this->plugin->options['replies_via_email_enable']) {
             switch ($this->plugin->options['replies_via_email_handler']) {
-                case 'mandrill': // Only choice at the moment; i.e. we have only integrated w/ Mandrill at this time.
+
+                case 'sparkpost': // SparkPost (free, recommended).
+
+                    if ($this->plugin->options['rve_sparkpost_reply_to_email']) {
+                        $rve_sparkpost_reply_to_email = $this->plugin->options['rve_sparkpost_reply_to_email'];
+
+                        if ($is_digest) { // In digests, we only want a post ID and sub key. A comment ID will need to be given by the end-user.
+                            $rve_sparkpost_reply_to_email = $this->plugin->utils_rve->irtSuffix($rve_sparkpost_reply_to_email, $entry_props->post->ID, null, $entry_props->sub->key);
+                        } else {
+                            $rve_sparkpost_reply_to_email = $this->plugin->utils_rve->irtSuffix($rve_sparkpost_reply_to_email, $entry_props->post->ID, $entry_props->comment->comment_ID, $entry_props->sub->key);
+                        }
+                        $entry_headers[] = 'Reply-To: '.$rve_sparkpost_reply_to_email;
+                    }
+                    break; // Break switch handler.
+
+                case 'mandrill': // Mandrill (SparkPost alternative).
 
                     if ($this->plugin->options['rve_mandrill_reply_to_email']) {
                         $rve_mandrill_reply_to_email = $this->plugin->options['rve_mandrill_reply_to_email'];

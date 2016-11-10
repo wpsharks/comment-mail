@@ -85,6 +85,14 @@ namespace WebSharks\CommentMail;
             display     : block;
             line-height : 1em;
         }
+        .comment-sub-ops .cso-sub-list
+        {
+            margin: 1em 0 0 0;
+        }
+        .comment-sub-ops .cso-sub-list label
+        {
+            cursor: pointer;
+        }
     </style>
 <?php $css_styles = ob_get_clean(); ?>
 
@@ -106,8 +114,13 @@ namespace WebSharks\CommentMail;
 <?php $sub_deliver_options = ob_get_clean(); ?>
 
 <?php ob_start(); ?>
-    <?php if ($plugin->options['list_server_enable'] && $plugin->options['list_server']) : ?>
-        <input type="checkbox" id="<?php echo esc_attr($sub_list_id); ?>" name="<?php echo esc_attr($sub_list_name); ?>" value="1" /> <?php echo __('Yes, I want to receive blog updates also.', 'comment-mail'); ?>
+    <?php if ($plugin->options['list_server_enable'] && $plugin->options['list_server'] && $plugin->options['list_server_checkbox_label']) : ?>
+        <div class="cso-sub-list">
+            <label for="<?php echo esc_attr($sub_list_id); ?>">
+                <input type="checkbox" id="<?php echo esc_attr($sub_list_id); ?>" name="<?php echo esc_attr($sub_list_name); ?>" value="1" <?php echo esc_attr($plugin->options['list_server_checkbox_default_state']); ?> />
+                <?php echo $plugin->options['list_server_checkbox_label']; ?>
+            </label>
+        </div>
     <?php endif; ?>
 <?php $sub_list_checkbox = ob_get_clean(); ?>
 

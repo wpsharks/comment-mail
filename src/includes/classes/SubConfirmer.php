@@ -17,56 +17,56 @@ namespace WebSharks\CommentMail;
 class SubConfirmer extends AbsBase
 {
     /**
-     * @type \stdClass|null Subscription.
+     * @var \stdClass|null Subscription.
      *
      * @since 141111 First documented version.
      */
     protected $sub;
 
     /**
-     * @type null|bool Auto-confirm?
+     * @var null|bool Auto-confirm?
      *
      * @since 141111 First documented version.
      */
     protected $auto_confirm;
 
     /**
-     * @type bool Process events?
+     * @var bool Process events?
      *
      * @since 141111 First documented version.
      */
     protected $process_events;
 
     /**
-     * @type bool Proces list server?
+     * @var bool Proces list server?
      *
      * @since 150922 Adding list server.
      */
     protected $process_list_server;
 
     /**
-     * @type bool User initiated?
+     * @var bool User initiated?
      *
      * @since 141111 First documented version.
      */
     protected $user_initiated;
 
     /**
-     * @type bool Auto confirmed?
+     * @var bool Auto confirmed?
      *
      * @since 141111 First documented version.
      */
     protected $auto_confirmed;
 
     /**
-     * @type bool Confirming via email?
+     * @var bool Confirming via email?
      *
      * @since 141111 First documented version.
      */
     protected $confirming_via_email;
 
     /**
-     * @type bool Sent an email?
+     * @var bool Sent an email?
      *
      * @since 141111 First documented version.
      */
@@ -84,7 +84,7 @@ class SubConfirmer extends AbsBase
     {
         parent::__construct();
 
-        $sub_id    = (integer) $sub_id;
+        $sub_id    = (int) $sub_id;
         $this->sub = $this->plugin->utils_sub->get($sub_id);
 
         $defaults_args = [
@@ -99,19 +99,19 @@ class SubConfirmer extends AbsBase
         $args = array_intersect_key($args, $defaults_args);
 
         if (isset($args['auto_confirm'])) {
-            $this->auto_confirm = (boolean) $args['auto_confirm'];
+            $this->auto_confirm = (bool) $args['auto_confirm'];
         }
-        $this->process_events      = (boolean) $args['process_events'];
-        $this->process_list_server = (boolean) $args['process_list_server'];
+        $this->process_events      = (bool) $args['process_events'];
+        $this->process_list_server = (bool) $args['process_list_server'];
 
-        $this->user_initiated = (boolean) $args['user_initiated'];
+        $this->user_initiated = (bool) $args['user_initiated'];
         $this->user_initiated = $this->plugin->utils_sub->checkUserInitiatedByAdmin(
             $this->sub ? $this->sub->email : '',
             $this->user_initiated
         );
-        $this->auto_confirmed          = false; // Initialize.
-        $this->confirming_via_email    = false; // Initialize.
-        $this->sent_email_successfully = false; // Initialize.
+        $this->auto_confirmed          = false;
+        $this->confirming_via_email    = false;
+        $this->sent_email_successfully = false;
 
         $this->maybeSendConfirmationRequest();
     }

@@ -98,14 +98,14 @@ class UpgraderVs extends AbsBase
         if (version_compare($this->prev_version, '160213', '<=') && IS_PRO) {
 
             $_marker = '<?php /* --------------------------- Legacy Template Backup ---------------------------
- * Comment Mail v160618 included changes that were not backwards compatible with your 
+ * Comment Mail v160618 included changes that were not backwards compatible with your
  * customized Advanced Template. To prevent problems with the upgrade to v160618, we reset
  * the Advanced Templates to their (new) default and backed up your customized template, a
  * copy of which is included below. You can reference your original template below to reapply
  * those changes to the new default template above. When you are ready to discard this backup,
- * simply delete this comment, and everything below it, and save the template. If you leave 
+ * simply delete this comment, and everything below it, and save the template. If you leave
  * this comment here and save the options, your backup below will be also saved.
- * 
+ *
  * Note: Everything below this comment is not parsed by Comment Mail; it is only here for
  * your reference so that you can re-apply your modifications to the new template above.
  */ ?>';
@@ -192,7 +192,7 @@ class UpgraderVs extends AbsBase
                 $_notice .= '<p><strong>To retain your template customizations, please read the following message carefully.</strong></p>';
                 $_notice .= sprintf(__('<p>%1$s v%2$s was released with a rewritten and improved codebase. This came with the unfortunate side effect of breaking backwards compatibility with any Advanced Templates that had been customized in a previous version.</p>', 'comment-mail'), esc_html(NAME), $this->plugin->options['version']);
                 $_notice .= '<p>All of your customized Advanced Templates have been reset to their new default and your customizations have been backed up. You will find the backup of your old customized template appended to the bottom of the new template, separated with a  <code>Legacy Template Backup</code> PHP comment. The following templates have been reset:</p>';
-                $_notice .= '<ul style="margin:0 0 0 3em; list-style:disc;">'.
+                $_notice .= '<ul style="margin:0 0 1.3em 3em; list-style:disc;">'.
                            $_options_reset_html .
                            '</ul>';
                 $_notice .= '<p><strong>Please review the above templates and re-apply your customizations.</strong></p>';

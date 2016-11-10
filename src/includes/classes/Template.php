@@ -17,42 +17,49 @@ namespace WebSharks\CommentMail;
 class Template extends AbsBase
 {
     /**
-     * @type string Type of template.
+     * @var string Type of template.
      *
      * @since 141111 First documented version.
      */
     protected $type;
 
     /**
-     * @type string Template file.
+     * @var string Template file.
      *
      * @since 141111 First documented version.
      */
     protected $file;
 
     /**
-     * @type string Snippet sub-directory.
+     * @var string Template file path.
+     *
+     * @since 16xxxx Enhancing templates.
+     */
+    protected $file_path;
+
+    /**
+     * @var string Snippet sub-directory.
      *
      * @since 141111 First documented version.
      */
     protected $snippet_sub_dir;
 
     /**
-     * @type bool Force default template?
+     * @var bool Force default template?
      *
      * @since 141111 First documented version.
      */
     protected $force_default;
 
     /**
-     * @type string Template file contents.
+     * @var string Template file contents.
      *
      * @since 141111 First documented version.
      */
     protected $file_contents;
 
     /**
-     * @type array Current vars.
+     * @var array Current vars.
      *
      * @since 141111 First documented version.
      */
@@ -91,9 +98,11 @@ class Template extends AbsBase
             throw new \exception(__('Empty file.', 'comment-mail'));
         }
         $this->snippet_sub_dir = dirname($this->file).'/snippet';
-        $this->force_default   = (boolean) $force_default;
-        $this->file_contents   = $this->getFileContents();
-        $this->current_vars    = []; // Initialize.
+        $this->file_path       = $this->getFilePath();
+
+        $this->force_default = (bool) $force_default;
+        $this->file_contents = $this->getFileContents();
+        $this->current_vars  = []; // Initialize.
     }
 
     /**
@@ -106,6 +115,18 @@ class Template extends AbsBase
     public function file()
     {
         return $this->file;
+    }
+
+    /**
+     * Public access to file path.
+     *
+     * @since 16xxxx Enhancing templates.
+     *
+     * @return string Template file path.
+     */
+    public function filePath()
+    {
+        return $this->file_path;
     }
 
     /**
@@ -142,11 +163,14 @@ class Template extends AbsBase
             $vars = array_merge($vars, $this->emailVars($vars));
         }
         $this->current_vars = &$vars; // Setup current variables.
+        $is_php             = $this->plugin->utils_fs->extension($this->file) === 'php';
 
-        if ($this->plugin->utils_fs->extension($this->file) !== 'php') {
-            return trim($this->file_contents); // No evaluate.
+        if ($is_php && $this->file_path) {
+            return trim($this->plugin->utils_php->getIsolatedInclude($this->file_path, $vars));
+        } elseif ($is_php && $this->file_contents) {
+            return trim($this->plugin->utils_php->evaluate($this->file_contents, $vars));
         }
-        return trim($this->plugin->utils_php->evaluate($this->file_contents, $vars));
+        return trim($this->file_contents); // Default behavior.
     }
 
     /**
@@ -175,8 +199,7 @@ class Template extends AbsBase
                     $shortcodes[$_key] = (string) $_value;
                 }
             }
-        }
-        unset($_key, $_value); // Housekeeping.
+        } // unset($_key, $_value); // Housekeeping.
 
         $snippet = trim($this->snippetFileContents($file));
 
@@ -302,13 +325,15 @@ class Template extends AbsBase
     }
 
     /**
-     * Template file contents.
+     * Template file path.
      *
-     * @since 141111 First documented version.
+     * @since 16xxxx Enhancing templates.
      *
      * @throws \exception If unable to locate the template.
+     *
+     * @return string Template file path.
      */
-    protected function getFileContents()
+    protected function getFilePath()
     {
         if ($this->force_default) {
             goto default_template;
@@ -320,12 +345,11 @@ class Template extends AbsBase
         $dirs[] = get_stylesheet_directory().'/'.SLUG_TD.'/type-'.$this->type;
         $dirs[] = get_template_directory().'/'.SLUG_TD.'/type-'.$this->type;
 
-        foreach ($dirs as $_dir /* In order of precedence. */) { // Note: don't check `filesize()` here; templates CAN be empty.
+        foreach ($dirs as $_dir /* In order of precedence. */) {
             if (is_file($_dir.'/'.$this->file) && is_readable($_dir.'/'.$this->file)) {
-                return file_get_contents($_dir.'/'.$this->file);
+                return $_dir.'/'.$this->file;
             }
-        }
-        unset($_dir); // Housekeeping.
+        } // unset($_dir); // Housekeeping.
 
         check_option_key: // Target point.
 
@@ -334,39 +358,60 @@ class Template extends AbsBase
         $option_key = static::dataOptionKey(['type' => $this->type, 'file' => $this->file]);
 
         if (!empty($this->plugin->options[$option_key])) {
-            // Strip legacy template backup, if applicable; see `fromLteV160213()` in `UpgraderVs.php`
-            $this->plugin->options[$option_key] = preg_replace('/\<\?php\s+\/\*\s+\-{3,}\s+Legacy\s+Template\s+Backup\s+\-{3,}.*/uis', '', $this->plugin->options[$option_key]);
-
-            return $this->plugin->options[$option_key];
+            return ''; // Not applicable.
         }
-        default_template: // Target point; default template.
+        default_template: // Target point.
 
         // Default template directory.
         $dirs   = []; // Initialize.
         $dirs[] = dirname(__DIR__).'/templates/type-'.$this->type;
 
-        foreach ($dirs as $_dir /* In order of precedence. */) { // Note: don't check `filesize()` here; templates CAN be empty.
+        foreach ($dirs as $_dir /* In order of precedence. */) {
             if (is_file($_dir.'/'.$this->file) && is_readable($_dir.'/'.$this->file)) {
-                return file_get_contents($_dir.'/'.$this->file);
+                return $_dir.'/'.$this->file;
             }
-        }
-        unset($_dir); // Housekeeping.
+        } // unset($_dir); // Housekeeping.
 
         throw new \exception(sprintf(__('Missing template: `type-%1$s/%2$s`.', 'comment-mail'), $this->type, $this->file));
     }
 
     /**
-     * Snippet file contents.
+     * Template file contents.
      *
      * @since 141111 First documented version.
+     *
+     * @throws \exception If unable to locate the template.
+     *
+     * @return string Template file contents.
+     */
+    protected function getFileContents()
+    {
+        if ($this->file_path) {
+            return file_get_contents($this->file_path);
+        }
+        // e.g. type `a` for `site/comment-form/file.php`.
+        // becomes: `template__type_a__site__comment_form__file___php`.
+        $option_key = static::dataOptionKey(['type' => $this->type, 'file' => $this->file]);
+
+        if (!empty($this->plugin->options[$option_key])) {
+            // Strip legacy template backup, if applicable; see `fromLteV160213()` in `UpgraderVs.php`
+            return $this->plugin->options[$option_key] = preg_replace('/\<\?php\s+\/\*\s+\-{3,}\s+Legacy\s+Template\s+Backup\s+\-{3,}.*/uis', '', $this->plugin->options[$option_key]);
+        }
+        throw new \exception(sprintf(__('Missing template: `type-%1$s/%2$s`.', 'comment-mail'), $this->type, $this->file));
+    }
+
+    /**
+     * Snippet file path.
+     *
+     * @since 16xxxx Enhancing templates.
      *
      * @param string $file File path, relative to snippet sub-directory.
      *
      * @throws \exception If unable to locate the snippet.
-     * @return string Snippet file contents; for the requested snippet.
      *
+     * @return string Snippet file path.
      */
-    protected function snippetFileContents($file)
+    protected function snippetFilePath($file)
     {
         if ($this->force_default) {
             goto default_snippet;
@@ -378,12 +423,11 @@ class Template extends AbsBase
         $dirs[] = get_stylesheet_directory().'/'.SLUG_TD.'/type-'.$this->type.'/'.$this->snippet_sub_dir;
         $dirs[] = get_template_directory().'/'.SLUG_TD.'/type-'.$this->type.'/'.$this->snippet_sub_dir;
 
-        foreach ($dirs as $_dir /* In order of precedence. */) { // Note: don't check `filesize()` here; snippets CAN be empty.
+        foreach ($dirs as $_dir /* In order of precedence. */) {
             if (is_file($_dir.'/'.$file) && is_readable($_dir.'/'.$file)) {
-                return file_get_contents($_dir.'/'.$file);
+                return $_dir.'/'.$file;
             }
-        }
-        unset($_dir); // Housekeeping.
+        } // unset($_dir); // Housekeeping.
 
         check_option_key: // Target point.
 
@@ -392,21 +436,46 @@ class Template extends AbsBase
         $option_key = static::dataOptionKey(['type' => $this->type, 'file' => $this->snippet_sub_dir.'/'.$file]);
 
         if (!empty($this->plugin->options[$option_key])) {
-            return $this->plugin->options[$option_key];
+            return ''; // Not applicable.
         }
-        default_snippet: // Target point; default snippet.
+        default_snippet: // Target point.
 
         // Default snippet directory.
         $dirs   = []; // Initialize.
         $dirs[] = dirname(__DIR__).'/templates/type-'.$this->type.'/'.$this->snippet_sub_dir;
 
-        foreach ($dirs as $_dir /* In order of precedence. */) { // Note: don't check `filesize()` here; templates CAN be empty.
+        foreach ($dirs as $_dir /* In order of precedence. */) {
             if (is_file($_dir.'/'.$file) && is_readable($_dir.'/'.$file)) {
-                return file_get_contents($_dir.'/'.$file);
+                return $_dir.'/'.$file;
             }
-        }
-        unset($_dir); // Housekeeping.
+        } // unset($_dir); // Housekeeping.
 
+        throw new \exception(sprintf(__('Missing snippet: `%1$s`.', 'comment-mail'), 'type-'.$this->type.'/'.$this->snippet_sub_dir.'/'.$file));
+    }
+
+    /**
+     * Snippet file contents.
+     *
+     * @since 141111 First documented version.
+     *
+     * @param string $file File path, relative to snippet sub-directory.
+     *
+     * @throws \exception If unable to locate the snippet.
+     *
+     * @return string Snippet file contents.
+     */
+    protected function snippetFileContents($file)
+    {
+        if (($file_path = $this->snippetFilePath($file))) {
+            return file_get_contents($file_path);
+        }
+        // e.g. type `a` for `site/comment-form/snippet/file.php`.
+        // becomes: `template__type_a__site__comment_form__snipppet__file___php`.
+        $option_key = static::dataOptionKey(['type' => $this->type, 'file' => $this->snippet_sub_dir.'/'.$file]);
+
+        if (!empty($this->plugin->options[$option_key])) {
+            return $this->plugin->options[$option_key];
+        }
         throw new \exception(sprintf(__('Missing snippet: `%1$s`.', 'comment-mail'), 'type-'.$this->type.'/'.$this->snippet_sub_dir.'/'.$file));
     }
 
@@ -432,7 +501,7 @@ class Template extends AbsBase
         if (!$type) {
             $type = $plugin->options['template_type'];
         }
-        unset($_m); // Just a little housekeeping.
+        unset($_m); // A little housekeeping.
 
         $file = $option_key; // Initialize.
         $file = preg_replace('/^template__type_.+?__/', '', $file);

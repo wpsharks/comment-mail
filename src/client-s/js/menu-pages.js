@@ -204,34 +204,28 @@
           ifDisabledShow = '.pmp-if-disabled-show';
 
         var withinANest = function () {
-          if ($thisNest.length) {
-            return false;
-          }
-          return $(this).hasClass('pmp-in-if-nest');
+          return $thisNest.length ? false : $(this).hasClass('pmp-in-if-nest');
         };
 
         var valueMatches = function () {
-          if (!matchValue) {
-            return true;
-          }
-          return $(this).hasClass('pmp-if-value-' + thisValue);
+          return !matchValue ? true : $(this).hasClass('pmp-if-value-' + thisValue);
         };
 
         if (enabled) {
-          $thisContainer.find(ifEnabled + ',' + ifEnabledShow).not(withinANest).filter(valueMatches)
-            .show().css('opacity', 1).find(':input').removeAttr('disabled');
+          if (matchValue) {
+            $thisContainer.find(ifEnabled + ',' + ifEnabledShow).not(withinANest).not(valueMatches).css('opacity', 0.2).find(':input').attr('disabled', 'disabled');
+            $thisContainer.find(ifEnabledShow).not(withinANest).not(valueMatches).hide();
+          }
+          $thisContainer.find(ifEnabled + ',' + ifEnabledShow).not(withinANest).filter(valueMatches).show().css('opacity', 1).find(':input').removeAttr('disabled');
         } else {
-          $thisContainer.find(ifEnabled + ',' + ifEnabledShow).not(withinANest)
-            .css('opacity', 0.2).find(':input').attr('disabled', 'disabled');
+          $thisContainer.find(ifEnabled + ',' + ifEnabledShow).not(withinANest).css('opacity', 0.2).find(':input').attr('disabled', 'disabled');
           $thisContainer.find(ifEnabledShow).not(withinANest).hide();
         }
 
         if (disabled) {
-          $thisContainer.find(ifDisabled + ',' + ifDisabledShow).not(withinANest)
-            .show().css('opacity', 1).find(':input').removeAttr('disabled');
+          $thisContainer.find(ifDisabled + ',' + ifDisabledShow).not(withinANest).show().css('opacity', 1).find(':input').removeAttr('disabled');
         } else {
-          $thisContainer.find(ifDisabled + ',' + ifDisabledShow).not(withinANest)
-            .css('opacity', 0.2).find(':input').attr('disabled', 'disabled');
+          $thisContainer.find(ifDisabled + ',' + ifDisabledShow).not(withinANest).css('opacity', 0.2).find(':input').attr('disabled', 'disabled');
           $thisContainer.find(ifDisabledShow).not(withinANest).hide();
         }
 

@@ -518,6 +518,113 @@ class MenuPage extends AbsBase
 
         /* ----------------------------------------------------------------------------------------- */
 
+        if (IS_PRO || $this->plugin->utils_env->isProPreview()) {
+            $_panel_body = '<table style="margin:0;">'.
+                           ' <tbody>'.
+                           $form_fields->selectRow(
+                               [
+                                   'label'       => __('Enable MailChimp Integration?', 'comment-mail'),
+                                   'placeholder' => __('Select an Option...', 'comment-mail'),
+
+                                   'field_class'   => 'pmp-if-change',
+                                   'name'          => 'list_server_enable',
+                                   'current_value' => $current_value_for('list_server_enable'),
+
+                                   'allow_arbitrary' => false,
+
+                                   'options' => [
+                                       '0' => __('No', 'comment-mail'),
+                                       '1' => __('Yes', 'comment-mail'),
+                                   ],
+                                   'notes_after' => '<div class="pmp-if-enabled-show" style="margin-top:1em !important;">'.
+                                                        '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('With MailChimp integration enabled:', 'comment-mail').'</p>'.
+                                                        '   <ul class="pmp-list-items">'.
+                                                        '      <li>'.__('When users leave a comment, in addition to subscribing to comment notifications they will also be given the option to subscribe to your site\'s mailing list. This is a powerful, unobtrusive way of inviting users to join your mailing list as they leave a comment or reply.', 'comment-mail').'</li>'.
+                                                        '      <li>'.__('Note that additional email confirmation is not required for this to work. Whenever a user confirms their comment subscription it will also automatically confirm their mailing list subscription at the same time. Or, in the case of auto-confirm being enabled for comment subscriptions, mailing list subscriptions are silently auto-confirmed as well.', 'comment-mail').'</li>'.
+                                                        '   </ul>'.
+                                                        '</div>',
+                               ]
+                           ).
+                           ' </tbody>'.
+                           '</table>';
+
+            $_panel_body .= '<div class="pmp-if-enabled-show"><hr />'.
+
+                            '<a href="https://wpsharks.com/r/mailchimp-api-key" target="_blank">'.
+                            '  <img src="'.esc_attr($this->plugin->utils_url->to('/src/client-s/images/mailchimp.png')).'" class="pmp-right" style="margin:1em 0 0 3em;" />'.
+                            '</a>'.
+
+                            ' <table style="width:auto;">'.
+                            '  <tbody>'.
+                            $form_fields->inputRow(
+                                [
+                                    'type'          => 'password',
+                                    'name'          => 'list_server_mailchimp_api_key',
+                                    'label'         => __('MailChimp API Key:', 'comment-mail'),
+                                    'placeholder'   => __('e.g., xxxc1d1ccxxx3e2d0xxb8xxxa1a1xxc6-us1', 'comment-mail'),
+                                    'current_value' => $current_value_for('list_server_mailchimp_api_key'),
+                                    'notes_after'   => '<p>'.sprintf(__('e.g., <code>xxxc1d1ccxxx3e2d0xxb8xxxa1a1xxc6-us1</code> See: %1$s', 'comment-mail'), $this->plugin->utils_markup->xAnchor('https://wpsharks.com/r/mailchimp-api-key', __('MailChimp API Key', 'comment-mail'))).'</p>',
+                                ]
+                            ).
+                            '  </tbody>'.
+                            ' </table>'.
+
+                            ' <table style="width:auto;">'.
+                            '  <tbody>'.
+                            $form_fields->inputRow(
+                                [
+                                    'type'          => 'text',
+                                    'label'         => __('MailChimp List ID:', 'comment-mail'),
+                                    'placeholder'   => __('e.g., ecxxaeb6b3', 'comment-mail'),
+                                    'name'          => 'list_server_mailchimp_list_id',
+                                    'current_value' => $current_value_for('list_server_mailchimp_list_id'),
+                                    'notes_after'   => '<p>'.__('e.g., <code>ecxxaeb6b3</code> You will find this in your MailChimp account under: <strong>Extras → List Name &amp; Defaults → List ID</strong>', 'comment-mail').'</p>',
+                                ]
+                            ).
+                            '  </tbody>'.
+                            ' </table>'.
+
+                            ' <table>'.
+                            '  <tbody>'.
+                            $form_fields->inputRow(
+                                [
+                                    'type'          => 'text',
+                                    'label'         => __('Opt-In Checkbox Label (HTML Allowed):', 'comment-mail'),
+                                    'placeholder'   => __('e.g., Yes, I want to receive blog updates also.', 'comment-mail'),
+                                    'name'          => 'list_server_checkbox_label',
+                                    'current_value' => $current_value_for('list_server_checkbox_label'),
+                                    'notes_after'   => '<p>'.__('e.g., <em>Yes, I want to receive blog updates also.</em>', 'comment-mail').'</p>',
+                                ]
+                            ).
+                            '  </tbody>'.
+                            ' </table>'.
+
+                            ' <table>'.
+                            '  <tbody>'.
+                            $form_fields->selectRow(
+                                [
+                                    'label'           => __('Opt-In Checkbox Default State:', 'comment-mail'),
+                                    'placeholder'     => __('Select an Option...', 'comment-mail'),
+                                    'name'            => 'list_server_checkbox_default_state',
+                                    'current_value'   => $current_value_for('list_server_checkbox_default_state'),
+                                    'allow_arbitrary' => false, // Must be one of these.
+                                    'options'         => [
+                                        'checked' => __('Checked by default (user must uncheck to avoid a subscription)', 'comment-mail'),
+                                        ''        => __('Unchecked (user must check to subscribe)', 'comment-mail'),
+                                    ],
+                                ]
+                            ).
+                            '  </tbody>'.
+                            ' </table>'.
+
+                            '</div>';
+
+            echo $this->panel(__('MailChimp Integration', 'comment-mail'), $_panel_body, ['pro_only' => true]);
+
+            unset($_panel_body); // Housekeeping.
+        }
+        /* ----------------------------------------------------------------------------------------- */
+
         $_panel_body = '<table style="margin:0;">'.
                        ' <tbody>'.
                        $form_fields->selectRow(
@@ -532,7 +639,7 @@ class MenuPage extends AbsBase
                                    '1' => __('Yes, enable Auto-Subscribe (recommended)', 'comment-mail'),
                                    '0' => __('No, disable all Auto-Subscribe functionality', 'comment-mail'),
                                ],
-                               'notes_after' => '<div class="pmp-if-enabled-show">'.
+                               'notes_after' => '<div class="pmp-if-enabled-show" style="margin-top:1em !important;">'.
                                                     '  <p style="font-weight:bold; font-size:110%; margin:0;">'.__('When Auto-Subscribe is enabled:', 'comment-mail').'</p>'.
                                                     '  <ul class="pmp-list-items">'.
                                                     '     <li>'.__('The author of a post can be subscribed to all comments/replies automatically. This way they\'ll receive email notifications w/o needing to go through the normal comment subscription process.', 'comment-mail').'</li>'.
@@ -819,7 +926,7 @@ class MenuPage extends AbsBase
                                        '0' => __('No, use the wp_mail function (default behavior)', 'comment-mail'),
                                        '1' => __('Yes, integrate w/ an SMTP server of my choosing (as configured below)', 'comment-mail'),
                                    ],
-                                   'notes_after' => '<div class="pmp-if-enabled-show">'.
+                                   'notes_after' => '<div class="pmp-if-enabled-show" style="margin-top:1em !important;">'.
                                                         '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('When SMTP Server Integration is enabled:', 'comment-mail').'</p>'.
                                                         '   <ul class="pmp-list-items">'.
                                                         '      <li>'.sprintf(__('Instead of using the default <code>%2$s</code> function, %1$s will send email confirmation requests &amp; comment/reply notifications through an SMTP server of your choosing; i.e., all email processed by %1$s will be routed through an SMTP server that you\'ve dedicated to comment subscriptions. This is highly recommended, since it can significantly improve the deliverability rate of emails that are sent by %1$s. In addition, it may also speed up your site (i.e., reduce the burden on your own web server). This is because an SMTP host is generally associated with an external server that is dedicated to email processing.', 'comment-mail'), esc_html(NAME), $this->plugin->utils_markup->xAnchor('https://developer.wordpress.org/reference/functions/wp_mail/', 'wp_mail')).'</li>'.
@@ -1024,14 +1131,14 @@ class MenuPage extends AbsBase
                                        '0' => __('No, do not allow comment replies via email', 'comment-mail'),
                                        '1' => __('Yes, allow subscribers to post comment replies via email (recommended)', 'comment-mail'),
                                    ],
-                                   'notes_after' => '<div class="pmp-if-enabled-show">'.
+                                   'notes_after' => '<div class="pmp-if-enabled-show" style="margin-top:1em !important;">'.
                                                         '   <p style="font-weight:bold; font-size:110%; margin:0;">'.__('When Replies via Email are enabled through an RVE Handler:', 'comment-mail').'</p>'.
                                                         '   <ul class="pmp-list-items">'.
                                                         '      <li>'.sprintf(__('%1$s&trade; will allow replies to comments via email using a special <code>Reply-To</code> address that you will need to set up by following the instructions provided below. Any other <code>Reply-To</code> address configured elsewhere in %1$s will be overridden by the address you configure here for an RVE Handler. There are no special exceptions to this. An RVE Handler takes precedence over any other <code>Reply-To</code> you configure.', 'comment-mail'), esc_html(NAME)).'</li>'.
                                                         '      <li>'.sprintf(__('Replies to comments via email will be functional for all types of notifications sent by %1$s (including digest notifications). However, there are a few things worth noting before you enable an RVE Handler. <a href="#" data-toggle="other" data-other=".pmp-rve-details">Click here to toggle important details</a>.', 'comment-mail'), esc_html(NAME)).
                                                         '        <ul class="pmp-rve-details" style="display:none;">'.
-                                                        '           <li>'.sprintf(__('All replies posted via email must be sent to the special <code>Reply-To</code> address that you configure below. Once you configure a <code>Reply-To</code> for an RVE Handler, %1$s will automatically set the <code>Reply-To:</code> header in all email notifications that it sends. This way when somebody replies to a comment notification, their email program will reply to the address required for replies via email to work properly.', 'comment-mail'), esc_html(NAME)).'</li>'.
-                                                        '           <li>'.sprintf(__('The <code>Reply-To</code> address that you configure below, will serve as a base for %1$s to work from. For instance, let\'s say you choose: <code>rve@mandrill.%2$s</code>. This base address will be suffixed automatically (at runtime) with details specific to a particular notification that %1$s sends. Ultimately, <code>rve@mandrill.%2$s</code> will look like: <code>rve<strong>+332-96-kgjdgxr4ldqpdrgjdgxr</strong>@mandrill.%2$s</code>. In this example, the additional details (following the <code>+</code> sign) are there to help %1$s route the reply to the proper location, and to provide a means by which to identify the end-user that is posting a reply.', 'comment-mail'), esc_html(NAME), esc_html($this->plugin->utils_url->currentHostBase())).'</li>'.
+                                                        '           <li>'.sprintf(__('All replies posted via email must be sent to the special <code>Reply-To</code> address that you configure below. Not to worry though, because once you configure the <code>Reply-To</code> for an RVE Handler, %1$s will automatically set the <code>Reply-To:</code> header in all email notifications that it sends. This way when somebody replies to a comment notification, their email program will reply to the address required for replies via email to work properly.', 'comment-mail'), esc_html(NAME)).'</li>'.
+                                                        '           <li>'.sprintf(__('The <code>Reply-To</code> address that you configure below, will serve as a base for %1$s to work from. For instance, let\'s say you choose: <code>rve@spark.%2$s</code>. This base address will be suffixed automatically (at runtime) with details specific to a particular notification that %1$s sends. Ultimately, <code>rve@spark.%2$s</code> will look like: <code>rve<strong>+332-96-kgjdgxr4ldqpdrgjdgxr</strong>@spark.%2$s</code>. In this example, the additional details (following the <code>+</code> sign) are there to help %1$s route the reply to the proper location, and to provide a means by which to identify the end-user that is posting a reply.', 'comment-mail'), esc_html(NAME), esc_html($this->plugin->utils_url->currentHostBase())).'</li>'.
                                                         '           <li>'.sprintf(__('For single-comment notifications; i.e., where a subscriber chooses delivery type <code>asap</code> (aka: instantly), there is just a single comment in each notification that a subscriber receives. This works best with replies via email, since the <code>Reply-To:</code> header (on its own) is enough for everything to work as expected. Someone replying via email need only hit the Reply button in their email program and start typing. Very simple.', 'comment-mail'), esc_html(NAME)).'</li>'.
                                                         '           <li>'.sprintf(__('For multi-comment notifications; i.e., where a subscriber chooses a delivery type that is not <code>asap</code> (e.g., <code>hourly</code>, <code>daily</code>, etc.); there can be more than a single comment in each notification they receive. If there is more than one comment in the notification, instructions will be provided to the end-user explaining how to reply. The special <code>Reply-To</code> address is still used in this case. However, they also need to specify which comment they want to reply to. To do this, the end-user must start their reply with a special marker provided by %1$s. Again, if there is more than one comment in the notification, instructions will be provided to the end-user explaining how to reply.', 'comment-mail'), esc_html(NAME)).'</li>'.
                                                         '           <li>'.sprintf(__('Comments posted via email are still piped through the same underlying WordPress handler that normal on-site comments go through (i.e., <code>/wp-comments-post.php</code>). This means that all of your existing WordPress Discussion Settings (and/or Akismet settings) will still apply to all comments, even if they are posted via email. <strong>With one exception.</strong> When an RVE Handler is enabled, any comments posted via email are allowed through without an end-user being logged-in. If your WordPress Discussion Settings require that users be logged-in to post comments, that will be overridden temporarily whenever a reply via email comes through. Please note that replies posted via email are generally from confirmed subscribers. Any reply via email that is not from a confirmed subscriber will be forced into moderation by %1$s anyway. Otherwise, whatever your current Discussion Settings are configured to allow, will be adhered to for replies via email also. For instance, if you require that all comments be moderated, that will continue to be the case for all replies via email. %1$s will never approve a comment on it\'s own. Approval of comments is always determined by your WP Discussion Settings.', 'comment-mail'), esc_html(NAME)).'</li>'.
@@ -1047,8 +1154,8 @@ class MenuPage extends AbsBase
 
             $_panel_body .= '<div class="pmp-if-enabled-show pmp-if-nest"><hr />'.
 
-                            '<a href="http://comment-mail.com/kb-article/mandrill-rve-handler/" target="_blank">'.
-                            '<img src="'.esc_attr($this->plugin->utils_url->to('/src/client-s/images/mandrill-rec.png')).'" class="pmp-right" style="margin-left:3em;" /></a>'.
+                            '<a href="http://comment-mail.com/r/sparkpost/" target="_blank">'.
+                            '<img src="'.esc_attr($this->plugin->utils_url->to('/src/client-s/images/sparkpost-rve.png')).'" class="pmp-right" style="margin-left:3em;" /></a>'.
 
                             ' <table style="width:auto; margin-bottom:0;">'.
                             '    <tbody>'.
@@ -1061,14 +1168,46 @@ class MenuPage extends AbsBase
                                     'current_value'   => $current_value_for('replies_via_email_handler'),
                                     'allow_arbitrary' => false, // Must be one of these.
                                     'options'         => [
-                                        ''         => '', // Empty value for the sake of making this somewhat understandable.
-                                        'mandrill' => __('Mandrill RVE Handler (free; recommended)', 'comment-mail'),
+                                        ''          => '',
+                                        'sparkpost' => __('SparkPost RVE Handler (recommended)', 'comment-mail'),
+                                        'mandrill'  => __('Mandrill RVE Handler (deprecated)', 'comment-mail'),
                                     ],
-                                    'notes_after' => '<p>'.sprintf(__('<strong>Note:</strong> %1$s is currently the only choice here; i.e., we have only integrated this with Mandrill thus far <i class="fa fa-smile-o"></i>', 'comment-mail'), $this->plugin->utils_markup->xAnchor('http://help.mandrill.com/entries/21699367-Inbound-Email-Processing-Overview', 'Mandrill')).'</p>',
                                 ]
                             ).
                             '    </tbody>'.
                             ' </table>'.
+
+                            ' <div class="pmp-if-enabled-show pmp-if-value-sparkpost pmp-in-if-nest"><hr />'.
+                            '    <table>'.
+                            '       <tbody>'.
+                            $form_fields->inputRow(
+                                [
+                                    'type'          => 'password',
+                                    'label'         => __('SparkPost API Key:', 'comment-mail'),
+                                    'placeholder'   => __('e.g., 7xxxxe7598ex6fe60d7cxxxx34a73ccdxxx084', 'comment-mail'),
+                                    'name'          => 'rve_sparkpost_api_key',
+                                    'current_value' => $current_value_for('rve_sparkpost_api_key'),
+                                    'notes_after'   => '<p>'.sprintf(__('Please see %1$s for detailed instructions.', 'comment-mail'), $this->plugin->utils_markup->xAnchor('http://comment-mail.com/kb-article/sparkpost-rve-handler/', __('this KB article', 'comment-mail'))).'</p>',
+                                ]
+                            ).
+                            '       </tbody>'.
+                            '    </table>'.
+
+                            '    <table>'.
+                            '       <tbody>'.
+                            $form_fields->inputRow(
+                                [
+                                    'type'          => 'email',
+                                    'label'         => __('SparkPost <code>Reply-To</code> Address:', 'comment-mail'),
+                                    'placeholder'   => sprintf(__('e.g., rve@spark.%1$s', 'comment-mail'), $this->plugin->utils_url->currentHostBase()),
+                                    'name'          => 'rve_sparkpost_reply_to_email',
+                                    'current_value' => $current_value_for('rve_sparkpost_reply_to_email'),
+                                    'notes_after'   => '<p>'.sprintf(__('Please see %1$s for detailed instructions.', 'comment-mail'), $this->plugin->utils_markup->xAnchor('http://comment-mail.com/kb-article/sparkpost-rve-handler/', __('this KB article', 'comment-mail'))).'</p>',
+                                ]
+                            ).
+                            '       </tbody>'.
+                            '    </table>'.
+                            ' </div>'.
 
                             ' <div class="pmp-if-enabled-show pmp-if-value-mandrill pmp-in-if-nest"><hr />'.
                             '    <table>'.
@@ -1080,7 +1219,7 @@ class MenuPage extends AbsBase
                                     'placeholder'   => sprintf(__('e.g., rve@mandrill.%1$s', 'comment-mail'), $this->plugin->utils_url->currentHostBase()),
                                     'name'          => 'rve_mandrill_reply_to_email',
                                     'current_value' => $current_value_for('rve_mandrill_reply_to_email'),
-                                    'notes_after'   => '<p class="pmp-note pmp-info">'.sprintf(__('This is really all it takes to get Replies via Email working. However, it requires that you setup a Mandrill account (free) and then configure an Inbound Mailbox Route that will connect to the Webhook URL shown below. <span class="pmp-hilite">Please see %1$s for detailed instructions.</span>', 'comment-mail'), $this->plugin->utils_markup->xAnchor('http://comment-mail.com/kb-article/mandrill-rve-handler/', __('this wiki article', 'comment-mail'))).'</p>'.
+                                    'notes_after'   => '<p class="pmp-note pmp-info">'.sprintf(__('This is really all it takes to get Replies via Email working. However, it does require that you setup a Mandrill account (free) and then configure an Inbound Mailbox Route that will connect to the Webhook URL shown below. <span class="pmp-hilite">Please see %1$s for detailed instructions.</span>', 'comment-mail'), $this->plugin->utils_markup->xAnchor('http://comment-mail.com/kb-article/mandrill-rve-handler/', __('this KB article', 'comment-mail'))).'</p>'.
                                                        $this->selectAllField(__('<strong>Mandrill Webhook URL:</strong>', 'comment-mail'), IS_PRO ? $this->plugin->utils_url->rveMandrillWebhookUrl() : ''),
                                 ]
                             ).
@@ -3244,6 +3383,7 @@ class MenuPage extends AbsBase
                                            '[inline_icon_svg]'     => __('Inline SVG icon that inherits the color and width of it\'s container automatically. Note, this is a scalable vector graphic that will look great at any size &gt;= 16x16 pixels.', 'comment-mail'),
                                            '[sub_type_options]'    => __('Select menu options. Allows a subscriber to choose if they wan\'t to subscribe or not; and in which way.', 'comment-mail'),
                                            '[sub_deliver_options]' => __('Select menu options. Allows a subscriber to choose a delivery option; e.g., asap, hourly, daily, weeky. This can be excluded if you wish. A default value of <code>asap</code> will be used in that case.', 'comment-mail'),
+                                           '[sub_list_checkbox]'   => __('Checkbox and label for mailing list subscription option; e.g., when MailChimp integration is enabled.', 'comment-mail'),
                                            '[sub_type_id]'         => __('The <code>id=""</code> attribute value used in <code>[sub_type_options]</code>.', 'comment-mail'),
                                            '[current_sub_email]'   => __('The current subscriber\'s email address, if it is known to have been confirmed; i.e., if it really is their email address. This will be empty if they have not previously confirmed a subscription.', 'comment-mail'),
                                            '[sub_new_url]'         => __('A URL leading to the "Add Subscription" page. This allows a visitor to subscribe w/o commenting even.', 'comment-mail'),
@@ -3879,7 +4019,7 @@ class MenuPage extends AbsBase
 
         echo '      <h2>'.sprintf(__('%1$s&trade; &raquo; Edit Subscription', 'comment-mail'), esc_html(NAME)).' <i class="'.esc_attr('si si-'.SLUG_TD.'-one').'"></i></h2>'."\n";
 
-        new MenuPageSubEditForm(!empty($_REQUEST['subscription']) ? (integer) $_REQUEST['subscription'] : 0); // Displays form.
+        new MenuPageSubEditForm(!empty($_REQUEST['subscription']) ? (int) $_REQUEST['subscription'] : 0); // Displays form.
 
         echo '   </form>';
         echo '</div>'."\n";
@@ -4713,7 +4853,7 @@ class MenuPage extends AbsBase
         $args = array_merge($default_args, $args);
         $args = array_intersect_key($args, $default_args);
 
-        $auto_chart = (boolean) $args['auto_chart'];
+        $auto_chart = (bool) $args['auto_chart'];
         $slug       = str_replace('_', '-', $view);
 
         $view = '<div class="'.esc_attr('pmp-stats-view pmp-stats-view-'.$slug).'" data-view="'.esc_attr($slug).'">'."\n";
@@ -4800,9 +4940,9 @@ class MenuPage extends AbsBase
 
         $note              = trim((string) $args['note']);
         $icon              = trim((string) $args['icon']);
-        $pro_only          = (boolean) $args['pro_only'];
-        $pro_preview_force = (boolean) $args['pro_preview_force'];
-        $open              = (boolean) $args['open'];
+        $pro_only          = (bool) $args['pro_only'];
+        $pro_preview_force = (bool) $args['pro_preview_force'];
+        $open              = (bool) $args['open'];
 
         if ($pro_only && !IS_PRO && !$pro_preview_force && !$this->plugin->utils_env->isProPreview()) {
             return ''; // Not applicable; not pro, or not a pro preview.
@@ -4850,8 +4990,8 @@ class MenuPage extends AbsBase
 
         $note     = trim((string) $args['note']);
         $icon     = trim((string) $args['icon']);
-        $pro_only = (boolean) $args['pro_only'];
-        $open     = (boolean) $args['open'];
+        $pro_only = (bool) $args['pro_only'];
+        $open     = (bool) $args['open'];
 
         $id = 'pb-'.md5($title.$icon.$note); // Auto-generate.
 

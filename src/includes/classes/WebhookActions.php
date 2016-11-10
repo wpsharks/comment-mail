@@ -17,7 +17,7 @@ namespace WebSharks\CommentMail;
 class WebhookActions extends AbsBase
 {
     /**
-     * @type array Valid actions.
+     * @var array Valid actions.
      *
      * @since 141111 First documented version.
      */
@@ -34,6 +34,7 @@ class WebhookActions extends AbsBase
 
         $this->valid_actions = [
             'rve_mandrill',
+            'rve_sparkpost',
         ];
         $this->maybeHandle();
     }
@@ -60,6 +61,22 @@ class WebhookActions extends AbsBase
             }
         }
         unset($_action, $_method, $_request_args); // Housekeeping.
+    }
+
+    /**
+     * RVE Webhook for SparkPost.
+     *
+     * @since 16xxxx Adding SparkPost integration.
+     *
+     * @param mixed $request_args Input argument(s).
+     */
+    protected function rveSparkPost($request_args)
+    {
+        $key = trim((string) $request_args);
+
+        new RveSparkPost($key);
+
+        exit(); // Stop; always.
     }
 
     /**

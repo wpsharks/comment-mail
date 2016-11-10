@@ -57,7 +57,7 @@ namespace WebSharks\CommentMail;
         <option value="comments"<?php selected('comments', $current->sub_type); ?>><?php echo __('yes, all comments/replies', 'comment-mail'); ?></option>
     </select>
 
-    <?php // TIP: this is optional. If you exclude this select menu, the value will automatically default to `asap`. ?>
+    <?php // TIP: this is optional. If you exclude this select menu, the value will automatically default to `asap`.?>
     <select id="<?php echo esc_attr($sub_deliver_id); ?>" name="<?php echo esc_attr($sub_deliver_name); ?>" class="cso-sub-deliver form-control" title="<?php echo __('Notify Me', 'comment-mail'); ?>">
         <option value="asap"<?php selected('asap', $current->sub_deliver); ?>><?php echo __('instantly', 'comment-mail'); ?></option>
         <option value="hourly"<?php selected('hourly', $current->sub_deliver); ?>><?php echo __('hourly digest', 'comment-mail'); ?></option>
@@ -65,22 +65,25 @@ namespace WebSharks\CommentMail;
         <option value="weekly"<?php selected('weekly', $current->sub_deliver); ?>><?php echo __('weekly digest', 'comment-mail'); ?></option>
     </select>
 
-  <div class="cso-sub-list">
-        <?php if ($plugin->options['list_server_enable'] && $plugin->options['list_server']) : ?>
-            <input type="checkbox" id="<?php echo esc_attr($sub_list_id); ?>" name="<?php echo esc_attr($sub_list_name); ?>" value="1" /> <?php echo __('Yes, I want to receive blog updates also.', 'comment-mail'); ?>
-        <?php endif; ?>
-    </div>
-
     <div class="cso-links">
         <span class="cso-link-new"><?php echo sprintf(__('Or, you can <a href="%1$s" rel="nofollow">subscribe without commenting</a>.', 'comment-mail'), esc_attr($sub_new_url)); ?></span>
-        <?php if ($current->sub_email) : // TIP: this is optional. If you exclude this, subscribers can still view their summary via emails they receive. ?>
+        <?php if ($current->sub_email) : // TIP: this is optional. If you exclude this, subscribers can still view their summary via emails they receive.?>
             <span class="cso-link-summary">~ <a href="<?php echo esc_attr($sub_summary_url); ?>" rel="nofollow"><?php echo __('manage my subscriptions', 'comment-mail'); ?></a></span>
         <?php endif; ?>
     </div>
 
+    <?php if ($plugin->options['list_server_enable'] && $plugin->options['list_server'] && $plugin->options['list_server_checkbox_label']) : ?>
+        <div class="cso-sub-list">
+            <label for="<?php echo esc_attr($sub_list_id); ?>">
+                <input type="checkbox" id="<?php echo esc_attr($sub_list_id); ?>" name="<?php echo esc_attr($sub_list_name); ?>" value="1" <?php echo esc_attr($plugin->options['list_server_checkbox_default_state']); ?> />
+                <?php echo $plugin->options['list_server_checkbox_label']; ?>
+            </label>
+        </div>
+    <?php endif; ?>
+
 </div>
 
-<?php // Styles used in this template. ?>
+<?php // Styles used in this template.?>
 
 <style type="text/css">
     .comment-sub-ops
@@ -121,5 +124,13 @@ namespace WebSharks\CommentMail;
     {
         display     : block;
         line-height : 1em;
+    }
+    .comment-sub-ops .cso-sub-list
+    {
+        margin: 1em 0 0 0;
+    }
+    .comment-sub-ops .cso-sub-list label
+    {
+        cursor: pointer;
     }
 </style>

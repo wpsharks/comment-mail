@@ -61,12 +61,12 @@ class UtilsMarkup extends AbsBase
         if (!($separator = (string) $args['separator'])) {
             $separator = ' '; // Must have.
         }
-        $span_title = (boolean) $args['span_title'];
+        $span_title = (bool) $args['span_title'];
 
         $name_style  = trim((string) $args['name_style']);
         $email_style = trim((string) $args['email_style']);
 
-        $anchor                 = (boolean) $args['anchor'];
+        $anchor                 = (bool) $args['anchor'];
         $anchor_to              = trim((string) $args['anchor_to']);
         $anchor_target          = trim((string) $args['anchor_target']);
         $anchor_summary_sub_key = trim((string) $args['anchor_summary_sub_key']);
@@ -123,8 +123,8 @@ class UtilsMarkup extends AbsBase
      */
     public function commentCount($post_id, $post_total_comments, array $args = [])
     {
-        $post_id             = (integer) $post_id;
-        $post_total_comments = (integer) $post_total_comments;
+        $post_id             = (int) $post_id;
+        $post_total_comments = (int) $post_total_comments;
 
         $default_args = [
             'style' => 'float:right; margin-left:5px;',
@@ -154,8 +154,8 @@ class UtilsMarkup extends AbsBase
      */
     public function subsCount($post_id, $post_total_subs, array $args = [])
     {
-        $post_id         = (integer) $post_id;
-        $post_total_subs = (integer) $post_total_subs;
+        $post_id         = (int) $post_id;
+        $post_total_subs = (int) $post_total_subs;
 
         $default_args = [
             'style'         => 'float:right; margin-left:5px;',
@@ -164,7 +164,7 @@ class UtilsMarkup extends AbsBase
         $args = array_merge($default_args, $args);
 
         $style         = (string) $args['style'];
-        $subscriptions = (boolean) $args['subscriptions'];
+        $subscriptions = (bool) $args['subscriptions'];
 
         $post_total_subs_label = $subscriptions // What should label contain?
             ? $this->plugin->utils_i18n->subscriptions($post_total_subs) : $post_total_subs;
@@ -219,10 +219,10 @@ class UtilsMarkup extends AbsBase
         $args = array_merge($default_args, $args);
         $args = array_intersect_key($args, $default_args);
 
-        $show_fname      = (boolean) $args['show_fname'];
-        $show_lname      = (boolean) $args['show_lname'];
-        $show_date       = (boolean) $args['show_date'];
-        $show_time       = (boolean) $args['show_time'];
+        $show_fname      = (bool) $args['show_fname'];
+        $show_lname      = (bool) $args['show_lname'];
+        $show_date       = (bool) $args['show_date'];
+        $show_time       = (bool) $args['show_time'];
         $name_email_args = (array) $args['name_email_args'];
         $view_args       = (array) $args['view_args'];
         $list_style      = trim((string) $args['list_style']);
@@ -280,11 +280,11 @@ class UtilsMarkup extends AbsBase
     {
         $selected_user_id = null; // Initialize.
         $current_user_id  = isset($current_user_id)
-            ? (integer) $current_user_id : null;
+            ? (int) $current_user_id : null;
 
         $default_args = [
             'max' => // Plugin option value.
-                (integer) $this->plugin->options['max_select_options'],
+                (int) $this->plugin->options['max_select_options'],
             'fail_on_max' => true,
             'no_cache'    => false,
 
@@ -296,9 +296,9 @@ class UtilsMarkup extends AbsBase
         $args = array_merge($default_args, $args);
         $args = array_intersect_key($args, $default_args);
 
-        $display_emails  = (boolean) $args['display_emails'];
-        $allow_empty     = (boolean) $args['allow_empty'];
-        $allow_arbitrary = (boolean) $args['allow_arbitrary'];
+        $display_emails  = (bool) $args['display_emails'];
+        $allow_empty     = (bool) $args['allow_empty'];
+        $allow_arbitrary = (bool) $args['allow_arbitrary'];
 
         if (!is_admin() || !current_user_can('list_users')) {
             return ''; // Not permitted to do so.
@@ -360,11 +360,11 @@ class UtilsMarkup extends AbsBase
     {
         $selected_post_id = null; // Initialize.
         $current_post_id  = isset($current_post_id)
-            ? (integer) $current_post_id : null;
+            ? (int) $current_post_id : null;
 
         $default_args = [
             'max' => // Plugin option value.
-                (integer) $this->plugin->options['max_select_options'],
+                (int) $this->plugin->options['max_select_options'],
             'fail_on_max'                => true,
             'for_comments_only'          => false,
             'include_post_types'         => [],
@@ -392,8 +392,8 @@ class UtilsMarkup extends AbsBase
         if (!$args['exclude_post_statuses'] && !is_admin()) { // If not in an admin area.
             $args['exclude_post_statuses'] = ['future', 'draft', 'pending', 'private'];
         }
-        $allow_empty     = (boolean) $args['allow_empty'];
-        $allow_arbitrary = (boolean) $args['allow_arbitrary'];
+        $allow_empty     = (bool) $args['allow_empty'];
+        $allow_arbitrary = (bool) $args['allow_arbitrary'];
 
         if (!$this->plugin->options['post_select_options_enable']) {
             return ''; // Use input field instead of options.
@@ -465,23 +465,24 @@ class UtilsMarkup extends AbsBase
      */
     public function commentSelectOptions($post_id, $current_comment_id = null, array $args = [])
     {
-        if (!($post_id = (integer) $post_id)) {
+        if (!($post_id = (int) $post_id)) {
             return ''; // Not possible.
         }
         $selected_comment_id = null; // Initialize.
         $current_comment_id  = isset($current_comment_id)
-            ? (integer) $current_comment_id : null;
+            ? (int) $current_comment_id : null;
 
         $default_args = [
             'max' => // Option value.
-                (integer) $this->plugin->options['max_select_options'],
-            'fail_on_max'                => true,
-            'parents_only'               => false,
-            'include_post_types'         => [],
-            'exclude_post_types'         => [],
-            'exclude_post_statuses'      => [],
-            'exclude_password_protected' => !is_admin(),
-            'no_cache'                   => false,
+                (int) $this->plugin->options['max_select_options'],
+            'fail_on_max'                 => true,
+            'parents_only'                => false,
+            'include_post_types'          => [],
+            'exclude_post_types'          => [],
+            'exclude_post_statuses'       => [],
+            'exclude_password_protected'  => !is_admin(),
+            'exclude_unapproved_comments' => !is_admin(),
+            'no_cache'                    => false,
 
             'display_emails' => // Show emails?
                 is_admin() && current_user_can('moderate_comments'),
@@ -506,9 +507,9 @@ class UtilsMarkup extends AbsBase
         if (!$args['exclude_post_statuses'] && !is_admin()) { // If not in an admin area.
             $args['exclude_post_statuses'] = ['future', 'draft', 'pending', 'private'];
         }
-        $display_emails  = (boolean) $args['display_emails'];
-        $allow_empty     = (boolean) $args['allow_empty'];
-        $allow_arbitrary = (boolean) $args['allow_arbitrary'];
+        $display_emails  = (bool) $args['display_emails'];
+        $allow_empty     = (bool) $args['allow_empty'];
+        $allow_arbitrary = (bool) $args['allow_arbitrary'];
 
         if (!$this->plugin->options['comment_select_options_enable']) {
             return ''; // Use input field instead of options.
@@ -583,8 +584,8 @@ class UtilsMarkup extends AbsBase
         $args = array_merge($default_args, $args);
         $args = array_intersect_key($args, $default_args);
 
-        $allow_empty     = (boolean) $args['allow_empty'];
-        $allow_arbitrary = (boolean) $args['allow_arbitrary'];
+        $allow_empty     = (bool) $args['allow_empty'];
+        $allow_arbitrary = (bool) $args['allow_arbitrary'];
 
         $deliver_options_available = [
             'asap'   => $this->plugin->utils_i18n->deliverLabel('asap'),
@@ -647,9 +648,9 @@ class UtilsMarkup extends AbsBase
         $args = array_merge($default_args, $args);
         $args = array_intersect_key($args, $default_args);
 
-        $allow_empty                   = (boolean) $args['allow_empty'];
-        $allow_arbitrary               = (boolean) $args['allow_arbitrary'];
-        $ui_protected_data_keys_enable = (boolean) $args['ui_protected_data_keys_enable'];
+        $allow_empty                   = (bool) $args['allow_empty'];
+        $allow_arbitrary               = (bool) $args['allow_arbitrary'];
+        $ui_protected_data_keys_enable = (bool) $args['ui_protected_data_keys_enable'];
 
         $status_options_available = [
             'unconfirmed' => $this->plugin->utils_i18n->statusLabel('unconfirmed'),
@@ -715,7 +716,7 @@ class UtilsMarkup extends AbsBase
         $args = array_merge($default_args, $args);
         $args = array_intersect_key($args, $default_args);
 
-        $allow_arbitrary = (boolean) $args['allow_arbitrary'];
+        $allow_arbitrary = (bool) $args['allow_arbitrary'];
 
         $options = ''; // Initialize.
         // There is no `$allow_empty` argument in this handler.
@@ -794,7 +795,7 @@ class UtilsMarkup extends AbsBase
         } elseif ($max_length === 'notification_parent') { // Option for parent comment clips.
             $max_length = $this->plugin->options['comment_notification_parent_content_clip_max_chars'];
         }
-        $max_length = (integer) $max_length;
+        $max_length = (int) $max_length;
         $markup     = $this->commentContent($comment);
         $clip       = $this->plugin->utils_string->clip($markup, $max_length, $force_ellipsis);
 
@@ -820,7 +821,7 @@ class UtilsMarkup extends AbsBase
         } elseif ($max_length === 'notification_parent') { // Option for parent comment clips.
             $max_length = $this->plugin->options['comment_notification_parent_content_clip_max_chars'];
         }
-        $max_length = (integer) $max_length;
+        $max_length = (int) $max_length;
         $markup     = $this->commentContent($comment);
         $mid_clip   = $this->plugin->utils_string->midClip($markup, $max_length);
 
@@ -854,8 +855,8 @@ class UtilsMarkup extends AbsBase
 
         $anchor_target        = trim((string) $args['anchor_target']);
         $anchor_style         = trim((string) $args['anchor_style']);
-        $icon_prefix          = (boolean) $args['icon_prefix'];
-        $for_wordpress_suffix = (boolean) $args['for_wordpress_suffix'];
+        $icon_prefix          = (bool) $args['icon_prefix'];
+        $for_wordpress_suffix = (bool) $args['for_wordpress_suffix'];
 
         $icon   = '<i class="'.esc_attr('si si-'.SLUG_TD).'"></i>';
         $anchor = '<a href="'.esc_attr($anchor_to).'" target="'.esc_attr($anchor_target).'" style="'.esc_attr($anchor_style).'">'.
@@ -887,7 +888,7 @@ class UtilsMarkup extends AbsBase
         $args = array_intersect_key($args, $default_args);
 
         $target   = (string) $args['target'];
-        $tabindex = (integer) $args['tabindex'];
+        $tabindex = (int) $args['tabindex'];
 
         return '<a href="'.esc_attr($url).'" target="'.esc_attr($target).'" tabindex="'.esc_attr($tabindex).'">'.$clickable.'</a>';
     }
@@ -959,7 +960,7 @@ class UtilsMarkup extends AbsBase
     /**
      * WordPress admin icon color schemes.
      *
-     * @type array WP admin icon colors.
+     * @var array WP admin icon colors.
      *
      * @note These must be hard-coded, because they don't become available
      *    in core until `admin_init`; i.e., too late for `admin_menu`.

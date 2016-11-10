@@ -19,7 +19,7 @@ class UtilsPhp extends AbsBase
     /**
      * PHP's language constructs.
      *
-     * @type array PHP's language constructs.
+     * @var array PHP's language constructs.
      *            Keys are currently unimportant. Subject to change.
      *
      * @since 141111 First documented version.
@@ -65,8 +65,8 @@ class UtilsPhp extends AbsBase
      *                           If this is TRUE, the input `$string` should NOT include PHP tags.
      *
      * @throws \exception If unable to evaluate.
-     * @return string Output string after having been evaluated by PHP.
      *
+     * @return string Output string after having been evaluated by PHP.
      */
     public function evaluate($___string, $___vars = [], $___no_tags = false)
     {
@@ -164,5 +164,28 @@ class UtilsPhp extends AbsBase
             $disabled = array_merge($disabled, ['eval']);
         }
         return $disabled;
+    }
+
+    /**
+     * Isolated PHP file include.
+     *
+     * @since 16xxxx Enhancing templates.
+     *
+     * @param string $___file_path Template file path.
+     * @param array  $___vars      Array of variables to parse.
+     *
+     * @return string Isolated PHP file include output.
+     */
+    public function getIsolatedInclude($___file_path, $___vars = [])
+    {
+        if (!$___file_path) {
+            return ''; // Not possible.
+        }
+        $___vars = (array) $___vars; // Force array.
+
+        ob_start();
+        extract($___vars);
+        include $___file_path;
+        return ob_get_clean();
     }
 }
