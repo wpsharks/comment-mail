@@ -33,7 +33,7 @@ class Template extends AbsBase
     /**
      * @var string Template file path.
      *
-     * @since 16xxxx Enhancing templates.
+     * @since 161118 Enhancing templates.
      */
     protected $file_path;
 
@@ -120,7 +120,7 @@ class Template extends AbsBase
     /**
      * Public access to file path.
      *
-     * @since 16xxxx Enhancing templates.
+     * @since 161118 Enhancing templates.
      *
      * @return string Template file path.
      */
@@ -327,7 +327,7 @@ class Template extends AbsBase
     /**
      * Template file path.
      *
-     * @since 16xxxx Enhancing templates.
+     * @since 161118 Enhancing templates.
      *
      * @throws \exception If unable to locate the template.
      *
@@ -403,7 +403,7 @@ class Template extends AbsBase
     /**
      * Snippet file path.
      *
-     * @since 16xxxx Enhancing templates.
+     * @since 161118 Enhancing templates.
      *
      * @param string $file File path, relative to snippet sub-directory.
      *

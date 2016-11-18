@@ -929,7 +929,7 @@ class Plugin extends AbsBase
     /**
      * Check current PHP version.
      *
-     * @since       16xxxx PHP version check.
+     * @since 161118 PHP version check.
      *
      * @attaches-to `admin_init` action.
      */

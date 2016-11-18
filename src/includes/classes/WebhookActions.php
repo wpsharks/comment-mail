@@ -66,7 +66,7 @@ class WebhookActions extends AbsBase
     /**
      * RVE Webhook for SparkPost.
      *
-     * @since 16xxxx Adding SparkPost integration.
+     * @since 161118 Adding SparkPost integration.
      *
      * @param mixed $request_args Input argument(s).
      */

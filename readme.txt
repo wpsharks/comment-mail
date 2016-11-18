@@ -1,6 +1,6 @@
 === Comment Mail ===
 
-Stable tag: 161110-RC
+Stable tag: 161118
 Requires at least: 4.4
 Tested up to: 4.7-alpha
 Text Domain: comment-mail
@@ -8,9 +8,9 @@ Text Domain: comment-mail
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Contributors: WebSharks, JasWSInc, raamdev, kristineds, sitegeek, renzms
+Contributors: WebSharks, JasWSInc, raamdev, kristineds, renzms
 Donate link: http://www.websharks-inc.com/r/wp-theme-plugin-donation/
-Tags: comments, subscribe, comment subscription, comment subscriptions, comment subscribe, subscribe comments, comment, comment email, comment notification, notifications, notification
+Tags: comments, subscribe, comment subscription, comment subscriptions, comment subscribe, subscribe comments, comment, comment email, comment notification, notifications, MailChimp
 
 Email comment subscriptions for WordPress
 
@@ -92,7 +92,7 @@ _**TIP:** you can preview Pro features in the free version by clicking the "Prev
 - **RVE (Replies Via Email)**
   Comment Mail Pro makes it very easy for subscribers to reply to a notification they receive via email—_with_ an email! In short, instead of a subscriber (i.e., someone that receives an update via email) being forced to return to your site, they can simply reply via email. Their response magically ends up on your site in the proper comment thread—just as if they _had_ taken the time to return to your site.
 
-  The best part about this feature is that it requires no special server requirements, and very little configuration. This is because Comment Mail Pro has been integrated with Mandrill for RVE service. So all you need to do is follow the simple instructions to setup a Mandrill account. Then supply Comment Mail with the email address that you configure there.
+  The best part about this feature is that it requires no special server requirements, and very little configuration. This is because Comment Mail Pro has been integrated with both Mandrill and SparkPost for RVE service. So all you need to do is follow the simple instructions to setup a Mandrill or SparkPost account. Then supply Comment Mail with the email address that you configure there.
 
 - **SSO (Single Sign-On) Integration**
   This powerful functionality in Comment Mail Pro attracts _many_ more comments (thus, subscribers). With SSO enabled a commenter can be identified by simply logging into your site with Facebook, Twitter, Google+, or LinkedIn.
@@ -135,6 +135,9 @@ _**TIP:** you can preview Pro features in the free version by clicking the "Prev
 
 - **Queue Processor Adjustments**
   Performance tuning Comment Mail can be important on very large sites. With Comment Mail Pro you'll have full control over the asynchronous email notification processing queue. For instance, you can control how often Comment Mail's queue processor runs, how long it will run each time, the max number of emails it will process in each run, and more.
+
+- **MailChimp Integration**
+  Integrate with MailChimp to give users the option of subscribing to your site-wide mailing list whenever they leave a comment or post a new reply. In addition to subscribing to comment reply notifications they can also choose to join your MailChimp mailing list.
 
 == Screenshots ==
 
@@ -172,7 +175,7 @@ _**TIP:** you can preview Pro features in the free version by clicking the "Prev
 - **RVE (Replies Via Email)**
   Comment Mail Pro makes it very easy for subscribers to reply to a notification they receive via email—_with_ an email! In short, instead of a subscriber (i.e., someone that receives an update via email) being forced to return to your site, they can simply reply via email. Their response magically ends up on your site in the proper comment thread—just as if they _had_ taken the time to return to your site.
 
-  The best part about this feature is that it requires no special server requirements, and very little configuration. This is because Comment Mail Pro has been integrated with Mandrill for RVE service. So all you need to do is follow the simple instructions to setup a Mandrill account. Then supply Comment Mail with the email address that you configure there.
+  The best part about this feature is that it requires no special server requirements, and very little configuration. This is because Comment Mail Pro has been integrated with both Mandrill and SparkPost for RVE service. So all you need to do is follow the simple instructions to setup a Mandrill or SparkPost account. Then supply Comment Mail with the email address that you configure there.
 
 - **SSO (Single Sign-On) Integration**
   This powerful functionality in Comment Mail Pro attracts _many_ more comments (thus, subscribers). With SSO enabled a commenter can be identified by simply logging into your site with Facebook, Twitter, Google+, or LinkedIn.
@@ -216,6 +219,9 @@ _**TIP:** you can preview Pro features in the free version by clicking the "Prev
 - **Queue Processor Adjustments**
   Performance tuning Comment Mail can be important on very large sites. With Comment Mail Pro you'll have full control over the asynchronous email notification processing queue. For instance, you can control how often Comment Mail's queue processor runs, how long it will run each time, the max number of emails it will process in each run, and more.
 
+- **MailChimp Integration**
+  Integrate with MailChimp to give users the option of subscribing to your site-wide mailing list whenever they leave a comment or post a new reply. In addition to subscribing to comment reply notifications they can also choose to join your MailChimp mailing list.
+
 == Software Requirements ==
 
 In addition to the [WordPress Requirements](http://wordpress.org/about/requirements/), Comment Mail™ requires the following minimum versions:
@@ -251,6 +257,14 @@ Released under the terms of the [GNU General Public License](http://www.gnu.org/
 Requires PHP v5.4+.
 
 == Changelog ==
+
+= v161118 =
+
+- **Bug Fix:** Exclude unapproved comments from the dropdown menu on the 'Subscribe Without Commenting' form. See [Issue #299](https://github.com/websharks/comment-mail/issues/299).
+- **Enhancement:** When parsing templates, this release uses `include()` instead of `eval()` whenever possible. This improves compatibility with shared hosting providers and makes it easier to debug template parsing issues should they occur. See [Issue #192](https://github.com/websharks/comment-mail/issues/192).
+- **PHP v7 Compatibility:** After further testing, it was found that while Comment Mail is compatible with PHP v7.0, you must be running PHP v7.0.9+. Starting with this release of Comment Mail if you're running PHP v7 < 7.0.9 a warning is displayed in the WordPress Dashboard asking the site owner to upgrade to PHP v7.0.9 or higher. Note: While PHP v7.0.9 is adequate, PHP v7.0.10 is strongly recommended. See [Issue #272](https://github.com/websharks/comment-mail/issues/272).
+- **New SparkPost Integration** (Pro):  It is now possible to use SparkPost for Replies-via-Email (RVE) instead of Mandrill. Note that SparkPost is now the suggested RVE Handler for Comment Mail because Mandrill changed its pricing structure a while back. In short, Mandrill requires a fee, whereas SparkPost (recommended) offers Relay Webhooks as a part of their free plan. See [Issue #265](https://github.com/websharks/comment-mail/issues/265).
+- **New Feature** (Pro): Adding support for MailChimp integration. It is now possible to give users the option of subscribing to your site-wide mailing list whenever they leave a comment or reply; i.e., in addition to subscribing to comment reply notifications they can also join your MailChimp mailing list. See [Issue #114](https://github.com/websharks/comment-mail/issues/114).
 
 = v160824 =
 

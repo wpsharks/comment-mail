@@ -1,16 +1,10 @@
-## [coming soon]
+= v161118 =
 
-- **SparkPost Integration:** It is now possible to use SparkPost for Replies-via-Email (RVE) instead of Mandrill. Note that SparkPost is now the suggested RVE Handler for Comment Mail because Mandrill changed its pricing structure a while back. In short, Mandrill requires a fee, whereas SparkPost (recommended) offers Relay Webhooks as a part of their free plan. See also [issue #265](https://github.com/websharks/comment-mail/issues/265) for additional details.
-
-- **UI Bug Fix** (Pro): Removed unnecessary padding from the bottom of the Pro Update Dashboard notification. Props @kristineds. See [Issue #296](https://github.com/websharks/comment-mail/issues/296).
-
-- **New Feature:** Adding support for MailChimp integration. Requires pro version. It is now possible to give users the option of subscribing to your site-wide mailing list whenever they leave a comment or reply; i.e., in addition to subscribing to comment reply notifications they can also join your MailChimp mailing list. See also: [issue #114](https://github.com/websharks/comment-mail/issues/114) for further details.
-
-- **PHP v7 Compatibility:** After further testing, it was found that while Comment Mail is compatible with PHP v7.0, you must be running PHP v7.0.9+. Starting with this release of Comment Mail if you're running PHP v7 < v7.0.9 a warning is displayed in the WordPress Dashboard asking the site owner to upgrade to PHP v7.0.9 or higher. Note: While PHP v7.0.9 is adequate, PHP v7.0.10 is strongly recommended. See also: [issue #272](https://github.com/websharks/comment-mail/issues/272) for further details.
-
-- **Template Parsing:** When parsing templates, this release uses `include()` instead of `eval()` whenever possible. This improves compatibility with shared hosting providers and makes it easier to debug template parsing issues should they occur. See also [issue #192](https://github.com/websharks/comment-mail/issues/192) for further details.
-
-- **Bug Fix:** Exclude unapproved comments from the dropdown menu on the 'Subscribe Without Commenting' form. See also: [issue #299](https://github.com/websharks/comment-mail/issues/299) for further details.
+- **Bug Fix:** Exclude unapproved comments from the dropdown menu on the 'Subscribe Without Commenting' form. See [Issue #299](https://github.com/websharks/comment-mail/issues/299).
+- **Enhancement:** When parsing templates, this release uses `include()` instead of `eval()` whenever possible. This improves compatibility with shared hosting providers and makes it easier to debug template parsing issues should they occur. See [Issue #192](https://github.com/websharks/comment-mail/issues/192).
+- **PHP v7 Compatibility:** After further testing, it was found that while Comment Mail is compatible with PHP v7.0, you must be running PHP v7.0.9+. Starting with this release of Comment Mail if you're running PHP v7 < 7.0.9 a warning is displayed in the WordPress Dashboard asking the site owner to upgrade to PHP v7.0.9 or higher. Note: While PHP v7.0.9 is adequate, PHP v7.0.10 is strongly recommended. See [Issue #272](https://github.com/websharks/comment-mail/issues/272).
+- **New SparkPost Integration** (Pro):  It is now possible to use SparkPost for Replies-via-Email (RVE) instead of Mandrill. Note that SparkPost is now the suggested RVE Handler for Comment Mail because Mandrill changed its pricing structure a while back. In short, Mandrill requires a fee, whereas SparkPost (recommended) offers Relay Webhooks as a part of their free plan. See [Issue #265](https://github.com/websharks/comment-mail/issues/265).
+- **New Feature** (Pro): Adding support for MailChimp integration. It is now possible to give users the option of subscribing to your site-wide mailing list whenever they leave a comment or reply; i.e., in addition to subscribing to comment reply notifications they can also join your MailChimp mailing list. See [Issue #114](https://github.com/websharks/comment-mail/issues/114).
 
 = v160824 =
 
