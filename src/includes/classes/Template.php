@@ -97,10 +97,11 @@ class Template extends AbsBase
         if (!$this->file) { // Empty file property?
             throw new \exception(__('Empty file.', 'comment-mail'));
         }
-        $this->snippet_sub_dir = dirname($this->file).'/snippet';
-        $this->file_path       = $this->getFilePath();
+        $this->force_default = (bool) $force_default; // Before `getFilePath()`.
 
-        $this->force_default = (bool) $force_default;
+        $this->file_path       = $this->getFilePath();
+        $this->snippet_sub_dir = dirname($this->file).'/snippet';
+
         $this->file_contents = $this->getFileContents();
         $this->current_vars  = []; // Initialize.
     }

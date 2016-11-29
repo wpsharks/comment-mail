@@ -1,3 +1,13 @@
+## v161129
+
+- **Bug Fix:** This release corrects a nasty bug that was first introduced in the previous release, resulting in the loss of template modifications when/if any Comment Mail options were edited after having upgraded to the previous release. See [Issue #322](https://github.com/websharks/comment-mail/issues/322).
+
+  In short, please avoid v161118 (the previous release).
+
+  _**Note:** If you already upgraded to v161118, but you have not edited your Comment Mail options yet (or had no template modifications anyway), there is no cause for alarm._
+
+  _However, if you upgraded to v161118 and **did** edit your Comment Mail options after updating, and if you also modified Comment Mail templates, you may have experienced a loss of template data; i.e., the changes you made to the default templates may have been lost as a result of this bug. We are very sorry about this. Please see [Issue #322](https://github.com/websharks/comment-mail/issues/322) for additional details._
+
 = v161118 =
 
 - **Bug Fix:** Exclude unapproved comments from the dropdown menu on the 'Subscribe Without Commenting' form. See [Issue #299](https://github.com/websharks/comment-mail/issues/299).

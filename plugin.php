@@ -8,7 +8,7 @@
  * @license   GNU General Public License, version 3
  */
 /*
-Version: 161118
+Version: 161129
 Text Domain: comment-mail
 Plugin Name: Comment Mail
 

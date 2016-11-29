@@ -1,6 +1,6 @@
 === Comment Mail ===
 
-Stable tag: 161118
+Stable tag: 161129
 Requires at least: 4.4
 Tested up to: 4.7-alpha
 Text Domain: comment-mail
@@ -258,9 +258,18 @@ Requires PHP v5.4+.
 
 == Changelog ==
 
+= v161129 =
+
+- **Bug Fix:** This release corrects a nasty bug that was first introduced in the previous release, resulting in the loss of template modifications when/if any Comment Mail options were edited after having upgraded to the previous release. See [Issue #322](https://github.com/websharks/comment-mail/issues/322). In short, please avoid v161118 (the previous release).
+
+  _**Note:** If you already upgraded to v161118, but you have not edited your Comment Mail options yet (or had no template modifications anyway), there is no cause for alarm._
+
+  _However, if you upgraded to v161118 and **did** edit your Comment Mail options after updating, and if you also modified Comment Mail templates, you may have experienced a loss of template data; i.e., the changes you made to the default templates may have been lost as a result of this bug. We are very sorry about this. Please see [Issue #322](https://github.com/websharks/comment-mail/issues/322) for additional details._
+
 = v161118 =
 
 - **Bug Fix:** Exclude unapproved comments from the dropdown menu on the 'Subscribe Without Commenting' form. See [Issue #299](https://github.com/websharks/comment-mail/issues/299).
+- **Enhancement:** When parsing templates, this release uses `include()` instead of `eval()` whenever possible. This improves compatibility with shared hosting providers and makes it easier to debug template parsing issues should they occur. See [Issue #192](https://github.com/websharks/comment-mail/issues/192).
 - **Enhancement:** When parsing templates, this release uses `include()` instead of `eval()` whenever possible. This improves compatibility with shared hosting providers and makes it easier to debug template parsing issues should they occur. See [Issue #192](https://github.com/websharks/comment-mail/issues/192).
 - **PHP v7 Compatibility:** After further testing, it was found that while Comment Mail is compatible with PHP v7.0, you must be running PHP v7.0.9+. Starting with this release of Comment Mail if you're running PHP v7 < 7.0.9 a warning is displayed in the WordPress Dashboard asking the site owner to upgrade to PHP v7.0.9 or higher. Note: While PHP v7.0.9 is adequate, PHP v7.0.10 is strongly recommended. See [Issue #272](https://github.com/websharks/comment-mail/issues/272).
 - **New SparkPost Integration** (Pro):  It is now possible to use SparkPost for Replies-via-Email (RVE) instead of Mandrill. Note that SparkPost is now the suggested RVE Handler for Comment Mail because Mandrill changed its pricing structure a while back. In short, Mandrill requires a fee, whereas SparkPost (recommended) offers Relay Webhooks as a part of their free plan. See [Issue #265](https://github.com/websharks/comment-mail/issues/265).
