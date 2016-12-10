@@ -18,6 +18,7 @@
       $menuPageArea = $('.' + namespaceSlug + '-menu-page-area'),
       $menuPageTable = $('.' + namespaceSlug + '-menu-page-table'),
       $menuPageForm = $('.' + namespaceSlug + '-menu-page-form'),
+      $menuPageQueue = $('.' + namespaceSlug + '-menu-page-queue'),
       $menuPageStats = $('.' + namespaceSlug + '-menu-page-stats'),
 
       vars = window[namespace + '_vars'],
@@ -436,6 +437,14 @@
     });
 
     Chart.BetterBar = Chart.BetterBar || function () {};
+
+    /* ------------------------------------------------------------------------------------------------------------
+     Plugin-specific JS for menu page queue that follows a WP standard, but need a few tweaks.
+     ------------------------------------------------------------------------------------------------------------ */
+
+    $menuPageQueue.find('.pmp-process-queue-manually').on('click', function () {
+      $(this).find('> i').removeClass('fa-paper-plane').addClass('fa-refresh fa-spin');
+    });
 
     /* ------------------------------------------------------------------------------------------------------------
      Plugin-specific JS for menu page stats that follow a WP standard, but need a few tweaks.

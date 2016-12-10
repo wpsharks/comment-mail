@@ -33,7 +33,7 @@ echo str_replace('%%title%%', __('Unsubscribe All', 'comment-mail'), $site_heade
                 <ul class="list-unstyled">
                     <?php foreach ($error_codes as $_error_code) : ?>
                         <li>
-                            <i class="fa fa-warning fa-fw"></i>
+                            <i class="fa fa-warning fa-fw" aria-hidden="true"></i>
                             <?php
                             switch ($_error_code) {
                                 case 'missing_sub_email':
@@ -70,7 +70,7 @@ echo str_replace('%%title%%', __('Unsubscribe All', 'comment-mail'), $site_heade
 
             <div class="alert alert-success" style="margin:0;">
                 <h4 style="margin:0;">
-                    <i class="fa fa-check fa-fw"></i> <?php echo __('Unsubscribed all successfully. Sorry to see you go!', 'comment-mail'); ?>
+                    <i class="fa fa-check fa-fw" aria-hidden="true"></i> <?php echo __('Unsubscribed all successfully. Sorry to see you go!', 'comment-mail'); ?>
                 </h4>
             </div>
 
@@ -81,7 +81,7 @@ echo str_replace('%%title%%', __('Unsubscribe All', 'comment-mail'), $site_heade
             <hr style="margin:0 0 1em 0;" />
 
             <h5 style="font-style:italic; margin:0;">
-                <i class="fa fa-frown-o"></i> <?php echo sprintf(__('Too many emails? ~ Please feel free to <a href="%1$s">add a new/different subscription</a> if you like!', 'comment-mail'), esc_attr($sub_new_url)); ?>
+                <i class="fa fa-frown-o" aria-hidden="true"></i> <?php echo sprintf(__('Too many emails? ~ Please feel free to <a href="%1$s">add a new/different subscription</a> if you like!', 'comment-mail'), esc_attr($sub_new_url)); ?>
             </h5>
 
         <?php endif; // END: if unsubscribed all successfully w/ no major errors. ?>

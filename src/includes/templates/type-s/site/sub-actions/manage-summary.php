@@ -97,7 +97,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
                 <ul class="list-unstyled">
                     <?php foreach ($error_codes as $_error_code) : ?>
                         <li>
-                            <i class="fa fa-warning fa-fw"></i>
+                            <i class="fa fa-warning fa-fw" aria-hidden="true"></i>
                             <?php
                             switch ($_error_code) {
                                 case 'missing_sub_key':
@@ -143,7 +143,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
                     <ul class="list-unstyled">
                         <?php foreach ($processing_errors_html as $_error_code => $_error_html) : ?>
                             <li>
-                                <i class="fa fa-warning fa-fw"></i> <?php echo $_error_html; ?>
+                                <i class="fa fa-warning fa-fw" aria-hidden="true"></i> <?php echo $_error_html; ?>
                             </li>
                         <?php endforeach; ?>
                     </ul>
@@ -160,7 +160,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
                     <ul class="list-unstyled">
                         <?php foreach ($processing_successes_html as $_success_code => $_success_html) : ?>
                             <li>
-                                <i class="fa fa-check fa-fw"></i> <?php echo $_success_html; ?>
+                                <i class="fa fa-check fa-fw" aria-hidden="true"></i> <?php echo $_success_html; ?>
                             </li>
                         <?php endforeach; ?>
                     </ul>
@@ -173,14 +173,14 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
                 <?php // @todo Remove completely, or reconsider, Add New Subscription from front-end ?>
                 <?php /*
                 <a href="<?php echo esc_attr($sub_new_url); ?>" title="<?php echo __('Add New Subscription', 'comment-mail'); ?>">
-                    <i class="fa fa-plus-square text-success pull-right" style="margin-left:.5em;"></i>
+                    <i class="fa fa-plus-square text-success pull-right" aria-hidden="true" style="margin-left:.5em;"></i>
                 </a>
                 */?>
                 <a href="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
                    data-action="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
                    data-confirmation="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address? Are you absolutely sure?', 'comment-mail'); ?>"
                    title="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address?', 'comment-mail'); ?>">
-                    <i class="fa fa-times-circle text-danger pull-right"></i>
+                    <i class="fa fa-times-circle text-danger pull-right" aria-hidden="true"></i>
                 </a>
                 <?php echo __('My Comment Subscriptions', 'comment-mail'); ?><br />
                 <em style="margin-left:.5em;">
@@ -192,7 +192,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
 
             <?php if (empty($subs)) : ?>
                 <h4>
-                    <?php echo sprintf(__('No subscriptions at this time. You may <a href="%1$s">click here</a> to create one <i class="fa fa-smile-o"></i>', 'comment-mail'), esc_attr($sub_new_url)); ?>
+                    <?php echo sprintf(__('No subscriptions at this time. You may <a href="%1$s">click here</a> to create one <i class="fa fa-smile-o" aria-hidden="true"></i>', 'comment-mail'), esc_attr($sub_new_url)); ?>
                 </h4>
             <?php endif; ?>
 
@@ -267,14 +267,14 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
                                     <div class="hover-links">
                                         <a href="<?php echo esc_attr($_sub_edit_url); ?>"
                                            title="<?php echo esc_attr(__('Edit Subscription', 'comment-mail')); ?>"
-                                            ><i class="fa fa-pencil-square-o"></i> <?php echo __('Edit Subscr.', 'comment-mail'); ?></a>
+                                            ><i class="fa fa-pencil-square-o" aria-hidden="true"></i> <?php echo __('Edit Subscr.', 'comment-mail'); ?></a>
 
                                         <span class="text-muted">|</span>
 
                                         <a data-action="<?php echo esc_attr($_sub_delete_url); ?>" href="<?php echo esc_attr($_sub_delete_url); ?>"
                                            data-confirmation="<?php echo esc_attr(__('Delete subscription? Are you sure?', 'comment-mail')); ?>"
                                            title="<?php echo esc_attr(__('Delete Subscription', 'comment-mail')); ?>" class="text-danger"
-                                            ><?php echo __('Delete', 'comment-mail'); ?> <i class="fa fa-times-circle"></i></a>
+                                            ><?php echo __('Delete', 'comment-mail'); ?> <i class="fa fa-times-circle" aria-hidden="true"></i></a>
                                     </div>
                                 </td>
                                 <td>
@@ -285,7 +285,7 @@ str_replace('%%title%%', __('My Comment Subscriptions', 'comment-mail'), $site_h
                                     <?php endif; ?>
 
                                     <?php if ($_sub->comment_id) : ?><br />
-                                        <i class="fa fa-level-up fa-rotate-90"></i>
+                                        <i class="fa fa-level-up fa-rotate-90" aria-hidden="true"></i>
 
                                         <?php if ($_sub_comment) : ?>
                                             <?php if ($_subscribed_to_own_comment) : ?>

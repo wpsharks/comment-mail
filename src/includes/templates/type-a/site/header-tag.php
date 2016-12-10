@@ -44,7 +44,7 @@ $icon_bubbles_url = $plugin->utils_url->to('/src/client-s/images/icon-bubbles.pn
     <h1>
         <?php echo esc_html($blog_name_clip); ?><br />
         <a href="<?php echo esc_attr($home_url); ?>">
-            <small><i class="fa fa-link"></i> <?php echo esc_html($current_host_path); ?></small>
+            <small><i class="fa fa-link" aria-hidden="true"></i> <?php echo esc_html($current_host_path); ?></small>
         </a>
     </h1>
     <img src="<?php echo esc_attr($icon_bubbles_url); ?>" class="icon-bubbles" />

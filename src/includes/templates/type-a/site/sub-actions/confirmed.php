@@ -38,7 +38,7 @@ echo str_replace('%%title%%', __('Confirmation', 'comment-mail'), $site_header);
                 <ul class="list-unstyled">
                     <?php foreach ($error_codes as $_error_code) : ?>
                         <li>
-                            <i class="fa fa-warning fa-fw"></i>
+                            <i class="fa fa-warning fa-fw" aria-hidden="true"></i>
                             <?php
                             switch ($_error_code) {
                                 case 'missing_sub_key':
@@ -110,7 +110,7 @@ echo str_replace('%%title%%', __('Confirmation', 'comment-mail'), $site_header);
 
             <div class="alert alert-success">
                 <h4 style="margin:0;">
-                    <i class="fa fa-check fa-fw"></i> <?php echo sprintf(__('Confirmed successfully. Thank you%1$s!', 'comment-mail'), $sub->fname ? ' '.esc_html($sub->fname) : ''); ?>
+                    <i class="fa fa-check fa-fw" aria-hidden="true"></i> <?php echo sprintf(__('Confirmed successfully. Thank you%1$s!', 'comment-mail'), $sub->fname ? ' '.esc_html($sub->fname) : ''); ?>
                 </h4>
             </div>
 
@@ -129,7 +129,7 @@ echo str_replace('%%title%%', __('Confirmation', 'comment-mail'), $site_header);
             </h4>
 
             <h4>
-                <i class="fa fa-thumb-tack"></i>
+                <i class="fa fa-thumb-tack" aria-hidden="true"></i>
                 <?php if ($sub_comment) : // A specific comment? ?>
                     <em><a href="<?php echo esc_attr($sub_comment_url); ?>"><?php echo esc_html($sub_post_title_clip); ?></a></em>
                 <?php else : // Subscribing to all comments/replies to this post. ?>
@@ -159,7 +159,7 @@ echo str_replace('%%title%%', __('Confirmation', 'comment-mail'), $site_header);
             <hr style="margin:0 0 1em 0;" />
 
             <h5 style="font-style:italic; margin:0;">
-                <i class="fa fa-lightbulb-o"></i> <?php echo sprintf(__('If any of this is incorrect, please <a href="%1$s">click here to edit</a> your subscription.', 'comment-mail'), esc_attr($sub_edit_url)); ?>
+                <i class="fa fa-lightbulb-o" aria-hidden="true"></i> <?php echo sprintf(__('If any of this is incorrect, please <a href="%1$s">click here to edit</a> your subscription.', 'comment-mail'), esc_attr($sub_edit_url)); ?>
             </h5>
 
         <?php endif; // END: confirmed successfully w/ no major errors. ?>

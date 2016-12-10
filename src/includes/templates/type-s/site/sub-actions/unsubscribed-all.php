@@ -33,7 +33,7 @@ echo str_replace('%%title%%', __('Unsubscribe All', 'comment-mail'), $site_heade
                 <ul class="list-unstyled">
                     <?php foreach ($error_codes as $_error_code) : ?>
                         <li>
-                            <i class="fa fa-warning fa-fw"></i>
+                            <i class="fa fa-warning fa-fw" aria-hidden="true"></i>
                             <?php
                             switch ($_error_code) {
                                 case 'missing_sub_email':

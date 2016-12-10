@@ -21,98 +21,98 @@ abstract class MenuPageTableBase extends \WP_List_Table
      */
 
     /**
-     * @type Plugin Plugin reference.
+     * @var Plugin Plugin reference.
      *
      * @since 141111 First documented version.
      */
     protected $plugin;
 
     /**
-     * @type string Singular item name.
+     * @var string Singular item name.
      *
      * @since 141111 First documented version.
      */
     protected $singular_name;
 
     /**
-     * @type string Singular item label.
+     * @var string Singular item label.
      *
      * @since 141111 First documented version.
      */
     protected $singular_label;
 
     /**
-     * @type string Plural item name.
+     * @var string Plural item name.
      *
      * @since 141111 First documented version.
      */
     protected $plural_name;
 
     /**
-     * @type string Plural item label.
+     * @var string Plural item label.
      *
      * @since 141111 First documented version.
      */
     protected $plural_label;
 
     /**
-     * @type string Regex for sub IDs.
+     * @var string Regex for sub IDs.
      *
      * @since 141111 First documented version.
      */
     protected $sub_ids_regex;
 
     /**
-     * @type string Regex for sub emails.
+     * @var string Regex for sub emails.
      *
      * @since 150527 Bug fix; missing property.
      */
     protected $sub_emails_regex;
 
     /**
-     * @type string Regex for user IDs.
+     * @var string Regex for user IDs.
      *
      * @since 141111 First documented version.
      */
     protected $user_ids_regex;
 
     /**
-     * @type string Regex for post IDs.
+     * @var string Regex for post IDs.
      *
      * @since 141111 First documented version.
      */
     protected $post_ids_regex;
 
     /**
-     * @type string Regex for comment IDs.
+     * @var string Regex for comment IDs.
      *
      * @since 141111 First documented version.
      */
     protected $comment_ids_regex;
 
     /**
-     * @type string Regex for `AND`.
+     * @var string Regex for `AND`.
      *
      * @since 141111 First documented version.
      */
     protected $and_regex;
 
     /**
-     * @type string Regex for statuses.
+     * @var string Regex for statuses.
      *
      * @since 141111 First documented version.
      */
     protected $statuses_regex;
 
     /**
-     * @type string Regex for events.
+     * @var string Regex for events.
      *
      * @since 141111 First documented version.
      */
     protected $events_regex;
 
     /**
-     * @type array Merged result sets.
+     * @var array Merged result sets.
      *
      * @since 141111 First documented version.
      */
@@ -633,7 +633,7 @@ abstract class MenuPageTableBase extends \WP_List_Table
         $post_comments_status   = $this->plugin->utils_i18n->statusLabel($this->plugin->utils_db->postCommentStatusI18n($item->{$prefix.'comment_status'}), 'ucwords');
         $post_edit_comments_url = $this->plugin->utils_url->postEditCommentsShort($item->{$key});
         $post_total_subs        = $this->plugin->utils_sub->queryTotal($item->{$key});
-        $post_total_comments    = (integer) $item->{$prefix.'comment_count'};
+        $post_total_comments    = (int) $item->{$prefix.'comment_count'};
 
         $post_info = $this->plugin->utils_markup->subsCount($item->{$key}, $post_total_subs).
                      $this->plugin->utils_markup->commentCount($item->{$key}, $post_total_comments).
@@ -1020,8 +1020,9 @@ abstract class MenuPageTableBase extends \WP_List_Table
             return '';
         }
         $_GET['s'] = $_REQUEST['s'] = addslashes($s);
+
         if (isset($_POST['s'])) {
-            $_POST['s'] = addslashes($s);
+            $_POST['s'] = $_REQUEST['s'];
         }
         return $s; // Raw query.
     }
@@ -1037,6 +1038,9 @@ abstract class MenuPageTableBase extends \WP_List_Table
     {
         $s = $this->getRawSearchQuery();
 
+        if ($s && strpos($s, '@') !== false && is_email($s)) {
+            $s = ''; // Goes into email addresses.
+        }
         $s = $s ? preg_replace($this->sub_ids_regex, '', $s) : '';
         $s = $s ? preg_replace($this->sub_emails_regex, '', $s) : '';
         $s = $s ? preg_replace($this->user_ids_regex, '', $s) : '';
@@ -1076,12 +1080,11 @@ abstract class MenuPageTableBase extends \WP_List_Table
 
         if ($s && preg_match_all($this->sub_ids_regex, $s, $_m)) {
             foreach (preg_split('/[|;,]+/', implode(',', $_m['sub_ids']), null, PREG_SPLIT_NO_EMPTY) as $_sub_id) {
-                if (($_sub_id = (integer) $_sub_id) > 0) {
+                if (($_sub_id = (int) $_sub_id) > 0) {
                     $sub_ids[$_sub_id] = $_sub_id;
                 }
             }
-        }
-        unset($_m, $_sub_id); // Housekeeping.
+        } // unset($_m, $_sub_id); // Housekeeping.
 
         return $sub_ids;
     }
@@ -1098,14 +1101,16 @@ abstract class MenuPageTableBase extends \WP_List_Table
         $sub_emails = []; // Initialize.
         $s          = $this->getRawSearchQuery();
 
-        if ($s && preg_match_all($this->sub_emails_regex, $s, $_m)) {
+        if ($s && strpos($s, '@') !== false && is_email($s)) {
+            $s              = strtolower($s);
+            $sub_emails[$s] = $s; // Email address.
+        } elseif ($s && preg_match_all($this->sub_emails_regex, $s, $_m)) {
             foreach (preg_split('/[|;,]+/', implode(',', $_m['sub_emails']), null, PREG_SPLIT_NO_EMPTY) as $_sub_email) {
                 if (($_sub_email = trim(strtolower($_sub_email)))) {
                     $sub_emails[$_sub_email] = $_sub_email;
                 }
             }
-        }
-        unset($_m, $_sub_email); // Housekeeping.
+        } // unset($_m, $_sub_email); // Housekeeping.
 
         return $sub_emails;
     }
@@ -1124,12 +1129,11 @@ abstract class MenuPageTableBase extends \WP_List_Table
 
         if ($s && preg_match_all($this->user_ids_regex, $s, $_m)) {
             foreach (preg_split('/[|;,]+/', implode(',', $_m['user_ids']), null, PREG_SPLIT_NO_EMPTY) as $_user_id) {
-                if (($_user_id = (integer) $_user_id) > 0) {
+                if (($_user_id = (int) $_user_id) > 0) {
                     $user_ids[$_user_id] = $_user_id;
                 }
             }
-        }
-        unset($_m, $_user_id); // Housekeeping.
+        } // unset($_m, $_user_id); // Housekeeping.
 
         return $user_ids;
     }
@@ -1148,12 +1152,11 @@ abstract class MenuPageTableBase extends \WP_List_Table
 
         if ($s && preg_match_all($this->post_ids_regex, $s, $_m)) {
             foreach (preg_split('/[|;,]+/', implode(',', $_m['post_ids']), null, PREG_SPLIT_NO_EMPTY) as $_post_id) {
-                if (($_post_id = (integer) $_post_id) > 0) {
+                if (($_post_id = (int) $_post_id) > 0) {
                     $post_ids[$_post_id] = $_post_id;
                 }
             }
-        }
-        unset($_m, $_post_id); // Housekeeping.
+        } // unset($_m, $_post_id); // Housekeeping.
 
         return $post_ids;
     }
@@ -1172,12 +1175,11 @@ abstract class MenuPageTableBase extends \WP_List_Table
 
         if ($s && preg_match_all($this->comment_ids_regex, $s, $_m)) {
             foreach (preg_split('/[|;,]+/', implode(',', $_m['comment_ids']), null, PREG_SPLIT_NO_EMPTY) as $_comment_id) {
-                if (($_comment_id = (integer) $_comment_id) > 0) {
+                if (($_comment_id = (int) $_comment_id) > 0) {
                     $comment_ids[$_comment_id] = $_comment_id;
                 }
             }
-        }
-        unset($_m, $_comment_id); // Housekeeping.
+        } // unset($_m, $_comment_id); // Housekeeping.
 
         return $comment_ids;
     }
@@ -1200,8 +1202,7 @@ abstract class MenuPageTableBase extends \WP_List_Table
                     $statuses[$_status] = $_status;
                 }
             }
-        }
-        unset($_m, $_status); // Housekeeping.
+        } // unset($_m, $_status); // Housekeeping.
 
         return $statuses;
     }
@@ -1224,8 +1225,7 @@ abstract class MenuPageTableBase extends \WP_List_Table
                     $events[$_event] = $_event;
                 }
             }
-        }
-        unset($_m, $_event); // Housekeeping.
+        } // unset($_m, $_event); // Housekeeping.
 
         return $events;
     }
@@ -1362,7 +1362,7 @@ abstract class MenuPageTableBase extends \WP_List_Table
         $order                       = $this->getOrder();
 
         $this->setItems([]); // `$this->items` = an array of \stdClass objects.
-        $this->setTotalItemsAvailable((integer) $this->plugin->utils_db->wp->get_var('SELECT FOUND_ROWS()'));
+        $this->setTotalItemsAvailable((int) $this->plugin->utils_db->wp->get_var('SELECT FOUND_ROWS()'));
 
         $this->prepareItemsMergeSubProperties();
         $this->prepareItemsMergeUserProperties();
@@ -1418,7 +1418,7 @@ abstract class MenuPageTableBase extends \WP_List_Table
     protected function getPerPage()
     {
         $max_limit       = $this->plugin->utils_user->screenOption($this->screen, 'per_page');
-        $upper_max_limit = (integer) apply_filters(get_class($this).'_upper_max_limit', 1000);
+        $upper_max_limit = (int) apply_filters(get_class($this).'_upper_max_limit', 1000);
 
         $max_limit = $max_limit < 1 ? 1 : $max_limit;
         $max_limit = $max_limit > $upper_max_limit ? 100 : $max_limit;
@@ -1476,7 +1476,7 @@ abstract class MenuPageTableBase extends \WP_List_Table
     protected function setTotalItemsAvailable($calc_found_rows)
     {
         $per_page    = $this->getPerPage();
-        $total_items = (integer) $calc_found_rows;
+        $total_items = (int) $calc_found_rows;
         $total_pages = ceil($total_items / $per_page);
         $this->set_pagination_args(compact('per_page', 'total_items', 'total_pages'));
 
@@ -1974,7 +1974,7 @@ abstract class MenuPageTableBase extends \WP_List_Table
      */
     protected function processBulkAction($bulk_action, array $ids)
     {
-        return !empty($counter) ? (integer) $counter : 0;
+        return !empty($counter) ? (int) $counter : 0;
     }
 
     /*
@@ -2080,7 +2080,7 @@ abstract class MenuPageTableBase extends \WP_List_Table
         unset($_comment_id, $_comment); // Housekeeping.
 
         foreach ($subs as $_sub) { // `\stdClass` objects.
-            /** @type $_sub \stdClass Reference for IDEs. */
+            /** @var $_sub \stdClass Reference for IDEs. */
             if (isset($sub_lis[$_sub->ID])) {
                 continue; // Duplicate.
             }
@@ -2120,7 +2120,7 @@ abstract class MenuPageTableBase extends \WP_List_Table
         unset($_sub_email, $_name_email_args); // Housekeeping.
 
         foreach ($users as $_user) { // `\WP_User` objects.
-            /** @type $_user \WP_User Reference for IDEs. */
+            /** @var $_user \WP_User Reference for IDEs. */
             if (isset($user_lis[$_user->ID])) {
                 continue; // Duplicate.
             }
@@ -2141,7 +2141,7 @@ abstract class MenuPageTableBase extends \WP_List_Table
         unset($_user, $_name_email_args, $_user_edit_link); // Housekeeping.
 
         foreach ($posts as $_post) { // `\WP_Post` objects.
-            /** @type $_post \WP_Post Reference for IDEs. */
+            /** @var $_post \WP_Post Reference for IDEs. */
             if (isset($post_lis[$_post->ID])) {
                 continue; // Duplicate.
             }
@@ -2164,7 +2164,7 @@ abstract class MenuPageTableBase extends \WP_List_Table
         foreach ($comments as $_comment) {
             // `\stdClass` objects.
 
-            /** @type $_comment \stdClass Reference for IDEs. */
+            /** @var $_comment \stdClass Reference for IDEs. */
             /* @var $_post \WP_Post Reference for IDEs. */
 
             if (isset($comment_lis[$_comment->comment_ID])) {
@@ -2293,7 +2293,6 @@ abstract class MenuPageTableBase extends \WP_List_Table
                     $m[3] = wp_specialchars_decode($m[3], ENT_QUOTES);
                     $m[3] = add_query_arg('s', urlencode($raw_search_query), $m[3]);
                     return $m[1].$m[2].esc_attr($m[3]).$m[4]; #
-
                 },
                 $column_headers
             );

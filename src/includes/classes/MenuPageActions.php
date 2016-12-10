@@ -17,7 +17,7 @@ namespace WebSharks\CommentMail;
 class MenuPageActions extends AbsBase
 {
     /**
-     * @type array Valid actions.
+     * @var array Valid actions.
      *
      * @since 141111 First documented version.
      */
@@ -47,6 +47,8 @@ class MenuPageActions extends AbsBase
             'sub_form_user_id_info_via_ajax',
 
             'stats_chart_data_via_ajax',
+
+            'process_queue',
 
             
         ];
@@ -304,7 +306,7 @@ class MenuPageActions extends AbsBase
         if (!isset($request_args['post_id'])) {
             exit; // Missing post ID.
         }
-        if (($post_id = (integer) $request_args['post_id']) < 0) {
+        if (($post_id = (int) $request_args['post_id']) < 0) {
             exit; // Invalid post ID.
         }
         if (!current_user_can($this->plugin->manage_cap)) {
@@ -331,7 +333,7 @@ class MenuPageActions extends AbsBase
         if (!isset($request_args['user_id'])) {
             exit; // Missing user ID.
         }
-        if (($user_id = (integer) $request_args['user_id']) < 0) {
+        if (($user_id = (int) $request_args['user_id']) < 0) {
             exit; // Invalid user ID.
         }
         if (!current_user_can($this->plugin->manage_cap)) {
@@ -365,6 +367,29 @@ class MenuPageActions extends AbsBase
         new ChartData($request_args); // With JSON output.
 
         exit(); // Stop after output; always.
+    }
+
+    /**
+     * Process the mail queue.
+     *
+     * @since 161202 Adding manual queue processor.
+     *
+     * @param mixed $request_args Input argument(s).
+     */
+    protected function processQueue($request_args)
+    {
+        $request_args = null; // Not used here.
+
+        if (current_user_can($this->plugin->manage_cap)) {
+            $QueueProcessor    = new QueueProcessor(false);
+            $processed_entries = $QueueProcessor->processedEntries();
+
+            $notice_markup = // Notice regarding queue processor running successfully.
+                sprintf(_n('A single queue-runner processed <code>%1$s</code> entry.', 'A single queue-runner processed <code>%1$s</code> entries.', $processed_entries, 'comment-mail'), esc_html($processed_entries)).'<br />'.
+                sprintf(__('<small><em><strong>Note:</strong> Each queue runner works for up to %1$s seconds and it will process up to %2$s queued emails. If additional emails remain in the queue (and they\'re ready to be sent) you can run again to continue processing.</em></small>', 'comment-mail'), esc_html($this->plugin->options['queue_processor_max_time']), esc_html($this->plugin->options['queue_processor_max_limit']));
+            $this->plugin->enqueueUserNotice($notice_markup, ['transient' => true]);
+        }
+        wp_redirect($this->plugin->utils_url->queueMenuPageOnly()).exit();
     }
 
     

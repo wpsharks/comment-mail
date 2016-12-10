@@ -39,7 +39,7 @@ echo str_replace('%%title%%', __('Unsubscribe', 'comment-mail'), $site_header); 
                 <ul class="list-unstyled">
                     <?php foreach ($error_codes as $_error_code) : ?>
                         <li>
-                            <i class="fa fa-warning fa-fw"></i>
+                            <i class="fa fa-warning fa-fw" aria-hidden="true"></i>
                             <?php
                             switch ($_error_code) {
                                 case 'missing_sub_key':
@@ -115,7 +115,7 @@ echo str_replace('%%title%%', __('Unsubscribe', 'comment-mail'), $site_header); 
 
             <div class="alert alert-success" style="margin:0;">
                 <h4 style="margin:0;">
-                    <i class="fa fa-check fa-fw"></i> <?php echo __('Unsubscribed successfully. Sorry to see you go!', 'comment-mail'); ?>
+                    <i class="fa fa-check fa-fw" aria-hidden="true"></i> <?php echo __('Unsubscribed successfully. Sorry to see you go!', 'comment-mail'); ?>
                 </h4>
             </div>
 
@@ -124,7 +124,7 @@ echo str_replace('%%title%%', __('Unsubscribe', 'comment-mail'), $site_header); 
                    data-action="<?php echo esc_attr($sub_unsubscribe_all_url); ?>"
                    data-confirmation="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address? Are you absolutely sure?', 'comment-mail'); ?>"
                    title="<?php echo __('Delete (unsubscribe) ALL subscriptions associated with your email address?', 'comment-mail'); ?>">
-                    <i class="fa fa-times-circle"></i> <?php echo __('Unsubscribe All?', 'comment-mail'); ?>
+                    <i class="fa fa-times-circle" aria-hidden="true"></i> <?php echo __('Unsubscribe All?', 'comment-mail'); ?>
                 </a>
             </div>
 
@@ -143,7 +143,7 @@ echo str_replace('%%title%%', __('Unsubscribe', 'comment-mail'), $site_header); 
             </h4>
 
             <h4>
-                <i class="fa fa-thumb-tack"></i>
+                <i class="fa fa-thumb-tack" aria-hidden="true"></i>
                 <?php if ($sub_post && $sub_comment) : // A specific comment? ?>
                     <em><a href="<?php echo esc_attr($sub_comment_url); ?>"><?php echo esc_html($sub_post_title_clip); ?></a></em>
                 <?php elseif ($sub_post) : // Unsubscribing from all comments/replies. ?>
@@ -156,7 +156,7 @@ echo str_replace('%%title%%', __('Unsubscribe', 'comment-mail'), $site_header); 
             <hr style="margin:0 0 1em 0;" />
 
             <h5 style="font-style:italic; margin:0;">
-                <i class="fa fa-frown-o"></i> <?php echo sprintf(__('Too many emails? ~ Please feel free to <a href="%1$s">add a new/different subscription</a> if you like!', 'comment-mail'), esc_attr($sub_new_url)); ?>
+                <i class="fa fa-frown-o" aria-hidden="true"></i> <?php echo sprintf(__('Too many emails? ~ Please feel free to <a href="%1$s">add a new/different subscription</a> if you like!', 'comment-mail'), esc_attr($sub_new_url)); ?>
             </h5>
 
             <?php

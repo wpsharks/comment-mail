@@ -588,6 +588,24 @@ class UtilsUrl extends AbsBase
     }
 
     /**
+     * Manual queue processing URL.
+     *
+     * @since 161202 Manual queue processing.
+     *
+     * @param string|null $scheme Optional . Defaults to `admin`.
+     *                            See {@link set_scheme()} method for further details.
+     *
+     * @return string Manual queue processing URL.
+     */
+    public function processQueue($scheme = 'admin')
+    {
+        $url  = $this->mainMenuPageNonceOnly(GLOBAL_NS, $scheme);
+        $args = [GLOBAL_NS => ['process_queue' => time()]];
+
+        return add_query_arg(urlencode_deep($args), $url);
+    }
+
+    /**
      * Restore default options URL.
      *
      * @since 141111 First documented version.

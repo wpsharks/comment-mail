@@ -18,7 +18,7 @@ namespace WebSharks\CommentMail;
 <?php echo $form_fields->selectRow(
     [
         'placeholder'         => __('— All Comments/Replies —', 'comment-mail'),
-        'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment', 'comment-mail'),
+        'label'               => __('<i class="fa fa-fw fa-comment-o" aria-hidden="true"></i> Comment', 'comment-mail'),
         'name'                => 'comment_id', 'required' => false, 'options' => '%%comments%%', 'post_id' => $post_id, 'current_value' => null,
         'input_fallback_args' => ['type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'current_value_empty_on_0' => true],
     ]

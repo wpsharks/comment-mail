@@ -75,20 +75,20 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
                 <ul class="list-unstyled">
                     <?php foreach ($processing_successes_html as $_success_code => $_success_html) : ?>
                         <li>
-                            <i class="fa fa-check fa-fw"></i> <?php echo $_success_html; ?>
+                            <i class="fa fa-check fa-fw" aria-hidden="true"></i> <?php echo $_success_html; ?>
                         </li>
                     <?php endforeach; ?>
                 </ul>
                     <p style="margin-top:1em;">
                         <?php if ($is_edit || ($current_email && $has_subscriptions)) : ?>
                             <a href="<?php echo esc_attr($plugin->utils_url->subManageSummaryUrl($sub_key, null, true)); ?>">
-                                <i class="fa fa-arrow-circle-left"></i> <?php echo __('Back to My Subscriptions', 'comment-mail'); ?>
+                                <i class="fa fa-arrow-circle-left" aria-hidden="true"></i> <?php echo __('Back to My Subscriptions', 'comment-mail'); ?>
                             </a>
                         <?php endif; ?>
                     </p>
             </div>
 
-        <?php elseif ($error_codes) : // Any other major errors? ?>
+        <?php elseif ($error_codes) : // Any other major errors??>
 
             <div class="alert alert-danger" style="margin:0;">
                 <h4>
@@ -97,7 +97,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
                 <ul class="list-unstyled">
                     <?php foreach ($error_codes as $_error_code) : ?>
                         <li>
-                            <i class="fa fa-warning fa-fw"></i>
+                            <i class="fa fa-warning fa-fw" aria-hidden="true"></i>
                             <?php
                             switch ($_error_code) {
                                 case 'missing_sub_key':
@@ -120,7 +120,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
                 </ul>
             </div>
 
-        <?php else : // Display form; there are no major errors. ?>
+        <?php else : // Display form; there are no major errors.?>
 
             <?php
             /*
@@ -135,7 +135,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
             $sub_summary_return_url = $plugin->utils_url->subManageSummaryUrl($sub_key, null, true);
             ?>
 
-            <?php if ($processing && $processing_errors) : // Any processing errors? ?>
+            <?php if ($processing && $processing_errors) : // Any processing errors??>
 
                 <div class="alert alert-danger">
                     <h4>
@@ -144,7 +144,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
                     <ul class="list-unstyled">
                         <?php foreach ($processing_errors_html as $_error_code => $_error_html) : ?>
                             <li>
-                                <i class="fa fa-warning fa-fw"></i> <?php echo $_error_html; ?>
+                                <i class="fa fa-warning fa-fw" aria-hidden="true"></i> <?php echo $_error_html; ?>
                             </li>
                         <?php endforeach; ?>
                     </ul>
@@ -152,7 +152,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
 
             <?php endif; ?>
 
-            <?php if ($processing && $processing_successes) : // Any processing successes? ?>
+            <?php if ($processing && $processing_successes) : // Any processing successes??>
 
                 <div class="alert alert-success">
                     <h4>
@@ -161,14 +161,14 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
                     <ul class="list-unstyled">
                         <?php foreach ($processing_successes_html as $_success_code => $_success_html) : ?>
                             <li>
-                                <i class="fa fa-check fa-fw"></i> <?php echo $_success_html; ?>
+                                <i class="fa fa-check fa-fw" aria-hidden="true"></i> <?php echo $_success_html; ?>
                             </li>
                         <?php endforeach; ?>
                     </ul>
                         <p style="margin-top:1em;">
                             <?php if ($is_edit || ($current_email && $has_subscriptions)) : ?>
                                 <a href="<?php echo esc_attr($sub_summary_return_url); ?>">
-                                    <i class="fa fa-arrow-circle-left"></i> <?php echo __('Back to My Subscriptions', 'comment-mail'); ?>
+                                    <i class="fa fa-arrow-circle-left" aria-hidden="true"></i> <?php echo __('Back to My Subscriptions', 'comment-mail'); ?>
                                 </a>
                             <?php endif; ?>
                         </p>
@@ -179,12 +179,12 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
                 <h2 style="margin-top:0;">
                     <?php if ($is_edit || ($current_email && $has_subscriptions)) : ?>
                         <a href="<?php echo esc_attr($sub_summary_return_url); ?>" title="<?php echo __('Back to My Subscriptions', 'comment-mail'); ?>">
-                            <i class="fa fa-arrow-circle-left pull-right"></i>
+                            <i class="fa fa-arrow-circle-left pull-right" aria-hidden="true"></i>
                         </a>
                     <?php endif; ?>
                     <?php if ($is_edit) : ?>
                         <?php echo __('Edit Subscription', 'comment-mail'); ?>
-                    <?php else : // Creating a new subscription. ?>
+                    <?php else : // Creating a new subscription.?>
                         <?php echo __('Add New Subscription', 'comment-mail'); ?>
                     <?php endif; ?>
                 </h2>
@@ -199,7 +199,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
                         <?php echo $form_fields->selectRow(
                             [
                                 'placeholder'         => __('Select a Post...', 'comment-mail'),
-                                'label'               => __('<i class="fa fa-fw fa-thumb-tack"></i> Post', 'comment-mail'),
+                                'label'               => __('<i class="fa fa-fw fa-thumb-tack" aria-hidden="true"></i> Post', 'comment-mail'),
                                 'name'                => 'post_id', 'required' => true, 'options' => '%%posts%%', 'current_value' => $current_value_for('post_id'),
                                 'notes_after'         => __('Required; the Post you\'re subscribing to.', 'comment-mail'),
                                 'input_fallback_args' => ['type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'placeholder' => '', 'current_value_empty_on_0' => true],
@@ -208,7 +208,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
                         <?php echo $form_fields->selectRow(
                             [ // Note: if you change this row; also change the AJAX template variation.
                                 'placeholder'         => __('— All Comments/Replies —', 'comment-mail'),
-                                'label'               => __('<i class="fa fa-fw fa-comment-o"></i> Comment', 'comment-mail'),
+                                'label'               => __('<i class="fa fa-fw fa-comment-o" aria-hidden="true"></i> Comment', 'comment-mail'),
                                 'name'                => 'comment_id', 'required' => false, 'options' => '%%comments%%', 'post_id' => $current_value_for('post_id'), 'current_value' => $current_value_for('comment_id'),
                                 'input_fallback_args' => ['type' => 'number', 'maxlength' => 20, 'other_attrs' => 'min="1" max="18446744073709551615"', 'current_value_empty_on_0' => true],
                             ]
@@ -221,19 +221,19 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
                     <?php echo $form_fields->inputRow(
                         [
                             'type'  => 'email', // For `<input>` type.
-                            'label' => __('<i class="fa fa-fw fa-envelope-o"></i> Email', 'comment-mail'),
+                            'label' => __('<i class="fa fa-fw fa-envelope-o" aria-hidden="true"></i> Email', 'comment-mail'),
                             'name'  => 'email', 'required' => true, 'maxlength' => 100, 'current_value' => $current_value_for('email'),
                         ]
                     ); ?>
                     <?php echo $form_fields->inputRow(
                         [
-                            'label' => __('<i class="fa fa-fw fa-pencil-square-o"></i> First Name', 'comment-mail'),
+                            'label' => __('<i class="fa fa-fw fa-pencil-square-o" aria-hidden="true"></i> First Name', 'comment-mail'),
                             'name'  => 'fname', 'required' => true, 'maxlength' => 50, 'current_value' => $current_value_for('fname'),
                         ]
                     ); ?>
                     <?php echo $form_fields->inputRow(
                         [
-                            'label' => __('<i class="fa fa-fw fa-level-up fa-rotate-90"></i> Last Name', 'comment-mail'),
+                            'label' => __('<i class="fa fa-fw fa-level-up fa-rotate-90" aria-hidden="true"></i> Last Name', 'comment-mail'),
                             'name'  => 'lname', 'required' => false, 'maxlength' => 100, 'current_value' => $current_value_for('lname'),
                         ]
                     ); ?>
@@ -241,11 +241,11 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
                     <?php echo $form_fields->horizontalLineRow(/* -------------------------------------------------------------------- */); ?>
                     <?php /* -------------------------------------------------------------------- */ ?>
 
-                    <?php if ($is_edit) : // Only for edits. ?>
+                    <?php if ($is_edit) : // Only for edits.?>
                         <?php echo $form_fields->selectRow(// New subscriptions always start w/ an `unconfirmed` status.
                             [
                                 'placeholder' => __('Select a Status...', 'comment-mail'),
-                                'label'       => __('<i class="fa fa-fw fa-flag-o"></i> Status', 'comment-mail'),
+                                'label'       => __('<i class="fa fa-fw fa-flag-o" aria-hidden="true"></i> Status', 'comment-mail'),
                                 'name'        => 'status', 'required' => true, 'options' => '%%status%%', 'current_value' => $current_value_for('status'),
                             ]
                         );
@@ -254,7 +254,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
                     <?php echo $form_fields->selectRow(
                         [
                             'placeholder' => __('Select a Delivery Option...', 'comment-mail'),
-                            'label'       => __('<i class="fa fa-fw fa-paper-plane-o"></i> Deliver', 'comment-mail'),
+                            'label'       => __('<i class="fa fa-fw fa-paper-plane-o" aria-hidden="true"></i> Deliver', 'comment-mail'),
                             'name'        => 'deliver', 'required' => true, 'options' => '%%deliver%%', 'current_value' => $current_value_for('deliver'),
                             'notes_after' => __('Any value that is not <code>instantly</code> results in a digest instead of instant notifications.', 'comment-mail'),
                         ]
@@ -265,7 +265,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
                 <hr />
 
                 <p>
-                    <?php echo $hidden_inputs(); // Required for processing. ?>
+                    <?php echo $hidden_inputs(); // Required for processing.?>
 
                     <?php echo '   <input type="submit"'.
                                ($is_edit  // Are they editing?
@@ -279,6 +279,10 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
             /* Javascript needed by this template.
              --------------------------------------------------------------------------------------------------------------------- */
             ?>
+            <?php if (!$plugin->options['enhance_select_options_enable']) : ?>
+                <script type="text/javascript">jQuery.fn.chosen = function() {};</script>
+            <?php endif; ?>
+
             <script type="text/javascript">
                 (function($) // Primary closure w/ jQuery; strict standards.
                 {
@@ -384,7 +388,7 @@ echo str_replace('%%title%%', $is_edit ? __('Edit Subscription', 'comment-mail')
             </script>
             <?php /* ---------------------------------------------------------------------------------------------------------- */ ?>
 
-        <?php endif; // END: display when no major errors. ?>
+        <?php endif; // END: display when no major errors.?>
     </div>
 
 <?php echo $site_footer; ?>

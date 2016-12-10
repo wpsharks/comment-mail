@@ -75,7 +75,7 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
     ]
 ); ?>
 
-    <?php foreach ($comments as $_comment) : // Comments in this notification. ?>
+    <?php foreach ($comments as $_comment) : // Comments in this notification.?>
         <hr />
         <?php
         // Parent comment, if applicable; i.e. if this comment is a reply to another.
@@ -84,26 +84,37 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
         // Parent comment URL, if applicable.
         $_comment_parent_url = $_comment_parent ? get_comment_link($_comment_parent->comment_ID) : '';
 
-        // A shorter clip of the full parent comment message body; in plain text.
-        $_comment_parent_clip = $_comment_parent ? $plugin->utils_markup->commentContentClip($_comment_parent, 'notification_parent') : '';
-
+        // A shorter clip of the full parent comment message body in plain text.
+        // Or, if clipping is disabled, this will be equal to the full comment content (raw HTML).
+        if ($_comment_parent && $plugin->options['comment_notification_clipping_enable']) {
+            $_comment_parent_content = esc_html($plugin->utils_markup->commentContentClip($_comment_parent, 'notification_parent', false));
+        } elseif ($_comment_parent) {
+            $_comment_parent_content = $plugin->utils_markup->commentContent($_comment_parent);
+        } else {
+            $_comment_parent_content = ''; // Default (empty).
+        }
         // A reply to their own comment?
         $_comment_reply_to_own_comment = $_comment_parent && strcasecmp($_comment_parent->comment_author_email, $sub->email) === 0;
 
         // URL to this comment; i.e. the one we're notifying about.
         $_comment_url = get_comment_link($_comment->comment_ID);
 
-        // URL to the reply link for this comment
+        // URL to the reply link for this comment.
         $_comment_reply_url = get_permalink($_comment->comment_post_ID).'?replytocom='.$_comment->comment_ID.'#respond';
 
         // How long ago the comment was posted on the site (human readable).
         $_comment_time_ago = $plugin->utils_date->approxTimeDifference(strtotime($_comment->comment_date_gmt));
 
-        // A shorter clip of the full comment message body; in plain text.
-        $_comment_clip = $plugin->utils_markup->commentContentClip($_comment, 'notification', false);
+        // A shorter clip of the full comment message body in plain text.
+        // Or, if clipping is disabled, this will be equal to the full comment content (raw HTML).
+        if ($plugin->options['comment_notification_clipping_enable']) {
+            $_comment_content = esc_html($plugin->utils_markup->commentContentClip($_comment, 'notification', false));
+        } else {
+            $_comment_content = $plugin->utils_markup->commentContent($_comment);
+        }
         
         ?>
-        <?php if ($_comment_parent) : // This is a reply to someone? ?>
+        <?php if ($_comment_parent) : // This is a reply to someone??>
 
             <?php echo $template->snippet(
                 'message-in-response-to.php',
@@ -111,7 +122,7 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
                     '[comment_parent_url]'         => esc_attr($_comment_parent_url),
                     '[comment_parent_id]'          => esc_html($_comment_parent->comment_ID),
                     '[comment_parent_author]'      => esc_html($_comment_parent->comment_author),
-                    '[comment_parent_clip]'        => esc_html($_comment_parent_clip),
+                    '[comment_parent_content]'     => $_comment_parent_content, '[comment_parent_clip]' => $_comment_parent_content,
                     'comment_reply_to_own_comment' => $_comment_reply_to_own_comment,
                 ]
             ); ?>
@@ -123,12 +134,16 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
                     '[comment_id]'       => esc_html($_comment->comment_ID),
                     '[comment_time_ago]' => esc_html($_comment_time_ago),
                     '[comment_author]'   => esc_html($_comment->comment_author),
-                    '[comment_clip]'     => esc_html($_comment_clip),
+                    '[comment_content]'  => $_comment_content, '[comment_clip]' => $_comment_content,
                 ]
             ); ?>
             <p>
                 <a href="<?php echo esc_attr($_comment_url); ?>">
-                    <?php echo __('Continue reading', 'comment-mail'); ?>
+                    <?php if ($plugin->options['comment_notification_clipping_enable']) : ?>
+                        <?php echo __('Continue Reading', 'comment-mail'); ?>
+                    <?php else : ?>
+                        <?php echo __('Jump to Thread', 'comment-mail'); ?>
+                    <?php endif; ?>
                 </a>
                 <?php if ($sub_post_comments_open) : ?>
                     | <a href="<?php echo esc_attr($_comment_reply_url); ?>">
@@ -142,7 +157,7 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
                 <?php endif; ?>
             </p>
 
-        <?php else : // A new comment; i.e. not a reply to someone. ?>
+        <?php else : // A new comment; i.e. not a reply to someone.?>
 
             <?php echo $template->snippet(
                 'message-comment-from.php',
@@ -151,12 +166,16 @@ $is_digest = count($comments) > 1; // `TRUE`, if more than one comment in the no
                     '[comment_id]'       => esc_html($_comment->comment_ID),
                     '[comment_time_ago]' => esc_html($_comment_time_ago),
                     '[comment_author]'   => esc_html($_comment->comment_author),
-                    '[comment_clip]'     => esc_html($_comment_clip),
+                    '[comment_content]'  => $_comment_content, '[comment_clip]' => $_comment_content,
                 ]
             ); ?>
             <p>
                 <a href="<?php echo esc_attr($_comment_url); ?>">
-                    <?php echo __('Continue reading', 'comment-mail'); ?>
+                    <?php if ($plugin->options['comment_notification_clipping_enable']) : ?>
+                        <?php echo __('Continue Reading', 'comment-mail'); ?>
+                    <?php else : ?>
+                        <?php echo __('Jump to Thread', 'comment-mail'); ?>
+                    <?php endif; ?>
                 </a>
                 <?php if ($sub_post_comments_open) : ?>
                     | <a href="<?php echo esc_attr($_comment_reply_url); ?>">

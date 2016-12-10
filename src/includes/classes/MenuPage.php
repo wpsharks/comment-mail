@@ -81,7 +81,7 @@ class MenuPage extends AbsBase
         /* ----------------------------------------------------------------------------------------- */
 
         echo '<div class="'.esc_attr(SLUG_TD.'-menu-page '.SLUG_TD.'-menu-page-options '.SLUG_TD.'-menu-page-area').'">'."\n";
-        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" novalidate="novalidate">'."\n";
+        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" novalidate="novalidate" autocomplete="off">'."\n";
 
         echo '      '.$this->heading(__('Plugin Options', 'comment-mail'), 'logo.png').
              '      '.$this->notes(); // Heading/notifications.
@@ -873,23 +873,44 @@ class MenuPage extends AbsBase
         /* ----------------------------------------------------------------------------------------- */
 
         if (IS_PRO || $this->plugin->utils_env->isProPreview()) {
-            $_panel_body = '<table>'.
-                           '  <tbody>'.
-                           $form_fields->inputRow(
+            $_panel_body = '<table style="margin:0;">'.
+                           ' <tbody>'.
+                           $form_fields->selectRow(
                                [
-                                   'type'          => 'number',
-                                   'label'         => __('Maximum Chars in Parent Comment Clips:', 'comment-mail'),
-                                   'placeholder'   => __('e.g., 100', 'comment-mail'),
-                                   'name'          => 'comment_notification_parent_content_clip_max_chars',
-                                   'other_attrs'   => 'min="1"',
-                                   'current_value' => $current_value_for('comment_notification_parent_content_clip_max_chars'),
-                                   'notes_after'   => '<p>'.sprintf(__('When %1$s notifies someone about a reply to their comment, there will first be a short clip of the original comment displayed to help offer some context; i.e., to show what the reply is pertaining to. How many characters (maximum) do you want to display in that short clip of the parent comment? The recommended setting is <code>100</code> characters, but you can change this to whatever you like. A very large number will prevent the parent comment from being clipped at all.', 'comment-mail'), esc_html(NAME)).'</p>',
+                                   'label'           => __('Enable Comment Content Clipping?', 'comment-mail'),
+                                   'placeholder'     => __('Select an Option...', 'comment-mail'),
+                                   'field_class'     => 'pmp-if-change', // JS change handler.
+                                   'name'            => 'comment_notification_clipping_enable',
+                                   'current_value'   => $current_value_for('comment_notification_clipping_enable'),
+                                   'allow_arbitrary' => false, // Must be one of these.
+                                   'options'         => [
+                                       '1' => __('Yes, clip comment content in email notifications (default behavhior)', 'comment-mail'),
+                                       '0' => __('No, do not clip comment content, use the full raw HTML in email notifications', 'comment-mail'),
+                                   ],
                                ]
                            ).
-                           '  </tbody>'.
+                           ' </tbody>'.
                            '</table>';
 
-            $_panel_body .= '<table>'.
+            $_panel_body .= '<div class="pmp-if-enabled-show"><hr />'.
+
+                            ' <table>'.
+                            '  <tbody>'.
+                            $form_fields->inputRow(
+                                [
+                                    'type'          => 'number',
+                                    'label'         => __('Maximum Chars in Parent Comment Clips:', 'comment-mail'),
+                                    'placeholder'   => __('e.g., 100', 'comment-mail'),
+                                    'name'          => 'comment_notification_parent_content_clip_max_chars',
+                                    'other_attrs'   => 'min="1"',
+                                    'current_value' => $current_value_for('comment_notification_parent_content_clip_max_chars'),
+                                    'notes_after'   => '<p>'.sprintf(__('When %1$s notifies someone about a reply to their comment, there will first be a short clip of the original comment displayed to help offer some context; i.e., to show what the reply is pertaining to. How many characters (maximum) do you want to display in that short clip of the parent comment? The recommended setting is <code>100</code> characters, but you can change this to whatever you like.', 'comment-mail'), esc_html(NAME)).'</p>',
+                                ]
+                            ).
+                            '  </tbody>'.
+                            ' </table>'.
+
+                            ' <table>'.
                             '  <tbody>'.
                             $form_fields->inputRow(
                                 [
@@ -899,11 +920,13 @@ class MenuPage extends AbsBase
                                     'name'          => 'comment_notification_content_clip_max_chars',
                                     'other_attrs'   => 'min="1"',
                                     'current_value' => $current_value_for('comment_notification_content_clip_max_chars'),
-                                    'notes_after'   => '<p>'.sprintf(__('For all other comment/reply notifications, there will be a short clip of the comment, along with a link to [continue reading] on your website. How many characters (maximum) do you want to display in those short clips of the comment or reply? The recommended setting is <code>200</code> characters, but you can change this to whatever you like. A very large number will prevent comments from being clipped at all.', 'comment-mail'), esc_html(NAME)).'</p>',
+                                    'notes_after'   => '<p>'.sprintf(__('For all other comment/reply notifications, there will be a short clip of the comment, along with a link to [continue reading] on your website. How many characters (maximum) do you want to display in those short clips of the comment or reply? The recommended setting is <code>200</code> characters, but you can change this to whatever you like.', 'comment-mail'), esc_html(NAME)).'</p>',
                                 ]
                             ).
                             '  </tbody>'.
-                            '</table>';
+                            ' </table>'.
+
+                            '</div>';
 
             echo $this->panel(__('Email Notification Clips', 'comment-mail'), $_panel_body, ['pro_only' => true]);
 
@@ -1154,8 +1177,13 @@ class MenuPage extends AbsBase
 
             $_panel_body .= '<div class="pmp-if-enabled-show pmp-if-nest"><hr />'.
 
-                            '<a href="http://comment-mail.com/r/sparkpost/" target="_blank">'.
-                            '<img src="'.esc_attr($this->plugin->utils_url->to('/src/client-s/images/sparkpost-rve.png')).'" class="pmp-right" style="margin-left:3em;" /></a>'.
+                            ' <div class="pmp-if-enabled-show pmp-if-value-sparkpost pmp-in-if-nest">'.
+                            '    <a href="http://comment-mail.com/r/sparkpost/" target="_blank"><img src="'.esc_attr($this->plugin->utils_url->to('/src/client-s/images/sparkpost-rve.png')).'" class="pmp-right" style="margin-left:3em;" /></a>'.
+                            '</div>'.
+
+                            ' <div class="pmp-if-enabled-show pmp-if-value-mandrill pmp-in-if-nest">'.
+                            '    <a href="http://comment-mail.com/r/mandrill/" target="_blank"><img src="'.esc_attr($this->plugin->utils_url->to('/src/client-s/images/mandrill-rve.png')).'" class="pmp-right" style="margin-left:3em;" /></a>'.
+                            '</div>'.
 
                             ' <table style="width:auto; margin-bottom:0;">'.
                             '    <tbody>'.
@@ -2012,7 +2040,7 @@ class MenuPage extends AbsBase
                             '  <tbody>'.
                             $form_fields->selectRow(
                                 [
-                                    'label'           => __('Select Menu Options; List Posts?', 'comment-mail'),
+                                    'label'           => __('Select Menu Options: List Posts?', 'comment-mail'),
                                     'placeholder'     => __('Select an Option...', 'comment-mail'),
                                     'name'            => 'post_select_options_enable',
                                     'current_value'   => $current_value_for('post_select_options_enable'),
@@ -2031,7 +2059,7 @@ class MenuPage extends AbsBase
                             '  <tbody>'.
                             $form_fields->selectRow(
                                 [
-                                    'label'           => __('Post Select Menu Options; Include Media?', 'comment-mail'),
+                                    'label'           => __('Post Select Menu Options: Include Media?', 'comment-mail'),
                                     'placeholder'     => __('Select an Option...', 'comment-mail'),
                                     'name'            => 'post_select_options_media_enable',
                                     'current_value'   => $current_value_for('post_select_options_media_enable'),
@@ -2052,7 +2080,7 @@ class MenuPage extends AbsBase
                             '  <tbody>'.
                             $form_fields->selectRow(
                                 [
-                                    'label'           => __('Select Menu Options; List Comments?', 'comment-mail'),
+                                    'label'           => __('Select Menu Options: List Comments?', 'comment-mail'),
                                     'placeholder'     => __('Select an Option...', 'comment-mail'),
                                     'name'            => 'comment_select_options_enable',
                                     'current_value'   => $current_value_for('comment_select_options_enable'),
@@ -2073,7 +2101,7 @@ class MenuPage extends AbsBase
                             '  <tbody>'.
                             $form_fields->selectRow(
                                 [
-                                    'label'           => __('Select Menu Options; List Users?', 'comment-mail'),
+                                    'label'           => __('Select Menu Options: List Users?', 'comment-mail'),
                                     'placeholder'     => __('Select an Option...', 'comment-mail'),
                                     'name'            => 'user_select_options_enable',
                                     'current_value'   => $current_value_for('user_select_options_enable'),
@@ -2083,6 +2111,27 @@ class MenuPage extends AbsBase
                                         '0' => __('No, disable user selection; I can enter user IDs manually', 'comment-mail'),
                                     ],
                                     'notes_after' => '<p>'.sprintf(__('On the back-end of %1$s, when you add/edit a subscription, %1$s can provide a drop-down menu with a list of all existing users for you to choose from. Would you like to enable or disable this feature? If disabled, you will need to enter any user IDs manually instead of being able to choose from a drop-down menu.', 'comment-mail'), esc_html(NAME)).'</p>',
+                                ]
+                            ).
+                            '  </tbody>'.
+                            '</table>';
+
+            $_panel_body .= '<hr />';
+
+            $_panel_body .= '<table>'.
+                            '  <tbody>'.
+                            $form_fields->selectRow(
+                                [
+                                    'label'           => __('Select Menu Options: Enhance?', 'comment-mail'),
+                                    'placeholder'     => __('Select an Option...', 'comment-mail'),
+                                    'name'            => 'enhance_select_options_enable',
+                                    'current_value'   => $current_value_for('enhance_select_options_enable'),
+                                    'allow_arbitrary' => false,
+                                    'options'         => [
+                                        '1' => __('Yes, enhance select menu options using jQuery Chosen extension', 'comment-mail'),
+                                        '0' => __('No, do not enhance (better accessibility; i.e., better screen reader compatibility)', 'comment-mail'),
+                                    ],
+                                    'notes_after' => '<p>'.__('Set this to <code>No</code> if you are more concerned about accessibility than presentation; i.e., <code>No</code> = more friendly to the visually impaired.', 'comment-mail').'</p>',
                                 ]
                             ).
                             '  </tbody>'.
@@ -2175,7 +2224,7 @@ class MenuPage extends AbsBase
             ];
             $_form_fields = new FormFields($_form_field_args);
 
-            $_panel_body = '<form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" novalidate="novalidate">'."\n";
+            $_panel_body = '<form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" novalidate="novalidate" autocomplete="off">'."\n";
 
             $_panel_body .= ' <h3 style="margin-bottom:0;">'.sprintf(__('Import New %1$s&trade; Subscriptions, or Update Existing Subscriptions', 'comment-mail'), esc_html(NAME)).'</h3>';
             $_panel_body .= ' <p>'.sprintf(__('The importation routine will accept direct CSV input in the textarea below, or you can choose to upload a prepared CSV file.', 'comment-mail'), esc_html(NAME)).'</p>';
@@ -2259,8 +2308,7 @@ class MenuPage extends AbsBase
             ];
             $_form_fields = new FormFields($_form_field_args);
 
-            $_panel_body = '<form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'"'.
-                           ' target="'.esc_attr(GLOBAL_NS.'_import_stcr_iframe').'" novalidate="novalidate">'."\n";
+            $_panel_body = '<form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" target="'.esc_attr(GLOBAL_NS.'_import_stcr_iframe').'" novalidate="novalidate" autocomplete="off">'."\n";
 
             $_panel_body .= ' <table style="table-layout:auto;">'.
                             '    <tbody>'.
@@ -2320,7 +2368,7 @@ class MenuPage extends AbsBase
             ];
             $_form_fields = new FormFields($_form_field_args);
 
-            $_panel_body = '<form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" novalidate="novalidate">'."\n";
+            $_panel_body = '<form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" novalidate="novalidate" autocomplete="off">'."\n";
 
             $_total_subs_in_db = $this->plugin->utils_sub->queryTotal(null, ['auto_discount_trash' => false]);
             $_panel_body .= ' <h3 style="margin-bottom:0;">'.sprintf(__('Export All of your %1$s&trade; Subscriptions', 'comment-mail'), esc_html(NAME)).'</h3>';
@@ -2408,7 +2456,7 @@ class MenuPage extends AbsBase
             ];
             $_form_fields = new FormFields($_form_field_args);
 
-            $_panel_body = '<form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" novalidate="novalidate">'."\n";
+            $_panel_body = '<form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" novalidate="novalidate" autocomplete="off">'."\n";
 
             $_panel_body .= ' <h3 style="margin-bottom:0;">'.sprintf(__('Import a New Set of %1$s&trade; Config. Options', 'comment-mail'), esc_html(NAME)).'</h3>';
             $_panel_body .= ' <p>'.sprintf(__('Configuration options are imported using a JSON-encoded file obtained from another copy of %1$s&trade;.', 'comment-mail'), esc_html(NAME)).'</p>';
@@ -2451,7 +2499,7 @@ class MenuPage extends AbsBase
             ];
             $_form_fields = new FormFields($_form_field_args);
 
-            $_panel_body = '<form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" novalidate="novalidate">'."\n";
+            $_panel_body = '<form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" novalidate="novalidate" autocomplete="off">'."\n";
 
             $_panel_body .= ' <h3 style="margin-bottom:0;">'.sprintf(__('Export All of your %1$s&trade; Config. Options', 'comment-mail'), esc_html(NAME)).'</h3>';
             $_panel_body .= ' <p>'.__('Configuration options are downloaded as a JSON-encoded file.', 'comment-mail').'</p>';
@@ -2521,7 +2569,7 @@ class MenuPage extends AbsBase
         /* ----------------------------------------------------------------------------------------- */
 
         echo '<div class="'.esc_attr(SLUG_TD.'-menu-page '.SLUG_TD.'-menu-page-email-templates '.SLUG_TD.'-menu-page-area').'">'."\n";
-        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" novalidate="novalidate">'."\n";
+        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" novalidate="novalidate" autocomplete="off">'."\n";
 
         echo '      '.$this->heading(__('Email Templates', 'comment-mail'), 'logo.png').
              '      '.$this->notes(); // Heading/notifications.
@@ -2769,10 +2817,10 @@ class MenuPage extends AbsBase
                                    'notes_after' => '<p class="pmp-note pmp-info">'.__('<strong>Tip:</strong> If you mess up your template by accident; empty the field completely and save your options. This reverts you back to the default template file automatically.', 'comment-mail').'</p>',
                                    'cm_details'  => $shortcode_details(
                                        [
-                                           '[comment_parent_url]'    => __('Parent comment URL.', 'comment-mail'),
-                                           '[comment_parent_id]'     => __('Parent comment ID.', 'comment-mail'),
-                                           '[comment_parent_author]' => __('Parent comment author name.', 'comment-mail'),
-                                           '[comment_parent_clip]'   => __('A shorter clip of the full parent comment message body.', 'comment-mail'),
+                                           '[comment_parent_url]'     => __('Parent comment URL.', 'comment-mail'),
+                                           '[comment_parent_id]'      => __('Parent comment ID.', 'comment-mail'),
+                                           '[comment_parent_author]'  => __('Parent comment author name.', 'comment-mail'),
+                                           '[comment_parent_content]' => __('A shorter clip of the full parent comment message body. Or, if clipping is disabled, the full comment message content (raw HTML).', 'comment-mail'),
                                        ]
                                    ),
                                ]
@@ -2804,7 +2852,7 @@ class MenuPage extends AbsBase
                                            '[comment_id]'       => __('Comment reply ID.', 'comment-mail'),
                                            '[comment_time_ago]' => __('How long ago the comment reply was posted (human readable).', 'comment-mail'),
                                            '[comment_author]'   => __('Comment reply author\'s name.', 'comment-mail'),
-                                           '[comment_clip]'     => __('A shorter clip of the full comment reply message body.', 'comment-mail'),
+                                           '[comment_content]'  => __('A shorter clip of the full comment reply message body. Or, if clipping is disabled, the full comment reply content (raw HTML).', 'comment-mail'),
                                        ]
                                    ),
                                ]
@@ -2836,7 +2884,7 @@ class MenuPage extends AbsBase
                                            '[comment_id]'       => __('Comment ID.', 'comment-mail'),
                                            '[comment_time_ago]' => __('How long ago the comment was posted (human readable).', 'comment-mail'),
                                            '[comment_author]'   => __('Comment author\'s name.', 'comment-mail'),
-                                           '[comment_clip]'     => __('A shorter clip of the full comment message body.', 'comment-mail'),
+                                           '[comment_content]'  => __('A shorter clip of the full comment message body. Or, if clipping is disabled, the full comment content (raw HTML).', 'comment-mail'),
                                        ]
                                    ),
                                ]
@@ -3154,7 +3202,7 @@ class MenuPage extends AbsBase
         /* ----------------------------------------------------------------------------------------- */
 
         echo '<div class="'.esc_attr(SLUG_TD.'-menu-page '.SLUG_TD.'-menu-page-site-templates '.SLUG_TD.'-menu-page-area').'">'."\n";
-        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" novalidate="novalidate">'."\n";
+        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" novalidate="novalidate" autocomplete="off">'."\n";
 
         echo '      '.$this->heading(__('Site Templates', 'comment-mail'), 'logo.png').
              '      '.$this->notes(); // Heading/notifications.
@@ -3977,7 +4025,7 @@ class MenuPage extends AbsBase
             case '': // Also the default case handler.
             default: // Everything else is handled by subs. table.
                 echo '<div class="'.esc_attr(SLUG_TD.'-menu-page-subs '.SLUG_TD.'-menu-page-table '.SLUG_TD.'-menu-page-area wrap').'">'."\n";
-                echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceTableNavVarsOnly()).'" novalidate="novalidate">'."\n";
+                echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceTableNavVarsOnly()).'" novalidate="novalidate" autocomplete="off">'."\n";
 
                 echo '      <h2>'.sprintf(__('%1$s&trade; &raquo; Subscriptions', 'comment-mail'), esc_html(NAME)).' <i class="'.esc_attr('si si-'.SLUG_TD).'"></i>'.
                      '       <a href="'.esc_attr($this->plugin->utils_url->newSubShort()).'" class="add-new-h2">'.__('Add New', 'comment-mail').'</a></h2>'."\n";
@@ -3997,7 +4045,7 @@ class MenuPage extends AbsBase
     protected function subNew()
     {
         echo '<div class="'.esc_attr(SLUG_TD.'-menu-page-sub-new '.SLUG_TD.'-menu-page-form '.SLUG_TD.'-menu-page-area wrap').'">'."\n";
-        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceTableNavVarsOnly(['action'])).'" novalidate="novalidate">'."\n";
+        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceTableNavVarsOnly(['action'])).'" novalidate="novalidate" autocomplete="off">'."\n";
 
         echo '      <h2>'.sprintf(__('%1$s&trade; &raquo; New Subscription', 'comment-mail'), esc_html(NAME)).' <i class="'.esc_attr('si si-'.SLUG_TD.'-one').'"></i></h2>'."\n";
 
@@ -4015,7 +4063,7 @@ class MenuPage extends AbsBase
     protected function subEdit()
     {
         echo '<div class="'.esc_attr(SLUG_TD.'-menu-page-sub-edit '.SLUG_TD.'-menu-page-form '.SLUG_TD.'-menu-page-area wrap').'">'."\n";
-        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceTableNavVarsOnly(['action', 'subscription'])).'" novalidate="novalidate">'."\n";
+        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceTableNavVarsOnly(['action', 'subscription'])).'" novalidate="novalidate" autocomplete="off">'."\n";
 
         echo '      <h2>'.sprintf(__('%1$s&trade; &raquo; Edit Subscription', 'comment-mail'), esc_html(NAME)).' <i class="'.esc_attr('si si-'.SLUG_TD.'-one').'"></i></h2>'."\n";
 
@@ -4033,7 +4081,7 @@ class MenuPage extends AbsBase
     protected function subEventLogX()
     {
         echo '<div class="'.esc_attr(SLUG_TD.'-menu-page-sub-event-log '.SLUG_TD.'-menu-page-table '.SLUG_TD.'-menu-page-area wrap').'">'."\n";
-        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceTableNavVarsOnly()).'" novalidate="novalidate">'."\n";
+        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceTableNavVarsOnly()).'" novalidate="novalidate" autocomplete="off">'."\n";
 
         echo '      <h2>'.sprintf(__('%1$s&trade; &raquo; Subscriptions &raquo; Event Log', 'comment-mail'), esc_html(NAME)).' <i class="fa fa-history"></i></h2>'."\n";
 
@@ -4051,9 +4099,10 @@ class MenuPage extends AbsBase
     protected function queueX()
     {
         echo '<div class="'.esc_attr(SLUG_TD.'-menu-page-queue '.SLUG_TD.'-menu-page-table '.SLUG_TD.'-menu-page-area wrap').'">'."\n";
-        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceTableNavVarsOnly()).'" novalidate="novalidate">'."\n";
+        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceTableNavVarsOnly()).'" novalidate="novalidate" autocomplete="off">'."\n";
 
         echo '      <h2>'.sprintf(__('%1$s&trade; &raquo; Queued (Pending) Notifications', 'comment-mail'), esc_html(NAME)).' <i class="fa fa-envelope-o"></i></h2>'."\n";
+        echo '      <a href="'.esc_url($this->plugin->utils_url->processQueue()).'" class="pmp-process-queue-manually button button-default" style="vertical-align:middle;"><i class="fa fa-paper-plane fa-fw"></i> '.__('Process Queue Manually', 'comment-mail').'</a> '.__('<em><strong>Note:</strong> Manual processing is not a requirement. The queue is also processed automatically behind-the-scenes on a five-minute interval via WP Cron.</em>', 'comment-mail')."\n";
 
         new MenuPageQueueTable(); // Displays table.
 
@@ -4069,7 +4118,7 @@ class MenuPage extends AbsBase
     protected function queueEventLogX()
     {
         echo '<div class="'.esc_attr(SLUG_TD.'-menu-page-queue-event-log '.SLUG_TD.'-menu-page-table '.SLUG_TD.'-menu-page-area wrap').'">'."\n";
-        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceTableNavVarsOnly()).'" novalidate="novalidate">'."\n";
+        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceTableNavVarsOnly()).'" novalidate="novalidate" autocomplete="off">'."\n";
 
         echo '      <h2>'.sprintf(__('%1$s&trade; &raquo; Queue &raquo; Event Log', 'comment-mail'), esc_html(NAME)).' <i class="fa fa-paper-plane"></i></h2>'."\n";
 
@@ -4607,7 +4656,7 @@ class MenuPage extends AbsBase
             return isset($_this->plugin->options[$key]) ? $_this->plugin->options[$key] : null;
         };
         echo '<div class="'.esc_attr(SLUG_TD.'-menu-page '.SLUG_TD.'-menu-page-pro-updater '.SLUG_TD.'-menu-page-area').'">'."\n";
-        echo '   <form method="post" enctype="multipart/form-data" autocomplete="off" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" novalidate="novalidate">'."\n";
+        echo '   <form method="post" enctype="multipart/form-data" action="'.esc_attr($this->plugin->utils_url->pageNonceOnly()).'" novalidate="novalidate" autocomplete="off">'."\n";
 
         echo '     '.$this->heading(__('Pro Updater', 'comment-mail'), 'logo.png').
              '     '.$this->notes(); // Heading/notifications.
@@ -4627,7 +4676,6 @@ class MenuPage extends AbsBase
                                 'label'         => __('Customer Username', 'comment-mail'),
                                 'placeholder'   => __('e.g., johndoe22', 'comment-mail'),
                                 'current_value' => $current_value_for('pro_update_username'),
-                                'other_attrs'   => 'autocomplete="new-password"',
                             ]
                         ).
                         '   </tbody>'.
@@ -4641,7 +4689,6 @@ class MenuPage extends AbsBase
                                 'name'          => 'password',
                                 'label'         => __('Customer Password or Product License Key', 'comment-mail'),
                                 'current_value' => $current_value_for('pro_update_password'),
-                                'other_attrs'   => 'autocomplete="new-password"',
                             ]
                         ).
                         '   </tbody>'.

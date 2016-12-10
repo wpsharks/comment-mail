@@ -55,7 +55,7 @@ echo str_replace('%%title%%', __('Complete Registration', 'comment-mail'), $site
                 <ul class="list-unstyled">
                     <?php foreach ($error_codes as $_error_code) : ?>
                         <li>
-                            <i class="fa fa-warning fa-fw"></i>
+                            <i class="fa fa-warning fa-fw" aria-hidden="true"></i>
                             <?php
                             switch ($_error_code) {
                                 case 'users_cannot_register':
@@ -97,19 +97,19 @@ echo str_replace('%%title%%', __('Complete Registration', 'comment-mail'), $site
                 <?php echo $form_fields->inputRow(
                     [
                         'type'  => 'email', // For `<input>` type.
-                        'label' => __('<i class="fa fa-fw fa-envelope-o"></i> Email Address', 'comment-mail'),
+                        'label' => __('<i class="fa fa-fw fa-envelope-o" aria-hidden="true"></i> Email Address', 'comment-mail'),
                         'name'  => 'email', 'required' => true, 'maxlength' => 100, 'current_value' => $email,
                     ]
                 ); ?>
                 <?php echo $form_fields->inputRow(
                     [
-                        'label' => __('<i class="fa fa-fw fa-pencil-square-o"></i> First Name', 'comment-mail'),
+                        'label' => __('<i class="fa fa-fw fa-pencil-square-o" aria-hidden="true"></i> First Name', 'comment-mail'),
                         'name'  => 'fname', 'required' => true, 'maxlength' => 50, 'current_value' => $fname,
                     ]
                 ); ?>
                 <?php echo $form_fields->inputRow(
                     [
-                        'label' => __('<i class="fa fa-fw fa-level-up fa-rotate-90"></i> Last Name', 'comment-mail'),
+                        'label' => __('<i class="fa fa-fw fa-level-up fa-rotate-90" aria-hidden="true"></i> Last Name', 'comment-mail'),
                         'name'  => 'lname', 'required' => false, 'maxlength' => 100, 'current_value' => $lname,
                     ]
                 ); ?>

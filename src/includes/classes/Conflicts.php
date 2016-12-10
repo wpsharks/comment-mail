@@ -31,8 +31,12 @@ class Conflicts
         if (!empty($GLOBALS[GLOBAL_NS.'_conflicting_plugin'])) {
             return $GLOBALS[GLOBAL_NS.'_conflicting_plugin'];
         }
+        $lite_slug = str_replace('_', '-', GLOBAL_NS);
+        $pro_slug  = $lite_slug.'-pro'; // Pro suffix.
+
         $conflicting_plugin_slugs = [
-            str_replace('_', '-', GLOBAL_NS).(IS_PRO ? '' : '-pro'),
+            IS_PRO ? $lite_slug : $pro_slug,
+            'subscribe-to-comments-reloaded',
         ];
         $active_plugins          = (array) get_option('active_plugins', array());
         $active_sitewide_plugins = is_multisite() ? array_keys((array) get_site_option('active_sitewide_plugins', array())) : array();
@@ -43,15 +47,14 @@ class Conflicts
                 continue; // Nothing to check in this case.
             }
             if (in_array($_active_plugin_slug, $conflicting_plugin_slugs, true)) {
-                if (in_array($_active_plugin_slug, array('comment-mail', 'comment-mail-pro'), true)) {
+                if (in_array($_active_plugin_slug, array($lite_slug, $pro_slug), true)) {
                     add_action('admin_init', function () use ($_active_plugin_basename) {
-                        if (function_exists('deactivate_plugins')) { // Can deactivate?
+                        if (function_exists('deactivate_plugins')) {
                             deactivate_plugins($_active_plugin_basename, true);
-                        }
-                    }, -1000);
-                } else {
-                    return $GLOBALS[GLOBAL_NS.'_conflicting_plugin'] = $_active_plugin_slug;
+                        } // Only if it is possible to deactivate.
+                    }, -1000); // Deactivate automatically.
                 }
+                return $GLOBALS[GLOBAL_NS.'_conflicting_plugin'] = $_active_plugin_slug;
             }
         }
         return $GLOBALS[GLOBAL_NS.'_conflicting_plugin'] = ''; // i.e. No conflicting plugins.
@@ -62,13 +65,18 @@ class Conflicts
      *
      * @since 160618 Rewrite.
      */
-    protected function maybeEnqueueNotice()
+    protected static function maybeEnqueueNotice()
     {
         if (!empty($GLOBALS[GLOBAL_NS.'_uninstalling'])) {
             return; // Not when uninstalling.
-        }
-        if (empty($GLOBALS[GLOBAL_NS.'_conflicting_plugin'])) {
+        } elseif (empty($GLOBALS[GLOBAL_NS.'_conflicting_plugin'])) {
             return; // Not conflicts.
+        }
+        $lite_slug = str_replace('_', '-', GLOBAL_NS);
+        $pro_slug  = $lite_slug.'-pro'; // Pro suffix.
+
+        if (in_array($GLOBALS[GLOBAL_NS.'_conflicting_plugin'], array($lite_slug, $pro_slug), true)) {
+            return; // Not necessary. Will be deactivated automatically.
         }
         add_action('all_admin_notices', function () {
             if (!empty($GLOBALS[GLOBAL_NS.'_conflicting_plugin_lite_pro'])) {
@@ -92,7 +100,7 @@ class Conflicts
             }
             echo '<div class="error">'.// Error notice.
                  '   <p>'.// Running one or more conflicting plugins at the same time.
-                 '      '.sprintf(__('<strong>%1$s</strong> is NOT running. A conflicting plugin, <strong>%2$s</strong>, is currently active. Please deactivate the %2$s plugin to clear this message.', 'comment-mail'), esc_html($this_plugin_name), esc_html($conflicting_plugin_name)).
+                 '      '.sprintf(__('<strong>%1$s</strong> is not running. A conflicting plugin, <strong>%2$s</strong>, is currently active at the same time. Please deactivate the <strong>%2$s</strong> plugin to clear this message.', 'comment-mail'), esc_html($this_plugin_name), esc_html($conflicting_plugin_name)).
                  '   </p>'.
                  '</div>';
         });

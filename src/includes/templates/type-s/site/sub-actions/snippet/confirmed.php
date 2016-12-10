@@ -1,6 +1,6 @@
 <div class="alert alert-success">
     <h4 style="margin:0;">
-        <i class="fa fa-check fa-fw"></i> Confirmed successfully. Thank you[if sub_fname] [sub_fname][endif]!
+        <i class="fa fa-check fa-fw" aria-hidden="true"></i> Confirmed successfully. Thank you[if sub_fname] [sub_fname][endif]!
     </h4>
 </div>
 
@@ -17,7 +17,7 @@
 </h4>
 
 <h4>
-    <i class="fa fa-thumb-tack"></i>
+    <i class="fa fa-thumb-tack" aria-hidden="true"></i>
     [if sub_comment]
         <em><a href="[sub_comment_url]">[sub_post_title_clip]</a></em>
     [else]
@@ -35,5 +35,5 @@
 <hr style="margin:0 0 1em 0;" />
 
 <h5 style="font-style:italic; margin:0;">
-    <i class="fa fa-lightbulb-o"></i> If any of this is incorrect, please <a href="[sub_edit_url]">click here to edit</a> your subscription.
+    <i class="fa fa-lightbulb-o" aria-hidden="true"></i> If any of this is incorrect, please <a href="[sub_edit_url]">click here to edit</a> your subscription.
 </h5>

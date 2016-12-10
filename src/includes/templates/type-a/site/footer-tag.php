@@ -50,13 +50,13 @@ $can_spam_privacy_policy_url = $plugin->options['can_spam_privacy_policy_url'];
             <?php if ($parent_template->file() !== 'site/sub-actions/manage-summary.php') : ?>
                 <?php // Displays a link leading them back to their subscriptions; if not already there. ?>
                 <a href="<?php echo esc_attr($sub_summary_return_url); ?>">
-                    <i class="fa fa-arrow-circle-left"></i> <?php echo __('My Comment Subscriptions', 'comment-mail'); ?>
+                    <i class="fa fa-arrow-circle-left" aria-hidden="true"></i> <?php echo __('My Comment Subscriptions', 'comment-mail'); ?>
                 </a>
                 <span class="text-muted">|</span>
             <?php endif; ?>
 
             <a href="<?php echo esc_attr($home_url); ?>">
-                <i class="fa fa-home"></i> <?php echo sprintf(__('Return to <em>%1$s</em>', 'comment-mail'), esc_html($blog_name_clip)); ?>
+                <i class="fa fa-home" aria-hidden="true"></i> <?php echo sprintf(__('Return to <em>%1$s</em>', 'comment-mail'), esc_html($blog_name_clip)); ?>
             </a>
 
             <?php if ($can_spam_privacy_policy_url) : ?>

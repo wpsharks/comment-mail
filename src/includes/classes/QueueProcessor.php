@@ -166,6 +166,18 @@ class QueueProcessor extends AbsBase
     }
 
     /**
+     * Processed entry counter.
+     *
+     * @since 161202 Processed entry counter.
+     *
+     * @return int Processed entry counter.
+     */
+    public function processedEntries()
+    {
+        return $this->processed_entry_counter;
+    }
+
+    /**
      * Prep CRON job.
      *
      * @since 141111 First documented version.

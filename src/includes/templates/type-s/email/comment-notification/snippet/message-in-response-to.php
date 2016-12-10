@@ -5,6 +5,6 @@
         In response to <a href="[comment_parent_url]">this comment</a>[if comment_parent_author] posted by [comment_parent_author][endif]:
     [endif]
 </p>
-<p style="font-style:italic;">
-    [comment_parent_clip]
-</p>
+<div style="margin:1em 0 1em 0; font-style:italic;">
+    [comment_parent_content]
+</div>

@@ -167,6 +167,8 @@ class FormFields extends AbsBase
 
                     '     value="'.esc_attr(trim((string) $current_value)).'"'.
 
+                    '     autocomplete="new-password"'.
+
                     '     '.$other_attrs.' />'.
 
                     ($type === 'checkbox' && $checkbox_label
@@ -299,6 +301,8 @@ class FormFields extends AbsBase
 
                 '     data-placeholder="'.esc_attr($placeholder).'"'.
                 '     placeholder="'.esc_attr($placeholder).'"'.
+
+                '     autocomplete="new-password"'.
 
                 '     '.$other_attrs.'>'.esc_textarea(trim((string) $current_value)).'</textarea>'.
 
@@ -445,6 +449,8 @@ class FormFields extends AbsBase
 
                 '     data-placeholder="'.esc_attr($placeholder).'"'.
                 '     placeholder="'.esc_attr($placeholder).'"'.
+
+                '     autocomplete="new-password"'.
 
                 '     '.$other_attrs.'>'.
 

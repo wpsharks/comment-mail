@@ -358,7 +358,7 @@ class MenuPageSubsTable extends MenuPageTableBase
         // PHPCS chokes on indentation here for some reason.
         if (($results = $this->plugin->utils_db->wp->get_results($sql))) {
             $this->setItems($results = $this->plugin->utils_db->typifyDeep($results));
-            $this->setTotalItemsAvailable((integer) $this->plugin->utils_db->wp->get_var('SELECT FOUND_ROWS()'));
+            $this->setTotalItemsAvailable((int) $this->plugin->utils_db->wp->get_var('SELECT FOUND_ROWS()'));
 
             $this->prepareItemsMergeUserProperties(); // Merge additional properties.
             $this->prepareItemsMergePostProperties(); // Merge additional properties.
@@ -454,6 +454,6 @@ class MenuPageSubsTable extends MenuPageTableBase
                 $counter = $this->plugin->utils_sub->bulkDelete($ids);
                 break; // Break switch handler.
         }
-        return !empty($counter) ? (integer) $counter : 0;
+        return !empty($counter) ? (int) $counter : 0;
     }
 }

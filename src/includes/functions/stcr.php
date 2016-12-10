@@ -11,7 +11,7 @@ namespace WebSharks\CommentMail;
 
 function stcr_transition()
 {
-    $plugin = plugin(); // Reference needed below.
+    $plugin = plugin();
 
     # Have we already done this?
 
@@ -21,6 +21,11 @@ function stcr_transition()
     # Do we have StCR options that we can import?
 
     if (!get_option('subscribe_reloaded_version')) {
+        return; // Not applicable.
+    }
+    # Is the StCR plugin actually installed; i.e., dir exists?
+
+    if (!is_dir(WP_PLUGIN_DIR.'/subscribe-to-comments-reloaded')) {
         return; // Not applicable.
     }
     # StCR to consider during a transition.
@@ -75,14 +80,16 @@ function stcr_transition()
     }
     # Save option changes, if any.
 
-    $plugin->optionsSave($plugin->options);
+    $plugin->options['stcr_transition_complete'] = '1';
+    $plugin->optionsSave($plugin->options); // Update options.
 
     # Notice to existing StCR users now upgrading to Comment Mail.
 
     $notice = sprintf(__('<h3 style="font-weight:400; margin:0 0 1em 0;">Upgrading from <strong>Subscribe to Comments Reloaded</strong> (StCR) to <strong>%1$s&trade;</strong> %2$s — Welcome! :-)</h3>', 'comment-mail'), esc_html(NAME), $plugin->utils_fs->inlineIconSvg());
     $notice .= '<ul style="margin:0 0 1.3em 3em; list-style:disc;">'.
-               '   <li>'.sprintf(__('%1$s automatically imported many of your StCR options (to learn what was imported, see <a href="http://comment-mail.com/r/kb-article-stcr-options-transitioned-by-comment-mail/" target="_blank">this article</a>). It\'s still a good idea to review your %1$s configuration though.', 'comment-mail'), esc_html(NAME)).'</li>'.
-               (ImportStcr::dataExists() ? '   <li>'.sprintf(__('<strong>IMPORTANT TIP:</strong> %1$s can import your existing StCR subscribers automatically too! <strong><a href="%2$s">Click here to review the StCR → %1$s import process</a></strong>.', 'comment-mail'), esc_html(NAME), esc_attr($plugin->utils_url->importExportMenuPageOnly())).'</li>' : '').
+                    '<li>'.sprintf(__('%1$s automatically imported many of your StCR options (to learn what was imported, see <a href="http://comment-mail.com/r/kb-article-stcr-options-transitioned-by-comment-mail/" target="_blank">this article</a>). It\'s still a good idea to review your %1$s configuration though.', 'comment-mail'), esc_html(NAME)).'</li>'.
+                    (!$plugin->options['comment_form_sub_template_enable'] ? '<li>'.sprintf(__('<strong>NOTE:</strong> The built-in %1$s template system has been disabled due to your imported StCR configuration. To enable the built-in comment form template system, please see: <strong>%1$s → Config. Options → Comment Form</strong>.', 'comment-mail'), esc_html(NAME)).'</li>' : '').
+                    (ImportStcr::dataExists() ? '<li>'.sprintf(__('<strong>IMPORTANT TIP:</strong> %1$s can import your existing StCR subscribers automatically too! <strong><a href="%2$s">Click here to review the StCR → %1$s import process</a></strong>.', 'comment-mail'), esc_html(NAME), esc_attr($plugin->utils_url->importExportMenuPageOnly())).'</li>' : '').
                '</ul>';
     $plugin->enqueueNotice($notice, ['persistent' => true, 'persistent_id' => 'upgrading-from-stcr']);
 }
