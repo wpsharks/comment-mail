@@ -17,70 +17,77 @@ namespace WebSharks\CommentMail;
 class QueueProcessor extends AbsBase
 {
     /**
-     * @var bool A CRON job?
+     * @type bool A CRON job?
      *
      * @since 141111 First documented version.
      */
     protected $is_cron;
 
     /**
-     * @var int Start time.
+     * @type bool A manual run?
+     *
+     * @since 161213 Manual queue processing.
+     */
+    protected $is_manual;
+
+    /**
+     * @type int Start time.
      *
      * @since 141111 First documented version.
      */
     protected $start_time;
 
     /**
-     * @var int Max time (in seconds).
+     * @type int Max time (in seconds).
      *
      * @since 141111 First documented version.
      */
     protected $max_time;
 
     /**
-     * @var int Delay (in milliseconds).
+     * @type int Delay (in milliseconds).
      *
      * @since 141111 First documented version.
      */
     protected $delay;
 
     /**
-     * @var int Max entries to process.
+     * @type int Max entries to process.
      *
      * @since 141111 First documented version.
      */
     protected $max_limit;
 
     /**
-     * @var Template Subject template.
+     * @type Template Subject template.
      *
      * @since 141111 First documented version.
      */
     protected $subject_template;
 
     /**
-     * @var Template Message template.
+     * @type Template Message template.
      *
      * @since 141111 First documented version.
      */
     protected $message_template;
 
     /**
-     * @var \stdClass[] Entries being processed.
+     * @type \stdClass[] Entries being processed.
      *
      * @since 141111 First documented version.
      */
     protected $entries;
 
     /**
-     * @var int Total entries.
+     * @type int Total entries.
      *
      * @since 141111 First documented version.
      */
     protected $total_entries;
 
     /**
-     * @var int Processed entry counter.
+     * @type int Processed entry counter.
      *
      * @since 141111 First documented version.
      */
@@ -91,9 +98,8 @@ class QueueProcessor extends AbsBase
      *
      * @since 141111 First documented version.
      *
-     * @param bool     $is_cron  Is this a CRON job?
-     *                           Defaults to a `TRUE` value. If calling directly pass `FALSE`.
-     * @param int|null $max_time Max time (in seconds).
+     * @param bool|string $is_cron  Is this a CRON job? Boolean or `manual`.
+     * @param int|null    $max_time Max time (in seconds).
      *
      *    This cannot be less than `10` seconds.
      *    This cannot be greater than `300` seconds.
@@ -116,8 +122,13 @@ class QueueProcessor extends AbsBase
     {
         parent::__construct();
 
-        $this->is_cron = (bool) $is_cron;
-
+        if ($is_cron === 'manual') {
+            $this->is_manual = true;
+            $this->is_cron   = false;
+        } else {
+            $this->is_manual = false;
+            $this->is_cron   = (bool) $is_cron;
+        }
         $this->start_time = time(); // Start time.
 
         if (isset($max_time)) { // Argument is set?
@@ -210,9 +221,10 @@ class QueueProcessor extends AbsBase
     {
         if (!$this->plugin->options['enable']) {
             return; // Disabled currently.
-        }
-        if (!$this->plugin->options['queue_processing_enable']) {
+        } elseif (!$this->plugin->options['queue_processing_enable']) {
             return; // Disabled currently.
+        } elseif (apply_filters(__CLASS__.'_manual_only', false) && !$this->is_manual) {
+            return; // Manual processing only.
         }
         if (!($this->entries = $this->entries())) {
             return; // Nothing to do.
@@ -854,7 +866,6 @@ class QueueProcessor extends AbsBase
 
         if ($this->plugin->options['replies_via_email_enable']) {
             switch ($this->plugin->options['replies_via_email_handler']) {
-
                 case 'sparkpost': // SparkPost (free, recommended).
 
                     if ($this->plugin->options['rve_sparkpost_reply_to_email']) {

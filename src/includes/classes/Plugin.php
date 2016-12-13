@@ -763,6 +763,9 @@ class Plugin extends AbsBase
         if (!$this->options['auto_confirm_force_enable']) {
             $this->options['all_wp_users_confirm_email'] = '0';
         }
+        if (!$this->options['replies_via_email_handler']) {
+            $this->options['replies_via_email_enable'] = '0';
+        }
         foreach (!IS_PRO ? $this->pro_only_option_keys : [] as $_key) {
             $this->options[$_key] = $this->default_options[$_key];
         } // Force default pro-only option keys in lite version.

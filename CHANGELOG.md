@@ -1,25 +1,15 @@
-## [coming soon]
-
-- **New Feature:** In Comment Mail Pro it is now possible to enable/disable comment content clipping entirely; e.g., if you prefer that email notifications include the full original comment content in raw HTML instead of being clipped and displayed in the email as plain text. See: **WP Dashboard → Comment Mail → Config. Options → Email Notification Clips**. See also: [Issue #281](https://github.com/websharks/comment-mail/issues/281).
-
-- **New Feature:** It is now possible to manually process the outgoing mail queue. See: **WP Dashboard → Comment Mail → Mail Queue**. See also: [Issue #282](https://github.com/websharks/comment-mail/issues/282).
-
-- **Bug Fix:** Do not show SparkPost partner image when Mandrill is selected as the RVE handler. See [Issue #318](https://github.com/websharks/comment-mail/issues/318).
-
-- **Bug Fix:** Do not attempt to import StCR settings if StCR is no longer installed, even if old StCR options exist in the database. See [Issue #294](https://github.com/websharks/comment-mail/issues/294).
-
-- **Bug Fix:** Notify StCR users about the comment form template being disabled under certain scenarios. See [Issue #314](https://github.com/websharks/comment-mail/issues/314).
-
-- **Bug Fix:** Searching by email address alone should always narrow to the search to that specific email address and not result in any fuzzy or fulltext matching. See [Issue #226](https://github.com/websharks/comment-mail/issues/226).
-
-- **Bug Fix:** The conflict check for 'Subscribe to Comments Reloaded' was not working in the previous release; i.e., if you attempt to activate both Comment Mail and the 'Subscribe to Comments Reloaded' plugin at the same, this should result in a Dashboard warning. Fixed in this release. See [Issue #315](https://github.com/websharks/comment-mail/issues/315).
+## v161213
 
 - **Bug Fix:** Prevent browser autocomplete in Comment Mail options. See [Issue #319](https://github.com/websharks/comment-mail/issues/319).
-
-- **Bug Fix:** Conflict checks between lite and pro corrected. This was not working properly in the previous release; i.e., installing Comment Mail Pro when Comment Mail Lite is already running should result in Comment Mail Lite being deactivated automatically. See [Issue #270](https://github.com/websharks/comment-mail/issues/270).
-
+- **Bug Fix:** Searching by email address alone should always narrow to the search to that specific email address and not result in any fuzzy or fulltext matching. See [Issue #226](https://github.com/websharks/comment-mail/issues/226).
+- **Bug Fix:** The conflict check for 'Subscribe to Comments Reloaded' was not working in the previous release; i.e., if you attempt to activate both Comment Mail and the 'Subscribe to Comments Reloaded' plugin at the same, this should result in a Dashboard warning. Fixed in this release. See [Issue #315](https://github.com/websharks/comment-mail/issues/315).
+- **Bug Fix:** Notify 'Subscribe to Comments Reloaded' users about the comment form template being disabled under certain scenarios. See [Issue #314](https://github.com/websharks/comment-mail/issues/314).
+- **Bug Fix:** Do not attempt to import 'Subscribe to Comments Reloaded' (StCR) settings if StCR is no longer installed, even if old StCR options exist in the database. See [Issue #294](https://github.com/websharks/comment-mail/issues/294).
+- **Bug Fix** (Pro): Do not show SparkPost partner image when Mandrill is selected as the RVE handler. See [Issue #318](https://github.com/websharks/comment-mail/issues/318).
+- **Bug Fix** (Pro): Conflict checks between lite and pro corrected. This was not working properly in the previous release; i.e., installing Comment Mail Pro when Comment Mail Lite is already running should result in Comment Mail Lite being deactivated automatically. See [Issue #270](https://github.com/websharks/comment-mail/issues/270).
+- **New Feature:** It is now possible to manually process the outgoing mail queue. See: **WP Dashboard → Comment Mail → Mail Queue**. See also [Issue #282](https://github.com/websharks/comment-mail/issues/282).
+- **New Feature** (Pro): In Comment Mail Pro it is now possible to enable/disable comment content clipping entirely; e.g., if you prefer that email notifications include the full original comment content in raw HTML instead of being clipped and displayed in the email as plain text. See: **WP Dashboard → Comment Mail → Config. Options → Email Notification Clips**. See also: [Issue #281](https://github.com/websharks/comment-mail/issues/281).
 - **Accessibility:** This release improves screen reader accessibility by adding `aria-hidden="true"` to all FontAwesome icons. See [Issue #304](https://github.com/websharks/comment-mail/issues/304).
-
 - **Accessibility:** This release improves screen reader accessibility by offering a new setting that allows a site owner to enable or disable select menu option enhancement via jQuery. Disabling select menu option enhancement has the benefit of improving accessibility for screen readers whenever accessibility is of more concern than presentation. See: **Dashboard → Comment Mail → Config Options → Misc. UI-Related Settings**. See also [Issue #304](https://github.com/websharks/comment-mail/issues/304).
 
 ## v161129
@@ -32,7 +22,7 @@
 
   _However, if you upgraded to v161118 and **did** edit your Comment Mail options after updating, and if you also modified Comment Mail templates, you may have experienced a loss of template data; i.e., the changes you made to the default templates may have been lost as a result of this bug. We are very sorry about this. Please see [Issue #322](https://github.com/websharks/comment-mail/issues/322) for additional details._
 
-= v161118 =
+## v161118
 
 - **Bug Fix:** Exclude unapproved comments from the dropdown menu on the 'Subscribe Without Commenting' form. See [Issue #299](https://github.com/websharks/comment-mail/issues/299).
 - **Enhancement:** When parsing templates, this release uses `include()` instead of `eval()` whenever possible. This improves compatibility with shared hosting providers and makes it easier to debug template parsing issues should they occur. See [Issue #192](https://github.com/websharks/comment-mail/issues/192).
@@ -40,11 +30,11 @@
 - **New SparkPost Integration** (Pro):  It is now possible to use SparkPost for Replies-via-Email (RVE) instead of Mandrill. Note that SparkPost is now the suggested RVE Handler for Comment Mail because Mandrill changed its pricing structure a while back. In short, Mandrill requires a fee, whereas SparkPost (recommended) offers Relay Webhooks as a part of their free plan. See [Issue #265](https://github.com/websharks/comment-mail/issues/265).
 - **New Feature** (Pro): Adding support for MailChimp integration. It is now possible to give users the option of subscribing to your site-wide mailing list whenever they leave a comment or reply; i.e., in addition to subscribing to comment reply notifications they can also join your MailChimp mailing list. See [Issue #114](https://github.com/websharks/comment-mail/issues/114).
 
-= v160824 =
+## v160824
 
 - **Bug Fix**: Fixed a bug that was generating a fatal error when replying to comments. This bug only affected the Lite version of Comment Mail and was introduced by the previous release (v160818) where [work](https://github.com/websharks/comment-mail/issues/285) was done to strip out unused Pro-only code from the Lite codebase. A few references to Pro-only functions were missed and that resulted in fatal errors for the Lite version in some scenarios. See [Issue #297](https://github.com/websharks/comment-mail/issues/297).
 
-= v160818 =
+## v160818
 
 - **Bug Fix**: Fixed a bug where the "My Comment Subscriptions" link would appear on the Add New Subscription page (when Subscribing without Commenting) and would lead to a page that displayed an error message stating that there were no subscriptions to list. That link is now hidden when there are no subscriptions to list. Props @Reedyseth @kristineds. See [Issue #229](https://github.com/websharks/comment-mail/issues/229).
 - **Bug Fix** (Pro): Removed an erroneous anchor tag in the Advanced Template for Comment Notification Message Body. Props @kristineds. See [Issue #287](https://github.com/websharks/comment-mail/issues/287).
@@ -55,7 +45,7 @@
 - Removed several development-only files from the distributable that were inadvertently included during the build process. See [Issue #285](https://github.com/websharks/comment-mail/issues/285).
 - Added Renz Sevilla (`renzms`) to the contributors list.
 
-= v160618 =
+## v160618
 
 - **Restructured Codebase**: The codebase has been completely restructured to improve performance, enhance flexibility, and make it easier to build in new features! Props @jaswsinc. See [Issue #150](https://github.com/websharks/comment-mail/issues/150).
 - **Comment Mail Pro Upgrade Notice: Incompatible Advanced Templates.** This version of Comment Mail includes a rewritten and improved codebase. This rewrite, however, came with the unfortunate side effect of breaking backwards compatibility with Advanced Templates that were customized in a previous version of Comment Mail Pro.
@@ -78,7 +68,7 @@
 - **UX Enhancement**: When Subscribing Without Commenting, the Add New Subscription form now pre-populates the Name and Email address fields whenever possible. Props @kristineds. See [Issue #204](https://github.com/websharks/comment-mail/issues/204).
 - **UI Enhancement**: Dashboard notices generated by Comment Mail now use the WordPress-style dismiss button to keep things consistent. Props @kristineds. See [Issue #193](https://github.com/websharks/comment-mail/issues/193).
 
-= v160213 =
+## v160213
 
 - **Minor Fix**: Fixed a spelling mistake in one of the default email templates. Props @kristineds  @RealDavidoff. See [Issue #208](https://github.com/websharks/comment-mail/issues/208).
 - **Enhancement**: Moved the default location for the Subscriptions Meta Box on the Post Edit screen so that it shows up underneath the post editing area instead of above the Publish box. See [Issue #57](https://github.com/websharks/comment-mail/issues/57#issuecomment-174482908).
@@ -92,7 +82,7 @@
 - **Enhancement**: Added the installed version number to the plugin options pages. Props @kristineds. See [Issue #187](https://github.com/websharks/comment-mail/issues/187).
 - **Enhancement**: Improved the organization of navigation links on the plugin options pages. Props @kristineds. See [Issue #187](https://github.com/websharks/comment-mail/issues/187).
 
-= v151224 =
+## v151224
 
 - **Bug Fix** (Multisite): Fixed a Multisite uninstallation bug that was preventing Comment Mail from taking Child Blogs into consideration when uninstalling, which was resulting in an incomplete uninstallation. See [Issue #136](https://github.com/websharks/comment-mail/issues/136).
 - **Bug Fix** (StCR Import): This release corrects an StCR importation bug. The bug was causing an existing StCR subscription with a `Y` status (i.e., one for all comments/replies) to be imported into Comment Mail on a per-comment basis. Therefore, a symptom of this bug was to find that you had multiple subscriptions imported for users who wanted _all_ comments, instead of them just having one subscription imported which would automatically cover the entire post. See also [Issue #162](https://github.com/websharks/comment-mail/issues/162).
@@ -126,6 +116,6 @@
 - **WordPress v4.4 Compatibility:** Fixed a compatibility bug with WordPress v4.4. Props @jaswsinc. See [Issue #170](https://github.com/websharks/comment-mail/issues/170).
 - **Jetpack Compatibility:** This release fixes a bug in the automatic Jetpack conflict detection; i.e., if you enable Jetpack Subscriptions w/ Follow Comments enabled together with Comment Mail at the same, a warning is displayed to notify you of a possible conflict in your configuration. See [Issue #113](https://github.com/websharks/comment-mail/issues/113).
 
-= v150709 =
+## v150709 
 
 - Initial release.

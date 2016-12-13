@@ -884,7 +884,7 @@ class MenuPage extends AbsBase
                                    'current_value'   => $current_value_for('comment_notification_clipping_enable'),
                                    'allow_arbitrary' => false, // Must be one of these.
                                    'options'         => [
-                                       '1' => __('Yes, clip comment content in email notifications (default behavhior)', 'comment-mail'),
+                                       '1' => __('Yes, clip comment content in email notifications (default behavior)', 'comment-mail'),
                                        '0' => __('No, do not clip comment content, use the full raw HTML in email notifications', 'comment-mail'),
                                    ],
                                ]
@@ -1215,7 +1215,7 @@ class MenuPage extends AbsBase
                                     'placeholder'   => __('e.g., 7xxxxe7598ex6fe60d7cxxxx34a73ccdxxx084', 'comment-mail'),
                                     'name'          => 'rve_sparkpost_api_key',
                                     'current_value' => $current_value_for('rve_sparkpost_api_key'),
-                                    'notes_after'   => '<p>'.sprintf(__('Please see %1$s for detailed instructions.', 'comment-mail'), $this->plugin->utils_markup->xAnchor('http://comment-mail.com/kb-article/sparkpost-rve-handler/', __('this KB article', 'comment-mail'))).'</p>',
+                                    'notes_after'   => '<p>'.sprintf(__('Please see %1$s for detailed instructions.', 'comment-mail'), $this->plugin->utils_markup->xAnchor('http://comment-mail.com/r/sparkpost-rve-handler/', __('this KB article', 'comment-mail'))).'</p>',
                                 ]
                             ).
                             '       </tbody>'.
@@ -1230,7 +1230,7 @@ class MenuPage extends AbsBase
                                     'placeholder'   => sprintf(__('e.g., rve@spark.%1$s', 'comment-mail'), $this->plugin->utils_url->currentHostBase()),
                                     'name'          => 'rve_sparkpost_reply_to_email',
                                     'current_value' => $current_value_for('rve_sparkpost_reply_to_email'),
-                                    'notes_after'   => '<p>'.sprintf(__('Please see %1$s for detailed instructions.', 'comment-mail'), $this->plugin->utils_markup->xAnchor('http://comment-mail.com/kb-article/sparkpost-rve-handler/', __('this KB article', 'comment-mail'))).'</p>',
+                                    'notes_after'   => '<p>'.sprintf(__('Please see %1$s for detailed instructions.', 'comment-mail'), $this->plugin->utils_markup->xAnchor('http://comment-mail.com/r/sparkpost-rve-handler/', __('this KB article', 'comment-mail'))).'</p>',
                                 ]
                             ).
                             '       </tbody>'.
@@ -1247,7 +1247,7 @@ class MenuPage extends AbsBase
                                     'placeholder'   => sprintf(__('e.g., rve@mandrill.%1$s', 'comment-mail'), $this->plugin->utils_url->currentHostBase()),
                                     'name'          => 'rve_mandrill_reply_to_email',
                                     'current_value' => $current_value_for('rve_mandrill_reply_to_email'),
-                                    'notes_after'   => '<p class="pmp-note pmp-info">'.sprintf(__('This is really all it takes to get Replies via Email working. However, it does require that you setup a Mandrill account (free) and then configure an Inbound Mailbox Route that will connect to the Webhook URL shown below. <span class="pmp-hilite">Please see %1$s for detailed instructions.</span>', 'comment-mail'), $this->plugin->utils_markup->xAnchor('http://comment-mail.com/kb-article/mandrill-rve-handler/', __('this KB article', 'comment-mail'))).'</p>'.
+                                    'notes_after'   => '<p class="pmp-note pmp-info">'.sprintf(__('This is really all it takes to get Replies via Email working. However, it does require that you setup a Mandrill account (free) and then configure an Inbound Mailbox Route that will connect to the Webhook URL shown below. <span class="pmp-hilite">Please see %1$s for detailed instructions.</span>', 'comment-mail'), $this->plugin->utils_markup->xAnchor('http://comment-mail.com/r/kb-article-mandrill-rve-handler/', __('this KB article', 'comment-mail'))).'</p>'.
                                                        $this->selectAllField(__('<strong>Mandrill Webhook URL:</strong>', 'comment-mail'), IS_PRO ? $this->plugin->utils_url->rveMandrillWebhookUrl() : ''),
                                 ]
                             ).
@@ -1265,7 +1265,7 @@ class MenuPage extends AbsBase
                                     'placeholder'   => __('e.g., 5.0', 'comment-mail'),
                                     'name'          => 'rve_mandrill_max_spam_score',
                                     'current_value' => $current_value_for('rve_mandrill_max_spam_score'),
-                                    'notes_after'   => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>3.0</code> to <code>5.0</code> is suggested here. Any reply via email with a spam score higher than what is configured here, will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g., if you use Akismet, each comment must also pass through Akismet too.', 'comment-mail'), $this->plugin->utils_markup->xAnchor('http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-', __('checks performed by Mandrill', 'comment-mail'))).'</p>',
+                                    'notes_after'   => '<p>'.sprintf(__('This is based on %1$s, powered by SpamAssassin. A value of <code>3.0</code> to <code>5.0</code> is suggested here. Any reply via email with a spam score higher than what is configured here, will be forced into moderation and marked as spam. <strong>Note:</strong> this is in addition to any other spam checking plugins that you run; e.g., if you use Akismet, each comment must also pass through Akismet too.', 'comment-mail'), $this->plugin->utils_markup->xAnchor('http://comment-mail.com/r/mandrill-inbound-email-webhooks/', __('checks performed by Mandrill', 'comment-mail'))).'</p>',
                                 ]
                             ).
                             '       </tbody>'.

@@ -381,7 +381,7 @@ class MenuPageActions extends AbsBase
         $request_args = null; // Not used here.
 
         if (current_user_can($this->plugin->manage_cap)) {
-            $QueueProcessor    = new QueueProcessor(false);
+            $QueueProcessor    = new QueueProcessor('manual');
             $processed_entries = $QueueProcessor->processedEntries();
 
             $notice_markup = // Notice regarding queue processor running successfully.
