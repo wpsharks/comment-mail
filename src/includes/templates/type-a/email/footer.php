@@ -25,7 +25,7 @@ namespace WebSharks\CommentMail;
  */
 ?>
 
-<hr style="margin-top:10em;" />
+<hr style="margin-top:1em;" />
 
 <?php echo $email_footer_tag; ?>
 
